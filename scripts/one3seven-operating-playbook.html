@@ -1,0 +1,1499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The one3Seven Operating Playbook</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Inter+Tight:wght@700;800;900&display=swap');
+
+  :root {
+    --indigo: #1E1B4B;
+    --violet: #6D4AFF;
+    --violet-light: #F0EBFF;
+    --violet-mid: #DCD3FF;
+    --amber: #D97706;
+    --amber-light: #FFFBEB;
+    --emerald: #059669;
+    --emerald-light: #ECFDF5;
+    --red: #DC2626;
+    --slate: #475569;
+    --slate-light: #F8FAFC;
+    --border: #E2E8F0;
+    --text: #1E293B;
+    --text-muted: #64748B;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 10.5pt;
+    line-height: 1.65;
+    color: var(--text);
+    background: white;
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 0;
+  }
+
+  /* ── Cover Page ── */
+  .cover {
+    min-height: 100vh;
+    background: linear-gradient(160deg, #1E1B4B 0%, #2D2A6E 50%, #3D3A8E 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 72px 64px;
+    page-break-after: always;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: -200px; right: -200px;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(109,74,255,0.25) 0%, transparent 70%);
+  }
+  .cover-logo {
+    font-size: 13pt;
+    font-weight: 800;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+  .cover-logo span { color: #A78BFA; }
+  .cover-main { position: relative; z-index: 1; }
+  .cover-eyebrow {
+    font-size: 9pt;
+    font-weight: 600;
+    color: #A78BFA;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+  .cover-title {
+    font-family: 'Inter Tight', 'Inter', sans-serif;
+    font-size: 48pt;
+    font-weight: 900;
+    color: white;
+    line-height: 1.0;
+    margin-bottom: 20px;
+    letter-spacing: -1px;
+  }
+  .cover-title .one { color: #A78BFA; }
+  .cover-subtitle {
+    font-size: 12pt;
+    font-weight: 400;
+    color: rgba(255,255,255,0.55);
+    max-width: 420px;
+    line-height: 1.6;
+    margin-bottom: 48px;
+  }
+  .cover-divider {
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, #6D4AFF, #A78BFA);
+    border-radius: 2px;
+    margin-bottom: 48px;
+  }
+  .cover-parts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 32px;
+  }
+  .cover-part {
+    font-size: 8.5pt;
+    color: rgba(255,255,255,0.4);
+    font-weight: 400;
+  }
+  .cover-part span { color: rgba(255,255,255,0.7); font-weight: 500; }
+  .cover-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    position: relative; z-index: 1;
+  }
+  .cover-version {
+    font-size: 8pt;
+    color: rgba(255,255,255,0.3);
+  }
+  .cover-badge {
+    background: rgba(109,74,255,0.3);
+    border: 1px solid rgba(109,74,255,0.4);
+    color: #C4B5FD;
+    font-size: 8pt;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 20px;
+    letter-spacing: 0.05em;
+  }
+
+  /* ── Page Layout ── */
+  .page {
+    padding: 56px 64px;
+    page-break-after: always;
+  }
+  .page:last-child { page-break-after: avoid; }
+
+  /* ── Part Headers ── */
+  .part-header {
+    margin-bottom: 40px;
+    padding-bottom: 24px;
+    border-bottom: 2px solid var(--border);
+  }
+  .part-number {
+    font-size: 8pt;
+    font-weight: 700;
+    color: var(--violet);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .part-title {
+    font-family: 'Inter Tight', 'Inter', sans-serif;
+    font-size: 28pt;
+    font-weight: 900;
+    color: var(--indigo);
+    line-height: 1.1;
+    letter-spacing: -0.5px;
+  }
+  .part-subtitle {
+    font-size: 10pt;
+    color: var(--text-muted);
+    margin-top: 10px;
+    max-width: 520px;
+    line-height: 1.6;
+  }
+
+  /* ── Typography ── */
+  h2 {
+    font-size: 14pt;
+    font-weight: 700;
+    color: var(--indigo);
+    margin: 36px 0 12px;
+    letter-spacing: -0.2px;
+  }
+  h3 {
+    font-size: 11pt;
+    font-weight: 700;
+    color: var(--indigo);
+    margin: 24px 0 8px;
+  }
+  p {
+    margin-bottom: 14px;
+    color: var(--text);
+    max-width: 640px;
+  }
+  p.wide { max-width: none; }
+  ul, ol {
+    margin: 0 0 16px 20px;
+    max-width: 620px;
+  }
+  li {
+    margin-bottom: 6px;
+    color: var(--text);
+  }
+  li strong { color: var(--indigo); }
+  strong { font-weight: 600; }
+
+  /* ── Callout Boxes ── */
+  .callout {
+    border-radius: 14px;
+    padding: 20px 24px;
+    margin: 24px 0;
+  }
+  .callout-core {
+    background: var(--violet-light);
+    border: 1.5px solid var(--violet-mid);
+  }
+  .callout-core .callout-label {
+    color: var(--violet);
+    font-size: 8pt;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .callout-core p { color: var(--indigo); font-weight: 500; margin: 0; font-size: 11pt; line-height: 1.6; }
+  .callout-warning {
+    background: var(--amber-light);
+    border: 1.5px solid #FDE68A;
+  }
+  .callout-warning .callout-label { color: var(--amber); font-size: 8pt; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 8px; }
+  .callout-warning p { color: #92400E; margin: 0; font-size: 10pt; }
+  .callout-safe {
+    background: var(--emerald-light);
+    border: 1.5px solid #A7F3D0;
+  }
+  .callout-safe .callout-label { color: var(--emerald); font-size: 8pt; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 8px; }
+  .callout-safe p { color: #065F46; margin: 0; font-size: 10pt; }
+  .callout-rule {
+    background: #F8FAFC;
+    border: 1.5px solid var(--border);
+    border-left: 4px solid var(--violet);
+  }
+  .callout-rule p { color: var(--text); margin: 0; font-size: 10pt; font-style: italic; }
+
+  /* ── Two-Column Layout ── */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin: 20px 0;
+  }
+  .col-card {
+    background: var(--slate-light);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .col-card h4 {
+    font-size: 10pt;
+    font-weight: 700;
+    color: var(--indigo);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .col-card ul { margin: 0 0 0 16px; }
+  .col-card li { font-size: 9.5pt; margin-bottom: 5px; color: var(--slate); }
+
+  /* ── Language Table ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 9.5pt;
+  }
+  thead tr {
+    background: var(--indigo);
+    color: white;
+  }
+  thead th {
+    padding: 10px 14px;
+    font-weight: 600;
+    text-align: left;
+    font-size: 9pt;
+    letter-spacing: 0.05em;
+  }
+  tbody tr { border-bottom: 1px solid var(--border); }
+  tbody tr:nth-child(even) { background: #FAFAFA; }
+  tbody td {
+    padding: 10px 14px;
+    vertical-align: top;
+    line-height: 1.5;
+  }
+  .say { color: var(--emerald); font-weight: 600; }
+  .not-say { color: var(--red); }
+  .why { color: var(--slate); font-size: 9pt; }
+
+  /* ── Journey Steps ── */
+  .journey { margin: 20px 0; }
+  .journey-step {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 14px;
+    align-items: flex-start;
+  }
+  .step-num {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--violet);
+    color: white;
+    font-size: 9pt;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+  }
+  .step-body { flex: 1; }
+  .step-title { font-weight: 600; font-size: 10pt; color: var(--indigo); margin-bottom: 2px; }
+  .step-desc { font-size: 9.5pt; color: var(--slate); line-height: 1.5; }
+
+  /* ── Decision Matrix ── */
+  .decision-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    margin: 20px 0;
+  }
+  .decision-card {
+    border-radius: 10px;
+    padding: 14px 12px;
+    text-align: center;
+  }
+  .decision-card .d-label { font-size: 8pt; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 6px; }
+  .decision-card .d-desc { font-size: 8.5pt; color: var(--slate); line-height: 1.4; }
+  .d-build { background: #ECFDF5; border: 1px solid #A7F3D0; }
+  .d-build .d-label { color: var(--emerald); }
+  .d-test { background: #EFF6FF; border: 1px solid #BFDBFE; }
+  .d-test .d-label { color: #2563EB; }
+  .d-pilot { background: var(--violet-light); border: 1px solid var(--violet-mid); }
+  .d-pilot .d-label { color: var(--violet); }
+  .d-defer { background: var(--amber-light); border: 1px solid #FDE68A; }
+  .d-defer .d-label { color: var(--amber); }
+  .d-reject { background: #FEF2F2; border: 1px solid #FECACA; }
+  .d-reject .d-label { color: var(--red); }
+
+  /* ── Metric Cards ── */
+  .metric-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 20px 0;
+  }
+  .metric-card {
+    background: white;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+  }
+  .metric-card .m-label { font-size: 8pt; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 4px; }
+  .metric-card .m-value { font-size: 11pt; font-weight: 700; color: var(--indigo); }
+
+  /* ── Do-Not-Touch ── */
+  .dnt-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin: 16px 0;
+  }
+  .dnt-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: #FEF2F2;
+    border: 1px solid #FECACA;
+    border-radius: 8px;
+    padding: 10px 12px;
+  }
+  .dnt-icon { color: var(--red); font-size: 12pt; flex-shrink: 0; margin-top: 1px; }
+  .dnt-text { font-size: 9pt; color: #991B1B; font-weight: 500; }
+
+  /* ── Roadmap ── */
+  .roadmap-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin: 20px 0;
+  }
+  .roadmap-card {
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .roadmap-now { background: #F0FDF4; border: 1.5px solid #A7F3D0; }
+  .roadmap-now h4 { color: var(--emerald); font-size: 10pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px; }
+  .roadmap-later { background: #F8FAFC; border: 1.5px solid var(--border); }
+  .roadmap-later h4 { color: var(--slate); font-size: 10pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px; }
+  .roadmap-card li { font-size: 9.5pt; margin-bottom: 5px; }
+  .roadmap-now li { color: #065F46; }
+  .roadmap-later li { color: var(--slate); }
+
+  /* ── TOC ── */
+  .toc-item {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding: 6px 0;
+    border-bottom: 1px dotted var(--border);
+  }
+  .toc-num { font-size: 9pt; font-weight: 700; color: var(--violet); min-width: 24px; }
+  .toc-title { font-size: 10pt; color: var(--text); flex: 1; }
+  .toc-sub { font-size: 8.5pt; color: var(--text-muted); }
+
+  /* ── Baseline Box ── */
+  .baseline-box {
+    background: var(--indigo);
+    border-radius: 16px;
+    padding: 28px 32px;
+    margin: 24px 0;
+  }
+  .baseline-box h3 { color: white; margin: 0 0 16px; font-size: 12pt; }
+  .baseline-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  .baseline-row:last-child { border-bottom: none; }
+  .baseline-label { font-size: 9pt; color: rgba(255,255,255,0.5); }
+  .baseline-value { font-size: 9pt; color: #A78BFA; font-weight: 600; font-family: monospace; }
+
+  /* ── Print ── */
+  @media print {
+    body { max-width: none; }
+    .page { padding: 48px 56px; }
+    .cover { padding: 64px 56px; }
+    .no-print { display: none; }
+  }
+
+  /* ── Inline Tags ── */
+  .tag {
+    display: inline-block;
+    font-size: 8pt;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-right: 4px;
+  }
+  .tag-green { background: #ECFDF5; color: var(--emerald); border: 1px solid #A7F3D0; }
+  .tag-red { background: #FEF2F2; color: var(--red); border: 1px solid #FECACA; }
+  .tag-violet { background: var(--violet-light); color: var(--violet); border: 1px solid var(--violet-mid); }
+
+  hr.section { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════
+     COVER PAGE
+═══════════════════════════════════════════════════════ -->
+<div class="cover">
+  <div class="cover-logo"><span>one3</span>Seven</div>
+
+  <div class="cover-main">
+    <div class="cover-eyebrow">Internal Operating Document · Confidential</div>
+    <div class="cover-title">The <span class="one">one3Seven</span><br>Operating<br>Playbook</div>
+    <div class="cover-subtitle">Product, Mission, Messaging, Sales, Safety, and Execution — a single source of truth for everyone who builds, sells, supports, or represents one3Seven.</div>
+    <div class="cover-divider"></div>
+    <div class="cover-parts">
+      <div class="cover-part"><span>Part 1</span> · The Founding Idea</div>
+      <div class="cover-part"><span>Part 9</span> · Pilot Playbook</div>
+      <div class="cover-part"><span>Part 2</span> · What one3Seven Is</div>
+      <div class="cover-part"><span>Part 10</span> · Product Decision Rules</div>
+      <div class="cover-part"><span>Part 3</span> · The People We Serve</div>
+      <div class="cover-part"><span>Part 11</span> · Safety and Trust Rules</div>
+      <div class="cover-part"><span>Part 4</span> · The Core Product Journey</div>
+      <div class="cover-part"><span>Part 12</span> · Technical Operating Rules</div>
+      <div class="cover-part"><span>Part 5</span> · The Mind Layer</div>
+      <div class="cover-part"><span>Part 13</span> · Brand and Voice</div>
+      <div class="cover-part"><span>Part 6</span> · Demo Versus Real Product</div>
+      <div class="cover-part"><span>Part 14</span> · Roles and Authority</div>
+      <div class="cover-part"><span>Part 7</span> · The Language Guide</div>
+      <div class="cover-part"><span>Part 15</span> · Roadmap Boundaries</div>
+      <div class="cover-part"><span>Part 8</span> · Sales Playbook</div>
+      <div class="cover-part"><span>Part 16</span> · Current Baseline</div>
+    </div>
+  </div>
+
+  <div class="cover-footer">
+    <div class="cover-version">Version 1.0 · June 2026 · one3Seven Beta</div>
+    <div class="cover-badge">Confidential — Internal Use Only</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     FOUNDER LETTER
+═══════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="part-header">
+    <div class="part-number">Founder Letter</div>
+    <div class="part-title">Why This Document Exists</div>
+  </div>
+
+  <p>Every company eventually reaches a moment where the founding idea is understood only by the people who built it. Everyone else is guessing — about the mission, the product, what to say, what not to say, what to build next, and why certain decisions are non-negotiable.</p>
+
+  <p>one3Seven reached that moment earlier than most, because the product operates in a space where imprecise language creates real risk. Employment law is sensitive. Worker records are sensitive. Attorney relationships are governed by professional rules. What we say — and what we don't say — matters.</p>
+
+  <p>This playbook exists so that every person who touches one3Seven — whether they write code, talk to firms, advise on strategy, or run a pilot — understands the product correctly before they act on it.</p>
+
+  <p>It is not a marketing document. It is not a vision deck. It is a working manual for doing this right.</p>
+
+  <p>The core thing you need to understand is this:</p>
+
+  <div class="callout callout-core">
+    <div class="callout-label">Core Statement</div>
+    <p>one3Seven exists to organize a worker's story and records before attorney review, so firms can begin with a clearer chronology, source documents, and open questions. The attorney makes every decision. The platform never does.</p>
+  </div>
+
+  <p>Everything in this document flows from that. If a feature, a message, or a decision conflicts with it, the decision rule is simple: don't do it.</p>
+
+  <p>Study this. Refer back to it. Update it when the product changes. But don't change the mission.</p>
+
+  <p style="margin-top: 32px; color: var(--text-muted); font-size: 9.5pt;">— The Founder, one3Seven · June 2026</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     PART 1 — THE FOUNDING IDEA
+═══════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="part-header">
+    <div class="part-number">Part 1</div>
+    <div class="part-title">The Founding Idea</div>
+    <div class="part-subtitle">The problem we saw, why it matters, and what we decided to do about it.</div>
+  </div>
+
+  <h2>The Problem We Saw</h2>
+  <p>When a worker believes they have been wronged at work — underpaid, retaliated against, unfairly terminated — they face an immediate and practical problem. They have a story, but their story is scattered.</p>
+  <p>It lives in text messages, email threads, pay stubs, an offer letter they printed in 2021, a termination letter they photographed with their phone, and memory. None of it is organized. None of it is dated in a useful way. None of it has been read by anyone who could tell them whether it matters.</p>
+  <p>At the same time, an employment attorney is sitting across the city waiting for exactly this kind of intake — but what arrives is either a long, emotional phone call with no documents, or a pile of files with no coherent story attached to them.</p>
+
+  <h2>Why Intake Is the Real Bottleneck</h2>
+  <p>Before an attorney can evaluate a matter, someone has to do work that doesn't require an attorney. Someone has to:</p>
+  <ul>
+    <li>Build a timeline of what happened and when</li>
+    <li>Identify what documents exist and what is missing</li>
+    <li>Connect events to the records that support them</li>
+    <li>Separate what the worker believes happened from what the documents actually show</li>
+    <li>Ask the right follow-up questions to fill the gaps</li>
+  </ul>
+  <p>In most employment law practices, this work falls to the attorney — during the consultation, or before it, or never. It is expensive, slow, and often incomplete. Matters that might have been evaluated are abandoned at the intake stage because nobody had time to assemble them.</p>
+
+  <h2>Why Existing Solutions Don't Solve It</h2>
+  <p>Intake forms collect data fields. Document upload tools store files. Case management platforms track what happened after representation began. None of them bridge the specific gap between a worker's raw story and the structured review that an attorney actually needs.</p>
+
+  <div class="callout callout-core">
+    <div class="callout-label">The Founding Insight</div>
+    <p>The intake bottleneck is not about access to attorneys. It is about disorganized information arriving before the first conversation. one3Seven performs the initial organization pass — so firms can begin evaluation with a structured record instead of a pile of files.</p>
+  </div>
+
+  <h2>What We Decided to Build</h2>
+  <p>A platform that guides workers through telling their story, helps them upload the records that support it, performs a deterministic organization of those records into a structured intake, and delivers a source-linked, chronological review record to an employment law firm — before the first consultation.</p>
+  <p>Not legal advice. Not a law firm. Not a case-value predictor. An intake organization and review platform.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     PART 2 — WHAT ONE3SEVEN IS
+═══════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="part-header">
+    <div class="part-number">Part 2</div>
+    <div class="part-title">What one3Seven Is</div>
+    <div class="part-subtitle">The precise definition — and what it is not. Mandatory reading for everyone.</div>
+  </div>
+
+  <div class="callout callout-core">
+    <div class="callout-label">Product Definition</div>
+    <p>one3Seven is an employment-intake organization and review platform that turns worker-submitted stories and records into structured, source-linked intake information for independent attorney review.</p>
+  </div>
+
+  <h2>What It Is</h2>
+  <ul>
+    <li>A guided intake tool that helps workers document their employment story</li>
+    <li>A document upload and organization platform for employment records</li>
+    <li>A structured review interface for employment law firms</li>
+    <li>A source-tracing system that links events and excerpts to the original files</li>
+    <li>A chronology builder that sequences documented events by date</li>
+    <li>A gap-detection tool that identifies missing records before consultation</li>
+    <li>A document-request channel between firms and workers</li>
+    <li>A firm-controlled intake workflow: review, request, accept, or decline</li>
+  </ul>
+
+  <h2>What It Is Not</h2>
+  <div class="callout callout-warning">
+    <div class="callout-label">Non-Negotiable Definitions — Do Not Misrepresent</div>
+    <p>These must be understood and respected by every person who represents one3Seven in any context.</p>
+  </div>
+
+  <div class="two-col">
+    <div class="col-card">
+      <h4>❌ Not a Law Firm</h4>
+      <ul>
+        <li>No attorney-client relationship is formed through the platform</li>
+        <li>No licensed attorney supervises one3Seven's operations</li>
+        <li>Representation requires a separate written agreement</li>
+      </ul>
+    </div>
+    <div class="col-card">
+      <h4>❌ Not Legal Advice</h4>
+      <ul>
+        <li>No claim assessment, evaluation, or opinion is provided</li>
+        <li>Workers are not told whether they have a case</li>
+        <li>Attorneys are not told what a case is worth</li>
+      </ul>
+    </div>
+    <div class="col-card">
+      <h4>❌ Not a Claim Scorer</h4>
+      <ul>
+        <li>No strength score, confidence level, or case grade</li>
+        <li>No prediction of legal outcomes</li>
+        <li>No assessment of the likelihood of representation</li>
+      </ul>
+    </div>
+    <div class="col-card">
+      <h4>❌ Not a Referral Marketplace</h4>
+      <ul>
+        <li>Workers are not matched to the "right" firm</li>
+        <li>No referral fees or placement commissions</li>
+        <li>Firm participation does not imply endorsement</li>
+      </ul>
+    </div>
+    <div class="col-card">
+      <h4>❌ Not a Guarantee</h4>
+      <ul>
+        <li>No guarantee of review, response, or representation</li>
+        <li>No guarantee of filing deadline accuracy</li>
+        <li>No guarantee of organized output completeness</li>
+      </ul>
+    </div>
+    <div class="col-card">
+      <h4>❌ Not AI-Decided</h4>
+      <ul>
+        <li>Every firm decision is made by a human attorney</li>
+        <li>Extracted facts require attorney review and confirmation</li>
+        <li>The platform organizes — it does not conclude</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     PART 3 — THE PEOPLE WE SERVE
+═══════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="part-header">
+    <div class="part-number">Part 3</div>
+    <div class="part-title">The People We Serve</div>
+    <div class="part-subtitle">Workers and firms have different needs. The platform is built around both.</div>
+  </div>
+
+  <div class="two-col">
+    <div>
+      <h2>Workers</h2>
+      <p>Workers who believe they have been wronged at work. They may be dealing with wage theft, unpaid overtime, retaliation after a complaint, wrongful termination, or discrimination. They are often anxious, unsure of what they have, and unsure whether what they have is enough.</p>
+      <h3>Their Needs</h3>
+      <ul>
+        <li>Help telling their story clearly and completely</li>
+        <li>Help identifying which records matter</li>
+        <li>Clarity about what was submitted and what is missing</li>
+        <li>Control over who sees their information</li>
+        <li>Simple, plain language throughout the process</li>
+        <li>Transparency about where their intake stands</li>
+        <li>Confidence that their documents are not shared without consent</li>
+        <li>A way to respond to firm requests for additional records</li>
+      </ul>
+      <h3>What They Are Not</h3>
+      <ul>
+        <li>Not clients until represented in writing</li>
+        <li>Not guaranteed a review or response from any firm</li>
+        <li>Not told whether they have a legal claim</li>
+      </ul>
+    </div>
+    <div>
+      <h2>Firms</h2>
+      <p>Employment law firms and solo practitioners who receive and evaluate potential client intakes. They range from high-volume practices to boutique firms. Their constraint is time — specifically, the time it takes to move from first contact to a decision about whether to pursue.</p>
+      <h3>Their Needs</h3>
+      <ul>
+        <li>Faster initial review without sacrificing accuracy</li>
+        <li>Chronology before the first consultation</li>
+        <li>Direct access to source documents</li>
+        <li>Clear signals about what is missing</li>
+        <li>Fewer back-and-forth collection steps</li>
+        <li>A structured way to request additional records</li>
+        <li>Confidence that the platform doesn't make legal decisions</li>
+        <li>A workflow that fits their existing intake process</li>
+      </ul>
+      <h3>What They Are Not</h3>
+      <ul>
+        <li>Not obligated to review, respond to, or accept any intake</li>
+        <li>Not verified as to their practice quality or outcomes</li>
+        <li>Not endorsed by one3Seven as the "right" firm for any worker</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout callout-rule">
+    <p>"The platform serves both sides by doing one thing for each. For workers: it organizes. For firms: it structures the review. It does not decide anything for either party."</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     PART 4 — THE CORE PRODUCT JOURNEY
+═══════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="part-header">
+    <div class="part-number">Part 4</div>
+    <div class="part-title">The Core Product Journey</div>
+    <div class="part-subtitle">Both workflows, step by step. This is what the product actually does.</div>
+  </div>
+
+  <h2>Worker Journey</h2>
+  <div class="journey">
+    <div class="journey-step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Arrives via firm link or direct sign-up</div><div class="step-desc">Worker enters through a firm-specific intake URL or discovers the platform independently. Firm code, if present, is stored and linked to the intake automatically.</div></div></div>
+    <div class="journey-step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Creates an account</div><div class="step-desc">Email/password or Google sign-in. Role is set to worker. Contact information collected.</div></div></div>
+    <div class="journey-step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Tells their story</div><div class="step-desc">Guided 8-question intake covering employment context, key people, timeline, and what happened. Answers are stored as the worker's own narrative — not transformed or summarized.</div></div></div>
+    <div class="journey-step"><div class="step-num">4</div><div class="step-body"><div class="step-title">Tags matter type</div><div class="step-desc">Selects from: wage theft, overtime, retaliation, wrongful termination, discrimination, harassment, FMLA, misclassification. These are organizational tags — not legal determinations.</div></div></div>
+    <div class="journey-step"><div class="step-num">5</div><div class="step-body"><div class="step-title">Uploads records</div><div class="step-desc">Drag-and-drop upload of PDFs, documents, and text files. System confirms upload, infers document category from filename and content, and stores in secure intake storage.</div></div></div>
+    <div class="journey-step"><div class="step-num">6</div><div class="step-body"><div class="step-title">Records are organized</div><div class="step-desc">The deterministic pipeline extracts text, dates, and key information. A source-linked timeline is built. Missing record types are flagged. A structured summary is assembled.</div></div></div>
+    <div class="journey-step"><div class="step-num">7</div><div class="step-body"><div class="step-title">Reviews intake summary and controls sharing</div><div class="step-desc">Worker sees the organized timeline and document list. Chooses to route to a firm by code or participating network. Consent is recorded at time of sharing.</div></div></div>
+    <div class="journey-step"><div class="step-num">8</div><div class="step-body"><div class="step-title">Responds to firm requests and tracks status</div><div class="step-desc">Worker receives requests for additional documents, uploads responses, and sees plain-language status updates at each stage of the review process.</div></div></div>
+  </div>
+
+  <hr class="section" />
+
+  <h2>Firm Journey</h2>
+  <div class="journey">
+    <div class="journey-step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Account created and reviewed</div><div class="step-desc">Firm creates an account during beta. Accounts are manually reviewed before intakes are routed. Firm code is generated for direct intake links.</div></div></div>
+    <div class="journey-step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Receives intake in review queue</div><div class="step-desc">Dashboard shows all routed intakes with status: new, preview, full access, accepted, or not pursuing. Notifications alert firm to new arrivals.</div></div></div>
+    <div class="journey-step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Opens intake review</div><div class="step-desc">Firm sees: worker context (clearly labeled as worker-provided, not verified), organized chronology, source-linked intelligence, document categories, readiness indicators, and missing-record flags.</div></div></div>
+    <div class="journey-step"><div class="step-num">4</div><div class="step-body"><div class="step-title">Reviews original files</div><div class="step-desc">Full-access routes allow direct file viewing with signed URLs. Source document review is the final authority — the platform's organization is the starting point.</div></div></div>
+    <div class="journey-step"><div class="step-num">5</div><div class="step-body"><div class="step-title">Requests additional documents if needed</div><div class="step-desc">Firm selects document categories and adds a note. Worker receives the request and uploads a response. Firm is notified when documents arrive.</div></div></div>
+    <div class="journey-step"><div class="step-num">6</div><div class="step-body"><div class="step-title">Makes intake decision</div><div class="step-desc">Firm accepts (continues toward representation), declines (not pursuing), or continues review. All decisions are firm-controlled. one3Seven records the outcome for measurement.</div></div></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     PART 5 — THE MIND LAYER
+═══════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="part-header">
+    <div class="part-number">Part 5</div>
+    <div class="part-title">The Mind Layer</div>
+    <div class="part-subtitle">What the intelligence system does — and exactly what it does not do. The most important technical section.</div>
+  </div>
+
+  <div class="callout callout-core">
+    <div class="callout-label">Core Philosophy</div>
+    <p>The mind layer organizes and surfaces. It does not analyze, conclude, or advise. Every output is traceable to a source document or a worker statement. Nothing is invented.</p>
+  </div>
+
+  <h2>What the Intelligence Layer Does</h2>
+  <div class="two-col">
+    <ul>
+      <li>Extracts text from uploaded records (PDF text layer, TXT, HTML)</li>
+      <li>Categorizes documents by type using filename and content signals</li>
+      <li>Extracts dates, employer names, and key people from document text</li>
+      <li>Builds a dated chronology of documented events</li>
+      <li>Links each chronology event to its source file(s)</li>
+      <li>Separates worker statements from document-derived information</li>
+      <li>Surfaces relevant excerpts and key document language</li>
+      <li>Identifies timing relationships between documented events</li>
+    </ul>
+    <ul>
+      <li>Flags missing or common-but-absent record types</li>
+      <li>Creates structured summaries for attorney review</li>
+      <li>Identifies dates that may warrant timely attorney attention</li>
+      <li>Extracts structured facts per document category (complaint topic, stated reason, warning date, pay figures)</li>
+      <li>Synthesizes per-document facts into an intake-level intelligence view</li>
+      <li>Labels all worker-provided content as worker-provided</li>
+      <li>Tracks source strength per event (strong / partial / inferred / needs review)</li>
+    </ul>
+  </div>
+
+  <h2>What the Intelligence Layer Does Not Do</h2>
+  <div class="callout callout-warning">
+    <div class="callout-label">Firm and Team Reminder — These Capabilities Do Not Exist</div>
+    <p>Do not imply, demonstrate, or promise any of the following.</p>
+  </div>
+  <div class="two-col">
+    <ul>
+      <li>Determine whether a legal claim exists</li>
+      <li>Score claim strength or legal merit</li>
+      <li>Decide who is telling the truth</li>
+      <li>Confirm that every extracted fact is accurate</li>
+      <li>Determine whether retaliation occurred</li>
+      <li>Calculate a guaranteed filing deadline</li>
+      <li>Identify the applicable agency or jurisdiction</li>
+    </ul>
+    <ul>
+      <li>Predict case outcomes</li>
+      <li>Replace original document review</li>
+      <li>Replace attorney judgment</li>
+      <li>Process scanned image files (OCR not currently implemented)</li>
+      <li>Detect contradictions between documents</li>
+      <li>Verify employer identity or HR authenticity</li>
+      <li>Guarantee output completeness for any intake</li>
+    </ul>
+  </div>
+
+  <h2>How Output Quality Varies</h2>
+  <p>Intelligence output depends on what the worker submitted. A complete record set — offer letter, pay stubs, HR correspondence, warning, termination letter — produces a richer output. An intake with only a termination letter produces a thinner output. Both are correct behavior. The platform is not failing when output is sparse; the records are sparse.</p>
+  <p>Attorneys must always treat platform output as a starting point for review, not a finished analysis.</p>
+
+  <h2>The Two Processing Paths</h2>
+  <div class="two-col">
+    <div class="col-card">
+      <h4>Phase 2A — Deterministic Pipeline</h4>
+      <ul>
+        <li>Runs on every intake automatically</li>
+        <li>PDF text extraction, filename-based classification</li>
+        <li>Rule-based timeline construction</li>
+        <li>Template-phrase summary generation</li>
+        <li>Banned-output guardrails prevent legal-conclusion language</li>
+        <li>Always produces some output regardless of document quality</li>
+      </ul>
+    </div>
+    <div class="col-card">
+      <h4>Phase 2B — Intelligence Extraction</h4>
+      <ul>
+        <li>Runs when a full-access firm opens an intake</li>
+        <li>Claude API extracts structured facts per document</li>
+        <li>Synthesis produces timing intervals, key quotes, facts</li>
+        <li>Output depends on document text quality</li>
+        <li>Non-blocking: failure does not affect base intake review</li>
+        <li>Confirmed operational as of June 2026</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     PART 6 — DEMO VERSUS REAL PRODUCT
+═══════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="part-header">
+    <div class="part-number">Part 6</div>
+    <div class="part-title">Demo Versus Real Product</div>
+    <div class="part-subtitle">What the demo shows, what is operational, and what must never be overstated.</div>
+  </div>
+
+  <div class="callout callout-warning">
+    <div class="callout-label">Required Understanding</div>
+    <p>The demo represents the intended quality of the product experience using a complete sample record set. Real output varies based on the records provided and the information available. Never represent demo-only features as currently operational without confirming they work for the intake being shown.</p>
+  </div>
+
+  <h2>What the Demo Shows (/?demo)</h2>
+  <p>The public demo uses a fictional intake — Marcus Rivera, Pacific Ridge Distribution LLC — with a complete, curated record set of 11 documents. It demonstrates the full intended output quality including all intelligence features.</p>
+
+  <table>
+    <thead><tr><th>Feature</th><th>Demo Status</th><th>Real Intake Status</th></tr></thead>
+    <tbody>
+      <tr><td>Chronology with source chips</td><td class="say">✓ Shown</td><td class="say">✓ Operational</td></tr>
+      <tr><td>Document categories and counts</td><td class="say">✓ Shown</td><td class="say">✓ Operational</td></tr>
+      <tr><td>Worker context (narrative)</td><td class="say">✓ Shown</td><td class="say">✓ Operational</td></tr>
+      <tr><td>Matter tags</td><td class="say">✓ Shown</td><td class="say">✓ Operational</td></tr>
+      <tr><td>Missing record flags</td><td class="say">✓ Shown</td><td class="say">✓ Operational</td></tr>
+      <tr><td>Filing date chip</td><td class="say">✓ Shown</td><td class="say">✓ Operational</td></tr>
+      <tr><td>Extracted from documents panel</td><td class="say">✓ Shown</td><td class="say">✓ Operational (confirmed Jun 2026)</td></tr>
+      <tr><td>Event timing cards (days between events)</td><td class="say">✓ Shown</td><td class="say">✓ Operational when dates parse correctly</td></tr>
+      <tr><td>Key document language quotes</td><td class="say">✓ Shown</td><td class="say">✓ Operational (confirmed Jun 2026)</td></tr>
+      <tr><td>Items requiring confirmation</td><td class="say">✓ Shown</td><td class="say">✓ Operational</td></tr>
+      <tr><td>Accept / decline / request more docs</td><td class="not-say">Demo only</td><td class="say">✓ Operational</td></tr>
+    </tbody>
+  </table>
+
+  <h2>What Must Never Be Overstated</h2>
+  <ul>
+    <li>Do not claim intelligence output is guaranteed for every intake — it depends on document quality</li>
+    <li>Do not demonstrate the demo to an attorney and imply it represents a live intake without clarifying it is a sample</li>
+    <li>Do not promise timing cards will render for every case — dates must be extractable from the documents</li>
+    <li>Do not represent scanned image files as supported for extraction</li>
+    <li>Do not claim voice transcription is available — the feature is currently disabled in production</li>
+  </ul>
+
+  <div class="callout callout-safe">
+    <div class="callout-label">Safe Framing for Demonstrations</div>
+    <p>This is a sample intake built from a complete set of employment records. In a live intake, output quality depends on what the worker uploads. The more complete the record set, the richer the organized output.</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     PART 7 — LANGUAGE GUIDE
+═══════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="part-header">
+    <div class="part-number">Part 7</div>
+    <div class="part-title">The Language Guide</div>
+    <div class="part-subtitle">Approved and prohibited language. Every person who speaks for one3Seven must use this.</div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width:28%">Say This</th>
+        <th style="width:28%">Not This</th>
+        <th>Why</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="say">Source-linked information</td><td class="not-say">Verified facts</td><td class="why">The platform does not independently verify truth. Extraction is from document text.</td></tr>
+      <tr><td class="say">Extracted from documents</td><td class="not-say">Confirmed facts / proven facts</td><td class="why">Facts require attorney review and confirmation against originals.</td></tr>
+      <tr><td class="say">Event timing</td><td class="not-say">Retaliation timing / retaliation pattern</td><td class="why">Timing between events is not a legal conclusion. Retaliation is a legal finding.</td></tr>
+      <tr><td class="say">Structured for attorney review</td><td class="not-say">Attorney-ready / case-ready</td><td class="why">Completeness varies. No intake is guaranteed ready for any particular next step.</td></tr>
+      <tr><td class="say">Potential matter topics</td><td class="not-say">Confirmed claims / identified claims</td><td class="why">Matter tags are organizational. They do not determine whether a claim exists.</td></tr>
+      <tr><td class="say">Time-sensitive dates present</td><td class="not-say">EEOC deadline / exact legal deadline</td><td class="why">Deadlines depend on claim type, jurisdiction, and facts. Platform does not determine them.</td></tr>
+      <tr><td class="say">Participating firm</td><td class="not-say">The right firm / matched firm / best firm</td><td class="why">The platform does not match, rank, or endorse firms for any worker.</td></tr>
+      <tr><td class="say">Prospective client</td><td class="not-say">Client / your client</td><td class="why">No attorney-client relationship exists until a separate written agreement is signed.</td></tr>
+      <tr><td class="say">Attorney decides</td><td class="not-say">AI decides / platform recommends</td><td class="why">Every review, acceptance, and recommendation is the attorney's independent judgment.</td></tr>
+      <tr><td class="say">Organized intake record</td><td class="not-say">Attorney-supervised / California-compliant</td><td class="why">No licensed attorney supervises operations. Compliance is not self-certified.</td></tr>
+      <tr><td class="say">Firm accounts are reviewed during beta</td><td class="not-say">Attorney identity verified</td><td class="why">Accounts are manually reviewed by the founder. Formal verification is not in place at scale.</td></tr>
+      <tr><td class="say">Relevant dates surfaced for attorney review</td><td class="not-say">We track EEOC deadlines</td><td class="why">EEOC is one example agency. The platform surfaces dates — it does not determine applicable rules.</td></tr>
+      <tr><td class="say">Worker controls sharing</td><td class="not-say">Full privacy guaranteed</td><td class="why">Consent is recorded, but absolute privacy guarantees are not appropriate.</td></tr>
+      <tr><td class="say">Initial organization pass</td><td class="not-say">AI organizes everything</td><td class="why">The pipeline is deterministic and rule-based. It does not understand everything in a document.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout callout-rule">
+    <p>"When in doubt: describe what the system observably does. Do not describe what it achieves legally or what it guarantees."</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     PART 8 — SALES PLAYBOOK
+═══════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="part-header">
+    <div class="part-number">Part 8</div>
+    <div class="part-title">Sales Playbook</div>
+    <div class="part-subtitle">How to talk to firms. What to show, what to ask, and what to never promise.</div>
+  </div>
+
+  <h2>The Opening Frame</h2>
+  <div class="callout callout-core">
+    <div class="callout-label">Opening Statement</div>
+    <p>Firms often receive stories, screenshots, pay records, complaints, and termination documents in different places — and someone has to organize them before the attorney can begin. one3Seven performs that initial organization pass automatically, so the intake arrives structured with a chronology and source documents already attached.</p>
+  </div>
+
+  <h2>Discovery Questions</h2>
+  <p>Before demonstrating, understand how the firm works:</p>
+  <ul>
+    <li>How does your firm currently collect employment records from prospective clients?</li>
+    <li>Who does the work of organizing documents before an attorney reviews them?</li>
+    <li>How many follow-up calls or emails are typically needed to get a complete picture?</li>
+    <li>What information is most often missing when an intake arrives?</li>
+    <li>How do attorneys currently see the sequence of events in a matter?</li>
+    <li>How quickly can the firm decide whether to continue reviewing an intake?</li>
+    <li>What causes potentially useful intakes to stall or be abandoned?</li>
+  </ul>
+
+  <h2>Demonstration Sequence</h2>
+  <p>Walk the firm through the demo in this order — each section answers a specific pain point:</p>
+  <div class="journey">
+    <div class="journey-step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Intake Snapshot</div><div class="step-desc">Worker, employer, record count, timeline span. The first screen a firm sees. Answers: "Do I know enough to continue?"</div></div></div>
+    <div class="journey-step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Chronology</div><div class="step-desc">Dated events, each linked to source files. Answers: "What happened and when — and can I verify it?"</div></div></div>
+    <div class="journey-step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Extracted from Documents</div><div class="step-desc">Structured facts, key language, event timing. Answers: "What do the documents actually say?"</div></div></div>
+    <div class="journey-step"><div class="step-num">4</div><div class="step-body"><div class="step-title">Document Categories</div><div class="step-desc">Organized file list by type. Answers: "What do I have, and what's missing?"</div></div></div>
+    <div class="journey-step"><div class="step-num">5</div><div class="step-body"><div class="step-title">Items Requiring Confirmation</div><div class="step-desc">Gaps flagged before consultation. Answers: "What should I ask the worker about?"</div></div></div>
+    <div class="journey-step"><div class="step-num">6</div><div class="step-body"><div class="step-title">Additional Document Request</div><div class="step-desc">Request specific records with a note. Worker receives and responds. Answers: "How do I get what I need without a phone call?"</div></div></div>
+  </div>
+
+  <h2>What to Never Promise</h2>
+  <div class="callout callout-warning">
+    <div class="callout-label">Prohibited Commitments</div>
+    <p>These statements must never be made to a firm, advisor, investor, or press contact — regardless of how the conversation is going.</p>
+  </div>
+  <ul>
+    <li>A guaranteed number of hours saved per intake</li>
+    <li>A higher case acceptance rate or conversion improvement</li>
+    <li>Better legal outcomes for workers or firms</li>
+    <li>Guaranteed deadline accuracy for any agency or jurisdiction</li>
+    <li>Automatic identification of legal claims</li>
+    <li>Guaranteed firm matching or routing success</li>
+    <li>That the platform has been validated by any bar association or regulatory body</li>
+  </ul>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     PART 9 — PILOT PLAYBOOK
+═══════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="part-header">
+    <div class="part-number">Part 9</div>
+    <div class="part-title">Pilot Playbook</div>
+    <div class="part-subtitle">How the controlled beta operates — who qualifies, what we measure, and what success means.</div>
+  </div>
+
+  <h2>Pilot Definition</h2>
+  <div class="two-col">
+    <div class="col-card">
+      <h4>Who Qualifies (Beta Firms)</h4>
+      <ul>
+        <li>Employment law focus — wage theft, termination, discrimination, retaliation</li>
+        <li>California-based or California practice area</li>
+        <li>Founder-reviewed and approved before activation</li>
+        <li>Agreement to provide structured feedback</li>
+        <li>No guarantee of intake volume</li>
+      </ul>
+    </div>
+    <div class="col-card">
+      <h4>What the Pilot Tests</h4>
+      <ul>
+        <li>Does the organized intake reduce pre-consultation work?</li>
+        <li>Does the chronology match what attorneys would build manually?</li>
+        <li>Do the document request and response loops work reliably?</li>
+        <li>Does the intelligence layer add value for real intakes?</li>
+        <li>What breaks, stalls, or confuses in a real workflow?</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Pilot Metrics</h2>
+  <div class="metric-grid">
+    <div class="metric-card"><div class="m-label">Submission → First Open</div><div class="m-value">Time from routing to first firm open</div></div>
+    <div class="metric-card"><div class="m-label">First Open → First Action</div><div class="m-value">Time from open to accept / decline / request</div></div>
+    <div class="metric-card"><div class="m-label">Doc Request Rate</div><div class="m-value">% of intakes with additional doc requests</div></div>
+    <div class="metric-card"><div class="m-label">Repeat Firm Usage</div><div class="m-value">Firms opening 3+ intakes</div></div>
+    <div class="metric-card"><div class="m-label">Extraction Success</div><div class="m-value">% of files with completed document facts</div></div>
+    <div class="metric-card"><div class="m-label">Intelligence Render Rate</div><div class="m-value">% of intakes where panel populates</div></div>
+    <div class="metric-card"><div class="m-label">Accept / Decline / Continue</div><div class="m-value">Distribution of firm intake decisions</div></div>
+    <div class="metric-card"><div class="m-label">Missing Record Frequency</div><div class="m-value">Most common flagged gaps by intake type</div></div>
+    <div class="metric-card"><div class="m-label">Organization Failures</div><div class="m-value">Stuck "Organizing Records" rate</div></div>
+  </div>
+
+  <h2>What Success Looks Like</h2>
+  <ul>
+    <li>Firms open intakes without contacting the worker first</li>
+    <li>Firms use the document request loop instead of phone calls</li>
+    <li>Attorneys cite the chronology as useful in the first consultation</li>
+    <li>No firm reports being misled about what the platform provides</li>
+    <li>No worker reports sharing information they did not intend to share</li>
+    <li>Intelligence panel renders and is cited as useful for at least one intake</li>
+  </ul>
+
+  <h2>Before Real Worker Data — Non-Negotiable Gates</h2>
+  <ul>
+    <li>RLS verified for all derived-data tables</li>
+    <li>Interrupted organization state handled with recovery UI</li>
+    <li>Firm email notifications operational for new intakes and document responses</li>
+    <li>Voice input hidden or transcription implemented</li>
+    <li>Demo language confirmed accurate and not overstated</li>
+  </ul>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     PART 10 — PRODUCT DECISION RULES
+═══════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="part-header">
+    <div class="part-number">Part 10</div>
+    <div class="part-title">Product Decision Rules</div>
+    <div class="part-subtitle">How to decide what to build, defer, and reject. Use this before every feature discussion.</div>
+  </div>
+
+  <h2>The Seven Questions</h2>
+  <p>Every proposed feature, change, or addition must answer all seven:</p>
+  <ol>
+    <li>Does this improve worker intake quality, clarity, or ease?</li>
+    <li>Does this improve firm review usefulness or efficiency?</li>
+    <li>Does this strengthen the mind layer — organization, source tracing, or intelligence?</li>
+    <li>Does this reduce friction in the core worker-to-firm loop?</li>
+    <li>Has a real user asked for it more than once, or will a real user need it for the pilot?</li>
+    <li>Does it create legal, privacy, or operational risk that outweighs the benefit?</li>
+    <li>Can it wait until after the first pilot produces evidence?</li>
+  </ol>
+
+  <p>If the answer to question 7 is yes, defer it. If the answer to question 6 is yes, stop and review before proceeding.</p>
+
+  <h2>Decision Categories</h2>
+  <div class="decision-grid">
+    <div class="decision-card d-build">
+      <div class="d-label">Build Now</div>
+      <div class="d-desc">Directly unblocks the pilot or fixes a confirmed defect</div>
+    </div>
+    <div class="decision-card d-test">
+      <div class="d-label">Test Manually</div>
+      <div class="d-desc">Needs real-world validation before building infrastructure</div>
+    </div>
+    <div class="decision-card d-pilot">
+      <div class="d-label">Pilot-Only</div>
+      <div class="d-desc">Useful but needs firm feedback to confirm value before full build</div>
+    </div>
+    <div class="decision-card d-defer">
+      <div class="d-label">Defer</div>
+      <div class="d-desc">Good idea but no evidence it is needed now. Revisit after pilot.</div>
+    </div>
+    <div class="decision-card d-reject">
+      <div class="d-label">Reject</div>
+      <div class="d-desc">Conflicts with product vision, creates unacceptable risk, or belongs to a different product</div>
+    </div>
+  </div>
+
+  <h2>The Governing Rule</h2>
+  <div class="callout callout-rule">
+    <p>"Hardening, not building. One prompt, one defect, one expected behavior change. No opportunistic cleanup. No scope expansion during the pilot stabilization sprint."</p>
+  </div>
+
+  <h2>Current Sprint Priority Order</h2>
+  <ol>
+    <li><strong>RLS verification</strong> — real-data security gate, non-negotiable</li>
+    <li><strong>Pending-extraction smoke test</strong> — validation only, no edits unless it fails</li>
+    <li><strong>Interrupted organization recovery</strong> — genuine pilot-blocking bug</li>
+    <li><strong>Voice input</strong> — hide immediately if persistence cannot be proven</li>
+    <li><strong>Minimum firm email notifications</strong> — one channel, two events</li>
+    <li><strong>Event-timing investigation</strong> — improvement, not a blocker</li>
+  </ol>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     PART 11 — SAFETY AND TRUST RULES
+═══════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="part-header">
+    <div class="part-number">Part 11</div>
+    <div class="part-title">Safety and Trust Rules</div>
+    <div class="part-subtitle">Non-negotiable operational rules. These are not guidelines. They are boundaries.</div>
+  </div>
+
+  <h2>Data and Privacy Rules</h2>
+  <ul>
+    <li>No real worker data may be used before security gates (RLS verification, organization recovery, consent flow) are confirmed complete</li>
+    <li>No production RLS policy may be modified without a full read-only audit first</li>
+    <li>No private information — worker narrative, allegations, employment details, document excerpts — may be included in notification emails</li>
+    <li>No client-side secrets. API keys, service role credentials, and environment variables belong server-side only</li>
+    <li>No cross-account access. A firm may only see intakes routed to them by their firm ID</li>
+    <li>No preview firm may access documents available only to full-access routes</li>
+  </ul>
+
+  <h2>Product Integrity Rules</h2>
+  <ul>
+    <li>No AI output without source attribution where available</li>
+    <li>No silent failures that leave workers believing information was saved when it was not</li>
+    <li>No demo feature represented as currently operational unless it works for real intakes</li>
+    <li>No legal conclusions, claim-strength language, deadline guarantees, or outcome predictions in any user-facing copy</li>
+    <li>No "verified" label applied to information that has not been independently confirmed</li>
+    <li>No attorney-client relationship implied through platform language</li>
+  </ul>
+
+  <h2>Engineering Rules</h2>
+  <ul>
+    <li>No broad refactors during the pilot stabilization sprint</li>
+    <li>No schema or migration changes without confirming RLS impact</li>
+    <li>No dependency installations without explicit approval</li>
+    <li>No deployments without a passing build, a pre-deploy phrase sweep, and a smoke test</li>
+    <li>No code changes to the intelligence pipeline, source trace codec, or banned-output logic without a full investigation pass first</li>
+    <li>Email failure must never roll back or block the intake workflow</li>
+  </ul>
+
+  <div class="callout callout-warning">
+    <div class="callout-label">Absolute Boundary</div>
+    <p>The platform organizes. It does not advise, conclude, guarantee, or represent. When any person, feature, or message crosses that line — stop and correct it before moving forward.</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     PART 12 — TECHNICAL OPERATING RULES
+═══════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="part-header">
+    <div class="part-number">Part 12</div>
+    <div class="part-title">Technical Operating Rules</div>
+    <div class="part-subtitle">The engineering standard for every change to one3Seven during the pilot period.</div>
+  </div>
+
+  <h2>The Engineering Workflow</h2>
+  <p>Every change — no matter how small — follows this sequence:</p>
+  <div class="journey">
+    <div class="journey-step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Audit first</div><div class="step-desc">Read the relevant files. Understand current behavior before forming a hypothesis.</div></div></div>
+    <div class="journey-step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Identify root cause</div><div class="step-desc">Confirm the exact failing boundary with evidence. Do not assume.</div></div></div>
+    <div class="journey-step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Checkpoint</div><div class="step-desc">Create a clean backup copy before any changes. Document the current state.</div></div></div>
+    <div class="journey-step"><div class="step-num">4</div><div class="step-body"><div class="step-title">Minimal patch</div><div class="step-desc">Change only what is required. No opportunistic cleanup. No related improvements.</div></div></div>
+    <div class="journey-step"><div class="step-num">5</div><div class="step-body"><div class="step-title">Build</div><div class="step-desc">Run npm run build. Zero new errors required. Pre-existing warnings are documented.</div></div></div>
+    <div class="journey-step"><div class="step-num">6</div><div class="step-body"><div class="step-title">Targeted tests</div><div class="step-desc">Run tests covering the changed behavior. Document any pre-existing failures.</div></div></div>
+    <div class="journey-step"><div class="step-num">7</div><div class="step-body"><div class="step-title">Smoke test</div><div class="step-desc">Manually verify the specific expected behavior change. Confirm no protected behavior changed.</div></div></div>
+    <div class="journey-step"><div class="step-num">8</div><div class="step-body"><div class="step-title">Deploy</div><div class="step-desc">Deploy from a clean timestamped copy via vercel.cmd --prod. Confirm production alias.</div></div></div>
+    <div class="journey-step"><div class="step-num">9</div><div class="step-body"><div class="step-title">Stop</div><div class="step-desc">Do not begin the next fix in the same session. Close the session after verification.</div></div></div>
+  </div>
+
+  <h2>Do-Not-Touch Systems</h2>
+  <p>These systems must not be modified without a full investigation pass and explicit approval:</p>
+  <div class="dnt-grid">
+    <div class="dnt-item"><div class="dnt-icon">🔒</div><div class="dnt-text">O3S_SOURCE_TRACE codec — changing serialization breaks all persisted timeline events</div></div>
+    <div class="dnt-item"><div class="dnt-icon">🔒</div><div class="dnt-text">O3S_ORG_ENGINE codec — changing breaks existing intake_summaries.overview values</div></div>
+    <div class="dnt-item"><div class="dnt-icon">🔒</div><div class="dnt-text">BANNED_IN_OUTPUT regex — core legal-safety guardrail in the text pipeline</div></div>
+    <div class="dnt-item"><div class="dnt-icon">🔒</div><div class="dnt-text">All RLS policies — require security review and staging test before any change</div></div>
+    <div class="dnt-item"><div class="dnt-icon">🔒</div><div class="dnt-text">ONE3SEVEN_UNIVERSAL_DISCLAIMER — used across 10+ screens and all exports</div></div>
+    <div class="dnt-item"><div class="dnt-icon">🔒</div><div class="dnt-text">uploadConsentAt timestamp — legal record of worker consent before sharing</div></div>
+    <div class="dnt-item"><div class="dnt-icon">🔒</div><div class="dnt-text">workerApproveFullAccess / route_status gating — worker control over firm access</div></div>
+    <div class="dnt-item"><div class="dnt-icon">🔒</div><div class="dnt-text">inferCategoryFromFileName — changes categories retroactively for all existing files</div></div>
+  </div>
+
+  <h2>The One-Session Rule</h2>
+  <div class="callout callout-rule">
+    <p>"One prompt, one defect, one expected behavior change. Do not combine intelligence work, notifications, RLS, voice, landing-page copy, or App.tsx refactoring into one session."</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     PART 13 — BRAND AND VOICE
+═══════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="part-header">
+    <div class="part-number">Part 13</div>
+    <div class="part-title">Brand and Voice</div>
+    <div class="part-subtitle">How one3Seven sounds. The tone, the register, and the examples to learn from.</div>
+  </div>
+
+  <h2>Brand Character</h2>
+  <div class="two-col">
+    <div class="col-card">
+      <h4>✓ one3Seven Is</h4>
+      <ul>
+        <li>Calm and deliberate</li>
+        <li>Clear and direct</li>
+        <li>Factual without being cold</li>
+        <li>Respectful of both parties</li>
+        <li>Confident without overstating</li>
+        <li>Intelligent but accessible</li>
+        <li>Serious about privacy and trust</li>
+      </ul>
+    </div>
+    <div class="col-card">
+      <h4>✗ one3Seven Is Not</h4>
+      <ul>
+        <li>Dramatic about legal outcomes</li>
+        <li>Condescending toward workers</li>
+        <li>Overly technical with firms</li>
+        <li>Advocacy-forward or emotionally charged</li>
+        <li>Vague about what the product actually does</li>
+        <li>Promising outcomes it cannot guarantee</li>
+        <li>Casual about privacy or security</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Voice Examples</h2>
+
+  <h3>Describing the product to a firm</h3>
+  <div class="callout callout-warning">
+    <div class="callout-label">❌ Do Not Write</div>
+    <p>AI finds the strongest retaliation claim and tells attorneys what matters.</p>
+  </div>
+  <div class="callout callout-safe">
+    <div class="callout-label">✓ Write This Instead</div>
+    <p>one3Seven surfaces document-backed events, timing relationships between key dates, and excerpts from source records — so attorneys begin with structure rather than building it from scratch.</p>
+  </div>
+
+  <h3>Describing the worker experience</h3>
+  <div class="callout callout-warning">
+    <div class="callout-label">❌ Do Not Write</div>
+    <p>Workers deserve organized representation. Get justice with AI on your side.</p>
+  </div>
+  <div class="callout callout-safe">
+    <div class="callout-label">✓ Write This Instead</div>
+    <p>Tell your story. Upload your records. one3Seven organizes what you have for attorney review — so the first conversation starts with context, not confusion.</p>
+  </div>
+
+  <h3>Describing intelligence output</h3>
+  <div class="callout callout-warning">
+    <div class="callout-label">❌ Do Not Write</div>
+    <p>Retaliation pattern detected. High-probability wrongful termination case identified.</p>
+  </div>
+  <div class="callout callout-safe">
+    <div class="callout-label">✓ Write This Instead</div>
+    <p>Timing relationships between events identified. A written warning was issued 11 days after the formal HR complaint. An attorney determines the legal significance.</p>
+  </div>
+
+  <h2>The Single Most Important Sentence</h2>
+  <div class="callout callout-core">
+    <div class="callout-label">Brand Anchor</div>
+    <p>one3Seven organizes the intake. The attorney reviews it. The worker controls the sharing. No one on the platform makes legal decisions — not the software, not the team, not the interface.</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     PART 14 — ROLES AND AUTHORITY
+═══════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="part-header">
+    <div class="part-number">Part 14</div>
+    <div class="part-title">Roles and Authority</div>
+    <div class="part-subtitle">Who may do what. As the team grows, this section becomes essential.</div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Role</th>
+        <th>May Do</th>
+        <th>May Not Do Without Approval</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Founder</strong></td>
+        <td>All decisions. Final authority on mission, product, legal posture, and team.</td>
+        <td>—</td>
+      </tr>
+      <tr>
+        <td><strong>Lead Engineer</strong></td>
+        <td>Implement approved tasks. Run builds. Deploy approved changes. Investigate bugs.</td>
+        <td>Architectural changes. Dependency additions. Schema changes. RLS modifications. Decisions about what to build next.</td>
+      </tr>
+      <tr>
+        <td><strong>Advisor</strong></td>
+        <td>Provide strategic input. Connect the company to contacts. Review materials provided.</td>
+        <td>Speak publicly for the company. Promise product features. Access worker data. Make product decisions.</td>
+      </tr>
+      <tr>
+        <td><strong>Sales / BD</strong></td>
+        <td>Demonstrate the product. Conduct discovery conversations. Schedule follow-up. Follow the sales playbook.</td>
+        <td>Deviate from approved language. Promise capabilities not in the platform. Sign agreements. Represent legal compliance.</td>
+      </tr>
+      <tr>
+        <td><strong>Pilot Firm</strong></td>
+        <td>Review routed intakes. Request documents. Accept or decline intakes. Provide feedback.</td>
+        <td>Access worker data beyond their routed intakes. Share platform access or intake data with other parties. Represent one3Seven publicly.</td>
+      </tr>
+      <tr>
+        <td><strong>Contractor / Outside Developer</strong></td>
+        <td>Implement scoped tasks as defined. Follow safety mode protocol. Ask clarifying questions before touching code.</td>
+        <td>Make product decisions. Deploy without approval. Access production Supabase credentials directly. Modify RLS or security settings.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>What Always Requires Founder Approval</h2>
+  <ul>
+    <li>Any public statement about one3Seven's legal compliance posture</li>
+    <li>Any claim about attorney involvement in operations</li>
+    <li>Any new firm onboarded to the beta network</li>
+    <li>Any change to pricing, billing structure, or trial terms</li>
+    <li>Any press engagement, media appearance, or public announcement</li>
+    <li>Any decision to use real worker data in a test, demo, or investor presentation</li>
+    <li>Any architecture change to the intelligence pipeline</li>
+    <li>Any modification to RLS policies</li>
+  </ul>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     PART 15 — ROADMAP BOUNDARIES
+═══════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="part-header">
+    <div class="part-number">Part 15</div>
+    <div class="part-title">Roadmap Boundaries</div>
+    <div class="part-subtitle">What is current scope and what is not. Visible but clearly bounded.</div>
+  </div>
+
+  <div class="roadmap-grid">
+    <div class="roadmap-card roadmap-now">
+      <h4>✓ Current Scope</h4>
+      <ul>
+        <li>Worker intake — story, guided questions, document upload</li>
+        <li>Document organization and categorization</li>
+        <li>Source-linked chronology construction</li>
+        <li>Firm review interface — full and preview access</li>
+        <li>Intelligence extraction (Phase 2B — confirmed operational)</li>
+        <li>Document-request loop between firm and worker</li>
+        <li>Accept / decline / continue workflow</li>
+        <li>Matter tagging (organizational)</li>
+        <li>Firm code direct routing</li>
+        <li>Participating network preview routing</li>
+        <li>Worker consent and access control</li>
+        <li>Security hardening and RLS verification</li>
+        <li>Pilot measurement and feedback collection</li>
+        <li>Firm email notifications (minimum — in progress)</li>
+        <li>Organization recovery for interrupted processing</li>
+      </ul>
+    </div>
+    <div class="roadmap-card roadmap-later">
+      <h4>Later — Requires Validation</h4>
+      <ul>
+        <li>Open worker acquisition and marketing</li>
+        <li>Broader firm network beyond controlled beta</li>
+        <li>Advanced intake analytics and dashboards</li>
+        <li>Billing enforcement and subscription tiers</li>
+        <li>OCR for scanned document images</li>
+        <li>Voice transcription for guided intake</li>
+        <li>Automated firm verification against bar records</li>
+        <li>Geographic expansion beyond California employment matters</li>
+        <li>Multi-matter tracking per worker</li>
+        <li>Litigation support and exhibit services</li>
+        <li>Medical record organization</li>
+        <li>Trial preparation tools</li>
+        <li>Transcript services</li>
+        <li>Contradiction detection between documents</li>
+        <li>Firm performance analytics and outcome tracking</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout callout-warning">
+    <div class="callout-label">Required Label for All Later Items</div>
+    <p>Not current scope. Requires pilot validation before building. Do not reference these as committed features in firm conversations, press, or investor materials.</p>
+  </div>
+
+  <h2>The Layered Document System</h2>
+  <p>This playbook has three layers. Update the right layer for each type of change:</p>
+  <div class="two-col">
+    <div class="col-card">
+      <h4>Layer 1 — Canon (Rarely Changes)</h4>
+      <ul>
+        <li>Mission and product definition</li>
+        <li>What one3Seven is not</li>
+        <li>Safety principles</li>
+        <li>Language rules</li>
+        <li>Decision rules</li>
+      </ul>
+    </div>
+    <div class="col-card">
+      <h4>Layer 2 — Product Manual (Per Release)</h4>
+      <ul>
+        <li>Live features and known limitations</li>
+        <li>Current workflows</li>
+        <li>Demo behavior and screenshots</li>
+        <li>Technical architecture</li>
+        <li>Pilot state</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     PART 16 — CURRENT BASELINE
+═══════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="part-header">
+    <div class="part-number">Part 16</div>
+    <div class="part-title">Current Baseline</div>
+    <div class="part-subtitle">The confirmed production state as of June 9, 2026. Update this after each meaningful release.</div>
+  </div>
+
+  <div class="baseline-box">
+    <h3>Production Checkpoint — June 9, 2026</h3>
+    <div class="baseline-row"><span class="baseline-label">Deployment ID</span><span class="baseline-value">dpl_DkxKoAwArFrnU4jQGjpHyPqYKbKS</span></div>
+    <div class="baseline-row"><span class="baseline-label">Live URL</span><span class="baseline-value">https://one3seven-beta.vercel.app</span></div>
+    <div class="baseline-row"><span class="baseline-label">Demo URL</span><span class="baseline-value">https://one3seven-beta.vercel.app/?demo</span></div>
+    <div class="baseline-row"><span class="baseline-label">Local Backup</span><span class="baseline-value">C:\tmp\one3seven-p0-language-deploy</span></div>
+    <div class="baseline-row"><span class="baseline-label">Test Baseline</span><span class="baseline-value">134 passing · 8 pre-existing failures (documented)</span></div>
+    <div class="baseline-row"><span class="baseline-label">Intelligence Pipeline</span><span class="baseline-value">Extraction → persistence → synthesis → hydration → rendering ✓</span></div>
+    <div class="baseline-row"><span class="baseline-label">Confirmed Intakes in DB</span><span class="baseline-value">2 intakes · 12 extracted (f50f8bfd) · 5 pending (d7123613 — never opened)</span></div>
+    <div class="baseline-row"><span class="baseline-label">Edge Functions</span><span class="baseline-value">extract-document-facts (6 deploys) · get-intake-intelligence (1 deploy)</span></div>
+    <div class="baseline-row"><span class="baseline-label">P0 Language Fixes</span><span class="baseline-value">Deployed and smoke-tested June 9, 2026</span></div>
+  </div>
+
+  <h2>Confirmed Operational</h2>
+  <div class="two-col">
+    <ul>
+      <li>Worker intake — story, questions, upload</li>
+      <li>Document organization pipeline (deterministic)</li>
+      <li>Source-linked chronology</li>
+      <li>Matter tagging</li>
+      <li>Firm routing — firm code and participating</li>
+      <li>Firm review interface — full and preview</li>
+    </ul>
+    <ul>
+      <li>Intelligence extraction (Claude API via Edge Function)</li>
+      <li>Intelligence synthesis and rendering</li>
+      <li>Document request loop (firm → worker → confirm)</li>
+      <li>Accept / decline workflow with event timestamps</li>
+      <li>Worker consent and access control</li>
+      <li>In-app notifications (bell, not email)</li>
+    </ul>
+  </div>
+
+  <h2>Known Gaps — P1 Priority Order</h2>
+  <ol>
+    <li><strong>RLS verification</strong> — derived-data tables not confirmed (worker_intake_metadata, intake_summaries, intake_timeline_events, file_text_extractions, document_facts)</li>
+    <li><strong>Pending-extraction smoke test</strong> — confirm auto-trigger works on first open for intake d7123613</li>
+    <li><strong>Interrupted organization recovery</strong> — workflow_status stuck at "Organizing Records" on browser refresh</li>
+    <li><strong>Voice input</strong> — mic UI present, transcription not implemented, entry point not gated</li>
+    <li><strong>Firm email notifications</strong> — currently stubbed, no external delivery</li>
+    <li><strong>Event timing investigation</strong> — timing cards not rendering for all intakes (date parse issue)</li>
+  </ol>
+
+  <h2>Glossary</h2>
+  <ul>
+    <li><strong>intake_routes</strong> — the record linking a worker intake to a firm; carries route_status and event timestamps</li>
+    <li><strong>file_text_extractions</strong> — stores extracted text and document_facts per uploaded file</li>
+    <li><strong>document_facts</strong> — structured JSON of per-file intelligence extracted by Claude</li>
+    <li><strong>IntakeIntelligence</strong> — the synthesized intelligence object from all document_facts for one intake</li>
+    <li><strong>firmLiveView</strong> — the complete data object delivered to the firm review screen</li>
+    <li><strong>O3S_SOURCE_TRACE</strong> — serialized source attribution embedded in timeline event worker_context fields</li>
+    <li><strong>BANNED_IN_OUTPUT</strong> — regex preventing legal-conclusion language in any generated summary text</li>
+    <li><strong>full_access</strong> — route_status granting firm access to original documents and intelligence panel</li>
+    <li><strong>preview_sent</strong> — route_status for participating network intakes before worker approval</li>
+    <li><strong>Phase 2A</strong> — deterministic pipeline: text extraction, categorization, chronology, summary</li>
+    <li><strong>Phase 2B</strong> — intelligence extraction: Claude API per-document fact extraction and synthesis</li>
+  </ul>
+
+  <div style="margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--border); text-align: center;">
+    <p style="font-size: 9pt; color: var(--text-muted); margin: 0;">The one3Seven Operating Playbook · Version 1.0 · June 2026</p>
+    <p style="font-size: 9pt; color: var(--text-muted); margin: 4px 0 0;">Confidential — Internal Use Only · Update Layer 2 after each meaningful release</p>
+    <p style="font-size: 9pt; color: var(--violet); margin: 8px 0 0; font-weight: 600;">one3seven-beta.vercel.app</p>
+  </div>
+</div>
+
+</body>
+</html>

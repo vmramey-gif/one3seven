@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>one3Seven — Demo Script</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background: #fff;
+    color: #1e1b4b;
+    font-size: 11pt;
+    line-height: 1.55;
+  }
+
+  /* ── COVER ── */
+  .cover {
+    background: linear-gradient(145deg, #1e1b4b 0%, #3b2d8a 60%, #6d4aff 100%);
+    color: white;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 72px 64px;
+    page-break-after: always;
+  }
+  .cover-eyebrow {
+    font-size: 9pt;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.55);
+    margin-bottom: 24px;
+  }
+  .cover-title {
+    font-size: 38pt;
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 18px;
+  }
+  .cover-title span { color: #c4b5fd; }
+  .cover-sub {
+    font-size: 13pt;
+    color: rgba(255,255,255,0.72);
+    max-width: 480px;
+    line-height: 1.5;
+    margin-bottom: 48px;
+  }
+  .cover-meta {
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+  .cover-meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .cover-meta-label {
+    font-size: 8pt;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+  }
+  .cover-meta-value {
+    font-size: 10.5pt;
+    color: rgba(255,255,255,0.9);
+    font-weight: 600;
+  }
+  .cover-link {
+    margin-top: 48px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 100px;
+    padding: 12px 24px;
+    font-size: 10pt;
+    color: white;
+    font-weight: 600;
+    text-decoration: none;
+    width: fit-content;
+  }
+  .cover-link-label {
+    font-size: 8pt;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-right: 4px;
+  }
+
+  /* ── PAGE ── */
+  .page {
+    padding: 52px 60px;
+    max-width: 820px;
+    margin: 0 auto;
+  }
+  .page-break { page-break-before: always; }
+
+  /* ── SECTION HEADER ── */
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 28px;
+    padding-bottom: 14px;
+    border-bottom: 2px solid #ede9fe;
+  }
+  .section-number {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #6d4aff;
+    color: white;
+    font-size: 11pt;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .section-title {
+    font-size: 15pt;
+    font-weight: 800;
+    color: #1e1b4b;
+    letter-spacing: -0.01em;
+  }
+
+  /* ── STOP CARD ── */
+  .stop {
+    background: #fafafe;
+    border: 1.5px solid #ede9fe;
+    border-radius: 16px;
+    padding: 22px 24px;
+    margin-bottom: 18px;
+    break-inside: avoid;
+  }
+  .stop-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .stop-badge {
+    background: #6d4aff;
+    color: white;
+    font-size: 8pt;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 100px;
+    flex-shrink: 0;
+  }
+  .stop-badge.moment { background: #059669; }
+  .stop-badge.close { background: #1e1b4b; }
+  .stop-title {
+    font-size: 11.5pt;
+    font-weight: 700;
+    color: #1e1b4b;
+  }
+  .stop-time {
+    margin-left: auto;
+    font-size: 8.5pt;
+    color: #6d4aff;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .point-to {
+    font-size: 8.5pt;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #6d4aff;
+    margin-bottom: 6px;
+  }
+  .point-to-value {
+    font-size: 9pt;
+    color: #4c1d95;
+    background: #f3f0ff;
+    border-radius: 6px;
+    padding: 4px 10px;
+    display: inline-block;
+    margin-bottom: 12px;
+  }
+
+  /* ── SCRIPT LINE ── */
+  .script-block {
+    background: white;
+    border-left: 3px solid #6d4aff;
+    border-radius: 0 10px 10px 0;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    font-size: 10.5pt;
+    color: #1e1b4b;
+    line-height: 1.6;
+  }
+  .script-block em {
+    font-style: normal;
+    color: #5b35d5;
+    font-weight: 600;
+  }
+  .script-block.pause {
+    border-left-color: #059669;
+    background: #f0fdf4;
+  }
+  .script-block.pause em { color: #065f46; }
+
+  /* ── WHY BOX ── */
+  .why-box {
+    background: #fffbeb;
+    border: 1px solid #fcd34d;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 9pt;
+    color: #78350f;
+    margin-top: 10px;
+  }
+  .why-box strong { color: #92400e; }
+
+  /* ── SETUP CARD ── */
+  .setup-card {
+    background: #1e1b4b;
+    color: white;
+    border-radius: 16px;
+    padding: 22px 24px;
+    margin-bottom: 24px;
+    break-inside: avoid;
+  }
+  .setup-card h3 {
+    font-size: 11pt;
+    font-weight: 700;
+    color: #c4b5fd;
+    margin-bottom: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-size: 8.5pt;
+  }
+  .setup-card p {
+    font-size: 10.5pt;
+    color: rgba(255,255,255,0.85);
+    line-height: 1.6;
+  }
+  .setup-card .send-line {
+    background: rgba(109,74,255,0.3);
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-top: 12px;
+    font-size: 10pt;
+    color: #e0d9ff;
+    font-style: italic;
+  }
+
+  /* ── OBJECTION TABLE ── */
+  .obj-table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+  .obj-table th {
+    background: #1e1b4b;
+    color: white;
+    font-size: 8.5pt;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 10px 14px;
+    text-align: left;
+  }
+  .obj-table th:first-child { border-radius: 10px 0 0 0; }
+  .obj-table th:last-child { border-radius: 0 10px 0 0; }
+  .obj-table td {
+    padding: 11px 14px;
+    font-size: 10pt;
+    vertical-align: top;
+    line-height: 1.5;
+    border-bottom: 1px solid #ede9fe;
+  }
+  .obj-table tr:nth-child(even) td { background: #fafafe; }
+  .obj-table tr:last-child td { border-bottom: none; }
+  .obj-table td:first-child {
+    font-weight: 600;
+    color: #4c1d95;
+    width: 36%;
+  }
+
+  /* ── RULE BOX ── */
+  .rule-box {
+    background: linear-gradient(135deg, #6d4aff 0%, #4c1d95 100%);
+    color: white;
+    border-radius: 16px;
+    padding: 24px 28px;
+    margin-top: 28px;
+    break-inside: avoid;
+  }
+  .rule-box h3 {
+    font-size: 13pt;
+    font-weight: 800;
+    margin-bottom: 10px;
+  }
+  .rule-box p {
+    font-size: 10.5pt;
+    color: rgba(255,255,255,0.85);
+    line-height: 1.6;
+  }
+
+  /* ── TIMELINE VISUAL ── */
+  .timeline-visual {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 16px 0;
+  }
+  .tl-item {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .tl-dot-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 24px;
+    flex-shrink: 0;
+  }
+  .tl-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #6d4aff;
+    border: 2px solid white;
+    box-shadow: 0 0 0 2px #6d4aff;
+    flex-shrink: 0;
+    margin-top: 3px;
+  }
+  .tl-dot.red { background: #dc2626; box-shadow: 0 0 0 2px #dc2626; }
+  .tl-line {
+    width: 2px;
+    background: #ddd6fe;
+    flex: 1;
+    min-height: 20px;
+  }
+  .tl-content {
+    padding-bottom: 16px;
+    flex: 1;
+  }
+  .tl-date {
+    font-size: 8pt;
+    font-weight: 700;
+    color: #6d4aff;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+  }
+  .tl-event {
+    font-size: 10pt;
+    font-weight: 600;
+    color: #1e1b4b;
+  }
+  .tl-event.red { color: #991b1b; }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 40px;
+    padding-top: 16px;
+    border-top: 1px solid #ede9fe;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 8pt;
+    color: #9ca3af;
+  }
+
+  @media print {
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .cover { min-height: 100vh; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     COVER
+══════════════════════════════════════════ -->
+<div class="cover">
+  <div class="cover-eyebrow">one3Seven · Confidential</div>
+  <div class="cover-title">Demo<br/><span>Script</span></div>
+  <div class="cover-sub">
+    A step-by-step walkthrough for presenting the one3Seven platform to law firms, intake coordinators, and legal tech partners.
+  </div>
+  <div class="cover-meta">
+    <div class="cover-meta-item">
+      <span class="cover-meta-label">Duration</span>
+      <span class="cover-meta-value">8 – 10 minutes</span>
+    </div>
+    <div class="cover-meta-item">
+      <span class="cover-meta-label">Audience</span>
+      <span class="cover-meta-value">Law firms · Legal tech</span>
+    </div>
+    <div class="cover-meta-item">
+      <span class="cover-meta-label">Format</span>
+      <span class="cover-meta-value">Live screen walkthrough</span>
+    </div>
+  </div>
+  <a class="cover-link" href="https://one3seven-beta.vercel.app/?demo">
+    <span class="cover-link-label">Demo →</span>
+    one3seven-beta.vercel.app/?demo
+  </a>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     PAGE 1 — SETUP + STOPS 1–3
+══════════════════════════════════════════ -->
+<div class="page">
+
+  <div class="section-header">
+    <div class="section-number">↑</div>
+    <div class="section-title">Before the Call</div>
+  </div>
+
+  <div class="setup-card">
+    <h3>Send the link ahead of time</h3>
+    <p>Send the demo link before the call. Tell them to hold off opening it until you're on together. This way you walk through it side by side — they're not confused and clicking ahead.</p>
+    <div class="send-line">"I'm sending you a link — hold off on opening it until we're on together."</div>
+  </div>
+
+  <!-- STOP 1 -->
+  <div class="stop">
+    <div class="stop-header">
+      <span class="stop-badge">Open</span>
+      <span class="stop-title">The first thing you say</span>
+      <span class="stop-time">20 sec</span>
+    </div>
+    <div class="script-block">
+      "What you're looking at is exactly what an attorney at your firm would see when a case gets routed to you through one3Seven. This is a real worker's case file — built entirely by the platform. The worker uploaded their documents, told their story, and <em>this is what came out the other side.</em> No intake coordinator touched it."
+    </div>
+    <div class="why-box"><strong>Why:</strong> You're not pitching features. You're placing them inside the product immediately. They're the attorney. This is their screen.</div>
+  </div>
+
+  <!-- STOP 2 -->
+  <div class="stop">
+    <div class="stop-header">
+      <span class="stop-badge">Stop 1</span>
+      <span class="stop-title">The slim header bar</span>
+      <span class="stop-time">30 sec</span>
+    </div>
+    <div class="point-to">Point to →</div>
+    <div class="point-to-value">Top bar — "one3Seven · Firm intake review" + "Sample intake" pill</div>
+    <div class="script-block">
+      "In the live product this bar shows your firm name and the intake number. The 'Sample intake' tag is just telling you this is a demo record — in production it would be a live case. <em>Everything below this line is identical to what your team would actually see.</em>"
+    </div>
+    <div class="script-block">
+      "And that strip at the bottom — that's just a 'Get Started' prompt for demo visitors. Your attorneys won't see that."
+    </div>
+    <div class="why-box"><strong>Why:</strong> Removes the "is this real?" skepticism before it forms.</div>
+  </div>
+
+  <!-- STOP 3 -->
+  <div class="stop">
+    <div class="stop-header">
+      <span class="stop-badge">Stop 2</span>
+      <span class="stop-title">The case snapshot card</span>
+      <span class="stop-time">1 min</span>
+    </div>
+    <div class="point-to">Point to →</div>
+    <div class="point-to-value">First card — employer name, employment dates, key people</div>
+    <div class="script-block">
+      "This is the first thing your attorney sees — the shape of the case. Worker's name, employer, how long they worked there, who the key people are. <em>This came from the documents, not from a phone call.</em>"
+    </div>
+    <div class="script-block">
+      "In this case — Pacific Ridge Distribution LLC, warehouse associate, two years and eight months. The key people are already named: the shift supervisor, the HR manager. Your attorney walks into the first consultation already knowing who they're dealing with."
+    </div>
+    <div class="why-box"><strong>Why:</strong> Specific names and dates make it feel like a real case. That's when they start leaning in.</div>
+  </div>
+
+  <div class="footer">
+    <span>one3Seven · Confidential · Demo Script</span>
+    <span>one3seven-beta.vercel.app/?demo</span>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     PAGE 2 — STOPS 4–6
+══════════════════════════════════════════ -->
+<div class="page page-break">
+
+  <div class="section-header">
+    <div class="section-number">2</div>
+    <div class="section-title">The Core Walkthrough</div>
+  </div>
+
+  <!-- STOP 4 -->
+  <div class="stop">
+    <div class="stop-header">
+      <span class="stop-badge">Stop 3</span>
+      <span class="stop-title">Firm Actions card</span>
+      <span class="stop-time">45 sec</span>
+    </div>
+    <div class="point-to">Point to →</div>
+    <div class="point-to-value">Accept · Not Pursuing buttons + Download Intake Summary</div>
+    <div class="script-block">
+      "These are the three decisions your firm makes. Accept it and it goes into your follow-up queue. Pass on it — and it stays in your system for reference, the worker isn't notified, it's internal only. Or download the full intake packet as a PDF to bring into your case management system."
+    </div>
+    <div class="script-block">
+      "<em>One screen. One decision.</em> That's the whole intake workflow from the firm's side."
+    </div>
+    <div class="why-box"><strong>Why:</strong> Shows the closed loop — the firm isn't just reading, they're acting. Decision fatigue is real in intake; this makes it simple.</div>
+  </div>
+
+  <!-- STOP 5 — THE MOMENT -->
+  <div class="stop">
+    <div class="stop-header">
+      <span class="stop-badge moment">The Moment</span>
+      <span class="stop-title">The timeline — this is where it lands</span>
+      <span class="stop-time">2.5 min</span>
+    </div>
+    <div class="point-to">Point to →</div>
+    <div class="point-to-value">Timeline events — scroll slowly through each one</div>
+
+    <div class="script-block">
+      "This is the timeline the platform reconstructed from the documents. <em>Not from what the worker said — from what the records actually show.</em>"
+    </div>
+
+    <p style="font-size:9pt; color:#6d4aff; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; margin:12px 0 8px;">Read these events out loud as you scroll:</p>
+
+    <div class="timeline-visual">
+      <div class="tl-item">
+        <div class="tl-dot-col"><div class="tl-dot"></div><div class="tl-line"></div></div>
+        <div class="tl-content">
+          <div class="tl-date">Q4 2022 – Q1 2023</div>
+          <div class="tl-event">Overtime hours recorded without matching pay rate</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot-col"><div class="tl-dot"></div><div class="tl-line"></div></div>
+        <div class="tl-content">
+          <div class="tl-date">March – July 2023</div>
+          <div class="tl-event">Missed meal-break entries across 14 documented shifts</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot-col"><div class="tl-dot"></div><div class="tl-line"></div></div>
+        <div class="tl-content">
+          <div class="tl-date">August 7, 2024</div>
+          <div class="tl-event">Formal HR complaint filed — payroll audit requested</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot-col"><div class="tl-dot red"></div><div class="tl-line"></div></div>
+        <div class="tl-content">
+          <div class="tl-date" style="color:#dc2626;">August 18, 2024 — 11 days later</div>
+          <div class="tl-event red">Written warning — "attitude and conduct." No prior record.</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot-col"><div class="tl-dot red"></div></div>
+        <div class="tl-content">
+          <div class="tl-date" style="color:#dc2626;">October 11, 2024 — 34 days after complaint</div>
+          <div class="tl-event red">Terminated — "performance deficiency." No PIP. No prior warnings.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="script-block pause">
+      <em>Stop here. Let them sit with it.</em>
+    </div>
+
+    <div class="script-block">
+      "That sequence — complaint, warning eleven days later, termination thirty-four days after — <em>that's the retaliation timeline.</em> The platform surfaced it automatically. Before one3Seven, an intake coordinator pieces that together from a stack of PDFs. That's an hour of work, minimum. Here it's on the screen before your attorney says a word."
+    </div>
+    <div class="why-box"><strong>Why this is the moment:</strong> The timing gap between complaint and termination is the kind of thing that takes hours to find manually. They will feel this. Don't rush past it.</div>
+  </div>
+
+  <div class="footer">
+    <span>one3Seven · Confidential · Demo Script</span>
+    <span>Page 2</span>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     PAGE 3 — STOPS 7–9 + CLOSE
+══════════════════════════════════════════ -->
+<div class="page page-break">
+
+  <div class="section-header">
+    <div class="section-number">3</div>
+    <div class="section-title">The Close</div>
+  </div>
+
+  <!-- STOP 6 -->
+  <div class="stop">
+    <div class="stop-header">
+      <span class="stop-badge">Stop 5</span>
+      <span class="stop-title">Verified Facts card</span>
+      <span class="stop-time">1 min</span>
+    </div>
+    <div class="point-to">Point to →</div>
+    <div class="point-to-value">Green "Verified Facts — From document content" card</div>
+    <div class="script-block">
+      "This section is different from the rest. Everything above it is organized from the worker's narrative. <em>This is pulled directly from the text of the documents themselves.</em>"
+    </div>
+    <div class="script-block">
+      "The complaint topic, the HR response, the warning language, the termination reason — all sourced from the actual files. And at the bottom: key document quotes. <em>Verbatim language</em> from the termination letter and the written warning, pulled automatically. Your attorney walks into the first call with this already in hand. That's a different kind of conversation."
+    </div>
+    <div class="why-box"><strong>Why:</strong> Separates one3Seven from "AI that summarizes things." This is AI that extracts and cites. That's what attorneys can actually trust.</div>
+  </div>
+
+  <!-- STOP 7 -->
+  <div class="stop">
+    <div class="stop-header">
+      <span class="stop-badge">Stop 6</span>
+      <span class="stop-title">Documents section</span>
+      <span class="stop-time">45 sec</span>
+    </div>
+    <div class="point-to">Point to →</div>
+    <div class="point-to-value">Document categories and file list</div>
+    <div class="script-block">
+      "Eleven documents across five categories — payroll records, time records, HR communications, termination records, handbook excerpt. The worker uploaded these. The platform categorized them, named them, and made them accessible at the right access level."
+    </div>
+    <div class="script-block">
+      "<em>No shared Dropbox. No email chain. No 'can you resend that file.'</em> It's all here, organized, when the case arrives."
+    </div>
+  </div>
+
+  <!-- STOP 8 -->
+  <div class="stop">
+    <div class="stop-header">
+      <span class="stop-badge">Stop 7</span>
+      <span class="stop-title">Clarifications Needed</span>
+      <span class="stop-time">30 sec</span>
+    </div>
+    <div class="point-to">Point to →</div>
+    <div class="point-to-value">Amber "Items Requiring Confirmation" card</div>
+    <div class="script-block">
+      "This is what's still missing. Prior performance reviews aren't in the file yet — which matters for the wrongful termination argument. Coworker corroboration isn't documented. The platform isn't saying the case is weak. <em>It's telling your attorney exactly what to ask for in the first call.</em>"
+    </div>
+    <div class="why-box"><strong>Why:</strong> This card shows the platform thinks like a lawyer — proactively flagging gaps, not just organizing what exists.</div>
+  </div>
+
+  <!-- CLOSE -->
+  <div class="stop">
+    <div class="stop-header">
+      <span class="stop-badge close">Close</span>
+      <span class="stop-title">Stop scrolling. Look at them. Say this.</span>
+      <span class="stop-time">1 min</span>
+    </div>
+    <div class="script-block">
+      "What you just saw represents two to four hours of intake work — eliminated. Before your attorney has said a word to this worker, they already know the employer, the timeline, the key documents, the retaliation sequence, and what's still missing."
+    </div>
+    <div class="script-block">
+      "Most firms screen cases they never convert. They spend intake hours on cases that go nowhere. one3Seven doesn't change whether a case is good or bad — <em>it makes the screening fast enough that passing on a case costs you five minutes instead of five hours.</em>"
+    </div>
+    <div class="script-block">
+      "The question for you is: how does this fit into what your firm is already doing?"
+    </div>
+    <div class="script-block pause">
+      <em>Stop. Let them respond. Do not fill the silence.</em>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>one3Seven · Confidential · Demo Script</span>
+    <span>Page 3</span>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     PAGE 4 — OBJECTIONS + THE RULE
+══════════════════════════════════════════ -->
+<div class="page page-break">
+
+  <div class="section-header">
+    <div class="section-number">4</div>
+    <div class="section-title">Objection Responses</div>
+  </div>
+
+  <table class="obj-table">
+    <thead>
+      <tr>
+        <th>They say</th>
+        <th>You say</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>"How accurate is the AI?"</td>
+        <td>The Verified Facts card cites every claim back to the source document — file name, category, verbatim quote. Attorneys verify, they don't trust blindly. It's a starting point, not a conclusion.</td>
+      </tr>
+      <tr>
+        <td>"What about confidentiality?"</td>
+        <td>Workers control access. A firm only sees a limited preview until the worker explicitly approves full access. Nothing is shared without consent. The worker can see exactly what the firm sees.</td>
+      </tr>
+      <tr>
+        <td>"We have our own intake process."</td>
+        <td>We're not replacing it — we're delivering to it. Think of this as the packet that arrives before your process starts, already organized. Your intake coordinator starts from a finished document instead of a blank screen.</td>
+      </tr>
+      <tr>
+        <td>"What does it cost?"</td>
+        <td>That's the conversation for a follow-up. Today I wanted you to see what the product does. Can we get 30 minutes on the calendar this week?</td>
+      </tr>
+      <tr>
+        <td>"Is the data secure?"</td>
+        <td>Everything is encrypted in transit and at rest, access-controlled at the database level, and the firm never holds worker data directly — they're reading through the platform, not downloading a raw file.</td>
+      </tr>
+      <tr>
+        <td>"What happens to the worker?"</td>
+        <td>The worker gets a live status tracker showing exactly where their case is, and gets notified when a firm takes action. They're not in the dark — they know the moment a firm reviews their file.</td>
+      </tr>
+      <tr>
+        <td>"Do you work with our case management system?"</td>
+        <td>Integration is on the roadmap. Right now, the download button exports a full intake packet as a PDF that drops into any system you're already using. It's format-agnostic.</td>
+      </tr>
+      <tr>
+        <td>"Is this HIPAA / bar compliant?"</td>
+        <td>We're building the compliance documentation now and happy to walk through it specifically. The data model is designed around lawyer-client privilege principles from day one — happy to have that conversation with your IT or compliance team.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="rule-box">
+    <h3>The One Rule</h3>
+    <p>
+      Never say <strong>"we're working on that"</strong> or <strong>"that's coming soon."</strong><br/><br/>
+      If something isn't built, say: <em>"That's a great question for the follow-up — I want to make sure I give you the right answer."</em> Then move on.<br/><br/>
+      You are selling the thing that exists today, not the roadmap. The demo already does enough. Let it speak.
+    </p>
+  </div>
+
+  <div class="footer">
+    <span>one3Seven · Confidential · Demo Script</span>
+    <span>one3seven-beta.vercel.app/?demo</span>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>one3Seven — Time & Cost Statistics</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background: #fff;
+    color: #1e1b4b;
+    font-size: 11pt;
+    line-height: 1.55;
+  }
+
+  /* ── COVER ── */
+  .cover {
+    background: linear-gradient(145deg, #0f0c29 0%, #1e1b4b 45%, #3b2d8a 80%, #6d4aff 100%);
+    color: white;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 72px 64px;
+    page-break-after: always;
+  }
+  .cover-top { display: flex; flex-direction: column; gap: 20px; }
+  .cover-logo {
+    font-size: 11pt;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    color: rgba(255,255,255,0.55);
+    text-transform: uppercase;
+  }
+  .cover-eyebrow {
+    font-size: 8.5pt;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+    margin-top: 32px;
+  }
+  .cover-title {
+    font-size: 40pt;
+    font-weight: 900;
+    line-height: 1.05;
+    letter-spacing: -0.025em;
+    margin-top: 12px;
+  }
+  .cover-title span { color: #c4b5fd; }
+  .cover-sub {
+    font-size: 12pt;
+    color: rgba(255,255,255,0.68);
+    max-width: 500px;
+    line-height: 1.6;
+    margin-top: 20px;
+  }
+
+  .cover-stats-row {
+    display: flex;
+    gap: 0;
+    margin-top: 52px;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .cover-stat {
+    flex: 1;
+    padding: 22px 24px;
+    border-right: 1px solid rgba(255,255,255,0.12);
+  }
+  .cover-stat:last-child { border-right: none; }
+  .cover-stat-num {
+    font-size: 22pt;
+    font-weight: 900;
+    color: #c4b5fd;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  .cover-stat-label {
+    font-size: 8.5pt;
+    color: rgba(255,255,255,0.55);
+    margin-top: 6px;
+    line-height: 1.4;
+  }
+
+  .cover-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-top: 40px;
+    border-top: 1px solid rgba(255,255,255,0.12);
+    margin-top: 40px;
+  }
+  .cover-disclaimer {
+    font-size: 7.5pt;
+    color: rgba(255,255,255,0.35);
+    max-width: 400px;
+    line-height: 1.5;
+  }
+  .cover-date {
+    font-size: 8.5pt;
+    color: rgba(255,255,255,0.4);
+    text-align: right;
+  }
+
+  /* ── PAGE ── */
+  .page {
+    padding: 52px 60px;
+    max-width: 820px;
+    margin: 0 auto;
+  }
+  .page-break { page-break-before: always; }
+
+  /* ── SECTION HEADER ── */
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 24px;
+    padding-bottom: 14px;
+    border-bottom: 2px solid #ede9fe;
+  }
+  .section-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: #6d4aff;
+    color: white;
+    font-size: 16pt;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .section-title {
+    font-size: 15pt;
+    font-weight: 800;
+    color: #1e1b4b;
+    letter-spacing: -0.01em;
+  }
+  .section-sub {
+    font-size: 9pt;
+    color: #6d4aff;
+    font-weight: 600;
+    margin-top: 2px;
+  }
+
+  /* ── STAT CARDS ── */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+  .stat-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+  .stat-card {
+    background: #fafafe;
+    border: 1.5px solid #ede9fe;
+    border-radius: 14px;
+    padding: 18px 20px;
+    break-inside: avoid;
+  }
+  .stat-card.purple {
+    background: linear-gradient(135deg, #6d4aff 0%, #4c1d95 100%);
+    border-color: transparent;
+    color: white;
+  }
+  .stat-card.dark {
+    background: #1e1b4b;
+    border-color: transparent;
+    color: white;
+  }
+  .stat-num {
+    font-size: 26pt;
+    font-weight: 900;
+    color: #6d4aff;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  .stat-card.purple .stat-num,
+  .stat-card.dark .stat-num { color: #c4b5fd; }
+  .stat-label {
+    font-size: 9.5pt;
+    font-weight: 600;
+    color: #1e1b4b;
+    margin-top: 6px;
+    line-height: 1.4;
+  }
+  .stat-card.purple .stat-label,
+  .stat-card.dark .stat-label { color: rgba(255,255,255,0.9); }
+  .stat-source {
+    font-size: 7.5pt;
+    color: #9ca3af;
+    margin-top: 5px;
+  }
+  .stat-card.purple .stat-source,
+  .stat-card.dark .stat-source { color: rgba(255,255,255,0.45); }
+
+  /* ── TABLE ── */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    break-inside: avoid;
+  }
+  .data-table th {
+    background: #1e1b4b;
+    color: white;
+    font-size: 8pt;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 10px 14px;
+    text-align: left;
+  }
+  .data-table th:first-child { border-radius: 10px 0 0 0; }
+  .data-table th:last-child { border-radius: 0 10px 0 0; }
+  .data-table td {
+    padding: 10px 14px;
+    font-size: 10pt;
+    border-bottom: 1px solid #ede9fe;
+    vertical-align: top;
+    line-height: 1.5;
+  }
+  .data-table tr:nth-child(even) td { background: #fafafe; }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table td.num {
+    font-weight: 800;
+    color: #6d4aff;
+    font-size: 11pt;
+    white-space: nowrap;
+  }
+  .data-table td.source {
+    font-size: 8pt;
+    color: #9ca3af;
+  }
+
+  /* ── COMPARISON BLOCK ── */
+  .compare-wrap {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 20px;
+    break-inside: avoid;
+  }
+  .compare-card {
+    border-radius: 14px;
+    padding: 18px 20px;
+  }
+  .compare-card.before {
+    background: #fff7f7;
+    border: 1.5px solid #fecaca;
+  }
+  .compare-card.after {
+    background: #f0fdf4;
+    border: 1.5px solid #bbf7d0;
+  }
+  .compare-label {
+    font-size: 8pt;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .compare-card.before .compare-label { color: #991b1b; }
+  .compare-card.after .compare-label { color: #065f46; }
+  .compare-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    font-size: 9.5pt;
+  }
+  .compare-row:last-child { border-bottom: none; }
+  .compare-task { color: #374151; flex: 1; }
+  .compare-time {
+    font-weight: 700;
+    font-size: 10pt;
+    flex-shrink: 0;
+    margin-left: 8px;
+  }
+  .compare-card.before .compare-time { color: #dc2626; }
+  .compare-card.after .compare-time { color: #059669; }
+  .compare-total {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 2px solid;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .compare-card.before .compare-total { border-color: #fca5a5; }
+  .compare-card.after .compare-total { border-color: #6ee7b7; }
+  .compare-total-label {
+    font-size: 9pt;
+    font-weight: 700;
+  }
+  .compare-card.before .compare-total-label { color: #991b1b; }
+  .compare-card.after .compare-total-label { color: #065f46; }
+  .compare-total-num {
+    font-size: 14pt;
+    font-weight: 900;
+  }
+  .compare-card.before .compare-total-num { color: #dc2626; }
+  .compare-card.after .compare-total-num { color: #059669; }
+
+  /* ── SAVINGS TABLE ── */
+  .savings-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    break-inside: avoid;
+  }
+  .savings-table th {
+    background: #6d4aff;
+    color: white;
+    font-size: 8pt;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 10px 14px;
+    text-align: left;
+  }
+  .savings-table th:first-child { border-radius: 10px 0 0 0; }
+  .savings-table th:last-child { border-radius: 0 10px 0 0; }
+  .savings-table td {
+    padding: 11px 14px;
+    font-size: 10pt;
+    border-bottom: 1px solid #ede9fe;
+    vertical-align: middle;
+  }
+  .savings-table tr:nth-child(even) td { background: #fafafe; }
+  .savings-table tr:last-child td { border-bottom: none; }
+  .savings-table td.highlight {
+    font-weight: 800;
+    color: #6d4aff;
+  }
+  .savings-table td.green {
+    font-weight: 800;
+    color: #059669;
+  }
+
+  /* ── CALLOUT ── */
+  .callout {
+    border-radius: 16px;
+    padding: 22px 26px;
+    margin-bottom: 20px;
+    break-inside: avoid;
+  }
+  .callout.purple {
+    background: linear-gradient(135deg, #6d4aff 0%, #4c1d95 100%);
+    color: white;
+  }
+  .callout.amber {
+    background: #fffbeb;
+    border: 1.5px solid #fcd34d;
+  }
+  .callout h3 {
+    font-size: 10pt;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .callout.purple h3 { color: #c4b5fd; }
+  .callout.amber h3 { color: #92400e; }
+  .callout p {
+    font-size: 10.5pt;
+    line-height: 1.65;
+  }
+  .callout.purple p { color: rgba(255,255,255,0.88); }
+  .callout.amber p { color: #78350f; }
+  .callout p + p { margin-top: 10px; }
+  .callout em {
+    font-style: normal;
+    font-weight: 700;
+  }
+  .callout.purple em { color: #e0d9ff; }
+  .callout.amber em { color: #92400e; }
+
+  /* ── QUOTE BLOCK ── */
+  .quote-block {
+    background: #f7f3ff;
+    border-left: 4px solid #6d4aff;
+    border-radius: 0 12px 12px 0;
+    padding: 16px 20px;
+    margin-bottom: 14px;
+    break-inside: avoid;
+  }
+  .quote-text {
+    font-size: 11pt;
+    color: #1e1b4b;
+    line-height: 1.65;
+    font-style: italic;
+  }
+  .quote-text strong { font-style: normal; color: #6d4aff; }
+  .quote-attr {
+    font-size: 8pt;
+    color: #9ca3af;
+    margin-top: 8px;
+    font-style: normal;
+  }
+
+  /* ── DISCLAIMER ── */
+  .disclaimer {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-size: 8.5pt;
+    color: #6b7280;
+    line-height: 1.55;
+    margin-top: 24px;
+    break-inside: avoid;
+  }
+  .disclaimer strong { color: #374151; }
+
+  /* ── SOURCES ── */
+  .sources {
+    margin-top: 24px;
+    break-inside: avoid;
+  }
+  .sources h4 {
+    font-size: 8.5pt;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #9ca3af;
+    margin-bottom: 10px;
+  }
+  .sources ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .sources li {
+    font-size: 8pt;
+    color: #6b7280;
+    line-height: 1.5;
+    padding-left: 14px;
+    position: relative;
+  }
+  .sources li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: #6d4aff;
+    font-weight: 700;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 36px;
+    padding-top: 14px;
+    border-top: 1px solid #ede9fe;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 7.5pt;
+    color: #9ca3af;
+  }
+
+  @media print {
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .cover { min-height: 100vh; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════ COVER ══════════════════════════ -->
+<div class="cover">
+  <div class="cover-top">
+    <div class="cover-logo">one3Seven</div>
+    <div class="cover-eyebrow">Industry Research & Platform Impact</div>
+    <div class="cover-title">Time &amp; Cost<br/><span>Saved</span></div>
+    <div class="cover-sub">
+      How one3Seven eliminates the hidden cost of employment law intake — supported by EEOC data, legal industry benchmarks, and honest platform estimates.
+    </div>
+
+    <div class="cover-stats-row">
+      <div class="cover-stat">
+        <div class="cover-stat-num">88,531</div>
+        <div class="cover-stat-label">EEOC charges filed<br/>FY2024 (+9.2% YoY)</div>
+      </div>
+      <div class="cover-stat">
+        <div class="cover-stat-num">&lt;5%</div>
+        <div class="cover-stat-label">Cases accepted by employment firms from screening</div>
+      </div>
+      <div class="cover-stat">
+        <div class="cover-stat-num">3–6 hrs</div>
+        <div class="cover-stat-label">Firm time per intake without one3Seven</div>
+      </div>
+      <div class="cover-stat">
+        <div class="cover-stat-num">12 min</div>
+        <div class="cover-stat-label">Firm time per intake with one3Seven</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cover-bottom">
+    <div class="cover-disclaimer">
+      Industry statistics are sourced from EEOC, Clio, Legora, and legal salary databases.
+      one3Seven time/cost estimates are derived from industry benchmarks and labeled accordingly.
+    </div>
+    <div class="cover-date">
+      one3Seven · Confidential<br/>June 2026
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════ PAGE 1 — MARKET + ATTORNEY ECONOMICS ══════════════════════════ -->
+<div class="page">
+
+  <div class="section-header">
+    <div class="section-icon">📊</div>
+    <div>
+      <div class="section-title">The Market</div>
+      <div class="section-sub">EEOC-sourced statistics — FY2024</div>
+    </div>
+  </div>
+
+  <div class="stat-grid three">
+    <div class="stat-card purple">
+      <div class="stat-num">88,531</div>
+      <div class="stat-label">Workplace discrimination charges filed with the EEOC in FY2024</div>
+      <div class="stat-source">EEOC 2024 Annual Performance Report</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">9.2%</div>
+      <div class="stat-label">Year-over-year increase in charges filed — the pipeline is growing</div>
+      <div class="stat-source">EEOC FY2024 vs FY2023</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">$700M</div>
+      <div class="stat-label">Recovered for ~21,000 discrimination victims in FY2024 via settlements</div>
+      <div class="stat-source">EEOC Office of General Counsel FY2024</div>
+    </div>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-num">$300–$1,500</div>
+      <div class="stat-label">Employment attorney hourly billing rate range</div>
+      <div class="stat-source">Novian Law / LegalMatch 2025</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">30–40%</div>
+      <div class="stat-label">Average contingency fee on settlement for employment cases</div>
+      <div class="stat-source">Legal industry standard</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">$75,000+</div>
+      <div class="stat-label">Average employer defense cost before trial per employment lawsuit</div>
+      <div class="stat-source">Novian Law 2025</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">2,729</div>
+      <div class="stat-label">Pregnant Workers Fairness Act charges in FY2024 — up from 188 the year prior</div>
+      <div class="stat-source">EEOC FY2024 Annual Report</div>
+    </div>
+  </div>
+
+  <div class="section-header" style="margin-top: 32px;">
+    <div class="section-icon">⚖️</div>
+    <div>
+      <div class="section-title">Attorney Economics</div>
+      <div class="section-sub">The billable hours problem — Clio 2024 Legal Trends Report</div>
+    </div>
+  </div>
+
+  <div class="stat-grid three">
+    <div class="stat-card dark">
+      <div class="stat-num">3 hrs</div>
+      <div class="stat-label">Average billable hours captured per 8-hour attorney workday</div>
+      <div class="stat-source">Clio 2024 Legal Trends Report</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">38 days</div>
+      <div class="stat-label">Average time from lead intake to first payment received by firm</div>
+      <div class="stat-source">Clio Legal Trends 2024</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">&lt;5%</div>
+      <div class="stat-label">Cases accepted by employment firms from initial screening inquiries</div>
+      <div class="stat-source">Touro Law Review — Case Screening in Employment Law</div>
+    </div>
+  </div>
+
+  <div class="callout amber">
+    <h3>What this means</h3>
+    <p>If a firm screens 100 inquiries per month and accepts fewer than 5, they spend intake hours on <em>95 cases that will never convert.</em> At 2–4 hours of triage per inquiry, that is <em>190–380 staff hours per month on work that generates zero revenue.</em></p>
+    <p>one3Seven reduces the triage time on rejected cases from hours to minutes — recovering that capacity without changing the firm's acceptance criteria.</p>
+  </div>
+
+  <div class="footer">
+    <span>one3Seven · Time &amp; Cost Statistics · Confidential</span>
+    <span>Page 1</span>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════ PAGE 2 — INTAKE COST BREAKDOWN ══════════════════════════ -->
+<div class="page page-break">
+
+  <div class="section-header">
+    <div class="section-icon">⏱️</div>
+    <div>
+      <div class="section-title">The Intake Cost Breakdown</div>
+      <div class="section-sub">Before and after one3Seven — per intake</div>
+    </div>
+  </div>
+
+  <div class="callout amber" style="margin-bottom: 20px;">
+    <h3>Methodology note</h3>
+    <p>Time estimates below are derived from industry intake process documentation and legal workflow benchmarks. They are labeled as estimates and should be presented as such in external conversations. Intake coordinator salary basis: $25/hr (midpoint of $19–$29/hr industry range, Salary.com / Glassdoor 2026).</p>
+  </div>
+
+  <div class="compare-wrap">
+    <div class="compare-card before">
+      <div class="compare-label">Without one3Seven</div>
+      <div class="compare-row">
+        <span class="compare-task">Phone/email back-and-forth with worker</span>
+        <span class="compare-time">45–90 min</span>
+      </div>
+      <div class="compare-row">
+        <span class="compare-task">Document collection &amp; chasing missing files</span>
+        <span class="compare-time">30–60 min</span>
+      </div>
+      <div class="compare-row">
+        <span class="compare-task">Manual timeline reconstruction from docs</span>
+        <span class="compare-time">45–90 min</span>
+      </div>
+      <div class="compare-row">
+        <span class="compare-task">Preparing summary for attorney</span>
+        <span class="compare-time">30–45 min</span>
+      </div>
+      <div class="compare-row">
+        <span class="compare-task">Attorney initial review &amp; assessment</span>
+        <span class="compare-time">30–60 min</span>
+      </div>
+      <div class="compare-total">
+        <span class="compare-total-label">Total firm time per intake</span>
+        <span class="compare-total-num">3–6 hrs</span>
+      </div>
+    </div>
+
+    <div class="compare-card after">
+      <div class="compare-label">With one3Seven</div>
+      <div class="compare-row">
+        <span class="compare-task">Worker completes intake (self-serve)</span>
+        <span class="compare-time">Worker's time</span>
+      </div>
+      <div class="compare-row">
+        <span class="compare-task">Platform builds timeline, extracts facts</span>
+        <span class="compare-time">Automated</span>
+      </div>
+      <div class="compare-row">
+        <span class="compare-task">Firm attorney reviews pre-built packet</span>
+        <span class="compare-time">10–20 min</span>
+      </div>
+      <div class="compare-row">
+        <span class="compare-task">Decision: accept, pass, or request docs</span>
+        <span class="compare-time">2 min</span>
+      </div>
+      <div class="compare-row">
+        <span class="compare-task">&nbsp;</span>
+        <span class="compare-time">&nbsp;</span>
+      </div>
+      <div class="compare-total">
+        <span class="compare-total-label">Total firm time per intake</span>
+        <span class="compare-total-num">12–22 min</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-header" style="margin-top: 28px;">
+    <div class="section-icon">💰</div>
+    <div>
+      <div class="section-title">Dollar Savings by Firm Size</div>
+      <div class="section-sub">Conservative estimate — 3 hrs saved per intake at $25/hr coordinator, $400/hr attorney billing rate</div>
+    </div>
+  </div>
+
+  <table class="savings-table">
+    <thead>
+      <tr>
+        <th>Firm Size</th>
+        <th>Intakes / month</th>
+        <th>Hours saved / month</th>
+        <th>Coordinator cost saved / mo</th>
+        <th>Attorney capacity freed / yr</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Small</strong> (solo / 2 atty)</td>
+        <td>20</td>
+        <td class="highlight">57 hours</td>
+        <td class="green">$1,425 / mo</td>
+        <td class="green">~$48,000 value</td>
+      </tr>
+      <tr>
+        <td><strong>Mid-size</strong> (5–10 atty)</td>
+        <td>75</td>
+        <td class="highlight">211 hours</td>
+        <td class="green">$5,275 / mo</td>
+        <td class="green">~$177,600 value</td>
+      </tr>
+      <tr>
+        <td><strong>Large</strong> (20+ atty)</td>
+        <td>200</td>
+        <td class="highlight">563 hours</td>
+        <td class="green">$14,075 / mo</td>
+        <td class="green">~$480,000 value</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout purple">
+    <h3>Annual impact — mid-size firm</h3>
+    <p>Coordinator time recovered: <em>$63,300/year</em><br/>
+    Attorney screening time redirected to billable work: <em>$177,600/year in value</em><br/>
+    Combined estimated annual impact: <em>~$240,000/year</em></p>
+  </div>
+
+  <div class="footer">
+    <span>one3Seven · Time &amp; Cost Statistics · Confidential</span>
+    <span>Page 2</span>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════ PAGE 3 — THE REJECTED CASE PROBLEM + AI BENCHMARKS ══════════════════════════ -->
+<div class="page page-break">
+
+  <div class="section-header">
+    <div class="section-icon">🗑️</div>
+    <div>
+      <div class="section-title">The Rejected Case Problem</div>
+      <div class="section-sub">The silent cost nobody talks about</div>
+    </div>
+  </div>
+
+  <p style="font-size:10.5pt; color:#374151; line-height:1.65; margin-bottom:18px;">
+    Employment law firms screen many more cases than they take. If a firm reviews 100 inquiries per month and accepts fewer than 5%, <strong>95 intakes are rejected</strong> — but each one still consumed staff time to triage. one3Seven doesn't change which cases a firm accepts. It eliminates the cost of the ones they don't.
+  </p>
+
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Scenario</th>
+        <th>Per rejected case</th>
+        <th>100 inquiries / month</th>
+        <th>Annual</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Without one3Seven</strong></td>
+        <td class="num">2 hrs triage</td>
+        <td class="num">190 hrs wasted</td>
+        <td class="num">2,280 hrs/yr</td>
+      </tr>
+      <tr>
+        <td><strong>With one3Seven</strong></td>
+        <td class="num">15 min review</td>
+        <td class="num">24 hrs used</td>
+        <td class="num">288 hrs/yr</td>
+      </tr>
+      <tr>
+        <td><strong style="color:#059669;">Hours recovered</strong></td>
+        <td class="num" style="color:#059669;">1 hr 45 min</td>
+        <td class="num" style="color:#059669;">166 hrs/mo</td>
+        <td class="num" style="color:#059669;">1,992 hrs/yr</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-num">$50,000</div>
+      <div class="stat-label">Annual value of recovered hours at coordinator rate ($25/hr)</div>
+      <div class="stat-source">Estimated — based on 100 inquiries/month</div>
+    </div>
+    <div class="stat-card purple">
+      <div class="stat-num">$800,000</div>
+      <div class="stat-label">Annual capacity value if those hours are redirected to attorney billable time at $400/hr</div>
+      <div class="stat-source">Estimated — upper-bound attorney billing rate scenario</div>
+    </div>
+  </div>
+
+  <div class="section-header" style="margin-top: 28px;">
+    <div class="section-icon">🤖</div>
+    <div>
+      <div class="section-title">AI Legal Tech Benchmarks</div>
+      <div class="section-sub">What the industry has published on AI time savings in law</div>
+    </div>
+  </div>
+
+  <div class="quote-block">
+    <div class="quote-text">Teams reported <strong>14 hours saved per lawyer per week</strong>, a 14% reduction in outside counsel spend, and a 21% accuracy advantage over generalist AI.</div>
+    <div class="quote-attr">Legora — study of 100+ active law firm customers, December 2025</div>
+  </div>
+
+  <div class="quote-block">
+    <div class="quote-text">AI frees an average of <strong>4 hours per week</strong> for lawyers — roughly 200 hours per year per attorney — and <strong>95% of legal professionals</strong> using AI report saving time weekly.</div>
+    <div class="quote-attr">Clio 2025 Legal Trends Report</div>
+  </div>
+
+  <div class="quote-block">
+    <div class="quote-text">Law firms adopting AI report <strong>improved work quality (65%)</strong>, faster client responsiveness (63%), increased capacity (54%), higher profitability (36%), and improved client satisfaction (34%).</div>
+    <div class="quote-attr">Clio 2025 Legal Trends Report</div>
+  </div>
+
+  <div class="footer">
+    <span>one3Seven · Time &amp; Cost Statistics · Confidential</span>
+    <span>Page 3</span>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════ PAGE 4 — THE THREE STATS TO USE + SOURCES ══════════════════════════ -->
+<div class="page page-break">
+
+  <div class="section-header">
+    <div class="section-icon">📣</div>
+    <div>
+      <div class="section-title">The Three Stats to Use in Conversation</div>
+      <div class="section-sub">Short, specific, provable — use these in calls, emails, and decks</div>
+    </div>
+  </div>
+
+  <div class="callout purple" style="margin-bottom: 18px;">
+    <h3>Stat 1 — The market + rejection problem</h3>
+    <p>"88,000 workplace discrimination charges were filed last year. Employment law firms accept fewer than 5% of cases they screen. The intake cost on rejected cases alone — cases that never convert — is 2–4 hours of staff time per inquiry. <em>one3Seven cuts that to 15 minutes.</em>"</p>
+  </div>
+
+  <div class="callout purple" style="margin-bottom: 18px;">
+    <h3>Stat 2 — The AI comparison</h3>
+    <p>"The average attorney bills 3 hours out of every 8 worked. Non-billable intake triage is one of the biggest reasons. Legora — the $675M legal AI platform — published data showing 14 hours saved per lawyer per week with AI assistance. <em>one3Seven applies that same principle specifically to the intake moment.</em>"</p>
+  </div>
+
+  <div class="callout purple" style="margin-bottom: 28px;">
+    <h3>Stat 3 — The FTE comparison</h3>
+    <p>"A mid-size employment firm screening 75 intakes a month spends an estimated 200+ hours on intake coordination. That's more than one full-time employee. <em>one3Seven converts that into a 10-minute attorney review.</em>"</p>
+  </div>
+
+  <div class="disclaimer">
+    <strong>Disclosure for external use:</strong> EEOC statistics (charges filed, recovery amounts) are sourced directly from EEOC FY2024 published reports and are factually accurate. Attorney hourly rates, acceptance rates, and salary figures are sourced from third-party industry publications (Clio, Legora, Salary.com, Novian Law, Touro Law Review) and cited as such. Time and cost savings estimates for one3Seven are derived from industry benchmarks and should be presented as estimates, not guaranteed outcomes. Legora time-savings data (14 hrs/week) is from their published customer study and relates to general legal AI usage, not specifically to intake processes.
+  </div>
+
+  <div class="sources">
+    <h4>Sources</h4>
+    <ul>
+      <li>EEOC FY2024 Annual Performance Report — eeoc.gov/2024-annual-performance-report</li>
+      <li>EEOC Office of General Counsel FY2024 Annual Report — eeoc.gov</li>
+      <li>Clio 2025 Legal Trends Report — clio.com/guides/ai-legal-trends</li>
+      <li>Clio Lawyer Statistics 2026 — clio.com/blog/lawyer-statistics</li>
+      <li>Legora Legal AI Review (14 hrs/week stat) — gc.ai/blog/legora-legal-ai-review</li>
+      <li>Salary.com — Legal Intake Coordinator Salary (March 2026) — salary.com</li>
+      <li>Glassdoor — Legal Intake Specialist Salary 2025 — glassdoor.com</li>
+      <li>Novian Law — Employment Lawyer Cost 2025 — novianlaw.com</li>
+      <li>Touro Law Review — How to Screen for Success in Employment Law Cases — digitalcommons.tourolaw.edu</li>
+    </ul>
+  </div>
+
+  <div class="footer">
+    <span>one3Seven · Time &amp; Cost Statistics · Confidential · June 2026</span>
+    <span>Page 4</span>
+  </div>
+</div>
+
+</body>
+</html>

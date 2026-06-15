@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>one3Seven — Partner Overview</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background: #fff;
+    color: #1e1b4b;
+    font-size: 11pt;
+    line-height: 1.55;
+  }
+
+  /* ═══════════════════════════════════════
+     COVER — full bleed dark gradient
+  ═══════════════════════════════════════ */
+  .cover {
+    background: linear-gradient(160deg, #050311 0%, #0f0c29 30%, #1e1b4b 58%, #3b2d8a 80%, #6d4aff 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 64px 64px 52px;
+    page-break-after: always;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Decorative circles */
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: -120px; right: -120px;
+    width: 500px; height: 500px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(109,74,255,0.18) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .cover::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; left: -60px;
+    width: 380px; height: 380px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(196,181,253,0.1) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .cover-top { position: relative; z-index: 1; }
+
+  .cover-logo-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 56px;
+  }
+  .cover-logo-mark {
+    width: 36px; height: 36px;
+    background: #6d4aff;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14pt; font-weight: 900; color: white;
+    letter-spacing: -0.04em;
+  }
+  .cover-logo-text {
+    font-size: 13pt;
+    font-weight: 800;
+    color: rgba(255,255,255,0.9);
+    letter-spacing: 0.02em;
+  }
+  .cover-badge {
+    margin-left: auto;
+    background: rgba(109,74,255,0.35);
+    border: 1px solid rgba(109,74,255,0.6);
+    color: #c4b5fd;
+    font-size: 7.5pt;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border-radius: 20px;
+  }
+
+  .cover-eyebrow {
+    font-size: 9pt;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(196,181,253,0.7);
+    margin-bottom: 16px;
+  }
+  .cover-headline {
+    font-size: 48pt;
+    font-weight: 900;
+    line-height: 0.95;
+    letter-spacing: -0.035em;
+    color: white;
+    margin-bottom: 20px;
+  }
+  .cover-headline span {
+    background: linear-gradient(90deg, #c4b5fd, #a78bfa, #818cf8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .cover-sub {
+    font-size: 13pt;
+    color: rgba(255,255,255,0.6);
+    max-width: 540px;
+    line-height: 1.65;
+  }
+
+  .cover-stat-strip {
+    display: flex;
+    gap: 0;
+    margin-top: 48px;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    overflow: hidden;
+    background: rgba(255,255,255,0.04);
+    backdrop-filter: blur(8px);
+    position: relative; z-index: 1;
+  }
+  .cover-stat {
+    flex: 1;
+    padding: 20px 22px;
+    border-right: 1px solid rgba(255,255,255,0.08);
+  }
+  .cover-stat:last-child { border-right: none; }
+  .cover-stat-num {
+    font-size: 21pt;
+    font-weight: 900;
+    color: #c4b5fd;
+    letter-spacing: -0.025em;
+    line-height: 1;
+  }
+  .cover-stat-label {
+    font-size: 8.5pt;
+    color: rgba(255,255,255,0.48);
+    margin-top: 5px;
+    line-height: 1.4;
+  }
+
+  .cover-bottom {
+    position: relative; z-index: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-top: 32px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    margin-top: 40px;
+  }
+  .cover-tagline {
+    font-size: 10pt;
+    color: rgba(255,255,255,0.4);
+    font-style: italic;
+    max-width: 420px;
+    line-height: 1.55;
+  }
+  .cover-meta {
+    text-align: right;
+    font-size: 8pt;
+    color: rgba(255,255,255,0.28);
+    line-height: 1.6;
+  }
+
+  /* ═══════════════════════════════════════
+     SHARED PAGE STYLES
+  ═══════════════════════════════════════ */
+  .page {
+    padding: 52px 60px;
+    max-width: 820px;
+    margin: 0 auto;
+  }
+  .page-break { page-break-before: always; }
+
+  /* Section header */
+  .sh {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #ede9fe;
+  }
+  .sh-icon {
+    width: 40px; height: 40px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #6d4aff, #4c1d95);
+    color: white;
+    font-size: 18pt;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+    box-shadow: 0 4px 14px rgba(109,74,255,0.35);
+  }
+  .sh-text {}
+  .sh-title {
+    font-size: 16pt;
+    font-weight: 800;
+    color: #1e1b4b;
+    letter-spacing: -0.015em;
+    line-height: 1.1;
+  }
+  .sh-sub {
+    font-size: 9pt;
+    color: #7c3aed;
+    font-weight: 600;
+    margin-top: 3px;
+    letter-spacing: 0.02em;
+  }
+
+  /* Page number pill */
+  .page-num {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 8pt;
+    color: #6d4aff;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+  .page-num::before {
+    content: '';
+    display: inline-block;
+    width: 20px; height: 2px;
+    background: #6d4aff;
+    border-radius: 1px;
+  }
+
+  /* ── STAT CARDS ── */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+  .grid4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+
+  .sc {
+    border-radius: 16px;
+    padding: 20px 20px 18px;
+    break-inside: avoid;
+    border: 1.5px solid #ede9fe;
+    background: #fafafe;
+  }
+  .sc.v-purple {
+    background: linear-gradient(135deg, #6d4aff 0%, #4c1d95 100%);
+    border-color: transparent;
+    box-shadow: 0 6px 24px rgba(109,74,255,0.28);
+  }
+  .sc.v-dark {
+    background: linear-gradient(135deg, #1e1b4b 0%, #0f0c29 100%);
+    border-color: transparent;
+  }
+  .sc.v-teal {
+    background: linear-gradient(135deg, #0891b2 0%, #164e63 100%);
+    border-color: transparent;
+  }
+  .sc.v-green {
+    background: #f0fdf4;
+    border-color: #bbf7d0;
+  }
+  .sc-num {
+    font-size: 28pt;
+    font-weight: 900;
+    color: #6d4aff;
+    letter-spacing: -0.025em;
+    line-height: 1;
+  }
+  .sc.v-purple .sc-num,
+  .sc.v-dark .sc-num,
+  .sc.v-teal .sc-num { color: #c4b5fd; }
+  .sc.v-green .sc-num { color: #059669; }
+  .sc-label {
+    font-size: 9.5pt;
+    font-weight: 600;
+    color: #374151;
+    margin-top: 7px;
+    line-height: 1.4;
+  }
+  .sc.v-purple .sc-label,
+  .sc.v-dark .sc-label,
+  .sc.v-teal .sc-label { color: rgba(255,255,255,0.88); }
+  .sc.v-green .sc-label { color: #064e3b; }
+  .sc-src {
+    font-size: 7.5pt;
+    color: #9ca3af;
+    margin-top: 5px;
+  }
+  .sc.v-purple .sc-src,
+  .sc.v-dark .sc-src,
+  .sc.v-teal .sc-src { color: rgba(255,255,255,0.38); }
+  .sc.v-green .sc-src { color: #6ee7b7; }
+
+  /* ── CALLOUTS ── */
+  .box {
+    border-radius: 16px;
+    padding: 22px 26px;
+    margin-bottom: 20px;
+    break-inside: avoid;
+  }
+  .box.b-purple {
+    background: linear-gradient(135deg, #6d4aff 0%, #4c1d95 100%);
+    box-shadow: 0 6px 28px rgba(109,74,255,0.22);
+  }
+  .box.b-light { background: #f7f3ff; border: 1.5px solid #ddd6fe; }
+  .box.b-dark { background: #1e1b4b; }
+  .box.b-green { background: #f0fdf4; border: 1.5px solid #bbf7d0; }
+  .box.b-amber { background: #fffbeb; border: 1.5px solid #fcd34d; }
+  .box h3 {
+    font-size: 9pt;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .box.b-purple h3 { color: #c4b5fd; }
+  .box.b-light h3 { color: #6d4aff; }
+  .box.b-dark h3 { color: #c4b5fd; }
+  .box.b-green h3 { color: #059669; }
+  .box.b-amber h3 { color: #92400e; }
+  .box p, .box ul { font-size: 10.5pt; line-height: 1.65; }
+  .box.b-purple p, .box.b-purple ul { color: rgba(255,255,255,0.88); }
+  .box.b-light p, .box.b-light ul { color: #312e81; }
+  .box.b-dark p, .box.b-dark ul { color: rgba(255,255,255,0.82); }
+  .box.b-green p, .box.b-green ul { color: #064e3b; }
+  .box.b-amber p, .box.b-amber ul { color: #78350f; }
+  .box p + p { margin-top: 10px; }
+  .box em { font-style: normal; font-weight: 800; }
+  .box.b-purple em { color: #e0d9ff; }
+  .box.b-light em { color: #6d4aff; }
+  .box.b-dark em { color: #c4b5fd; }
+  .box.b-green em { color: #059669; }
+  .box.b-amber em { color: #b45309; }
+
+  .box ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .box ul li { padding-left: 20px; position: relative; }
+  .box.b-purple ul li::before { content: '→'; position:absolute; left:0; color:#c4b5fd; font-weight:700; }
+  .box.b-light ul li::before { content: '→'; position:absolute; left:0; color:#6d4aff; font-weight:700; }
+  .box.b-dark ul li::before { content: '→'; position:absolute; left:0; color:#c4b5fd; font-weight:700; }
+  .box.b-green ul li::before { content: '✓'; position:absolute; left:0; color:#059669; font-weight:700; }
+  .box.b-amber ul li::before { content: '→'; position:absolute; left:0; color:#b45309; font-weight:700; }
+
+  /* ── BIG QUOTE ── */
+  .big-quote {
+    background: linear-gradient(135deg, #0f0c29 0%, #1e1b4b 100%);
+    border-radius: 18px;
+    padding: 30px 32px;
+    margin-bottom: 20px;
+    break-inside: avoid;
+    position: relative;
+    overflow: hidden;
+  }
+  .big-quote::before {
+    content: '"';
+    position: absolute;
+    top: -20px; left: 20px;
+    font-size: 120pt;
+    color: rgba(109,74,255,0.15);
+    font-weight: 900;
+    line-height: 1;
+    pointer-events: none;
+  }
+  .big-quote-text {
+    font-size: 14pt;
+    font-weight: 700;
+    color: white;
+    line-height: 1.6;
+    position: relative;
+    z-index: 1;
+  }
+  .big-quote-text span { color: #c4b5fd; }
+  .big-quote-attr {
+    font-size: 8.5pt;
+    color: rgba(255,255,255,0.4);
+    margin-top: 14px;
+    position: relative; z-index: 1;
+  }
+
+  /* ── FEATURE ROWS ── */
+  .feature-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .feature-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    background: #fafafe;
+    border: 1.5px solid #ede9fe;
+    border-radius: 14px;
+    padding: 16px 18px;
+    break-inside: avoid;
+  }
+  .feature-icon {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #6d4aff, #4c1d95);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15pt;
+    flex-shrink: 0;
+    box-shadow: 0 3px 10px rgba(109,74,255,0.3);
+  }
+  .feature-body {}
+  .feature-title {
+    font-size: 11pt;
+    font-weight: 700;
+    color: #1e1b4b;
+    line-height: 1.3;
+  }
+  .feature-desc {
+    font-size: 9.5pt;
+    color: #6b7280;
+    margin-top: 3px;
+    line-height: 1.5;
+  }
+
+  /* ── TWO COLUMN CARDS ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+  .col-card {
+    border-radius: 14px;
+    padding: 20px;
+    break-inside: avoid;
+  }
+  .col-card.cc-problem { background: #fff5f5; border: 1.5px solid #fecaca; }
+  .col-card.cc-solution { background: #f0fdf4; border: 1.5px solid #bbf7d0; }
+  .col-label {
+    font-size: 8pt;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .cc-problem .col-label { color: #991b1b; }
+  .cc-solution .col-label { color: #065f46; }
+  .col-list { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+  .col-list li { font-size: 10pt; padding-left: 18px; position: relative; line-height: 1.45; }
+  .cc-problem .col-list li::before { content: '✗'; position:absolute; left:0; color:#dc2626; font-weight:700; }
+  .cc-solution .col-list li::before { content: '✓'; position:absolute; left:0; color:#059669; font-weight:700; }
+  .cc-problem .col-list li { color: #7f1d1d; }
+  .cc-solution .col-list li { color: #064e3b; }
+
+  /* ── OPPORTUNITY TABLE ── */
+  .opp-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    break-inside: avoid;
+  }
+  .opp-table th {
+    background: linear-gradient(90deg, #1e1b4b, #3b2d8a);
+    color: white;
+    font-size: 8pt;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 11px 14px;
+    text-align: left;
+  }
+  .opp-table th:first-child { border-radius: 10px 0 0 0; }
+  .opp-table th:last-child { border-radius: 0 10px 0 0; }
+  .opp-table td {
+    padding: 12px 14px;
+    font-size: 10pt;
+    border-bottom: 1px solid #ede9fe;
+    vertical-align: middle;
+    line-height: 1.5;
+  }
+  .opp-table tr:nth-child(even) td { background: #fafafe; }
+  .opp-table tr:last-child td { border-bottom: none; }
+  .opp-table td.t-bold { font-weight: 700; color: #1e1b4b; }
+  .opp-table td.t-purple { font-weight: 800; color: #6d4aff; }
+  .opp-table td.t-green { font-weight: 800; color: #059669; }
+  .opp-table td.t-pill {}
+  .pill {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 8pt;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+  }
+  .pill.p-high { background: #f0fdf4; color: #059669; border: 1px solid #bbf7d0; }
+  .pill.p-med { background: #fffbeb; color: #b45309; border: 1px solid #fcd34d; }
+  .pill.p-new { background: #f7f3ff; color: #6d4aff; border: 1px solid #ddd6fe; }
+
+  /* ── TIMELINE ── */
+  .tl { display: flex; flex-direction: column; gap: 0; margin-bottom: 20px; }
+  .tl-item { display: flex; gap: 16px; align-items: flex-start; }
+  .tl-left { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; width: 34px; }
+  .tl-dot {
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: #6d4aff;
+    border: 3px solid white;
+    box-shadow: 0 0 0 2px #6d4aff;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .tl-line { width: 2px; flex: 1; background: linear-gradient(#ede9fe, #ede9fe); min-height: 24px; }
+  .tl-content { padding-bottom: 20px; flex: 1; }
+  .tl-tag {
+    font-size: 8pt;
+    font-weight: 700;
+    color: #6d4aff;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .tl-title { font-size: 11pt; font-weight: 700; color: #1e1b4b; margin-top: 2px; }
+  .tl-desc { font-size: 9.5pt; color: #6b7280; margin-top: 4px; line-height: 1.5; }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 36px;
+    padding-top: 14px;
+    border-top: 1px solid #ede9fe;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 7.5pt;
+    color: #9ca3af;
+  }
+  .footer-logo { font-weight: 800; color: #6d4aff; font-size: 8.5pt; letter-spacing: 0.04em; }
+
+  /* ── DIVIDER ── */
+  .divider { border: none; border-top: 1.5px solid #ede9fe; margin: 22px 0; }
+
+  @media print {
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .cover { min-height: 100vh; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     COVER
+══════════════════════════════════════════ -->
+<div class="cover">
+  <div class="cover-top">
+    <div class="cover-logo-row">
+      <div class="cover-logo-mark">o7</div>
+      <div class="cover-logo-text">one3Seven</div>
+      <div class="cover-badge">Confidential · Partner Overview</div>
+    </div>
+
+    <div class="cover-eyebrow">The opportunity · 2026</div>
+    <div class="cover-headline">A new standard<br/>for employment<br/><span>law intake.</span></div>
+    <div class="cover-sub">
+      one3Seven is the platform connecting workers with employment law firms — intelligently, efficiently, and at scale. We're building the infrastructure layer that the industry has never had.
+    </div>
+
+    <div class="cover-stat-strip">
+      <div class="cover-stat">
+        <div class="cover-stat-num">88,531</div>
+        <div class="cover-stat-label">Workplace discrimination charges filed with the EEOC — FY2024</div>
+      </div>
+      <div class="cover-stat">
+        <div class="cover-stat-num">$700M</div>
+        <div class="cover-stat-label">Recovered for workers via EEOC settlements last year</div>
+      </div>
+      <div class="cover-stat">
+        <div class="cover-stat-num">&lt;5%</div>
+        <div class="cover-stat-label">Of cases accepted by firms from initial screening</div>
+      </div>
+      <div class="cover-stat">
+        <div class="cover-stat-num">~$4B</div>
+        <div class="cover-stat-label">U.S. employment litigation market — plaintiff side</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cover-bottom">
+    <div class="cover-tagline">"The intake moment is where most employment cases are won or lost — before an attorney ever looks at them."</div>
+    <div class="cover-meta">one3Seven · Confidential<br/>June 2026 · Partner Overview</div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     PAGE 1 — THE PROBLEM
+══════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-num">01 · The Problem</div>
+
+  <div class="sh">
+    <div class="sh-icon">⚠️</div>
+    <div class="sh-text">
+      <div class="sh-title">Employment law has a broken front door</div>
+      <div class="sh-sub">And it's costing both workers and firms — every single day</div>
+    </div>
+  </div>
+
+  <div class="grid3">
+    <div class="sc">
+      <div class="sc-num">88,531</div>
+      <div class="sc-label">Workplace discrimination charges filed with EEOC in FY2024 — up 9.2% year over year</div>
+      <div class="sc-src">EEOC FY2024 Annual Report</div>
+    </div>
+    <div class="sc v-purple">
+      <div class="sc-num">&lt;5%</div>
+      <div class="sc-label">Cases accepted by employment firms from initial screening inquiries — 95% are turned away</div>
+      <div class="sc-src">Touro Law Review</div>
+    </div>
+    <div class="sc">
+      <div class="sc-num">3–6 hrs</div>
+      <div class="sc-label">Staff time spent per intake — including the 95% that are rejected and generate zero revenue</div>
+      <div class="sc-src">Industry benchmark estimate</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="col-card cc-problem">
+      <div class="col-label">The worker's reality</div>
+      <ul class="col-list">
+        <li>Doesn't know how to organize their documents or story</li>
+        <li>Calls multiple firms — gets voicemail, gets put on hold</li>
+        <li>Has a 180-day EEOC filing deadline they may not know about</li>
+        <li>Gets declined not because their case is weak — but because it was presented poorly</li>
+        <li>Has no visibility after submitting. No update. No guidance.</li>
+      </ul>
+    </div>
+    <div class="col-card cc-solution" style="background:#fff5f5; border-color:#fecaca;">
+      <div class="col-label" style="color:#991b1b;">The firm's reality</div>
+      <ul class="col-list" style="color:#7f1d1d;">
+        <li style="color:#7f1d1d;"><span style="position:absolute;left:0;color:#dc2626;font-weight:700;">✗</span>200–400 hours/month on intakes that never convert</li>
+        <li style="color:#7f1d1d;"><span style="position:absolute;left:0;color:#dc2626;font-weight:700;">✗</span>Intake coordinator chasing documents, scheduling calls</li>
+        <li style="color:#7f1d1d;"><span style="position:absolute;left:0;color:#dc2626;font-weight:700;">✗</span>Attorney reviewing incomplete, unstructured summaries</li>
+        <li style="color:#7f1d1d;"><span style="position:absolute;left:0;color:#dc2626;font-weight:700;">✗</span>Strong cases look the same as weak ones on arrival</li>
+        <li style="color:#7f1d1d;"><span style="position:absolute;left:0;color:#dc2626;font-weight:700;">✗</span>No consistent intake format — every case is different</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="big-quote">
+    <div class="big-quote-text">
+      The average employment attorney bills <span>3 hours out of every 8 worked.</span> The rest is buried in intake overhead, administration, and triage for cases that will never convert.
+    </div>
+    <div class="big-quote-attr">Clio 2024 Legal Trends Report · Clio 2025 Legal Trends Report</div>
+  </div>
+
+  <div class="footer">
+    <span class="footer-logo">one3Seven</span>
+    <span>Partner Overview · Confidential · June 2026</span>
+    <span>Page 1</span>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     PAGE 2 — THE PLATFORM
+══════════════════════════════════════════ -->
+<div class="page page-break">
+  <div class="page-num">02 · The Platform</div>
+
+  <div class="sh">
+    <div class="sh-icon">⚡</div>
+    <div class="sh-text">
+      <div class="sh-title">What one3Seven actually does</div>
+      <div class="sh-sub">A two-sided platform built specifically for employment law intake</div>
+    </div>
+  </div>
+
+  <div class="box b-purple" style="margin-bottom:24px;">
+    <h3>The core idea</h3>
+    <p>one3Seven is the infrastructure layer between workers who need legal help and employment law firms who need to find the right cases efficiently. <em>We don't give legal advice. We don't tell firms which cases to take.</em> We make sure the right information reaches the right attorney in the clearest possible format — and that both sides know what happens next.</p>
+  </div>
+
+  <div class="feature-list">
+    <div class="feature-row">
+      <div class="feature-icon">📋</div>
+      <div class="feature-body">
+        <div class="feature-title">Guided Worker Intake</div>
+        <div class="feature-desc">Workers complete a structured intake flow at their own pace — employment timeline, key people, what happened, document uploads. No phone call required. No intake form lost in email. Everything captured in one place.</div>
+      </div>
+    </div>
+    <div class="feature-row">
+      <div class="feature-icon">🧠</div>
+      <div class="feature-body">
+        <div class="feature-title">AI Intelligence Layer</div>
+        <div class="feature-desc">The platform reads uploaded documents, extracts key quotes, identifies retaliation timing gaps (e.g., "termination 34 days after HR complaint"), surfaces confirmed facts, and flags what's still missing. Every intake arrives pre-analyzed.</div>
+      </div>
+    </div>
+    <div class="feature-row">
+      <div class="feature-icon">⚖️</div>
+      <div class="feature-body">
+        <div class="feature-title">Firm Review Dashboard</div>
+        <div class="feature-desc">Attorneys see a clean, structured intake card: overview, timeline, AI intelligence, categorized documents, readiness signals, and gaps. Review takes 10–20 minutes — not 3–6 hours. One-click decision: accept, request more documents, or pass.</div>
+      </div>
+    </div>
+    <div class="feature-row">
+      <div class="feature-icon">🔔</div>
+      <div class="feature-body">
+        <div class="feature-title">Closed-Loop Outcomes</div>
+        <div class="feature-desc">Workers aren't left wondering. Firms have a documented record of every decision. The loop closes cleanly — with notifications, status updates, and document request workflows all handled in-platform.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid2" style="margin-top:4px;">
+    <div class="sc v-dark">
+      <div class="sc-num">12 min</div>
+      <div class="sc-label">Estimated firm review time per intake with one3Seven vs. 3–6 hours without</div>
+      <div class="sc-src">Platform estimate based on industry benchmarks</div>
+    </div>
+    <div class="sc v-green">
+      <div class="sc-num">~$240K</div>
+      <div class="sc-label">Estimated annual recoverable value for a mid-size firm (75 intakes/month)</div>
+      <div class="sc-src">one3Seven estimate — coordinator + attorney time savings</div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span class="footer-logo">one3Seven</span>
+    <span>Partner Overview · Confidential · June 2026</span>
+    <span>Page 2</span>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     PAGE 3 — THE MARKET OPPORTUNITY
+══════════════════════════════════════════ -->
+<div class="page page-break">
+  <div class="page-num">03 · The Market</div>
+
+  <div class="sh">
+    <div class="sh-icon">📈</div>
+    <div class="sh-text">
+      <div class="sh-title">The Market Is Large and Growing</div>
+      <div class="sh-sub">Employment claims are accelerating — and the infrastructure to handle them hasn't caught up</div>
+    </div>
+  </div>
+
+  <div class="grid4">
+    <div class="sc v-purple">
+      <div class="sc-num">~$4B</div>
+      <div class="sc-label">U.S. employment litigation market — plaintiff side</div>
+      <div class="sc-src">IBISWorld 2025</div>
+    </div>
+    <div class="sc">
+      <div class="sc-num">88,531</div>
+      <div class="sc-label">EEOC charges filed in FY2024 — up 9.2% from FY2023</div>
+      <div class="sc-src">EEOC FY2024</div>
+    </div>
+    <div class="sc">
+      <div class="sc-num">2,729</div>
+      <div class="sc-label">Pregnant Workers Act charges in first full year — up from 188 the year prior</div>
+      <div class="sc-src">EEOC FY2024</div>
+    </div>
+    <div class="sc v-dark">
+      <div class="sc-num">$700M</div>
+      <div class="sc-label">Recovered for discrimination victims via EEOC settlements in FY2024 alone</div>
+      <div class="sc-src">EEOC OGC FY2024</div>
+    </div>
+  </div>
+
+  <div class="box b-light">
+    <h3>Why the volume keeps growing</h3>
+    <ul>
+      <li>New categories of protected class claims expanding the pipeline every year (PWFA, AI-driven hiring bias claims, pay transparency enforcement)</li>
+      <li>Remote and hybrid work created new documentation gaps and employer compliance failures</li>
+      <li>Worker awareness of rights is higher than ever — more people are willing to pursue claims</li>
+      <li>The 180-day EEOC filing window means every worker with a real claim has an urgent need for legal guidance</li>
+    </ul>
+  </div>
+
+  <div class="sh" style="margin-top:28px;">
+    <div class="sh-icon">🤖</div>
+    <div class="sh-text">
+      <div class="sh-title">Legal AI Is Proven — and Accelerating</div>
+      <div class="sh-sub">The industry has validated the category. one3Seven is built for this specific use case.</div>
+    </div>
+  </div>
+
+  <div class="grid3">
+    <div class="sc">
+      <div class="sc-num">14 hrs</div>
+      <div class="sc-label">Saved per lawyer per week — Legora's study of 100+ active law firm customers</div>
+      <div class="sc-src">Legora December 2025</div>
+    </div>
+    <div class="sc v-purple">
+      <div class="sc-num">95%</div>
+      <div class="sc-label">Of legal professionals using AI report saving time weekly on their work</div>
+      <div class="sc-src">Clio 2025 Legal Trends</div>
+    </div>
+    <div class="sc">
+      <div class="sc-num">$675M</div>
+      <div class="sc-label">Legora's valuation — the legal AI market is being taken seriously at the highest levels</div>
+      <div class="sc-src">Legora funding round 2025</div>
+    </div>
+  </div>
+
+  <div class="box b-dark">
+    <h3>The gap Legora doesn't fill</h3>
+    <p>Platforms like Legora, Harvey, and CoCounsel serve <em>attorneys doing legal research, drafting, and analysis.</em> None of them solve the front-door problem: the intake moment where the worker first arrives, the documents are unorganized, and the attorney is deciding whether to spend 6 hours or 6 seconds on this case. <em>That is exactly what one3Seven is built for.</em></p>
+  </div>
+
+  <div class="footer">
+    <span class="footer-logo">one3Seven</span>
+    <span>Partner Overview · Confidential · June 2026</span>
+    <span>Page 3</span>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     PAGE 4 — TARGET CUSTOMER + OPPORTUNITY
+══════════════════════════════════════════ -->
+<div class="page page-break">
+  <div class="page-num">04 · Who We Serve</div>
+
+  <div class="sh">
+    <div class="sh-icon">🎯</div>
+    <div class="sh-text">
+      <div class="sh-title">Who one3Seven Is Built For</div>
+      <div class="sh-sub">Two customers. One platform. Every intake.</div>
+    </div>
+  </div>
+
+  <table class="opp-table">
+    <thead>
+      <tr>
+        <th>Customer</th>
+        <th>Profile</th>
+        <th>Primary Pain</th>
+        <th>Value Delivered</th>
+        <th>Priority</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="t-bold">Employment Law Firm</td>
+        <td>2–50 attorney firms handling discrimination, wrongful termination, wage &amp; hour, harassment</td>
+        <td>200–400 hours/month on intake overhead; no structured data on incoming cases</td>
+        <td class="t-green">10–20 min review, pre-analyzed packet, one-click decision</td>
+        <td><span class="pill p-high">Primary</span></td>
+      </tr>
+      <tr>
+        <td class="t-bold">Displaced Worker</td>
+        <td>Wage theft, discrimination, wrongful termination, harassment — any employment matter</td>
+        <td>Doesn't know how to present their case; no access to legal guidance; approaching deadlines</td>
+        <td class="t-green">Structured guided intake, document upload, firm visibility, clear outcome</td>
+        <td><span class="pill p-high">Primary</span></td>
+      </tr>
+      <tr>
+        <td class="t-bold">HR / Compliance Partners</td>
+        <td>Companies seeking to understand and reduce employment claim exposure proactively</td>
+        <td>No early-warning visibility into potential claims before EEOC filing</td>
+        <td class="t-purple">Future product layer — intake data as compliance intelligence</td>
+        <td><span class="pill p-new">Future</span></td>
+      </tr>
+      <tr>
+        <td class="t-bold">Legal Aid Organizations</td>
+        <td>Nonprofits and legal aid societies handling high-volume, low-resource intake</td>
+        <td>Extreme volume, minimal staff, no triage infrastructure</td>
+        <td class="t-purple">White-label intake infrastructure for mission-driven organizations</td>
+        <td><span class="pill p-med">Expansion</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="sh" style="margin-top:28px;">
+    <div class="sh-icon">💼</div>
+    <div class="sh-text">
+      <div class="sh-title">The Firm-Side Economics</div>
+      <div class="sh-sub">Why every employment law firm has a reason to say yes</div>
+    </div>
+  </div>
+
+  <table class="opp-table">
+    <thead>
+      <tr>
+        <th>Firm Size</th>
+        <th>Intakes / month</th>
+        <th>Hours saved / month</th>
+        <th>Coordinator cost saved</th>
+        <th>Attorney capacity freed</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="t-bold">Small (1–2 atty)</td>
+        <td>20</td>
+        <td class="t-purple">~57 hours</td>
+        <td class="t-green">$1,425 / mo</td>
+        <td class="t-green">~$48K/yr value</td>
+      </tr>
+      <tr>
+        <td class="t-bold">Mid-size (5–10 atty)</td>
+        <td>75</td>
+        <td class="t-purple">~211 hours</td>
+        <td class="t-green">$5,275 / mo</td>
+        <td class="t-green">~$177K/yr value</td>
+      </tr>
+      <tr>
+        <td class="t-bold">Large (20+ atty)</td>
+        <td>200</td>
+        <td class="t-purple">~563 hours</td>
+        <td class="t-green">$14,075 / mo</td>
+        <td class="t-green">~$480K/yr value</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="footer">
+    <span class="footer-logo">one3Seven</span>
+    <span>Partner Overview · Confidential · June 2026</span>
+    <span>Page 4</span>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     PAGE 5 — THE PARTNER OPPORTUNITY
+══════════════════════════════════════════ -->
+<div class="page page-break">
+  <div class="page-num">05 · The Opportunity</div>
+
+  <div class="sh">
+    <div class="sh-icon">🤝</div>
+    <div class="sh-text">
+      <div class="sh-title">Why Partner with one3Seven Now</div>
+      <div class="sh-sub">Early access to a category being built from the ground up</div>
+    </div>
+  </div>
+
+  <div class="big-quote">
+    <div class="big-quote-text">
+      There is no incumbent in employment law intake. No platform owns this moment. The firm that gets there first <span>sets the standard.</span> The partner who helps build it gets to shape the category.
+    </div>
+    <div class="big-quote-attr">one3Seven · Company thesis · 2026</div>
+  </div>
+
+  <div class="tl">
+    <div class="tl-item">
+      <div class="tl-left"><div class="tl-dot"></div><div class="tl-line"></div></div>
+      <div class="tl-content">
+        <div class="tl-tag">Right now</div>
+        <div class="tl-title">Platform is built and live</div>
+        <div class="tl-desc">Intake flow, document upload, AI intelligence layer, firm review dashboard, and accept/decline/document-request workflow are all operational. The product exists — we're moving to firm acquisition.</div>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-left"><div class="tl-dot"></div><div class="tl-line"></div></div>
+      <div class="tl-content">
+        <div class="tl-tag">Phase 1</div>
+        <div class="tl-title">First firm partnerships — proof of traction</div>
+        <div class="tl-desc">Onboarding initial employment law firms. Goal: 5–10 active firm partners generating real case volume, validating intake quality, and providing the case studies that drive the next wave.</div>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-left"><div class="tl-dot"></div><div class="tl-line"></div></div>
+      <div class="tl-content">
+        <div class="tl-tag">Phase 2</div>
+        <div class="tl-title">Network expansion and intake volume scale</div>
+        <div class="tl-desc">Growing the firm network drives worker supply. Growing worker volume drives firm demand. The two sides compound each other — the platform becomes more valuable as both sides grow.</div>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-left"><div class="tl-dot"></div></div>
+      <div class="tl-content" style="padding-bottom:0;">
+        <div class="tl-tag">Phase 3</div>
+        <div class="tl-title">Category ownership</div>
+        <div class="tl-desc">Data, firm relationships, and worker trust compound into a defensible network. The category of employment law intake infrastructure becomes synonymous with one3Seven.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="box b-light" style="margin-top:20px;">
+    <h3>Who we're looking to work with</h3>
+    <ul>
+      <li><strong>Business development partners</strong> who have relationships with employment law firms and can open the door for conversations</li>
+      <li><strong>Legal industry connectors</strong> — bar association contacts, legal tech networks, firm administrators who see the intake problem firsthand</li>
+      <li><strong>Worker-side organizations</strong> — nonprofits, unions, HR advocacy groups, community organizations that serve displaced workers</li>
+      <li><strong>Strategic advisors</strong> with employment law, legal tech, or marketplace platform experience</li>
+    </ul>
+  </div>
+
+  <div class="footer">
+    <span class="footer-logo">one3Seven</span>
+    <span>Partner Overview · Confidential · June 2026</span>
+    <span>Page 5</span>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     PAGE 6 — WHAT MAKES US DIFFERENT + CLOSE
+══════════════════════════════════════════ -->
+<div class="page page-break">
+  <div class="page-num">06 · Our Edge</div>
+
+  <div class="sh">
+    <div class="sh-icon">🔑</div>
+    <div class="sh-text">
+      <div class="sh-title">What Makes one3Seven Different</div>
+      <div class="sh-sub">Not another legal AI tool — a purpose-built network</div>
+    </div>
+  </div>
+
+  <div class="feature-list">
+    <div class="feature-row">
+      <div class="feature-icon">🎯</div>
+      <div class="feature-body">
+        <div class="feature-title">Built for one moment — not everything</div>
+        <div class="feature-desc">Most legal AI is horizontal — built for every kind of legal work. one3Seven is vertical: built exclusively for the employment law intake moment. That specificity means every feature, every AI output, every UI decision serves exactly that use case.</div>
+      </div>
+    </div>
+    <div class="feature-row">
+      <div class="feature-icon">🔄</div>
+      <div class="feature-body">
+        <div class="feature-title">Two-sided network with compounding value</div>
+        <div class="feature-desc">More firms on the platform means more visibility for workers. More workers means more case volume for firms. The two sides reinforce each other — making it harder for a competitor to replicate the network, not just the software.</div>
+      </div>
+    </div>
+    <div class="feature-row">
+      <div class="feature-icon">🧠</div>
+      <div class="feature-body">
+        <div class="feature-title">AI that reads the documents, not just the form</div>
+        <div class="feature-desc">Workers upload their actual files. The platform extracts quotes, identifies retaliation timing, and surfaces what's missing. The attorney sees not just what the worker said — but what the evidence shows. That's the difference between a summary and an intelligence layer.</div>
+      </div>
+    </div>
+    <div class="feature-row">
+      <div class="feature-icon">⚖️</div>
+      <div class="feature-body">
+        <div class="feature-title">Firm makes every decision — we surface, never advise</div>
+        <div class="feature-desc">one3Seven does not tell firms which cases to take. It does not give workers legal advice. This is a deliberate structural choice that keeps us out of the practice of law and keeps trust on both sides of the platform intact.</div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider" />
+
+  <div class="box b-purple">
+    <h3>The single thing to remember</h3>
+    <p>88,000 workers file discrimination charges every year. Employment law firms accept fewer than 5% of what they screen. The gap between those two facts — the 95% that fall through — <em>is the market one3Seven is built to serve.</em></p>
+    <p>We're not building another legal research tool. We're not building a case management system. We're building the moment that comes before all of that — the moment where the worker's story meets the firm's time — and making it fast, structured, and fair for both sides.</p>
+  </div>
+
+  <div class="box b-green" style="margin-top:0;">
+    <h3>Next step</h3>
+    <p>If you have relationships with employment law firms, worker advocacy organizations, or legal tech networks — <em>let's talk.</em> We're selective about who we partner with and how we grow. The right partners in the right markets can move the needle significantly at this stage.</p>
+  </div>
+
+  <div class="footer">
+    <span class="footer-logo">one3Seven</span>
+    <span>Partner Overview · Confidential · June 2026</span>
+    <span>Page 6</span>
+  </div>
+</div>
+
+</body>
+</html>

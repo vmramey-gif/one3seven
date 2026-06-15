@@ -1,0 +1,20 @@
+Checkpoint:
+- Sign in works.
+- Auth listener no longer awaits Supabase work directly.
+- Role selection waits for profiles.role commit/readback.
+- Upload persistence requires committed worker profile role.
+- Supabase Storage upload succeeds.
+- public.uploaded_files row is created.
+- public.file_text_extractions row is created.
+- Removed duplicate summary refresh from openWorkerSummaryFromHub.
+- Split summary/access refresh effects to avoid profile.id causing duplicate summary fetches.
+
+Supabase SQL applied:
+- Added storage.objects policies for intake-files:
+  storage_intake_worker_insert
+  storage_intake_worker_select
+  storage_intake_worker_update
+  storage_intake_worker_delete.
+
+Remaining known issue:
+- timeline_events and intake_summaries requests return 404; verify live DB schema next.

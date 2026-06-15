@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>one3Seven — Overview for Wes</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #fff;
+    color: #1E1B4B;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .page {
+    width: 8.5in;
+    min-height: 11in;
+    margin: 0 auto;
+    padding: 0.65in 0.75in;
+    page-break-after: always;
+    position: relative;
+    overflow: hidden;
+  }
+
+  @media print {
+    .page { margin: 0; width: 100%; }
+    @page { margin: 0; size: letter; }
+  }
+
+  /* ── PAGE 1: COVER ── */
+  .cover {
+    background: linear-gradient(145deg, #1E1B4B 0%, #2D2870 55%, #4C35A0 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    color: white;
+  }
+
+  .cover-blob-1 {
+    position: absolute;
+    width: 420px; height: 420px;
+    background: radial-gradient(circle, rgba(109,74,255,0.35) 0%, transparent 70%);
+    top: -80px; right: -80px;
+    border-radius: 50%;
+  }
+  .cover-blob-2 {
+    position: absolute;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(139,92,246,0.2) 0%, transparent 70%);
+    bottom: 40px; left: -60px;
+    border-radius: 50%;
+  }
+
+  .cover-top { position: relative; z-index: 2; }
+
+  .logo {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: rgba(255,255,255,0.9);
+    margin-bottom: 80px;
+  }
+
+  .cover-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 100px;
+    padding: 6px 14px;
+    font-size: 10.5px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.75);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+
+  .cover-badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: #A78BFA;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .cover-headline {
+    font-size: 52px;
+    font-weight: 900;
+    line-height: 1.03;
+    letter-spacing: -0.03em;
+    color: white;
+    margin-bottom: 24px;
+    max-width: 540px;
+  }
+
+  .cover-headline span { color: #A78BFA; }
+
+  .cover-sub {
+    font-size: 16px;
+    line-height: 1.6;
+    color: rgba(255,255,255,0.62);
+    max-width: 520px;
+    font-weight: 400;
+  }
+
+  .cover-bottom {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+
+  .cover-stats {
+    display: flex;
+    gap: 36px;
+  }
+
+  .cover-stat { }
+  .cover-stat-num {
+    font-size: 30px;
+    font-weight: 900;
+    color: white;
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+  .cover-stat-label {
+    font-size: 10px;
+    color: rgba(255,255,255,0.45);
+    margin-top: 4px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .cover-date {
+    font-size: 11px;
+    color: rgba(255,255,255,0.3);
+    font-weight: 500;
+    text-align: right;
+  }
+
+  /* ── PAGE 2: PROBLEM + SOLUTION ── */
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 44px;
+    padding-bottom: 18px;
+    border-bottom: 1.5px solid #F0EBFF;
+  }
+
+  .page-logo {
+    font-size: 13px;
+    font-weight: 700;
+    color: #1E1B4B;
+  }
+
+  .page-num {
+    font-size: 10px;
+    font-weight: 600;
+    color: #1E1B4B;
+    opacity: 0.3;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .section-label {
+    font-size: 9.5px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: #6D4AFF;
+    margin-bottom: 10px;
+  }
+
+  .section-title {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    line-height: 1.12;
+    color: #1E1B4B;
+    margin-bottom: 14px;
+  }
+
+  .section-body {
+    font-size: 13px;
+    line-height: 1.65;
+    color: rgba(30,27,75,0.62);
+    max-width: 580px;
+  }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-top: 28px;
+  }
+
+  .card {
+    background: #FAFAFF;
+    border: 1.5px solid #EDE8FF;
+    border-radius: 18px;
+    padding: 22px;
+  }
+
+  .card-icon { font-size: 22px; margin-bottom: 12px; }
+  .card-title { font-size: 13px; font-weight: 700; color: #1E1B4B; margin-bottom: 6px; }
+  .card-body { font-size: 11.5px; line-height: 1.6; color: rgba(30,27,75,0.58); }
+
+  .card.accent {
+    background: linear-gradient(135deg, #F0EBFF 0%, #E8E0FF 100%);
+    border-color: #DCD3FF;
+  }
+
+  .card.dark {
+    background: #1E1B4B;
+    border-color: #2D2870;
+  }
+  .card.dark .card-title { color: white; }
+  .card.dark .card-body { color: rgba(255,255,255,0.55); }
+
+  .divider {
+    height: 1.5px;
+    background: #F0EBFF;
+    margin: 36px 0;
+  }
+
+  /* ── PAGE 3: PRODUCT + TRACTION ── */
+  .flow-steps {
+    display: flex;
+    gap: 0;
+    margin: 28px 0;
+    position: relative;
+  }
+
+  .flow-step {
+    flex: 1;
+    position: relative;
+  }
+
+  .flow-step::after {
+    content: '→';
+    position: absolute;
+    right: -12px;
+    top: 22px;
+    font-size: 16px;
+    color: #C4B5FD;
+    font-weight: 700;
+    z-index: 2;
+  }
+
+  .flow-step:last-child::after { display: none; }
+
+  .flow-num {
+    width: 36px; height: 36px;
+    background: #6D4AFF;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 10px;
+  }
+
+  .flow-title { font-size: 12px; font-weight: 700; color: #1E1B4B; margin-bottom: 5px; }
+  .flow-body { font-size: 10.5px; line-height: 1.55; color: rgba(30,27,75,0.55); padding-right: 24px; }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    margin-top: 24px;
+  }
+
+  .feature-pill {
+    background: #F7F3FF;
+    border: 1.5px solid #E7E1FF;
+    border-radius: 12px;
+    padding: 12px 14px;
+  }
+
+  .feature-pill-icon { font-size: 15px; margin-bottom: 6px; }
+  .feature-pill-label { font-size: 10.5px; font-weight: 700; color: #1E1B4B; margin-bottom: 3px; }
+  .feature-pill-desc { font-size: 9.5px; line-height: 1.5; color: rgba(30,27,75,0.52); }
+
+  .traction-bar {
+    background: linear-gradient(135deg, #1E1B4B 0%, #2D2870 100%);
+    border-radius: 20px;
+    padding: 24px 28px;
+    margin-top: 28px;
+    color: white;
+  }
+
+  .traction-label {
+    font-size: 9px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: rgba(255,255,255,0.45);
+    margin-bottom: 16px;
+  }
+
+  .traction-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+
+  .traction-item-num {
+    font-size: 26px;
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    color: #A78BFA;
+    line-height: 1;
+  }
+
+  .traction-item-label {
+    font-size: 9.5px;
+    color: rgba(255,255,255,0.45);
+    margin-top: 4px;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+
+  /* ── PAGE 4: REVENUE + ASK ── */
+  .pricing-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 14px;
+    margin-top: 24px;
+  }
+
+  .pricing-card {
+    border: 1.5px solid #EDE8FF;
+    border-radius: 18px;
+    padding: 22px;
+    background: white;
+  }
+
+  .pricing-card.featured {
+    background: linear-gradient(145deg, #6D4AFF, #5B35D5);
+    border-color: #6D4AFF;
+    color: white;
+  }
+
+  .pricing-card-plan {
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #6D4AFF;
+    margin-bottom: 8px;
+  }
+
+  .pricing-card.featured .pricing-card-plan { color: rgba(255,255,255,0.65); }
+
+  .pricing-card-price {
+    font-size: 30px;
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    color: #1E1B4B;
+    line-height: 1;
+  }
+
+  .pricing-card.featured .pricing-card-price { color: white; }
+
+  .pricing-card-mo {
+    font-size: 11px;
+    color: rgba(30,27,75,0.4);
+    font-weight: 500;
+  }
+
+  .pricing-card.featured .pricing-card-mo { color: rgba(255,255,255,0.5); }
+
+  .pricing-divider { height: 1px; background: #F0EBFF; margin: 14px 0; }
+  .pricing-card.featured .pricing-divider { background: rgba(255,255,255,0.15); }
+
+  .pricing-item {
+    font-size: 10.5px;
+    color: rgba(30,27,75,0.6);
+    line-height: 1.55;
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    margin-bottom: 5px;
+  }
+
+  .pricing-card.featured .pricing-item { color: rgba(255,255,255,0.7); }
+  .pricing-item::before { content: '✓'; color: #6D4AFF; font-weight: 700; flex-shrink: 0; }
+  .pricing-card.featured .pricing-item::before { color: #C4B5FD; }
+
+  .revenue-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    font-size: 11px;
+  }
+
+  .revenue-table th {
+    background: #F7F3FF;
+    color: #6D4AFF;
+    font-weight: 700;
+    font-size: 9.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 9px 14px;
+    text-align: left;
+    border-bottom: 1.5px solid #EDE8FF;
+  }
+
+  .revenue-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid #F5F3FF;
+    color: rgba(30,27,75,0.75);
+    font-size: 11px;
+  }
+
+  .revenue-table tr:last-child td { border-bottom: none; }
+  .revenue-table td:first-child { font-weight: 600; color: #1E1B4B; }
+  .revenue-table td.highlight { color: #6D4AFF; font-weight: 700; }
+
+  .ask-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 22px;
+  }
+
+  .ask-card {
+    border-radius: 16px;
+    padding: 18px 20px;
+    border: 1.5px solid #EDE8FF;
+    background: #FAFAFF;
+  }
+
+  .ask-card-num {
+    font-size: 9px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #6D4AFF;
+    margin-bottom: 8px;
+  }
+
+  .ask-card-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #1E1B4B;
+    margin-bottom: 5px;
+  }
+
+  .ask-card-body {
+    font-size: 10.5px;
+    line-height: 1.6;
+    color: rgba(30,27,75,0.55);
+  }
+
+  .comp-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  .comp-chip {
+    background: #F7F3FF;
+    border: 1.5px solid #E7E1FF;
+    border-radius: 10px;
+    padding: 9px 14px;
+    font-size: 10.5px;
+    font-weight: 600;
+    color: #1E1B4B;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+  }
+
+  .comp-chip-name { color: #6D4AFF; font-size: 11px; font-weight: 700; }
+  .comp-chip-val { font-size: 12px; font-weight: 800; color: #1E1B4B; }
+  .comp-chip-label { font-size: 9px; color: rgba(30,27,75,0.45); font-weight: 500; }
+
+  .footer-bar {
+    position: absolute;
+    bottom: 0.4in;
+    left: 0.75in;
+    right: 0.75in;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 12px;
+    border-top: 1px solid #F0EBFF;
+  }
+
+  .footer-brand { font-size: 10px; font-weight: 700; color: rgba(30,27,75,0.3); }
+  .footer-note { font-size: 9.5px; color: rgba(30,27,75,0.3); }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════ PAGE 1: COVER ════════════════════════════════════ -->
+<div class="page cover">
+  <div class="cover-blob-1"></div>
+  <div class="cover-blob-2"></div>
+
+  <div class="cover-top">
+    <div class="logo">one3Seven</div>
+    <div class="cover-badge">Confidential · First Look</div>
+    <div class="cover-headline">
+      The AI intake engine<br/>
+      employment law<br/>
+      <span>has been waiting for.</span>
+    </div>
+    <div class="cover-sub">
+      one3Seven turns disorganized worker documents into structured, attorney-ready
+      intake records — automatically. Before the first consultation. Built, live, and
+      ready for its first firm partners.
+    </div>
+  </div>
+
+  <div class="cover-bottom">
+    <div class="cover-stats">
+      <div class="cover-stat">
+        <div class="cover-stat-num">30d</div>
+        <div class="cover-stat-label">Idea to built product</div>
+      </div>
+      <div class="cover-stat">
+        <div class="cover-stat-num">$649B</div>
+        <div class="cover-stat-label">US legal market</div>
+      </div>
+      <div class="cover-stat">
+        <div class="cover-stat-num">67K+</div>
+        <div class="cover-stat-label">EEOC charges/year</div>
+      </div>
+      <div class="cover-stat">
+        <div class="cover-stat-num">$0</div>
+        <div class="cover-stat-label">Dominant AI competitor</div>
+      </div>
+    </div>
+    <div class="cover-date">
+      June 2026<br/>
+      Private Overview
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════ PAGE 2: PROBLEM + SOLUTION ════════════════════════════════════ -->
+<div class="page">
+  <div class="page-header">
+    <div class="page-logo">one3Seven</div>
+    <div class="page-num">The Problem & The Fix · 02</div>
+  </div>
+
+  <div class="section-label">The Problem</div>
+  <div class="section-title">Cases die before they start.</div>
+  <div class="section-body">
+    Every day, workers with legitimate employment claims — wrongful termination, wage theft, retaliation — arrive at attorney offices with documents scattered across phones, emails, and folders. Attorneys spend 4–6 hours per intake just getting organized before they can even evaluate the case. When intake fails, the worker loses their shot at justice. The attorney loses a case they never got to see.
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-icon">⏱</div>
+      <div class="card-title">$1,400–$2,100 wasted per intake</div>
+      <div class="card-body">4–6 hours of attorney or paralegal time at $350/hr — just getting documents organized before the case evaluation even begins.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">⏳</div>
+      <div class="card-title">180-day EEOC window</div>
+      <div class="card-body">Workers have 180 days from termination to file with the EEOC. Without organized intake, this deadline is frequently missed — the case disappears before anyone fights it.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">📁</div>
+      <div class="card-title">Critical documents go missing</div>
+      <div class="card-body">Pay stubs, HR complaints, text messages — the evidence that wins cases never makes it to counsel in an organized form. 40% of cases are lost before the first consult.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔍</div>
+      <div class="card-title">No dominant AI solution exists</div>
+      <div class="card-body">Legal AI is racing into contract review, research, and drafting. Workers' rights intake — the front door to employment law — has no organized AI player. The lane is open.</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section-label">The Solution</div>
+  <div class="section-title">one3Seven organizes the intake.<br/>The attorney evaluates the case.</div>
+  <div class="section-body">
+    Workers upload their documents. AI extracts a timestamped timeline, identifies retaliation patterns, calculates EEOC deadlines, surfaces key quotes, and flags missing documents. The attorney receives a structured, attorney-ready intake card — before the consultation begins. No legal conclusions. No case scoring. Just the work that used to cost 4–6 hours, done in minutes.
+  </div>
+
+  <div class="footer-bar">
+    <div class="footer-brand">one3Seven · Confidential</div>
+    <div class="footer-note">one3Seven does not provide legal advice or legal conclusions</div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════ PAGE 3: PRODUCT + TRACTION ════════════════════════════════════ -->
+<div class="page">
+  <div class="page-header">
+    <div class="page-logo">one3Seven</div>
+    <div class="page-num">The Product · 03</div>
+  </div>
+
+  <div class="section-label">How It Works</div>
+  <div class="section-title">Three steps. Both sides served.</div>
+
+  <div class="flow-steps">
+    <div class="flow-step">
+      <div class="flow-num">1</div>
+      <div class="flow-title">Worker uploads</div>
+      <div class="flow-body">Pay stubs, emails, HR complaints, texts, screenshots — anything. Guided intake flow, no legal knowledge needed. Mobile-first.</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num">2</div>
+      <div class="flow-title">AI organizes</div>
+      <div class="flow-body">Timeline extracted. Dates confirmed. Retaliation patterns flagged. EEOC deadline calculated. Key quotes surfaced. Documents categorized.</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num">3</div>
+      <div class="flow-title">Attorney reviews</div>
+      <div class="flow-body">Structured intake card arrives in firm dashboard. Attorney evaluates the case — not the documents. Worker controls when to share.</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section-label">What Attorneys See</div>
+
+  <div class="features-grid">
+    <div class="feature-pill">
+      <div class="feature-pill-icon">📅</div>
+      <div class="feature-pill-label">Timestamped Timeline</div>
+      <div class="feature-pill-desc">Events extracted and ordered from source documents with date confirmation.</div>
+    </div>
+    <div class="feature-pill">
+      <div class="feature-pill-icon">🔴</div>
+      <div class="feature-pill-label">Retaliation Score Cards</div>
+      <div class="feature-pill-desc">Days between complaint and adverse action — red for short gaps, color-coded by pattern strength.</div>
+    </div>
+    <div class="feature-pill">
+      <div class="feature-pill-icon">⚠️</div>
+      <div class="feature-pill-label">EEOC Deadline Flag</div>
+      <div class="feature-pill-desc">180-day window calculated automatically. Warning banner when deadline is approaching.</div>
+    </div>
+    <div class="feature-pill">
+      <div class="feature-pill-icon">✓</div>
+      <div class="feature-pill-label">Doc Checklist</div>
+      <div class="feature-pill-desc">Requested vs. received at a glance — no manual cross-referencing.</div>
+    </div>
+    <div class="feature-pill">
+      <div class="feature-pill-icon">💬</div>
+      <div class="feature-pill-label">Key Quotes Extracted</div>
+      <div class="feature-pill-desc">Significant language pulled directly from HR letters, emails, and documents.</div>
+    </div>
+    <div class="feature-pill">
+      <div class="feature-pill-icon">🔗</div>
+      <div class="feature-pill-label">Shareable Intake Link</div>
+      <div class="feature-pill-desc">One URL. Workers go through guided intake and land directly in the firm's dashboard.</div>
+    </div>
+  </div>
+
+  <div class="traction-bar">
+    <div class="traction-label">Where we are — 30 days from idea</div>
+    <div class="traction-grid">
+      <div>
+        <div class="traction-item-num">100%</div>
+        <div class="traction-item-label">Core product built &amp; live</div>
+      </div>
+      <div>
+        <div class="traction-item-num">2-sided</div>
+        <div class="traction-item-label">Worker + firm marketplace</div>
+      </div>
+      <div>
+        <div class="traction-item-num">Stripe</div>
+        <div class="traction-item-label">Billing wired, ready to charge</div>
+      </div>
+      <div>
+        <div class="traction-item-num">CA-ready</div>
+        <div class="traction-item-label">Bar ethics &amp; SB 574 aligned</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-bar">
+    <div class="footer-brand">one3Seven · Confidential</div>
+    <div class="footer-note">30 days. Fully built. Billing live.</div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════ PAGE 4: REVENUE + ASK ════════════════════════════════════ -->
+<div class="page">
+  <div class="page-header">
+    <div class="page-logo">one3Seven</div>
+    <div class="page-num">Revenue Model &amp; The Ask · 04</div>
+  </div>
+
+  <div class="section-label">Revenue Model</div>
+  <div class="section-title">SaaS. Monthly. Firm-side only.</div>
+
+  <div class="pricing-cards">
+    <div class="pricing-card">
+      <div class="pricing-card-plan">Solo</div>
+      <div class="pricing-card-price">$149<span class="pricing-card-mo">/mo</span></div>
+      <div class="pricing-divider"></div>
+      <div class="pricing-item">Up to 10 intakes/month</div>
+      <div class="pricing-item">1 attorney seat</div>
+      <div class="pricing-item">30-day free trial</div>
+      <div class="pricing-item">Full AI intake engine</div>
+    </div>
+    <div class="pricing-card featured">
+      <div class="pricing-card-plan">Practice · Most Popular</div>
+      <div class="pricing-card-price">$349<span class="pricing-card-mo">/mo</span></div>
+      <div class="pricing-divider"></div>
+      <div class="pricing-item">Up to 35 intakes/month</div>
+      <div class="pricing-item">3 attorney seats</div>
+      <div class="pricing-item">30-day free trial</div>
+      <div class="pricing-item">Full AI intake engine</div>
+    </div>
+    <div class="pricing-card">
+      <div class="pricing-card-plan">Firm</div>
+      <div class="pricing-card-price">$749<span class="pricing-card-mo">/mo</span></div>
+      <div class="pricing-divider"></div>
+      <div class="pricing-item">Unlimited intakes</div>
+      <div class="pricing-item">10 seats</div>
+      <div class="pricing-item">30-day free trial</div>
+      <div class="pricing-item">Full AI intake engine</div>
+    </div>
+  </div>
+
+  <table class="revenue-table">
+    <tr>
+      <th>Firms</th>
+      <th>Blended ARPU</th>
+      <th>MRR</th>
+      <th>ARR</th>
+      <th>Comparable</th>
+    </tr>
+    <tr>
+      <td>25</td><td>$280/mo</td><td>$7K</td><td class="highlight">$84K</td><td>First pilot cohort</td>
+    </tr>
+    <tr>
+      <td>100</td><td>$320/mo</td><td>$32K</td><td class="highlight">$384K</td><td>Series A stage</td>
+    </tr>
+    <tr>
+      <td>300</td><td>$360/mo</td><td>$108K</td><td class="highlight">$1.3M</td><td>Casetext Year 3</td>
+    </tr>
+    <tr>
+      <td>1,500</td><td>$420/mo</td><td>$630K</td><td class="highlight">$7.6M</td><td>Path to exit</td>
+    </tr>
+  </table>
+
+  <div class="section-label" style="margin-top:28px;">Why Now</div>
+
+  <div class="comp-row">
+    <div class="comp-chip">
+      <div class="comp-chip-name">Casetext / CoCounsel</div>
+      <div class="comp-chip-val">$650M</div>
+      <div class="comp-chip-label">Acquired by Thomson Reuters · Legal AI · Same playbook, different lane</div>
+    </div>
+    <div class="comp-chip">
+      <div class="comp-chip-name">Clio</div>
+      <div class="comp-chip-val">$1.6B</div>
+      <div class="comp-chip-label">Legal practice management · 90%+ retention · SaaS for law firms</div>
+    </div>
+    <div class="comp-chip">
+      <div class="comp-chip-name">MyCase</div>
+      <div class="comp-chip-val">$193M exit</div>
+      <div class="comp-chip-label">Legal SaaS acquisition · Proved the firm subscription model</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section-label">What We're Looking For</div>
+
+  <div class="ask-grid">
+    <div class="ask-card">
+      <div class="ask-card-num">01 · Go-to-Market</div>
+      <div class="ask-card-title">How do you get the first 10 firms?</div>
+      <div class="ask-card-body">Bar association presence, plaintiff attorney networks, legal aid partnerships — what's the highest-leverage entry point for a first-mover with a live product?</div>
+    </div>
+    <div class="ask-card">
+      <div class="ask-card-num">02 · Positioning</div>
+      <div class="ask-card-title">Tool vs. Platform vs. Network?</div>
+      <div class="ask-card-body">The two-sided marketplace moat is real — but should we lead with the attorney-facing tool first, or build worker volume to pull firms in? Growth sequencing.</div>
+    </div>
+    <div class="ask-card">
+      <div class="ask-card-num">03 · Partnerships</div>
+      <div class="ask-card-title">Who accelerates this?</div>
+      <div class="ask-card-body">Legal aid orgs, bar associations, law school clinics, plaintiff attorney groups — what strategic partnerships open the right doors fastest?</div>
+    </div>
+    <div class="ask-card">
+      <div class="ask-card-num">04 · Fundraising Timing</div>
+      <div class="ask-card-title">Raise now or revenue first?</div>
+      <div class="ask-card-body">Product is live. Billing is wired. First paying firm closes the proof point. Is this a 5-firm revenue story first, then raise — or does the category opportunity warrant moving faster?</div>
+    </div>
+  </div>
+
+  <div class="footer-bar">
+    <div class="footer-brand">one3Seven · Confidential · June 2026</div>
+    <div class="footer-note">one3seven.com &nbsp;·&nbsp; hello@one3seven.com</div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>one3Seven — 10-Year Financial Projection</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background: #fff;
+    color: #1e1b4b;
+    font-size: 10.5pt;
+    line-height: 1.55;
+  }
+
+  /* ═══════ COVER ═══════ */
+  .cover {
+    background: linear-gradient(155deg, #020110 0%, #0f0c29 28%, #1e1b4b 55%, #2d2080 78%, #6d4aff 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 64px 64px 52px;
+    page-break-after: always;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: -100px; right: -100px;
+    width: 520px; height: 520px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(109,74,255,0.2) 0%, transparent 70%);
+  }
+  .cover::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; left: -80px;
+    width: 360px; height: 360px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(196,181,253,0.08) 0%, transparent 70%);
+  }
+
+  .cover-top { position: relative; z-index: 1; }
+  .cover-logo-row { display: flex; align-items: center; gap: 10px; margin-bottom: 54px; }
+  .cover-mark {
+    width: 38px; height: 38px; background: #6d4aff; border-radius: 11px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13pt; font-weight: 900; color: white; letter-spacing: -0.04em;
+  }
+  .cover-wordmark { font-size: 13pt; font-weight: 800; color: rgba(255,255,255,0.88); }
+  .cover-badge {
+    margin-left: auto;
+    background: rgba(109,74,255,0.3);
+    border: 1px solid rgba(109,74,255,0.55);
+    color: #c4b5fd;
+    font-size: 7.5pt; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase;
+    padding: 5px 12px; border-radius: 20px;
+  }
+  .cover-eyebrow { font-size: 8.5pt; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(196,181,253,0.6); margin-bottom: 14px; }
+  .cover-headline { font-size: 44pt; font-weight: 900; line-height: 0.96; letter-spacing: -0.035em; color: white; margin-bottom: 18px; }
+  .cover-headline span { background: linear-gradient(90deg, #c4b5fd, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .cover-sub { font-size: 12pt; color: rgba(255,255,255,0.58); max-width: 520px; line-height: 1.65; }
+
+  .cover-kpi-strip {
+    display: flex; gap: 0; margin-top: 44px;
+    border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; overflow: hidden;
+    background: rgba(255,255,255,0.04); position: relative; z-index: 1;
+  }
+  .kpi { flex: 1; padding: 20px 20px; border-right: 1px solid rgba(255,255,255,0.08); }
+  .kpi:last-child { border-right: none; }
+  .kpi-num { font-size: 20pt; font-weight: 900; color: #c4b5fd; letter-spacing: -0.025em; line-height: 1; }
+  .kpi-label { font-size: 8pt; color: rgba(255,255,255,0.44); margin-top: 5px; line-height: 1.4; }
+
+  .cover-bottom {
+    position: relative; z-index: 1;
+    display: flex; justify-content: space-between; align-items: flex-end;
+    padding-top: 28px; border-top: 1px solid rgba(255,255,255,0.08); margin-top: 36px;
+  }
+  .cover-disc { font-size: 8pt; color: rgba(255,255,255,0.32); max-width: 440px; line-height: 1.5; }
+  .cover-meta { font-size: 8pt; color: rgba(255,255,255,0.28); text-align: right; line-height: 1.6; }
+
+  /* ═══════ PAGE ═══════ */
+  .page { padding: 50px 58px; max-width: 820px; margin: 0 auto; }
+  .page-break { page-break-before: always; }
+  .page-num {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-size: 7.5pt; color: #6d4aff; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 26px;
+  }
+  .page-num::before { content: ''; display: inline-block; width: 18px; height: 2px; background: #6d4aff; border-radius: 1px; }
+
+  /* ═══════ SECTION HEADER ═══════ */
+  .sh { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 22px; padding-bottom: 14px; border-bottom: 2px solid #ede9fe; }
+  .sh-icon {
+    width: 38px; height: 38px; border-radius: 11px;
+    background: linear-gradient(135deg, #6d4aff, #4c1d95);
+    color: white; font-size: 17pt;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(109,74,255,0.3);
+  }
+  .sh-title { font-size: 15pt; font-weight: 800; color: #1e1b4b; letter-spacing: -0.01em; }
+  .sh-sub { font-size: 8.5pt; color: #7c3aed; font-weight: 600; margin-top: 3px; }
+
+  /* ═══════ TABLES ═══════ */
+  .t {
+    width: 100%; border-collapse: collapse; margin-bottom: 18px; break-inside: avoid;
+  }
+  .t th {
+    font-size: 7.5pt; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 10px 12px; text-align: left;
+  }
+  .t.t-dark th { background: linear-gradient(90deg, #1e1b4b, #2d2080); color: white; }
+  .t.t-purple th { background: linear-gradient(90deg, #6d4aff, #4c1d95); color: white; }
+  .t.t-dark th:first-child, .t.t-purple th:first-child { border-radius: 10px 0 0 0; }
+  .t.t-dark th:last-child, .t.t-purple th:last-child { border-radius: 0 10px 0 0; }
+  .t td {
+    padding: 10px 12px; font-size: 9.5pt;
+    border-bottom: 1px solid #ede9fe; vertical-align: middle; line-height: 1.45;
+  }
+  .t tr:nth-child(even) td { background: #fafafe; }
+  .t tr:last-child td { border-bottom: none; }
+  .t td.bold { font-weight: 700; color: #1e1b4b; }
+  .t td.purple { font-weight: 800; color: #6d4aff; }
+  .t td.green { font-weight: 800; color: #059669; }
+  .t td.red { font-weight: 700; color: #dc2626; }
+  .t td.gray { color: #9ca3af; font-size: 8.5pt; }
+  .t td.right { text-align: right; }
+  .t td.center { text-align: center; }
+  .t tr.highlight td { background: #f7f3ff !important; }
+  .t tr.total td { background: #1e1b4b !important; color: white !important; font-weight: 800; }
+  .t tr.total td.green { color: #6ee7b7 !important; }
+  .t tr.total td.red { color: #fca5a5 !important; }
+
+  /* ═══════ CARDS ═══════ */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 18px; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 18px; }
+  .grid4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; margin-bottom: 18px; }
+
+  .sc { border-radius: 14px; padding: 18px 18px 16px; break-inside: avoid; border: 1.5px solid #ede9fe; background: #fafafe; }
+  .sc.v-p { background: linear-gradient(135deg, #6d4aff 0%, #4c1d95 100%); border-color: transparent; box-shadow: 0 4px 18px rgba(109,74,255,0.25); }
+  .sc.v-d { background: linear-gradient(135deg, #1e1b4b, #0f0c29); border-color: transparent; }
+  .sc.v-g { background: #f0fdf4; border-color: #bbf7d0; }
+  .sc.v-r { background: #fff5f5; border-color: #fecaca; }
+  .sc.v-a { background: #fffbeb; border-color: #fcd34d; }
+  .sc-num { font-size: 24pt; font-weight: 900; color: #6d4aff; letter-spacing: -0.025em; line-height: 1; }
+  .sc.v-p .sc-num, .sc.v-d .sc-num { color: #c4b5fd; }
+  .sc.v-g .sc-num { color: #059669; }
+  .sc.v-r .sc-num { color: #dc2626; }
+  .sc.v-a .sc-num { color: #b45309; }
+  .sc-label { font-size: 9pt; font-weight: 600; color: #374151; margin-top: 6px; line-height: 1.4; }
+  .sc.v-p .sc-label, .sc.v-d .sc-label { color: rgba(255,255,255,0.88); }
+  .sc.v-g .sc-label { color: #064e3b; }
+  .sc.v-r .sc-label { color: #7f1d1d; }
+  .sc.v-a .sc-label { color: #78350f; }
+  .sc-src { font-size: 7.5pt; color: #9ca3af; margin-top: 4px; }
+  .sc.v-p .sc-src, .sc.v-d .sc-src { color: rgba(255,255,255,0.35); }
+
+  /* ═══════ CALLOUTS ═══════ */
+  .box { border-radius: 14px; padding: 20px 24px; margin-bottom: 18px; break-inside: avoid; }
+  .box.b-p { background: linear-gradient(135deg, #6d4aff, #4c1d95); box-shadow: 0 4px 20px rgba(109,74,255,0.2); }
+  .box.b-l { background: #f7f3ff; border: 1.5px solid #ddd6fe; }
+  .box.b-d { background: #1e1b4b; }
+  .box.b-g { background: #f0fdf4; border: 1.5px solid #bbf7d0; }
+  .box.b-a { background: #fffbeb; border: 1.5px solid #fcd34d; }
+  .box h3 { font-size: 8.5pt; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 9px; }
+  .box.b-p h3 { color: #c4b5fd; }
+  .box.b-l h3 { color: #6d4aff; }
+  .box.b-d h3 { color: #c4b5fd; }
+  .box.b-g h3 { color: #059669; }
+  .box.b-a h3 { color: #92400e; }
+  .box p { font-size: 10pt; line-height: 1.65; }
+  .box.b-p p { color: rgba(255,255,255,0.88); }
+  .box.b-l p { color: #312e81; }
+  .box.b-d p { color: rgba(255,255,255,0.82); }
+  .box.b-g p { color: #064e3b; }
+  .box.b-a p { color: #78350f; }
+  .box p + p { margin-top: 9px; }
+  .box em { font-style: normal; font-weight: 800; }
+  .box.b-p em { color: #e0d9ff; }
+  .box.b-l em { color: #6d4aff; }
+  .box.b-d em { color: #c4b5fd; }
+  .box.b-g em { color: #059669; }
+  .box.b-a em { color: #b45309; }
+
+  /* ═══════ BAR CHART ═══════ */
+  .bar-chart { margin-bottom: 18px; break-inside: avoid; }
+  .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .bar-year { font-size: 8.5pt; font-weight: 700; color: #6b7280; width: 42px; flex-shrink: 0; text-align: right; }
+  .bar-track { flex: 1; height: 22px; background: #f3f0ff; border-radius: 6px; overflow: hidden; position: relative; }
+  .bar-fill { height: 100%; border-radius: 6px; display: flex; align-items: center; padding-left: 8px; font-size: 8pt; font-weight: 700; color: white; white-space: nowrap; transition: width 0.3s; }
+  .bar-fill.bf-arr { background: linear-gradient(90deg, #6d4aff, #4c1d95); }
+  .bar-fill.bf-firms { background: linear-gradient(90deg, #0891b2, #164e63); }
+  .bar-val { font-size: 8.5pt; font-weight: 800; color: #6d4aff; width: 70px; flex-shrink: 0; }
+  .bar-val.bv-teal { color: #0891b2; }
+
+  /* ═══════ PRICING TIER ═══════ */
+  .tier-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 18px; }
+  .tier-card {
+    border-radius: 14px; padding: 18px 16px 16px;
+    border: 1.5px solid #ede9fe; background: #fafafe;
+    text-align: center; break-inside: avoid;
+  }
+  .tier-card.featured {
+    background: linear-gradient(145deg, #6d4aff, #4c1d95);
+    border-color: transparent;
+    box-shadow: 0 6px 24px rgba(109,74,255,0.3);
+    transform: scale(1.02);
+  }
+  .tier-name { font-size: 8pt; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: #6d4aff; margin-bottom: 10px; }
+  .tier-card.featured .tier-name { color: #c4b5fd; }
+  .tier-price { font-size: 22pt; font-weight: 900; color: #1e1b4b; letter-spacing: -0.025em; line-height: 1; }
+  .tier-card.featured .tier-price { color: white; }
+  .tier-per { font-size: 8pt; color: #9ca3af; margin-top: 2px; }
+  .tier-card.featured .tier-per { color: rgba(255,255,255,0.5); }
+  .tier-divider { border: none; border-top: 1px solid #ede9fe; margin: 12px 0; }
+  .tier-card.featured .tier-divider { border-color: rgba(255,255,255,0.15); }
+  .tier-desc { font-size: 8.5pt; color: #6b7280; line-height: 1.5; }
+  .tier-card.featured .tier-desc { color: rgba(255,255,255,0.75); }
+  .tier-annual { font-size: 8pt; font-weight: 700; color: #059669; margin-top: 8px; }
+  .tier-card.featured .tier-annual { color: #6ee7b7; }
+
+  /* ═══════ COMPARABLE ═══════ */
+  .comp-card {
+    border-radius: 12px; padding: 16px 18px;
+    background: #fafafe; border: 1.5px solid #ede9fe;
+    break-inside: avoid; margin-bottom: 10px;
+    display: flex; gap: 14px; align-items: flex-start;
+  }
+  .comp-dot { width: 10px; height: 10px; border-radius: 50%; background: #6d4aff; flex-shrink: 0; margin-top: 5px; }
+  .comp-name { font-size: 10pt; font-weight: 700; color: #1e1b4b; }
+  .comp-detail { font-size: 9pt; color: #6b7280; margin-top: 2px; line-height: 1.5; }
+  .comp-stat { font-size: 9pt; font-weight: 800; color: #6d4aff; margin-top: 4px; }
+
+  /* ═══════ FOOTER ═══════ */
+  .footer { margin-top: 32px; padding-top: 12px; border-top: 1px solid #ede9fe; display: flex; justify-content: space-between; align-items: center; font-size: 7.5pt; color: #9ca3af; }
+  .footer-logo { font-weight: 800; color: #6d4aff; font-size: 8.5pt; }
+
+  .divider { border: none; border-top: 1.5px solid #ede9fe; margin: 18px 0; }
+  .label-row { display: flex; gap: 16px; align-items: center; margin-bottom: 8px; flex-wrap: wrap; }
+  .legend { display: inline-flex; align-items: center; gap: 5px; font-size: 8pt; color: #6b7280; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 3px; }
+
+  @media print {
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .cover { min-height: 100vh; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════
+     COVER
+══════════════════════════ -->
+<div class="cover">
+  <div class="cover-top">
+    <div class="cover-logo-row">
+      <div class="cover-mark">o7</div>
+      <div class="cover-wordmark">one3Seven</div>
+      <div class="cover-badge">Confidential · Internal Projection</div>
+    </div>
+    <div class="cover-eyebrow">10-Year Financial Model · 2026 – 2035</div>
+    <div class="cover-headline">The<br/>revenue<br/><span>roadmap.</span></div>
+    <div class="cover-sub">Subscription model, overhead structure, retention assumptions, and 10-year trajectory — built on comparable legal SaaS benchmarks and two-sided marketplace growth data.</div>
+
+    <div class="cover-kpi-strip">
+      <div class="kpi">
+        <div class="kpi-num">$199–$1,999</div>
+        <div class="kpi-label">Monthly subscription range across firm tiers</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-num">88%</div>
+        <div class="kpi-label">Target annual firm retention (legal SaaS benchmark: 85–92%)</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-num">$39M</div>
+        <div class="kpi-label">Projected ARR by Year 10 at conservative growth</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-num">Yr 4–5</div>
+        <div class="kpi-label">Projected break-even — consistent with legal SaaS comps</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cover-bottom">
+    <div class="cover-disc">All projections are forward-looking estimates based on legal SaaS industry benchmarks (Clio, MyCase, Filevine), two-sided marketplace trajectories, and internal assumptions. Not a guarantee of future performance.</div>
+    <div class="cover-meta">one3Seven · Confidential<br/>June 2026</div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════
+     PAGE 1 — REVENUE MODEL + PRICING
+══════════════════════════ -->
+<div class="page">
+  <div class="page-num">01 · Revenue Model &amp; Pricing</div>
+
+  <div class="sh">
+    <div class="sh-icon">💳</div>
+    <div>
+      <div class="sh-title">Subscription Tiers — Firm Side</div>
+      <div class="sh-sub">Workers use the platform free — firms pay for intake access. Same two-sided model as Clio, Filevine, LegalMatch.</div>
+    </div>
+  </div>
+
+  <div class="tier-grid">
+    <div class="tier-card">
+      <div class="tier-name">Starter</div>
+      <div class="tier-price">$199</div>
+      <div class="tier-per">/ month</div>
+      <hr class="tier-divider"/>
+      <div class="tier-desc">Solo attorney or 1–2 person firm. Up to 25 intakes/month reviewed. Core intake dashboard.</div>
+      <div class="tier-annual">$2,388 / year</div>
+    </div>
+    <div class="tier-card featured">
+      <div class="tier-name">Growth</div>
+      <div class="tier-price">$499</div>
+      <div class="tier-per">/ month</div>
+      <hr class="tier-divider"/>
+      <div class="tier-desc">2–5 attorney firms. Up to 100 intakes/month. Full AI intelligence layer, document requests.</div>
+      <div class="tier-annual">$5,988 / year</div>
+    </div>
+    <div class="tier-card">
+      <div class="tier-name">Scale</div>
+      <div class="tier-price">$999</div>
+      <div class="tier-per">/ month</div>
+      <hr class="tier-divider"/>
+      <div class="tier-desc">6–15 attorney firms. Unlimited intakes. Priority worker routing, analytics dashboard.</div>
+      <div class="tier-annual">$11,988 / year</div>
+    </div>
+    <div class="tier-card">
+      <div class="tier-name">Enterprise</div>
+      <div class="tier-price">$1,999</div>
+      <div class="tier-per">/ month</div>
+      <hr class="tier-divider"/>
+      <div class="tier-desc">15+ attorneys. Unlimited. Custom intake branding, API access, dedicated account manager.</div>
+      <div class="tier-annual">$23,988 / year</div>
+    </div>
+  </div>
+
+  <div class="sh" style="margin-top:24px;">
+    <div class="sh-icon">📐</div>
+    <div>
+      <div class="sh-title">Blended ARPU &amp; Mix Assumptions</div>
+      <div class="sh-sub">Based on legal SaaS market distribution — small firms dominate volume, mid-tier drives most revenue</div>
+    </div>
+  </div>
+
+  <table class="t t-dark">
+    <thead>
+      <tr>
+        <th>Tier</th>
+        <th>Monthly Price</th>
+        <th>Firm Mix (Yr 1–3)</th>
+        <th>Firm Mix (Yr 5+)</th>
+        <th>Revenue Weight</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="bold">Starter</td>
+        <td class="purple">$199 / mo</td>
+        <td>45%</td>
+        <td>35%</td>
+        <td class="gray">Low volume, high count</td>
+      </tr>
+      <tr>
+        <td class="bold">Growth ★</td>
+        <td class="purple">$499 / mo</td>
+        <td>35%</td>
+        <td>38%</td>
+        <td class="gray">Core revenue engine</td>
+      </tr>
+      <tr>
+        <td class="bold">Scale</td>
+        <td class="purple">$999 / mo</td>
+        <td>16%</td>
+        <td>20%</td>
+        <td class="gray">High value, moderate count</td>
+      </tr>
+      <tr>
+        <td class="bold">Enterprise</td>
+        <td class="purple">$1,999 / mo</td>
+        <td>4%</td>
+        <td>7%</td>
+        <td class="gray">Anchor logos, high ACV</td>
+      </tr>
+      <tr class="highlight">
+        <td class="bold">Blended ARPU</td>
+        <td class="purple bold">~$547 / mo</td>
+        <td colspan="2" class="gray">Year 1–3 weighted average</td>
+        <td class="purple bold">~$6,560 / yr</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="grid2">
+    <div class="box b-l">
+      <h3>Why workers are free</h3>
+      <p>Worker-side is free to drive supply and keep intake volume high. <em>The firm pays for access to pre-analyzed, document-backed intakes.</em> This is identical to Clio's model (firms pay, clients are free) and LegalMatch's lead model. Free worker side removes friction, scales the pipeline.</p>
+    </div>
+    <div class="box b-g">
+      <h3>Future revenue layers</h3>
+      <p>Year 3+: <em>Per-intake success fee</em> on accepted cases (1–2% of settlement referral). Year 5+: <em>HR compliance intelligence</em> layer for enterprise employers. Year 7+: <em>White-label</em> licensing to legal aid organizations and bar associations.</p>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span class="footer-logo">one3Seven</span>
+    <span>10-Year Financial Projection · Confidential · June 2026</span>
+    <span>Page 1</span>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════
+     PAGE 2 — RETENTION + COMPARABLE BENCHMARKS
+══════════════════════════ -->
+<div class="page page-break">
+  <div class="page-num">02 · Retention &amp; Comparable Companies</div>
+
+  <div class="sh">
+    <div class="sh-icon">🔄</div>
+    <div>
+      <div class="sh-title">Retention Model</div>
+      <div class="sh-sub">Legal SaaS firms that solve a real workflow problem retain at 85–93% annually — stickier than general SaaS</div>
+    </div>
+  </div>
+
+  <table class="t t-purple">
+    <thead>
+      <tr>
+        <th>Metric</th>
+        <th>Year 1–2</th>
+        <th>Year 3–5</th>
+        <th>Year 6–10</th>
+        <th>Basis</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="bold">Annual Firm Retention</td>
+        <td>78%</td>
+        <td>85%</td>
+        <td class="green">90%</td>
+        <td class="gray">Clio: 90%+ after Yr 3</td>
+      </tr>
+      <tr>
+        <td class="bold">Monthly Churn Rate</td>
+        <td class="red">1.8%</td>
+        <td>1.3%</td>
+        <td class="green">0.9%</td>
+        <td class="gray">Legal SaaS avg 1–2%</td>
+      </tr>
+      <tr>
+        <td class="bold">Net Revenue Retention</td>
+        <td>95%</td>
+        <td>108%</td>
+        <td class="green">115%</td>
+        <td class="gray">Upgrades offset churn</td>
+      </tr>
+      <tr>
+        <td class="bold">Avg Contract Length</td>
+        <td>Month-to-month</td>
+        <td>6–12 mo</td>
+        <td class="green">Annual</td>
+        <td class="gray">Mirrors Clio, MyCase path</td>
+      </tr>
+      <tr>
+        <td class="bold">Payback Period (CAC)</td>
+        <td class="red">18–24 mo</td>
+        <td>12–16 mo</td>
+        <td class="green">8–10 mo</td>
+        <td class="gray">Legal SaaS median: 12 mo</td>
+      </tr>
+      <tr>
+        <td class="bold">LTV : CAC Ratio</td>
+        <td>2.5x</td>
+        <td>4.2x</td>
+        <td class="green">6.8x</td>
+        <td class="gray">Target: 3x+ healthy SaaS</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="box b-a" style="margin-bottom:22px;">
+    <h3>Why legal SaaS retains well</h3>
+    <p>Once an attorney firm integrates an intake workflow into their practice, switching cost is high — client data, intake history, and established process live on the platform. <em>Clio's NPS is consistently 70+.</em> MyCase was acquired for $193M on the back of sticky firm relationships. Legal software churn is structurally lower than general B2B SaaS because the workflow is mission-critical and daily.</p>
+  </div>
+
+  <div class="sh">
+    <div class="sh-icon">📊</div>
+    <div>
+      <div class="sh-title">Comparable Companies — Growth Trajectories</div>
+      <div class="sh-sub">Legal SaaS and two-sided marketplace benchmarks one3Seven models against</div>
+    </div>
+  </div>
+
+  <div class="comp-card">
+    <div class="comp-dot" style="background:#6d4aff;"></div>
+    <div>
+      <div class="comp-name">Clio (Themis Solutions)</div>
+      <div class="comp-detail">Legal practice management SaaS. Founded 2008. Serves 150,000+ legal professionals. Free client portal, firm subscription.</div>
+      <div class="comp-stat">$1.6B valuation · $150M+ estimated ARR · 90%+ annual retention · 15 years to category leadership</div>
+    </div>
+  </div>
+  <div class="comp-card">
+    <div class="comp-dot" style="background:#0891b2;"></div>
+    <div>
+      <div class="comp-name">MyCase</div>
+      <div class="comp-detail">Legal practice management for small firms. Built on firm subscription + free client access. Acquired 2022.</div>
+      <div class="comp-stat">Acquired for $193M · Reached acquisition in ~10 years · ~85% annual retention</div>
+    </div>
+  </div>
+  <div class="comp-card">
+    <div class="comp-dot" style="background:#7c3aed;"></div>
+    <div>
+      <div class="comp-name">Filevine</div>
+      <div class="comp-detail">Legal case management and document automation. Focused on plaintiff-side litigation firms — direct one3Seven overlap.</div>
+      <div class="comp-stat">$108M raised · Plaintiff-firm focus · 3–5x revenue growth in years 3–6</div>
+    </div>
+  </div>
+  <div class="comp-card">
+    <div class="comp-dot" style="background:#059669;"></div>
+    <div>
+      <div class="comp-name">LegalMatch</div>
+      <div class="comp-detail">Two-sided marketplace — workers find attorneys, attorneys pay per lead. Validates the worker-free / firm-pays model.</div>
+      <div class="comp-stat">$50M+ revenue · Two-sided model validated · 20+ year operating history</div>
+    </div>
+  </div>
+  <div class="comp-card">
+    <div class="comp-dot" style="background:#dc2626;"></div>
+    <div>
+      <div class="comp-name">Legora</div>
+      <div class="comp-detail">Legal AI — general research and drafting. $675M valuation. Validates legal AI investment appetite at scale.</div>
+      <div class="comp-stat">$675M valuation · 14 hrs/week saved per lawyer · Category-making in legal AI 2024–2025</div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span class="footer-logo">one3Seven</span>
+    <span>10-Year Financial Projection · Confidential · June 2026</span>
+    <span>Page 2</span>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════
+     PAGE 3 — OVERHEAD + COST STRUCTURE
+══════════════════════════ -->
+<div class="page page-break">
+  <div class="page-num">03 · Overhead &amp; Cost Structure</div>
+
+  <div class="sh">
+    <div class="sh-icon">🏗️</div>
+    <div>
+      <div class="sh-title">Cost Structure Over 10 Years</div>
+      <div class="sh-sub">Lean startup → product-market fit → scale — mirroring Clio and Filevine growth phases</div>
+    </div>
+  </div>
+
+  <table class="t t-dark">
+    <thead>
+      <tr>
+        <th>Cost Category</th>
+        <th>Year 1</th>
+        <th>Year 2</th>
+        <th>Year 3</th>
+        <th>Year 5</th>
+        <th>Year 7</th>
+        <th>Year 10</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="bold">Founders / Core Team</td>
+        <td>$120K</td>
+        <td>$200K</td>
+        <td>$380K</td>
+        <td>$900K</td>
+        <td>$2.1M</td>
+        <td>$4.8M</td>
+      </tr>
+      <tr>
+        <td class="bold">Infrastructure (Supabase, hosting, AI API)</td>
+        <td>$18K</td>
+        <td>$36K</td>
+        <td>$72K</td>
+        <td>$180K</td>
+        <td>$420K</td>
+        <td>$960K</td>
+      </tr>
+      <tr>
+        <td class="bold">Sales &amp; Marketing</td>
+        <td>$24K</td>
+        <td>$60K</td>
+        <td>$150K</td>
+        <td>$600K</td>
+        <td>$1.4M</td>
+        <td>$3.2M</td>
+      </tr>
+      <tr>
+        <td class="bold">Legal / Compliance / IP</td>
+        <td>$20K</td>
+        <td>$30K</td>
+        <td>$45K</td>
+        <td>$90K</td>
+        <td>$150K</td>
+        <td>$300K</td>
+      </tr>
+      <tr>
+        <td class="bold">Operations / G&amp;A</td>
+        <td>$18K</td>
+        <td>$34K</td>
+        <td>$53K</td>
+        <td>$130K</td>
+        <td>$280K</td>
+        <td>$540K</td>
+      </tr>
+      <tr>
+        <td class="bold">Customer Success</td>
+        <td>$0</td>
+        <td>$0</td>
+        <td>$80K</td>
+        <td>$200K</td>
+        <td>$560K</td>
+        <td>$1.2M</td>
+      </tr>
+      <tr class="total">
+        <td>Total Annual Overhead</td>
+        <td class="red">$200K</td>
+        <td class="red">$360K</td>
+        <td class="red">$780K</td>
+        <td class="red">$2.1M</td>
+        <td class="red">$4.9M</td>
+        <td class="red">$11.0M</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="grid3">
+    <div class="sc v-r">
+      <div class="sc-num">$200K</div>
+      <div class="sc-label">Year 1 total overhead — lean founding team, infrastructure only</div>
+      <div class="sc-src">Estimated</div>
+    </div>
+    <div class="sc v-a">
+      <div class="sc-num">$2.1M</div>
+      <div class="sc-label">Year 5 overhead — full sales team, customer success, scaled infra</div>
+      <div class="sc-src">Estimated</div>
+    </div>
+    <div class="sc v-g">
+      <div class="sc-num">72%</div>
+      <div class="sc-label">Target gross margin by Year 5 — consistent with legal SaaS benchmarks (Clio: ~70–75%)</div>
+      <div class="sc-src">Legal SaaS benchmark</div>
+    </div>
+  </div>
+
+  <div class="sh" style="margin-top:18px;">
+    <div class="sh-icon">📉</div>
+    <div>
+      <div class="sh-title">Cost as % of Revenue — The Scale Advantage</div>
+      <div class="sh-sub">SaaS unit economics improve dramatically as revenue scales past overhead</div>
+    </div>
+  </div>
+
+  <table class="t t-purple">
+    <thead>
+      <tr>
+        <th>Year</th>
+        <th>ARR</th>
+        <th>Total Overhead</th>
+        <th>Gross Profit</th>
+        <th>Operating Margin</th>
+        <th>Phase</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="bold">Year 1</td>
+        <td>$66K</td>
+        <td class="red">$200K</td>
+        <td class="red">($134K)</td>
+        <td class="red">-203%</td>
+        <td class="gray">Seed / Build</td>
+      </tr>
+      <tr>
+        <td class="bold">Year 2</td>
+        <td>$328K</td>
+        <td class="red">$360K</td>
+        <td class="red">($32K)</td>
+        <td class="red">-10%</td>
+        <td class="gray">Early traction</td>
+      </tr>
+      <tr>
+        <td class="bold">Year 3</td>
+        <td>$786K</td>
+        <td class="red">$780K</td>
+        <td>$6K</td>
+        <td>+0.8%</td>
+        <td class="gray">Near break-even</td>
+      </tr>
+      <tr class="highlight">
+        <td class="bold">Year 4</td>
+        <td class="purple">$1.97M</td>
+        <td>$1.3M</td>
+        <td class="green">$670K</td>
+        <td class="green">+34%</td>
+        <td class="bold">Break-even ✓</td>
+      </tr>
+      <tr class="highlight">
+        <td class="bold">Year 5</td>
+        <td class="purple">$3.93M</td>
+        <td>$2.1M</td>
+        <td class="green">$1.83M</td>
+        <td class="green">+47%</td>
+        <td class="bold">Profitable</td>
+      </tr>
+      <tr>
+        <td class="bold">Year 7</td>
+        <td class="purple">$13.1M</td>
+        <td>$4.9M</td>
+        <td class="green">$8.2M</td>
+        <td class="green">+63%</td>
+        <td class="gray">Scale</td>
+      </tr>
+      <tr>
+        <td class="bold">Year 10</td>
+        <td class="purple">$39.4M</td>
+        <td>$11.0M</td>
+        <td class="green">$28.4M</td>
+        <td class="green">+72%</td>
+        <td class="gray">Category leader</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="footer">
+    <span class="footer-logo">one3Seven</span>
+    <span>10-Year Financial Projection · Confidential · June 2026</span>
+    <span>Page 3</span>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════
+     PAGE 4 — 10-YEAR REVENUE PROJECTION TABLE
+══════════════════════════ -->
+<div class="page page-break">
+  <div class="page-num">04 · 10-Year Revenue Projection</div>
+
+  <div class="sh">
+    <div class="sh-icon">📈</div>
+    <div>
+      <div class="sh-title">Full 10-Year Revenue Model</div>
+      <div class="sh-sub">Conservative growth curve — modeled on Clio's first 10 years, Filevine's plaintiff-firm expansion, LegalMatch's marketplace scaling</div>
+    </div>
+  </div>
+
+  <table class="t t-dark">
+    <thead>
+      <tr>
+        <th>Year</th>
+        <th>Active Firms</th>
+        <th>New Firms Added</th>
+        <th>Churn</th>
+        <th>Blended ARPU</th>
+        <th>ARR</th>
+        <th>MRR</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="bold">2026 · Yr 1</td>
+        <td>10</td>
+        <td>10</td>
+        <td class="red">0</td>
+        <td>$547</td>
+        <td class="purple">$65,640</td>
+        <td>$5,470</td>
+      </tr>
+      <tr>
+        <td class="bold">2027 · Yr 2</td>
+        <td>42</td>
+        <td>35</td>
+        <td class="red">3</td>
+        <td>$560</td>
+        <td class="purple">$282,240</td>
+        <td>$23,520</td>
+      </tr>
+      <tr>
+        <td class="bold">2028 · Yr 3</td>
+        <td>110</td>
+        <td>80</td>
+        <td class="red">12</td>
+        <td>$596</td>
+        <td class="purple">$785,520</td>
+        <td>$65,460</td>
+      </tr>
+      <tr class="highlight">
+        <td class="bold">2029 · Yr 4</td>
+        <td>275</td>
+        <td>190</td>
+        <td class="red">25</td>
+        <td>$598</td>
+        <td class="purple">$1,969,200</td>
+        <td>$164,100</td>
+      </tr>
+      <tr class="highlight">
+        <td class="bold">2030 · Yr 5</td>
+        <td>590</td>
+        <td>360</td>
+        <td class="red">45</td>
+        <td>$555</td>
+        <td class="purple">$3,929,400</td>
+        <td>$327,450</td>
+      </tr>
+      <tr>
+        <td class="bold">2031 · Yr 6</td>
+        <td>1,080</td>
+        <td>560</td>
+        <td class="red">70</td>
+        <td>$568</td>
+        <td class="purple">$7,360,320</td>
+        <td>$613,360</td>
+      </tr>
+      <tr>
+        <td class="bold">2032 · Yr 7</td>
+        <td>1,820</td>
+        <td>840</td>
+        <td class="red">100</td>
+        <td>$599</td>
+        <td class="purple">$13,058,160</td>
+        <td>$1,088,180</td>
+      </tr>
+      <tr>
+        <td class="bold">2033 · Yr 8</td>
+        <td>2,750</td>
+        <td>1,100</td>
+        <td class="red">170</td>
+        <td>$617</td>
+        <td class="purple">$20,361,000</td>
+        <td>$1,696,750</td>
+      </tr>
+      <tr>
+        <td class="bold">2034 · Yr 9</td>
+        <td>3,900</td>
+        <td>1,350</td>
+        <td class="red">200</td>
+        <td>$634</td>
+        <td class="purple">$29,628,000</td>
+        <td>$2,469,000</td>
+      </tr>
+      <tr class="highlight">
+        <td class="bold">2035 · Yr 10</td>
+        <td>5,400</td>
+        <td>1,700</td>
+        <td class="red">200</td>
+        <td>$607</td>
+        <td class="purple">$39,333,600</td>
+        <td>$3,277,800</td>
+      </tr>
+      <tr class="total">
+        <td>10-Year Total Revenue</td>
+        <td colspan="3">—</td>
+        <td>Cumulative</td>
+        <td class="green">~$117M</td>
+        <td class="green">—</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="box b-p" style="margin-top:6px;">
+    <h3>Growth rate assumptions</h3>
+    <p>Years 1–2: 200–300% YoY growth (founding traction). Years 3–5: 100–150% YoY (product-market fit, referral momentum). Years 6–8: 60–80% YoY (scaled sales motion). Years 9–10: 30–40% YoY (market maturation, category ownership). <em>These rates mirror Clio's documented path from 2008–2018.</em> ARPU increases over time as firm mix shifts toward Scale/Enterprise tiers and NRR from upgrades exceeds churn.</p>
+  </div>
+
+  <div class="footer">
+    <span class="footer-logo">one3Seven</span>
+    <span>10-Year Financial Projection · Confidential · June 2026</span>
+    <span>Page 4</span>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════
+     PAGE 5 — VISUAL ARR + FIRM GROWTH BARS
+══════════════════════════ -->
+<div class="page page-break">
+  <div class="page-num">05 · Visual Growth Trajectory</div>
+
+  <div class="sh">
+    <div class="sh-icon">📊</div>
+    <div>
+      <div class="sh-title">ARR Growth — Visual</div>
+      <div class="sh-sub">Annual Recurring Revenue · 2026 – 2035 (bars scaled to $39.3M Year 10 max)</div>
+    </div>
+  </div>
+
+  <div class="label-row" style="margin-bottom:12px;">
+    <div class="legend"><div class="legend-dot" style="background:#6d4aff;"></div> Annual Recurring Revenue (ARR)</div>
+  </div>
+
+  <div class="bar-chart">
+    <div class="bar-row">
+      <div class="bar-year">2026</div>
+      <div class="bar-track"><div class="bar-fill bf-arr" style="width:0.2%;">&nbsp;</div></div>
+      <div class="bar-val">$66K</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-year">2027</div>
+      <div class="bar-track"><div class="bar-fill bf-arr" style="width:0.7%;">&nbsp;</div></div>
+      <div class="bar-val">$282K</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-year">2028</div>
+      <div class="bar-track"><div class="bar-fill bf-arr" style="width:2%;">&nbsp;</div></div>
+      <div class="bar-val">$786K</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-year">2029</div>
+      <div class="bar-track"><div class="bar-fill bf-arr" style="width:5%; background:linear-gradient(90deg,#6d4aff,#4c1d95);">$2.0M</div></div>
+      <div class="bar-val">$1.97M</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-year">2030</div>
+      <div class="bar-track"><div class="bar-fill bf-arr" style="width:10%;">$3.9M</div></div>
+      <div class="bar-val">$3.93M</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-year">2031</div>
+      <div class="bar-track"><div class="bar-fill bf-arr" style="width:19%;">$7.4M</div></div>
+      <div class="bar-val">$7.36M</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-year">2032</div>
+      <div class="bar-track"><div class="bar-fill bf-arr" style="width:33%;">$13.1M</div></div>
+      <div class="bar-val">$13.1M</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-year">2033</div>
+      <div class="bar-track"><div class="bar-fill bf-arr" style="width:52%;">$20.4M</div></div>
+      <div class="bar-val">$20.4M</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-year">2034</div>
+      <div class="bar-track"><div class="bar-fill bf-arr" style="width:75%;">$29.6M</div></div>
+      <div class="bar-val">$29.6M</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-year">2035</div>
+      <div class="bar-track"><div class="bar-fill bf-arr" style="width:100%;">$39.3M</div></div>
+      <div class="bar-val">$39.3M</div>
+    </div>
+  </div>
+
+  <hr class="divider"/>
+
+  <div class="sh" style="margin-top:6px;">
+    <div class="sh-icon">🏢</div>
+    <div>
+      <div class="sh-title">Active Firm Count — Visual</div>
+      <div class="sh-sub">Firm subscriptions · 2026 – 2035 (bars scaled to 5,400 Year 10 max)</div>
+    </div>
+  </div>
+
+  <div class="label-row" style="margin-bottom:12px;">
+    <div class="legend"><div class="legend-dot" style="background:#0891b2;"></div> Active Subscribing Firms</div>
+  </div>
+
+  <div class="bar-chart">
+    <div class="bar-row">
+      <div class="bar-year">2026</div>
+      <div class="bar-track"><div class="bar-fill bf-firms" style="width:0.2%;">&nbsp;</div></div>
+      <div class="bar-val bv-teal">10</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-year">2027</div>
+      <div class="bar-track"><div class="bar-fill bf-firms" style="width:0.8%;">&nbsp;</div></div>
+      <div class="bar-val bv-teal">42</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-year">2028</div>
+      <div class="bar-track"><div class="bar-fill bf-firms" style="width:2%;">&nbsp;</div></div>
+      <div class="bar-val bv-teal">110</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-year">2029</div>
+      <div class="bar-track"><div class="bar-fill bf-firms" style="width:5%; background:linear-gradient(90deg,#0891b2,#164e63);">275</div></div>
+      <div class="bar-val bv-teal">275</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-year">2030</div>
+      <div class="bar-track"><div class="bar-fill bf-firms" style="width:11%;">590</div></div>
+      <div class="bar-val bv-teal">590</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-year">2031</div>
+      <div class="bar-track"><div class="bar-fill bf-firms" style="width:20%;">1,080</div></div>
+      <div class="bar-val bv-teal">1,080</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-year">2032</div>
+      <div class="bar-track"><div class="bar-fill bf-firms" style="width:34%;">1,820</div></div>
+      <div class="bar-val bv-teal">1,820</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-year">2033</div>
+      <div class="bar-track"><div class="bar-fill bf-firms" style="width:51%;">2,750</div></div>
+      <div class="bar-val bv-teal">2,750</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-year">2034</div>
+      <div class="bar-track"><div class="bar-fill bf-firms" style="width:72%;">3,900</div></div>
+      <div class="bar-val bv-teal">3,900</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-year">2035</div>
+      <div class="bar-track"><div class="bar-fill bf-firms" style="width:100%;">5,400</div></div>
+      <div class="bar-val bv-teal">5,400</div>
+    </div>
+  </div>
+
+  <div class="box b-l" style="margin-top:12px;">
+    <h3>Market penetration context</h3>
+    <p>There are approximately <em>40,000–50,000 employment law attorneys</em> in the U.S. (BLS 2024), working across roughly <em>15,000–20,000 plaintiff-side employment firms.</em> 5,400 active firms by Year 10 represents <em>27–36% market penetration</em> — aggressive but consistent with Clio's trajectory (150,000+ legal professionals across ~50,000 firms). The TAM supports $100M+ ARR at full penetration.</p>
+  </div>
+
+  <div class="footer">
+    <span class="footer-logo">one3Seven</span>
+    <span>10-Year Financial Projection · Confidential · June 2026</span>
+    <span>Page 5</span>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════
+     PAGE 6 — MILESTONES + VALUATION
+══════════════════════════ -->
+<div class="page page-break">
+  <div class="page-num">06 · Milestones &amp; Valuation</div>
+
+  <div class="sh">
+    <div class="sh-icon">🏁</div>
+    <div>
+      <div class="sh-title">Key Financial Milestones</div>
+      <div class="sh-sub">The moments that define each phase of the business</div>
+    </div>
+  </div>
+
+  <table class="t t-purple">
+    <thead>
+      <tr>
+        <th>Milestone</th>
+        <th>Projected Timing</th>
+        <th>ARR at Milestone</th>
+        <th>Significance</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="bold">First 10 paying firms</td>
+        <td>Q3 2026</td>
+        <td>$66K ARR</td>
+        <td class="gray">Proof of concept — firms will pay</td>
+      </tr>
+      <tr>
+        <td class="bold">$100K ARR</td>
+        <td>Q1 2027</td>
+        <td>$100K</td>
+        <td class="gray">Seed fundraising credibility threshold</td>
+      </tr>
+      <tr>
+        <td class="bold">$1M ARR</td>
+        <td>Q2 2029</td>
+        <td>$1M</td>
+        <td class="gray">Series A viability — standard legal SaaS benchmark</td>
+      </tr>
+      <tr class="highlight">
+        <td class="bold">Break-even</td>
+        <td>2029 · Year 4</td>
+        <td>$1.97M ARR</td>
+        <td class="bold green">Revenue covers all operating costs</td>
+      </tr>
+      <tr>
+        <td class="bold">$5M ARR</td>
+        <td>2030 · Year 5</td>
+        <td>$5M</td>
+        <td class="gray">Series B territory — scale fundraise</td>
+      </tr>
+      <tr>
+        <td class="bold">$10M ARR</td>
+        <td>2031 · Year 6</td>
+        <td>$10M</td>
+        <td class="gray">Category leadership signal — acquisition interest begins</td>
+      </tr>
+      <tr class="highlight">
+        <td class="bold">$39M ARR</td>
+        <td>2035 · Year 10</td>
+        <td class="purple">$39.3M</td>
+        <td class="bold green">Full category ownership — IPO or strategic exit</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="sh" style="margin-top:24px;">
+    <div class="sh-icon">💎</div>
+    <div>
+      <div class="sh-title">Valuation Range — Based on Comp Multiples</div>
+      <div class="sh-sub">Legal SaaS trades at 8–15x ARR at growth stage · 5–8x at maturity</div>
+    </div>
+  </div>
+
+  <table class="t t-dark">
+    <thead>
+      <tr>
+        <th>Year</th>
+        <th>ARR</th>
+        <th>Conservative (5x)</th>
+        <th>Base Case (10x)</th>
+        <th>Optimistic (15x)</th>
+        <th>Note</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="bold">Year 3 · 2028</td>
+        <td>$786K</td>
+        <td>$3.9M</td>
+        <td class="purple">$7.9M</td>
+        <td>$11.8M</td>
+        <td class="gray">Seed / pre-Series A</td>
+      </tr>
+      <tr>
+        <td class="bold">Year 5 · 2030</td>
+        <td>$3.93M</td>
+        <td>$19.7M</td>
+        <td class="purple">$39.3M</td>
+        <td>$58.9M</td>
+        <td class="gray">Series A/B range</td>
+      </tr>
+      <tr>
+        <td class="bold">Year 7 · 2032</td>
+        <td>$13.1M</td>
+        <td>$65.5M</td>
+        <td class="purple">$131M</td>
+        <td>$196M</td>
+        <td class="gray">MyCase acquired at ~$193M</td>
+      </tr>
+      <tr class="highlight">
+        <td class="bold">Year 10 · 2035</td>
+        <td class="purple">$39.3M</td>
+        <td class="green">$196M</td>
+        <td class="green">$393M</td>
+        <td class="green">$590M</td>
+        <td class="bold">Strategic exit / IPO window</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="grid2">
+    <div class="box b-d">
+      <h3>Comparable exit data</h3>
+      <p>MyCase acquired for <em>~$193M</em> — Year 10 legal SaaS firm. Filevine raised $108M at implied valuation of $500M+. Clio valued at $1.6B with $150M+ ARR. <em>The legal SaaS exit environment is proven and active.</em></p>
+    </div>
+    <div class="box b-g">
+      <h3>The disciplined path</h3>
+      <p>Reach break-even at Year 4 without external funding. Use Years 1–3 to build the network effect that makes one3Seven defensible. Raise only when growth capital can compound returns — <em>not to cover operating losses indefinitely.</em></p>
+    </div>
+  </div>
+
+  <div class="box b-p">
+    <h3>The one number that matters most</h3>
+    <p>At 5,400 firms paying an average of $607/month, one3Seven generates <em>$39M in ARR</em> — from a market of 15,000–20,000 plaintiff-side employment firms, representing 27–36% penetration. The unit economics, retention benchmarks, and comparable exit data all point to the same conclusion: <em>this is a category worth building, and the window to own it is now.</em></p>
+  </div>
+
+  <div class="box b-a" style="margin-bottom:0;">
+    <h3>Disclosure</h3>
+    <p>All financial projections are estimates based on publicly available legal SaaS benchmarks (Clio, MyCase, Filevine, LegalMatch), EEOC market data, and internal modeling assumptions. They are not a guarantee of future results. Comparable company data is sourced from public reporting, press releases, and industry research. Valuation multiples reflect market conditions as of 2025–2026 and are subject to change.</p>
+  </div>
+
+  <div class="footer">
+    <span class="footer-logo">one3Seven</span>
+    <span>10-Year Financial Projection · Confidential · June 2026</span>
+    <span>Page 6</span>
+  </div>
+</div>
+
+</body>
+</html>

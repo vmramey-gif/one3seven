@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Why one3Seven</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background: #fff;
+    color: #1e1b4b;
+    font-size: 11pt;
+    line-height: 1.55;
+  }
+
+  /* ── COVER ── */
+  .cover {
+    background: linear-gradient(150deg, #0a0818 0%, #1e1b4b 40%, #3b2d8a 75%, #6d4aff 100%);
+    color: white;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 72px 64px;
+    page-break-after: always;
+  }
+  .cover-logo {
+    font-size: 11pt;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    color: rgba(255,255,255,0.4);
+    text-transform: uppercase;
+  }
+  .cover-eyebrow {
+    font-size: 8.5pt;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+    margin-top: 48px;
+  }
+  .cover-title {
+    font-size: 46pt;
+    font-weight: 900;
+    line-height: 1.0;
+    letter-spacing: -0.03em;
+    margin-top: 14px;
+  }
+  .cover-title span { color: #c4b5fd; }
+  .cover-sub {
+    font-size: 13pt;
+    color: rgba(255,255,255,0.65);
+    max-width: 520px;
+    line-height: 1.65;
+    margin-top: 22px;
+  }
+
+  .cover-problem-box {
+    margin-top: 48px;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 18px;
+    padding: 28px 32px;
+    background: rgba(255,255,255,0.05);
+  }
+  .cover-problem-label {
+    font-size: 8pt;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #c4b5fd;
+    margin-bottom: 14px;
+  }
+  .cover-problem-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .cover-problem-list li {
+    font-size: 10.5pt;
+    color: rgba(255,255,255,0.82);
+    padding-left: 20px;
+    position: relative;
+    line-height: 1.5;
+  }
+  .cover-problem-list li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: #6d4aff;
+    font-weight: 700;
+  }
+
+  .cover-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-top: 36px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    margin-top: 40px;
+  }
+  .cover-tagline {
+    font-size: 10pt;
+    color: rgba(255,255,255,0.5);
+    font-style: italic;
+  }
+  .cover-date {
+    font-size: 8.5pt;
+    color: rgba(255,255,255,0.35);
+    text-align: right;
+  }
+
+  /* ── PAGE ── */
+  .page {
+    padding: 52px 60px;
+    max-width: 820px;
+    margin: 0 auto;
+  }
+  .page-break { page-break-before: always; }
+
+  /* ── SECTION HEADER ── */
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 22px;
+    padding-bottom: 14px;
+    border-bottom: 2px solid #ede9fe;
+  }
+  .section-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 11px;
+    background: #6d4aff;
+    color: white;
+    font-size: 17pt;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .section-title {
+    font-size: 15pt;
+    font-weight: 800;
+    color: #1e1b4b;
+    letter-spacing: -0.01em;
+  }
+  .section-sub {
+    font-size: 9pt;
+    color: #6d4aff;
+    font-weight: 600;
+    margin-top: 2px;
+  }
+
+  /* ── STAT CARDS ── */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 22px;
+  }
+  .stat-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+  .stat-card {
+    background: #fafafe;
+    border: 1.5px solid #ede9fe;
+    border-radius: 14px;
+    padding: 18px 20px;
+    break-inside: avoid;
+  }
+  .stat-card.purple {
+    background: linear-gradient(135deg, #6d4aff 0%, #4c1d95 100%);
+    border-color: transparent;
+  }
+  .stat-card.dark {
+    background: #1e1b4b;
+    border-color: transparent;
+  }
+  .stat-card.red {
+    background: #fff5f5;
+    border-color: #fecaca;
+  }
+  .stat-num {
+    font-size: 26pt;
+    font-weight: 900;
+    color: #6d4aff;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  .stat-card.purple .stat-num,
+  .stat-card.dark .stat-num { color: #c4b5fd; }
+  .stat-card.red .stat-num { color: #dc2626; }
+  .stat-label {
+    font-size: 9.5pt;
+    font-weight: 600;
+    color: #1e1b4b;
+    margin-top: 6px;
+    line-height: 1.4;
+  }
+  .stat-card.purple .stat-label,
+  .stat-card.dark .stat-label { color: rgba(255,255,255,0.9); }
+  .stat-card.red .stat-label { color: #7f1d1d; }
+  .stat-source {
+    font-size: 7.5pt;
+    color: #9ca3af;
+    margin-top: 5px;
+  }
+  .stat-card.purple .stat-source,
+  .stat-card.dark .stat-source { color: rgba(255,255,255,0.4); }
+  .stat-card.red .stat-source { color: #fca5a5; }
+
+  /* ── CALLOUT ── */
+  .callout {
+    border-radius: 16px;
+    padding: 22px 26px;
+    margin-bottom: 20px;
+    break-inside: avoid;
+  }
+  .callout.purple {
+    background: linear-gradient(135deg, #6d4aff 0%, #4c1d95 100%);
+    color: white;
+  }
+  .callout.light {
+    background: #f7f3ff;
+    border: 1.5px solid #ddd6fe;
+  }
+  .callout.red {
+    background: #fff5f5;
+    border: 1.5px solid #fecaca;
+  }
+  .callout.green {
+    background: #f0fdf4;
+    border: 1.5px solid #bbf7d0;
+  }
+  .callout h3 {
+    font-size: 9.5pt;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .callout.purple h3 { color: #c4b5fd; }
+  .callout.light h3 { color: #6d4aff; }
+  .callout.red h3 { color: #991b1b; }
+  .callout.green h3 { color: #065f46; }
+  .callout p {
+    font-size: 10.5pt;
+    line-height: 1.65;
+  }
+  .callout.purple p { color: rgba(255,255,255,0.88); }
+  .callout.light p { color: #312e81; }
+  .callout.red p { color: #7f1d1d; }
+  .callout.green p { color: #064e3b; }
+  .callout p + p { margin-top: 10px; }
+  .callout em {
+    font-style: normal;
+    font-weight: 800;
+  }
+  .callout.purple em { color: #e0d9ff; }
+  .callout.light em { color: #6d4aff; }
+  .callout.red em { color: #dc2626; }
+  .callout.green em { color: #059669; }
+
+  /* ── TWO COLUMN BLOCK ── */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 22px;
+  }
+  .col-card {
+    border-radius: 14px;
+    padding: 20px;
+    break-inside: avoid;
+  }
+  .col-card.problem {
+    background: #fff5f5;
+    border: 1.5px solid #fecaca;
+  }
+  .col-card.solution {
+    background: #f0fdf4;
+    border: 1.5px solid #bbf7d0;
+  }
+  .col-label {
+    font-size: 8pt;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .col-card.problem .col-label { color: #991b1b; }
+  .col-card.solution .col-label { color: #065f46; }
+  .col-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+  .col-list li {
+    font-size: 10pt;
+    padding-left: 18px;
+    position: relative;
+    line-height: 1.45;
+  }
+  .col-card.problem .col-list li::before { content: '✗'; position: absolute; left: 0; color: #dc2626; font-weight: 700; font-size: 10pt; }
+  .col-card.solution .col-list li::before { content: '✓'; position: absolute; left: 0; color: #059669; font-weight: 700; font-size: 10pt; }
+  .col-card.problem .col-list li { color: #7f1d1d; }
+  .col-card.solution .col-list li { color: #064e3b; }
+
+  /* ── FEATURE TABLE ── */
+  .feature-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    break-inside: avoid;
+  }
+  .feature-table th {
+    background: #1e1b4b;
+    color: white;
+    font-size: 8pt;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 10px 14px;
+    text-align: left;
+  }
+  .feature-table th:first-child { border-radius: 10px 0 0 0; }
+  .feature-table th:last-child { border-radius: 0 10px 0 0; text-align: center; }
+  .feature-table td {
+    padding: 11px 14px;
+    font-size: 10pt;
+    border-bottom: 1px solid #ede9fe;
+    vertical-align: top;
+    line-height: 1.5;
+  }
+  .feature-table tr:nth-child(even) td { background: #fafafe; }
+  .feature-table tr:last-child td { border-bottom: none; }
+  .feature-table td.check { text-align: center; font-size: 14pt; }
+  .feature-table td.feature-name { font-weight: 600; color: #1e1b4b; }
+  .feature-table td.feature-desc { color: #374151; font-size: 9.5pt; }
+
+  /* ── QUOTE ── */
+  .quote-block {
+    background: #f7f3ff;
+    border-left: 4px solid #6d4aff;
+    border-radius: 0 12px 12px 0;
+    padding: 16px 20px;
+    margin-bottom: 14px;
+    break-inside: avoid;
+  }
+  .quote-text {
+    font-size: 11pt;
+    color: #1e1b4b;
+    line-height: 1.65;
+    font-style: italic;
+  }
+  .quote-text strong { font-style: normal; color: #6d4aff; }
+  .quote-attr {
+    font-size: 8pt;
+    color: #9ca3af;
+    margin-top: 8px;
+    font-style: normal;
+  }
+
+  /* ── TIMELINE ── */
+  .timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin-bottom: 22px;
+    break-inside: avoid;
+  }
+  .timeline-item {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+  .timeline-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+    width: 32px;
+  }
+  .timeline-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #6d4aff;
+    border: 2.5px solid white;
+    box-shadow: 0 0 0 2px #6d4aff;
+    flex-shrink: 0;
+    margin-top: 3px;
+  }
+  .timeline-dot.red { background: #dc2626; box-shadow: 0 0 0 2px #dc2626; }
+  .timeline-line {
+    width: 2px;
+    flex: 1;
+    background: #ede9fe;
+    min-height: 28px;
+  }
+  .timeline-content {
+    padding-bottom: 20px;
+    flex: 1;
+  }
+  .timeline-label {
+    font-size: 8.5pt;
+    font-weight: 700;
+    color: #6d4aff;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .timeline-label.red { color: #dc2626; }
+  .timeline-title {
+    font-size: 10.5pt;
+    font-weight: 700;
+    color: #1e1b4b;
+    margin-top: 2px;
+    line-height: 1.4;
+  }
+  .timeline-desc {
+    font-size: 9.5pt;
+    color: #6b7280;
+    margin-top: 4px;
+    line-height: 1.5;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 36px;
+    padding-top: 14px;
+    border-top: 1px solid #ede9fe;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 7.5pt;
+    color: #9ca3af;
+  }
+
+  /* ── SOURCES ── */
+  .sources {
+    margin-top: 22px;
+    break-inside: avoid;
+  }
+  .sources h4 {
+    font-size: 8.5pt;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #9ca3af;
+    margin-bottom: 10px;
+  }
+  .sources ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .sources li {
+    font-size: 8pt;
+    color: #6b7280;
+    line-height: 1.5;
+    padding-left: 14px;
+    position: relative;
+  }
+  .sources li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: #6d4aff;
+    font-weight: 700;
+  }
+
+  @media print {
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .cover { min-height: 100vh; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════ COVER ══════════════════════════ -->
+<div class="cover">
+  <div>
+    <div class="cover-logo">one3Seven</div>
+    <div class="cover-eyebrow">Product Overview · 2026</div>
+    <div class="cover-title">Why<br/><span>one3Seven</span></div>
+    <div class="cover-sub">
+      Employment law intake is broken. Workers fall through the cracks. Firms burn hours on cases that never convert. one3Seven fixes both sides of the same problem.
+    </div>
+
+    <div class="cover-problem-box">
+      <div class="cover-problem-label">The problem in four facts</div>
+      <ul class="cover-problem-list">
+        <li>88,531 workplace discrimination charges were filed in FY2024 — up 9.2% year over year</li>
+        <li>Fewer than 5% of cases screened by employment firms are ever accepted</li>
+        <li>The average firm spends 3–6 hours of staff time on every intake, including the 95% it rejects</li>
+        <li>Workers navigating the process alone — without legal guidance — regularly miss filing deadlines, misstate their claims, or give up entirely</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="cover-bottom">
+    <div class="cover-tagline">"The intake moment is where most cases are lost — before anyone even looks at them."</div>
+    <div class="cover-date">one3Seven · Confidential<br/>June 2026</div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════ PAGE 1 — THE PROBLEM ══════════════════════════ -->
+<div class="page">
+
+  <div class="section-header">
+    <div class="section-icon">⚠️</div>
+    <div>
+      <div class="section-title">The Problem is Real — and Large</div>
+      <div class="section-sub">Employment law has a broken front door. These numbers prove it.</div>
+    </div>
+  </div>
+
+  <div class="stat-grid three">
+    <div class="stat-card red">
+      <div class="stat-num">88,531</div>
+      <div class="stat-label">Workplace discrimination charges filed with the EEOC — FY2024 alone</div>
+      <div class="stat-source">EEOC FY2024 Annual Performance Report</div>
+    </div>
+    <div class="stat-card red">
+      <div class="stat-num">9.2%</div>
+      <div class="stat-label">Year-over-year increase — the volume is accelerating, not slowing</div>
+      <div class="stat-source">EEOC FY2024 vs FY2023</div>
+    </div>
+    <div class="stat-card red">
+      <div class="stat-num">&lt;5%</div>
+      <div class="stat-label">Cases accepted by employment firms from initial screening inquiries</div>
+      <div class="stat-source">Touro Law Review — Case Screening in Employment Law</div>
+    </div>
+  </div>
+
+  <div class="callout red">
+    <h3>What that means in practice</h3>
+    <p>For every 100 workers who reach out to an employment law firm, <em>95 are turned away.</em> Many of them have real, valid claims. They were turned away because the intake process couldn't surface what mattered quickly enough — or at all. The firm didn't have the information. The worker didn't know how to present it. The case was declined on incomplete data.</p>
+    <p>Meanwhile, the firm spent 200–400 hours of staff time that month processing those 100 inquiries. <em>None of it generated revenue.</em></p>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-num">$700M</div>
+      <div class="stat-label">Recovered for ~21,000 discrimination victims via EEOC settlements in FY2024</div>
+      <div class="stat-source">EEOC Office of General Counsel FY2024</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">180 days</div>
+      <div class="stat-label">EEOC filing deadline from the discriminatory act — a hard cutoff workers frequently miss</div>
+      <div class="stat-source">EEOC filing requirements</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">3 hrs</div>
+      <div class="stat-num" style="font-size:14pt; margin-top:2px; color:#6b7280;">of 8</div>
+      <div class="stat-label">Average billable hours captured per attorney workday — the rest is admin and intake overhead</div>
+      <div class="stat-source">Clio 2024 Legal Trends Report</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">$75K+</div>
+      <div class="stat-label">Average employer defense cost before trial — the stakes on every intake are high</div>
+      <div class="stat-source">Novian Law 2025</div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>one3Seven · Why one3Seven · Confidential</span>
+    <span>Page 1</span>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════ PAGE 2 — TWO SIDES, ONE SOLUTION ══════════════════════════ -->
+<div class="page page-break">
+
+  <div class="section-header">
+    <div class="section-icon">⚖️</div>
+    <div>
+      <div class="section-title">Two Sides, One Solution</div>
+      <div class="section-sub">one3Seven serves the worker and the firm simultaneously</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="col-card problem">
+      <div class="col-label">The worker — without one3Seven</div>
+      <ul class="col-list">
+        <li>Doesn't know how to organize their documents or story</li>
+        <li>Calls multiple firms, gets put on hold, hears "we'll call you back"</li>
+        <li>Loses track of filing deadlines (180-day EEOC window)</li>
+        <li>Presents their case poorly on the first call — and gets declined</li>
+        <li>Has no visibility into whether the firm reviewed their materials</li>
+        <li>Falls through the cracks with no guidance on next steps</li>
+      </ul>
+    </div>
+    <div class="col-card solution">
+      <div class="col-label">The worker — with one3Seven</div>
+      <ul class="col-list">
+        <li>Guided intake flow walks them through their situation step by step</li>
+        <li>Uploads documents directly — no email back-and-forth</li>
+        <li>Sees their case organized and reflected back to them clearly</li>
+        <li>Knows a real firm is reviewing their actual materials</li>
+        <li>Gets a clear outcome: accepted, more info needed, or not pursuing</li>
+        <li>Has a documented record of their situation regardless of outcome</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="col-card problem">
+      <div class="col-label">The firm — without one3Seven</div>
+      <ul class="col-list">
+        <li>3–6 hours of staff time per intake to triage</li>
+        <li>95 out of 100 intakes generate no revenue</li>
+        <li>Intake coordinator chasing documents, scheduling calls</li>
+        <li>Attorney reviews incomplete summaries before deciding</li>
+        <li>No structured data — every intake is a different format</li>
+        <li>High-value intakes look the same as low-value ones on arrival</li>
+      </ul>
+    </div>
+    <div class="col-card solution">
+      <div class="col-label">The firm — with one3Seven</div>
+      <ul class="col-list">
+        <li>10–20 minute structured review per intake</li>
+        <li>Pre-built timeline, key quotes, and AI intelligence ready on arrival</li>
+        <li>Documents already uploaded and categorized</li>
+        <li>Firm sees readiness signals — strong cases surface faster</li>
+        <li>One-click decision: accept, request more, or decline</li>
+        <li>Consistent intake format across every case</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout purple">
+    <h3>The core insight</h3>
+    <p>Most intake platforms optimize for the firm. Most legal aid tools optimize for the worker. one3Seven is built on the belief that <em>if the worker's story is presented well, the firm makes a better decision</em> — and both sides win. The intake packet a firm sees is only as good as what the worker was able to communicate. one3Seven bridges that gap.</p>
+  </div>
+
+  <div class="footer">
+    <span>one3Seven · Why one3Seven · Confidential</span>
+    <span>Page 2</span>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════ PAGE 3 — HOW IT WORKS ══════════════════════════ -->
+<div class="page page-break">
+
+  <div class="section-header">
+    <div class="section-icon">🔄</div>
+    <div>
+      <div class="section-title">How It Works</div>
+      <div class="section-sub">From worker submission to firm decision — end to end</div>
+    </div>
+  </div>
+
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-left">
+        <div class="timeline-dot"></div>
+        <div class="timeline-line"></div>
+      </div>
+      <div class="timeline-content">
+        <div class="timeline-label">Step 1 — Worker</div>
+        <div class="timeline-title">Worker submits their intake</div>
+        <div class="timeline-desc">Guided question flow captures employment dates, key people, what happened, and when. The worker uploads their documents — pay stubs, termination letters, HR emails — directly into the platform. No phone tag. No intake form that gets lost in email.</div>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-left">
+        <div class="timeline-dot"></div>
+        <div class="timeline-line"></div>
+      </div>
+      <div class="timeline-content">
+        <div class="timeline-label">Step 2 — Platform</div>
+        <div class="timeline-title">one3Seven builds the intake packet</div>
+        <div class="timeline-desc">AI extracts the timeline of events, identifies key quotes from uploaded documents, surfaces timing gaps (complaint → warning → termination), flags confirmed facts, and generates a structured intelligence layer for the reviewing attorney. Every packet is the same clean format.</div>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-left">
+        <div class="timeline-dot"></div>
+        <div class="timeline-line"></div>
+      </div>
+      <div class="timeline-content">
+        <div class="timeline-label">Step 3 — Firm</div>
+        <div class="timeline-title">Attorney reviews the pre-built packet</div>
+        <div class="timeline-desc">The firm sees a structured intake card: overview, timeline, AI intelligence, uploaded files, confirmed facts, and what's still missing. Review takes 10–20 minutes — not 3–6 hours. The attorney has everything needed to make a confident decision.</div>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-left">
+        <div class="timeline-dot"></div>
+        <div class="timeline-line"></div>
+      </div>
+      <div class="timeline-content">
+        <div class="timeline-label">Step 4 — Decision</div>
+        <div class="timeline-title">One-click outcome with worker visibility</div>
+        <div class="timeline-desc">The firm accepts the case, requests additional documents, or marks it as not pursuing — all tracked in the platform. The worker isn't left wondering. The firm has a documented record. The loop closes cleanly.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout light">
+    <h3>What makes the AI layer different</h3>
+    <p>one3Seven doesn't just store documents — it reads them. The platform identifies <em>retaliation timing intervals</em> (e.g., "termination 34 days after HR complaint"), <em>direct quotes from uploaded files</em> that are legally significant, and <em>what's missing</em> from the current record set. The attorney sees not just what the worker submitted — but what it means.</p>
+  </div>
+
+  <div class="footer">
+    <span>one3Seven · Why one3Seven · Confidential</span>
+    <span>Page 3</span>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════ PAGE 4 — THE NUMBERS + MARKET ══════════════════════════ -->
+<div class="page page-break">
+
+  <div class="section-header">
+    <div class="section-icon">📊</div>
+    <div>
+      <div class="section-title">The Numbers Behind the Case</div>
+      <div class="section-sub">Why now, why this market, why this approach</div>
+    </div>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card purple">
+      <div class="stat-num">~$4B</div>
+      <div class="stat-label">Annual U.S. employment litigation market — plaintiff-side contingency firms alone</div>
+      <div class="stat-source">IBISWorld / Legal industry estimates 2025</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">2,729</div>
+      <div class="stat-label">Pregnant Workers Fairness Act charges in FY2024 — up from 188 the year prior. New categories keep expanding the pipeline.</div>
+      <div class="stat-source">EEOC FY2024 Annual Report</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">95%</div>
+      <div class="stat-label">Of legal professionals using AI report saving time weekly on their core work</div>
+      <div class="stat-source">Clio 2025 Legal Trends Report</div>
+    </div>
+    <div class="stat-card dark">
+      <div class="stat-num">14 hrs</div>
+      <div class="stat-label">Saved per lawyer per week — Legora's study of 100+ active law firm customers</div>
+      <div class="stat-source">Legora December 2025</div>
+    </div>
+  </div>
+
+  <div class="section-header" style="margin-top: 28px;">
+    <div class="section-icon">🎯</div>
+    <div>
+      <div class="section-title">What one3Seven Is — and Isn't</div>
+      <div class="section-sub">Positioning clarity for conversations with firms and investors</div>
+    </div>
+  </div>
+
+  <table class="feature-table">
+    <thead>
+      <tr>
+        <th style="width:30%">Category</th>
+        <th style="width:40%">What one3Seven does</th>
+        <th style="width:30%">What it doesn't do</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="feature-name">Legal advice</td>
+        <td class="feature-desc">Organizes and presents the worker's situation clearly</td>
+        <td class="feature-desc">Does not provide legal opinions or case assessments</td>
+      </tr>
+      <tr>
+        <td class="feature-name">Case selection</td>
+        <td class="feature-desc">Surfaces strong signals — the firm decides</td>
+        <td class="feature-desc">Does not tell firms which cases to take</td>
+      </tr>
+      <tr>
+        <td class="feature-name">Document review</td>
+        <td class="feature-desc">Extracts quotes, identifies categories, flags missing files</td>
+        <td class="feature-desc">Does not replace attorney review of full documents</td>
+      </tr>
+      <tr>
+        <td class="feature-name">Worker guidance</td>
+        <td class="feature-desc">Walks workers through structured intake, keeps them informed</td>
+        <td class="feature-desc">Does not act as legal counsel or representation</td>
+      </tr>
+      <tr>
+        <td class="feature-name">Firm workflow</td>
+        <td class="feature-desc">Reduces review time from hours to minutes per intake</td>
+        <td class="feature-desc">Does not replace case management software post-acceptance</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout green">
+    <h3>The one rule</h3>
+    <p>one3Seven does not tell firms which cases to take. It does not give workers legal advice. It does one thing: <em>it makes sure the right information reaches the right attorney in the clearest possible format.</em> What happens after that is between the firm and the worker — as it should be.</p>
+  </div>
+
+  <div class="sources">
+    <h4>Sources</h4>
+    <ul>
+      <li>EEOC FY2024 Annual Performance Report — eeoc.gov</li>
+      <li>EEOC Office of General Counsel FY2024 Annual Report — eeoc.gov</li>
+      <li>Clio 2025 Legal Trends Report — clio.com/guides/ai-legal-trends</li>
+      <li>Legora Legal AI Review — gc.ai/blog/legora-legal-ai-review</li>
+      <li>Touro Law Review — Case Screening in Employment Law — digitalcommons.tourolaw.edu</li>
+      <li>Novian Law — Employment Lawyer Cost Guide 2025 — novianlaw.com</li>
+      <li>IBISWorld — Employment Law Services in the US — ibisworld.com</li>
+    </ul>
+  </div>
+
+  <div class="footer">
+    <span>one3Seven · Why one3Seven · Confidential · June 2026</span>
+    <span>Page 4</span>
+  </div>
+</div>
+
+</body>
+</html>

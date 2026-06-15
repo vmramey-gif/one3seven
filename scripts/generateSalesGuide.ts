@@ -1,0 +1,1015 @@
+/**
+ * Run with: npx ts-node scripts/generateSalesGuide.ts
+ * Or open scripts/sales-guide.html in a browser and Print → Save as PDF
+ */
+
+import * as fs from 'fs';
+import * as path from 'path';
+
+const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>one3Seven — Sales Guide</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 13px;
+    color: #1e1b4b;
+    background: #fff;
+    line-height: 1.6;
+  }
+
+  /* ── Page layout ── */
+  .page {
+    width: 816px;
+    margin: 0 auto;
+    padding: 48px 56px;
+  }
+
+  @media print {
+    .page { width: 100%; padding: 32px 40px; }
+    .page-break { page-break-before: always; }
+    .no-break { page-break-inside: avoid; }
+  }
+
+  /* ── Cover ── */
+  .cover {
+    min-height: 320px;
+    background: linear-gradient(135deg, #1e1b4b 0%, #4c1d95 60%, #7c3aed 100%);
+    border-radius: 16px;
+    padding: 48px;
+    color: #fff;
+    margin-bottom: 40px;
+  }
+  .cover-logo {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+  }
+  .cover-logo span { color: #c4b5fd; }
+  .cover-subtitle {
+    font-size: 13px;
+    color: #c4b5fd;
+    margin-bottom: 40px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .cover-title {
+    font-size: 36px;
+    font-weight: 800;
+    line-height: 1.15;
+    margin-bottom: 12px;
+  }
+  .cover-desc {
+    font-size: 15px;
+    color: #ddd6fe;
+    max-width: 480px;
+    line-height: 1.6;
+  }
+  .cover-tag {
+    display: inline-block;
+    margin-top: 28px;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #fff;
+  }
+
+  /* ── Section headers ── */
+  .section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #7c3aed;
+    margin-bottom: 6px;
+  }
+  h1 { font-size: 22px; font-weight: 800; color: #1e1b4b; margin-bottom: 6px; }
+  h2 { font-size: 17px; font-weight: 700; color: #1e1b4b; margin-bottom: 10px; margin-top: 28px; }
+  h3 { font-size: 13px; font-weight: 700; color: #1e1b4b; margin-bottom: 6px; }
+  p  { margin-bottom: 10px; color: #374151; }
+
+  /* ── Divider ── */
+  hr { border: none; border-top: 1px solid #e5e7eb; margin: 28px 0; }
+
+  /* ── Callout boxes ── */
+  .callout {
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin: 16px 0;
+  }
+  .callout-purple { background: #f5f3ff; border-left: 3px solid #7c3aed; }
+  .callout-green  { background: #f0fdf4; border-left: 3px solid #16a34a; }
+  .callout-amber  { background: #fffbeb; border-left: 3px solid #d97706; }
+  .callout-blue   { background: #eff6ff; border-left: 3px solid #2563eb; }
+  .callout-title  { font-weight: 700; font-size: 12px; margin-bottom: 4px; }
+  .callout-purple .callout-title { color: #5b21b6; }
+  .callout-green  .callout-title { color: #15803d; }
+  .callout-amber  .callout-title { color: #92400e; }
+  .callout-blue   .callout-title { color: #1d4ed8; }
+
+  /* ── Two-column grid ── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin: 16px 0; }
+
+  /* ── Cards ── */
+  .card {
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 16px;
+  }
+  .card-icon { font-size: 22px; margin-bottom: 8px; }
+  .card h3  { font-size: 12px; margin-bottom: 4px; }
+  .card p   { font-size: 11.5px; color: #6b7280; margin: 0; }
+
+  /* ── Pills / tags ── */
+  .pill {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    margin: 2px;
+  }
+  .pill-purple { background: #ede9fe; color: #5b21b6; }
+  .pill-green  { background: #dcfce7; color: #15803d; }
+  .pill-amber  { background: #fef3c7; color: #92400e; }
+  .pill-red    { background: #fee2e2; color: #b91c1c; }
+  .pill-blue   { background: #dbeafe; color: #1d4ed8; }
+
+  /* ── Flow diagram ── */
+  .flow { display: flex; align-items: center; gap: 0; margin: 20px 0; flex-wrap: wrap; }
+  .flow-step {
+    background: #f5f3ff;
+    border: 1px solid #ddd6fe;
+    border-radius: 8px;
+    padding: 12px 16px;
+    text-align: center;
+    min-width: 110px;
+    flex: 1;
+  }
+  .flow-step-num {
+    font-size: 10px;
+    font-weight: 700;
+    color: #7c3aed;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .flow-step-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #1e1b4b;
+    margin-top: 2px;
+  }
+  .flow-arrow {
+    font-size: 18px;
+    color: #7c3aed;
+    padding: 0 6px;
+    flex-shrink: 0;
+  }
+
+  /* ── Table ── */
+  table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 12px; }
+  th {
+    background: #1e1b4b;
+    color: #fff;
+    padding: 8px 12px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 11px;
+  }
+  td { padding: 8px 12px; border-bottom: 1px solid #f3f4f6; vertical-align: top; }
+  tr:nth-child(even) td { background: #fafafa; }
+
+  /* ── Quote ── */
+  .quote {
+    border-left: 3px solid #7c3aed;
+    padding: 10px 16px;
+    margin: 12px 0;
+    background: #f5f3ff;
+    border-radius: 0 8px 8px 0;
+  }
+  .quote p { font-style: italic; color: #5b21b6; margin: 0; font-size: 13px; }
+  .quote-attr { font-size: 11px; color: #7c3aed; margin-top: 4px; font-weight: 600; }
+
+  /* ── Checklist ── */
+  .checklist { list-style: none; padding: 0; }
+  .checklist li {
+    padding: 5px 0 5px 24px;
+    position: relative;
+    font-size: 12.5px;
+    color: #374151;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  .checklist li:before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: #16a34a;
+    font-weight: 700;
+  }
+
+  /* ── Numbered list ── */
+  .numlist { list-style: none; padding: 0; counter-reset: num; }
+  .numlist li {
+    padding: 6px 0 6px 28px;
+    position: relative;
+    font-size: 12.5px;
+    color: #374151;
+    counter-increment: num;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  .numlist li:before {
+    content: counter(num);
+    position: absolute;
+    left: 0;
+    background: #7c3aed;
+    color: #fff;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    font-size: 10px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    top: 7px;
+  }
+
+  /* ── Objection block ── */
+  .objection { margin: 12px 0; }
+  .objection-q {
+    background: #fee2e2;
+    border-radius: 8px 8px 0 0;
+    padding: 10px 14px;
+    font-weight: 600;
+    font-size: 12px;
+    color: #991b1b;
+  }
+  .objection-a {
+    background: #f0fdf4;
+    border-radius: 0 0 8px 8px;
+    padding: 10px 14px;
+    font-size: 12px;
+    color: #166534;
+  }
+
+  /* ── Footer ── */
+  .footer {
+    margin-top: 40px;
+    padding-top: 16px;
+    border-top: 1px solid #e5e7eb;
+    font-size: 10px;
+    color: #9ca3af;
+    text-align: center;
+  }
+
+  /* ── Highlight ── */
+  .hl { background: #ede9fe; padding: 1px 4px; border-radius: 3px; font-weight: 600; color: #5b21b6; }
+
+  /* ── Big stat ── */
+  .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 16px 0; }
+  .stat-card { background: #1e1b4b; border-radius: 10px; padding: 16px; text-align: center; color: #fff; }
+  .stat-num { font-size: 28px; font-weight: 800; color: #c4b5fd; }
+  .stat-label { font-size: 11px; color: #a5b4fc; margin-top: 2px; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ══════════════════════════════════════════════
+       COVER
+  ══════════════════════════════════════════════ -->
+  <div class="cover">
+    <div class="cover-logo">one3<span>Seven</span></div>
+    <div class="cover-subtitle">Sales Reference Guide · Confidential</div>
+    <div class="cover-title">The App,<br>Plain and Simple</div>
+    <div class="cover-desc">
+      Everything sales needs to explain what one3Seven does, who it's for,
+      how the intake works, and how to answer the hard questions firms ask.
+    </div>
+    <div class="cover-tag">For Internal Use — Do Not Distribute</div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       SECTION 1 — THE ONE-SENTENCE PITCH
+  ══════════════════════════════════════════════ -->
+  <div class="section-label">Section 1</div>
+  <h1>The One-Sentence Pitch</h1>
+  <p>Before anything else, memorize this:</p>
+
+  <div class="callout callout-purple">
+    <div class="callout-title">The Pitch</div>
+    <p style="font-size:15px; font-weight:600; color:#4c1d95; margin:0;">
+      one3Seven helps employment workers organize and submit their records to participating attorneys —
+      so firms receive a structured, document-backed intake packet instead of a phone call or web form.
+    </p>
+  </div>
+
+  <p>That's it. You're not selling AI. You're not selling lead gen. You're selling
+  <strong>a better first handoff</strong> between a potential client and their attorney.</p>
+
+  <hr>
+
+  <!-- ══════════════════════════════════════════════
+       SECTION 2 — THE TWO USERS
+  ══════════════════════════════════════════════ -->
+  <div class="section-label">Section 2</div>
+  <h1>Two Users, One Platform</h1>
+  <p>one3Seven has two completely separate sides. You need to understand both.</p>
+
+  <div class="grid-2">
+    <div class="card" style="border-color:#ddd6fe; background:#faf5ff;">
+      <div class="card-icon">👷</div>
+      <h3 style="color:#5b21b6;">The Worker</h3>
+      <p>A current or former employee who believes their rights were violated —
+      wrongful termination, wage theft, harassment, retaliation.
+      They use one3Seven to tell their story and upload their documents.</p>
+      <br>
+      <p><strong style="color:#5b21b6;">What they get:</strong> A guided intake experience. A way to organize what happened. A connection to a participating firm.</p>
+    </div>
+    <div class="card" style="border-color:#bbf7d0; background:#f0fdf4;">
+      <div class="card-icon">⚖️</div>
+      <h3 style="color:#15803d;">The Firm</h3>
+      <p>A plaintiff employment law firm — solo practitioners to mid-size boutiques.
+      They use one3Seven to review incoming intakes, access organized documents,
+      and decide whether to take a case.</p>
+      <br>
+      <p><strong style="color:#15803d;">What they get:</strong> A structured intake packet with a timeline, key documents, and attorney questions pre-built.</p>
+    </div>
+  </div>
+
+  <div class="callout callout-amber">
+    <div class="callout-title">Important: Workers Do Not Pay</div>
+    <p>Workers use one3Seven for free. The product is entirely on the firm side.
+    Firms pay for access to intake packets and the review infrastructure.</p>
+  </div>
+
+  <hr>
+
+  <!-- ══════════════════════════════════════════════
+       SECTION 3 — HOW IT WORKS (END TO END)
+  ══════════════════════════════════════════════ -->
+  <div class="section-label">Section 3</div>
+  <h1>How It Works, Start to Finish</h1>
+  <p>Walk through this flow with any prospect. It takes 90 seconds.</p>
+
+  <div class="flow">
+    <div class="flow-step">
+      <div class="flow-step-num">Step 1</div>
+      <div class="flow-step-label">Worker tells their story</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="flow-step-num">Step 2</div>
+      <div class="flow-step-label">Worker uploads documents</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="flow-step-num">Step 3</div>
+      <div class="flow-step-label">Platform organizes everything</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="flow-step-num">Step 4</div>
+      <div class="flow-step-label">Firm reviews the packet</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="flow-step-num">Step 5</div>
+      <div class="flow-step-label">Firm decides: accept or pass</div>
+    </div>
+  </div>
+
+  <h2>Step-by-Step Breakdown</h2>
+
+  <div class="no-break">
+    <h3>Step 1 — Worker tells their story</h3>
+    <p>The worker fills out a guided intake form. They describe what happened, who was involved,
+    key dates, and whether they were paid correctly. The platform asks smart follow-up questions
+    (Did you file an HR complaint? Were you given a reason for termination?).
+    This is not a blank form — it's a structured conversation.</p>
+  </div>
+
+  <div class="no-break">
+    <h3>Step 2 — Worker uploads documents</h3>
+    <p>The worker uploads whatever they have: paystubs, offer letters, termination letters,
+    text messages, HR emails, written warnings, meal break logs, coworker statements.
+    They don't need everything — even 3–4 documents produce a useful packet.
+    The platform categorizes each file automatically.</p>
+  </div>
+
+  <div class="no-break">
+    <h3>Step 3 — Platform organizes everything</h3>
+    <p>This is where one3Seven does the work. The platform:</p>
+    <ul class="checklist">
+      <li>Builds a chronological timeline from the documents</li>
+      <li>Links each event to its source document</li>
+      <li>Reads the PDFs with AI to extract key facts (dates, stated reasons, key quotes)</li>
+      <li>Generates 8 priority questions an attorney should ask</li>
+      <li>Flags items that need confirmation (date discrepancies, post-termination statements)</li>
+      <li>Notes what documents are missing and would strengthen the record</li>
+    </ul>
+  </div>
+
+  <div class="no-break">
+    <h3>Step 4 — Firm reviews the packet</h3>
+    <p>The firm sees a live intake review screen with the timeline, supporting documents, and
+    structured facts. They can also download a formatted PDF packet to share internally
+    or save to their matter management system.</p>
+  </div>
+
+  <div class="no-break">
+    <h3>Step 5 — Firm decides</h3>
+    <p>Inside the platform, the firm can: accept the intake, request additional documents,
+    request clarification from the worker, or decline. Their decision is tracked.</p>
+  </div>
+
+  <hr>
+
+</div>
+
+<!-- ══════════════════════════════════════════════
+     PAGE 2
+══════════════════════════════════════════════ -->
+<div class="page page-break">
+
+  <!-- ══════════════════════════════════════════════
+       SECTION 4 — WHAT'S IN THE PACKET
+  ══════════════════════════════════════════════ -->
+  <div class="section-label">Section 4</div>
+  <h1>What's In the Intake Packet</h1>
+  <p>This is the product's core deliverable. Firms get a 10-section review packet — live on screen
+  and downloadable as a PDF. Know these sections cold.</p>
+
+  <table>
+    <tr>
+      <th>#</th>
+      <th>Section Name</th>
+      <th>What It Contains</th>
+      <th>Why Firms Care</th>
+    </tr>
+    <tr>
+      <td><span class="pill pill-purple">1</span></td>
+      <td><strong>Review Snapshot</strong></td>
+      <td>Worker name, employer, dates, document count, summary of what records exist</td>
+      <td>Answers "is this worth opening?" in 10 seconds</td>
+    </tr>
+    <tr>
+      <td><span class="pill pill-purple">2</span></td>
+      <td><strong>Why This Requires Review</strong></td>
+      <td>Auto-generated narrative: the sequence of events from the documents</td>
+      <td>Tells the story without the firm having to piece it together</td>
+    </tr>
+    <tr>
+      <td><span class="pill pill-purple">3</span></td>
+      <td><strong>Intake Overview</strong></td>
+      <td>Employer, employment dates, key people, submission type, access level</td>
+      <td>Basic case facts at a glance</td>
+    </tr>
+    <tr>
+      <td><span class="pill pill-purple">4</span></td>
+      <td><strong>Sequence for Review</strong></td>
+      <td>Chronological timeline with timing intervals (e.g., "72 days after complaint")</td>
+      <td>Retaliation pattern visible immediately — no hunting</td>
+    </tr>
+    <tr>
+      <td><span class="pill pill-purple">5</span></td>
+      <td><strong>Priority Questions</strong></td>
+      <td>8 attorney-level questions generated from the timeline pattern</td>
+      <td>Replaces 30 minutes of junior associate issue-spotting</td>
+    </tr>
+    <tr>
+      <td><span class="pill pill-purple">6</span></td>
+      <td><strong>Supporting Records</strong></td>
+      <td>All documents sorted by priority (HR records first, payroll last)</td>
+      <td>Firm knows exactly which 3 documents to open first</td>
+    </tr>
+    <tr>
+      <td><span class="pill pill-purple">7</span></td>
+      <td><strong>Evidence Support</strong></td>
+      <td>For each key claim, whether a supporting document exists</td>
+      <td>Quick yes/no on "can we prove this happened?"</td>
+    </tr>
+    <tr>
+      <td><span class="pill pill-purple">8</span></td>
+      <td><strong>Items Requiring Confirmation</strong></td>
+      <td>Date discrepancies, unconfirmed reasons, missing extractions flagged</td>
+      <td>Tells the firm exactly what to ask the client before signing</td>
+    </tr>
+    <tr>
+      <td><span class="pill pill-purple">9</span></td>
+      <td><strong>Worker Context</strong></td>
+      <td>Worker's own words — not verified, clearly labeled as worker-reported</td>
+      <td>Background for the consultation, kept separate from verified facts</td>
+    </tr>
+    <tr>
+      <td><span class="pill pill-purple">10</span></td>
+      <td><strong>Firm Review Options</strong></td>
+      <td>Available actions, missing document suggestions, confirmation item count</td>
+      <td>Clear next steps — no ambiguity about what to do after reviewing</td>
+    </tr>
+  </table>
+
+  <div class="callout callout-green">
+    <div class="callout-title">The AI Layer (Verified Facts)</div>
+    <p>After a firm gains full access to an intake, the platform automatically reads each uploaded
+    PDF with AI. It extracts: stated termination reason, complaint topic, overtime flags, missed
+    break patterns, key quotes from documents, and timing between events. These appear as
+    <strong>Verified Facts</strong> — clearly labeled as document-extracted, never as legal conclusions.</p>
+  </div>
+
+  <hr>
+
+  <!-- ══════════════════════════════════════════════
+       SECTION 5 — ACCESS LEVELS
+  ══════════════════════════════════════════════ -->
+  <div class="section-label">Section 5</div>
+  <h1>Access Levels — How Firms See Intakes</h1>
+  <p>Not every firm sees every intake the same way. There are two states:</p>
+
+  <div class="grid-2">
+    <div class="card" style="border-color:#fde68a; background:#fffbeb;">
+      <div class="card-icon">👁️</div>
+      <h3>Preview Access</h3>
+      <p>Firm sees basic facts: employer, approximate dates, document categories, event count.
+      <strong>No actual documents.</strong> Enough to decide if they want full access.</p>
+      <br>
+      <p style="font-size:11px; color:#92400e;"><strong>Typical flow:</strong>
+      Worker submits → firm gets preview → firm requests full access → worker approves.</p>
+    </div>
+    <div class="card" style="border-color:#86efac; background:#f0fdf4;">
+      <div class="card-icon">🔓</div>
+      <h3>Full Access</h3>
+      <p>Firm sees everything: the complete packet, all source documents (downloadable),
+      verified facts from AI extraction, and all timeline details.</p>
+      <br>
+      <p style="font-size:11px; color:#15803d;"><strong>Requires:</strong>
+      Worker approval OR firm-code intake (firm sent the worker directly).</p>
+    </div>
+  </div>
+
+  <div class="callout callout-blue">
+    <div class="callout-title">Firm-Code Intakes</div>
+    <p>A firm can generate a unique intake link to send directly to a potential client.
+    When a worker comes through that link, the firm automatically gets full access — no
+    approval step needed. This is how firms use one3Seven as their own intake infrastructure.</p>
+  </div>
+
+  <hr>
+
+  <!-- ══════════════════════════════════════════════
+       SECTION 6 — DOCUMENT TYPES
+  ══════════════════════════════════════════════ -->
+  <div class="section-label">Section 6</div>
+  <h1>Document Types the Platform Handles</h1>
+  <p>Workers can upload any of these. The platform categorizes them automatically
+  and knows how to read each one for relevant facts.</p>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-icon">📄</div>
+      <h3>Offer Letters</h3>
+      <p>Start date, position, pay rate, employer name, arbitration clauses</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">💰</div>
+      <h3>Pay Records / Paystubs</h3>
+      <p>Regular hours, overtime hours, overtime rate, pay period, gross/net pay</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📧</div>
+      <h3>Workplace Communications</h3>
+      <p>HR complaint emails, text messages, responses — complaint topic and resolution</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📅</div>
+      <h3>Schedules</h3>
+      <p>Schedule change notices, shift records — effective dates, what changed</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">⚠️</div>
+      <h3>Performance / Discipline</h3>
+      <p>Written warnings, PIPs — stated reason, who issued it, policy cited</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🚪</div>
+      <h3>Separation Records</h3>
+      <p>Termination letters — employer-stated reason, termination date, who issued it</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🕐</div>
+      <h3>Meal & Rest Period Records</h3>
+      <p>Break logs — missed breaks, short breaks, period covered</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">👥</div>
+      <h3>Witness Statements</h3>
+      <p>Coworker declarations — what they observed, relationship to worker, corroborated events</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📁</div>
+      <h3>Other Documents</h3>
+      <p>Anything else — the platform still organizes and makes it available for download</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════
+     PAGE 3
+══════════════════════════════════════════════ -->
+<div class="page page-break">
+
+  <!-- ══════════════════════════════════════════════
+       SECTION 7 — HOW TO PITCH TO FIRMS
+  ══════════════════════════════════════════════ -->
+  <div class="section-label">Section 7</div>
+  <h1>How to Pitch to Employment Firms</h1>
+  <p>Know your audience. Plaintiff employment lawyers are busy, skeptical of AI hype,
+  and fiercely protective of their ethical obligations. Pitch facts, not features.</p>
+
+  <h2>What Actually Resonates</h2>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-num">10 sec</div>
+      <div class="stat-label">to know if an intake is worth opening</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">3×</div>
+      <div class="stat-label">more intakes screened in the same time</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">0</div>
+      <div class="stat-label">legal conclusions made by the platform</div>
+    </div>
+  </div>
+
+  <h2>The Comparison That Lands</h2>
+
+  <table>
+    <tr>
+      <th>What Firms Get Today</th>
+      <th>What one3Seven Delivers</th>
+    </tr>
+    <tr>
+      <td>"I was fired unfairly" phone call</td>
+      <td>Structured timeline backed by uploaded documents</td>
+    </tr>
+    <tr>
+      <td>Disorganized email with 12 PDF attachments</td>
+      <td>Categorized document inventory, priority-sorted</td>
+    </tr>
+    <tr>
+      <td>Junior associate summarizes in 45 minutes</td>
+      <td>Platform generates summary before the attorney sees it</td>
+    </tr>
+    <tr>
+      <td>"What was the stated termination reason?" — not answered until consultation</td>
+      <td>Extracted from the termination letter before the consultation</td>
+    </tr>
+    <tr>
+      <td>Firm chases client for missing documents after the call</td>
+      <td>Platform flags what's missing and requests it from the worker directly</td>
+    </tr>
+    <tr>
+      <td>No record of what the firm reviewed or when</td>
+      <td>Full intake timeline tracked: preview → access requested → full access granted</td>
+    </tr>
+  </table>
+
+  <h2>Language That Works vs. Language That Doesn't</h2>
+
+  <div class="grid-2">
+    <div>
+      <div style="font-size:11px; font-weight:700; color:#16a34a; text-transform:uppercase; margin-bottom:8px;">✓ Say This</div>
+      <ul class="checklist">
+        <li>"We organize the intake so your team can make faster decisions"</li>
+        <li>"The platform extracts facts from documents — your attorneys decide what it means"</li>
+        <li>"Workers who come through one3Seven arrive with records already organized"</li>
+        <li>"Lead qualification plus case-ready intake"</li>
+        <li>"It surfaces the retaliation timeline without anyone having to build it"</li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-size:11px; font-weight:700; color:#dc2626; text-transform:uppercase; margin-bottom:8px;">✗ Don't Say This</div>
+      <ul style="list-style:none; padding:0;">
+        <li style="padding:5px 0 5px 24px; position:relative; font-size:12.5px; color:#374151; border-bottom:1px solid #f3f4f6;">
+          <span style="position:absolute; left:0; color:#dc2626; font-weight:700;">✗</span>
+          "The AI tells you if it's a good case"</li>
+        <li style="padding:5px 0 5px 24px; position:relative; font-size:12.5px; color:#374151; border-bottom:1px solid #f3f4f6;">
+          <span style="position:absolute; left:0; color:#dc2626; font-weight:700;">✗</span>
+          "We score leads for you"</li>
+        <li style="padding:5px 0 5px 24px; position:relative; font-size:12.5px; color:#374151; border-bottom:1px solid #f3f4f6;">
+          <span style="position:absolute; left:0; color:#dc2626; font-weight:700;">✗</span>
+          "The platform predicts case outcomes"</li>
+        <li style="padding:5px 0 5px 24px; position:relative; font-size:12.5px; color:#374151; border-bottom:1px solid #f3f4f6;">
+          <span style="position:absolute; left:0; color:#dc2626; font-weight:700;">✗</span>
+          "It's like having an extra paralegal"</li>
+        <li style="padding:5px 0 5px 24px; position:relative; font-size:12.5px; color:#374151; border-bottom:1px solid #f3f4f6;">
+          <span style="position:absolute; left:0; color:#dc2626; font-weight:700;">✗</span>
+          "We replace your intake process"</li>
+      </ul>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- ══════════════════════════════════════════════
+       SECTION 8 — OBJECTION HANDLING
+  ══════════════════════════════════════════════ -->
+  <div class="section-label">Section 8</div>
+  <h1>Handling Objections</h1>
+  <p>These are the five questions every firm asks. Know the answers cold.</p>
+
+  <div class="objection no-break">
+    <div class="objection-q">❓ "We already have an intake process. Why would we change it?"</div>
+    <div class="objection-a">You don't have to change it. one3Seven adds a structured document layer before the first consultation — your intake staff still does what they do. The question is whether you want to walk into every consultation already knowing what documents exist, what the termination letter says, and what the retaliation timeline looks like.</div>
+  </div>
+
+  <div class="objection no-break">
+    <div class="objection-q">❓ "We're worried about AI making legal conclusions."</div>
+    <div class="objection-a">one3Seven never makes legal conclusions. It extracts facts from documents — dates, stated reasons, quotes — and flags what requires attorney review. It explicitly says "this is not a legal analysis, theory of the case, or outcome prediction" in every packet. Your attorneys make every decision. The platform just organizes the record before they do.</div>
+  </div>
+
+  <div class="objection no-break">
+    <div class="objection-q">❓ "Does this integrate with Clio / Lawmatics / our system?"</div>
+    <div class="objection-a">Right now, every intake is downloadable as a formatted PDF that can be attached to any matter in any system. Native integrations with Clio and Lawmatics are on the roadmap for post-beta. The PDF today is production-quality — it has the full timeline, source documents, and verified facts formatted for firm use.</div>
+  </div>
+
+  <div class="objection no-break">
+    <div class="objection-q">❓ "How do we know the AI extracted the right facts?"</div>
+    <div class="objection-a">Every extracted fact shows which document it came from. Items the platform couldn't confirm are explicitly listed as "Requiring Confirmation." The source documents are always available for direct download — the platform supplements attorney review, it doesn't replace it.</div>
+  </div>
+
+  <div class="objection no-break">
+    <div class="objection-q">❓ "What if workers don't upload enough documents?"</div>
+    <div class="objection-a">The platform handles partial records well. Even 3–4 documents produce a useful packet. When documents are missing, the platform flags them specifically (e.g., "timecards for the full employment period not uploaded") and has a built-in workflow to request them from the worker before or after the consultation.</div>
+  </div>
+
+  <hr>
+
+  <!-- ══════════════════════════════════════════════
+       SECTION 9 — FIRM TYPES + FIT
+  ══════════════════════════════════════════════ -->
+  <div class="section-label">Section 9</div>
+  <h1>Which Firms Are the Best Fit</h1>
+
+  <table>
+    <tr>
+      <th>Firm Type</th>
+      <th>Fit</th>
+      <th>Key Message</th>
+    </tr>
+    <tr>
+      <td><strong>Boutique retaliation / wrongful termination</strong><br><small>2–10 attorneys, selective case acceptance</small></td>
+      <td><span class="pill pill-green">Best Fit</span></td>
+      <td>Every intake decision matters. The packet helps them decide faster and more consistently without expanding staff.</td>
+    </tr>
+    <tr>
+      <td><strong>Wage-and-hour plaintiff firms</strong><br><small>Focus on overtime, meal break, final pay claims</small></td>
+      <td><span class="pill pill-green">Best Fit</span></td>
+      <td>The overtime and break flag layer is built for them. Platform surfaces underpayment patterns from paystubs before the consultation.</td>
+    </tr>
+    <tr>
+      <td><strong>Mixed employment plaintiff</strong><br><small>Handles multiple matter types</small></td>
+      <td><span class="pill pill-blue">Good Fit</span></td>
+      <td>The platform covers the full employment document set. Good for firms that want consistent intake across matter types.</td>
+    </tr>
+    <tr>
+      <td><strong>High-volume intake shops</strong><br><small>100+ intakes/month, heavy paralegal use</small></td>
+      <td><span class="pill pill-amber">Fit With Caveats</span></td>
+      <td>Volume is good. But they'll ask about integration with their triage workflow. Lead with the PDF packet + "eventual Clio integration" story.</td>
+    </tr>
+    <tr>
+      <td><strong>Defense-side / employer-side firms</strong></td>
+      <td><span class="pill pill-red">Not a Fit</span></td>
+      <td>one3Seven is built for plaintiff-side workers. Do not pitch to defense firms.</td>
+    </tr>
+  </table>
+
+</div>
+
+<!-- ══════════════════════════════════════════════
+     PAGE 4
+══════════════════════════════════════════════ -->
+<div class="page page-break">
+
+  <!-- ══════════════════════════════════════════════
+       SECTION 10 — THE DEMO SCRIPT
+  ══════════════════════════════════════════════ -->
+  <div class="section-label">Section 10</div>
+  <h1>The 5-Minute Demo Script</h1>
+  <p>Use this structure when showing the platform. Adapt to who's in the room.</p>
+
+  <div class="callout callout-purple">
+    <div class="callout-title">Before the demo</div>
+    <p>Pull up Marcus Rivera's intake — it's the sample intake with 12 documents covering
+    the full employment arc: offer letter → paystubs → HR complaint → HR response →
+    schedule change → written warning → meal break log → final paystub → termination letter → coworker statement.</p>
+  </div>
+
+  <ol class="numlist">
+    <li>
+      <strong>Open with the firm dashboard (30 sec).</strong>
+      "This is what your team sees when a new intake arrives. Worker name, employer, document count,
+      last documented event. Enough to decide if it's worth opening — before you touch a single document."
+    </li>
+    <li>
+      <strong>Open the intake, show the timeline (90 sec).</strong>
+      "Here's the reconstructed chronology. October 3rd — HR complaint filed. October 6th — HR response
+      received, 3 days later. November 1st — schedule changed, 29 days after the complaint.
+      December 14th — written warning. September 2024 — terminated, 11 months after the complaint.
+      The platform built this from the documents. Your team didn't have to."
+    </li>
+    <li>
+      <strong>Show Priority Questions (30 sec).</strong>
+      "These are the 8 questions your associate would normally spend 30 minutes building.
+      What did the worker report to HR? What did HR say back? What reason does the warning give?
+      Does the termination letter match the warning? The packet hands this to whoever does the consultation."
+    </li>
+    <li>
+      <strong>Show Evidence Support (30 sec).</strong>
+      "For each claim type — HR complaint, employer response, schedule change, written warning,
+      termination — we show whether a document exists. Not 'is this a good case.' Just: is the
+      record there to support the allegation?"
+    </li>
+    <li>
+      <strong>Show Items Requiring Confirmation (30 sec).</strong>
+      "These are the things we can't confirm from documents alone. Start date discrepancy.
+      Coworker statement dated post-termination. Termination reason not yet read. These are
+      the exact questions you'd ask in the first 5 minutes of a consultation — now you walk in
+      already knowing what to ask."
+    </li>
+    <li>
+      <strong>Download the PDF (30 sec).</strong>
+      "One click. This goes into your matter system, gets shared with the attorney doing the
+      consultation, or gets attached to the file. No reformatting."
+    </li>
+    <li>
+      <strong>Close (30 sec).</strong>
+      "What you just saw took your team roughly 4 minutes to review instead of 45.
+      That's the difference between screening 5 intakes a week and screening 20."
+    </li>
+  </ol>
+
+  <hr>
+
+  <!-- ══════════════════════════════════════════════
+       SECTION 11 — WHAT ONE3SEVEN IS NOT
+  ══════════════════════════════════════════════ -->
+  <div class="section-label">Section 11</div>
+  <h1>What one3Seven Is NOT</h1>
+  <p>This matters for ethics conversations and for positioning against competitors.</p>
+
+  <div class="grid-2">
+    <div class="callout callout-amber" style="margin:0;">
+      <div class="callout-title">Not a Lead Generation Service</div>
+      <p>We don't promise volume. We don't buy leads or scrape directories.
+      Workers find us or are sent to us by a firm. The value is in the quality
+      and organization of each intake — not the number of names we deliver.</p>
+    </div>
+    <div class="callout callout-amber" style="margin:0;">
+      <div class="callout-title">Not a Case Assessment Tool</div>
+      <p>one3Seven never scores cases, predicts outcomes, or tells a firm whether
+      a case is worth taking. It organizes facts. Attorneys decide what those
+      facts mean and whether to represent the worker.</p>
+    </div>
+    <div class="callout callout-amber" style="margin:0;">
+      <div class="callout-title">Not a Law Firm</div>
+      <p>one3Seven does not provide legal advice. Workers submitting intake are not
+      creating an attorney-client relationship with one3Seven. Every packet
+      includes this disclaimer prominently.</p>
+    </div>
+    <div class="callout callout-amber" style="margin:0;">
+      <div class="callout-title">Not a Practice Management System</div>
+      <p>one3Seven handles the pre-engagement intake phase only. It does not
+      replace Clio, Lawmatics, or any matter management system. It plugs in
+      before those tools via the PDF export.</p>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- ══════════════════════════════════════════════
+       SECTION 12 — QUICK REFERENCE GLOSSARY
+  ══════════════════════════════════════════════ -->
+  <div class="section-label">Section 12</div>
+  <h1>Glossary — Terms You'll Hear</h1>
+
+  <table>
+    <tr>
+      <th>Term</th>
+      <th>What It Means</th>
+    </tr>
+    <tr>
+      <td><strong>Intake</strong></td>
+      <td>One worker's submission — their story, documents, and all associated review data</td>
+    </tr>
+    <tr>
+      <td><strong>Intake Packet</strong></td>
+      <td>The formatted review document the firm receives — live on screen + downloadable as PDF</td>
+    </tr>
+    <tr>
+      <td><strong>Timeline / Chronology</strong></td>
+      <td>The reconstructed sequence of events built from the uploaded documents</td>
+    </tr>
+    <tr>
+      <td><strong>Verified Facts</strong></td>
+      <td>Facts extracted from the actual document text by AI — labeled as document-extracted, not worker-reported</td>
+    </tr>
+    <tr>
+      <td><strong>Items Requiring Confirmation</strong></td>
+      <td>Things the platform flagged but can't confirm from documents alone — for the attorney to verify</td>
+    </tr>
+    <tr>
+      <td><strong>Preview Access</strong></td>
+      <td>Firm sees basic intake facts but not source documents — to decide if they want full access</td>
+    </tr>
+    <tr>
+      <td><strong>Full Access</strong></td>
+      <td>Firm sees everything: complete packet, all source documents, verified facts</td>
+    </tr>
+    <tr>
+      <td><strong>Firm-Code Intake</strong></td>
+      <td>Worker came through the firm's own intake link — firm gets full access automatically, no approval step</td>
+    </tr>
+    <tr>
+      <td><strong>Routed Intake</strong></td>
+      <td>Worker submitted independently and was matched to a participating firm through the platform</td>
+    </tr>
+    <tr>
+      <td><strong>Phase 2A / Phase 2B</strong></td>
+      <td>Internal terms — Phase 2A is PDF text extraction, Phase 2B is AI fact extraction. Don't use these with clients.</td>
+    </tr>
+    <tr>
+      <td><strong>Worker Context</strong></td>
+      <td>The worker's own description of what happened — clearly labeled as unverified, kept separate from document-extracted facts</td>
+    </tr>
+    <tr>
+      <td><strong>Evidence Support</strong></td>
+      <td>The section of the packet showing which claims have a document behind them</td>
+    </tr>
+  </table>
+
+  <hr>
+
+  <!-- ══════════════════════════════════════════════
+       SECTION 13 — QUOTES TO KEEP IN YOUR BACK POCKET
+  ══════════════════════════════════════════════ -->
+  <div class="section-label">Section 13</div>
+  <h1>Quotes to Keep in Your Back Pocket</h1>
+  <p>Use these to anchor firm conversations in real attorney priorities.</p>
+
+  <div class="quote">
+    <p>"This is what we wish every potential client sent us: a structured timeline,
+    key documents, and a to-do list of issues to check."</p>
+    <div class="quote-attr">— How employment plaintiff attorneys describe the ideal intake</div>
+  </div>
+
+  <div class="quote">
+    <p>"It doesn't tell me if it's a good case, but it organizes the chaos
+    so my team can make that call faster."</p>
+    <div class="quote-attr">— What firms say after seeing the packet</div>
+  </div>
+
+  <div class="quote">
+    <p>"If we could get every wage-and-hour lead into this format, my associate
+    could screen 3× as many intakes in the same time."</p>
+    <div class="quote-attr">— High-volume wage-and-hour firm perspective</div>
+  </div>
+
+  <div class="quote">
+    <p>"The reconstructed chronology with timing intervals is the thing that saves
+    the most time — I can see the retaliation pattern before I open a single document."</p>
+    <div class="quote-attr">— Retaliation practice attorney perspective</div>
+  </div>
+
+  <hr>
+
+  <!-- Footer -->
+  <div class="footer">
+    one3Seven · Sales Reference Guide · Confidential — For Internal Use Only · Do Not Distribute<br>
+    Questions? Contact the product team before presenting to a firm prospect.
+  </div>
+
+</div>
+</body>
+</html>`;
+
+const outPath = path.join(__dirname, 'one3seven-sales-guide.html');
+fs.writeFileSync(outPath, html, 'utf-8');
+console.log(`✅ Sales guide written to: ${outPath}`);
+console.log(`   Open in a browser, then File → Print → Save as PDF`);

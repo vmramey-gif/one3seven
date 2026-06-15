@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>one3Seven — AI Engineering Study Notes</title>
+<style>
+  @page { size: letter; margin: 0.65in 0.75in; }
+  @media print {
+    html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    body { max-width: none !important; }
+    .page { padding: 32px 40px !important; }
+    .cover { padding: 48px 44px !important; min-height: auto !important; }
+  }
+
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap');
+
+  :root {
+    --ink: #0F0D2B;
+    --violet: #6D4AFF;
+    --violet-soft: #F0EBFF;
+    --violet-border: #DCD3FF;
+    --green: #059669;
+    --green-soft: #ECFDF5;
+    --green-border: #A7F3D0;
+    --red: #DC2626;
+    --red-soft: #FEF2F2;
+    --red-border: #FECACA;
+    --amber: #D97706;
+    --amber-soft: #FFFBEB;
+    --amber-border: #FDE68A;
+    --blue: #2563EB;
+    --blue-soft: #EFF6FF;
+    --blue-border: #BFDBFE;
+    --slate: #64748B;
+    --border: #E2E8F0;
+    --code-bg: #1E1B4B;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 10pt;
+    line-height: 1.65;
+    color: var(--ink);
+    background: white;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  /* ── COVER ── */
+  .cover {
+    background: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 60px 56px;
+    page-break-after: always;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: -100px; right: -100px;
+    width: 400px; height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(109,74,255,0.2) 0%, transparent 65%);
+  }
+  .cover::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; left: -80px;
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(37,99,235,0.15) 0%, transparent 65%);
+  }
+  .cover-top { display: flex; justify-content: space-between; align-items: flex-start; position: relative; z-index: 1; }
+  .cover-logo { font-size: 11pt; font-weight: 800; color: rgba(255,255,255,0.3); letter-spacing: 0.12em; text-transform: uppercase; }
+  .cover-logo b { color: #A78BFA; }
+  .cover-tag { background: rgba(37,99,235,0.25); border: 1px solid rgba(37,99,235,0.35); color: #93C5FD; font-size: 8pt; font-weight: 600; padding: 5px 12px; border-radius: 20px; }
+
+  .cover-body { position: relative; z-index: 1; }
+  .cover-eyebrow { font-size: 8pt; font-weight: 700; color: #A78BFA; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 16px; }
+  .cover-title { font-size: 38pt; font-weight: 900; color: white; line-height: 1.0; letter-spacing: -1.5px; margin-bottom: 8px; }
+  .cover-title .accent { color: #A78BFA; }
+  .cover-rule { width: 48px; height: 3px; background: linear-gradient(90deg, #6D4AFF, #2563EB); border-radius: 2px; margin: 20px 0; }
+  .cover-sub { font-size: 10.5pt; color: rgba(255,255,255,0.45); line-height: 1.65; max-width: 460px; }
+  .cover-sub strong { color: rgba(255,255,255,0.75); }
+
+  .cover-bottom { position: relative; z-index: 1; }
+  .source-list { margin-bottom: 28px; }
+  .source-item { display: flex; align-items: baseline; gap: 10px; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  .source-num { font-size: 8pt; font-weight: 700; color: #6D4AFF; min-width: 20px; }
+  .source-title { font-size: 8.5pt; color: rgba(255,255,255,0.4); }
+  .cover-footer { display: flex; justify-content: space-between; align-items: center; }
+  .cover-version { font-size: 8pt; color: rgba(255,255,255,0.2); }
+
+  /* ── PAGE ── */
+  .page { padding: 48px 56px; page-break-after: always; }
+  .page:last-child { page-break-after: avoid; }
+
+  /* ── SECTION HEADER ── */
+  .section-header { margin-bottom: 28px; padding-bottom: 16px; border-bottom: 2px solid var(--border); }
+  .section-source { font-size: 7.5pt; font-weight: 700; color: var(--violet); letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 6px; background: var(--violet-soft); border: 1px solid var(--violet-border); display: inline-block; padding: 2px 10px; border-radius: 20px; }
+  .section-title { font-size: 22pt; font-weight: 900; color: var(--ink); letter-spacing: -0.5px; line-height: 1.1; margin-bottom: 6px; }
+  .section-subtitle { font-size: 9.5pt; color: var(--slate); max-width: 520px; line-height: 1.55; }
+
+  /* ── APPLICATION BOX ── */
+  .apply-box {
+    background: var(--ink);
+    border-radius: 14px;
+    padding: 20px 24px;
+    margin: 20px 0;
+  }
+  .apply-label { font-size: 7.5pt; font-weight: 800; color: #A78BFA; letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 10px; }
+  .apply-box p { font-size: 9.5pt; color: rgba(255,255,255,0.75); margin: 0 0 8px; line-height: 1.55; }
+  .apply-box p:last-child { margin: 0; }
+
+  /* ── CODE BLOCK ── */
+  .code-block {
+    background: var(--code-bg);
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin: 16px 0;
+    overflow-x: auto;
+  }
+  .code-label { font-size: 7.5pt; font-weight: 700; color: rgba(255,255,255,0.3); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 10px; font-family: 'JetBrains Mono', monospace; }
+  .code-block pre {
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    font-size: 8.5pt;
+    color: #E2E8F0;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    margin: 0;
+  }
+  .code-block pre .kw { color: #A78BFA; }
+  .code-block pre .str { color: #86EFAC; }
+  .code-block pre .comment { color: rgba(255,255,255,0.3); font-style: italic; }
+  .code-block pre .type { color: #67E8F9; }
+  .code-block pre .key { color: #FCA5A5; }
+
+  /* ── COMPARISON ── */
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 16px 0; }
+  .compare-card { border-radius: 10px; padding: 14px 16px; }
+  .before { background: var(--red-soft); border: 1.5px solid var(--red-border); }
+  .after  { background: var(--green-soft); border: 1.5px solid var(--green-border); }
+  .compare-label { font-size: 7.5pt; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 8px; }
+  .before .compare-label { color: var(--red); }
+  .after  .compare-label { color: var(--green); }
+  .compare-card p { font-size: 9pt; line-height: 1.5; margin: 0; }
+  .before p { color: #991B1B; }
+  .after  p { color: #065F46; }
+  .compare-card pre { font-family: 'JetBrains Mono', monospace; font-size: 8pt; margin: 0; white-space: pre-wrap; }
+  .before pre { color: #991B1B; }
+  .after  pre { color: #065F46; }
+
+  /* ── CALLOUT ── */
+  .callout { border-radius: 10px; padding: 14px 18px; margin: 16px 0; }
+  .callout-violet { background: var(--violet-soft); border: 1.5px solid var(--violet-border); }
+  .callout-violet .c-label { color: var(--violet); font-size: 7.5pt; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 6px; }
+  .callout-violet p { color: var(--ink); font-size: 9.5pt; margin: 0; line-height: 1.55; font-weight: 500; }
+  .callout-amber { background: var(--amber-soft); border: 1.5px solid var(--amber-border); }
+  .callout-amber .c-label { color: var(--amber); font-size: 7.5pt; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 6px; }
+  .callout-amber p { color: #92400E; font-size: 9.5pt; margin: 0; line-height: 1.55; }
+  .callout-blue { background: var(--blue-soft); border: 1.5px solid var(--blue-border); }
+  .callout-blue .c-label { color: var(--blue); font-size: 7.5pt; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 6px; }
+  .callout-blue p { color: #1E3A5F; font-size: 9.5pt; margin: 0; line-height: 1.55; }
+
+  /* ── EVAL TABLE ── */
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 9pt; }
+  thead tr { background: var(--ink); }
+  thead th { padding: 9px 12px; font-weight: 700; color: white; text-align: left; font-size: 8.5pt; }
+  tbody tr { border-bottom: 1px solid var(--border); }
+  tbody tr:nth-child(even) { background: #FAFAFA; }
+  tbody td { padding: 9px 12px; vertical-align: top; line-height: 1.45; }
+  .green-text { color: var(--green); font-weight: 600; }
+  .red-text   { color: var(--red); }
+  .amber-text { color: var(--amber); font-weight: 600; }
+
+  /* ── PIPELINE DIAGRAM ── */
+  .pipeline { display: flex; align-items: center; gap: 0; margin: 20px 0; flex-wrap: wrap; }
+  .pipe-step { background: var(--violet-soft); border: 1.5px solid var(--violet-border); border-radius: 8px; padding: 8px 14px; font-size: 8.5pt; font-weight: 600; color: var(--violet); white-space: nowrap; }
+  .pipe-step.highlight { background: var(--violet); color: white; border-color: var(--violet); }
+  .pipe-step.warn { background: var(--amber-soft); border-color: var(--amber-border); color: var(--amber); }
+  .pipe-arrow { font-size: 10pt; color: var(--slate); padding: 0 6px; }
+
+  /* ── TYPOGRAPHY ── */
+  h2 { font-size: 12pt; font-weight: 700; color: var(--ink); margin: 28px 0 10px; letter-spacing: -0.1px; }
+  h3 { font-size: 10.5pt; font-weight: 700; color: var(--ink); margin: 20px 0 8px; }
+  p { margin-bottom: 12px; font-size: 9.5pt; max-width: 650px; line-height: 1.65; }
+  ul, ol { margin: 0 0 14px 18px; }
+  li { margin-bottom: 6px; font-size: 9.5pt; line-height: 1.5; }
+  li strong { color: var(--ink); }
+  hr { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════ COVER ═══════════════════ -->
+<div class="cover">
+  <div class="cover-top">
+    <div class="cover-logo"><b>one3</b>Seven</div>
+    <div class="cover-tag">Internal Engineering Study</div>
+  </div>
+
+  <div class="cover-body">
+    <div class="cover-eyebrow">Applied AI Engineering · June 2026</div>
+    <div class="cover-title">Production AI<br>Engineering —<br><span class="accent">Applied to one3Seven</span></div>
+    <div class="cover-rule"></div>
+    <div class="cover-sub">
+      Key lessons from six production AI engineering resources — <strong>translated directly into what they mean for one3Seven's intelligence pipeline, consistency problem, and evaluation gaps.</strong> Not theory. Specific decisions and code patterns.
+    </div>
+  </div>
+
+  <div class="cover-bottom">
+    <div class="source-list">
+      <div class="source-item"><div class="source-num">01</div><div class="source-title">Building Real-World AI Systems in Production</div></div>
+      <div class="source-item"><div class="source-num">02</div><div class="source-title">OpenAI DevDay — Structured Outputs for Reliable Applications</div></div>
+      <div class="source-item"><div class="source-num">03</div><div class="source-title">OpenAI Structured Output — All You Need to Know</div></div>
+      <div class="source-item"><div class="source-num">04</div><div class="source-title">What Are AI Evaluations? Human, Programmatic, and LLM-as-Judge</div></div>
+      <div class="source-item"><div class="source-num">05</div><div class="source-title">Intro to LLM Evaluation with OpenAI Evals</div></div>
+      <div class="source-item"><div class="source-num">06</div><div class="source-title">How to Systematically Setup LLM Evals</div></div>
+    </div>
+    <div class="cover-footer">
+      <div class="cover-version">June 2026 · Internal Only · one3Seven Beta</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ VIDEO 1 ═══════════════════ -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-source">Video 01 of 06</div>
+    <div class="section-title">Building Real-World AI Systems in Production</div>
+    <div class="section-subtitle">The gap between "AI demo" and "production AI system" — and the specific patterns that bridge it.</div>
+  </div>
+
+  <h2>The Core Lesson</h2>
+  <p>Production AI systems fail differently than demos. In a demo, you control the inputs — you pick the document, you know the expected output, and you never test edge cases. In production, users send scanned images, handwritten notes, files named "final_FINAL_v3.pdf," and documents with zero machine-readable text. The system must handle all of them gracefully.</p>
+
+  <p>The engineering discipline for this is not "make the AI smarter." It is: <strong>design the system so failures are bounded, visible, and recoverable</strong>.</p>
+
+  <h2>Key Production Patterns</h2>
+
+  <h3>1. Treat AI output as untrusted input</h3>
+  <p>Every piece of AI-generated content should go through the same validation that user input goes through. If the AI returns a date, validate it's a real date before storing it. If it returns a list of events, validate the schema before rendering.</p>
+
+  <div class="compare">
+    <div class="compare-card before">
+      <div class="compare-label">❌ Demo Thinking</div>
+      <p>Trust that Claude returns a valid date string in the timeline. Render it directly.</p>
+    </div>
+    <div class="compare-card after">
+      <div class="compare-label">✓ Production Thinking</div>
+      <p>Validate every date extracted. Fall back to "Date not confirmed" if invalid. Never crash the render layer on bad AI output.</p>
+    </div>
+  </div>
+
+  <h3>2. Non-blocking intelligence</h3>
+  <p>Intelligence extraction (Phase 2B) must never block the core intake workflow. If Claude fails, the firm still sees the intake. If extraction times out, a retry can be scheduled. The base product is the chronology and documents — intelligence is an enhancement.</p>
+
+  <div class="callout callout-violet">
+    <div class="c-label">one3Seven Already Does This Right</div>
+    <p>Phase 2B is already non-blocking in the current architecture — `get-intake-intelligence` failure is caught and swallowed in `loadFirmLiveIntakeView`. The intelligence field is null, not an error state. This is the correct production pattern. Keep it.</p>
+  </div>
+
+  <h3>3. Separate concerns: extraction vs. synthesis vs. rendering</h3>
+  <p>Three distinct steps should never be merged into one AI call:</p>
+  <div class="pipeline">
+    <div class="pipe-step">Raw Documents</div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step highlight">Extract Facts</div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step">Persist to DB</div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step highlight">Synthesize</div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step">Single Packet</div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step highlight">Render</div>
+  </div>
+  <p>one3Seven has this right architecturally — `extract-document-facts` (per file) and `get-intake-intelligence` (synthesis) are separate Edge Functions. The gap is that <strong>synthesis and rendering diverge</strong> between the firm review screen and the PDF exporter.</p>
+
+  <h3>4. Idempotency is mandatory</h3>
+  <p>Any operation that touches the database must be safe to run twice. If a document is re-processed, it should produce the same result, not a duplicate. The `fact_extraction_status = 'completed'` guard in `extract-document-facts` is the right pattern — already present, must be preserved.</p>
+
+  <div class="apply-box">
+    <div class="apply-label">Applied to one3Seven — Action Items</div>
+    <p>1. The "Organizing Records" stuck state is a violation of this principle. Organization must be idempotent and resumable — if interrupted, it should continue from where it stopped, not restart from zero and risk duplicates.</p>
+    <p>2. The firm review screen and PDF exporter must call the same synthesis function, not implement their own versions of it. One source, two renderers.</p>
+    <p>3. All timeline event dates extracted by AI must be validated before storage — not just before rendering.</p>
+  </div>
+</div>
+
+<!-- ═══════════════════ VIDEO 2 ═══════════════════ -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-source">Video 02 of 06</div>
+    <div class="section-title">Structured Outputs for Reliable Applications</div>
+    <div class="section-subtitle">Why enforcing a schema on AI output is the single most important reliability upgrade available — and how to do it.</div>
+  </div>
+
+  <h2>The Core Lesson</h2>
+  <p>Free-form AI text is unpredictable. Even with a perfect prompt, the model may return "the date was November 26th" in one call and "Nov 26, 2025" in the next. Structured outputs force the model to return a specific JSON schema — guaranteed. No parsing, no string manipulation, no guessing.</p>
+
+  <p>OpenAI's Structured Outputs feature (and Anthropic's equivalent) uses JSON Schema enforcement at the API level — not just in the prompt. The model cannot return a malformed response. This eliminates an entire category of production bugs.</p>
+
+  <h2>The Pattern</h2>
+
+  <div class="code-block">
+    <div class="code-label">Unstructured — What one3Seven Does Today (Phase 2A deterministic path)</div>
+    <pre><span class="comment">// Prompt asks Claude to write a paragraph summarizing events
+// Output: "Marcus Rivera filed an HR complaint on November 26th, 2025..."
+// Problem: parsing prose to extract dates, names, events is fragile</span>
+
+<span class="kw">const</span> result = <span class="kw">await</span> anthropic.messages.create({
+  model: <span class="str">'claude-sonnet-4-5'</span>,
+  messages: [{ role: <span class="str">'user'</span>, content: prompt }]
+  <span class="comment">// No schema enforcement — model returns whatever it wants</span>
+});</pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-label">Structured — What one3Seven Should Do (Phase 2B intelligence path)</div>
+    <pre><span class="comment">// Define the exact shape of what you want back</span>
+<span class="kw">const</span> DocumentFactsSchema = {
+  type: <span class="str">"object"</span>,
+  properties: {
+    <span class="key">complaint_date</span>:      { type: <span class="str">"string"</span>, description: <span class="str">"ISO 8601 date or null"</span> },
+    <span class="key">complaint_topic</span>:     { type: <span class="str">"string"</span> },
+    <span class="key">warning_date</span>:        { type: <span class="str">"string"</span>, description: <span class="str">"ISO 8601 date or null"</span> },
+    <span class="key">warning_reason</span>:      { type: <span class="str">"string"</span> },
+    <span class="key">termination_date</span>:    { type: <span class="str">"string"</span>, description: <span class="str">"ISO 8601 date or null"</span> },
+    <span class="key">termination_reason</span>:  { type: <span class="str">"string"</span> },
+    <span class="key">key_people</span>:          { type: <span class="str">"array"</span>, items: { type: <span class="str">"string"</span> } },
+    <span class="key">key_quotes</span>:          { type: <span class="str">"array"</span>, items: { type: <span class="str">"string"</span> } },
+    <span class="key">dates_present</span>:       { type: <span class="str">"array"</span>, items: { type: <span class="str">"string"</span> } },
+    <span class="key">source_confidence</span>:   { type: <span class="str">"string"</span>, enum: [<span class="str">"high"</span>, <span class="str">"partial"</span>, <span class="str">"low"</span>] }
+  },
+  required: [<span class="str">"source_confidence"</span>],
+  additionalProperties: <span class="kw">false</span>
+};
+
+<span class="comment">// Anthropic equivalent: structured output via tool use with strict schema</span>
+<span class="kw">const</span> result = <span class="kw">await</span> anthropic.messages.create({
+  model: <span class="str">'claude-sonnet-4-5'</span>,
+  tools: [{ name: <span class="str">'extract_document_facts'</span>, input_schema: DocumentFactsSchema }],
+  tool_choice: { type: <span class="str">'tool'</span>, name: <span class="str">'extract_document_facts'</span> },
+  messages: [{ role: <span class="str">'user'</span>, content: prompt }]
+  <span class="comment">// Model MUST return valid DocumentFacts — no free-form text possible</span>
+});</pre>
+  </div>
+
+  <h2>Why This Directly Solves the Consistency Problem</h2>
+  <p>The live review screen and PDF export produce different outputs today because they both generate content from prose — either from stored prose summaries or from re-prompting the model. If both surfaces read from a single structured object stored in the database, they can never diverge.</p>
+
+  <div class="pipeline">
+    <div class="pipe-step warn">Documents</div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step highlight">Structured Extraction</div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step">document_facts (JSONB)</div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step highlight">review_packet_v1</div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step">Screen</div>
+    <div class="pipe-arrow">+</div>
+    <div class="pipe-step">PDF</div>
+  </div>
+
+  <div class="apply-box">
+    <div class="apply-label">Applied to one3Seven — The Fix</div>
+    <p>The `extract-document-facts` Edge Function already uses structured tool-use calls to Claude — the `document_facts` JSONB field is already a structured object. The gap is <strong>downstream</strong>: the firm review screen and PDF exporter don't both read from that same object. They have independent rendering logic.</p>
+    <p>The fix is not to change extraction. It is to create `review_packet_v1` — a single synthesized object derived from `document_facts` — and have both rendering surfaces read from it.</p>
+  </div>
+</div>
+
+<!-- ═══════════════════ VIDEO 3 ═══════════════════ -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-source">Video 03 of 06</div>
+    <div class="section-title">Structured Output — All You Need to Know</div>
+    <div class="section-subtitle">The practical implementation guide — TypeScript types, Pydantic models, strict mode, and the tradeoffs.</div>
+  </div>
+
+  <h2>The Core Lesson</h2>
+  <p>Structured output is not just about JSON — it is about making the contract between your application and the AI model explicit and enforceable. When you define a TypeScript type for what you expect back, you are writing a specification. When you enforce it at the API level, the specification becomes a guarantee.</p>
+
+  <h2>The review_packet_v1 Type Definition</h2>
+  <p>This is what one3Seven's central intelligence object should look like. Every surface reads from this — nothing is generated independently:</p>
+
+  <div class="code-block">
+    <div class="code-label">TypeScript — review_packet_v1 (proposed)</div>
+    <pre><span class="kw">interface</span> <span class="type">TimingInterval</span> {
+  label:       <span class="type">string</span>;           <span class="comment">// "HR response", "Termination"</span>
+  days:        <span class="type">number</span>;
+  description: <span class="type">string</span>;           <span class="comment">// human-readable sentence</span>
+}
+
+<span class="kw">interface</span> <span class="type">KeyQuote</span> {
+  file_name:   <span class="type">string</span>;
+  category:    <span class="type">string</span>;
+  quote:       <span class="type">string</span>;
+  confidence:  <span class="str">'high'</span> | <span class="str">'partial'</span> | <span class="str">'low'</span>;
+}
+
+<span class="kw">interface</span> <span class="type">TimelineEvent</span> {
+  id:             <span class="type">string</span>;
+  event_date:     <span class="type">string</span>;      <span class="comment">// ISO 8601 or human-readable range</span>
+  title:          <span class="type">string</span>;
+  category:       <span class="type">string</span>;
+  summary:        <span class="type">string</span>;      <span class="comment">// document-derived only</span>
+  worker_context: <span class="type">string</span> | <span class="type">null</span>;
+  source_files:   <span class="type">string</span>[];    <span class="comment">// direct file names, not parsed from prose</span>
+  source_type:    <span class="str">'record_grounded'</span> | <span class="str">'worker_reported'</span> | <span class="str">'mixed'</span>;
+}
+
+<span class="kw">interface</span> <span class="type">ReviewPacketV1</span> {
+  <span class="comment">// Identity</span>
+  intake_id:             <span class="type">string</span>;
+  generated_at:          <span class="type">string</span>;       <span class="comment">// ISO 8601 timestamp</span>
+  schema_version:        <span class="str">'1'</span>;           <span class="comment">// bump when shape changes</span>
+
+  <span class="comment">// Summary</span>
+  overview:              <span class="type">string</span>;        <span class="comment">// one paragraph, deterministic</span>
+  matter_tags:           <span class="type">string</span>[];
+
+  <span class="comment">// Timeline</span>
+  timeline:              <span class="type">TimelineEvent</span>[];
+  timeline_span:         <span class="type">string</span>;        <span class="comment">// "March 2022 – January 2026"</span>
+  timeline_count:        <span class="type">number</span>;
+
+  <span class="comment">// Records</span>
+  record_count:          <span class="type">number</span>;
+  record_categories:     <span class="type">string</span>[];
+  missing_records:       <span class="type">string</span>[];
+
+  <span class="comment">// Intelligence (Phase 2B — null until extraction runs)</span>
+  intelligence: {
+    timing_intervals:    <span class="type">TimingInterval</span>[];
+    key_quotes:          <span class="type">KeyQuote</span>[];
+    confirmation_items:  <span class="type">string</span>[];
+    extracted_facts:     <span class="type">Record</span>&lt;<span class="type">string</span>, <span class="type">unknown</span>&gt;;
+  } | <span class="kw">null</span>;
+}
+
+<span class="comment">// Both of these read from ReviewPacketV1 — they never generate independently</span>
+<span class="kw">function</span> renderFirmReviewScreen(packet: <span class="type">ReviewPacketV1</span>): <span class="type">JSX.Element</span> { ... }
+<span class="kw">function</span> buildFirmPDF(packet: <span class="type">ReviewPacketV1</span>): <span class="type">Uint8Array</span> { ... }</pre>
+  </div>
+
+  <div class="callout callout-violet">
+    <div class="c-label">The Critical Insight</div>
+    <p>`schema_version: '1'` on the packet means you can detect when old packets need regeneration. When you change the shape in a future sprint, old packets with version '0' or without the field can be flagged for re-synthesis without breaking anything currently rendering.</p>
+  </div>
+
+  <div class="apply-box">
+    <div class="apply-label">Applied to one3Seven — What This Unlocks</div>
+    <p>Once `ReviewPacketV1` exists as the single source, the PDF export function `buildFirmIntakeSummaryPDF` in `firmIntakeSummaryDownload.ts` stops maintaining its own version of the chronology, record count, and clarifications. It reads `packet.timeline`, `packet.record_count`, `packet.intelligence.confirmation_items`. Screen and PDF are guaranteed identical because they share one object.</p>
+  </div>
+</div>
+
+<!-- ═══════════════════ VIDEO 4 ═══════════════════ -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-source">Video 04 of 06</div>
+    <div class="section-title">What Are AI Evaluations?</div>
+    <div class="section-subtitle">Human evals, programmatic evals, and LLM-as-judge — when to use each and why one3Seven needs all three.</div>
+  </div>
+
+  <h2>The Core Lesson</h2>
+  <p>An evaluation is the answer to: <em>"How do I know the AI did it correctly?"</em> Without evals, you rely on vibes — it seemed right, the demo looked good, no one complained yet. With evals, you have a system that catches regressions before they reach production.</p>
+
+  <p>There are three types of evals. Each catches different things.</p>
+
+  <h2>The Three Eval Types</h2>
+
+  <table>
+    <thead><tr><th>Eval Type</th><th>How It Works</th><th>Best For</th><th>Cost</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>Programmatic</strong></td>
+        <td>Code checks the output — schema validation, regex match, exact value, count</td>
+        <td>Schema correctness, required fields present, dates parse, no banned phrases</td>
+        <td class="green-text">Free, instant, fully automated</td>
+      </tr>
+      <tr>
+        <td><strong>LLM-as-Judge</strong></td>
+        <td>A second AI model reads the output and scores it against criteria</td>
+        <td>Tone accuracy, legal-language safety, summary quality, completeness</td>
+        <td class="amber-text">API cost per eval, fast to set up</td>
+      </tr>
+      <tr>
+        <td><strong>Human</strong></td>
+        <td>A real person reviews output and marks it correct / incorrect / partially correct</td>
+        <td>Qualitative accuracy, attorney usefulness, trust calibration</td>
+        <td class="red-text">Slow and expensive — use sparingly</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>The Crestline Problem — Diagnosed as an Eval Gap</h2>
+  <p>The live review screen and PDF showed different content for the same intake. That is an eval failure — specifically a missing programmatic eval that should check:</p>
+
+  <div class="code-block">
+    <div class="code-label">Programmatic Eval — Consistency Check (should exist today)</div>
+    <pre><span class="kw">async function</span> evalPacketConsistency(intakeId: <span class="type">string</span>) {
+  <span class="kw">const</span> liveData = <span class="kw">await</span> loadFirmLiveIntakeView(intakeId);
+  <span class="kw">const</span> pdfData  = <span class="kw">await</span> buildFirmIntakeSummaryPDF(intakeId);
+
+  <span class="comment">// These should never differ — if they do, it's a bug</span>
+  assert(liveData.events.length    === pdfData.timelineCount,   <span class="str">'timeline count mismatch'</span>);
+  assert(liveData.files.length     === pdfData.recordCount,     <span class="str">'record count mismatch'</span>);
+  assert(liveData.missing.length   === pdfData.gapCount,        <span class="str">'gap count mismatch'</span>);
+
+  <span class="comment">// Every clarification in the PDF should appear in the live view</span>
+  <span class="kw">for</span> (<span class="kw">const</span> item <span class="kw">of</span> pdfData.confirmationItems) {
+    assert(liveData.intelligence?.confirmationNeeded.includes(item),
+      <span class="str">`PDF item not in live view: ${item}`</span>);
+  }
+}</pre>
+  </div>
+
+  <h2>The LLM-as-Judge Pattern for one3Seven</h2>
+  <p>After extraction, a second Claude call evaluates the output:</p>
+
+  <div class="code-block">
+    <div class="code-label">LLM-as-Judge — Legal Language Safety Check</div>
+    <pre><span class="kw">const</span> judgePrompt = <span class="str">`
+You are reviewing AI-generated intake summary text for an employment law intake platform.
+The platform must NEVER produce legal conclusions, claim assessments, or outcome predictions.
+
+Review this text and return JSON:
+{
+  "safe": boolean,
+  "violations": string[],  // exact phrases that are legal conclusions
+  "reason": string
+}
+
+Text to review:
+"${generatedText}"
+`</span>;
+
+<span class="comment">// Run after every synthesis pass — before storing to database</span>
+<span class="comment">// If safe === false: do not store, log violation, fall back to deterministic output</span></pre>
+  </div>
+
+  <div class="apply-box">
+    <div class="apply-label">Applied to one3Seven — Three Evals to Build</div>
+    <p><strong>1. Programmatic — Schema validation.</strong> Every `document_facts` write must pass a JSON schema check before being stored. Dates must parse. Required fields must be present.</p>
+    <p><strong>2. Programmatic — Consistency check.</strong> Before any deployment, run `evalPacketConsistency` against the Crestline intake and confirm the live view and PDF agree on all counts.</p>
+    <p><strong>3. LLM-as-Judge — Language safety.</strong> The `BANNED_IN_OUTPUT` regex is a programmatic safety check. An LLM judge adds a second layer that catches near-misses the regex doesn't pattern-match.</p>
+  </div>
+</div>
+
+<!-- ═══════════════════ VIDEO 5 ═══════════════════ -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-source">Video 05 of 06</div>
+    <div class="section-title">Intro to LLM Evaluation</div>
+    <div class="section-subtitle">Building a golden dataset and running repeatable evals — the shift from "it seemed right" to "it passed."</div>
+  </div>
+
+  <h2>The Core Lesson</h2>
+  <p>An eval framework needs three things: a golden dataset (known inputs with known correct outputs), a scoring function (how you measure correctness), and a harness (code that runs the eval and reports results). Without all three, you can't measure whether a prompt change made things better or worse.</p>
+
+  <h2>The Golden Dataset for one3Seven</h2>
+  <p>You already have one — you just don't know it yet. The Crestline intake (f50f8bfd) with 12 completed extractions is your first golden record. The Marcus Rivera demo intake is your second. Together they define the baseline. Every future model upgrade, prompt change, or pipeline change should be validated against both.</p>
+
+  <div class="code-block">
+    <div class="code-label">Golden Dataset Structure — one3Seven Evals</div>
+    <pre><span class="comment">// evals/golden-dataset.ts</span>
+
+<span class="kw">export const</span> goldenIntakes = [
+  {
+    id:          <span class="str">'crestline-logistics'</span>,
+    description: <span class="str">'Wage theft + retaliation, 12 documents, fully extracted'</span>,
+    expected: {
+      timeline_count:      <span class="type">6</span>,      <span class="comment">// must produce at least 6 events</span>
+      record_count:        <span class="type">12</span>,     <span class="comment">// must reflect all uploaded files</span>
+      has_intelligence:    <span class="type">true</span>,   <span class="comment">// Phase 2B must run</span>
+      timing_intervals:    <span class="type">2</span>,      <span class="comment">// complaint→warning, complaint→termination</span>
+      key_quotes_count:    <span class="type">3</span>,      <span class="comment">// at minimum</span>
+      banned_phrases:      [],     <span class="comment">// zero legal conclusions in any output field</span>
+    }
+  },
+  {
+    id:          <span class="str">'marcus-rivera-demo'</span>,
+    description: <span class="str">'Demo intake — curated, 11 documents, known correct output'</span>,
+    expected: {
+      timeline_count:      <span class="type">6</span>,
+      record_count:        <span class="type">11</span>,
+      has_intelligence:    <span class="type">true</span>,
+      timing_intervals:    <span class="type">2</span>,
+      key_quotes_count:    <span class="type">3</span>,
+      banned_phrases:      [],
+    }
+  }
+];</pre>
+  </div>
+
+  <h2>The Scoring Function</h2>
+  <p>Scoring for one3Seven is not "did the AI write good prose." It is deterministic and measurable:</p>
+
+  <table>
+    <thead><tr><th>Metric</th><th>Pass Condition</th><th>Fail Action</th></tr></thead>
+    <tbody>
+      <tr><td>Schema validity</td><td>All required fields present, correct types</td><td>Block storage, alert</td></tr>
+      <tr><td>Event count</td><td>≥ expected count for this intake</td><td>Flag for review</td></tr>
+      <tr><td>Date validity</td><td>All date fields parse as valid dates or are null</td><td>Store as null, flag</td></tr>
+      <tr><td>Banned phrase check</td><td>Zero regex matches in any generated field</td><td>Block output, fallback</td></tr>
+      <tr><td>Consistency</td><td>Live view and PDF agree on all counts</td><td>Block deploy</td></tr>
+      <tr><td>Intelligence render</td><td>Panel populates for full-access intakes with extracted facts</td><td>Investigate pipeline</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout callout-blue">
+    <div class="c-label">The Mindset Shift</div>
+    <p>The question stops being "did Claude seem to get it right?" and becomes "did the output pass the eval suite?" That shift is what separates a production intelligence layer from a demo intelligence layer. The Crestline test was an accidental human eval. Build the programmatic version so it runs on every deploy.</p>
+  </div>
+
+  <div class="apply-box">
+    <div class="apply-label">Applied to one3Seven — Minimum Viable Eval Suite</div>
+    <p>You do not need a full eval framework today. You need three things in a single test file: (1) a schema validator that runs against `document_facts` shape, (2) a consistency check that compares live view counts to PDF counts for the Crestline intake, (3) a banned-phrase check that runs the `BANNED_IN_OUTPUT` regex against every text field in the intelligence object. Run it in CI or manually before every deploy. That's it for v1.</p>
+  </div>
+</div>
+
+<!-- ═══════════════════ VIDEO 6 ═══════════════════ -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-source">Video 06 of 06</div>
+    <div class="section-title">How to Systematically Setup LLM Evals</div>
+    <div class="section-subtitle">Metrics, unit tests, and LLM-as-judge — the system that makes your intelligence layer trustworthy at scale.</div>
+  </div>
+
+  <h2>The Core Lesson</h2>
+  <p>Systematic LLM evals start with defining what "correct" means for your specific use case, not for AI in general. For one3Seven, "correct" has a precise and narrow definition: the output is an accurate, source-linked, legal-conclusion-free organization of the records the worker submitted. That definition is the foundation of every eval metric.</p>
+
+  <h2>Four Layers of Systematic Evals</h2>
+
+  <h3>Layer 1 — Unit Tests (fastest, cheapest)</h3>
+  <p>Test individual functions in isolation with known inputs and expected outputs. No AI calls required.</p>
+  <div class="code-block">
+    <div class="code-label">Unit Test Examples for one3Seven</div>
+    <pre><span class="comment">// Test: date normalization never crashes on edge-case AI output</span>
+expect(normalizeEventDate(<span class="str">"November 26th, 2025"</span>)).toBe(<span class="str">"2025-11-26"</span>);
+expect(normalizeEventDate(<span class="str">"unclear"</span>)).toBeNull();
+expect(normalizeEventDate(<span class="str">""</span>)).toBeNull();
+
+<span class="comment">// Test: banned phrase regex catches all prohibited patterns</span>
+expect(containsBannedPhrase(<span class="str">"retaliation pattern detected"</span>)).toBe(<span class="kw">true</span>);
+expect(containsBannedPhrase(<span class="str">"timing relationships identified"</span>)).toBe(<span class="kw">false</span>);
+expect(containsBannedPhrase(<span class="str">"wrongful termination case"</span>)).toBe(<span class="kw">true</span>);
+
+<span class="comment">// Test: timeline count in live view matches PDF builder input</span>
+expect(buildPDFInput(mockPacket).timelineCount).toBe(mockPacket.timeline.length);</pre>
+  </div>
+
+  <h3>Layer 2 — Integration Tests (medium cost)</h3>
+  <p>Use a real intake with known expected output. Run the full pipeline. Compare to golden dataset.</p>
+
+  <h3>Layer 3 — LLM-as-Judge (flexible, cost per call)</h3>
+  <p>A separate Claude call reviews the output for qualitative correctness that code can't check.</p>
+
+  <h3>Layer 4 — Human Eval (high cost, low frequency)</h3>
+  <p>An attorney reviews the output and rates its usefulness. Run this once per major version, not per deploy.</p>
+
+  <h2>The Regression Prevention Rule</h2>
+  <div class="callout callout-amber">
+    <div class="c-label">⚠ The Most Important Pattern</div>
+    <p>Every time you find a bug manually — like the Crestline consistency mismatch — write a test that would have caught it before it reached production. The test suite should grow with every discovered failure. A bug that has been found once must never be found again through manual testing.</p>
+  </div>
+
+  <h2>The one3Seven Eval Roadmap</h2>
+  <table>
+    <thead><tr><th>Phase</th><th>What to Build</th><th>When</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Now</strong></td><td>Schema validator for `document_facts`. Consistency check for Crestline. Banned-phrase sweep on intelligence object fields.</td><td>Before next deploy</td></tr>
+      <tr><td><strong>Post-RLS</strong></td><td>Golden dataset file with Crestline + demo expected outputs. Integration test that runs pipeline against golden dataset.</td><td>Before pilot opens</td></tr>
+      <tr><td><strong>Post-Pilot v1</strong></td><td>LLM-as-judge for legal language safety. Human eval rubric for attorney usefulness. A/B prompt testing framework.</td><td>After first 10 real intakes</td></tr>
+    </tbody>
+  </table>
+
+  <div class="apply-box">
+    <div class="apply-label">Applied to one3Seven — The Complete Picture</div>
+    <p>You have been running human evals manually — opening the Crestline intake, reading the output, comparing to the PDF, noticing the mismatch. That process works but doesn't scale and doesn't prevent regressions. The programmatic eval suite converts your manual review process into automated tests that run every time something changes. The goal is: <strong>the Crestline intake always renders the same thing on the firm review screen as in the PDF, and you know it before the deploy ships, not after a firm notices.</strong></p>
+  </div>
+</div>
+
+<!-- ═══════════════════ SYNTHESIS PAGE ═══════════════════ -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-source">Synthesis</div>
+    <div class="section-title">What All Six Videos Mean for one3Seven Right Now</div>
+    <div class="section-subtitle">One unified engineering direction — translated from concept to specific next actions.</div>
+  </div>
+
+  <h2>The Single Unifying Insight</h2>
+  <div class="callout callout-violet">
+    <div class="c-label">The Core Shift</div>
+    <p>one3Seven is not a chatbot that generates summaries. It is a production data pipeline that extracts structured facts from documents, synthesizes them into a single packet, and renders that packet to multiple surfaces. Every reliability, consistency, and trust problem in the product today comes from not treating it that way yet.</p>
+  </div>
+
+  <h2>The Architecture That Emerges from All Six Videos</h2>
+  <div class="pipeline" style="flex-direction:column; align-items:flex-start; gap:8px;">
+    <div style="display:flex; align-items:center; gap:8px;">
+      <div class="pipe-step">Worker uploads documents</div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step highlight">Structured extraction per file (schema-enforced)</div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step">document_facts stored in DB</div>
+    </div>
+    <div style="padding-left:32px; color:var(--slate); font-size:8.5pt; font-style:italic;">↓ Eval: schema valid? dates parse? banned phrases?</div>
+    <div style="display:flex; align-items:center; gap:8px;">
+      <div class="pipe-step">document_facts (all files)</div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step highlight">Synthesis → review_packet_v1</div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step">Stored / cached</div>
+    </div>
+    <div style="padding-left:32px; color:var(--slate); font-size:8.5pt; font-style:italic;">↓ Eval: consistency check — all counts match golden baseline?</div>
+    <div style="display:flex; align-items:center; gap:8px;">
+      <div class="pipe-step highlight">review_packet_v1</div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step">Firm Review Screen</div>
+      <div class="pipe-arrow">+</div>
+      <div class="pipe-step">PDF Export</div>
+      <div class="pipe-arrow">+</div>
+      <div class="pipe-step">Queue Card</div>
+    </div>
+    <div style="padding-left:32px; color:var(--slate); font-size:8.5pt; font-style:italic;">↓ Eval: all three surfaces show identical counts and content</div>
+  </div>
+
+  <h2>Priority Action Map</h2>
+  <table>
+    <thead><tr><th>#</th><th>Action</th><th>Concept Source</th><th>Impact</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Intelligence consistency audit — map where screen and PDF diverge</td><td>Videos 1, 2</td><td class="green-text">Fixes trust issue immediately</td></tr>
+      <tr><td>2</td><td>Define `ReviewPacketV1` TypeScript interface as the single source</td><td>Videos 2, 3</td><td class="green-text">Eliminates entire class of consistency bugs</td></tr>
+      <tr><td>3</td><td>Add schema validator for `document_facts` before storage</td><td>Videos 4, 5</td><td class="green-text">Catches bad extractions at the source</td></tr>
+      <tr><td>4</td><td>Write consistency eval test: Crestline live view counts = PDF counts</td><td>Videos 4, 6</td><td class="amber-text">Prevents Crestline-class regressions</td></tr>
+      <tr><td>5</td><td>Expand `BANNED_IN_OUTPUT` to run against all intelligence fields, not just summary text</td><td>Videos 4, 6</td><td class="amber-text">Closes language safety gap in Phase 2B output</td></tr>
+      <tr><td>6</td><td>Make organization recovery idempotent — safe to run twice</td><td>Video 1</td><td class="amber-text">Fixes stuck "Organizing Records" state</td></tr>
+    </tbody>
+  </table>
+
+  <h2>What You Do Not Need to Build Yet</h2>
+  <ul>
+    <li>A full eval framework (OpenAI Evals, LangSmith, etc.) — three test functions in one file is enough for now</li>
+    <li>LLM-as-judge — the regex guardrail handles this at the current scale; add judge after first 10 real intakes</li>
+    <li>A/B prompt testing — your prompts are not the bottleneck; the architecture is</li>
+    <li>Vector search or RAG — structured extraction from discrete documents does not need semantic search</li>
+  </ul>
+
+  <div style="margin-top:44px; padding-top:20px; border-top:1px solid var(--border); text-align:center;">
+    <p style="font-size:8.5pt; color:var(--slate); margin:0;">one3Seven AI Engineering Study Notes · June 2026 · Internal Only</p>
+    <p style="font-size:8.5pt; color:var(--violet); margin:6px 0 0; font-weight:600;">Applied from production AI engineering principles to one3Seven's specific architecture</p>
+  </div>
+</div>
+
+</body>
+</html>

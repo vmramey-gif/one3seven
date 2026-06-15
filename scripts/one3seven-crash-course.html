@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>one3Seven — Crash Course Bible</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+  :root {
+    --ink: #0F0D2B;
+    --violet: #6D4AFF;
+    --violet-soft: #F0EBFF;
+    --violet-border: #DCD3FF;
+    --green: #059669;
+    --green-soft: #ECFDF5;
+    --green-border: #A7F3D0;
+    --red: #DC2626;
+    --red-soft: #FEF2F2;
+    --red-border: #FECACA;
+    --amber: #D97706;
+    --amber-soft: #FFFBEB;
+    --amber-border: #FDE68A;
+    --slate: #64748B;
+    --border: #E2E8F0;
+    --bg: #FAFAFA;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 10pt;
+    line-height: 1.6;
+    color: var(--ink);
+    background: white;
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  /* ── COVER ── */
+  .cover {
+    background: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 60px 56px;
+    page-break-after: always;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::after {
+    content: '';
+    position: absolute;
+    bottom: -120px; right: -120px;
+    width: 500px; height: 500px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(109,74,255,0.18) 0%, transparent 65%);
+    pointer-events: none;
+  }
+  .cover-top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .cover-logo { font-size: 11pt; font-weight: 800; color: rgba(255,255,255,0.35); letter-spacing: 0.12em; text-transform: uppercase; }
+  .cover-logo b { color: #A78BFA; }
+  .cover-pill { background: rgba(109,74,255,0.25); border: 1px solid rgba(109,74,255,0.35); color: #C4B5FD; font-size: 8pt; font-weight: 600; padding: 5px 12px; border-radius: 20px; letter-spacing: 0.06em; }
+
+  .cover-body { position: relative; z-index: 1; }
+  .cover-eyebrow { font-size: 8.5pt; font-weight: 700; color: #A78BFA; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 18px; }
+  .cover-title { font-size: 52pt; font-weight: 900; color: white; line-height: 0.95; letter-spacing: -2px; margin-bottom: 8px; }
+  .cover-title .accent { color: #A78BFA; }
+  .cover-rule { width: 48px; height: 3px; background: linear-gradient(90deg, #6D4AFF, #A78BFA); border-radius: 2px; margin: 22px 0; }
+  .cover-sub { font-size: 11pt; color: rgba(255,255,255,0.45); line-height: 1.6; max-width: 380px; }
+  .cover-sub strong { color: rgba(255,255,255,0.75); font-weight: 600; }
+
+  .cover-bottom { position: relative; z-index: 1; }
+  .cover-toc {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 32px;
+    margin-bottom: 32px;
+  }
+  .cover-toc-item { font-size: 8pt; color: rgba(255,255,255,0.3); }
+  .cover-toc-item span { color: rgba(255,255,255,0.6); font-weight: 500; }
+  .cover-footer { display: flex; justify-content: space-between; align-items: center; }
+  .cover-version { font-size: 8pt; color: rgba(255,255,255,0.2); }
+  .cover-read { font-size: 8pt; color: #A78BFA; font-weight: 600; }
+
+  /* ── PAGE ── */
+  .page {
+    padding: 48px 56px;
+    page-break-after: always;
+  }
+  .page:last-child { page-break-after: avoid; }
+
+  /* ── SECTION HEADER ── */
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--border);
+  }
+  .section-num {
+    font-size: 8pt;
+    font-weight: 800;
+    color: var(--violet);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    flex-shrink: 0;
+    background: var(--violet-soft);
+    border: 1px solid var(--violet-border);
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+  .section-title {
+    font-size: 20pt;
+    font-weight: 900;
+    color: var(--ink);
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+  }
+
+  /* ── BIG STATEMENT ── */
+  .big-statement {
+    background: var(--ink);
+    border-radius: 16px;
+    padding: 28px 32px;
+    margin: 0 0 28px;
+  }
+  .big-statement p {
+    font-size: 14pt;
+    font-weight: 700;
+    color: white;
+    line-height: 1.5;
+    letter-spacing: -0.2px;
+    margin: 0;
+  }
+  .big-statement p .highlight { color: #A78BFA; }
+
+  /* ── RULE BOX ── */
+  .rule-box {
+    border-left: 4px solid var(--violet);
+    background: var(--violet-soft);
+    border-radius: 0 10px 10px 0;
+    padding: 14px 18px;
+    margin: 20px 0;
+  }
+  .rule-box p { font-size: 10pt; font-weight: 600; color: var(--ink); margin: 0; font-style: italic; }
+  .rule-box .rule-label { font-size: 7.5pt; font-weight: 800; color: var(--violet); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 5px; }
+
+  /* ── YES/NO GRID ── */
+  .yn-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin: 20px 0;
+  }
+  .yn-card { border-radius: 12px; padding: 16px 18px; }
+  .yn-yes { background: var(--green-soft); border: 1.5px solid var(--green-border); }
+  .yn-no  { background: var(--red-soft);   border: 1.5px solid var(--red-border);   }
+  .yn-label { font-size: 8pt; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 10px; }
+  .yn-yes .yn-label { color: var(--green); }
+  .yn-no  .yn-label { color: var(--red); }
+  .yn-card ul { margin: 0 0 0 14px; }
+  .yn-card li { font-size: 9pt; margin-bottom: 5px; color: var(--ink); line-height: 1.45; }
+
+  /* ── LANGUAGE TABLE ── */
+  table { width: 100%; border-collapse: collapse; margin: 18px 0; font-size: 9pt; }
+  thead tr { background: var(--ink); }
+  thead th { padding: 9px 12px; font-weight: 700; color: white; text-align: left; font-size: 8.5pt; letter-spacing: 0.04em; }
+  tbody tr { border-bottom: 1px solid var(--border); }
+  tbody tr:nth-child(even) { background: #FAFAFA; }
+  tbody td { padding: 9px 12px; vertical-align: top; line-height: 1.45; }
+  .say { color: var(--green); font-weight: 600; }
+  .not { color: var(--red); }
+  .why { color: var(--slate); font-size: 8.5pt; }
+
+  /* ── JOURNEY ── */
+  .steps { margin: 18px 0; }
+  .step { display: flex; gap: 14px; margin-bottom: 12px; align-items: flex-start; }
+  .step-dot {
+    flex-shrink: 0; width: 24px; height: 24px; border-radius: 50%;
+    background: var(--violet); color: white;
+    font-size: 8.5pt; font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    margin-top: 1px;
+  }
+  .step-body {}
+  .step-title { font-weight: 700; font-size: 9.5pt; color: var(--ink); margin-bottom: 1px; }
+  .step-desc { font-size: 9pt; color: var(--slate); line-height: 1.45; }
+
+  /* ── PILL TAGS ── */
+  .pill-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+  .pill { display: inline-flex; align-items: center; gap: 5px; border-radius: 20px; padding: 5px 12px; font-size: 8.5pt; font-weight: 600; }
+  .pill-green { background: var(--green-soft); border: 1px solid var(--green-border); color: var(--green); }
+  .pill-red   { background: var(--red-soft);   border: 1px solid var(--red-border);   color: var(--red); }
+  .pill-violet { background: var(--violet-soft); border: 1px solid var(--violet-border); color: var(--violet); }
+  .pill-amber  { background: var(--amber-soft);  border: 1px solid var(--amber-border);  color: var(--amber); }
+
+  /* ── ALERT BOX ── */
+  .alert { border-radius: 12px; padding: 16px 20px; margin: 18px 0; }
+  .alert-warn { background: var(--amber-soft); border: 1.5px solid var(--amber-border); }
+  .alert-warn .alert-label { color: var(--amber); font-size: 7.5pt; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 6px; }
+  .alert-warn p { color: #92400E; font-size: 9.5pt; margin: 0; line-height: 1.55; }
+  .alert-safe { background: var(--green-soft); border: 1.5px solid var(--green-border); }
+  .alert-safe .alert-label { color: var(--green); font-size: 7.5pt; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 6px; }
+  .alert-safe p { color: #065F46; font-size: 9.5pt; margin: 0; line-height: 1.55; }
+
+  /* ── CHECKLIST ── */
+  .checklist { list-style: none; margin: 14px 0; padding: 0; }
+  .checklist li { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px; font-size: 9.5pt; color: var(--ink); line-height: 1.45; }
+  .checklist li::before { content: '✓'; color: var(--green); font-weight: 800; font-size: 10pt; flex-shrink: 0; margin-top: 0px; }
+  .checklist-x li::before { content: '✗'; color: var(--red); }
+
+  /* ── TWO COL ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 18px 0; }
+  .mini-card { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+  .mini-card h4 { font-size: 9.5pt; font-weight: 700; color: var(--ink); margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+  .mini-card li { font-size: 9pt; color: var(--slate); margin-bottom: 4px; }
+  .mini-card ul { margin-left: 14px; }
+
+  /* ── BASELINE TABLE ── */
+  .baseline { background: var(--ink); border-radius: 14px; padding: 24px 28px; margin: 20px 0; }
+  .baseline h3 { color: white; font-size: 11pt; margin-bottom: 16px; }
+  .b-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .b-row:last-child { border-bottom: none; }
+  .b-label { font-size: 8.5pt; color: rgba(255,255,255,0.4); }
+  .b-val { font-size: 8.5pt; color: #A78BFA; font-weight: 600; font-family: monospace; }
+
+  /* ── NUMBERED LIST ── */
+  ol.styled { margin: 12px 0 12px 18px; }
+  ol.styled li { margin-bottom: 7px; font-size: 9.5pt; line-height: 1.5; }
+  ol.styled li strong { color: var(--ink); }
+
+  p { margin-bottom: 12px; font-size: 9.5pt; max-width: 640px; line-height: 1.6; }
+  h2 { font-size: 12pt; font-weight: 700; color: var(--ink); margin: 28px 0 10px; letter-spacing: -0.1px; }
+  hr.divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+
+  @media print {
+    body { max-width: none; }
+    .page { padding: 40px 48px; }
+    .cover { padding: 52px 48px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════ COVER ══════════════════════════════ -->
+<div class="cover">
+  <div class="cover-top">
+    <div class="cover-logo"><b>one3</b>Seven</div>
+    <div class="cover-pill">10-minute read</div>
+  </div>
+
+  <div class="cover-body">
+    <div class="cover-eyebrow">Crash Course Bible · Confidential</div>
+    <div class="cover-title">Every<br>thing<br><span class="accent">Fast.</span></div>
+    <div class="cover-rule"></div>
+    <div class="cover-sub">
+      <strong>Read this before anything else.</strong> What the product is, what it isn't, how to talk about it, who it serves, and the rules that keep it safe. One page per topic. No padding.
+    </div>
+  </div>
+
+  <div class="cover-bottom">
+    <div class="cover-toc">
+      <div class="cover-toc-item"><span>01</span> · The One-Sentence Truth</div>
+      <div class="cover-toc-item"><span>06</span> · What to Say / Not Say</div>
+      <div class="cover-toc-item"><span>02</span> · Is / Is Not</div>
+      <div class="cover-toc-item"><span>07</span> · Sales in 60 Seconds</div>
+      <div class="cover-toc-item"><span>03</span> · The Two Users</div>
+      <div class="cover-toc-item"><span>08</span> · Safety Rules</div>
+      <div class="cover-toc-item"><span>04</span> · How the Product Works</div>
+      <div class="cover-toc-item"><span>09</span> · Engineering Rules</div>
+      <div class="cover-toc-item"><span>05</span> · The Mind Layer</div>
+      <div class="cover-toc-item"><span>10</span> · Current State</div>
+    </div>
+    <div class="cover-footer">
+      <div class="cover-version">Version 1.0 · June 2026 · Internal Only</div>
+      <div class="cover-read">≈ 10 min read</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════ 01 ══════════════════════════════ -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <div class="section-title">The One-Sentence Truth</div>
+  </div>
+
+  <div class="big-statement">
+    <p>one3Seven <span class="highlight">organizes a worker's story and records</span> before attorney review — so employment law firms begin with a structured chronology and source documents, not a pile of files and a phone call.</p>
+  </div>
+
+  <p>That's it. That's the whole product. Every feature, every screen, every design decision either serves that sentence or it shouldn't be there.</p>
+
+  <h2>Three Things the Attorney Gets</h2>
+  <div class="steps">
+    <div class="step"><div class="step-dot">1</div><div class="step-body"><div class="step-title">A structured timeline</div><div class="step-desc">Documented events in chronological order, each linked to its source file. No floating claims.</div></div></div>
+    <div class="step"><div class="step-dot">2</div><div class="step-body"><div class="step-title">Organized records</div><div class="step-desc">Every uploaded file categorized by type — payroll, HR, time records, termination — with nothing buried.</div></div></div>
+    <div class="step"><div class="step-dot">3</div><div class="step-body"><div class="step-title">Clear gaps</div><div class="step-desc">What's missing is flagged before the first call, so the consultation starts on what matters.</div></div></div>
+  </div>
+
+  <h2>Three Things the Attorney Does Not Get</h2>
+  <ul style="margin-left:18px;">
+    <li style="margin-bottom:7px; font-size:9.5pt;">A claim assessment, strength score, or case-value estimate</li>
+    <li style="margin-bottom:7px; font-size:9.5pt;">Legal conclusions about what happened or who is at fault</li>
+    <li style="margin-bottom:7px; font-size:9.5pt;">A filing-deadline guarantee or agency determination</li>
+  </ul>
+
+  <div class="rule-box">
+    <div class="rule-label">The Governing Principle</div>
+    <p>"The platform organizes. The attorney reviews. The worker controls the sharing. No one on the platform makes legal decisions."</p>
+  </div>
+
+  <h2>Why This Matters</h2>
+  <p>Employment intake has a bottleneck — not access to attorneys, but disorganized information arriving before the first conversation. Workers have records scattered across phones, emails, and folders. Attorneys spend the first consultation building a timeline that could have existed before they arrived. one3Seven closes that gap.</p>
+  <p>It does not close the legal access gap. It does not replace legal advice. It removes one specific friction point in a specific part of the workflow.</p>
+</div>
+
+<!-- ══════════════════════════════ 02 ══════════════════════════════ -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <div class="section-title">Is / Is Not</div>
+  </div>
+
+  <p>Memorize the "Is Not" column. It's where the legal and product risk lives.</p>
+
+  <div class="yn-grid">
+    <div class="yn-card yn-yes">
+      <div class="yn-label">✓ one3Seven Is</div>
+      <ul>
+        <li>A guided intake tool for employment records</li>
+        <li>A document upload and organization platform</li>
+        <li>A structured review interface for firms</li>
+        <li>A source-tracing system (events → files)</li>
+        <li>A chronology builder</li>
+        <li>A gap-detection and document-request tool</li>
+        <li>A firm-controlled workflow (review, request, accept, decline)</li>
+        <li>An intake routing platform (firm code or network)</li>
+      </ul>
+    </div>
+    <div class="yn-card yn-no">
+      <div class="yn-label">✗ one3Seven Is Not</div>
+      <ul>
+        <li>A law firm or legal services provider</li>
+        <li>A source of legal advice for any party</li>
+        <li>A claim-strength scorer or case evaluator</li>
+        <li>A filing-deadline calculator or deadline guarantor</li>
+        <li>A referral marketplace or firm matchmaker</li>
+        <li>A product supervised by a licensed attorney</li>
+        <li>A guarantee of review, response, or representation</li>
+        <li>A verified fact source — output requires attorney review</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="alert alert-warn">
+    <div class="alert-label">⚠ Non-Negotiable</div>
+    <p>These definitions cannot be softened, blurred, or footnoted away in any pitch, email, demo, press piece, or investor deck. If anyone on the team misrepresents them, correct it immediately.</p>
+  </div>
+
+  <h2>What This Means in Practice</h2>
+  <table>
+    <thead><tr><th>If someone asks…</th><th>The answer is…</th></tr></thead>
+    <tbody>
+      <tr><td>"Does it tell me if I have a case?"</td><td class="not">No. The attorney decides that after reviewing your organized intake.</td></tr>
+      <tr><td>"Does it know when my deadline is?"</td><td class="not">No. It surfaces relevant dates for timely attorney review. Deadlines depend on claim type and jurisdiction.</td></tr>
+      <tr><td>"Is it supervised by a lawyer?"</td><td class="not">No. Firm accounts are reviewed by the founder during beta. No licensed attorney supervises operations.</td></tr>
+      <tr><td>"Will the firm definitely respond?"</td><td class="not">No. Firms review routed intakes independently. No response is guaranteed.</td></tr>
+      <tr><td>"Can I use it to sue my employer?"</td><td class="not">one3Seven organizes your records for attorney review. An attorney decides whether to represent you.</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ══════════════════════════════ 03 ══════════════════════════════ -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <div class="section-title">The Two Users</div>
+  </div>
+
+  <div class="two-col">
+    <div class="mini-card">
+      <h4>👤 Workers</h4>
+      <p style="font-size:9pt; color:var(--slate); margin-bottom:10px;">Employees who believe they've been wronged — wage theft, retaliation, wrongful termination, discrimination. Often anxious, unsure what they have, unsure if it's enough.</p>
+      <ul>
+        <li>Need help telling their story clearly</li>
+        <li>Need to know which records matter</li>
+        <li>Need control over who sees their information</li>
+        <li>Need plain language throughout</li>
+        <li>Need transparency on where their intake stands</li>
+      </ul>
+    </div>
+    <div class="mini-card">
+      <h4>⚖️ Firms</h4>
+      <p style="font-size:9pt; color:var(--slate); margin-bottom:10px;">Employment law attorneys and practices who evaluate potential clients. Their constraint: time. Every minute spent organizing documents before the consultation is a minute not spent on the matter itself.</p>
+      <ul>
+        <li>Need faster initial review without losing accuracy</li>
+        <li>Need a chronology before the first consultation</li>
+        <li>Need direct access to source documents</li>
+        <li>Need clear signals about what's missing</li>
+        <li>Need fewer back-and-forth collection steps</li>
+      </ul>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <h2>What Each User Controls</h2>
+  <table>
+    <thead><tr><th>Action</th><th>Who Controls It</th></tr></thead>
+    <tbody>
+      <tr><td>Submitting a story and uploading records</td><td class="say">Worker</td></tr>
+      <tr><td>Consenting to share an intake with a firm</td><td class="say">Worker</td></tr>
+      <tr><td>Approving firm full access to original documents</td><td class="say">Worker</td></tr>
+      <tr><td>Requesting additional records from the worker</td><td class="say">Firm</td></tr>
+      <tr><td>Accepting, declining, or continuing to review</td><td class="say">Firm</td></tr>
+      <tr><td>Legal evaluation and representation decision</td><td class="say">Firm (attorney)</td></tr>
+      <tr><td>What the organized output says</td><td class="say">The platform — based only on submitted records</td></tr>
+      <tr><td>What the platform concludes legally</td><td class="not">Nobody — it doesn't conclude anything legally</td></tr>
+    </tbody>
+  </table>
+
+  <div class="alert alert-safe">
+    <div class="alert-label">✓ How to Think About It</div>
+    <p>Workers are not clients until represented in writing. Firms are not endorsements. The platform is the infrastructure between them — it never takes a side, never makes a recommendation, never guarantees anything for either party.</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════ 04 ══════════════════════════════ -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <div class="section-title">How the Product Works</div>
+  </div>
+
+  <div class="two-col">
+    <div>
+      <h2>Worker Flow</h2>
+      <div class="steps">
+        <div class="step"><div class="step-dot">1</div><div class="step-body"><div class="step-title">Arrives via firm link or direct sign-up</div><div class="step-desc">Firm code is captured and stored automatically.</div></div></div>
+        <div class="step"><div class="step-dot">2</div><div class="step-body"><div class="step-title">Answers 8 guided questions</div><div class="step-desc">Employment context, key people, timeline, what happened. Stored as-told — not transformed.</div></div></div>
+        <div class="step"><div class="step-dot">3</div><div class="step-body"><div class="step-title">Tags the matter type</div><div class="step-desc">Wage theft, overtime, retaliation, termination, discrimination, etc. Organizational tags only.</div></div></div>
+        <div class="step"><div class="step-dot">4</div><div class="step-body"><div class="step-title">Uploads records</div><div class="step-desc">PDFs, docs. System categorizes, extracts text, and stores securely.</div></div></div>
+        <div class="step"><div class="step-dot">5</div><div class="step-body"><div class="step-title">Intake is organized automatically</div><div class="step-desc">Timeline built, gaps flagged, structured summary assembled.</div></div></div>
+        <div class="step"><div class="step-dot">6</div><div class="step-body"><div class="step-title">Routes to firm and responds to requests</div><div class="step-desc">Worker controls sharing. Uploads requested documents. Tracks status in plain language.</div></div></div>
+      </div>
+    </div>
+    <div>
+      <h2>Firm Flow</h2>
+      <div class="steps">
+        <div class="step"><div class="step-dot">1</div><div class="step-body"><div class="step-title">Receives intake in review queue</div><div class="step-desc">Status: new, preview, full access, accepted, not pursuing.</div></div></div>
+        <div class="step"><div class="step-dot">2</div><div class="step-body"><div class="step-title">Opens intake review</div><div class="step-desc">Worker context, organized chronology, source-linked intelligence, document categories, missing-record flags.</div></div></div>
+        <div class="step"><div class="step-dot">3</div><div class="step-body"><div class="step-title">Reviews original files</div><div class="step-desc">Full-access route. Source documents are the final authority. Platform output is the starting point.</div></div></div>
+        <div class="step"><div class="step-dot">4</div><div class="step-body"><div class="step-title">Requests documents if needed</div><div class="step-desc">Selects category + note. Worker receives and responds. Firm notified when docs arrive.</div></div></div>
+        <div class="step"><div class="step-dot">5</div><div class="step-body"><div class="step-title">Makes intake decision</div><div class="step-desc">Accept, decline, or continue reviewing. All decisions are the attorney's. Platform records the outcome.</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="rule-box">
+    <div class="rule-label">The Loop in One Line</div>
+    <p>Worker submits → platform organizes → firm reviews → attorney decides → outcome recorded. Every step is visible to the right party. Nothing is automated past the organization step.</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════ 05 ══════════════════════════════ -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-num">05</div>
+    <div class="section-title">The Mind Layer</div>
+  </div>
+
+  <p>The intelligence system is the most likely thing to be misrepresented. Read this carefully.</p>
+
+  <div class="yn-grid">
+    <div class="yn-card yn-yes">
+      <div class="yn-label">✓ The Mind Layer Does</div>
+      <ul>
+        <li>Extract text from uploaded files (PDF text layer, TXT)</li>
+        <li>Categorize documents by type</li>
+        <li>Extract dates, employer names, key people</li>
+        <li>Build a dated, source-linked chronology</li>
+        <li>Surface relevant excerpts from documents</li>
+        <li>Calculate days between documented events</li>
+        <li>Flag missing or absent common record types</li>
+        <li>Extract structured facts per document category</li>
+        <li>Label all worker-provided content as worker-provided</li>
+        <li>Synthesize per-document facts into an intake-level view</li>
+      </ul>
+    </div>
+    <div class="yn-card yn-no">
+      <div class="yn-label">✗ The Mind Layer Does Not</div>
+      <ul>
+        <li>Determine whether a legal claim exists</li>
+        <li>Score claim strength or assign a grade</li>
+        <li>Decide who is telling the truth</li>
+        <li>Confirm that extracted facts are accurate</li>
+        <li>Determine whether retaliation occurred</li>
+        <li>Calculate a guaranteed filing deadline</li>
+        <li>Predict case outcomes</li>
+        <li>Replace original document review</li>
+        <li>Process scanned image files (no OCR)</li>
+        <li>Replace attorney judgment — ever</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Two Processing Paths</h2>
+  <div class="two-col">
+    <div class="mini-card">
+      <h4>Phase 2A — Deterministic</h4>
+      <ul>
+        <li>Runs on every intake automatically</li>
+        <li>Text extraction, filename-based classification</li>
+        <li>Rule-based timeline construction</li>
+        <li>Banned-output guardrails (no legal conclusions)</li>
+        <li>Always produces output — quality scales with records</li>
+      </ul>
+    </div>
+    <div class="mini-card">
+      <h4>Phase 2B — Intelligence</h4>
+      <ul>
+        <li>Runs when a full-access firm first opens intake</li>
+        <li>Claude API extracts structured facts per document</li>
+        <li>Synthesis produces timing cards, key quotes, facts</li>
+        <li>Confirmed operational as of June 2026</li>
+        <li>Non-blocking — failure never breaks base review</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="alert alert-warn">
+    <div class="alert-label">⚠ Output Quality Varies</div>
+    <p>A complete record set produces a rich intelligence panel. An intake with only a termination letter produces a sparse one. Both are correct behavior — the records are sparse, not the platform. Never represent demo-level output as guaranteed for all intakes.</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════ 06 ══════════════════════════════ -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-num">06</div>
+    <div class="section-title">What to Say / Not Say</div>
+  </div>
+
+  <p>Every person who speaks for one3Seven must use this table. No exceptions.</p>
+
+  <table>
+    <thead><tr><th style="width:30%">Say This</th><th style="width:30%">Not This</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td class="say">Extracted from documents</td><td class="not">Verified facts / confirmed facts</td><td class="why">Attorney verification is required. Extraction ≠ verification.</td></tr>
+      <tr><td class="say">Source-linked information</td><td class="not">Proven / established facts</td><td class="why">Proof is a legal determination. The platform surfaces, not proves.</td></tr>
+      <tr><td class="say">Event timing</td><td class="not">Retaliation timing / retaliation pattern</td><td class="why">Timing is observable. Retaliation is a legal conclusion.</td></tr>
+      <tr><td class="say">Structured for attorney review</td><td class="not">Attorney-ready / case-ready</td><td class="why">Completeness varies by intake. No guarantee of readiness.</td></tr>
+      <tr><td class="say">Potential matter topics</td><td class="not">Confirmed claims / identified claims</td><td class="why">Tags are organizational. They don't determine claim existence.</td></tr>
+      <tr><td class="say">Time-sensitive dates present</td><td class="not">EEOC deadline is X days</td><td class="why">Applicable period depends on claim type, agency, and jurisdiction.</td></tr>
+      <tr><td class="say">Participating firm</td><td class="not">The right firm / matched firm</td><td class="why">No matching, ranking, or endorsement of any firm.</td></tr>
+      <tr><td class="say">Prospective client</td><td class="not">Client / your client</td><td class="why">No attorney-client relationship until a separate written agreement.</td></tr>
+      <tr><td class="say">Attorney decides</td><td class="not">AI recommends / platform advises</td><td class="why">Every legal decision is the attorney's independent judgment.</td></tr>
+      <tr><td class="say">Initial organization pass</td><td class="not">AI verified everything</td><td class="why">Deterministic pipeline, not a complete understanding of every document.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Three Before/After Examples</h2>
+
+  <div style="margin-bottom:14px;">
+    <div class="alert alert-warn" style="margin-bottom:6px;"><div class="alert-label">❌ Wrong</div><p>"Retaliation pattern detected. Strong wrongful termination case identified."</p></div>
+    <div class="alert alert-safe"><div class="alert-label">✓ Right</div><p>"A written warning was issued 11 days after the formal HR complaint. An attorney determines the legal significance of that timing."</p></div>
+  </div>
+
+  <div style="margin-bottom:14px;">
+    <div class="alert alert-warn" style="margin-bottom:6px;"><div class="alert-label">❌ Wrong</div><p>"AI organizes everything and tells attorneys what to focus on."</p></div>
+    <div class="alert alert-safe"><div class="alert-label">✓ Right</div><p>"one3Seven performs an initial organization pass — so firms begin with structure instead of building it from scratch."</p></div>
+  </div>
+
+  <div class="alert alert-warn" style="margin-bottom:6px;"><div class="alert-label">❌ Wrong</div><p>"We track EEOC deadlines automatically."</p></div>
+  <div class="alert alert-safe"><div class="alert-label">✓ Right</div><p>"We surface relevant dates that may warrant timely attorney review. Applicable filing periods depend on the specific claim, agency, and jurisdiction."</p></div>
+</div>
+
+<!-- ══════════════════════════════ 07 ══════════════════════════════ -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-num">07</div>
+    <div class="section-title">Sales in 60 Seconds</div>
+  </div>
+
+  <div class="big-statement">
+    <p>Before a firm can evaluate a matter, someone has to organize it. one3Seven does that <span class="highlight">automatically, before the first call.</span></p>
+  </div>
+
+  <h2>Opening Frame (use this verbatim or close to it)</h2>
+  <div class="rule-box">
+    <p>"Firms often receive stories, screenshots, pay records, and termination letters in different places — and someone has to organize them before the attorney can begin. one3Seven performs that initial organization pass automatically, so the intake arrives structured with a chronology and source documents already attached."</p>
+  </div>
+
+  <h2>5 Discovery Questions (before the demo)</h2>
+  <ol class="styled">
+    <li>How does your firm currently collect employment records from prospective clients?</li>
+    <li>Who does the work of organizing documents before an attorney reviews them?</li>
+    <li>What information is most often missing when an intake arrives?</li>
+    <li>How quickly can the firm decide whether to continue reviewing an intake?</li>
+    <li>What causes potentially useful intakes to stall or be abandoned?</li>
+  </ol>
+
+  <h2>Demo Order (5 stops)</h2>
+  <div class="steps">
+    <div class="step"><div class="step-dot">1</div><div class="step-body"><div class="step-title">Intake Snapshot</div><div class="step-desc">Worker, employer, record count, timeline. First read in 10 seconds.</div></div></div>
+    <div class="step"><div class="step-dot">2</div><div class="step-body"><div class="step-title">Chronology</div><div class="step-desc">Dated events, each linked to source files. "What happened and can I verify it?"</div></div></div>
+    <div class="step"><div class="step-dot">3</div><div class="step-body"><div class="step-title">Extracted from Documents</div><div class="step-desc">Structured facts, key language, event timing. "What do the documents actually say?"</div></div></div>
+    <div class="step"><div class="step-dot">4</div><div class="step-body"><div class="step-title">Document Categories</div><div class="step-desc">Organized file list by type + missing-record flags. "What do I have?"</div></div></div>
+    <div class="step"><div class="step-dot">5</div><div class="step-body"><div class="step-title">Document Request Loop</div><div class="step-desc">Request specific records with a note, no phone call needed.</div></div></div>
+  </div>
+
+  <h2>Never Promise</h2>
+  <ul class="checklist checklist-x">
+    <li>A specific number of hours saved per intake</li>
+    <li>A higher case acceptance or conversion rate</li>
+    <li>Better legal outcomes for any party</li>
+    <li>Deadline accuracy for any agency or jurisdiction</li>
+    <li>That the platform has been validated by any bar association</li>
+    <li>Automatic identification of legal claims</li>
+  </ul>
+</div>
+
+<!-- ══════════════════════════════ 08 ══════════════════════════════ -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-num">08</div>
+    <div class="section-title">Safety Rules</div>
+  </div>
+
+  <p>These are not guidelines. They are hard limits. The platform stays safe because these are non-negotiable.</p>
+
+  <h2>Data and Privacy</h2>
+  <ul class="checklist">
+    <li>No real worker data in production before security gates (RLS, org recovery, consent flow) are confirmed</li>
+    <li>No private worker information — narrative, allegations, document excerpts — in notification emails</li>
+    <li>No client-side API keys or secrets. Everything credentials-related is server-side only</li>
+    <li>No cross-account access. A firm sees only intakes routed to their firm ID</li>
+    <li>No preview-access firm viewing documents gated to full-access routes</li>
+    <li>Consent is recorded before any intake is shared with a firm — this is a legal record</li>
+  </ul>
+
+  <h2>Product Integrity</h2>
+  <ul class="checklist">
+    <li>No AI output without source attribution where available</li>
+    <li>No demo feature represented as operational unless it works for real intakes</li>
+    <li>No legal conclusions, claim-strength language, or deadline guarantees in any user-facing copy</li>
+    <li>"Verified" never appears on information that hasn't been independently confirmed</li>
+    <li>No implication of an attorney-client relationship through any platform language</li>
+    <li>No silent failures that leave workers believing their information was saved when it wasn't</li>
+  </ul>
+
+  <h2>What Requires Founder Approval</h2>
+  <ul class="checklist">
+    <li>Any public statement about legal compliance posture</li>
+    <li>Any claim about attorney involvement in operations</li>
+    <li>Any new firm onboarded to the beta</li>
+    <li>Any press, media, or public announcement</li>
+    <li>Any use of real worker data in a test, demo, or investor presentation</li>
+    <li>Any change to RLS policies or security settings</li>
+  </ul>
+
+  <div class="alert alert-warn">
+    <div class="alert-label">⚠ The Absolute Boundary</div>
+    <p>The platform organizes. It does not advise, conclude, guarantee, or represent. When any person, feature, or message crosses that line — stop and correct it before moving forward.</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════ 09 ══════════════════════════════ -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-num">09</div>
+    <div class="section-title">Engineering Rules</div>
+  </div>
+
+  <p>For developers, contractors, and anyone reviewing or approving code changes.</p>
+
+  <div class="rule-box">
+    <div class="rule-label">The Governing Rule</div>
+    <p>"One prompt, one defect, one expected behavior change. No opportunistic cleanup. No scope expansion during the pilot stabilization sprint."</p>
+  </div>
+
+  <h2>Every Change Follows This Order</h2>
+  <ol class="styled">
+    <li><strong>Read first.</strong> Audit the relevant files before touching anything.</li>
+    <li><strong>Identify root cause</strong> with evidence, not assumption.</li>
+    <li><strong>Create a clean backup copy</strong> with a timestamp before any edit.</li>
+    <li><strong>Minimal patch.</strong> Change only what is required. Nothing else.</li>
+    <li><strong>Build.</strong> npm run build. Zero new errors required.</li>
+    <li><strong>Run targeted tests.</strong> Document any pre-existing failures.</li>
+    <li><strong>Smoke test</strong> the specific expected behavior change on production.</li>
+    <li><strong>Deploy.</strong> From the clean copy, via vercel.cmd --prod.</li>
+    <li><strong>Stop.</strong> Do not begin the next fix in the same session.</li>
+  </ol>
+
+  <h2>Do Not Touch — Ever Without Investigation</h2>
+  <div class="pill-row">
+    <span class="pill pill-red">O3S_SOURCE_TRACE codec</span>
+    <span class="pill pill-red">O3S_ORG_ENGINE codec</span>
+    <span class="pill pill-red">BANNED_IN_OUTPUT regex</span>
+    <span class="pill pill-red">All RLS policies</span>
+    <span class="pill pill-red">ONE3SEVEN_UNIVERSAL_DISCLAIMER</span>
+    <span class="pill pill-red">uploadConsentAt timestamp</span>
+    <span class="pill pill-red">workerApproveFullAccess / route_status gating</span>
+    <span class="pill pill-red">inferCategoryFromFileName</span>
+  </div>
+
+  <h2>P1 Sprint — In Order</h2>
+  <ol class="styled">
+    <li><strong>RLS verification</strong> — read-only audit of all derived-data tables. No changes until matrix is complete.</li>
+    <li><strong>Pending-extraction smoke test</strong> — open intake d7123613, confirm auto-trigger fires once, confirm intelligence renders after reload.</li>
+    <li><strong>Organization recovery</strong> — detect and handle stale "Organizing Records" state. Must not duplicate data.</li>
+    <li><strong>Voice input</strong> — hide entry point if transcription cannot be proven. Do not delete underlying code.</li>
+    <li><strong>Firm email notifications</strong> — one channel, two events. Email failure must never block intake workflow.</li>
+    <li><strong>Event timing investigation</strong> — read-only first. Determine why timing cards don't render for all intakes.</li>
+  </ol>
+</div>
+
+<!-- ══════════════════════════════ 10 ══════════════════════════════ -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <div class="section-title">Current State — June 2026</div>
+  </div>
+
+  <div class="baseline">
+    <h3>Production Snapshot</h3>
+    <div class="b-row"><span class="b-label">Live URL</span><span class="b-val">one3seven-beta.vercel.app</span></div>
+    <div class="b-row"><span class="b-label">Demo URL</span><span class="b-val">one3seven-beta.vercel.app/?demo</span></div>
+    <div class="b-row"><span class="b-label">Test baseline</span><span class="b-val">134 passing · 8 pre-existing failures (documented)</span></div>
+    <div class="b-row"><span class="b-label">Intelligence pipeline</span><span class="b-val">Fully operational — confirmed June 2026</span></div>
+    <div class="b-row"><span class="b-label">P0 language fixes</span><span class="b-val">Deployed and smoke-tested</span></div>
+    <div class="b-row"><span class="b-label">Pilot status</span><span class="b-val">Beta — controlled, founder-reviewed firm accounts</span></div>
+  </div>
+
+  <div class="two-col">
+    <div>
+      <h2>✓ Confirmed Operational</h2>
+      <ul class="checklist">
+        <li>Worker intake — story, questions, upload</li>
+        <li>Document organization (deterministic)</li>
+        <li>Source-linked chronology</li>
+        <li>Firm routing — firm code and network</li>
+        <li>Full and preview access firm review</li>
+        <li>Intelligence extraction and rendering (2B)</li>
+        <li>Document request loop</li>
+        <li>Accept / decline workflow</li>
+        <li>Worker consent and access control</li>
+        <li>In-app notifications</li>
+      </ul>
+    </div>
+    <div>
+      <h2>⚠ Known Gaps (P1)</h2>
+      <ul class="checklist checklist-x">
+        <li>RLS not yet verified on derived-data tables</li>
+        <li>Pending extraction smoke test (intake d7123613)</li>
+        <li>Interrupted "Organizing Records" — no recovery UI</li>
+        <li>Voice mic present — transcription not implemented</li>
+        <li>Firm email notifications — not yet wired externally</li>
+        <li>Timing cards — not rendering for all intakes</li>
+      </ul>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <h2>Minimum Gates Before Real Worker Data</h2>
+  <ol class="styled">
+    <li>RLS verified for all derived-data tables</li>
+    <li>Organization recovery working for interrupted intakes</li>
+    <li>Voice input hidden or transcription proven</li>
+    <li>Firm email notifications delivering to inbox</li>
+    <li>Demo language confirmed accurate and not overstated</li>
+  </ol>
+
+  <div style="margin-top:40px; padding-top:20px; border-top:1px solid var(--border); text-align:center;">
+    <p style="font-size:8.5pt; color:var(--slate); margin:0;">one3Seven Crash Course Bible · Version 1.0 · June 2026 · Internal Use Only</p>
+    <p style="font-size:8.5pt; color:var(--violet); margin:6px 0 0; font-weight:600;">one3seven-beta.vercel.app</p>
+  </div>
+</div>
+
+</body>
+</html>

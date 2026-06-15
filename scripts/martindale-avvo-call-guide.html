@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>one3Seven — Martindale-Avvo Call Guide</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 13px;
+    color: #1e1b4b;
+    background: #fff;
+    line-height: 1.65;
+  }
+
+  .page {
+    width: 816px;
+    margin: 0 auto;
+    padding: 48px 56px;
+  }
+
+  @media print {
+    .page { width: 100%; padding: 32px 40px; }
+    .page-break { page-break-before: always; }
+    .no-break { page-break-inside: avoid; }
+  }
+
+  /* ── Cover ── */
+  .cover {
+    background: linear-gradient(135deg, #1e1b4b 0%, #3730a3 55%, #6d28d9 100%);
+    border-radius: 14px;
+    padding: 44px 48px;
+    color: #fff;
+    margin-bottom: 36px;
+  }
+  .cover-eyebrow {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #a5b4fc;
+    margin-bottom: 6px;
+  }
+  .cover-logo { font-size: 22px; font-weight: 800; color: #fff; margin-bottom: 24px; }
+  .cover-logo span { color: #c4b5fd; }
+  .cover-title { font-size: 32px; font-weight: 800; line-height: 1.15; margin-bottom: 10px; }
+  .cover-sub { font-size: 14px; color: #c7d2fe; max-width: 500px; line-height: 1.6; margin-bottom: 28px; }
+  .cover-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+  .cover-tag {
+    display: inline-block;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.22);
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #e0e7ff;
+  }
+
+  /* ── Section labels ── */
+  .section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    color: #6d28d9;
+    margin-bottom: 5px;
+  }
+  h1 { font-size: 20px; font-weight: 800; color: #1e1b4b; margin-bottom: 8px; }
+  h2 { font-size: 15px; font-weight: 700; color: #1e1b4b; margin: 24px 0 8px; }
+  h3 { font-size: 12.5px; font-weight: 700; color: #1e1b4b; margin-bottom: 4px; }
+  p  { color: #374151; margin-bottom: 9px; }
+  hr { border: none; border-top: 1px solid #e5e7eb; margin: 28px 0; }
+
+  /* ── Callouts ── */
+  .callout {
+    border-radius: 10px;
+    padding: 15px 18px;
+    margin: 14px 0;
+  }
+  .callout-purple { background: #f5f3ff; border-left: 3px solid #7c3aed; }
+  .callout-green  { background: #f0fdf4; border-left: 3px solid #16a34a; }
+  .callout-red    { background: #fff1f2; border-left: 3px solid #e11d48; }
+  .callout-amber  { background: #fffbeb; border-left: 3px solid #d97706; }
+  .callout-blue   { background: #eff6ff; border-left: 3px solid #2563eb; }
+  .callout-title  { font-size: 11px; font-weight: 700; margin-bottom: 5px; }
+  .callout-purple .callout-title { color: #5b21b6; }
+  .callout-green  .callout-title { color: #15803d; }
+  .callout-red    .callout-title { color: #be123c; }
+  .callout-amber  .callout-title { color: #92400e; }
+  .callout-blue   .callout-title { color: #1e40af; }
+
+  /* ── Quote blocks ── */
+  .script-block {
+    background: #1e1b4b;
+    border-radius: 10px;
+    padding: 18px 22px;
+    margin: 14px 0;
+    position: relative;
+  }
+  .script-block-label {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #818cf8;
+    margin-bottom: 8px;
+  }
+  .script-block p {
+    color: #e0e7ff;
+    font-size: 13px;
+    font-style: italic;
+    margin: 0;
+    line-height: 1.65;
+  }
+
+  /* ── Say / Don't grid ── */
+  .say-dont {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin: 14px 0;
+  }
+  .say-col, .dont-col {
+    border-radius: 10px;
+    padding: 16px;
+  }
+  .say-col  { background: #f0fdf4; border: 1px solid #bbf7d0; }
+  .dont-col { background: #fff1f2; border: 1px solid #fecdd3; }
+  .say-header  { font-size: 11px; font-weight: 700; color: #15803d; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+  .dont-header { font-size: 11px; font-weight: 700; color: #be123c; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+
+  .say-list, .dont-list { list-style: none; padding: 0; }
+  .say-list li, .dont-list li {
+    padding: 6px 0 6px 22px;
+    position: relative;
+    font-size: 12px;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    line-height: 1.5;
+  }
+  .say-list  li:before { content: "✓"; position: absolute; left: 0; color: #16a34a; font-weight: 700; }
+  .dont-list li:before { content: "✗"; position: absolute; left: 0; color: #e11d48; font-weight: 700; }
+  .say-list  li:last-child,
+  .dont-list li:last-child { border-bottom: none; }
+
+  /* ── Numbered steps ── */
+  .steps { list-style: none; padding: 0; counter-reset: step; }
+  .steps li {
+    padding: 12px 0 12px 40px;
+    position: relative;
+    counter-increment: step;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  .steps li:last-child { border-bottom: none; }
+  .steps li:before {
+    content: counter(step);
+    position: absolute;
+    left: 0;
+    top: 13px;
+    background: #6d28d9;
+    color: #fff;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    line-height: 24px;
+  }
+  .steps li strong { color: #1e1b4b; font-size: 13px; display: block; margin-bottom: 3px; }
+  .steps li p { font-size: 12px; margin: 0; color: #4b5563; }
+
+  /* ── Highlight ── */
+  .hl { background: #ede9fe; padding: 1px 5px; border-radius: 3px; font-weight: 600; color: #5b21b6; }
+  .hl-red { background: #fee2e2; padding: 1px 5px; border-radius: 3px; font-weight: 600; color: #b91c1c; }
+  .hl-green { background: #dcfce7; padding: 1px 5px; border-radius: 3px; font-weight: 600; color: #15803d; }
+
+  /* ── Objection block ── */
+  .objection { margin: 12px 0; border-radius: 10px; overflow: hidden; }
+  .objection-q { background: #fef3c7; padding: 10px 14px; font-weight: 600; font-size: 12px; color: #92400e; }
+  .objection-a { background: #f0fdf4; padding: 10px 14px; font-size: 12px; color: #166534; }
+
+  /* ── Big goal box ── */
+  .goal-box {
+    background: linear-gradient(135deg, #6d28d9, #4c1d95);
+    border-radius: 12px;
+    padding: 22px 26px;
+    margin: 18px 0;
+    color: #fff;
+  }
+  .goal-box-label { font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #c4b5fd; margin-bottom: 6px; }
+  .goal-box-text { font-size: 18px; font-weight: 700; color: #fff; line-height: 1.4; }
+
+  /* ── Two-col layout ── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 14px 0; }
+
+  /* ── Footer ── */
+  .footer {
+    margin-top: 36px;
+    padding-top: 14px;
+    border-top: 1px solid #e5e7eb;
+    font-size: 10px;
+    color: #9ca3af;
+    text-align: center;
+  }
+
+  /* ── Context card ── */
+  .context-card {
+    border: 1px solid #ddd6fe;
+    border-radius: 10px;
+    padding: 16px 18px;
+    background: #faf5ff;
+    margin: 14px 0;
+  }
+  .context-card h3 { color: #5b21b6; margin-bottom: 6px; }
+  .context-card p { font-size: 12px; color: #4b5563; margin: 0; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- COVER -->
+  <div class="cover">
+    <div class="cover-eyebrow">one3Seven · Sales Intelligence</div>
+    <div class="cover-logo">one3<span>Seven</span></div>
+    <div class="cover-title">Martindale-Avvo<br>Call Playbook</div>
+    <div class="cover-sub">
+      What to say, what to ask, what to never mention —
+      for a first call with a Martindale-Avvo contact
+      that earns you a second conversation.
+    </div>
+    <div class="cover-tags">
+      <span class="cover-tag">Relationship Call</span>
+      <span class="cover-tag">Not a Pitch</span>
+      <span class="cover-tag">Goal: Second Call</span>
+      <span class="cover-tag">Confidential</span>
+    </div>
+  </div>
+
+  <!-- THE ONE GOAL -->
+  <div class="goal-box">
+    <div class="goal-box-label">The Only Goal of This Call</div>
+    <div class="goal-box-text">Get a second conversation. That's it.<br>
+    <span style="font-size:13px; font-weight:400; color:#c4b5fd;">You are not pitching today. You are opening a door.</span></div>
+  </div>
+
+  <!-- WHO YOU'RE CALLING -->
+  <div class="section-label">Know This First</div>
+  <h1>Who Martindale-Avvo Is</h1>
+  <p>Martindale-Avvo is the largest legal lead generation company in the country. They own both Martindale-Hubbell (attorney directory, ratings) and Avvo (consumer-facing attorney marketplace). Attorneys pay them for directory listings, leads, and intake traffic.</p>
+
+  <div class="context-card">
+    <h3>Their Core Business Problem</h3>
+    <p>Martindale-Avvo sends attorneys leads — but leads are just contact information and a few sentences. The handoff from "person submitted a form" to "attorney actually takes the case" is full of friction, drop-off, and wasted time for both sides. <strong>They know this better than anyone.</strong> That gap is exactly what one3Seven addresses. That's the conversation.</p>
+  </div>
+
+  <div class="callout callout-blue">
+    <div class="callout-title">Why This Contact Matters</div>
+    <p>An associate at Martindale-Avvo isn't a decision-maker — but they're an insider who understands the lead quality problem from the inside. The goal is to learn how they see the space and plant a seed. If this person sees the fit, they can open the right door internally.</p>
+  </div>
+
+  <hr>
+
+  <!-- HOW TO OPEN -->
+  <div class="section-label">The Opening</div>
+  <h1>How to Start the Call</h1>
+  <p>Lead with the relationship, then the reason for the call. Keep it honest and low-pressure.</p>
+
+  <div class="script-block">
+    <div class="script-block-label">Opening Line — Say This</div>
+    <p>"Hey — I know you're deep in this space so I'll keep it short. We're building something in the employment law intake world that I think is complementary to what Martindale-Avvo does, not competitive. I'm not pitching you today. I just want to understand how you're thinking about the lead quality problem and share what problem we're solving. If there's something worth exploring, we'll know pretty quickly."</p>
+  </div>
+
+  <div class="callout callout-green">
+    <div class="callout-title">Why This Opening Works</div>
+    <p>It's honest. It removes pressure. It positions the conversation as peer-to-peer between people who understand the industry. And it signals you respect their time — which earns you more of it.</p>
+  </div>
+
+  <hr>
+
+  <!-- WHAT TO TALK ABOUT -->
+  <div class="section-label">The Conversation</div>
+  <h1>What to Talk About</h1>
+  <p>These are your three talking points. Each one is designed to invite them to react — not to explain the product.</p>
+
+  <ol class="steps">
+    <li>
+      <strong>Lead quality, not lead volume</strong>
+      <p>"The employment firms we talk to aren't asking for more leads. They're asking for better-organized leads. The intake handoff is broken — workers submit contact forms, firms call back days later, half the information is missing. We're focused on that gap." <span class="hl">Then stop. Let them react.</span> They know this problem. Let them say it back to you.</p>
+    </li>
+    <li>
+      <strong>The worker-first angle</strong>
+      <p>"Most lead gen is built for the firm — it's about getting attorneys in front of clients. We came at it from the other direction: what does a worker actually need to get their situation in front of an attorney in a way that gets taken seriously? That reframe leads somewhere different." This is interesting enough to create curiosity without revealing what the product actually does.</p>
+    </li>
+    <li>
+      <strong>The niche focus</strong>
+      <p>"We're starting in plaintiff employment — retaliation, wrongful termination, wage-and-hour. It's a segment with high volume, real document complexity, and firms that are selective about what they take. That selectivity creates an interesting intake problem." Shows domain knowledge and focus without showing the product.</p>
+    </li>
+  </ol>
+
+  <hr>
+
+  <!-- THE ONE QUESTION -->
+  <div class="section-label">The Power Move</div>
+  <h1>The One Question to Ask</h1>
+
+  <div class="script-block">
+    <div class="script-block-label">Ask This — Then Listen</div>
+    <p>"From where you sit — what's the biggest drop-off point between a worker submitting a lead and a firm actually engaging them?"</p>
+  </div>
+
+  <div class="callout callout-purple">
+    <div class="callout-title">Why This Question Wins the Call</div>
+    <p>Their answer tells you everything: whether they see the same problem you're solving, how sophisticated their thinking is, and whether there's a natural story about how one3Seven fits alongside their lead flow. It also makes them feel heard — you're asking for their expertise, not just selling at them. <strong>Take notes. Their answer is market research.</strong></p>
+  </div>
+
+  <hr>
+
+  <!-- HOW TO CLOSE -->
+  <div class="section-label">The Close</div>
+  <h1>How to End the Call</h1>
+
+  <div class="script-block">
+    <div class="script-block-label">Closing Line — Say This</div>
+    <p>"I'd love to get our founders on a call with you once we're a little further along — just to show you what we've built and get your honest reaction. You know this space better than almost anyone. Your feedback would actually be useful to us, not just a sales conversation."</p>
+  </div>
+
+  <div class="callout callout-green">
+    <div class="callout-title">Why This Close Works</div>
+    <p>You're asking for their expertise, not their business. That framing keeps the relationship warm, removes the pressure of a sales ask, and makes the second call about them — which means they're more likely to say yes.</p>
+  </div>
+
+  <hr>
+
+</div>
+
+<!-- PAGE 2 -->
+<div class="page page-break">
+
+  <!-- THE ONE-LINER IF THEY PUSH -->
+  <div class="section-label">If They Ask What You're Building</div>
+  <h1>The One-Liner (And Nothing More)</h1>
+  <p>If they push for a product description before you're ready to share details, use exactly this:</p>
+
+  <div class="script-block">
+    <div class="script-block-label">Product Description — One Sentence Only</div>
+    <p>"We help employment workers organize and submit their records so attorneys receive a structured intake instead of a phone call. Think of it as the layer between the lead and the consultation."</p>
+  </div>
+
+  <p>That's accurate, it's interesting, and it doesn't give away anything proprietary. If they want more — that's the second call. Say: <span class="hl">"I'd rather show you than describe it — can we get 30 minutes on the calendar?"</span></p>
+
+  <hr>
+
+  <!-- SAY / DON'T -->
+  <div class="section-label">Full Reference</div>
+  <h1>What to Say vs. What to Never Say</h1>
+
+  <div class="say-dont">
+    <div class="say-col">
+      <div class="say-header">✓ Say This</div>
+      <ul class="say-list">
+        <li>"The intake handoff is broken — we're focused on that gap"</li>
+        <li>"We came at it from the worker's side, not the firm's side"</li>
+        <li>"Complementary to what you do, not competitive"</li>
+        <li>"Starting in plaintiff employment — retaliation, wage-and-hour"</li>
+        <li>"Firms receive a structured intake instead of a phone call"</li>
+        <li>"The layer between the lead and the consultation"</li>
+        <li>"I want to understand how you see the space"</li>
+        <li>"Your feedback would be useful to us"</li>
+        <li>"We're a little further along — can we get 30 minutes?"</li>
+      </ul>
+    </div>
+    <div class="dont-col">
+      <div class="dont-header">✗ Never Say This</div>
+      <ul class="dont-list">
+        <li>"We use AI / Claude / Anthropic to read documents"</li>
+        <li>"We extract facts from PDFs automatically"</li>
+        <li>"We built a Verified Facts feature"</li>
+        <li>Anything about the tech stack or infrastructure</li>
+        <li>"We're building a competitor to your intake product"</li>
+        <li>Your pricing model or revenue structure</li>
+        <li>Specific firm clients or firm names</li>
+        <li>Worker names or any intake data</li>
+        <li>"We score or rank cases for firms"</li>
+        <li>"The AI tells attorneys what cases to take"</li>
+        <li>Funding status or runway</li>
+        <li>How many intakes are live in the system</li>
+      </ul>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- TOPICS TO AVOID ENTIRELY -->
+  <div class="section-label">Hard Stops</div>
+  <h1>Topics to Avoid Entirely on This Call</h1>
+  <p>These topics either reveal too much, create the wrong impression, or open conversations you're not ready to have yet.</p>
+
+  <div class="callout callout-red no-break">
+    <div class="callout-title">🚫 Do Not Discuss: The AI Layer</div>
+    <p>The AI extraction feature is one3Seven's most defensible technology. Describing it in a first call — before NDAs or trust are established — hands a well-resourced competitor a roadmap. The phrase "AI-powered intake" is fine as concept. The mechanics are off-limits.</p>
+  </div>
+
+  <div class="callout callout-red no-break">
+    <div class="callout-title">🚫 Do Not Discuss: Partnership Structure or Revenue Share</div>
+    <p>Martindale-Avvo will immediately want to know "what's in it for us." If you answer that question on the first call, you've started a negotiation you're not prepared for. Keep it at: "That's a conversation for when we're both clear on whether there's a fit."</p>
+  </div>
+
+  <div class="callout callout-red no-break">
+    <div class="callout-title">🚫 Do Not Discuss: Current Client or Firm List</div>
+    <p>Even if it would impress them — the firms currently using the platform are confidential. Namedropping creates liability and violates the trust those firms placed in you.</p>
+  </div>
+
+  <div class="callout callout-red no-break">
+    <div class="callout-title">🚫 Do Not Discuss: Exclusivity or White-Label</div>
+    <p>They may fish for this — "could we be your exclusive employment law partner?" or "could this be Avvo-branded?" Don't engage with that yet. The answer is: "That's worth a real conversation — let's get the right people in the room first."</p>
+  </div>
+
+  <div class="callout callout-red no-break">
+    <div class="callout-title">🚫 Do Not Discuss: Weaknesses or What's Not Built Yet</div>
+    <p>No integrations, no volume stats, no "we're still figuring out X." First calls are about fit and curiosity. Save the honest warts-and-all conversation for when there's mutual interest and an NDA.</p>
+  </div>
+
+  <hr>
+
+  <!-- IF IT GOES WELL / BADLY -->
+  <div class="section-label">Reading the Room</div>
+  <h1>How to Read the Call</h1>
+
+  <div class="grid-2">
+    <div class="callout callout-green" style="margin:0;">
+      <div class="callout-title">🟢 It's Going Well If...</div>
+      <p style="font-size:12px;">They're asking questions about how it works. They're telling you about their own lead quality problem. They mention specific attorneys or firm types. They say "that's interesting" or "I hadn't thought about it that way." They ask who else is in the space.</p>
+      <br>
+      <p style="font-size:12px;"><strong>Do:</strong> Keep listening. Ask follow-up questions. End by booking the second call before you hang up.</p>
+    </div>
+    <div class="callout callout-amber" style="margin:0;">
+      <div class="callout-title">🟡 Pump the Brakes If...</div>
+      <p style="font-size:12px;">They start asking about pricing, volume guarantees, or tech details. They mention their own intake product. They ask if you're raising money. They want to loop in their boss immediately.</p>
+      <br>
+      <p style="font-size:12px;"><strong>Do:</strong> Slow down. "That's a great question for a second conversation — I want to make sure the right people are in the room." Get off the call cleanly.</p>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- OBJECTION HANDLING -->
+  <div class="section-label">If They Push Back</div>
+  <h1>Quick Objection Responses</h1>
+
+  <div class="objection no-break">
+    <div class="objection-q">❓ "We already have an intake product — why would we need this?"</div>
+    <div class="objection-a">"That's exactly the conversation I want to have. Your intake product captures the lead — ours is what happens after. If there's a fit, it's additive. I'd rather show you and let you decide."</div>
+  </div>
+
+  <div class="objection no-break">
+    <div class="objection-q">❓ "How is this different from what we already do?"</div>
+    <div class="objection-a">"You connect workers to attorneys. We organize what the worker brings so the attorney can actually evaluate it. Different problem, different layer — which is why I used the word complementary."</div>
+  </div>
+
+  <div class="objection no-break">
+    <div class="objection-q">❓ "Can you just send me a deck?"</div>
+    <div class="objection-a">"I'll send you something, but honestly a 20-minute call with our founder is more useful than a deck at this stage — the product is easier to see than describe. Can we find 20 minutes in the next two weeks?"</div>
+  </div>
+
+  <div class="objection no-break">
+    <div class="objection-q">❓ "We'd want exclusivity in the legal space."</div>
+    <div class="objection-a">"That's a real conversation worth having — with the right people in the room and some mutual understanding of what we're each bringing. Let's get to that second call first."</div>
+  </div>
+
+  <hr>
+
+  <!-- CALL CHECKLIST -->
+  <div class="section-label">Before You Dial</div>
+  <h1>Pre-Call Checklist</h1>
+
+  <table style="width:100%; border-collapse:collapse; font-size:12px;">
+    <tr style="background:#1e1b4b; color:#fff;">
+      <th style="padding:8px 12px; text-align:left; font-size:11px;">Item</th>
+      <th style="padding:8px 12px; text-align:left; font-size:11px;">Why It Matters</th>
+    </tr>
+    <tr>
+      <td style="padding:8px 12px; border-bottom:1px solid #f3f4f6;">Know the contact's exact role at Martindale-Avvo</td>
+      <td style="padding:8px 12px; border-bottom:1px solid #f3f4f6;">Shapes how much detail you share and what angle lands</td>
+    </tr>
+    <tr style="background:#fafafa;">
+      <td style="padding:8px 12px; border-bottom:1px solid #f3f4f6;">Review their LinkedIn — what have they worked on?</td>
+      <td style="padding:8px 12px; border-bottom:1px solid #f3f4f6;">Gives you a bridge: "I saw you worked on X — that's exactly the space we're in"</td>
+    </tr>
+    <tr>
+      <td style="padding:8px 12px; border-bottom:1px solid #f3f4f6;">Know the one-sentence product description cold</td>
+      <td style="padding:8px 12px; border-bottom:1px solid #f3f4f6;">You'll need it if they push — have it ready, nothing more</td>
+    </tr>
+    <tr style="background:#fafafa;">
+      <td style="padding:8px 12px; border-bottom:1px solid #f3f4f6;">Have a calendar link ready to send immediately</td>
+      <td style="padding:8px 12px; border-bottom:1px solid #f3f4f6;">Book the second call while the call is warm — don't follow up later</td>
+    </tr>
+    <tr>
+      <td style="padding:8px 12px; border-bottom:1px solid #f3f4f6;">Know who at one3Seven would lead the second call</td>
+      <td style="padding:8px 12px; border-bottom:1px solid #f3f4f6;">"I'll connect you directly with our founder" lands better than vague next steps</td>
+    </tr>
+    <tr style="background:#fafafa;">
+      <td style="padding:8px 12px;">Have this guide open in front of you</td>
+      <td style="padding:8px 12px;">It's a reference, not a script — glance at what NOT to say if the call gets interesting</td>
+    </tr>
+  </table>
+
+  <div class="footer">
+    one3Seven · Martindale-Avvo Call Playbook · Confidential — For Internal Use Only<br>
+    Questions before the call? Run it by the product team first.
+  </div>
+
+</div>
+</body>
+</html>
