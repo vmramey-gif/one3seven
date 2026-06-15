@@ -670,14 +670,51 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, firm
               )}
             </motion.div>
 
-            {/* Right: visual */}
+            {/* Right: static hero visual */}
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.7, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
               className="flex justify-center"
             >
-              <IntakeTransformVisual />
+              <div className="w-full max-w-[420px] rounded-[24px] bg-gradient-to-br from-[#1E1B4B] to-[#2D1F6E] p-6 shadow-[0_32px_80px_rgba(0,0,0,.45)]">
+                {/* Header */}
+                <div className="mb-5 flex items-center justify-between">
+                  <div>
+                    <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#A78BFA]">one3Seven</div>
+                    <div className="mt-0.5 text-[15px] font-bold text-white">Your case, organized.</div>
+                  </div>
+                  <div className="rounded-full bg-emerald-500/20 border border-emerald-500/30 px-3 py-1 text-[10px] font-bold text-emerald-400">Ready</div>
+                </div>
+                {/* Doc checklist */}
+                <div className="mb-4 space-y-2">
+                  {[
+                    { label: 'Intake Form', done: true },
+                    { label: 'Pay Stub + Employment', done: true },
+                    { label: 'Police Report + Evidence', done: true },
+                    { label: 'Messages + Calendar', done: true },
+                  ].map((d) => (
+                    <div key={d.label} className="flex items-center gap-3 rounded-xl bg-white/8 px-3 py-2.5">
+                      <div className="h-5 w-5 rounded-md bg-white/10" />
+                      <span className="flex-1 text-[13px] text-white/80">{d.label}</span>
+                      <div className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 text-[10px] font-bold text-white">✓</div>
+                    </div>
+                  ))}
+                </div>
+                {/* Send button */}
+                <div className="mb-4 rounded-full bg-gradient-to-r from-[#6D4AFF] to-[#7C3AED] py-3 text-center text-[14px] font-bold text-white shadow-[0_8px_24px_rgba(109,74,255,0.4)]">
+                  Send to Firms
+                </div>
+                {/* Firm cards */}
+                <div className="grid grid-cols-3 gap-2">
+                  {['LEE & HOWARD', 'RIVERA PARTNERS', 'MURPHY & ASSOC.'].map((f) => (
+                    <div key={f} className="rounded-xl border border-[#A78BFA]/20 bg-white/5 p-2 text-center">
+                      <div className="text-[8px] font-bold text-white/70 leading-tight">{f}</div>
+                      <div className="mt-1.5 rounded-full bg-[#6D4AFF]/30 py-0.5 text-[7px] font-semibold text-[#A78BFA]">Received ✓</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </motion.div>
           </div>
         </div>
