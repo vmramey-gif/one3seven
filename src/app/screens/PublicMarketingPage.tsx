@@ -563,7 +563,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, firm
       </nav>
 
       {/* ── HERO ── */}
-      <section className="relative overflow-hidden bg-[#FAFAFF] px-5 pb-16 pt-14 sm:px-8 sm:pb-24 sm:pt-20 hidden">
+      <section className="relative overflow-hidden bg-[#FAFAFF] px-5 pb-16 pt-14 sm:px-8 sm:pb-24 sm:pt-20">
         {/* Background blobs — slow drift */}
         <motion.div
           className="pointer-events-none absolute -left-32 -top-32 h-[500px] w-[500px] rounded-full bg-[#6D4AFF]/5 blur-3xl"
