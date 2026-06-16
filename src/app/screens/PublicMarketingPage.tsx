@@ -399,6 +399,319 @@ function IntakeTransformVisual() {
 
 
 
+// ── WorkerWorkflowScroll ─────────────────────────────────────────────────────
+function WorkerWorkflowScroll() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const rafRef = useRef<number | null>(null);
+  const prefersReduced = useReducedMotion() ?? false;
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container || prefersReduced) return;
+
+    const cv = container.querySelector('canvas') as HTMLCanvasElement;
+    const ctx = cv.getContext('2d')!;
+    const card     = container.querySelector('.ww-card') as HTMLElement;
+    const inNum    = container.querySelector('.ww-num') as HTMLElement;
+    const inTit    = container.querySelector('.ww-title') as HTMLElement;
+    const inBod    = container.querySelector('.ww-body') as HTMLElement;
+    const tfill    = container.querySelector('.ww-fill') as HTMLElement;
+    const tthumb   = container.querySelector('.ww-thumb') as HTMLElement;
+    const track    = container.querySelector('.ww-track') as HTMLElement;
+    const hint     = container.querySelector('.ww-hint') as HTMLElement;
+    const pips     = container.querySelectorAll('.ww-pip') as NodeListOf<HTMLElement>;
+
+    function resize() {
+      const r = devicePixelRatio || 1;
+      const w = container.clientWidth;
+      const h = Math.round(w * 9 / 16);
+      container.style.height = h + 'px';
+      cv.width = w * r; cv.height = h * r;
+      ctx.setTransform(r, 0, 0, r, 0, 0);
+    }
+    resize();
+    const ro = new ResizeObserver(resize);
+    ro.observe(container);
+
+    const W = () => container.clientWidth;
+    const H = () => container.clientHeight;
+
+    function toAnimP(raw: number) {
+      if (raw < 0.28) return lerp(0, 0.18, raw / 0.28);
+      if (raw < 0.45) return lerp(0.18, 0.4, (raw - 0.28) / 0.17);
+      if (raw < 0.65) return lerp(0.4, 0.58, (raw - 0.45) / 0.20);
+      if (raw < 0.82) return lerp(0.58, 0.8, (raw - 0.65) / 0.17);
+      return lerp(0.8, 1.0, (raw - 0.82) / 0.18);
+    }
+
+    const INFOS = [
+      { lo: 0,   hi: .28, num: 'Step 1 of 3', title: 'Worker uploads their documents', body: 'Pay stubs, HR complaints, texts, medical records — uploaded directly from their phone in minutes. No preparation required.', step: 0 },
+      { lo: .28, hi: .45, num: '', title: '', body: '', step: -1 },
+      { lo: .45, hi: .65, num: 'Step 2 of 3', title: 'AI organizes your record', body: 'one3Seven clusters your documents, flags missing items, extracts key dates, and surfaces time-sensitive events automatically.', step: 1 },
+      { lo: .65, hi: .82, num: '', title: '', body: '', step: -1 },
+      { lo: .82, hi: 1.0, num: 'Step 3 of 3', title: 'Firms receive a structured intake', body: 'Attorneys open a clean, organized packet before the first consultation — no sorting, no follow-up calls needed.', step: 2 },
+    ];
+
+    let rawP = 0, renderP = 0, lastInfo = -1;
+
+    function setRaw(v: number) {
+      rawP = Math.max(0, Math.min(1, v));
+      tfill.style.width = (rawP * 100) + '%';
+      tthumb.style.left = (rawP * 100) + '%';
+      if (rawP > 0.02) hint.style.opacity = '0';
+      const info = INFOS.find(x => rawP <= x.hi) || INFOS[INFOS.length - 1];
+      if (info.step !== lastInfo) {
+        lastInfo = info.step;
+        if (info.step >= 0) {
+          inNum.textContent = info.num;
+          inTit.textContent = info.title;
+          inBod.textContent = info.body;
+          card.classList.add('show');
+          pips.forEach((p, i) => {
+            p.classList.remove('active', 'done');
+            if (i === info.step) p.classList.add('active');
+            else if (i < info.step) p.classList.add('done');
+          });
+        } else {
+          card.classList.remove('show');
+        }
+      }
+    }
+
+    const eOut = (t: number) => 1 - Math.pow(1 - t, 3);
+    const eIn  = (t: number) => t * t * t;
+    const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+    const cl   = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v));
+    const band = (p: number, lo: number, hi: number) => cl((p - lo) / (hi - lo), 0, 1);
+
+    const DOCS = [
+      { label: 'Intake Form',  icon: '📋', a: 0   }, { label: 'Pay Stub',     icon: '💵', a: 45  },
+      { label: 'Police Rpt',   icon: '🗂',  a: 90  }, { label: 'HR Complaint', icon: '📄', a: 135 },
+      { label: 'Texts',        icon: '💬', a: 180 }, { label: 'Medical',      icon: '🏥', a: 225 },
+      { label: 'Calendar',     icon: '📅', a: 270 }, { label: 'Employment',   icon: '💼', a: 315 },
+    ];
+    const FIRMS = [
+      { name: 'Lee & Howard LLC', tag: 'Employment Law' },
+      { name: 'Rivera Partners',  tag: 'Civil Rights · Labor' },
+      { name: 'Murphy & Assoc.',  tag: 'Wrongful Termination' },
+    ];
+    const CHECKS = ['Intake Form', 'Pay Stub + Employment', 'Police Report + Evidence', 'Messages + Calendar'];
+
+    function rr(x: number, y: number, w: number, h: number, r: number, fl?: string | null, st?: string | null, sw = 1) {
+      ctx.beginPath(); ctx.roundRect(x, y, w, h, r);
+      if (fl) { ctx.fillStyle = fl; ctx.fill(); }
+      if (st) { ctx.strokeStyle = st; ctx.lineWidth = sw; ctx.stroke(); }
+    }
+    function tx(s: string, x: number, y: number, sz: number, col: string, al: CanvasTextAlign = 'center', wt = '400') {
+      ctx.font = `${wt} ${sz}px -apple-system,sans-serif`;
+      ctx.fillStyle = col; ctx.textAlign = al; ctx.fillText(s, x, y);
+    }
+
+    function drawDoc(x: number, y: number, label: string, icon: string, alpha: number, scale = 1, rot = 0) {
+      const cw = 86, ch = 56;
+      ctx.save(); ctx.translate(x, y); ctx.rotate(rot); ctx.scale(scale, scale); ctx.globalAlpha = alpha;
+      rr(-cw/2, -ch/2, cw, ch, 10, 'rgba(45,31,110,.95)', 'rgba(109,74,255,.45)');
+      ctx.font = '16px serif'; ctx.textAlign = 'center'; ctx.fillText(icon, 0, -7);
+      tx(label, 0, 12, 7.5, 'rgba(255,255,255,.72)');
+      ctx.restore();
+    }
+
+    function drawPhone(x: number, y: number, alpha: number, checkP: number) {
+      const pw = 150, ph = 248, pr = 16;
+      ctx.save(); ctx.globalAlpha = alpha;
+      rr(x-pw/2, y-ph/2, pw, ph, pr, '#1A1340', 'rgba(109,74,255,.55)', 1.5);
+      rr(x-18, y-ph/2+5, 36, 8, 4, '#0E0B26');
+      ctx.fillStyle = 'rgba(109,74,255,.8)'; ctx.fillRect(x-pw/2+2, y-ph/2+17, pw-4, 28);
+      tx('one3seven', x, y-ph/2+34, 10, '#fff', 'center', '500');
+      tx('Your case, organized.', x, y-ph/2+53, 8, 'rgba(255,255,255,.55)');
+      tx('8 documents · Ready to send', x, y-ph/2+65, 7.5, 'rgba(255,255,255,.35)');
+      const sy = y - ph/2 + 80;
+      CHECKS.forEach((c, i) => {
+        const iy = sy + i * 32, p2 = cl((checkP * 4) - i, 0, 1);
+        rr(x-pw/2+7, iy, pw-14, 26, 7, 'rgba(255,255,255,.055)');
+        rr(x-pw/2+13, iy+6, 13, 13, 4, p2 > .5 ? '#34D399' : 'rgba(255,255,255,.07)', p2 > .5 ? '#34D399' : 'rgba(255,255,255,.18)');
+        if (p2 > .5) tx('✓', x-pw/2+19.5, iy+16, 9, '#fff', 'center', '500');
+        tx(c, x-pw/2+33, iy+15.5, 8, 'rgba(255,255,255,.72)', 'left');
+        if (p2 > .5) { ctx.beginPath(); ctx.arc(x+pw/2-15, iy+12, 4, 0, Math.PI*2); ctx.fillStyle = '#34D399'; ctx.fill(); }
+      });
+      const bvy = y + ph/2 - 38, ba = cl((checkP - .7) / .3, 0, 1);
+      if (ba > 0) { ctx.globalAlpha = alpha * ba; rr(x-pw/2+8, bvy, pw-16, 24, 12, '#6D4AFF'); tx('Send to Firms', x, bvy+15, 9.5, '#fff', 'center', '500'); ctx.globalAlpha = alpha; }
+      ctx.restore();
+    }
+
+    function drawFirm(x: number, y: number, name: string, tag: string, alpha: number, recv: number) {
+      const fw = 124, fh = 68;
+      ctx.save(); ctx.globalAlpha = alpha;
+      rr(x-fw/2, y-fh/2, fw, fh, 12, 'rgba(26,19,64,.95)', recv > 0 ? 'rgba(52,211,153,.5)' : 'rgba(109,74,255,.3)', recv > 0 ? 1.5 : 1);
+      tx(name, x, y-9, 8, 'rgba(255,255,255,.9)', 'center', '500');
+      tx(tag, x, y+3.5, 7, 'rgba(255,255,255,.4)');
+      if (recv > 0) { ctx.globalAlpha = alpha * recv; rr(x-34, y+12, 68, 15, 7, 'rgba(52,211,153,.18)'); tx('Case Received ✓', x, y+22, 7.5, '#34D399', 'center', '500'); }
+      ctx.restore();
+    }
+
+    interface Sparkle { x: number; y: number; vx: number; vy: number; life: number; sz: number; col: string; }
+    let sparkles: Sparkle[] = [], firmReceived = [0, 0, 0], lastTs = 0;
+
+    function addSp(x: number, y: number, n = 4) {
+      for (let i = 0; i < n; i++) {
+        const a = Math.random() * Math.PI * 2, sp = 25 + Math.random() * 50;
+        sparkles.push({ x, y, vx: Math.cos(a)*sp, vy: Math.sin(a)*sp, life: 1, sz: 2 + Math.random()*2.5, col: Math.random() < .5 ? '#A78BFA' : '#34D399' });
+      }
+    }
+
+    function frame(ts: number) {
+      const dt = Math.min((ts - lastTs) / 1000, .05); lastTs = ts;
+      renderP = lerp(renderP, toAnimP(rawP), .12);
+      const p = renderP, cw = W(), ch = H(), cx = cw/2, cy = ch/2;
+      ctx.clearRect(0, 0, cw, ch);
+      const g = ctx.createRadialGradient(cx, cy*.7, 0, cx, cy, Math.max(cw,ch)*.7);
+      g.addColorStop(0, '#2D1F6E'); g.addColorStop(1, '#0E0B26');
+      ctx.fillStyle = g; ctx.fillRect(0, 0, cw, ch);
+
+      if (p < .42) {
+        DOCS.forEach((d, i) => {
+          const delay = i / DOCS.length * .4, tIn = cl((band(p, 0, .18) - delay) / (1 - delay), 0, 1);
+          const ang = (d.a + i*4) * Math.PI/180, baseR = cw * .265;
+          if (p < .18) {
+            const fl = Math.sin(ts/700 + i) * 3;
+            drawDoc(cx + Math.cos(ang)*eOut(tIn)*baseR, cy + Math.sin(ang)*eOut(tIn)*baseR*.6 + fl, d.label, d.icon, eOut(Math.min(tIn*3, 1)), 1, (d.a/180 - .5)*.28);
+          } else {
+            const vd = i/DOCS.length*.35, t2v = cl((band(p, .18, .4) - vd) / (1 - vd), 0, 1);
+            const spin = eIn(t2v)*Math.PI*1.8, rNow = baseR*(1 - eOut(t2v));
+            drawDoc(cx + Math.cos(ang+spin)*rNow, cy + Math.sin(ang+spin)*rNow*.6, d.label, d.icon, Math.max(1 - eOut(Math.max(t2v-.55,0)/.45), 0), 1 - eOut(t2v)*.65);
+          }
+        });
+        if (p >= .18) {
+          const vt = band(p, .18, .4), va = vt * .65;
+          const vg = ctx.createRadialGradient(cx, cy, 0, cx, cy, 72*vt);
+          vg.addColorStop(0, `rgba(109,74,255,${va})`); vg.addColorStop(1, 'rgba(109,74,255,0)');
+          ctx.fillStyle = vg; ctx.beginPath(); ctx.arc(cx, cy, 72*vt, 0, Math.PI*2); ctx.fill();
+          for (let r = 0; r < 3; r++) {
+            const rp = (vt*1.2 + r/3) % 1;
+            ctx.beginPath(); ctx.arc(cx, cy, rp*88, 0, Math.PI*2);
+            ctx.strokeStyle = `rgba(167,139,250,${(1-rp)*.4})`; ctx.lineWidth = 1.5; ctx.stroke();
+          }
+        }
+      }
+
+      if (p >= .32 && p < .65) {
+        drawPhone(cx, cy, eOut(band(p, .36, .5)), band(p, .45, .62));
+        if (band(p, .45, .62) > .95 && Math.random() < .05) addSp(cx + lerp(-50,50,Math.random()), cy + lerp(-60,60,Math.random()), 2);
+      }
+
+      if (p >= .58) {
+        const phoneA = cl(1 - band(p, .65, .8)*2.5, 0, 1);
+        if (p < .82) drawPhone(cx, cy, Math.max(phoneA, 0), 1);
+        const fy = cy + ch*.13, fxs = [cx - cw*.24, cx, cx + cw*.24];
+        fxs.forEach((fx, i) => {
+          const delay = i * .07, t2v = band(p, .62 + delay, .8);
+          if (p < .82) drawFirm(fx, fy, FIRMS[i].name, FIRMS[i].tag, eOut(t2v), 0);
+          if (t2v > 0 && t2v < 1) {
+            const px = lerp(cx, fx, eOut(t2v)), py = lerp(cy-22, fy-33, eOut(t2v)) - Math.sin(t2v*Math.PI)*ch*.12;
+            ctx.save(); ctx.translate(px, py); ctx.rotate(Math.atan2((fy-33)-(cy-22), (fx-cx))*.7);
+            ctx.fillStyle = '#A78BFA'; ctx.beginPath(); ctx.moveTo(11,0); ctx.lineTo(-5,-4); ctx.lineTo(-2,0); ctx.lineTo(-5,4); ctx.closePath(); ctx.fill(); ctx.restore();
+            if (t2v > .88) addSp(fx, fy-28, 1);
+          }
+          if (p >= .8) { firmReceived[i] = Math.min(firmReceived[i] + dt*3, band(p, .8, .97)); drawFirm(fx, fy, FIRMS[i].name, FIRMS[i].tag, 1, firmReceived[i]); }
+          if (p > .84 && p < .92 && Math.random() < .03) addSp(fx, fy, 1);
+        });
+      }
+
+      sparkles = sparkles.filter(s => s.life > 0);
+      sparkles.forEach(s => {
+        s.x += s.vx*dt; s.y += s.vy*dt; s.life -= dt*2;
+        ctx.save(); ctx.globalAlpha = Math.max(s.life, 0); ctx.translate(s.x, s.y); ctx.fillStyle = s.col;
+        ctx.beginPath();
+        for (let i = 0; i < 8; i++) { const r2 = i%2===0 ? s.sz : s.sz*.35, a = i*Math.PI/4; i===0 ? ctx.moveTo(Math.cos(a)*r2, Math.sin(a)*r2) : ctx.lineTo(Math.cos(a)*r2, Math.sin(a)*r2); }
+        ctx.closePath(); ctx.fill(); ctx.restore();
+      });
+
+      if (rawP < .02) firmReceived = [0, 0, 0];
+      rafRef.current = requestAnimationFrame(frame);
+    }
+
+    // input handlers
+    const onWheel = (e: WheelEvent) => { e.preventDefault(); setRaw(rawP + e.deltaY / 900); };
+    wrap.addEventListener('wheel', onWheel, { passive: false });
+
+    let drag = false, dx0 = 0, dp0 = 0;
+    const onDown  = (e: MouseEvent) => { drag = true; dx0 = e.clientX; dp0 = rawP; };
+    const onTDown = (e: TouchEvent) => { drag = true; dx0 = e.touches[0].clientX; dp0 = rawP; };
+    const onMove  = (e: MouseEvent) => { if (drag) setRaw(dp0 + (e.clientX - dx0) / W()); };
+    const onTMove = (e: TouchEvent) => { if (drag) setRaw(dp0 + (e.touches[0].clientX - dx0) / W()); };
+    const onUp    = () => { drag = false; };
+    cv.addEventListener('mousedown', onDown);
+    cv.addEventListener('touchstart', onTDown, { passive: true });
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('touchmove', onTMove, { passive: true });
+    window.addEventListener('mouseup', onUp);
+    window.addEventListener('touchend', onUp);
+
+    let sdrag = false, sdx0 = 0, sdp0 = 0;
+    const onSDown  = (e: MouseEvent) => { sdrag = true; sdx0 = e.clientX; sdp0 = rawP; };
+    const onSTDown = (e: TouchEvent) => { sdrag = true; sdx0 = e.touches[0].clientX; sdp0 = rawP; };
+    const onSMove  = (e: MouseEvent) => { if (sdrag) setRaw(sdp0 + (e.clientX - sdx0) / track.clientWidth); };
+    const onSTMove = (e: TouchEvent) => { if (sdrag) setRaw(sdp0 + (e.touches[0].clientX - sdx0) / track.clientWidth); };
+    track.addEventListener('mousedown', onSDown);
+    track.addEventListener('touchstart', onSTDown, { passive: true });
+    window.addEventListener('mousemove', onSMove);
+    window.addEventListener('touchmove', onSTMove, { passive: true });
+    window.addEventListener('mouseup', () => { sdrag = false; });
+    window.addEventListener('touchend', () => { sdrag = false; });
+
+    const wrap = cv.parentElement as HTMLElement;
+
+    setRaw(0);
+    rafRef.current = requestAnimationFrame(frame);
+
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      ro.disconnect();
+      wrap.removeEventListener('wheel', onWheel);
+      cv.removeEventListener('mousedown', onDown);
+      cv.removeEventListener('touchstart', onTDown);
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('touchmove', onTMove);
+      window.removeEventListener('mouseup', onUp);
+      window.removeEventListener('touchend', onUp);
+      track.removeEventListener('mousedown', onSDown);
+      track.removeEventListener('touchstart', onSTDown);
+      window.removeEventListener('mousemove', onSMove);
+      window.removeEventListener('touchmove', onSTMove);
+    };
+  }, [prefersReduced]);
+
+  return (
+    <div
+      ref={containerRef}
+      className="relative w-full overflow-hidden rounded-[20px] cursor-grab active:cursor-grabbing"
+      style={{ background: '#0E0B26' }}
+    >
+      <canvas className="block w-full h-full" />
+      {/* Step pips */}
+      <div className="absolute top-3.5 left-1/2 -translate-x-1/2 flex gap-1.5 items-center">
+        {[0,1,2].map(i => <div key={i} className="ww-pip w-1.5 h-1.5 rounded-full bg-white/20 transition-all duration-300 [&.active]:bg-[#6D4AFF] [&.active]:w-5 [&.active]:rounded-sm [&.done]:bg-[#6D4AFF]/50" />)}
+      </div>
+      {/* Info card */}
+      <div className="absolute top-0 left-0 right-0 bottom-14 flex items-center justify-start px-8 pointer-events-none">
+        <div className="ww-card bg-[rgba(14,11,38,0.82)] border border-[rgba(109,74,255,0.3)] rounded-2xl p-4 max-w-[220px] opacity-0 translate-y-1.5 transition-all duration-300 [&.show]:opacity-100 [&.show]:translate-y-0">
+          <div className="ww-num text-[10px] font-bold text-[#A78BFA] tracking-widest uppercase mb-1.5" />
+          <div className="ww-title text-[14px] font-semibold text-white leading-snug mb-1.5" />
+          <div className="ww-body text-[11px] text-white/50 leading-relaxed" />
+        </div>
+      </div>
+      {/* Scrubber */}
+      <div className="absolute bottom-3.5 left-5 right-5 flex items-center gap-3">
+        <div className="ww-track relative flex-1 h-[3px] bg-white/10 rounded-full cursor-pointer">
+          <div className="ww-fill h-full bg-[#6D4AFF] rounded-full w-0" />
+          <div className="ww-thumb absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-[#6D4AFF] border-2 border-white left-0 cursor-grab" />
+        </div>
+        <div className="ww-hint text-[10px] text-white/30 uppercase tracking-widest whitespace-nowrap transition-opacity duration-500">drag to explore</div>
+      </div>
+    </div>
+  );
+}
+
 // ── InfoTooltip ──────────────────────────────────────────────────────────────
 function InfoTooltip({ tip }: { tip: string }) {
   const [open, setOpen] = useState(false);
@@ -790,27 +1103,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, firm
             </h2>
           </div>
 
-          <div className="grid gap-5 sm:grid-cols-3">
-            {HOW_IT_WORKS.map((step, i) => (
-              <motion.div
-                key={step.step}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.1, ease: [0.22, 1, 0.36, 1] }}
-                className={`relative overflow-hidden rounded-[24px] border p-7 cursor-default ${step.color}`}
-                whileHover={{ y: -6, boxShadow: '0 16px 40px rgba(30,27,75,0.10)' }}
-              >
-                <div className={`pointer-events-none absolute -right-2 -top-3 text-[88px] font-black leading-none select-none opacity-[0.07] ${step.accent}`}>{step.step}</div>
-                <div className={`mb-4 text-[13px] font-black tracking-widest ${step.accent}`}>{step.step}</div>
-                <h3 className="mb-3 text-[17px] font-bold leading-snug text-[#1E1B4B]">{step.title}</h3>
-                <p className="text-[13px] leading-relaxed text-[#1E1B4B]/60">{step.body}</p>
-                {i < HOW_IT_WORKS.length - 1 && (
-                  <ChevronRight className={`mt-5 h-5 w-5 ${step.accent} hidden sm:block`} />
-                )}
-              </motion.div>
-            ))}
-          </div>
+          <WorkerWorkflowScroll />
         </div>
       </section>
 
