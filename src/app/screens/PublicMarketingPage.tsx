@@ -413,10 +413,10 @@ function WorkerWorkflowScroll() {
 
     const cv    = panel.querySelector('canvas') as HTMLCanvasElement;
     const ctx   = cv.getContext('2d')!;
-    const card  = panel.querySelector('.ww-card') as HTMLElement;
-    const inNum = panel.querySelector('.ww-num') as HTMLElement;
-    const inTit = panel.querySelector('.ww-title') as HTMLElement;
-    const inBod = panel.querySelector('.ww-body') as HTMLElement;
+    const cards = panel.querySelectorAll('.ww-card') as NodeListOf<HTMLElement>;
+    const nums  = panel.querySelectorAll('.ww-num') as NodeListOf<HTMLElement>;
+    const tits  = panel.querySelectorAll('.ww-title') as NodeListOf<HTMLElement>;
+    const bods  = panel.querySelectorAll('.ww-body') as NodeListOf<HTMLElement>;
     const pips  = panel.querySelectorAll('.ww-pip') as NodeListOf<HTMLElement>;
 
     function resize() {
@@ -456,17 +456,17 @@ function WorkerWorkflowScroll() {
       if (info.step !== lastInfo) {
         lastInfo = info.step;
         if (info.step >= 0) {
-          inNum.textContent = info.num;
-          inTit.textContent = info.title;
-          inBod.textContent = info.body;
-          card.classList.add('show');
+          nums.forEach(el => el.textContent = info.num);
+          tits.forEach(el => el.textContent = info.title);
+          bods.forEach(el => el.textContent = info.body);
+          cards.forEach(el => el.classList.add('show'));
           pips.forEach((p, i) => {
             p.classList.remove('active', 'done');
             if (i === info.step) p.classList.add('active');
             else if (i < info.step) p.classList.add('done');
           });
         } else {
-          card.classList.remove('show');
+          cards.forEach(el => el.classList.remove('show'));
         }
       }
     }
@@ -500,45 +500,48 @@ function WorkerWorkflowScroll() {
       ctx.fillStyle = col; ctx.textAlign = al; ctx.fillText(s, x, y);
     }
 
+    // scale factor so all canvas drawing is proportional on any screen size
+    const sc = () => Math.min(W(), 640) / 640;
+
     function drawDoc(x: number, y: number, label: string, icon: string, alpha: number, scale = 1, rot = 0) {
-      const cw = 86, ch = 56;
+      const s = sc(), cw = 86*s, ch = 56*s;
       ctx.save(); ctx.translate(x, y); ctx.rotate(rot); ctx.scale(scale, scale); ctx.globalAlpha = alpha;
-      rr(-cw/2, -ch/2, cw, ch, 10, 'rgba(45,31,110,.95)', 'rgba(109,74,255,.45)');
-      ctx.font = '16px serif'; ctx.textAlign = 'center'; ctx.fillText(icon, 0, -7);
-      tx(label, 0, 12, 7.5, 'rgba(255,255,255,.72)');
+      rr(-cw/2, -ch/2, cw, ch, 10*s, 'rgba(45,31,110,.95)', 'rgba(109,74,255,.45)');
+      ctx.font = `${16*s}px serif`; ctx.textAlign = 'center'; ctx.fillText(icon, 0, -7*s);
+      tx(label, 0, 12*s, 7.5*s, 'rgba(255,255,255,.72)');
       ctx.restore();
     }
 
     function drawPhone(x: number, y: number, alpha: number, checkP: number) {
-      const pw = 150, ph = 248, pr = 16;
+      const s = sc(), pw = 150*s, ph = 248*s, pr = 16*s;
       ctx.save(); ctx.globalAlpha = alpha;
       rr(x-pw/2, y-ph/2, pw, ph, pr, '#1A1340', 'rgba(109,74,255,.55)', 1.5);
-      rr(x-18, y-ph/2+5, 36, 8, 4, '#0E0B26');
-      ctx.fillStyle = 'rgba(109,74,255,.8)'; ctx.fillRect(x-pw/2+2, y-ph/2+17, pw-4, 28);
-      tx('one3seven', x, y-ph/2+34, 10, '#fff', 'center', '500');
-      tx('Your case, organized.', x, y-ph/2+53, 8, 'rgba(255,255,255,.55)');
-      tx('8 documents · Ready to send', x, y-ph/2+65, 7.5, 'rgba(255,255,255,.35)');
-      const sy = y - ph/2 + 80;
+      rr(x-18*s, y-ph/2+5*s, 36*s, 8*s, 4, '#0E0B26');
+      ctx.fillStyle = 'rgba(109,74,255,.8)'; ctx.fillRect(x-pw/2+2, y-ph/2+17*s, pw-4, 28*s);
+      tx('one3seven', x, y-ph/2+34*s, 10*s, '#fff', 'center', '500');
+      tx('Your case, organized.', x, y-ph/2+53*s, 8*s, 'rgba(255,255,255,.55)');
+      tx('8 documents · Ready to send', x, y-ph/2+65*s, 7.5*s, 'rgba(255,255,255,.35)');
+      const sy = y - ph/2 + 80*s;
       CHECKS.forEach((c, i) => {
-        const iy = sy + i * 32, p2 = cl((checkP * 4) - i, 0, 1);
-        rr(x-pw/2+7, iy, pw-14, 26, 7, 'rgba(255,255,255,.055)');
-        rr(x-pw/2+13, iy+6, 13, 13, 4, p2 > .5 ? '#34D399' : 'rgba(255,255,255,.07)', p2 > .5 ? '#34D399' : 'rgba(255,255,255,.18)');
-        if (p2 > .5) tx('✓', x-pw/2+19.5, iy+16, 9, '#fff', 'center', '500');
-        tx(c, x-pw/2+33, iy+15.5, 8, 'rgba(255,255,255,.72)', 'left');
-        if (p2 > .5) { ctx.beginPath(); ctx.arc(x+pw/2-15, iy+12, 4, 0, Math.PI*2); ctx.fillStyle = '#34D399'; ctx.fill(); }
+        const iy = sy + i * 32*s, p2 = cl((checkP * 4) - i, 0, 1);
+        rr(x-pw/2+7*s, iy, pw-14*s, 26*s, 7, 'rgba(255,255,255,.055)');
+        rr(x-pw/2+13*s, iy+6*s, 13*s, 13*s, 4, p2 > .5 ? '#34D399' : 'rgba(255,255,255,.07)', p2 > .5 ? '#34D399' : 'rgba(255,255,255,.18)');
+        if (p2 > .5) tx('✓', x-pw/2+19.5*s, iy+16*s, 9*s, '#fff', 'center', '500');
+        tx(c, x-pw/2+33*s, iy+15.5*s, 8*s, 'rgba(255,255,255,.72)', 'left');
+        if (p2 > .5) { ctx.beginPath(); ctx.arc(x+pw/2-15*s, iy+12*s, 4, 0, Math.PI*2); ctx.fillStyle = '#34D399'; ctx.fill(); }
       });
-      const bvy = y + ph/2 - 38, ba = cl((checkP - .7) / .3, 0, 1);
-      if (ba > 0) { ctx.globalAlpha = alpha * ba; rr(x-pw/2+8, bvy, pw-16, 24, 12, '#6D4AFF'); tx('Send to Firms', x, bvy+15, 9.5, '#fff', 'center', '500'); ctx.globalAlpha = alpha; }
+      const bvy = y + ph/2 - 38*s, ba = cl((checkP - .7) / .3, 0, 1);
+      if (ba > 0) { ctx.globalAlpha = alpha * ba; rr(x-pw/2+8*s, bvy, pw-16*s, 24*s, 12, '#6D4AFF'); tx('Send to Firms', x, bvy+15*s, 9.5*s, '#fff', 'center', '500'); ctx.globalAlpha = alpha; }
       ctx.restore();
     }
 
     function drawFirm(x: number, y: number, name: string, tag: string, alpha: number, recv: number) {
-      const fw = 124, fh = 68;
+      const s = sc(), fw = 124*s, fh = 68*s;
       ctx.save(); ctx.globalAlpha = alpha;
       rr(x-fw/2, y-fh/2, fw, fh, 12, 'rgba(26,19,64,.95)', recv > 0 ? 'rgba(52,211,153,.5)' : 'rgba(109,74,255,.3)', recv > 0 ? 1.5 : 1);
-      tx(name, x, y-9, 8, 'rgba(255,255,255,.9)', 'center', '500');
-      tx(tag, x, y+3.5, 7, 'rgba(255,255,255,.4)');
-      if (recv > 0) { ctx.globalAlpha = alpha * recv; rr(x-34, y+12, 68, 15, 7, 'rgba(52,211,153,.18)'); tx('Case Received ✓', x, y+22, 7.5, '#34D399', 'center', '500'); }
+      tx(name, x, y-9*s, 8*s, 'rgba(255,255,255,.9)', 'center', '500');
+      tx(tag, x, y+3.5*s, 7*s, 'rgba(255,255,255,.4)');
+      if (recv > 0) { ctx.globalAlpha = alpha * recv; rr(x-34*s, y+12*s, 68*s, 15*s, 7, 'rgba(52,211,153,.18)'); tx('Case Received ✓', x, y+22*s, 7.5*s, '#34D399', 'center', '500'); }
       ctx.restore();
     }
 
@@ -561,47 +564,58 @@ function WorkerWorkflowScroll() {
       g.addColorStop(0, '#2D1F6E'); g.addColorStop(1, '#0E0B26');
       ctx.fillStyle = g; ctx.fillRect(0, 0, cw, ch);
 
+      const mob = cw < 640;
+      // on mobile, animation sits in upper 55% so bottom info card doesn't overlap
+      const animCy = mob ? ch * .42 : cy;
+
       if (p < .42) {
         DOCS.forEach((d, i) => {
           const delay = i / DOCS.length * .4, tIn = cl((band(p, 0, .18) - delay) / (1 - delay), 0, 1);
-          const ang = (d.a + i*4) * Math.PI/180, baseR = cw * .265;
+          const ang = (d.a + i*4) * Math.PI/180, baseR = mob ? cw * .32 : cw * .265;
           if (p < .18) {
             const fl = Math.sin(ts/700 + i) * 3;
-            drawDoc(cx + Math.cos(ang)*eOut(tIn)*baseR, cy + Math.sin(ang)*eOut(tIn)*baseR*.6 + fl, d.label, d.icon, eOut(Math.min(tIn*3, 1)), 1, (d.a/180 - .5)*.28);
+            drawDoc(cx + Math.cos(ang)*eOut(tIn)*baseR, animCy + Math.sin(ang)*eOut(tIn)*baseR*.6 + fl, d.label, d.icon, eOut(Math.min(tIn*3, 1)), 1, (d.a/180 - .5)*.28);
           } else {
             const vd = i/DOCS.length*.35, t2v = cl((band(p, .18, .4) - vd) / (1 - vd), 0, 1);
             const spin = eIn(t2v)*Math.PI*1.8, rNow = baseR*(1 - eOut(t2v));
-            drawDoc(cx + Math.cos(ang+spin)*rNow, cy + Math.sin(ang+spin)*rNow*.6, d.label, d.icon, Math.max(1 - eOut(Math.max(t2v-.55,0)/.45), 0), 1 - eOut(t2v)*.65);
+            drawDoc(cx + Math.cos(ang+spin)*rNow, animCy + Math.sin(ang+spin)*rNow*.6, d.label, d.icon, Math.max(1 - eOut(Math.max(t2v-.55,0)/.45), 0), 1 - eOut(t2v)*.65);
           }
         });
         if (p >= .18) {
-          const vt = band(p, .18, .4), va = vt * .65;
-          const vg = ctx.createRadialGradient(cx, cy, 0, cx, cy, 72*vt);
+          const vt = band(p, .18, .4), va = vt * .65, vr = mob ? 48 : 72;
+          const vg = ctx.createRadialGradient(cx, animCy, 0, cx, animCy, vr*vt);
           vg.addColorStop(0, `rgba(109,74,255,${va})`); vg.addColorStop(1, 'rgba(109,74,255,0)');
-          ctx.fillStyle = vg; ctx.beginPath(); ctx.arc(cx, cy, 72*vt, 0, Math.PI*2); ctx.fill();
+          ctx.fillStyle = vg; ctx.beginPath(); ctx.arc(cx, animCy, vr*vt, 0, Math.PI*2); ctx.fill();
           for (let r = 0; r < 3; r++) {
             const rp = (vt*1.2 + r/3) % 1;
-            ctx.beginPath(); ctx.arc(cx, cy, rp*88, 0, Math.PI*2);
+            ctx.beginPath(); ctx.arc(cx, animCy, rp*(mob ? 60 : 88), 0, Math.PI*2);
             ctx.strokeStyle = `rgba(167,139,250,${(1-rp)*.4})`; ctx.lineWidth = 1.5; ctx.stroke();
           }
         }
       }
 
       if (p >= .32 && p < .65) {
-        drawPhone(cx, cy, eOut(band(p, .36, .5)), band(p, .45, .62));
-        if (band(p, .45, .62) > .95 && Math.random() < .05) addSp(cx + lerp(-50,50,Math.random()), cy + lerp(-60,60,Math.random()), 2);
+        drawPhone(cx, animCy, eOut(band(p, .36, .5)), band(p, .45, .62));
+        if (band(p, .45, .62) > .95 && Math.random() < .05) addSp(cx + lerp(-50,50,Math.random()), animCy + lerp(-60,60,Math.random()), 2);
       }
 
       if (p >= .58) {
         const phoneA = cl(1 - band(p, .65, .8)*2.5, 0, 1);
-        if (p < .82) drawPhone(cx, cy, Math.max(phoneA, 0), 1);
-        const fy = cy + ch*.13, fxs = [cx - cw*.24, cx, cx + cw*.24];
+        if (p < .82) drawPhone(cx, animCy, Math.max(phoneA, 0), 1);
+        // on mobile: stack firms vertically; on desktop: spread horizontally
+        const fxs = mob
+          ? [cx, cx, cx]
+          : [cx - cw*.24, cx, cx + cw*.24];
+        const fys = mob
+          ? [animCy - ch*.18, animCy, animCy + ch*.18]
+          : [cy + ch*.13, cy + ch*.13, cy + ch*.13];
         fxs.forEach((fx, i) => {
+          const fy = fys[i];
           const delay = i * .07, t2v = band(p, .62 + delay, .8);
           if (p < .82) drawFirm(fx, fy, FIRMS[i].name, FIRMS[i].tag, eOut(t2v), 0);
           if (t2v > 0 && t2v < 1) {
-            const px = lerp(cx, fx, eOut(t2v)), py = lerp(cy-22, fy-33, eOut(t2v)) - Math.sin(t2v*Math.PI)*ch*.12;
-            ctx.save(); ctx.translate(px, py); ctx.rotate(Math.atan2((fy-33)-(cy-22), (fx-cx))*.7);
+            const px = lerp(cx, fx, eOut(t2v)), py = lerp(animCy-22, fy-33, eOut(t2v)) - Math.sin(t2v*Math.PI)*ch*.08;
+            ctx.save(); ctx.translate(px, py); ctx.rotate(Math.atan2((fy-33)-(animCy-22), (fx-cx))*.7);
             ctx.fillStyle = '#A78BFA'; ctx.beginPath(); ctx.moveTo(11,0); ctx.lineTo(-5,-4); ctx.lineTo(-2,0); ctx.lineTo(-5,4); ctx.closePath(); ctx.fill(); ctx.restore();
             if (t2v > .88) addSp(fx, fy-28, 1);
           }
@@ -659,20 +673,29 @@ function WorkerWorkflowScroll() {
         <canvas style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
 
         {/* Top label */}
-        <div className="absolute top-6 left-0 right-0 flex flex-col items-center gap-1 pointer-events-none">
+        <div className="absolute top-5 left-0 right-0 flex flex-col items-center gap-1 pointer-events-none">
           <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#A78BFA]">How it works</div>
-          <div className="text-[11px] text-white/30 tracking-widest uppercase">scroll to explore</div>
+          <div className="text-[10px] text-white/30 tracking-widest uppercase">scroll to explore</div>
         </div>
 
-        {/* Step pips */}
-        <div className="absolute top-1/2 -translate-y-1/2 right-6 flex flex-col gap-3 items-center">
+        {/* Step pips — right side on desktop, hidden on mobile (progress bar is enough) */}
+        <div className="absolute top-1/2 -translate-y-1/2 right-4 hidden sm:flex flex-col gap-3 items-center">
           {[0,1,2].map(i => (
             <div key={i} className="ww-pip w-1.5 h-1.5 rounded-full bg-white/20 transition-all duration-500 [&.active]:bg-[#6D4AFF] [&.active]:h-8 [&.active]:rounded-full [&.done]:bg-[#6D4AFF]/40" />
           ))}
         </div>
 
-        {/* Info panel — left side */}
-        <div className="absolute top-0 left-0 bottom-0 w-[320px] flex flex-col justify-center px-10 pointer-events-none">
+        {/* Info card — bottom on mobile, left column on desktop */}
+        {/* Mobile: bottom overlay */}
+        <div className="absolute bottom-5 left-4 right-4 sm:hidden pointer-events-none">
+          <div className="ww-card opacity-0 translate-y-2 transition-all duration-500 [&.show]:opacity-100 [&.show]:translate-y-0 rounded-2xl bg-white/[0.06] border border-white/10 backdrop-blur-sm px-5 py-4">
+            <div className="ww-num mb-1.5 text-[10px] font-bold text-[#A78BFA] uppercase tracking-[0.15em]" />
+            <div className="ww-title mb-1.5 text-[17px] font-bold text-white leading-snug" />
+            <div className="ww-body text-[12px] text-white/50 leading-relaxed" />
+          </div>
+        </div>
+        {/* Desktop: left column */}
+        <div className="absolute top-0 left-0 bottom-0 hidden sm:flex w-[300px] flex-col justify-center px-8 pointer-events-none">
           <div className="ww-card opacity-0 translate-y-3 transition-all duration-500 [&.show]:opacity-100 [&.show]:translate-y-0">
             <div className="ww-num mb-3 text-[11px] font-bold text-[#A78BFA] uppercase tracking-[0.15em]" />
             <div className="ww-title mb-3 text-[22px] font-bold text-white leading-snug" />
@@ -682,7 +705,7 @@ function WorkerWorkflowScroll() {
 
         {/* Scroll progress bar — bottom */}
         <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-white/8">
-          <div className="ww-fill h-full bg-[#6D4AFF] w-0 transition-none" style={{ transition: 'width 0.05s linear' }} />
+          <div className="ww-fill h-full bg-[#6D4AFF] w-0" style={{ transition: 'width 0.05s linear' }} />
         </div>
       </div>
     </>
