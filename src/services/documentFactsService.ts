@@ -39,6 +39,8 @@ export type DocumentFacts = {
   key_quote: string | null;
   flags: string[];
   text_truncated?: boolean;
+  /** Phase 2b: every explicitly-stated date in the document, each with a short context label. */
+  document_dates?: import('./documentDateExtraction').DocumentDate[];
 };
 
 export type FileWithFacts = {

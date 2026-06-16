@@ -78,6 +78,8 @@ type DocumentFacts = {
   key_quote: string | null;
   flags: string[];
   text_truncated?: boolean;
+  // Phase 2b: every explicitly-stated date in the document, each with a short context label.
+  document_dates?: Array<{ date: string; context: string }>;
 };
 
 // ---------------------------------------------------------------------------
@@ -161,6 +163,7 @@ const JSON_SCHEMA = `{
   "events_corroborated": string[],
   "relationship_to_worker": string | null,
   "key_quote": string | null,
+  "document_dates": [{ "date": string, "context": string }],
   "confidence": "high" | "medium" | "low",
   "flags": string[]
 }`;
@@ -178,6 +181,7 @@ Document category: ${category}
 File name: ${fileName}${truncated ? `\nNote: this document is long; only the first portion is shown below.` : ''}
 
 Reminders: quote verbatim for key_quote (under 200 characters); use null / [] for anything not explicitly present; no legal conclusions; raw JSON only.
+Capture EVERY date explicitly stated in the document in "document_dates", each as { "date": "<as written>", "context": "<short factual label, e.g. 'complaint filed', 'warning issued'>" }. Include only dates the text actually states; never infer a date. Keep context labels factual, never conclusory.
 
 CATEGORY-SPECIFIC GUIDANCE:
 ${guidance}
@@ -216,6 +220,7 @@ Document category: ${category}
 File name: ${fileName}
 
 Reminders: quote verbatim for key_quote (under 200 characters); use null / [] for anything not explicitly present; no legal conclusions; raw JSON only.
+Capture EVERY date explicitly stated in the document in "document_dates", each as { "date": "<as written>", "context": "<short factual label, e.g. 'complaint filed', 'warning issued'>" }. Include only dates the text actually states; never infer a date. Keep context labels factual, never conclusory.
 
 CATEGORY-SPECIFIC GUIDANCE:
 ${guidance}
@@ -517,7 +522,14 @@ async function processSingleFile(params: {
     return { ok: false, error: 'Parse failed' };
   }
 
-  const enriched = { ...facts, category, file_name: fileName, extracted_at: new Date().toISOString(), text_truncated: textTruncated };
+  const enriched = {
+    ...facts,
+    category,
+    file_name: fileName,
+    extracted_at: new Date().toISOString(),
+    text_truncated: textTruncated,
+    document_dates: sanitizeDocumentDates(facts.document_dates),
+  };
 
   const { error: writeErr } = await supabase.from('file_text_extractions').update({
     document_facts: enriched,
@@ -528,6 +540,35 @@ async function processSingleFile(params: {
 
   if (writeErr) return { ok: false, error: writeErr.message };
   return { ok: true, facts: enriched };
+}
+
+// ---------------------------------------------------------------------------
+// Phase 2b: validate the multi-date array before storage. Shape-checks each
+// entry, drops dateless entries, and clears any context label carrying a
+// conclusory term (the date itself — a plain fact — is retained). Compact mirror
+// of the client-side normalizeDocumentDates banned-vocabulary guard.
+// ---------------------------------------------------------------------------
+const DOCUMENT_DATE_BANNED = /\b(illegal|unlawful|wrongful|violat|discriminat|retaliat|harassment|proves?|liable|liability|strong case|weak case|valid claim|wage theft|damages|settlement|case value|case score)\b/i;
+
+function sanitizeDocumentDates(raw: unknown): Array<{ date: string; context: string }> {
+  if (!Array.isArray(raw)) return [];
+  const out: Array<{ date: string; context: string }> = [];
+  const seen = new Set<string>();
+  for (const entry of raw) {
+    if (!entry || typeof entry !== 'object') continue;
+    const rawDate = (entry as { date?: unknown }).date;
+    const date = typeof rawDate === 'string' ? rawDate.trim() : '';
+    if (!date) continue;
+    const rawContext = (entry as { context?: unknown }).context;
+    let context = typeof rawContext === 'string' ? rawContext.trim() : '';
+    if (context && DOCUMENT_DATE_BANNED.test(context)) context = '';
+    const key = `${date.toLowerCase()}::${context.toLowerCase()}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push({ date, context });
+    if (out.length >= 12) break;
+  }
+  return out;
 }
 
 // ---------------------------------------------------------------------------
