@@ -79,10 +79,10 @@ const TIMELINE = [
 const ORGANIZED_SUMMARY =
   "According to the worker's account and supporting records, Marcus Rivera was employed as a warehouse associate at Pacific Ridge Distribution LLC from March 2022 through January 2026. Records currently reflect pay-related discrepancies beginning Q4 2022, a formal HR complaint dated November 14, 2025, a written warning 11 days later, and separation documentation dated December 19, 2025. These timeline patterns are organized for attorney review and may require confirmation against the source files.";
 
-const CONCERNS = ['Wage & Hour', 'Wrongful Termination', 'Retaliation'];
+const CONCERNS = ['Wage & Hour', 'Employment Separation', 'After Raising a Concern'];
 
 const SUGGESTIONS = [
-  'Earlier pay records (2022–2023) may strengthen wage discrepancy timeline',
+  'Earlier pay records (2022–2023) may help complete the wage discrepancy timeline',
   'Supervisor communication prior to formal complaint not yet in record',
   'Performance review referenced in termination letter not located',
 ];

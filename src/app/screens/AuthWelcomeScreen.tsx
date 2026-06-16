@@ -106,7 +106,7 @@ export function AuthWelcomeScreen({
               Your story doesn't have to be.
             </h1>
             <p className="mx-auto mt-3 max-w-[390px] text-[14px] leading-relaxed text-[#1e1b4b]/68 sm:mt-5 sm:text-[15px]">
-              Organize documents, conversations, timelines, evidence, and records in one place before speaking
+              Organize documents, conversations, timelines, and records in one place before speaking
               with an attorney.
             </p>
 

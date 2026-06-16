@@ -109,7 +109,7 @@ const O3S_CONCEPT_SVG = `<svg id="sv" viewBox="0 0 1280 720" xmlns="http://www.w
 <rect x="498" y="88" width="284" height="80" fill="#6D4AFF"/>
 <text x="640" y="136" text-anchor="middle" font-size="22" fill="white" font-weight="700" font-family="system-ui">one3seven</text>
 <rect x="602" y="96" width="76" height="18" rx="9" fill="#0D0B1E" opacity=".6"/>
-<text x="640" y="202" text-anchor="middle" font-size="18" fill="white" font-weight="700" font-family="system-ui">Your case, organized.</text>
+<text x="640" y="202" text-anchor="middle" font-size="18" fill="white" font-weight="700" font-family="system-ui">Your records, organized.</text>
 <text x="640" y="224" text-anchor="middle" font-size="12" fill="#A78BFA" font-family="system-ui">8 documents · Ready to send</text>
 <rect x="514" y="242" width="252" height="44" rx="10" fill="white" opacity=".07"/>
 <rect x="524" y="252" width="20" height="20" rx="4" fill="#EDE8FF" opacity=".8"/>
@@ -837,7 +837,7 @@ function _WorkerWorkflowScrollCanvas_unused() {
       rr(x-18*s, y-ph/2+5*s, 36*s, 8*s, 4, '#0E0B26');
       ctx.fillStyle = 'rgba(109,74,255,.8)'; ctx.fillRect(x-pw/2+2, y-ph/2+17*s, pw-4, 28*s);
       tx('one3seven', x, y-ph/2+34*s, 10*s, '#fff', 'center', '500');
-      tx('Your case, organized.', x, y-ph/2+53*s, 8*s, 'rgba(255,255,255,.55)');
+      tx('Your records, organized.', x, y-ph/2+53*s, 8*s, 'rgba(255,255,255,.55)');
       tx('8 documents · Ready to send', x, y-ph/2+65*s, 7.5*s, 'rgba(255,255,255,.35)');
       const sy = y - ph/2 + 80*s;
       CHECKS.forEach((c, i) => {
@@ -1188,7 +1188,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, firm
             <div className="flex flex-col">
               <button type="button" onClick={onSignIn} className="flex items-center min-h-[48px] text-base font-medium text-[#1E1B4B]/60 text-left py-3">Sign in</button>
               <button type="button" onClick={openBetaModal} className="flex items-center gap-1.5 min-h-[48px] text-base font-semibold text-[#6D4AFF] text-left py-3">For attorneys <ArrowRight className="h-4 w-4" /></button>
-              <button type="button" onClick={openBetaModal} className="flex items-center gap-1.5 min-h-[48px] text-base font-semibold text-[#1E1B4B]/70 text-left py-3">Organize my case <ArrowRight className="h-4 w-4" /></button>
+              <button type="button" onClick={openBetaModal} className="flex items-center gap-1.5 min-h-[48px] text-base font-semibold text-[#1E1B4B]/70 text-left py-3">Organize my intake <ArrowRight className="h-4 w-4" /></button>
             </div>
           </div>
         )}
@@ -1291,7 +1291,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, firm
                       onClick={openBetaModal}
                       className="flex items-center justify-center gap-2 rounded-full border border-[#E7E1FF] bg-white px-7 py-3.5 text-[15px] font-semibold text-[#1E1B4B] transition hover:bg-[#F7F3FF]"
                     >
-                      Organize my case
+                      Organize my intake
                     </button>
                   </div>
 
@@ -1435,7 +1435,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, firm
                 onClick={openBetaModal}
                 className="flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-7 py-3.5 text-[15px] font-semibold text-white backdrop-blur transition hover:bg-white/20"
               >
-                Organize my case
+                Organize my intake
                 <ArrowRight className="h-4 w-4" />
               </button>
             </div>
@@ -1526,7 +1526,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, firm
                 onClick={openBetaModal}
                 className="rounded-full border border-white/30 px-8 py-4 text-[15px] font-semibold text-white transition hover:bg-white/10"
               >
-                Organize my case
+                Organize my intake
               </button>
             </div>
             <p className="mt-4 text-[12px] text-white/40">
