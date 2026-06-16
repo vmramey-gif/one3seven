@@ -36,7 +36,7 @@ export function resolveFirmExportAccessTier(view: FirmLiveIntakeView): FirmExpor
 
 export function firmIntakeReviewPdfFilename(intakeNumber: string): string {
   const safe = (intakeNumber || 'intake').replace(/[^\w.-]+/g, '-').slice(0, 48);
-  return `one3Seven-firm-intake-review-${safe}.pdf`;
+  return `one3seven-firm-intake-review-${safe}.pdf`;
 }
 
 function categoryBreakdownFromFiles(files: FirmAccessibleUploadFile[]): CategoryCountRow[] {
@@ -309,13 +309,21 @@ const RECORD_PRIORITY_ORDER: string[] = [
   'HR Documents',
 ];
 
-const PRIORITY_RECORD_CATEGORIES = new Set([
-  'Workplace Communications',
-  'Performance / discipline records',
-  'Separation Records',
-  'Witness Statement',
-  'Schedules',
-]);
+// Keyword-based priority test — tolerant of category-naming differences across the
+// app (e.g. "HR Communications" vs. "Workplace Communications", "Termination Records"
+// vs. "Separation Records"). Exact-string matching previously demoted the most
+// important records (HR complaint, warning, termination letter) to "Supporting".
+function isPriorityCategory(category: string | null | undefined): boolean {
+  const c = (category ?? '').toLowerCase();
+  if (!c) return false;
+  return (
+    /\bhr\b|communication|complaint|workplace/.test(c) ||
+    /discipline|disciplinary|warning|performance/.test(c) ||
+    /separation|termination/.test(c) ||
+    /witness|statement|coworker/.test(c) ||
+    /schedule/.test(c)
+  );
+}
 
 function sortFilesByPriority(files: ResolvedFile[]): ResolvedFile[] {
   return [...files].sort((a, b) => {
@@ -693,7 +701,7 @@ function buildFirmPolishedPacketPdfLines(
   // --- Header ---
   const generated = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
   push(lines, 'Firm Intake Review');
-  push(lines, `Prepared ${generated}  ·  one3Seven`);
+  push(lines, `Prepared ${generated}  ·  one3seven`);
   blank(lines);
   push(lines, `Total records: ${resolvedFiles.length}  ·  Timeline events: ${cleanEvents.length}`);
 
@@ -812,8 +820,8 @@ function buildFirmPolishedPacketPdfLines(
     blank(lines);
   } else if (resolvedFiles.length) {
     const sorted = sortFilesByPriority(resolvedFiles);
-    const priority = sorted.filter((f) => PRIORITY_RECORD_CATEGORIES.has(f.category));
-    const supporting = sorted.filter((f) => !PRIORITY_RECORD_CATEGORIES.has(f.category));
+    const priority = sorted.filter((f) => isPriorityCategory(f.category));
+    const supporting = sorted.filter((f) => !isPriorityCategory(f.category));
 
     if (priority.length) {
       push(lines, 'Priority Review Records');
@@ -878,7 +886,7 @@ function buildFirmPolishedPacketPdfLines(
 
   // Dynamic summary line
   const unresolvedCount = confirmItems.length;
-  const priorityCount = resolvedFiles.filter((f) => PRIORITY_RECORD_CATEGORIES.has(f.category)).length;
+  const priorityCount = resolvedFiles.filter((f) => isPriorityCategory(f.category)).length;
   push(lines, `Current items requiring confirmation: ${unresolvedCount}`);
   blank(lines);
   push(lines, `Priority records available for review: ${priorityCount} of ${resolvedFiles.length}`);

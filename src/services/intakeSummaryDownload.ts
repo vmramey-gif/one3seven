@@ -694,7 +694,10 @@ function pdfSafeText(s: string): string {
     .replace(/\u201c|\u201d/g, '"')
     .replace(/\u2014|\u2013/g, '-')
     .replace(/\u2026/g, '...')
-    .replace(/\u00a0/g, ' ');
+    .replace(/\u00a0/g, ' ')
+    .replace(/\u2192/g, '->')   // \u2192 arrow (used in Evidence Support rows)
+    .replace(/\u2691/g, '!')    // \u2691 flag marker (used for payroll alert)
+    .replace(/\u2713|\u2714/g, '[x]'); // \u2713 checkmarks, if present
 }
 
 function escapePdfLiteral(s: string): string {

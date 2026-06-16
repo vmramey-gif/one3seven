@@ -1,10 +1,10 @@
 /**
- * one3Seven product positioning — calm workflow language only.
+ * one3seven product positioning — calm workflow language only.
  */
 
 /** Full UPL-safe disclaimer — single source for footers, exports, and modals. */
 export const ONE3SEVEN_UNIVERSAL_DISCLAIMER =
-  'one3Seven is not a law firm and does not provide legal advice. Use of one3Seven does not create an attorney-client relationship. Attorneys and firms independently evaluate information submitted through the platform. No outcome, representation, review, attorney response, or claim validity is guaranteed.';
+  'one3seven is not a law firm and does not provide legal advice. Use of one3seven does not create an attorney-client relationship. Attorneys and firms independently evaluate information submitted through the platform. No outcome, representation, review, attorney response, or claim validity is guaranteed.';
 
 export const ONE3SEVEN_NOTICES = {
   positioning: ONE3SEVEN_UNIVERSAL_DISCLAIMER,
@@ -55,7 +55,7 @@ export const PARTICIPATING_NETWORK_COPY = {
   accessRequestPending:
     'A participating firm requested expanded review access. Approve below when you are ready to share your full organized packet with that firm.',
   accessApproved:
-    'You approved expanded review access. That firm can open your full organized intake in one3Seven for continued review.',
+    'You approved expanded review access. That firm can open your full organized intake in one3seven for continued review.',
   shareModalTitle: 'Send to participating firms',
   shareModalBody:
     'Sends a limited preview to the participating review network. This is separate from entering a firm code for a firm you already work with.',
@@ -241,11 +241,11 @@ export function getWorkerTrackerStepsForDisplay(
 
 export const FIRM_ROUTING_COPY = {
   sendOrganizedIntro:
-    'Already working with a law firm? Enter their one3Seven Firm Code to route this organized intake directly to their dashboard.',
+    'Already working with a law firm? Enter their one3seven Firm Code to route this organized intake directly to their dashboard.',
   firmCodeHelper:
-    'Firm Code routing is for people already connected with a law firm. Participating Firms routing allows one3Seven to send a limited preview to matching participating firms.',
+    'Firm Code routing is for people already connected with a law firm. Participating Firms routing allows one3seven to send a limited preview to matching participating firms.',
   firmCodeFieldHelp:
-    "Enter your law firm's one3Seven Firm Code to route this organized intake directly to their dashboard.",
+    "Enter your law firm's one3seven Firm Code to route this organized intake directly to their dashboard.",
   participatingShort:
     'Share a limited preview with the participating review network (not a direct firm-code link).',
   firmCodeNotFound:
