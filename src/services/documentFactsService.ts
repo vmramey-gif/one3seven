@@ -38,6 +38,7 @@ export type DocumentFacts = {
   relationship_to_worker: string | null;
   key_quote: string | null;
   flags: string[];
+  text_truncated?: boolean;
 };
 
 export type FileWithFacts = {
@@ -297,6 +298,41 @@ export function synthesizeIntakeIntelligence(files: FileWithFacts[]): IntakeInte
   }
   if (allFlags.includes('post_termination_statement')) {
     confirmationNeeded.push('Coworker statement is dated after termination — confirm independence from the claim.');
+  }
+
+  // ── Cross-document consistency (neutral — surfaced for attorney verification only) ──
+  const distinctEmployers = [
+    ...new Map(
+      files
+        .map((f) => f.document_facts?.employer_name?.trim())
+        .filter((n): n is string => Boolean(n))
+        .map((n) => [n.toLowerCase(), n] as const)
+    ).values(),
+  ];
+  if (distinctEmployers.length > 1) {
+    confirmationNeeded.push(
+      `Employer name differs across documents (${distinctEmployers.join(' vs ')}) — confirm the correct legal entity.`
+    );
+  }
+
+  const lowConfidenceCount = files.filter((f) => f.document_facts?.confidence === 'low').length;
+  if (lowConfidenceCount > 0) {
+    confirmationNeeded.push(
+      `${lowConfidenceCount} document${lowConfidenceCount === 1 ? '' : 's'} produced low-confidence extractions — verify those fields against the source.`
+    );
+  }
+
+  const truncatedCount = files.filter((f) => f.document_facts?.text_truncated).length;
+  if (truncatedCount > 0) {
+    confirmationNeeded.push(
+      `${truncatedCount === 1 ? 'One document was' : `${truncatedCount} documents were`} long; only the first portion was analyzed — review the full source for completeness.`
+    );
+  }
+
+  if (allFlags.includes('reason_may_conflict_with_timeline')) {
+    confirmationNeeded.push(
+      'A separation document’s stated reason may not align with the complaint timeline — confirm the sequence against the source records.'
+    );
   }
 
   return {

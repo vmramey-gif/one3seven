@@ -1893,12 +1893,28 @@ export function IntakeReviewScreen({
                     <>
                       <p className="text-[10px] uppercase tracking-wider text-[#1E1B4B]/40 mb-2">Key document language</p>
                       <div className="space-y-3">
-                        {intelKeyQuotes.slice(0, 4).map((q) => (
-                          <div key={q.file_name} className="rounded-lg bg-[#F7F3FF] border border-[#E7E1FF] px-3 py-2">
-                            <p className="text-[10px] text-[#6D4AFF] mb-1">{q.category.replace(/_/g, ' ')} — {q.file_name.replace(/_/g, ' ').replace(/\.[^.]+$/, '')}</p>
-                            <p className="text-xs text-[#1E1B4B]/75 italic leading-relaxed">"{q.quote}"</p>
-                          </div>
-                        ))}
+                        {intelKeyQuotes.slice(0, 4).map((q) => {
+                          const conf = (q.confidence || '').toLowerCase();
+                          const confStyle =
+                            conf === 'high'
+                              ? 'bg-emerald-50 text-emerald-700 border-emerald-100'
+                              : conf === 'low'
+                              ? 'bg-rose-50 text-rose-600 border-rose-100'
+                              : 'bg-amber-50 text-amber-700 border-amber-100';
+                          return (
+                            <div key={q.file_name} className="rounded-lg bg-[#F7F3FF] border border-[#E7E1FF] px-3 py-2">
+                              <div className="mb-1 flex items-center justify-between gap-2">
+                                <p className="text-[10px] text-[#6D4AFF]">{q.category.replace(/_/g, ' ')} — {q.file_name.replace(/_/g, ' ').replace(/\.[^.]+$/, '')}</p>
+                                {conf && (
+                                  <span className={`shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-semibold capitalize ${confStyle}`}>
+                                    {conf} confidence
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-xs text-[#1E1B4B]/75 italic leading-relaxed">"{q.quote}"</p>
+                            </div>
+                          );
+                        })}
                       </div>
                     </>
                   )}

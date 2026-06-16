@@ -13,8 +13,32 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
-const MODEL = 'claude-sonnet-4-5';
+const MODEL = 'claude-sonnet-4-6';
 const BUCKET = 'intake-files';
+const MAX_TEXT_CHARS = 12_000;
+const MAX_TOKENS = 3000;
+
+// ---------------------------------------------------------------------------
+// System prompt — establishes role and non-negotiable legal guardrails.
+// Kept in the system slot (not the user turn) so the constraints are anchored
+// independently of per-document content. one3seven organizes information for
+// attorney review; it never evaluates, predicts, or concludes.
+// ---------------------------------------------------------------------------
+
+const SYSTEM_PROMPT = `You are the document-extraction engine for one3seven, an employment-intake organization system used by attorneys.
+
+Your only job is to extract facts that are EXPLICITLY STATED in a document and return them as structured JSON. You organize information; you never evaluate it.
+
+ABSOLUTE RULES:
+- Extract only what the document explicitly states. Never infer, assume, or supplement from outside knowledge.
+- Never make or imply a legal conclusion. Never use words such as "illegal", "unlawful", "wrongful", "violated", "discrimination", "retaliation", "harassment", "proves", "liable", "valid claim", or "strong case".
+- Never assess the merits, strength, value, or likely outcome of any matter.
+- Quote the document verbatim for key_quote (under 200 characters). Never paraphrase a quote.
+- If a field is not explicitly present, return null (or an empty array). Do not guess.
+- Calibrate confidence honestly: "high" only when the relevant fields are clearly and unambiguously stated; "medium" when some are ambiguous; "low" when the document is unclear, partial, or hard to read.
+- Output raw JSON only — no prose, no markdown, no code fences.
+
+Attorneys independently review every source document. Accuracy and restraint matter more than completeness.`;
 
 // ---------------------------------------------------------------------------
 // DocumentFacts schema
@@ -53,6 +77,7 @@ type DocumentFacts = {
   relationship_to_worker: string | null;
   key_quote: string | null;
   flags: string[];
+  text_truncated?: boolean;
 };
 
 // ---------------------------------------------------------------------------
@@ -144,27 +169,25 @@ function buildTextPrompt(category: string, fileName: string, text: string): { ro
   const guidance = CATEGORY_GUIDANCE[category] ??
     `Extract: document date, people mentioned, employer name, and key_quote (most significant sentence).`;
 
-  const prompt = `You are extracting structured facts from an employment document for an attorney review system.
+  const truncated = text.length > MAX_TEXT_CHARS;
+  const body = truncated ? text.slice(0, MAX_TEXT_CHARS) : text;
+
+  const prompt = `Extract structured facts from this employment document.
 
 Document category: ${category}
-File name: ${fileName}
+File name: ${fileName}${truncated ? `\nNote: this document is long; only the first portion is shown below.` : ''}
 
-EXTRACTION RULES:
-- Extract only what is explicitly stated. Do not infer or add information not present.
-- Use exact quoted text for key_quote (under 200 characters).
-- If a field is not present, set it to null or empty array.
-- Never make legal conclusions. Do not use words like "illegal", "wrongful", "violated", "proves", "strong case".
-- Set confidence to "high" if most fields are clearly present, "medium" if some are ambiguous, "low" if the document is unclear.
+Reminders: quote verbatim for key_quote (under 200 characters); use null / [] for anything not explicitly present; no legal conclusions; raw JSON only.
 
 CATEGORY-SPECIFIC GUIDANCE:
 ${guidance}
 
-Return ONLY valid JSON matching this schema. No explanation, no markdown, no code blocks — raw JSON only:
+Return ONLY valid JSON matching this schema — no markdown, no code fences:
 ${JSON_SCHEMA}
 
 DOCUMENT TEXT:
 ---
-${text.slice(0, 12_000)}
+${body}
 ---`;
 
   return [{ role: 'user', content: prompt }];
@@ -187,22 +210,17 @@ function buildPdfPrompt(category: string, fileName: string, base64Pdf: string): 
       },
       {
         type: 'text',
-        text: `You are extracting structured facts from an employment document for an attorney review system.
+        text: `Extract structured facts from the attached employment document.
 
 Document category: ${category}
 File name: ${fileName}
 
-EXTRACTION RULES:
-- Extract only what is explicitly stated in the document. Do not infer or add information not present.
-- Use exact quoted text for key_quote (under 200 characters).
-- If a field is not present, set it to null or empty array.
-- Never make legal conclusions. Do not use words like "illegal", "wrongful", "violated", "proves", "strong case".
-- Set confidence to "high" if most fields are clearly present, "medium" if some are ambiguous, "low" if the document is unclear.
+Reminders: quote verbatim for key_quote (under 200 characters); use null / [] for anything not explicitly present; no legal conclusions; raw JSON only.
 
 CATEGORY-SPECIFIC GUIDANCE:
 ${guidance}
 
-Return ONLY valid JSON matching this schema. No explanation, no markdown, no code blocks — raw JSON only:
+Return ONLY valid JSON matching this schema — no markdown, no code fences:
 ${JSON_SCHEMA}`,
       },
     ],
@@ -213,40 +231,69 @@ ${JSON_SCHEMA}`,
 // Claude API call
 // ---------------------------------------------------------------------------
 
+/** Robustly parse Claude's response into JSON — tolerates code fences and stray prose. */
+function parseFacts(content: string): DocumentFacts | null {
+  let s = content.trim();
+  // Strip a leading/trailing markdown code fence if the model added one.
+  s = s.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+  try {
+    return JSON.parse(s) as DocumentFacts;
+  } catch {
+    const match = s.match(/\{[\s\S]*\}/);
+    if (match) {
+      try { return JSON.parse(match[0]) as DocumentFacts; } catch { /* fall through */ }
+    }
+    return null;
+  }
+}
+
 async function callClaude(
   messages: unknown[],
   apiKey: string
 ): Promise<DocumentFacts | null> {
-  const response = await fetch(ANTHROPIC_API_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
-      'anthropic-beta': 'pdfs-2024-09-25',
-    },
-    body: JSON.stringify({
-      model: MODEL,
-      max_tokens: 1024,
-      messages,
-    }),
-  });
+  const MAX_ATTEMPTS = 3;
+  let lastError = '';
 
-  if (!response.ok) {
-    const err = await response.text();
-    throw new Error(`Anthropic API error ${response.status}: ${err}`);
-  }
+  for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+    const response = await fetch(ANTHROPIC_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-beta': 'pdfs-2024-09-25',
+      },
+      body: JSON.stringify({
+        model: MODEL,
+        max_tokens: MAX_TOKENS,
+        temperature: 0, // deterministic extraction — reproducible for legal review
+        system: SYSTEM_PROMPT,
+        messages,
+      }),
+    });
 
-  const data = await response.json();
-  const content = data?.content?.[0]?.text ?? '';
+    // Transient errors (rate limit / overloaded) — back off and retry.
+    if (response.status === 429 || response.status === 503 || response.status === 529) {
+      lastError = `Anthropic API ${response.status} (transient)`;
+      await new Promise((r) => setTimeout(r, 800 * (attempt + 1)));
+      continue;
+    }
 
-  try {
-    return JSON.parse(content.trim()) as DocumentFacts;
-  } catch {
-    const match = content.match(/\{[\s\S]+\}/);
-    if (match) return JSON.parse(match[0]) as DocumentFacts;
+    if (!response.ok) {
+      const err = await response.text();
+      throw new Error(`Anthropic API error ${response.status}: ${err}`);
+    }
+
+    const data = await response.json();
+    const content = data?.content?.[0]?.text ?? '';
+    const parsed = parseFacts(content);
+    if (parsed) return parsed;
+
+    // Parse failed — at temperature 0 a retry would be identical, so stop here.
     return null;
   }
+
+  throw new Error(lastError || 'Anthropic API call failed after retries');
 }
 
 // ---------------------------------------------------------------------------
@@ -415,9 +462,11 @@ async function processSingleFile(params: {
   }
 
   let messages: unknown[];
+  let textTruncated = false;
 
   if (existingRow?.extraction_status === 'completed' && existingRow?.extracted_text?.trim()) {
     // Phase 2A text is available — use it
+    textTruncated = existingRow.extracted_text.length > MAX_TEXT_CHARS;
     messages = buildTextPrompt(category, fileName, existingRow.extracted_text);
   } else {
     // No text layer — download file and send as PDF to Claude
@@ -468,7 +517,7 @@ async function processSingleFile(params: {
     return { ok: false, error: 'Parse failed' };
   }
 
-  const enriched = { ...facts, category, file_name: fileName, extracted_at: new Date().toISOString() };
+  const enriched = { ...facts, category, file_name: fileName, extracted_at: new Date().toISOString(), text_truncated: textTruncated };
 
   const { error: writeErr } = await supabase.from('file_text_extractions').update({
     document_facts: enriched,
