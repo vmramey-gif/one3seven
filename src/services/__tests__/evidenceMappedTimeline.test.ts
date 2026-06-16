@@ -439,6 +439,47 @@ describe('evidence-mapped timeline engine', () => {
     );
   });
 
+  test('keeps same-topic records with different dates as separate events', () => {
+    // Regression: a dated record must not be absorbed into a same-topic cluster
+    // that already carries a different concrete date (e.g. a Nov 2023 schedule
+    // notice collapsing onto an Oct 2024 event that cross-references it).
+    const fileRecords: IntakeFileOrganizationRecord[] = [
+      sampleFileRecord({
+        source_file_id: 'sched-2024',
+        file_name: 'Schedule_Change_Oct2024.pdf',
+        document_type: 'Time Records',
+        legacy_upload_category: 'Time Records',
+        likely_date: 'October 2024',
+        employment_topics: ['Scheduling and timekeeping'],
+        possible_timeline_event: {
+          title: 'Schedule change',
+          date: 'October 2024',
+          neutral_summary: 'Schedule change notice.',
+        },
+      }),
+      sampleFileRecord({
+        source_file_id: 'sched-2023',
+        file_name: 'Schedule_Change_Nov2023.pdf',
+        document_type: 'Time Records',
+        legacy_upload_category: 'Time Records',
+        likely_date: 'November 2023',
+        employment_topics: ['Scheduling and timekeeping'],
+        possible_timeline_event: {
+          title: 'Schedule change',
+          date: 'November 2023',
+          neutral_summary: 'Schedule change notice.',
+        },
+      }),
+    ];
+
+    const events = buildEvidenceMappedTimelineEvents({ fileRecords });
+    const scheduleEvents = events.filter((e) => /schedule change documented/i.test(e.title));
+    expect(scheduleEvents).toHaveLength(2);
+    const dates = scheduleEvents.map((e) => e.date.toLowerCase());
+    expect(dates.some((d) => d.includes('november 2023'))).toBe(true);
+    expect(dates.some((d) => d.includes('october 2024'))).toBe(true);
+  });
+
   test('grounded organization emits evidence timeline and sections', () => {
     const org = buildDocumentGroundedOrganization(
       [
