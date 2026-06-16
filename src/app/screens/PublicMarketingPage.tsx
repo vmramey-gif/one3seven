@@ -1053,21 +1053,6 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, firm
         </div>
       </section>
 
-      {/* ── 137 PATH ── */}
-      <section className="px-5 py-16 sm:px-8 sm:py-20 overflow-hidden">
-        <div className="mx-auto max-w-6xl">
-          <div className="mb-10 text-center">
-            <div className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-[#6D4AFF]">The 137 path</div>
-            <h2 className="text-[26px] font-bold leading-tight tracking-tight text-[#1E1B4B] sm:text-[34px]">
-              Records finding order
-            </h2>
-          </div>
-          <div className="mx-auto max-w-4xl">
-            <IntakeTransformVisual />
-          </div>
-        </div>
-      </section>
-
       {/* ── HOW IT WORKS ── */}
       <WorkerWorkflowScroll />
 
