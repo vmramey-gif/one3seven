@@ -679,19 +679,20 @@ function WorkerWorkflowScroll() {
     const H = () => window.innerHeight;
 
     function toAnimP(raw: number) {
-      if (raw < 0.28) return lerp(0, 0.18, raw / 0.28);
-      if (raw < 0.45) return lerp(0.18, 0.4, (raw - 0.28) / 0.17);
-      if (raw < 0.65) return lerp(0.4, 0.58, (raw - 0.45) / 0.20);
-      if (raw < 0.82) return lerp(0.58, 0.8, (raw - 0.65) / 0.17);
-      return lerp(0.8, 1.0, (raw - 0.82) / 0.18);
+      // even thirds: step 1 → step 2 → step 3, brief crossfade in between
+      if (raw < 0.30) return lerp(0, 0.38, raw / 0.30);
+      if (raw < 0.40) return lerp(0.38, 0.50, (raw - 0.30) / 0.10);
+      if (raw < 0.65) return lerp(0.50, 0.78, (raw - 0.40) / 0.25);
+      if (raw < 0.75) return lerp(0.78, 0.88, (raw - 0.65) / 0.10);
+      return lerp(0.88, 1.0, (raw - 0.75) / 0.25);
     }
 
     const INFOS = [
-      { lo: 0,   hi: .28, num: 'Step 1 of 3', title: 'Worker uploads their documents', body: 'Pay stubs, HR complaints, texts, medical records — uploaded directly from their phone in minutes. No preparation required.', step: 0 },
-      { lo: .28, hi: .45, num: '', title: '', body: '', step: -1 },
-      { lo: .45, hi: .65, num: 'Step 2 of 3', title: 'AI organizes your record', body: 'one3Seven clusters your documents, flags missing items, extracts key dates, and surfaces time-sensitive events automatically.', step: 1 },
-      { lo: .65, hi: .82, num: '', title: '', body: '', step: -1 },
-      { lo: .82, hi: 1.0, num: 'Step 3 of 3', title: 'Firms receive a structured intake', body: 'Attorneys open a clean, organized packet before the first consultation — no sorting, no follow-up calls needed.', step: 2 },
+      { lo: 0,   hi: .35, num: 'Step 1 of 3', title: 'Worker uploads their documents', body: 'Pay stubs, HR complaints, texts, medical records — uploaded directly from their phone in minutes. No preparation required.', step: 0 },
+      { lo: .35, hi: .45, num: '', title: '', body: '', step: -1 },
+      { lo: .45, hi: .70, num: 'Step 2 of 3', title: 'AI organizes your record', body: 'one3Seven clusters your documents, flags missing items, extracts key dates, and surfaces time-sensitive events automatically.', step: 1 },
+      { lo: .70, hi: .80, num: '', title: '', body: '', step: -1 },
+      { lo: .80, hi: 1.0, num: 'Step 3 of 3', title: 'Firms receive a structured intake', body: 'Attorneys open a clean, organized packet before the first consultation — no sorting, no follow-up calls needed.', step: 2 },
     ];
 
     let rawP = 0, renderP = 0, lastInfo = -1;
@@ -805,7 +806,7 @@ function WorkerWorkflowScroll() {
 
     function frame(ts: number) {
       const dt = Math.min((ts - lastTs) / 1000, .05); lastTs = ts;
-      renderP = lerp(renderP, toAnimP(rawP), .12);
+      renderP = lerp(renderP, toAnimP(rawP), .18);
       const p = renderP, cw = W(), ch = H(), cx = cw/2, cy = ch/2;
       ctx.clearRect(0, 0, cw, ch);
       const g = ctx.createRadialGradient(cx, cy*.7, 0, cx, cy, Math.max(cw,ch)*.7);
@@ -890,10 +891,10 @@ function WorkerWorkflowScroll() {
       const rect = placeholder.getBoundingClientRect();
       const scrollable = placeholder.offsetHeight - window.innerHeight;
       if (scrollable <= 0) return;
-      const inView = rect.top <= 0 && rect.bottom >= window.innerHeight;
-      panel.style.opacity = inView ? '1' : '0';
-      panel.style.pointerEvents = inView ? 'none' : 'none';
-      if (inView) setRaw(-rect.top / scrollable);
+      // show panel as soon as placeholder starts entering viewport (not just when top hits 0)
+      const entering = rect.top < window.innerHeight * 0.5 && rect.bottom > 0;
+      panel.style.opacity = entering ? '1' : '0';
+      if (entering) setRaw(Math.max(0, -rect.top / scrollable));
     };
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
@@ -910,13 +911,13 @@ function WorkerWorkflowScroll() {
 
   return (
     <>
-      {/* Tall placeholder that holds scroll space */}
-      <div ref={placeholderRef} style={{ height: '320vh' }} aria-hidden="true" />
+      {/* Tall placeholder that holds scroll space — dark bg prevents white flash on entry/exit */}
+      <div ref={placeholderRef} style={{ height: '220vh', background: '#0E0B26' }} aria-hidden="true" />
 
       {/* Fixed fullscreen panel */}
       <div
         ref={panelRef}
-        style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 40, background: '#0E0B26', opacity: 0, transition: 'opacity 0.3s' }}
+        style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 40, background: '#0E0B26', opacity: 0, transition: 'opacity 0.15s' }}
       >
         <canvas style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
 
