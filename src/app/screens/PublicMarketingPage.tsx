@@ -632,7 +632,7 @@ function WorkerWorkflowScroll() {
 
     // input handlers
     const onWheel = (e: WheelEvent) => { e.preventDefault(); setRaw(rawP + e.deltaY / 900); };
-    wrap.addEventListener('wheel', onWheel, { passive: false });
+    container.addEventListener('wheel', onWheel, { passive: false });
 
     let drag = false, dx0 = 0, dp0 = 0;
     const onDown  = (e: MouseEvent) => { drag = true; dx0 = e.clientX; dp0 = rawP; };
@@ -659,15 +659,13 @@ function WorkerWorkflowScroll() {
     window.addEventListener('mouseup', () => { sdrag = false; });
     window.addEventListener('touchend', () => { sdrag = false; });
 
-    const wrap = cv.parentElement as HTMLElement;
-
     setRaw(0);
     rafRef.current = requestAnimationFrame(frame);
 
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       ro.disconnect();
-      wrap.removeEventListener('wheel', onWheel);
+      container.removeEventListener('wheel', onWheel);
       cv.removeEventListener('mousedown', onDown);
       cv.removeEventListener('touchstart', onTDown);
       window.removeEventListener('mousemove', onMove);
