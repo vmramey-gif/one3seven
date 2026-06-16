@@ -401,31 +401,27 @@ function IntakeTransformVisual() {
 
 // ── WorkerWorkflowScroll ─────────────────────────────────────────────────────
 function WorkerWorkflowScroll() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const rafRef = useRef<number | null>(null);
+  const sectionRef  = useRef<HTMLElement>(null);
+  const stickyRef   = useRef<HTMLDivElement>(null);
+  const rafRef      = useRef<number | null>(null);
   const prefersReduced = useReducedMotion() ?? false;
 
   useEffect(() => {
-    const container = containerRef.current;
-    if (!container || prefersReduced) return;
+    const section  = sectionRef.current;
+    const container = stickyRef.current;
+    if (!section || !container || prefersReduced) return;
 
-    const cv = container.querySelector('canvas') as HTMLCanvasElement;
-    const ctx = cv.getContext('2d')!;
-    const card     = container.querySelector('.ww-card') as HTMLElement;
-    const inNum    = container.querySelector('.ww-num') as HTMLElement;
-    const inTit    = container.querySelector('.ww-title') as HTMLElement;
-    const inBod    = container.querySelector('.ww-body') as HTMLElement;
-    const tfill    = container.querySelector('.ww-fill') as HTMLElement;
-    const tthumb   = container.querySelector('.ww-thumb') as HTMLElement;
-    const track    = container.querySelector('.ww-track') as HTMLElement;
-    const hint     = container.querySelector('.ww-hint') as HTMLElement;
-    const pips     = container.querySelectorAll('.ww-pip') as NodeListOf<HTMLElement>;
+    const cv    = container.querySelector('canvas') as HTMLCanvasElement;
+    const ctx   = cv.getContext('2d')!;
+    const card  = container.querySelector('.ww-card') as HTMLElement;
+    const inNum = container.querySelector('.ww-num') as HTMLElement;
+    const inTit = container.querySelector('.ww-title') as HTMLElement;
+    const inBod = container.querySelector('.ww-body') as HTMLElement;
+    const pips  = container.querySelectorAll('.ww-pip') as NodeListOf<HTMLElement>;
 
     function resize() {
       const r = devicePixelRatio || 1;
-      const w = container.clientWidth;
-      const h = Math.round(w * 9 / 16);
-      container.style.height = h + 'px';
+      const w = container.clientWidth, h = container.clientHeight;
       cv.width = w * r; cv.height = h * r;
       ctx.setTransform(r, 0, 0, r, 0, 0);
     }
@@ -456,9 +452,8 @@ function WorkerWorkflowScroll() {
 
     function setRaw(v: number) {
       rawP = Math.max(0, Math.min(1, v));
-      tfill.style.width = (rawP * 100) + '%';
-      tthumb.style.left = (rawP * 100) + '%';
-      if (rawP > 0.02) hint.style.opacity = '0';
+      const fillEl = container.querySelector('.ww-fill') as HTMLElement | null;
+      if (fillEl) fillEl.style.width = (rawP * 100) + '%';
       const info = INFOS.find(x => rawP <= x.hi) || INFOS[INFOS.length - 1];
       if (info.step !== lastInfo) {
         lastInfo = info.step;
@@ -630,34 +625,15 @@ function WorkerWorkflowScroll() {
       rafRef.current = requestAnimationFrame(frame);
     }
 
-    // input handlers
-    const onWheel = (e: WheelEvent) => { e.preventDefault(); setRaw(rawP + e.deltaY / 900); };
-    container.addEventListener('wheel', onWheel, { passive: false });
-
-    let drag = false, dx0 = 0, dp0 = 0;
-    const onDown  = (e: MouseEvent) => { drag = true; dx0 = e.clientX; dp0 = rawP; };
-    const onTDown = (e: TouchEvent) => { drag = true; dx0 = e.touches[0].clientX; dp0 = rawP; };
-    const onMove  = (e: MouseEvent) => { if (drag) setRaw(dp0 + (e.clientX - dx0) / W()); };
-    const onTMove = (e: TouchEvent) => { if (drag) setRaw(dp0 + (e.touches[0].clientX - dx0) / W()); };
-    const onUp    = () => { drag = false; };
-    cv.addEventListener('mousedown', onDown);
-    cv.addEventListener('touchstart', onTDown, { passive: true });
-    window.addEventListener('mousemove', onMove);
-    window.addEventListener('touchmove', onTMove, { passive: true });
-    window.addEventListener('mouseup', onUp);
-    window.addEventListener('touchend', onUp);
-
-    let sdrag = false, sdx0 = 0, sdp0 = 0;
-    const onSDown  = (e: MouseEvent) => { sdrag = true; sdx0 = e.clientX; sdp0 = rawP; };
-    const onSTDown = (e: TouchEvent) => { sdrag = true; sdx0 = e.touches[0].clientX; sdp0 = rawP; };
-    const onSMove  = (e: MouseEvent) => { if (sdrag) setRaw(sdp0 + (e.clientX - sdx0) / track.clientWidth); };
-    const onSTMove = (e: TouchEvent) => { if (sdrag) setRaw(sdp0 + (e.touches[0].clientX - sdx0) / track.clientWidth); };
-    track.addEventListener('mousedown', onSDown);
-    track.addEventListener('touchstart', onSTDown, { passive: true });
-    window.addEventListener('mousemove', onSMove);
-    window.addEventListener('touchmove', onSTMove, { passive: true });
-    window.addEventListener('mouseup', () => { sdrag = false; });
-    window.addEventListener('touchend', () => { sdrag = false; });
+    // page scroll drives the animation
+    const onScroll = () => {
+      const rect = section.getBoundingClientRect();
+      const scrollable = section.offsetHeight - window.innerHeight;
+      if (scrollable <= 0) return;
+      setRaw(-rect.top / scrollable);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
 
     setRaw(0);
     rafRef.current = requestAnimationFrame(frame);
@@ -665,48 +641,47 @@ function WorkerWorkflowScroll() {
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       ro.disconnect();
-      container.removeEventListener('wheel', onWheel);
-      cv.removeEventListener('mousedown', onDown);
-      cv.removeEventListener('touchstart', onTDown);
-      window.removeEventListener('mousemove', onMove);
-      window.removeEventListener('touchmove', onTMove);
-      window.removeEventListener('mouseup', onUp);
-      window.removeEventListener('touchend', onUp);
-      track.removeEventListener('mousedown', onSDown);
-      track.removeEventListener('touchstart', onSTDown);
-      window.removeEventListener('mousemove', onSMove);
-      window.removeEventListener('touchmove', onSTMove);
+      window.removeEventListener('scroll', onScroll);
     };
   }, [prefersReduced]);
 
   return (
-    <div
-      ref={containerRef}
-      className="relative w-full overflow-hidden rounded-[20px] cursor-grab active:cursor-grabbing"
-      style={{ background: '#0E0B26' }}
-    >
-      <canvas className="block w-full h-full" />
-      {/* Step pips */}
-      <div className="absolute top-3.5 left-1/2 -translate-x-1/2 flex gap-1.5 items-center">
-        {[0,1,2].map(i => <div key={i} className="ww-pip w-1.5 h-1.5 rounded-full bg-white/20 transition-all duration-300 [&.active]:bg-[#6D4AFF] [&.active]:w-5 [&.active]:rounded-sm [&.done]:bg-[#6D4AFF]/50" />)}
-      </div>
-      {/* Info card */}
-      <div className="absolute top-0 left-0 right-0 bottom-14 flex items-center justify-start px-8 pointer-events-none">
-        <div className="ww-card bg-[rgba(14,11,38,0.82)] border border-[rgba(109,74,255,0.3)] rounded-2xl p-4 max-w-[220px] opacity-0 translate-y-1.5 transition-all duration-300 [&.show]:opacity-100 [&.show]:translate-y-0">
-          <div className="ww-num text-[10px] font-bold text-[#A78BFA] tracking-widest uppercase mb-1.5" />
-          <div className="ww-title text-[14px] font-semibold text-white leading-snug mb-1.5" />
-          <div className="ww-body text-[11px] text-white/50 leading-relaxed" />
+    <section ref={sectionRef} style={{ height: '320vh' }} className="relative">
+      <div
+        ref={stickyRef}
+        className="sticky top-0 h-screen overflow-hidden"
+        style={{ background: '#0E0B26' }}
+      >
+        <canvas className="absolute inset-0 w-full h-full" />
+
+        {/* Top label */}
+        <div className="absolute top-6 left-0 right-0 flex flex-col items-center gap-1 pointer-events-none">
+          <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#A78BFA]">How it works</div>
+          <div className="text-[11px] text-white/30 tracking-widest uppercase">scroll to explore</div>
+        </div>
+
+        {/* Step pips */}
+        <div className="absolute top-1/2 -translate-y-1/2 right-6 flex flex-col gap-3 items-center">
+          {[0,1,2].map(i => (
+            <div key={i} className="ww-pip w-1.5 h-1.5 rounded-full bg-white/20 transition-all duration-500 [&.active]:bg-[#6D4AFF] [&.active]:h-8 [&.active]:rounded-full [&.done]:bg-[#6D4AFF]/40" />
+          ))}
+        </div>
+
+        {/* Info panel — left side */}
+        <div className="absolute top-0 left-0 bottom-0 w-[320px] flex flex-col justify-center px-10 pointer-events-none">
+          <div className="ww-card opacity-0 translate-y-3 transition-all duration-500 [&.show]:opacity-100 [&.show]:translate-y-0">
+            <div className="ww-num mb-3 text-[11px] font-bold text-[#A78BFA] uppercase tracking-[0.15em]" />
+            <div className="ww-title mb-3 text-[22px] font-bold text-white leading-snug" />
+            <div className="ww-body text-[14px] text-white/50 leading-relaxed" />
+          </div>
+        </div>
+
+        {/* Scroll progress bar — bottom */}
+        <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-white/8">
+          <div className="ww-fill h-full bg-[#6D4AFF] w-0 transition-none" style={{ transition: 'width 0.05s linear' }} />
         </div>
       </div>
-      {/* Scrubber */}
-      <div className="absolute bottom-3.5 left-5 right-5 flex items-center gap-3">
-        <div className="ww-track relative flex-1 h-[3px] bg-white/10 rounded-full cursor-pointer">
-          <div className="ww-fill h-full bg-[#6D4AFF] rounded-full w-0" />
-          <div className="ww-thumb absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-[#6D4AFF] border-2 border-white left-0 cursor-grab" />
-        </div>
-        <div className="ww-hint text-[10px] text-white/30 uppercase tracking-widest whitespace-nowrap transition-opacity duration-500">drag to explore</div>
-      </div>
-    </div>
+    </section>
   );
 }
 
@@ -1090,20 +1065,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, firm
       </section>
 
       {/* ── HOW IT WORKS ── */}
-      <section className="bg-[#FAFAFF] px-5 py-16 sm:px-8 sm:py-24">
-        <div className="mx-auto max-w-6xl">
-          <div className="mb-12 text-center">
-            <div className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-[#6D4AFF]">How it works</div>
-            <h2 className="text-[30px] font-bold leading-tight tracking-tight text-[#1E1B4B] sm:text-[38px]">
-              From scattered files to
-              <br />
-              structured intake records
-            </h2>
-          </div>
-
-          <WorkerWorkflowScroll />
-        </div>
-      </section>
+      <WorkerWorkflowScroll />
 
       {/* ── FOR ATTORNEYS ── */}
       <section className="px-5 py-16 sm:px-8 sm:py-24">
