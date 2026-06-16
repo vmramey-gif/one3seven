@@ -1973,6 +1973,31 @@ export function IntakeReviewScreen({
               );
             })()}
 
+            {/* Questions that may help complete the intake (Phase 2a clarification engine) */}
+            {(() => {
+              const rawClarifications = firmLiveView?.intelligence?.clarificationQuestions;
+              const clarifications: string[] = Array.isArray(rawClarifications) ? rawClarifications : [];
+              if (!clarifications.length) return null;
+              return (
+                <motion.section
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.05 }}
+                  className="rounded-[24px] border border-[#E7E1FF] bg-[#F7F3FF] p-5 shadow-[0_14px_38px_rgba(31,27,75,0.08)]"
+                >
+                  <h3 className="text-sm font-semibold text-[#1E1B4B] mb-1">Questions that may help complete the intake</h3>
+                  <p className="text-[11px] text-[#1E1B4B]/45 mb-3">Suggested follow-ups drawn from gaps in the uploaded records. Not legal advice.</p>
+                  <div className="space-y-2">
+                    {clarifications.map((line, index) => (
+                      <p key={`${line}-${index}`} className="text-sm leading-relaxed text-[#1E1B4B]/70">
+                        · {line}
+                      </p>
+                    ))}
+                  </div>
+                </motion.section>
+              );
+            })()}
+
             {firmLiveView?.documentRequest?.categories?.length ? (() => {
               const requested = firmLiveView.documentRequest!.categories;
               const fulfilled: string[] = firmLiveView?.documentResponse?.fulfilled ?? [];

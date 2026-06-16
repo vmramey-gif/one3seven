@@ -866,9 +866,18 @@ function buildFirmPolishedPacketPdfLines(
     }
   }
 
-  // --- 9. Worker Context ---
+  // --- 9. Questions That May Help Complete the Intake (Phase 2a clarification engine) ---
+  const clarifications = intel?.clarificationQuestions ?? [];
+  if (tier !== 'limited_preview' && clarifications.length > 0) {
+    section(lines, '9.  Questions That May Help Complete the Intake');
+    for (const cq of clarifications) {
+      bullet(lines, cq);
+    }
+  }
+
+  // --- 10. Worker Context ---
   if (tier !== 'limited_preview') {
-    section(lines, '9.  Worker Context');
+    section(lines, '10.  Worker Context');
     if (workerStory) {
       const paragraphs = workerStory.split(/\n+/).map((p) => p.trim()).filter(Boolean);
       for (const para of paragraphs) {
@@ -881,8 +890,8 @@ function buildFirmPolishedPacketPdfLines(
     }
   }
 
-  // --- 10. Firm Review Options ---
-  section(lines, '10.  Firm Review Options');
+  // --- 11. Firm Review Options ---
+  section(lines, '11.  Firm Review Options');
 
   // Dynamic summary line
   const unresolvedCount = confirmItems.length;

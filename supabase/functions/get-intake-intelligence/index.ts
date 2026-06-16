@@ -138,6 +138,50 @@ function timingLabel(days: number, name: string): string {
   return `${name}: approximately ${m} month${m === 1 ? '' : 's'} after complaint`;
 }
 
+// Phase 2a Clarification Engine (deterministic, no LLM) — mirrors documentFactsService.
+function buildClarificationQuestions(input: {
+  distinctEmployers: string[];
+  confirmedComplaintTopic: string | null;
+  confirmedComplaintDate: string | null;
+  confirmedHrResponseSummary: string | null;
+  confirmedStartDate: string | null;
+  confirmedTerminationDate: string | null;
+  finalPayPresent: boolean;
+  overtimeIssueDetected: boolean;
+  hasComplaintRecord: boolean;
+  hasSeparationRecord: boolean;
+  hasOffer: boolean;
+  hasWitness: boolean;
+  missedBreaksRecorded: boolean;
+}): string[] {
+  const q: string[] = [];
+  if (input.distinctEmployers.length > 1) {
+    q.push(`The records show more than one employer name (${input.distinctEmployers.join(', ')}). Which name appears on your paystub or offer letter?`);
+  }
+  if (input.confirmedComplaintTopic && !input.confirmedHrResponseSummary) {
+    q.push('The records include a workplace concern but do not show who received it or how it was handled. Who did you report it to?');
+  }
+  if ((input.hasComplaintRecord || input.confirmedComplaintTopic) && !input.confirmedComplaintDate) {
+    q.push('A workplace concern is noted but its date is not clear in the records. When did you first raise it?');
+  }
+  if ((input.hasSeparationRecord || input.confirmedTerminationDate) && !input.finalPayPresent) {
+    q.push('The records reference a separation from employment. Do you have a termination letter, final paystub, or related message to upload?');
+  }
+  if (!input.confirmedStartDate && !input.hasOffer) {
+    q.push('The records do not yet show an employment start date. Do you have an offer letter or an early paystub that shows when you started?');
+  }
+  if (input.overtimeIssueDetected) {
+    q.push('Pay records show overtime hours without a matching overtime rate. Do you have additional paystubs or wage statements for those periods?');
+  }
+  if (input.missedBreaksRecorded) {
+    q.push('Break records show missed or short breaks. Do you have time records or schedules for the same dates?');
+  }
+  if (!input.hasWitness && input.confirmedComplaintTopic && (input.hasSeparationRecord || input.confirmedTerminationDate)) {
+    q.push('No coworker statement is in the records. Is there anyone who saw what happened who could share what they observed?');
+  }
+  return q.slice(0, 6);
+}
+
 function synthesize(files: any[]): unknown {
   const byCategory = new Map<string, any[]>();
   for (const f of files) {
@@ -262,6 +306,22 @@ function synthesize(files: any[]): unknown {
     );
   }
 
+  const clarificationQuestions = buildClarificationQuestions({
+    distinctEmployers,
+    confirmedComplaintTopic,
+    confirmedComplaintDate,
+    confirmedHrResponseSummary,
+    confirmedStartDate,
+    confirmedTerminationDate,
+    finalPayPresent,
+    overtimeIssueDetected,
+    hasComplaintRecord: communications.length > 0,
+    hasSeparationRecord: separation.length > 0,
+    hasOffer: offers.length > 0,
+    hasWitness: witness.length > 0,
+    missedBreaksRecorded: mealBreaks.some((m: any) => m.flags?.includes('missed_breaks_recorded') || m.flags?.includes('short_breaks_recorded')),
+  });
+
   return {
     confirmedEmployer,
     confirmedStartDate,
@@ -279,5 +339,6 @@ function synthesize(files: any[]): unknown {
     keyQuotes,
     allFlags,
     confirmationNeeded,
+    clarificationQuestions,
   };
 }

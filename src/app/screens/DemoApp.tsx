@@ -167,6 +167,10 @@ const DEMO_FIRM_LIVE_VIEW: FirmLiveIntakeView = {
       'Prior annual performance reviews (2022–2024) not in current record set — may be relevant to attorney evaluation',
       'Coworker corroboration not yet documented',
     ],
+    clarificationQuestions: [
+      'Pay records show overtime hours without a matching overtime rate. Do you have additional paystubs or wage statements for those periods?',
+      'No coworker statement is in the records. Is there anyone who saw what happened who could share what they observed?',
+    ],
   },
 };
 
