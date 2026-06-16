@@ -241,7 +241,10 @@ export function buildMissingRecordSuggestion(topic: string): string {
   if (/payroll|pay stub|paystub|wage statement/i.test(t)) {
     return additionalRecordsMayHelpPhrase('a payroll record for this period');
   }
-  if (/communicat|email|message/i.test(t)) {
+  // Only collapse to the generic phrasing when the topic is *primarily* about a missing
+  // communication — not when it is a specific request like "HR response or follow-up
+  // communication", which should keep its precise wording.
+  if (/^(a\s+)?(communicat|email|message)/i.test(t)) {
     return additionalRecordsMayHelpPhrase('a communication from this date range');
   }
   if (/time|schedule|timesheet/i.test(t)) {

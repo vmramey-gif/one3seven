@@ -113,12 +113,12 @@ const EVENT_FORBIDDEN_FILE_PATTERNS: Record<string, RegExp[]> = {
 };
 
 /**
- * Upstream titles that are known to mislabel events (e.g. "safety concerns" when
- * the context is a wage complaint). These are forced through EVENT_TITLE_RULES
- * instead of passing through as-is.
+ * Only genuinely vague or conclusory upstream titles are forced through
+ * EVENT_TITLE_RULES. Titles that LEAD with a bare abstract noun ("Concern raised",
+ * "Incident reported") are flattened; concrete event-first titles that name the
+ * actor or action ("Worker raises safety concerns") are preserved as-is.
  */
-const MISLEADING_UPSTREAM_TITLE_RE =
-  /\bsafety concern\b|\braised safety\b|\bworker raises safety\b|\bsafety issue\b/i;
+const MISLEADING_UPSTREAM_TITLE_RE = /^(concern|issue|problem|incident|matter|situation)\b/i;
 
 /** Maps resolved event titles to a human-readable display category for the firm card badge. */
 const TITLE_TO_DISPLAY_CATEGORY: Record<string, string> = {
@@ -313,10 +313,11 @@ function isConcreteUpstreamTitle(title: string): boolean {
 
 function roleAwareTitle(baseTitle: string, haystack: string): string {
   if (baseTitle !== 'Complaint submitted to Human Resources') return baseTitle;
+  // Match either order: "Name (Human Resources …)" / "Name - Human Resources" or "Human Resources Name".
   const match = haystack.match(
-    /\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,2})\s*(?:\((?:Human Resources|HR|HR Generalist|Human Resources Representative)[^)]+\)|[-,]\s*(?:Human Resources|HR|HR Generalist|Human Resources Representative)|\s+(?:Human Resources|HR Generalist|Human Resources Representative))\b/
+    /([A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,2})\s*(?:\((?:Human Resources|HR|HR Generalist)[^)]*\)|[-,]\s*(?:Human Resources|HR|HR Generalist|Human Resources Representative))|(?:Human Resources|HR Generalist|Human Resources Representative)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,2})/
   );
-  const name = match?.[1]?.trim();
+  const name = (match?.[1] ?? match?.[2])?.trim();
   if (!name || /\b(Human Resources|Resources Representative|Complaint Submitted)\b/i.test(name)) return baseTitle;
   return `${baseTitle} (${name})`;
 }
