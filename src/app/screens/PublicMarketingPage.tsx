@@ -399,7 +399,7 @@ function IntakeTransformVisual() {
 
 
 
-// ── HeroVisual: chaos → organize → clarity three-panel canvas animation ────────
+// ── HeroVisual: scattered records → swirl → intake card ──────────────────────
 function HeroVisual() {
   const containerRef = useRef<HTMLDivElement>(null);
   const rafRef       = useRef<number | null>(null);
@@ -411,10 +411,11 @@ function HeroVisual() {
     const cv = container.querySelector('canvas') as HTMLCanvasElement;
     const ctx = cv.getContext('2d')!;
 
-    let W = 0, H = 0;
+    let W = 0, H = 0, CX = 0, CY = 0;
     function resize() {
       const r = devicePixelRatio || 1;
       W = container.clientWidth; H = container.clientHeight;
+      CX = W / 2; CY = H / 2;
       cv.width = W * r; cv.height = H * r;
       ctx.setTransform(r, 0, 0, r, 0, 0);
     }
@@ -422,217 +423,208 @@ function HeroVisual() {
     const ro = new ResizeObserver(resize);
     ro.observe(container);
 
-    // scale relative to design width 540
-    const sc = () => Math.min(W, 560) / 560;
+    const TOTAL = 6000;
+    const PH = { appear: 0, float: 700, swirl: 2000, form: 3400, rest: 4100, end: 5300 };
 
-    const CHAOS = [
-      { label: 'Screenshot', color: '#FEE2E2', text: '#991B1B', icon: '📱', fx: 0.14, fy: 0.14, ph: 0.0 },
-      { label: 'Text Msg',   color: '#E0F2FE', text: '#0369A1', icon: '💬', fx: 0.74, fy: 0.22, ph: 1.4 },
-      { label: 'Pay Stub',   color: '#DCFCE7', text: '#166534', icon: '💵', fx: 0.10, fy: 0.50, ph: 2.6 },
-      { label: 'HR Cmplnt',  color: '#FEF3C7', text: '#92400E', icon: '📄', fx: 0.72, fy: 0.54, ph: 0.7 },
-      { label: 'Email',      color: '#F3E8FF', text: '#7C3AED', icon: '✉️', fx: 0.16, fy: 0.80, ph: 1.9 },
-      { label: 'Calendar',   color: '#E0F2FE', text: '#0369A1', icon: '📅', fx: 0.68, fy: 0.84, ph: 3.2 },
-      { label: '?',          color: '',        text: '#9F1239', icon: '?', fx: 0.88, fy: 0.42, ph: 2.0 },
-      { label: '?',          color: '',        text: '#B45309', icon: '?', fx: 0.06, fy: 0.35, ph: 0.5 },
+    type DocItem = { lb: string; hc: string; bc: string; bx: number; by: number; rot: number; ph: number; sa: number; sr: number };
+    const DOCS: DocItem[] = [
+      { lb: 'SCREENSHOT',   hc: '#6D4AFF', bc: '#EEE9FF', bx: -130, by:  -68, rot: -17, ph: 0.0, sa: 0, sr: 0 },
+      { lb: 'TEXT MSG',     hc: '#5B39E6', bc: '#F2EFFF', bx:  -52, by: -108, rot:   9, ph: 0.5, sa: 0, sr: 0 },
+      { lb: 'PAY STUB',     hc: '#111b3d', bc: '#F8F6FF', bx: -122, by:   48, rot:  -6, ph: 1.0, sa: 0, sr: 0 },
+      { lb: 'HR COMPLAINT', hc: '#4A30CC', bc: '#EEE9FF', bx:   18, by:  -88, rot:  13, ph: 1.5, sa: 0, sr: 0 },
+      { lb: 'EMAIL',        hc: '#8B6BFF', bc: '#F2EFFF', bx:   88, by:  -18, rot:  -8, ph: 2.0, sa: 0, sr: 0 },
+      { lb: 'SCHEDULE',     hc: '#39415f', bc: '#F8F6FF', bx:  -42, by:   95, rot:  11, ph: 2.5, sa: 0, sr: 0 },
+      { lb: 'NOTICE',       hc: '#6D4AFF', bc: '#EEE9FF', bx:  108, by:   52, rot: -13, ph: 3.0, sa: 0, sr: 0 },
+    ];
+    DOCS.forEach(d => { d.sa = Math.atan2(d.by, d.bx); d.sr = Math.sqrt(d.bx * d.bx + d.by * d.by); });
+
+    const QMS = [
+      { bx: -95, by: -148, ph: 0.0, sz: 28 },
+      { bx:  52, by: -142, ph: 1.4, sz: 23 },
+      { bx: 145, by:  -90, ph: 2.3, sz: 19 },
     ];
 
-    const INTAKE = [
-      { label: 'Incident Date',       value: 'Oct 14',   color: '#6D4AFF' },
-      { label: 'HR Complaint Filed',  value: 'Oct 22',   color: '#059669' },
-      { label: 'Termination Notice',  value: 'Nov 3',    color: '#DC2626' },
-      { label: 'EEOC Deadline',       value: '180 days', color: '#D97706' },
-    ];
+    const sc = () => Math.min(W, 580) / 580;
+    const cl = (v: number, lo = 0, hi = 1) => Math.max(lo, Math.min(hi, v));
+    const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+    const eOut = (t: number) => 1 - (1 - t) ** 3;
+    const eIn  = (t: number) => t * t * t;
+    const eIO  = (t: number) => t < .5 ? 4*t*t*t : 1 - (-2*t+2)**3/2;
 
-    type Pt = { x: number; y: number; tx: number; ty: number; prog: number; spd: number; sz: number; col: string };
-    const particles: Pt[] = [];
-    let lastSpawn = 0;
-
-    function spawnPt(ts: number) {
-      const W3 = W / 3;
-      const cx = W3 + W3 / 2, cy = H / 2;
-      // left → center
-      particles.push({
-        x: W3 * (0.1 + Math.random() * 0.8), y: H * (0.15 + Math.random() * 0.7),
-        tx: cx + (Math.random() - 0.5) * W3 * 0.3, ty: cy + (Math.random() - 0.5) * H * 0.25,
-        prog: 0, spd: 0.007 + Math.random() * 0.007, sz: 1.5 + Math.random() * 2,
-        col: Math.random() < 0.5 ? '#A78BFA' : '#C4B5FD',
-      });
-      // center → right
-      particles.push({
-        x: cx + (Math.random() - 0.5) * W3 * 0.3, y: cy + (Math.random() - 0.5) * H * 0.25,
-        tx: 2 * W3 + W3 * (0.1 + Math.random() * 0.8), ty: H * (0.15 + Math.random() * 0.7),
-        prog: 0, spd: 0.007 + Math.random() * 0.007, sz: 1.5 + Math.random() * 2,
-        col: Math.random() < 0.5 ? '#34D399' : '#6EE7B7',
-      });
-      lastSpawn = ts;
-    }
-
-    function rr(x: number, y: number, w: number, h: number, r: number | number[], fill?: string | null, stroke?: string | null, sw = 1) {
-      ctx.beginPath();
-      if (typeof r === 'number') ctx.roundRect(x, y, w, h, r);
-      else ctx.roundRect(x, y, w, h, r);
-      if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+    function rr(x: number, y: number, w: number, h: number, r: number, fill?: string | null, stroke?: string | null, sw = 1) {
+      ctx.beginPath(); ctx.roundRect(x, y, w, h, r);
+      if (fill)   { ctx.fillStyle = fill;     ctx.fill(); }
       if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = sw; ctx.stroke(); }
     }
-    function tx(s: string, x: number, y: number, sz: number, color: string, align: CanvasTextAlign = 'center', weight = '400') {
+    function tx(str: string, x: number, y: number, sz: number, color: string, align: CanvasTextAlign = 'center', weight = '400') {
       ctx.font = `${weight} ${sz}px -apple-system,BlinkMacSystemFont,sans-serif`;
-      ctx.fillStyle = color; ctx.textAlign = align; ctx.globalAlpha = 1;
-      ctx.fillText(s, x, y);
+      ctx.fillStyle = color; ctx.textAlign = align; ctx.textBaseline = 'alphabetic';
+      ctx.fillText(str, x, y);
     }
-    const eio = (t: number) => t < .5 ? 2*t*t : -1+(4-2*t)*t;
+
+    function drawDoc(d: DocItem, x: number, y: number, rotDeg: number, scale: number, alpha: number) {
+      const s = sc(), dw = 100*s, dh = 70*s;
+      ctx.save();
+      ctx.translate(x, y); ctx.rotate(rotDeg * Math.PI / 180); ctx.scale(scale, scale); ctx.globalAlpha = alpha;
+      ctx.shadowColor = 'rgba(24,31,67,0.10)'; ctx.shadowBlur = 14; ctx.shadowOffsetY = 5;
+      rr(-dw/2, -dh/2, dw, dh, 8*s, d.bc);
+      ctx.shadowBlur = 0;
+      ctx.save(); ctx.beginPath(); ctx.roundRect(-dw/2, -dh/2, dw, dh, 8*s); ctx.clip();
+      ctx.fillStyle = d.hc; ctx.fillRect(-dw/2, -dh/2, dw, 22*s); ctx.restore();
+      tx(d.lb, 0, -dh/2+15*s, 6.5*s, 'white', 'center', '700');
+      const lc = 'rgba(109,74,255,0.10)', lx = -dw/2+12*s;
+      rr(lx, -dh/2+28*s, (dw-24*s)*0.88, 4.5*s, 2.5, lc);
+      rr(lx, -dh/2+37*s, (dw-24*s)*0.68, 4.5*s, 2.5, lc);
+      rr(lx, -dh/2+46*s, (dw-24*s)*0.78, 4.5*s, 2.5, lc);
+      rr(-dw/2, -dh/2, dw, dh, 8*s, null, '#e5def8', 1);
+      ctx.restore();
+    }
+
+    function drawCard(x: number, y: number, scale: number, alpha: number) {
+      const s = sc(), cw = 242*s, ch = 326*s;
+      ctx.save();
+      ctx.translate(x, y); ctx.scale(scale, scale); ctx.globalAlpha = alpha;
+      const g = ctx.createRadialGradient(0, 0, 0, 0, 0, 190*s);
+      g.addColorStop(0, 'rgba(109,74,255,0.08)'); g.addColorStop(1, 'rgba(109,74,255,0)');
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(0, 0, 190*s, 0, Math.PI*2); ctx.fill();
+      ctx.shadowColor = 'rgba(24,31,67,0.12)'; ctx.shadowBlur = 40; ctx.shadowOffsetY = 16*s;
+      rr(-cw/2, -ch/2, cw, ch, 16*s, 'white');
+      ctx.shadowBlur = 0;
+      ctx.save(); ctx.beginPath(); ctx.roundRect(-cw/2, -ch/2, cw, ch, 16*s); ctx.clip();
+      ctx.fillStyle = '#6D4AFF'; ctx.fillRect(-cw/2, -ch/2, cw, 60*s); ctx.restore();
+      tx('INTAKE READY', 0, -ch/2+32*s, 12*s, 'white', 'center', '800');
+      tx('Employment  •  Wrongful Termination', 0, -ch/2+49*s, 7.5*s, 'rgba(255,255,255,0.75)', 'center', '500');
+      const bx = -cw/2+18*s, bw = cw-36*s;
+      let y2 = -ch/2+72*s;
+      ctx.strokeStyle = '#e5def8'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(bx, y2); ctx.lineTo(bx+bw, y2); ctx.stroke();
+      y2 += 15*s;
+      tx('TIMELINE', bx, y2, 7*s, '#66708f', 'left', '700');
+      y2 += 17*s;
+      const tl = [
+        { t: 'HR complaint filed',     c: '#6D4AFF' },
+        { t: 'Written warning issued', c: '#8B6BFF' },
+        { t: 'Termination',            c: '#111b3d' },
+      ];
+      tl.forEach((item, i) => {
+        const iy = y2 + i*25*s;
+        ctx.beginPath(); ctx.arc(bx+8*s, iy-4*s, 3.5*s, 0, Math.PI*2);
+        ctx.fillStyle = item.c; ctx.fill();
+        if (i < tl.length-1) {
+          ctx.strokeStyle = '#e5def8'; ctx.lineWidth = 1;
+          ctx.beginPath(); ctx.moveTo(bx+8*s, iy); ctx.lineTo(bx+8*s, iy+21*s); ctx.stroke();
+        }
+        tx(item.t, bx+21*s, iy, 8*s, '#39415f', 'left', '400');
+      });
+      y2 += tl.length*25*s + 12*s;
+      ctx.strokeStyle = '#e5def8'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(bx, y2); ctx.lineTo(bx+bw, y2); ctx.stroke();
+      y2 += 15*s;
+      tx('DOCUMENTS', bx, y2, 7*s, '#66708f', 'left', '700');
+      y2 += 17*s;
+      const docs2 = [
+        { t: 'Termination letter', done: true  },
+        { t: 'Pay records',        done: true  },
+        { t: 'Performance review', done: false },
+      ];
+      docs2.forEach((d2, i) => {
+        const dy = y2 + i*25*s;
+        ctx.beginPath(); ctx.arc(bx+8*s, dy-4*s, 6*s, 0, Math.PI*2);
+        if (d2.done) { ctx.fillStyle = '#6D4AFF'; ctx.fill(); tx('✓', bx+8*s, dy, 8.5*s, 'white', 'center', '700'); }
+        else { ctx.fillStyle = 'transparent'; ctx.strokeStyle = '#d5c9f3'; ctx.lineWidth = 1.5; ctx.stroke(); }
+        tx(d2.done ? d2.t : d2.t + ' pending', bx+21*s, dy, 8*s, d2.done ? '#111b3d' : '#66708f', 'left', '400');
+      });
+      const badgeY = ch/2 - 36*s;
+      rr(-bw/2, badgeY, bw, 24*s, 12*s, '#6D4AFF');
+      tx('● Organized', 0, badgeY+16*s, 9.5*s, 'white', 'center', '700');
+      rr(-cw/2, -ch/2, cw, ch, 16*s, null, '#e5def8', 1.5);
+      ctx.restore();
+    }
 
     let t0: number | null = null;
 
     function frame(ts: number) {
       if (!t0) t0 = ts;
-      const T = (ts - t0) / 1000;
+      const T = (ts - t0) % TOTAL;
       const s = sc();
-      const W3 = W / 3;
-      const cx = W3 + W3 / 2, cy = H / 2;
 
       ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = '#f8f6ff'; ctx.fillRect(0, 0, W, H);
 
-      // ── Panel backgrounds ──
-      // Left: warm cream chaos
-      ctx.save();
-      ctx.beginPath(); ctx.roundRect(0, 0, W3, H, [16, 0, 0, 16]);
-      ctx.fillStyle = '#FFF9F9'; ctx.fill(); ctx.restore();
-      // Center: purple tint
-      ctx.fillStyle = '#F7F4FF';
-      ctx.fillRect(W3, 0, W3, H);
-      // Right: clean mint
-      ctx.save();
-      ctx.beginPath(); ctx.roundRect(2 * W3, 0, W3, H, [0, 16, 16, 0]);
-      ctx.fillStyle = '#F2FDF8'; ctx.fill(); ctx.restore();
-      // Dividers
-      ctx.strokeStyle = 'rgba(109,74,255,0.12)'; ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.moveTo(W3, 0); ctx.lineTo(W3, H); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(2 * W3, 0); ctx.lineTo(2 * W3, H); ctx.stroke();
+      const inDocs  = T < PH.swirl;
+      const inSwirl = T >= PH.swirl && T < PH.form;
+      const inForm  = T >= PH.form  && T < PH.rest;
+      const inRest  = T >= PH.rest  && T < PH.end;
+      const inEnd   = T >= PH.end;
 
-      // ── Panel labels ──
-      tx('SCATTERED', W3 / 2, 14, 6.5 * s, '#EF4444', 'center', '700');
-      tx('one3Seven', cx, 14, 6.5 * s, '#6D4AFF', 'center', '700');
-      tx('REVIEW-READY', 2 * W3 + W3 / 2, 14, 6.5 * s, '#059669', 'center', '700');
+      if (inSwirl) {
+        const gt = cl((T - PH.swirl) / (PH.form - PH.swirl));
+        const g2 = ctx.createRadialGradient(CX, CY, 0, CX, CY, 100*s);
+        g2.addColorStop(0, `rgba(109,74,255,${eIO(gt)*0.18})`); g2.addColorStop(1, 'rgba(109,74,255,0)');
+        ctx.fillStyle = g2; ctx.beginPath(); ctx.arc(CX, CY, 100*s, 0, Math.PI*2); ctx.fill();
+      }
 
-      // ── LEFT PANEL: chaos documents ──
-      CHAOS.forEach((d, i) => {
-        const px = d.fx * W3 + Math.sin(T * 0.55 + d.ph) * 5 * s;
-        const py = d.fy * H + Math.cos(T * 0.42 + d.ph * 1.3) * 4 * s;
-        const rot = Math.sin(T * 0.28 + d.ph) * 9 * (Math.PI / 180);
-        const cw = 58 * s, ch = 36 * s;
-        ctx.save(); ctx.translate(px, py); ctx.rotate(rot);
-        if (d.label === '?') {
-          ctx.font = `700 ${20 * s}px -apple-system,sans-serif`;
-          ctx.fillStyle = d.text; ctx.textAlign = 'center'; ctx.globalAlpha = 0.55;
-          ctx.fillText('?', 0, 7 * s);
+      if (!inForm && !inRest && !inEnd) {
+        const ft = T / 1000;
+        DOCS.forEach((d, i) => {
+          let x: number, y: number, rot: number, scale: number, alpha: number;
+          if (inDocs) {
+            const at = cl((T - i*90) / 480);
+            alpha = eOut(at);
+            x = CX + d.bx*s + Math.sin(ft*0.7 + d.ph)*6*s;
+            y = CY + d.by*s + Math.cos(ft*0.55 + d.ph*1.3)*5*s;
+            rot = d.rot + Math.sin(ft*0.38 + d.ph)*3;
+            scale = 1;
+          } else {
+            const st = cl((T - PH.swirl) / (PH.form - PH.swirl));
+            const ang = d.sa - eIn(st) * Math.PI * 2.2;
+            const rad = d.sr * s * Math.pow(1 - eIn(st), 1.35);
+            x = CX + Math.cos(ang) * rad;
+            y = CY + Math.sin(ang) * rad * 0.65;
+            rot = d.rot + st * 480;
+            scale = Math.max(0, 1 - eIn(Math.pow(st, 1.2)) * 0.92);
+            alpha = st < 0.55 ? 1 : cl(1 - (st - 0.55) / 0.45);
+          }
+          if (alpha > 0.02 && scale > 0.02) drawDoc(d, x, y, rot, scale, alpha);
+        });
+      }
+
+      if (inDocs) {
+        const ft = T / 1000;
+        QMS.forEach((q, i) => {
+          const at = cl((T - 320 - i*150) / 500);
+          const qa = eOut(at) * 0.55;
+          if (qa < 0.01) return;
+          const qx = CX + q.bx*s + Math.sin(ft*0.5 + q.ph)*5*s;
+          const qy = CY + q.by*s + Math.cos(ft*0.44 + q.ph*1.2)*7*s;
+          ctx.save(); ctx.translate(qx, qy); ctx.globalAlpha = qa;
+          ctx.font = `700 ${q.sz*s}px -apple-system,sans-serif`;
+          ctx.fillStyle = '#C7B9FF'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+          ctx.fillText('?', 0, 0); ctx.restore();
+        });
+      }
+
+      if (inForm || inRest || inEnd) {
+        const ft = T / 1000;
+        let cs: number, ca: number, fy = 0;
+        if (inForm) {
+          const ft2 = cl((T - PH.form) / (PH.rest - PH.form));
+          cs = lerp(0.72, 1, eOut(ft2)); ca = eOut(ft2);
+        } else if (inRest) {
+          cs = 1; ca = 1; fy = Math.sin(ft * 1.1) * 3*s;
         } else {
-          ctx.shadowColor = 'rgba(0,0,0,0.10)'; ctx.shadowBlur = 10;
-          rr(-cw / 2, -ch / 2, cw, ch, 6 * s, d.color, d.text + '30', 1);
-          ctx.shadowBlur = 0;
-          ctx.font = `${10 * s}px serif`; ctx.textAlign = 'center';
-          ctx.globalAlpha = 1; ctx.fillText(d.icon, 0, -ch / 2 + 12 * s);
-          tx(d.label, 0, ch / 2 - 5 * s, 5.5 * s, d.text, 'center', '600');
+          const et = cl((T - PH.end) / (TOTAL - PH.end));
+          cs = 1; ca = 1 - eOut(et); fy = Math.sin(ft * 1.1) * 3*s;
         }
-        ctx.restore();
-        void i;
-      });
-
-      // ── CENTER PANEL: organizing orb ──
-      const pulse = Math.sin(T * 1.6) * 0.15 + 0.85;
-      // Outer soft glow
-      const gGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 60 * s * pulse);
-      gGrad.addColorStop(0, 'rgba(109,74,255,0.28)');
-      gGrad.addColorStop(1, 'rgba(109,74,255,0)');
-      ctx.fillStyle = gGrad; ctx.beginPath(); ctx.arc(cx, cy, 60 * s * pulse, 0, Math.PI * 2); ctx.fill();
-      // Rotating arcs (golden-angle motion)
-      for (let ri = 0; ri < 3; ri++) {
-        ctx.save(); ctx.translate(cx, cy); ctx.rotate(T * (0.35 + ri * 0.18) + ri * 1.2);
-        ctx.beginPath(); ctx.arc(0, 0, (42 + ri * 11) * s, 0, Math.PI * 0.55);
-        ctx.strokeStyle = ri === 0 ? `rgba(245,200,66,${0.35 * pulse})` : `rgba(167,139,250,${(0.22 - ri * 0.04) * pulse})`;
-        ctx.lineWidth = 1.5; ctx.stroke(); ctx.restore();
+        drawCard(CX, CY + fy, cs, ca);
       }
-      // Inner circle
-      rr(cx - 30 * s, cy - 30 * s, 60 * s, 60 * s, 30 * s, 'rgba(109,74,255,0.14)', 'rgba(109,74,255,0.5)', 1.5);
-      // Logo
-      tx('one3seven', cx, cy + 4 * s, 8.5 * s, '#5B35D5', 'center', '800');
-      // Golden angle label
-      tx('137°', cx, cy - 38 * s, 7 * s, 'rgba(180,149,40,0.9)', 'center', '700');
-      // "Begin Organizing" pill
-      const pW = 84 * s, pH = 18 * s;
-      ctx.save();
-      ctx.shadowColor = 'rgba(109,74,255,0.4)'; ctx.shadowBlur = 12 * s;
-      rr(cx - pW / 2, cy + 20 * s, pW, pH, 9 * s, '#6D4AFF');
-      ctx.restore();
-      tx('Begin Organizing', cx, cy + 32 * s, 6.5 * s, '#fff', 'center', '600');
-      // Flow arrows (visual hint left→right)
-      const arrY = cy + 50 * s;
-      [W3 * 0.5, W3 * 1.5, W3 * 2.5].forEach((ax, ai) => {
-        const bounce = Math.sin(T * 2.2 + ai * 1.1) * 2 * s;
-        ctx.save(); ctx.translate(ax + bounce, arrY);
-        ctx.fillStyle = ai === 1 ? '#6D4AFF' : '#A78BFA'; ctx.globalAlpha = 0.5;
-        ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-4 * s, -6 * s); ctx.lineTo(4 * s, -6 * s); ctx.closePath(); ctx.fill();
-        ctx.restore();
-      });
-
-      // ── RIGHT PANEL: organized intake card ──
-      const rPad = 10 * s;
-      const rx0 = 2 * W3 + rPad, rW = W3 - rPad * 2;
-      const cardY = 22 * s, cardH = H - 28 * s;
-      // Card shadow
-      ctx.save(); ctx.shadowColor = 'rgba(0,150,80,0.10)'; ctx.shadowBlur = 16;
-      rr(rx0, cardY, rW, cardH, 10 * s, 'white', '#BBF7D0', 1.2);
-      ctx.restore();
-      // Card header bar
-      rr(rx0, cardY, rW, 26 * s, [10 * s, 10 * s, 0, 0], '#6D4AFF');
-      tx('Intake · Organized', 2 * W3 + W3 / 2, cardY + 17 * s, 7 * s, '#fff', 'center', '700');
-      // Worker line
-      tx('Maria T. · Employment', 2 * W3 + W3 / 2, cardY + 40 * s, 6.5 * s, '#374151', 'center', '500');
-      // Hairline
-      ctx.strokeStyle = '#E5E7EB'; ctx.lineWidth = 0.75;
-      ctx.beginPath(); ctx.moveTo(rx0 + 8 * s, cardY + 48 * s); ctx.lineTo(rx0 + rW - 8 * s, cardY + 48 * s); ctx.stroke();
-      // Timeline label
-      tx('KEY DATES', rx0 + 10 * s, cardY + 60 * s, 5.5 * s, '#9CA3AF', 'left', '700');
-      // Timeline items
-      INTAKE.forEach((item, i) => {
-        const iy = cardY + 70 * s + i * 26 * s;
-        ctx.beginPath(); ctx.arc(rx0 + 12 * s, iy + 5 * s, 3 * s, 0, Math.PI * 2);
-        ctx.fillStyle = item.color; ctx.fill();
-        tx(item.label, rx0 + 22 * s, iy + 8 * s, 6 * s, '#374151', 'left', '400');
-        tx(item.value, rx0 + rW - 8 * s, iy + 8 * s, 6 * s, item.color, 'right', '600');
-      });
-      // Doc count
-      const dcY = cardY + 74 * s + INTAKE.length * 26 * s;
-      rr(rx0 + 8 * s, dcY, rW - 16 * s, 18 * s, 5 * s, '#F0FDF4', '#BBF7D0');
-      tx('8 docs · AI-organized · Source-linked', 2 * W3 + W3 / 2, dcY + 12 * s, 5.5 * s, '#059669', 'center', '500');
-      // Ready badge
-      const rdY = cardY + cardH - 22 * s;
-      rr(rx0 + 10 * s, rdY, rW - 20 * s, 17 * s, 8 * s, '#059669');
-      tx('Ready for firm review ✓', 2 * W3 + W3 / 2, rdY + 11.5 * s, 6.5 * s, '#fff', 'center', '700');
-
-      // ── PARTICLES ──
-      if (ts - lastSpawn > 140) spawnPt(ts);
-      for (let i = particles.length - 1; i >= 0; i--) {
-        const p = particles[i];
-        p.prog += p.spd;
-        if (p.prog >= 1) { particles.splice(i, 1); continue; }
-        const eased = eio(p.prog);
-        const ppx = p.x + (p.tx - p.x) * eased;
-        const ppy = p.y + (p.ty - p.y) * eased;
-        ctx.beginPath(); ctx.arc(ppx, ppy, p.sz, 0, Math.PI * 2);
-        ctx.fillStyle = p.col; ctx.globalAlpha = Math.sin(p.prog * Math.PI) * 0.75;
-        ctx.fill(); ctx.globalAlpha = 1;
-      }
-
-      // Outer border
-      rr(0, 0, W, H, 16, null, 'rgba(109,74,255,0.15)', 1.5);
 
       rafRef.current = requestAnimationFrame(frame);
     }
 
     if (prefersReduced) {
-      // static single frame at T=2 — just run frame once without looping
-      t0 = performance.now() - 2000;
-      frame(performance.now());
+      ctx.fillStyle = '#f8f6ff'; ctx.fillRect(0, 0, W, H);
+      drawCard(CX, CY, 1, 1);
       ro.disconnect();
       return;
     }
@@ -647,8 +639,8 @@ function HeroVisual() {
   return (
     <div
       ref={containerRef}
-      className="relative w-full overflow-hidden rounded-[16px] shadow-[0_24px_64px_rgba(109,74,255,0.14)]"
-      style={{ aspectRatio: '4/3' }}
+      className="relative w-full overflow-hidden rounded-[16px] border border-[#e5def8]"
+      style={{ aspectRatio: '4/3', background: '#f8f6ff' }}
     >
       <canvas className="absolute inset-0 w-full h-full" />
     </div>
