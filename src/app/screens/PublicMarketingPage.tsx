@@ -16,22 +16,25 @@ const HOW_IT_WORKS = [
     step: '01',
     title: 'Worker uploads their documents',
     body: 'Pay stubs, emails, HR complaints, text messages, doctor notes — anything relevant. No legal knowledge needed.',
-    color: 'bg-[#F7F3FF] border-[#E7E1FF]',
-    accent: 'text-[#6D4AFF]',
+    color: 'bg-white border-[#e5def8]',
+    accent: 'text-[#6d4aff]',
+    tag: 'Worker',
   },
   {
     step: '02',
-    title: 'AI structures the submitted information',
+    title: 'AI organizes and structures the record',
     body: 'The engine extracts a timeline, identifies key dates, categorizes documents, surfaces timing relationships between reported concerns and later workplace actions, and flags dates that may require timely attorney review.',
-    color: 'bg-[#F0FDF4] border-[#BBF7D0]',
-    accent: 'text-emerald-600',
+    color: 'bg-[#f2efff] border-[#d5c9f3]',
+    accent: 'text-[#5b39e6]',
+    tag: 'one3seven',
   },
   {
     step: '03',
     title: 'Attorney receives a structured intake',
-    body: 'A structured, timestamped intake record arrives in the firm dashboard for attorney review — before the first consultation.',
-    color: 'bg-[#FFF7ED] border-[#FED7AA]',
-    accent: 'text-orange-600',
+    body: 'A clean, organized packet arrives in the firm dashboard before the first consultation — no sorting, no follow-up calls.',
+    color: 'bg-white border-[#e5def8]',
+    accent: 'text-[#4A30CC]',
+    tag: 'Firm',
   },
 ];
 
@@ -650,6 +653,71 @@ function HeroVisual() {
 
 // ── WorkerWorkflowScroll ─────────────────────────────────────────────────────
 function WorkerWorkflowScroll() {
+  return (
+    <section className="px-5 py-20 sm:px-8 sm:py-28 bg-[#f8f6ff]">
+      <div className="mx-auto max-w-2xl">
+        {/* Header */}
+        <div className="mb-14 text-center">
+          <p className="mb-3 text-xs font-bold uppercase tracking-[0.18em] text-[#6d4aff]">How it works</p>
+          <h2 className="text-[28px] font-bold leading-snug text-[#111b3d] sm:text-[34px]">
+            From scattered records<br className="hidden sm:block" /> to review-ready intake
+          </h2>
+        </div>
+
+        {/* Steps */}
+        <div className="relative">
+          {/* Connecting line */}
+          <div className="absolute left-[27px] top-10 bottom-10 w-px bg-[#e5def8] sm:left-[35px]" aria-hidden />
+
+          <div className="space-y-6">
+            {HOW_IT_WORKS.map((s, i) => (
+              <motion.div
+                key={s.step}
+                initial={{ opacity: 0, x: -16 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, margin: '-60px' }}
+                transition={{ duration: 0.45, delay: i * 0.1, ease: 'easeOut' }}
+                className={`relative flex gap-5 rounded-2xl border p-5 sm:p-6 ${s.color}`}
+              >
+                {/* Step circle */}
+                <div className="relative z-10 flex h-[54px] w-[54px] shrink-0 flex-col items-center justify-center rounded-full bg-[#6d4aff] shadow-[0_4px_14px_rgba(109,74,255,0.30)]">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-white/60">step</span>
+                  <span className="text-[15px] font-bold leading-none text-white">{s.step}</span>
+                </div>
+
+                {/* Content */}
+                <div className="flex-1 pt-1">
+                  <div className="mb-1 flex items-center gap-2">
+                    <span className={`text-[10px] font-bold uppercase tracking-widest ${s.accent}`}>{s.tag}</span>
+                  </div>
+                  <h3 className="mb-2 text-[17px] font-bold leading-snug text-[#111b3d] sm:text-[18px]">{s.title}</h3>
+                  <p className="text-sm leading-relaxed text-[#39415f]">{s.body}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
+        {/* Result pill */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-40px' }}
+          transition={{ duration: 0.45, delay: 0.3 }}
+          className="mt-10 flex items-center justify-center gap-3 rounded-2xl border border-[#e5def8] bg-white px-6 py-4"
+        >
+          <CheckCircle2 className="h-5 w-5 shrink-0 text-[#6d4aff]" />
+          <p className="text-sm font-medium text-[#111b3d]">
+            Attorneys open an organized packet — before the first call.
+          </p>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
+// ── WorkerWorkflowScroll_UNUSED_CANVAS ──────────────────────────────────────
+function _WorkerWorkflowScrollCanvas_unused() {
   const placeholderRef = useRef<HTMLDivElement>(null);
   const panelRef       = useRef<HTMLDivElement>(null);
   const rafRef         = useRef<number | null>(null);
@@ -961,6 +1029,7 @@ function WorkerWorkflowScroll() {
     </>
   );
 }
+void _WorkerWorkflowScrollCanvas_unused;
 
 // ── InfoTooltip ──────────────────────────────────────────────────────────────
 function InfoTooltip({ tip }: { tip: string }) {
