@@ -843,11 +843,11 @@ function buildFirmPolishedPacketPdfLines(
     blank(lines);
   }
 
-  // --- 7. Supporting Materials ---
+  // --- 7. Documented vs. Worker-Reported (provenance map, not a second file list) ---
   if (tier !== 'limited_preview') {
     const evidenceRows = buildSupportingMaterialRows(linkedEvents);
     if (evidenceRows.length > 0) {
-      section(lines, '7.  Supporting Materials');
+      section(lines, '7.  Documented vs. Worker-Reported');
       for (const row of evidenceRows) {
         tableRow(lines, row.question, row.support);
       }
