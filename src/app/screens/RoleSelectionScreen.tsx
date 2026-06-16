@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { FileText, Briefcase, ArrowRight, ArrowLeft } from 'lucide-react';
 import { Screen } from '../App';
 import { One3SevenDisclaimer } from '../components/One3SevenDisclaimer';
+import { WordMark } from '../components/WordMark';
 
 interface RoleSelectionScreenProps {
   onNavigate: (screen: Screen) => void;
@@ -71,9 +72,9 @@ export function RoleSelectionScreen({ onNavigate, onSelectRole, onCommitRole }: 
         >
           {/* Header */}
           <div className="mb-12 text-center">
-            <h1 className="mb-2 text-xl font-semibold text-[#1E1B4B]">One3Seven</h1>
+            <h1 className="mb-2 text-xl font-semibold text-[#1E1B4B]"><WordMark /></h1>
             <h2 className="mb-3 text-2xl font-semibold tracking-tight text-[#1E1B4B]">
-              How will you use One3Seven?
+              How will you use <WordMark />?
             </h2>
             <p className="text-sm text-[#1E1B4B]/64">
               Choose the workspace for this account.

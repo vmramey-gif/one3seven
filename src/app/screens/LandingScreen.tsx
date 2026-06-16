@@ -18,6 +18,7 @@ import { WorkerFirmCodeSection } from '../components/WorkerFirmCodeSection';
 import { WorkerExpandableSection } from '../components/WorkerExpandableSection';
 import type { WorkerIntakeFirmRoutingCard } from '../../services/intakeDataService';
 import { formatWorkerIntakeLastActivity } from '../utils/workerDashboardFormat';
+import { WordMark } from '../components/WordMark';
 import {
   WORKER_HUB_COPY,
   WORKER_INTAKE_ACTIONS,
@@ -739,7 +740,7 @@ export function LandingScreen({
               onClick={() => (showWorkerHub && onGoWorkerDashboard ? onGoWorkerDashboard() : onNavigate('landing'))}
               className={`${showWorkerHub ? 'text-base' : 'text-lg'} font-medium text-[#1E1B4B] hover:opacity-80 transition-opacity text-left tracking-tight`}
             >
-              one3Seven
+              <WordMark />
             </button>
             <div className="flex items-center gap-2">
               {showWorkerHub ? (
@@ -1415,7 +1416,7 @@ export function LandingScreen({
         }`}
       >
         <div className="text-center">
-          <div className="mb-2 text-lg font-semibold text-[#1E1B4B]">one3Seven</div>
+          <div className="mb-2 text-lg font-semibold text-[#1E1B4B]"><WordMark /></div>
           <p className="mb-8 text-sm leading-relaxed text-[#475569]">
             A workflow organization platform for intake preparation.
           </p>

@@ -19,6 +19,7 @@ import type { FirmSubmissionTypeDisplay } from '../constants/one3sevenProduct';
 import { NotificationsBell } from '../components/NotificationsBell';
 import type { AppNotificationItem } from '../components/NotificationsBell';
 import { BETA_HIDE_FIRM_ARCHIVED_TAB } from '../constants/flags';
+import { WordMark } from '../components/WordMark';
 
 interface LawFirmDashboardScreenProps {
   onNavigate: (screen: Screen) => void;
@@ -313,7 +314,7 @@ export function LawFirmDashboardScreen({
         <div className="px-6 py-5">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
-              <h1 className="text-xl font-semibold text-[#1E1B4B]">one3Seven</h1>
+              <h1 className="text-xl font-semibold text-[#1E1B4B]"><WordMark /></h1>
             </div>
             <div className="flex flex-wrap items-center gap-2">
               <NotificationsBell items={firmBellNotifications} />

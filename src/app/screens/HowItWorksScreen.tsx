@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { ArrowLeft, Upload, Layers, FileCheck, CheckCircle2 } from 'lucide-react';
 import { Screen } from '../App';
 import { One3SevenDisclaimer } from '../components/One3SevenDisclaimer';
+import { WordMark } from '../components/WordMark';
 
 interface HowItWorksScreenProps {
   onNavigate: (screen: Screen) => void;
@@ -63,7 +64,7 @@ export function HowItWorksScreen({ onNavigate }: HowItWorksScreenProps) {
             onClick={() => onNavigate('landing')}
             className="text-xl font-semibold text-[#6d4aff] hover:opacity-70 transition-opacity duration-200"
           >
-            one3Seven
+            <WordMark />
           </button>
         </div>
       </nav>

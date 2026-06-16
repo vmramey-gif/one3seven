@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { FileText, Folder, Calendar, Loader2, ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { Screen } from '../App';
 import { ONE3SEVEN_NOTICES } from '../constants/one3sevenProduct';
+import { WordMark } from '../components/WordMark';
 import { NotificationsBell } from '../components/NotificationsBell';
 import type { AppNotificationItem } from '../components/NotificationsBell';
 
@@ -172,7 +173,7 @@ export function ProcessingScreen({
             onClick={() => onNavigate('landing')}
             className="text-xl font-semibold text-[#6d4aff] hover:opacity-70 transition-opacity duration-200"
           >
-            one3Seven
+            <WordMark />
           </button>
           <div className="flex items-center gap-2 flex-shrink-0">
             <NotificationsBell items={workerBellNotifications} panelNotice={notificationsPanelNotice} />

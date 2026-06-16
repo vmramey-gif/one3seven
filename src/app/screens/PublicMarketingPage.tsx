@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { WordMark } from '../components/WordMark';
 import { motion, useReducedMotion } from 'motion/react';
 import { ArrowRight, CheckCircle2, Shield, Clock, FileText, Users, Zap, ChevronRight } from 'lucide-react';
 
@@ -1081,7 +1082,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, firm
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-5 sm:h-16 sm:px-8">
           <div className="flex items-center gap-2">
             <div className="h-5 w-5 rounded-[5px] bg-gradient-to-br from-[#6D4AFF] to-[#A78BFA] shadow-sm" />
-            <div className="text-[17px] font-bold tracking-tight text-[#1E1B4B]">one3Seven</div>
+            <div className="text-[17px] font-bold tracking-tight text-[#1E1B4B]"><WordMark /></div>
           </div>
           <div className="hidden items-center gap-6 sm:flex">
             <button
@@ -1489,7 +1490,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, firm
             <div>
               <div className="mb-1 flex items-center gap-2">
                 <div className="h-4 w-4 rounded-[4px] bg-gradient-to-br from-[#6D4AFF] to-[#A78BFA]" />
-                <div className="text-[16px] font-bold text-white">one3Seven</div>
+                <div className="text-[16px] font-bold text-white"><WordMark className="text-white [&>span]:text-[#c7b9ff]" /></div>
               </div>
               <div className="text-[12px] text-white/40">AI-powered employment intake engine</div>
             </div>
@@ -1531,7 +1532,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, firm
             <div className="p-8">
               <div className="mb-1 flex items-center gap-1.5">
                 <div className="h-3.5 w-3.5 rounded-[3px] bg-gradient-to-br from-[#6D4AFF] to-[#A78BFA]" />
-                <div className="text-xs font-bold uppercase tracking-wider text-[#6D4AFF]">one3Seven</div>
+                <div className="text-xs font-bold uppercase tracking-wider text-[#6D4AFF]"><WordMark /></div>
               </div>
               <h2 className="mb-3 text-[20px] font-bold leading-snug text-[#1E1B4B]">Controlled beta</h2>
               <p className="mb-6 text-[14px] leading-relaxed text-[#1E1B4B]/60">

@@ -51,6 +51,7 @@ import { One3SevenDisclaimer } from '../components/One3SevenDisclaimer';
 import { suggestAttorneyFriendlyFileTitle } from '../../services/documentFactExtractionService';
 import { NotificationsBell } from '../components/NotificationsBell';
 import type { AppNotificationItem } from '../components/NotificationsBell';
+import { WordMark } from '../components/WordMark';
 
 const UPLOAD_PAGE_SHELL =
   'min-h-screen bg-[#f6f2ff] text-[#111827] selection:bg-violet-200/70 selection:text-[#111827]';
@@ -771,7 +772,7 @@ export function UploadScreen({
             onClick={onLogoClick}
             className={UPLOAD_NAV_BRAND}
           >
-            one3Seven
+            <WordMark />
           </button>
           <div className="flex items-center gap-2 flex-shrink-0">
             <NotificationsBell items={workerBellNotifications} panelNotice={notificationsPanelNotice} />

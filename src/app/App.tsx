@@ -89,6 +89,7 @@ import {
   stripTimelineSourceTraceBlock,
 } from '../services/timelineSourceTraceCodec';
 import { enrichWorkerTimelineWithSources } from './utils/workerIntakePresentationUtils';
+import { WordMark } from './components/WordMark';
 import { FIRM_ROUTING_COPY, SAMPLE_INTAKE_NUMBER, SAMPLE_INTAKE_SUMMARY_PREVIEW } from './constants/one3sevenProduct';
 import {
   CALIFORNIA_BETA_CASE_CATEGORIES,
@@ -3790,10 +3791,10 @@ export default function App() {
 
   if (authRestoringSplash) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center px-6">
+      <div className="min-h-screen bg-[#f8f6ff] flex items-center justify-center px-6">
         <div className="text-center">
-          <p className="text-lg font-semibold text-slate-900">one3Seven</p>
-          <p className="mt-2 text-sm text-slate-600">Restoring your secure session…</p>
+          <p className="text-lg font-semibold text-[#1E1B4B]"><WordMark /></p>
+          <p className="mt-2 text-sm text-[#66708f]">Restoring your secure session…</p>
         </div>
       </div>
     );

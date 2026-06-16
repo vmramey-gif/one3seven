@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { WordMark } from '../components/WordMark';
 import { Screen } from '../App';
 
 export type WorkerDetailsPayload = {
@@ -79,7 +80,7 @@ export function WorkerDetailsScreen({ onNavigate, onComplete, initialDetails }: 
 
       <div className="px-6 pt-8 pb-16 max-w-[420px] mx-auto">
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
-          <h1 className="text-xl font-semibold text-[#6d4aff] mb-1">one3Seven</h1>
+          <h1 className="text-xl font-semibold text-[#1E1B4B] mb-1"><WordMark /></h1>
           <h2 className="text-lg font-semibold text-[#111b3d] mb-2">Your details</h2>
           <p className="text-sm text-[#39415f] mb-6">
             Add your name and contact information so we can reach you about your intake when needed.

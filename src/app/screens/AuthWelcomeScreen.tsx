@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { WordMark } from '../components/WordMark';
 import { ArrowRight } from 'lucide-react';
 import { Screen } from '../App';
 
@@ -45,7 +46,7 @@ export function AuthWelcomeScreen({
     <div className="min-h-screen bg-[#f6f2ff] px-5 py-4 text-[#1e1b4b] sm:px-6 sm:py-8">
       <div className="mx-auto flex min-h-[calc(100vh-2rem)] w-full max-w-[480px] flex-col sm:min-h-[calc(100vh-4rem)]">
         <header className="flex items-center justify-between">
-          <div className="text-[15px] font-semibold tracking-tight text-[#1e1b4b]">one3Seven</div>
+          <div className="text-[15px] font-semibold tracking-tight text-[#1e1b4b]"><WordMark /></div>
           <button
             type="button"
             onClick={openSignIn}

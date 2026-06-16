@@ -10,6 +10,7 @@ import type { AppNotificationItem } from '../components/NotificationsBell';
 import type { WorkerTimelineItem } from '../types/workerTimeline';
 import { SHOW_SAMPLE_INTAKE } from '../constants/flags';
 import { SAMPLE_INTAKE_SUMMARY_PREVIEW, SAMPLE_DEMO_LABEL } from '../constants/one3sevenProduct';
+import { WordMark } from '../components/WordMark';
 
 interface WorkerTimelineScreenProps {
   intakeId: string | null;
@@ -93,9 +94,9 @@ export function WorkerTimelineScreen({
           <button
             type="button"
             onClick={onBackToDashboard}
-            className="text-xl font-semibold text-slate-900 hover:opacity-70 transition-opacity"
+            className="text-xl font-semibold text-[#1E1B4B] hover:opacity-70 transition-opacity"
           >
-            one3Seven
+            <WordMark />
           </button>
           <div className="flex items-center gap-2 flex-wrap justify-end">
             <NotificationsBell items={workerBellNotifications} />

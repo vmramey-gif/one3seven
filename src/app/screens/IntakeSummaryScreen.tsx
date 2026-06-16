@@ -101,6 +101,7 @@ import { extractStoryFollowUpFromOverview } from '../../services/storyFollowUpPe
 import { extractRecordStoryFromOverview, parseTimelineSourceTrace } from '../../services/timelineSourceTraceCodec';
 import type { WorkerTimelineItem } from '../types/workerTimeline';
 import { workerMobileSummarySkin } from '../utils/workerMobileSummaryPresentation';
+import { WordMark } from '../components/WordMark';
 
 function resolveWorkerFirmDocumentRequest(
   overview: string | undefined,
@@ -1055,7 +1056,7 @@ export function IntakeSummaryScreen({
       <header className={O3S_NAV_TOP}>
         <div className="px-6 py-4 flex items-center justify-between gap-3">
           <button type="button" onClick={onLogoClick} className={O3S_NAV_BRAND}>
-            one3Seven
+            <WordMark />
           </button>
           <div className="flex items-center gap-2 flex-shrink-0">
             <NotificationsBell items={workerBellNotifications} panelNotice={notificationsPanelNotice} />

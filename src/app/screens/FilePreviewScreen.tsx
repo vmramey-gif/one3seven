@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { motion } from 'motion/react';
 import { ArrowLeft, FileText } from 'lucide-react';
+import { WordMark } from '../components/WordMark';
 import { Screen } from '../App';
 
 interface FilePreviewScreenProps {
@@ -29,7 +30,7 @@ export function FilePreviewScreen({
             onClick={() => onNavigate('landing')}
             className="text-xl font-semibold text-[#6d4aff] hover:opacity-70 transition-opacity duration-200"
           >
-            one3Seven
+            <WordMark />
           </button>
         </div>
       </nav>

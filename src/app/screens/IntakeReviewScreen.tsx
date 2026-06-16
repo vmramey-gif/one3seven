@@ -65,6 +65,7 @@ import { FirmCollapsibleText } from '../components/FirmCollapsibleText';
 import { FirmTimelineEventCard } from '../components/FirmTimelineEventCard';
 import { FIRM_REVIEW_SECTION } from '../constants/firmIntakePresentation';
 import { EmploymentMatterChipList } from '../components/EmploymentMatterTagsLine';
+import { WordMark } from '../components/WordMark';
 
 interface IntakeReviewScreenProps {
   onNavigate: (screen: Screen) => void;
@@ -854,7 +855,7 @@ export function IntakeReviewScreen({
         <nav className="sticky top-0 z-50 border-b border-[#E7E1FF] bg-white/95 backdrop-blur">
           <div className="flex items-center justify-between px-5 py-2.5">
             <div className="flex items-center gap-2.5">
-              <span className="text-sm font-semibold text-[#1E1B4B]">one3Seven</span>
+              <span className="text-sm font-semibold text-[#1E1B4B]"><WordMark /></span>
               <span className="hidden sm:inline text-[#E7E1FF]">·</span>
               <span className="hidden sm:inline text-xs text-[#1E1B4B]/50">Firm intake review</span>
             </div>

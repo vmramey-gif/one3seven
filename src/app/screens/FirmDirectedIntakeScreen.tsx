@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { WordMark } from '../components/WordMark';
 import { motion } from 'motion/react';
 import { ArrowRight, CheckCircle2 } from 'lucide-react';
 
@@ -67,7 +68,7 @@ export function FirmDirectedIntakeScreen({ firmName, onSubmit }: FirmDirectedInt
     <div className="min-h-screen bg-[#F6F2FF]">
       {/* Header */}
       <nav className="sticky top-0 z-50 border-b border-[#E7E1FF] bg-white/90 backdrop-blur-md px-6 py-4">
-        <span className="text-base font-semibold text-[#1E1B4B]">one3Seven</span>
+        <span className="text-base font-semibold text-[#1E1B4B]"><WordMark /></span>
       </nav>
 
       <div className="mx-auto max-w-[520px] px-6 py-10">
