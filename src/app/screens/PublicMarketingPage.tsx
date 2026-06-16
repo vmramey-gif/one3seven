@@ -1257,7 +1257,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, firm
                 <>
                   <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#DCD3FF] bg-white px-4 py-1.5 text-xs font-semibold text-[#6D4AFF] shadow-[0_2px_12px_rgba(109,74,255,0.12)]">
                     <span className="h-1.5 w-1.5 rounded-full bg-gradient-to-r from-[#6D4AFF] to-[#A78BFA] animate-pulse" />
-                    AI-powered employment intake engine
+                    Employment intake · California beta
                   </div>
 
                   <h1 className="mb-5 text-[32px] font-bold leading-[1.1] tracking-tight text-[#1E1B4B] sm:text-[44px] lg:text-[54px]">
@@ -1269,7 +1269,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, firm
                   </h1>
 
                   <p className="mb-5 max-w-[480px] text-[16px] leading-relaxed text-[#1E1B4B]/62 sm:text-[17px]">
-                    one3Seven helps workers turn scattered records, screenshots, and story details into a review-ready intake packet for participating employment firms.
+                    one3seven turns scattered employment records, notes, and documents into a structured intake packet — organized before the attorney ever reviews it.
                   </p>
 
                   <p className="mb-7 flex items-center gap-2 text-sm font-medium text-[#1E1B4B]/70">
@@ -1283,7 +1283,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, firm
                       onClick={openBetaModal}
                       className="flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#6D4AFF] to-[#7C3AED] px-7 py-3.5 text-[15px] font-semibold text-white shadow-[0_16px_48px_rgba(109,74,255,0.32)] transition hover:shadow-[0_20px_60px_rgba(109,74,255,0.45)] hover:-translate-y-0.5 active:scale-[0.97]"
                     >
-                      Controlled beta — access by invitation
+                      Organize my intake
                       <ArrowRight className="h-4 w-4" />
                     </button>
                     <button
@@ -1296,7 +1296,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, firm
                   </div>
 
                   <p className="mt-4 text-sm text-[#1E1B4B]/50">
-                    No credit card required · Cancel anytime · Built for California employment matters
+                    Free to submit · Built for California employment matters · You control what's shared
                   </p>
                 </>
               )}
@@ -1330,10 +1330,10 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, firm
           <div className="mx-auto max-w-[640px] text-center">
             <div className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-[#6D4AFF]">The problem</div>
             <h2 className="mb-5 text-[30px] font-bold leading-tight tracking-tight text-[#1E1B4B] sm:text-[38px]">
-              Disorganized intake slows down case evaluation
+              Employment matters rarely arrive organized
             </h2>
             <p className="text-[15px] leading-relaxed text-[#1E1B4B]/60 sm:text-[16px]">
-              Workers arrive with documents scattered across phones, emails, and folders. Attorneys spend time in the first consultation getting organized rather than evaluating the matter. When intake is disorganized, important information can be missed, decisions can be delayed, and time-sensitive issues may become harder to identify.
+              Workers show up with documents scattered across phones, emails, and folders — no order, no timeline, no clear story. Attorneys spend the first consultation assembling the record instead of evaluating the matter. When intake is disorganized, important information gets missed, decisions get delayed, and time-sensitive issues can slip through.
             </p>
           </div>
 
@@ -1482,7 +1482,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, firm
               <ul className="grid gap-3 sm:grid-cols-2">
                 {TRUST_ITEMS.map((item) => (
                   <li key={item} className="flex items-start gap-2.5">
-                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#6D4AFF]" />
                     <span className="text-[13px] text-[#1E1B4B]/70">{item}</span>
                   </li>
                 ))}
@@ -1510,7 +1510,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, firm
               on disorganized intakes?
             </h2>
             <p className="mb-8 text-[15px] leading-relaxed text-white/70">
-              Start a free 30-day pilot. No credit card required. Your first intake arrives organized — or we'll walk you through it personally.
+              Join the pilot. Your first intake arrives organized — timeline extracted, documents categorized, dates surfaced for attorney review.
             </p>
             <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
               <button
