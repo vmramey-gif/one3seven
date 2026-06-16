@@ -401,36 +401,34 @@ function IntakeTransformVisual() {
 
 // ── WorkerWorkflowScroll ─────────────────────────────────────────────────────
 function WorkerWorkflowScroll() {
-  const sectionRef  = useRef<HTMLElement>(null);
-  const stickyRef   = useRef<HTMLDivElement>(null);
-  const rafRef      = useRef<number | null>(null);
+  const placeholderRef = useRef<HTMLDivElement>(null);
+  const panelRef       = useRef<HTMLDivElement>(null);
+  const rafRef         = useRef<number | null>(null);
   const prefersReduced = useReducedMotion() ?? false;
 
   useEffect(() => {
-    const section  = sectionRef.current;
-    const container = stickyRef.current;
-    if (!section || !container || prefersReduced) return;
+    const placeholder = placeholderRef.current;
+    const panel       = panelRef.current;
+    if (!placeholder || !panel || prefersReduced) return;
 
-    const cv    = container.querySelector('canvas') as HTMLCanvasElement;
+    const cv    = panel.querySelector('canvas') as HTMLCanvasElement;
     const ctx   = cv.getContext('2d')!;
-    const card  = container.querySelector('.ww-card') as HTMLElement;
-    const inNum = container.querySelector('.ww-num') as HTMLElement;
-    const inTit = container.querySelector('.ww-title') as HTMLElement;
-    const inBod = container.querySelector('.ww-body') as HTMLElement;
-    const pips  = container.querySelectorAll('.ww-pip') as NodeListOf<HTMLElement>;
+    const card  = panel.querySelector('.ww-card') as HTMLElement;
+    const inNum = panel.querySelector('.ww-num') as HTMLElement;
+    const inTit = panel.querySelector('.ww-title') as HTMLElement;
+    const inBod = panel.querySelector('.ww-body') as HTMLElement;
+    const pips  = panel.querySelectorAll('.ww-pip') as NodeListOf<HTMLElement>;
 
     function resize() {
       const r = devicePixelRatio || 1;
-      const w = container.clientWidth, h = container.clientHeight;
-      cv.width = w * r; cv.height = h * r;
+      cv.width = window.innerWidth * r; cv.height = window.innerHeight * r;
       ctx.setTransform(r, 0, 0, r, 0, 0);
     }
     resize();
-    const ro = new ResizeObserver(resize);
-    ro.observe(container);
+    window.addEventListener('resize', resize);
 
-    const W = () => container.clientWidth;
-    const H = () => container.clientHeight;
+    const W = () => window.innerWidth;
+    const H = () => window.innerHeight;
 
     function toAnimP(raw: number) {
       if (raw < 0.28) return lerp(0, 0.18, raw / 0.28);
@@ -452,7 +450,7 @@ function WorkerWorkflowScroll() {
 
     function setRaw(v: number) {
       rawP = Math.max(0, Math.min(1, v));
-      const fillEl = container.querySelector('.ww-fill') as HTMLElement | null;
+      const fillEl = panel.querySelector('.ww-fill') as HTMLElement | null;
       if (fillEl) fillEl.style.width = (rawP * 100) + '%';
       const info = INFOS.find(x => rawP <= x.hi) || INFOS[INFOS.length - 1];
       if (info.step !== lastInfo) {
@@ -625,12 +623,15 @@ function WorkerWorkflowScroll() {
       rafRef.current = requestAnimationFrame(frame);
     }
 
-    // page scroll drives the animation
+    // page scroll drives the animation via fixed panel
     const onScroll = () => {
-      const rect = section.getBoundingClientRect();
-      const scrollable = section.offsetHeight - window.innerHeight;
+      const rect = placeholder.getBoundingClientRect();
+      const scrollable = placeholder.offsetHeight - window.innerHeight;
       if (scrollable <= 0) return;
-      setRaw(-rect.top / scrollable);
+      const inView = rect.top <= 0 && rect.bottom >= window.innerHeight;
+      panel.style.opacity = inView ? '1' : '0';
+      panel.style.pointerEvents = inView ? 'none' : 'none';
+      if (inView) setRaw(-rect.top / scrollable);
     };
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
@@ -640,19 +641,22 @@ function WorkerWorkflowScroll() {
 
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      ro.disconnect();
+      window.removeEventListener('resize', resize);
       window.removeEventListener('scroll', onScroll);
     };
   }, [prefersReduced]);
 
   return (
-    <section ref={sectionRef} style={{ height: '320vh' }} className="relative">
+    <>
+      {/* Tall placeholder that holds scroll space */}
+      <div ref={placeholderRef} style={{ height: '320vh' }} aria-hidden="true" />
+
+      {/* Fixed fullscreen panel */}
       <div
-        ref={stickyRef}
-        className="sticky top-0 h-screen overflow-hidden"
-        style={{ background: '#0E0B26' }}
+        ref={panelRef}
+        style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 40, background: '#0E0B26', opacity: 0, transition: 'opacity 0.3s' }}
       >
-        <canvas className="absolute inset-0 w-full h-full" />
+        <canvas style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
 
         {/* Top label */}
         <div className="absolute top-6 left-0 right-0 flex flex-col items-center gap-1 pointer-events-none">
@@ -681,7 +685,7 @@ function WorkerWorkflowScroll() {
           <div className="ww-fill h-full bg-[#6D4AFF] w-0 transition-none" style={{ transition: 'width 0.05s linear' }} />
         </div>
       </div>
-    </section>
+    </>
   );
 }
 
