@@ -1087,7 +1087,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, firm
           <div className="hidden items-center gap-6 sm:flex">
             <button
               type="button"
-              onClick={openBetaModal}
+              onClick={onSignIn}
               className="text-sm font-medium text-[#1E1B4B]/60 transition hover:text-[#1E1B4B]"
             >
               Sign in
@@ -1117,7 +1117,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, firm
         {mobileMenuOpen && (
           <div className="border-t border-[#F0EBFF] bg-white px-5 py-4 sm:hidden">
             <div className="flex flex-col gap-3">
-              <button type="button" onClick={openBetaModal} className="text-sm font-medium text-[#1E1B4B]/60 text-left">Sign in</button>
+              <button type="button" onClick={onSignIn} className="text-sm font-medium text-[#1E1B4B]/60 text-left">Sign in</button>
               <button type="button" onClick={openBetaModal} className="flex items-center gap-1.5 text-sm font-semibold text-[#6D4AFF] text-left">For attorneys <ArrowRight className="h-3.5 w-3.5" /></button>
               <button type="button" onClick={openBetaModal} className="flex items-center gap-1.5 text-sm font-semibold text-[#1E1B4B]/70 text-left">Organize my case <ArrowRight className="h-3.5 w-3.5" /></button>
             </div>
@@ -1498,7 +1498,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, firm
               {[
                 { label: 'For workers', action: openBetaModal },
                 { label: 'For attorneys', action: openBetaModal },
-                { label: 'Sign in', action: openBetaModal },
+                { label: 'Sign in', action: onSignIn },
               ].map((l) => (
                 <button
                   key={l.label}

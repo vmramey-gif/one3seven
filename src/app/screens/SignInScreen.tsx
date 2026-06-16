@@ -152,15 +152,9 @@ export function SignInScreen({ onNavigate, onSignIn, onGoogleAuth }: SignInScree
               </button>
             ) : null}
 
-            {/* Create Account Link */}
+            {/* Create Account — invite-only during beta */}
             <div className="mt-8 text-center">
-              <span className="text-sm text-[#1E1B4B]/64">Don't have an account? </span>
-              <button
-                onClick={() => onNavigate('createAccount')}
-                className="text-sm font-medium text-[#5B35D5] hover:underline"
-              >
-                Create one
-              </button>
+              <span className="text-sm text-[#1E1B4B]/40">New accounts are invite-only during beta.</span>
             </div>
             <One3SevenDisclaimer variant="compact" className="mt-8" />
           </motion.div>
