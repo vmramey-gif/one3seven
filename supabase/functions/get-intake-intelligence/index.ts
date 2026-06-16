@@ -280,11 +280,8 @@ function synthesize(files: any[]): unknown {
         .map((n: string) => [n.toLowerCase(), n] as const)
     ).values(),
   ];
-  if (distinctEmployers.length > 1) {
-    confirmationNeeded.push(
-      `Employer name differs across documents (${distinctEmployers.join(' vs ')}) — confirm which employer name is correct.`
-    );
-  }
+  // Note: employer-name divergence is surfaced once, as a clarification question
+  // (see buildClarificationQuestions). It is intentionally NOT duplicated here.
 
   const lowConfidenceCount = files.filter((f: any) => f.document_facts?.confidence === 'low').length;
   if (lowConfidenceCount > 0) {
