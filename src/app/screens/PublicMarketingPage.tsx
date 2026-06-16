@@ -399,6 +399,262 @@ function IntakeTransformVisual() {
 
 
 
+// ── HeroVisual: chaos → organize → clarity three-panel canvas animation ────────
+function HeroVisual() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const rafRef       = useRef<number | null>(null);
+  const prefersReduced = useReducedMotion() ?? false;
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    const cv = container.querySelector('canvas') as HTMLCanvasElement;
+    const ctx = cv.getContext('2d')!;
+
+    let W = 0, H = 0;
+    function resize() {
+      const r = devicePixelRatio || 1;
+      W = container.clientWidth; H = container.clientHeight;
+      cv.width = W * r; cv.height = H * r;
+      ctx.setTransform(r, 0, 0, r, 0, 0);
+    }
+    resize();
+    const ro = new ResizeObserver(resize);
+    ro.observe(container);
+
+    // scale relative to design width 540
+    const sc = () => Math.min(W, 560) / 560;
+
+    const CHAOS = [
+      { label: 'Screenshot', color: '#FEE2E2', text: '#991B1B', icon: '📱', fx: 0.14, fy: 0.14, ph: 0.0 },
+      { label: 'Text Msg',   color: '#E0F2FE', text: '#0369A1', icon: '💬', fx: 0.74, fy: 0.22, ph: 1.4 },
+      { label: 'Pay Stub',   color: '#DCFCE7', text: '#166534', icon: '💵', fx: 0.10, fy: 0.50, ph: 2.6 },
+      { label: 'HR Cmplnt',  color: '#FEF3C7', text: '#92400E', icon: '📄', fx: 0.72, fy: 0.54, ph: 0.7 },
+      { label: 'Email',      color: '#F3E8FF', text: '#7C3AED', icon: '✉️', fx: 0.16, fy: 0.80, ph: 1.9 },
+      { label: 'Calendar',   color: '#E0F2FE', text: '#0369A1', icon: '📅', fx: 0.68, fy: 0.84, ph: 3.2 },
+      { label: '?',          color: '',        text: '#9F1239', icon: '?', fx: 0.88, fy: 0.42, ph: 2.0 },
+      { label: '?',          color: '',        text: '#B45309', icon: '?', fx: 0.06, fy: 0.35, ph: 0.5 },
+    ];
+
+    const INTAKE = [
+      { label: 'Incident Date',       value: 'Oct 14',   color: '#6D4AFF' },
+      { label: 'HR Complaint Filed',  value: 'Oct 22',   color: '#059669' },
+      { label: 'Termination Notice',  value: 'Nov 3',    color: '#DC2626' },
+      { label: 'EEOC Deadline',       value: '180 days', color: '#D97706' },
+    ];
+
+    type Pt = { x: number; y: number; tx: number; ty: number; prog: number; spd: number; sz: number; col: string };
+    const particles: Pt[] = [];
+    let lastSpawn = 0;
+
+    function spawnPt(ts: number) {
+      const W3 = W / 3;
+      const cx = W3 + W3 / 2, cy = H / 2;
+      // left → center
+      particles.push({
+        x: W3 * (0.1 + Math.random() * 0.8), y: H * (0.15 + Math.random() * 0.7),
+        tx: cx + (Math.random() - 0.5) * W3 * 0.3, ty: cy + (Math.random() - 0.5) * H * 0.25,
+        prog: 0, spd: 0.007 + Math.random() * 0.007, sz: 1.5 + Math.random() * 2,
+        col: Math.random() < 0.5 ? '#A78BFA' : '#C4B5FD',
+      });
+      // center → right
+      particles.push({
+        x: cx + (Math.random() - 0.5) * W3 * 0.3, y: cy + (Math.random() - 0.5) * H * 0.25,
+        tx: 2 * W3 + W3 * (0.1 + Math.random() * 0.8), ty: H * (0.15 + Math.random() * 0.7),
+        prog: 0, spd: 0.007 + Math.random() * 0.007, sz: 1.5 + Math.random() * 2,
+        col: Math.random() < 0.5 ? '#34D399' : '#6EE7B7',
+      });
+      lastSpawn = ts;
+    }
+
+    function rr(x: number, y: number, w: number, h: number, r: number | number[], fill?: string | null, stroke?: string | null, sw = 1) {
+      ctx.beginPath();
+      if (typeof r === 'number') ctx.roundRect(x, y, w, h, r);
+      else ctx.roundRect(x, y, w, h, r);
+      if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+      if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = sw; ctx.stroke(); }
+    }
+    function tx(s: string, x: number, y: number, sz: number, color: string, align: CanvasTextAlign = 'center', weight = '400') {
+      ctx.font = `${weight} ${sz}px -apple-system,BlinkMacSystemFont,sans-serif`;
+      ctx.fillStyle = color; ctx.textAlign = align; ctx.globalAlpha = 1;
+      ctx.fillText(s, x, y);
+    }
+    const eio = (t: number) => t < .5 ? 2*t*t : -1+(4-2*t)*t;
+
+    let t0: number | null = null;
+
+    function frame(ts: number) {
+      if (!t0) t0 = ts;
+      const T = (ts - t0) / 1000;
+      const s = sc();
+      const W3 = W / 3;
+      const cx = W3 + W3 / 2, cy = H / 2;
+
+      ctx.clearRect(0, 0, W, H);
+
+      // ── Panel backgrounds ──
+      // Left: warm cream chaos
+      ctx.save();
+      ctx.beginPath(); ctx.roundRect(0, 0, W3, H, [16, 0, 0, 16]);
+      ctx.fillStyle = '#FFF9F9'; ctx.fill(); ctx.restore();
+      // Center: purple tint
+      ctx.fillStyle = '#F7F4FF';
+      ctx.fillRect(W3, 0, W3, H);
+      // Right: clean mint
+      ctx.save();
+      ctx.beginPath(); ctx.roundRect(2 * W3, 0, W3, H, [0, 16, 16, 0]);
+      ctx.fillStyle = '#F2FDF8'; ctx.fill(); ctx.restore();
+      // Dividers
+      ctx.strokeStyle = 'rgba(109,74,255,0.12)'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(W3, 0); ctx.lineTo(W3, H); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(2 * W3, 0); ctx.lineTo(2 * W3, H); ctx.stroke();
+
+      // ── Panel labels ──
+      tx('SCATTERED', W3 / 2, 14, 6.5 * s, '#EF4444', 'center', '700');
+      tx('one3Seven', cx, 14, 6.5 * s, '#6D4AFF', 'center', '700');
+      tx('REVIEW-READY', 2 * W3 + W3 / 2, 14, 6.5 * s, '#059669', 'center', '700');
+
+      // ── LEFT PANEL: chaos documents ──
+      CHAOS.forEach((d, i) => {
+        const px = d.fx * W3 + Math.sin(T * 0.55 + d.ph) * 5 * s;
+        const py = d.fy * H + Math.cos(T * 0.42 + d.ph * 1.3) * 4 * s;
+        const rot = Math.sin(T * 0.28 + d.ph) * 9 * (Math.PI / 180);
+        const cw = 58 * s, ch = 36 * s;
+        ctx.save(); ctx.translate(px, py); ctx.rotate(rot);
+        if (d.label === '?') {
+          ctx.font = `700 ${20 * s}px -apple-system,sans-serif`;
+          ctx.fillStyle = d.text; ctx.textAlign = 'center'; ctx.globalAlpha = 0.55;
+          ctx.fillText('?', 0, 7 * s);
+        } else {
+          ctx.shadowColor = 'rgba(0,0,0,0.10)'; ctx.shadowBlur = 10;
+          rr(-cw / 2, -ch / 2, cw, ch, 6 * s, d.color, d.text + '30', 1);
+          ctx.shadowBlur = 0;
+          ctx.font = `${10 * s}px serif`; ctx.textAlign = 'center';
+          ctx.globalAlpha = 1; ctx.fillText(d.icon, 0, -ch / 2 + 12 * s);
+          tx(d.label, 0, ch / 2 - 5 * s, 5.5 * s, d.text, 'center', '600');
+        }
+        ctx.restore();
+        void i;
+      });
+
+      // ── CENTER PANEL: organizing orb ──
+      const pulse = Math.sin(T * 1.6) * 0.15 + 0.85;
+      // Outer soft glow
+      const gGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 60 * s * pulse);
+      gGrad.addColorStop(0, 'rgba(109,74,255,0.28)');
+      gGrad.addColorStop(1, 'rgba(109,74,255,0)');
+      ctx.fillStyle = gGrad; ctx.beginPath(); ctx.arc(cx, cy, 60 * s * pulse, 0, Math.PI * 2); ctx.fill();
+      // Rotating arcs (golden-angle motion)
+      for (let ri = 0; ri < 3; ri++) {
+        ctx.save(); ctx.translate(cx, cy); ctx.rotate(T * (0.35 + ri * 0.18) + ri * 1.2);
+        ctx.beginPath(); ctx.arc(0, 0, (42 + ri * 11) * s, 0, Math.PI * 0.55);
+        ctx.strokeStyle = ri === 0 ? `rgba(245,200,66,${0.35 * pulse})` : `rgba(167,139,250,${(0.22 - ri * 0.04) * pulse})`;
+        ctx.lineWidth = 1.5; ctx.stroke(); ctx.restore();
+      }
+      // Inner circle
+      rr(cx - 30 * s, cy - 30 * s, 60 * s, 60 * s, 30 * s, 'rgba(109,74,255,0.14)', 'rgba(109,74,255,0.5)', 1.5);
+      // Logo
+      tx('one3seven', cx, cy + 4 * s, 8.5 * s, '#5B35D5', 'center', '800');
+      // Golden angle label
+      tx('137°', cx, cy - 38 * s, 7 * s, 'rgba(180,149,40,0.9)', 'center', '700');
+      // "Begin Organizing" pill
+      const pW = 84 * s, pH = 18 * s;
+      ctx.save();
+      ctx.shadowColor = 'rgba(109,74,255,0.4)'; ctx.shadowBlur = 12 * s;
+      rr(cx - pW / 2, cy + 20 * s, pW, pH, 9 * s, '#6D4AFF');
+      ctx.restore();
+      tx('Begin Organizing', cx, cy + 32 * s, 6.5 * s, '#fff', 'center', '600');
+      // Flow arrows (visual hint left→right)
+      const arrY = cy + 50 * s;
+      [W3 * 0.5, W3 * 1.5, W3 * 2.5].forEach((ax, ai) => {
+        const bounce = Math.sin(T * 2.2 + ai * 1.1) * 2 * s;
+        ctx.save(); ctx.translate(ax + bounce, arrY);
+        ctx.fillStyle = ai === 1 ? '#6D4AFF' : '#A78BFA'; ctx.globalAlpha = 0.5;
+        ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-4 * s, -6 * s); ctx.lineTo(4 * s, -6 * s); ctx.closePath(); ctx.fill();
+        ctx.restore();
+      });
+
+      // ── RIGHT PANEL: organized intake card ──
+      const rPad = 10 * s;
+      const rx0 = 2 * W3 + rPad, rW = W3 - rPad * 2;
+      const cardY = 22 * s, cardH = H - 28 * s;
+      // Card shadow
+      ctx.save(); ctx.shadowColor = 'rgba(0,150,80,0.10)'; ctx.shadowBlur = 16;
+      rr(rx0, cardY, rW, cardH, 10 * s, 'white', '#BBF7D0', 1.2);
+      ctx.restore();
+      // Card header bar
+      rr(rx0, cardY, rW, 26 * s, [10 * s, 10 * s, 0, 0], '#6D4AFF');
+      tx('Intake · Organized', 2 * W3 + W3 / 2, cardY + 17 * s, 7 * s, '#fff', 'center', '700');
+      // Worker line
+      tx('Maria T. · Employment', 2 * W3 + W3 / 2, cardY + 40 * s, 6.5 * s, '#374151', 'center', '500');
+      // Hairline
+      ctx.strokeStyle = '#E5E7EB'; ctx.lineWidth = 0.75;
+      ctx.beginPath(); ctx.moveTo(rx0 + 8 * s, cardY + 48 * s); ctx.lineTo(rx0 + rW - 8 * s, cardY + 48 * s); ctx.stroke();
+      // Timeline label
+      tx('KEY DATES', rx0 + 10 * s, cardY + 60 * s, 5.5 * s, '#9CA3AF', 'left', '700');
+      // Timeline items
+      INTAKE.forEach((item, i) => {
+        const iy = cardY + 70 * s + i * 26 * s;
+        ctx.beginPath(); ctx.arc(rx0 + 12 * s, iy + 5 * s, 3 * s, 0, Math.PI * 2);
+        ctx.fillStyle = item.color; ctx.fill();
+        tx(item.label, rx0 + 22 * s, iy + 8 * s, 6 * s, '#374151', 'left', '400');
+        tx(item.value, rx0 + rW - 8 * s, iy + 8 * s, 6 * s, item.color, 'right', '600');
+      });
+      // Doc count
+      const dcY = cardY + 74 * s + INTAKE.length * 26 * s;
+      rr(rx0 + 8 * s, dcY, rW - 16 * s, 18 * s, 5 * s, '#F0FDF4', '#BBF7D0');
+      tx('8 docs · AI-organized · Source-linked', 2 * W3 + W3 / 2, dcY + 12 * s, 5.5 * s, '#059669', 'center', '500');
+      // Ready badge
+      const rdY = cardY + cardH - 22 * s;
+      rr(rx0 + 10 * s, rdY, rW - 20 * s, 17 * s, 8 * s, '#059669');
+      tx('Ready for firm review ✓', 2 * W3 + W3 / 2, rdY + 11.5 * s, 6.5 * s, '#fff', 'center', '700');
+
+      // ── PARTICLES ──
+      if (ts - lastSpawn > 140) spawnPt(ts);
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.prog += p.spd;
+        if (p.prog >= 1) { particles.splice(i, 1); continue; }
+        const eased = eio(p.prog);
+        const ppx = p.x + (p.tx - p.x) * eased;
+        const ppy = p.y + (p.ty - p.y) * eased;
+        ctx.beginPath(); ctx.arc(ppx, ppy, p.sz, 0, Math.PI * 2);
+        ctx.fillStyle = p.col; ctx.globalAlpha = Math.sin(p.prog * Math.PI) * 0.75;
+        ctx.fill(); ctx.globalAlpha = 1;
+      }
+
+      // Outer border
+      rr(0, 0, W, H, 16, null, 'rgba(109,74,255,0.15)', 1.5);
+
+      rafRef.current = requestAnimationFrame(frame);
+    }
+
+    if (prefersReduced) {
+      // static single frame at T=2 — just run frame once without looping
+      t0 = performance.now() - 2000;
+      frame(performance.now());
+      ro.disconnect();
+      return;
+    }
+
+    rafRef.current = requestAnimationFrame(frame);
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      ro.disconnect();
+    };
+  }, [prefersReduced]);
+
+  return (
+    <div
+      ref={containerRef}
+      className="relative w-full overflow-hidden rounded-[16px] shadow-[0_24px_64px_rgba(109,74,255,0.14)]"
+      style={{ aspectRatio: '4/3' }}
+    >
+      <canvas className="absolute inset-0 w-full h-full" />
+    </div>
+  );
+}
+
 // ── WorkerWorkflowScroll ─────────────────────────────────────────────────────
 function WorkerWorkflowScroll() {
   const placeholderRef = useRef<HTMLDivElement>(null);
@@ -950,7 +1206,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, firm
                   </h1>
 
                   <p className="mb-5 max-w-[480px] text-[16px] leading-relaxed text-[#1E1B4B]/62 sm:text-[17px]">
-                    one3Seven turns worker-uploaded stories and documents into structured intake records for attorney review — before the first consultation.
+                    one3Seven helps workers turn scattered records, screenshots, and story details into a review-ready intake packet for participating employment firms.
                   </p>
 
                   <p className="mb-7 flex items-center gap-2 text-sm font-medium text-[#1E1B4B]/70">
@@ -983,49 +1239,20 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, firm
               )}
             </motion.div>
 
-            {/* Right: static hero visual */}
+            {/* Right: animated hero visual — chaos → organize → clarity */}
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.7, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
               className="flex justify-center"
             >
-              <div className="w-full max-w-[420px] rounded-[24px] bg-gradient-to-br from-[#1E1B4B] to-[#2D1F6E] p-6 shadow-[0_32px_80px_rgba(0,0,0,.45)]">
-                {/* Header */}
-                <div className="mb-5 flex items-center justify-between">
-                  <div>
-                    <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#A78BFA]">one3Seven</div>
-                    <div className="mt-0.5 text-[15px] font-bold text-white">Your case, organized.</div>
-                  </div>
-                  <div className="rounded-full bg-emerald-500/20 border border-emerald-500/30 px-3 py-1 text-[10px] font-bold text-emerald-400">Ready</div>
-                </div>
-                {/* Doc checklist */}
-                <div className="mb-4 space-y-2">
-                  {[
-                    { label: 'Intake Form', done: true },
-                    { label: 'Pay Stub + Employment', done: true },
-                    { label: 'Police Report + Evidence', done: true },
-                    { label: 'Messages + Calendar', done: true },
-                  ].map((d) => (
-                    <div key={d.label} className="flex items-center gap-3 rounded-xl bg-white/8 px-3 py-2.5">
-                      <div className="h-5 w-5 rounded-md bg-white/10" />
-                      <span className="flex-1 text-[13px] text-white/80">{d.label}</span>
-                      <div className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 text-[10px] font-bold text-white">✓</div>
-                    </div>
-                  ))}
-                </div>
-                {/* Send button */}
-                <div className="mb-4 rounded-full bg-gradient-to-r from-[#6D4AFF] to-[#7C3AED] py-3 text-center text-[14px] font-bold text-white shadow-[0_8px_24px_rgba(109,74,255,0.4)]">
-                  Send to Firms
-                </div>
-                {/* Firm cards */}
-                <div className="grid grid-cols-3 gap-2">
-                  {['LEE & HOWARD', 'RIVERA PARTNERS', 'MURPHY & ASSOC.'].map((f) => (
-                    <div key={f} className="rounded-xl border border-[#A78BFA]/20 bg-white/5 p-2 text-center">
-                      <div className="text-[8px] font-bold text-white/70 leading-tight">{f}</div>
-                      <div className="mt-1.5 rounded-full bg-[#6D4AFF]/30 py-0.5 text-[7px] font-semibold text-[#A78BFA]">Received ✓</div>
-                    </div>
-                  ))}
+              <div className="w-full max-w-[520px]">
+                <HeroVisual />
+                {/* Caption beneath visual */}
+                <div className="mt-3 flex items-center justify-center gap-6 text-[11px] text-[#1E1B4B]/40">
+                  <span>Scattered evidence</span>
+                  <span className="text-[#6D4AFF]/60">→ one3Seven →</span>
+                  <span>Attorney-ready intake</span>
                 </div>
               </div>
             </motion.div>
