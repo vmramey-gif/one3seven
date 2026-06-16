@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest';
 import {
   buildFirmIntakeReviewPdfLines,
+  linkEventsToFiles,
   resolveFirmExportAccessTier,
 } from '../firmIntakeSummaryDownload';
 import type { FirmLiveIntakeView } from '../intakeDataService';
@@ -95,5 +96,23 @@ describe('firm intake summary download', () => {
 
     expect(text).toContain('10. Worker Context');
     expect(text).not.toContain('EXECUTIVE SNAPSHOT');
+  });
+
+  // Regression: a supporting file whose filename year clearly conflicts with the event
+  // year must never be attributed to that event (Oct 2024 event ↮ Nov 2023 schedule notice).
+  test('date-consistency guard: a 2023 file is not attributed to a 2024 event', () => {
+    const linked = linkEventsToFiles(
+      [{ date: 'October 2, 2024', title: 'Schedule change documented', category: 'Schedules' }],
+      [{ file_name: 'Schedule_Change_Notice_November_2023.pdf', category: 'Schedules' }]
+    );
+    expect(linked[0].sourceFile).toBeNull();
+  });
+
+  test('date-consistency guard is narrow: a same-year file still links', () => {
+    const linked = linkEventsToFiles(
+      [{ date: 'October 2, 2024', title: 'Schedule change documented', category: 'Schedules' }],
+      [{ file_name: 'Schedule_Change_Notice_October_2024.pdf', category: 'Schedules' }]
+    );
+    expect(linked[0].sourceFile).toBe('Schedule Change Notice October 2024');
   });
 });

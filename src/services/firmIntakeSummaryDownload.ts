@@ -177,7 +177,7 @@ interface ResolvedFile {
   category: string;
 }
 
-function linkEventsToFiles(
+export function linkEventsToFiles(
   events: Array<{ date: string; title: string; category?: string | null }>,
   files: ResolvedFile[]
 ): Array<{ date: string; title: string; category?: string | null; sourceFile: string | null }> {
@@ -197,10 +197,23 @@ function linkEventsToFiles(
       return fname.includes(yr) && moRe.test(fname);
     };
 
+    // Date-consistency guard: never attribute a file whose filename carries a clearly
+    // parsed 4-digit year that conflicts with the event's year. Narrow on purpose —
+    // it only fires when BOTH the event date and a filename year are unambiguous and
+    // differ (e.g. a Nov 2023 Schedule Change Notice cannot support an Oct 2024 event).
+    const eventYear = evDate ? String(evDate.getFullYear()) : null;
+    const fileYearConflicts = (fname: string): boolean => {
+      if (!eventYear) return false;
+      const fy = fname.match(/\b(?:19|20)\d{2}\b/)?.[0] ?? null;
+      return Boolean(fy && fy !== eventYear);
+    };
+
     // Try specific name-based match first (avoids wrong-file-in-same-category errors)
     let match = files.find((f) => {
       const fname = (f.file_name || '').toLowerCase().replace(/_/g, ' ');
       const cat = (f.category || '').toLowerCase();
+
+      if (fileYearConflicts(fname)) return false;
 
       if (/complaint|hr complaint/i.test(title) && /workplace communications/i.test(cat))
         return /complaint/i.test(fname);
@@ -396,7 +409,21 @@ function buildSupportingMaterialRows(
     }
   }
 
-  return rows;
+  // Consolidate same-type entries: multi-date capture yields one event per dated
+  // record (e.g. several paystubs), but Section 7 should show each entry TYPE once.
+  // Dedupe by question, preferring a document-backed support line over "Worker reported only".
+  const byQuestion = new Map<string, SupportingMaterialRow>();
+  for (const row of rows) {
+    const existing = byQuestion.get(row.question);
+    if (!existing) {
+      byQuestion.set(row.question, row);
+      continue;
+    }
+    if (/worker reported only/i.test(existing.support) && !/worker reported only/i.test(row.support)) {
+      byQuestion.set(row.question, row);
+    }
+  }
+  return [...byQuestion.values()];
 }
 
 // ---------------------------------------------------------------------------
