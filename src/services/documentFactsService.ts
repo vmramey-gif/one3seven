@@ -311,27 +311,27 @@ export function synthesizeIntakeIntelligence(files: FileWithFacts[]): IntakeInte
   ];
   if (distinctEmployers.length > 1) {
     confirmationNeeded.push(
-      `Employer name differs across documents (${distinctEmployers.join(' vs ')}) — confirm the correct legal entity.`
+      `Employer name differs across documents (${distinctEmployers.join(' vs ')}) — confirm which employer name is correct.`
     );
   }
 
   const lowConfidenceCount = files.filter((f) => f.document_facts?.confidence === 'low').length;
   if (lowConfidenceCount > 0) {
     confirmationNeeded.push(
-      `${lowConfidenceCount} document${lowConfidenceCount === 1 ? '' : 's'} produced low-confidence extractions — verify those fields against the source.`
+      `${lowConfidenceCount} document${lowConfidenceCount === 1 ? '' : 's'} produced low-confidence extractions — review those fields against the source.`
     );
   }
 
   const truncatedCount = files.filter((f) => f.document_facts?.text_truncated).length;
   if (truncatedCount > 0) {
     confirmationNeeded.push(
-      `${truncatedCount === 1 ? 'One document was' : `${truncatedCount} documents were`} long; only the first portion was analyzed — review the full source for completeness.`
+      `${truncatedCount === 1 ? 'One document was' : `${truncatedCount} documents were`} long; only the first portion was processed — review the full source for completeness.`
     );
   }
 
   if (allFlags.includes('reason_may_conflict_with_timeline')) {
     confirmationNeeded.push(
-      'A separation document’s stated reason may not align with the complaint timeline — confirm the sequence against the source records.'
+      'Separation reason and complaint date should be reviewed together — confirm the sequence against the source records.'
     );
   }
 

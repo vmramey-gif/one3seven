@@ -1313,9 +1313,9 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, firm
                 <HeroVisual />
                 {/* Caption beneath visual */}
                 <div className="mt-3 hidden items-center justify-center gap-6 text-xs text-[#1E1B4B]/40 sm:flex">
-                  <span>Scattered evidence</span>
+                  <span>Scattered records</span>
                   <span className="text-[#6D4AFF]/60">→ one3seven →</span>
-                  <span>Attorney-ready intake</span>
+                  <span>Organized for attorney review</span>
                 </div>
               </div>
             </motion.div>
