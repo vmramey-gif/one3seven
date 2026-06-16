@@ -46,7 +46,7 @@ describe('workerLiveTimelineWorkspace', () => {
       accessApprovalPending: true,
     });
 
-    expect(moments[0]?.title).toBe('Firm requested access');
+    expect(moments[0]?.title).toBe('Review access requested');
     expect(moments[0]?.markerKind).toBe('action');
   });
 

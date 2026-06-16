@@ -55,11 +55,11 @@ describe('firm intake summary download', () => {
     const lines = buildFirmIntakeReviewPdfLines(baseView({ previewOnly: true, routeStatus: 'preview_sent' }));
     const text = lines.join('\n');
 
-    expect(text).toContain('Full record access is pending worker approval');
-    expect(text).toContain('Section 1 - Intake Overview');
-    expect(text).toContain('Section 3 - Timeline Highlights');
-    expect(text).toContain('Section 5 - Topics Reflected in the Records');
-    expect(text).toContain('Section 6 - Additional Context That May Help');
+    expect(text).toContain('Access Level: Limited preview');
+    expect(text).toContain('1. Review Snapshot');
+    expect(text).toContain('3. Intake Overview');
+    expect(text).toContain('4. Sequence for Firm Review');
+    expect(text).toContain('6. Supporting Records');
 
     expect(text).not.toContain('O3S_RECORD_STORY');
     expect(text).not.toContain('Review signals');
@@ -74,8 +74,8 @@ describe('firm intake summary download', () => {
     const lines = buildFirmIntakeReviewPdfLines(baseView({ previewOnly: false }));
     const text = lines.join('\n');
 
-    expect(text).toContain('Section 2 - Worker Story');
-    expect(text).toContain('Section 4 - Records Available');
+    expect(text).toContain('10. Worker Context');
+    expect(text).toContain('6. Supporting Records');
     expect(text).toContain('Worker narrative that must stay hidden');
     expect(text).not.toContain('PAGE 3 — KNOWLEDGE CLUSTERS');
     expect(text).not.toContain('PAGE 5 — SUGGESTED REVIEW PROMPTS');
@@ -93,7 +93,7 @@ describe('firm intake summary download', () => {
     );
     const text = lines.join('\n');
 
-    expect(text).toContain('Section 2 - Worker Story');
+    expect(text).toContain('10. Worker Context');
     expect(text).not.toContain('EXECUTIVE SNAPSHOT');
   });
 });
