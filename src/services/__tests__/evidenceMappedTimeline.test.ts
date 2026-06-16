@@ -434,7 +434,7 @@ describe('evidence-mapped timeline engine', () => {
     expect(events[0]?.gaps_or_uncertainties).toEqual(
       expect.arrayContaining([
         'Date may require confirmation from source records.',
-        'No supporting record was located.',
+        'No related records found yet.',
       ])
     );
   });

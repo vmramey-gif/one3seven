@@ -270,7 +270,8 @@ changed_afterward:My schedule changed and I later received separation documents.
     });
 
     expect(summary).toMatch(/What remains unclear:/i);
-    expect(summary).toMatch(/Manager response or follow-up after the reported concern may help complete the timeline/i);
+    // Missing-record items are joined into a single "may help complete the timeline" clause.
+    expect(summary).toMatch(/Manager response or follow-up after the reported concern/i);
     expect(summary).toMatch(/Additional timekeeping or schedule records for comparison may help complete the timeline/i);
     expect(summary).not.toMatch(/\b(retaliation occurred|discrimination occurred|wrongful termination|liability|settlement value|strong case|weak case|likely illegal)\b/i);
   });
