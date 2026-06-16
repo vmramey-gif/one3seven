@@ -163,14 +163,14 @@ export function ProcessingScreen({
   }, [phase, quickMode]);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[#f8f6ff]">
       {/* Top Navigation */}
-      <nav className="sticky top-0 bg-white/80 backdrop-blur-md border-b border-slate-100 z-50">
+      <nav className="sticky top-0 bg-[#f8f6ff]/80 backdrop-blur-md border-b border-[#e5def8] z-50">
         <div className="px-6 py-7 flex items-center justify-between gap-3">
           <button
             type="button"
             onClick={() => onNavigate('landing')}
-            className="text-xl font-semibold text-slate-900 hover:opacity-70 transition-opacity duration-200"
+            className="text-xl font-semibold text-[#6d4aff] hover:opacity-70 transition-opacity duration-200"
           >
             one3Seven
           </button>
@@ -180,7 +180,7 @@ export function ProcessingScreen({
               <button
                 type="button"
                 onClick={onOpenWorkerSettings}
-                className="text-sm text-slate-600 hover:text-slate-900 px-3 py-2 rounded-lg hover:bg-slate-50"
+                className="text-sm text-[#39415f] hover:text-[#111b3d] px-3 py-2 rounded-lg hover:bg-[#eee9ff]"
               >
                 Settings
               </button>
@@ -189,7 +189,7 @@ export function ProcessingScreen({
               <button
                 type="button"
                 onClick={onWorkerSignOut}
-                className="text-sm text-slate-600 hover:text-slate-900 px-3 py-2 rounded-lg hover:bg-slate-50"
+                className="text-sm text-[#39415f] hover:text-[#111b3d] px-3 py-2 rounded-lg hover:bg-[#eee9ff]"
               >
                 Sign out
               </button>
@@ -203,7 +203,7 @@ export function ProcessingScreen({
         <button
           type="button"
           onClick={() => onNavigate('upload')}
-          className="flex items-center gap-1.5 text-xs uppercase tracking-wide font-normal self-start text-slate-500 hover:text-slate-700 transition-colors duration-200"
+          className="flex items-center gap-1.5 text-xs uppercase tracking-wide font-normal self-start text-[#66708f] hover:text-[#39415f] transition-colors duration-200"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           Back to upload
@@ -211,12 +211,12 @@ export function ProcessingScreen({
         <button
           type="button"
           onClick={() => onNavigate('landing')}
-          className="text-xs self-start text-slate-500 hover:text-slate-800"
+          className="text-xs self-start text-[#66708f] hover:text-[#111b3d]"
         >
           Your dashboard
         </button>
         {phase === 'finalizing' ? (
-          <p className="text-xs text-slate-500 self-start">
+          <p className="text-xs text-[#66708f] self-start">
             {finalizeTimedOut
               ? 'Taking longer than expected — you can leave; your intake will keep updating.'
               : quickMode
@@ -234,34 +234,34 @@ export function ProcessingScreen({
             transition={{ duration: 0.5 }}
             className="text-center"
           >
-            <h1 className="text-[28px] leading-[1.2] font-semibold text-slate-900 mb-4 tracking-tight">
+            <h1 className="text-[28px] leading-[1.2] font-semibold text-[#111b3d] mb-4 tracking-tight">
               Organizing Your Intake
             </h1>
-            <p className="text-base text-slate-600 mb-10 leading-relaxed">
+            <p className="text-base text-[#39415f] mb-10 leading-relaxed">
               Your records, file names, and any context you added are being organized into a clear timeline and intake
               summary structure.
             </p>
 
             {/* Animated workflow visualization */}
-            <div className="relative bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-[18px] p-10 mb-8 border border-slate-200/60">
+            <div className="relative bg-gradient-to-br from-[#f8f6ff] to-[#eee9ff] rounded-[18px] p-10 mb-8 border border-[#e5def8]">
               <div className="flex justify-center gap-6 items-center mb-8">
                 <motion.div
                   animate={{ scale: [1, 1.1, 1], opacity: [0.5, 1, 0.5] }}
                   transition={{ duration: 2, repeat: Infinity }}
                 >
-                  <FileText className="w-8 h-8 text-slate-600" />
+                  <FileText className="w-8 h-8 text-[#6d4aff]" />
                 </motion.div>
                 <motion.div
                   animate={{ scale: [1, 1.1, 1], opacity: [0.5, 1, 0.5] }}
                   transition={{ duration: 2, repeat: Infinity, delay: 0.3 }}
                 >
-                  <Folder className="w-8 h-8 text-slate-700" />
+                  <Folder className="w-8 h-8 text-[#6d4aff]" />
                 </motion.div>
                 <motion.div
                   animate={{ scale: [1, 1.1, 1], opacity: [0.5, 1, 0.5] }}
                   transition={{ duration: 2, repeat: Infinity, delay: 0.6 }}
                 >
-                  <Calendar className="w-8 h-8 text-slate-800" />
+                  <Calendar className="w-8 h-8 text-[#6d4aff]" />
                 </motion.div>
               </div>
 
@@ -276,34 +276,34 @@ export function ProcessingScreen({
                     className="flex items-center justify-center gap-2 text-sm"
                   >
                     {index <= currentStep ? (
-                      <CheckCircle2 className="w-4 h-4 text-slate-700" />
+                      <CheckCircle2 className="w-4 h-4 text-[#6d4aff]" />
                     ) : (
-                      <div className="w-4 h-4 border-2 border-slate-300 rounded-full" />
+                      <div className="w-4 h-4 border-2 border-[#d5c9f3] rounded-full" />
                     )}
-                    <span className={index <= currentStep ? 'text-slate-700' : 'text-slate-400'}>{step}</span>
+                    <span className={index <= currentStep ? 'text-[#111b3d]' : 'text-[#66708f]'}>{step}</span>
                   </motion.div>
                 ))}
               </div>
 
               {phase === 'finalizing' ? (
-                <div className="mt-8 pt-6 border-t border-slate-200/80 flex flex-col items-center gap-3">
-                  <Loader2 className="w-8 h-8 text-slate-700 animate-spin" aria-hidden />
-                  <p className="text-sm font-medium text-slate-800">
+                <div className="mt-8 pt-6 border-t border-[#e5def8] flex flex-col items-center gap-3">
+                  <Loader2 className="w-8 h-8 text-[#6d4aff] animate-spin" aria-hidden />
+                  <p className="text-sm font-medium text-[#111b3d]">
                     {quickMode ? 'Sending updated files to the firm…' : 'Finalizing organization...'}
                   </p>
-                  <p className="text-xs text-slate-500 leading-relaxed">
+                  <p className="text-xs text-[#66708f] leading-relaxed">
                     {quickMode ? 'Usually under a few seconds.' : 'This can take a few more seconds.'}
                   </p>
                 </div>
               ) : null}
 
               {phase === 'complete' ? (
-                <div className="mt-8 pt-6 border-t border-slate-200/80 flex flex-col items-center gap-3">
-                  <CheckCircle2 className="w-10 h-10 text-slate-700" aria-hidden />
-                  <p className="text-sm font-medium text-slate-800">
+                <div className="mt-8 pt-6 border-t border-[#e5def8] flex flex-col items-center gap-3">
+                  <CheckCircle2 className="w-10 h-10 text-[#6d4aff]" aria-hidden />
+                  <p className="text-sm font-medium text-[#111b3d]">
                     {quickMode ? 'Intake updated' : 'Intake summary updated'}
                   </p>
-                  <p className="text-xs text-slate-500 leading-relaxed">
+                  <p className="text-xs text-[#66708f] leading-relaxed">
                     {destinationAfterComplete === 'landing'
                       ? 'Returning to your dashboard…'
                       : 'Opening your summary…'}
@@ -312,7 +312,7 @@ export function ProcessingScreen({
               ) : null}
             </div>
 
-            <p className="text-xs text-slate-500 leading-relaxed">{ONE3SEVEN_NOTICES.positioning}</p>
+            <p className="text-xs text-[#66708f] leading-relaxed">{ONE3SEVEN_NOTICES.positioning}</p>
           </motion.div>
         </div>
       </div>

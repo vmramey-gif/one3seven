@@ -80,42 +80,42 @@ export function CategoryQuestionnaireScreen({
   }, [questions]);
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="border-b border-slate-100 bg-white px-6 py-4">
+    <div className="min-h-screen bg-[#f8f6ff]">
+      <header className="border-b border-[#e5def8] bg-white px-6 py-4">
         <div className={INTAKE_OPENING_SHELL}>
           <button
             type="button"
             onClick={onBackToCategories}
-            className="inline-flex items-center gap-1 text-xs font-medium text-slate-600 hover:text-slate-900"
+            className="inline-flex items-center gap-1 text-xs font-medium text-[#39415f] hover:text-[#111b3d]"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             Back
           </button>
-          <p className="mt-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
+          <p className="mt-3 text-xs font-semibold uppercase tracking-wide text-[#66708f]">
             {category}
             {questions.length > 0 ? ` · ${questions.length} optional prompts` : ''}
           </p>
-          <h1 className="mt-1 text-xl font-semibold text-slate-900 leading-snug">A few questions to organize your records</h1>
-          <p className="mt-2 text-sm text-slate-600 leading-relaxed">
+          <h1 className="mt-1 text-xl font-semibold text-[#111b3d] leading-snug">A few questions to organize your records</h1>
+          <p className="mt-2 text-sm text-[#39415f] leading-relaxed">
             {INTAKE_OPENING_MICROCOPY.briefOk} {INTAKE_OPENING_MICROCOPY.shareWhatRelevant}{' '}
             {INTAKE_OPENING_MICROCOPY.organizesTimeline}
           </p>
           {intakeNumber ? (
-            <p className="mt-2 text-[11px] text-slate-500">Intake {intakeNumber}</p>
+            <p className="mt-2 text-[11px] text-[#66708f]">Intake {intakeNumber}</p>
           ) : null}
         </div>
       </header>
 
       <main className={`${INTAKE_OPENING_SHELL} px-6 py-8`}>
-        <div className="mb-8 rounded-[14px] border border-slate-100 bg-white/90 px-4 py-3.5">
-          <p className="text-xs leading-relaxed text-slate-600">{UPLOAD_REDACTION_NOTICE}</p>
+        <div className="mb-8 rounded-[14px] border border-[#e5def8] bg-white/90 px-4 py-3.5">
+          <p className="text-xs leading-relaxed text-[#39415f]">{UPLOAD_REDACTION_NOTICE}</p>
         </div>
 
         <div className="space-y-10">
           {questionGroups.map((group, groupIdx) => (
             <section key={group.label ?? `group-${groupIdx}`}>
               {group.label ? (
-                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-4">{group.label}</p>
+                <p className="text-xs font-semibold uppercase tracking-wide text-[#66708f] mb-4">{group.label}</p>
               ) : null}
               <div className="space-y-5">
                 {group.indices.map((idx) => {
@@ -124,18 +124,18 @@ export function CategoryQuestionnaireScreen({
                   return (
                     <div
                       key={question}
-                      className="rounded-[14px] border border-slate-100 bg-white px-4 py-4 shadow-sm shadow-slate-100/50"
+                      className="rounded-[14px] border border-[#e5def8] bg-white px-4 py-4 shadow-[0_2px_8px_rgba(24,31,67,0.05)]"
                     >
                       <div className="flex items-start justify-between gap-2 mb-2">
-                        <label htmlFor={`scaffold-q-${idx}`} className="text-sm font-medium text-slate-900 leading-snug">
+                        <label htmlFor={`scaffold-q-${idx}`} className="text-sm font-medium text-[#111b3d] leading-snug">
                           {question}
                         </label>
-                        <span className="shrink-0 text-[10px] font-medium uppercase tracking-wide text-slate-400">
+                        <span className="shrink-0 text-[10px] font-medium uppercase tracking-wide text-[#66708f]">
                           {INTAKE_OPENING_MICROCOPY.optionalField}
                         </span>
                       </div>
                       {questions.length > 1 ? (
-                        <p className="text-[11px] text-slate-400 mb-2">
+                        <p className="text-[11px] text-[#66708f] mb-2">
                           {idx + 1} of {questions.length}
                         </p>
                       ) : null}
@@ -145,7 +145,7 @@ export function CategoryQuestionnaireScreen({
                         onChange={(e) => setAnswersByIndex((prev) => ({ ...prev, [idx]: e.target.value }))}
                         rows={3}
                         placeholder="Optional — leave blank if not applicable"
-                        className="w-full rounded-[12px] border border-slate-200 bg-slate-50/50 px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200 focus:bg-white"
+                        className="w-full rounded-[12px] border border-[#e5def8] bg-[#f8f6ff] px-3 py-2.5 text-sm text-[#111b3d] placeholder:text-[#66708f] focus:border-[#6d4aff] focus:outline-none focus:ring-2 focus:ring-[#c7b9ff] focus:bg-white"
                       />
                     </div>
                   );
@@ -155,8 +155,8 @@ export function CategoryQuestionnaireScreen({
           ))}
         </div>
 
-        <div className="mt-10 rounded-[14px] border border-slate-100 bg-slate-50/80 px-4 py-3.5">
-          <p className="text-xs leading-relaxed text-slate-600">
+        <div className="mt-10 rounded-[14px] border border-[#e5def8] bg-[#f2efff] px-4 py-3.5">
+          <p className="text-xs leading-relaxed text-[#39415f]">
             By continuing, you confirm you control what you share. You can redact sensitive details before upload.{' '}
             {INTAKE_OPENING_MICROCOPY.editLater}
           </p>
@@ -167,7 +167,7 @@ export function CategoryQuestionnaireScreen({
           <button
             type="button"
             onClick={saveAndContinue}
-            className="inline-flex items-center gap-1 rounded-[12px] bg-slate-900 px-4 py-3 text-sm font-semibold text-white hover:bg-slate-800 min-h-[44px] touch-manipulation"
+            className="inline-flex items-center gap-1 rounded-[12px] bg-[#6d4aff] px-4 py-3 text-sm font-semibold text-white hover:bg-[#5b39e6] min-h-[44px] touch-manipulation"
           >
             Continue to upload
             <ArrowRight className="h-4 w-4" />

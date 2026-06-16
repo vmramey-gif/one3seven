@@ -62,13 +62,15 @@ export function WorkerDetailsScreen({ onNavigate, onComplete, initialDetails }: 
     if (res.error) setError(res.error);
   };
 
+  const inputCls = 'w-full px-4 py-3 bg-[#f8f6ff] border border-[#e5def8] rounded-[14px] text-sm text-[#111b3d] placeholder:text-[#66708f] focus:border-[#6d4aff] focus:outline-none focus:ring-2 focus:ring-[#c7b9ff]';
+
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[#f8f6ff]">
       <div className="px-6 pt-6">
         <button
           type="button"
           onClick={() => onNavigate('authWelcome')}
-          className="flex items-center gap-1.5 text-xs uppercase tracking-wide text-slate-500 hover:text-slate-700"
+          className="flex items-center gap-1.5 text-xs uppercase tracking-wide text-[#66708f] hover:text-[#39415f]"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           Back
@@ -77,9 +79,9 @@ export function WorkerDetailsScreen({ onNavigate, onComplete, initialDetails }: 
 
       <div className="px-6 pt-8 pb-16 max-w-[420px] mx-auto">
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
-          <h1 className="text-xl font-semibold text-slate-900 mb-1">one3Seven</h1>
-          <h2 className="text-lg font-semibold text-slate-900 mb-2">Your details</h2>
-          <p className="text-sm text-slate-600 mb-6">
+          <h1 className="text-xl font-semibold text-[#6d4aff] mb-1">one3Seven</h1>
+          <h2 className="text-lg font-semibold text-[#111b3d] mb-2">Your details</h2>
+          <p className="text-sm text-[#39415f] mb-6">
             Add your name and contact information so we can reach you about your intake when needed.
           </p>
 
@@ -91,99 +93,48 @@ export function WorkerDetailsScreen({ onNavigate, onComplete, initialDetails }: 
 
           <form onSubmit={(e) => void handleSubmit(e)} className="space-y-4">
             <div>
-              <label className="text-sm font-medium text-slate-900 mb-1 block">First name</label>
-              <input
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-[14px] text-sm"
-                autoComplete="given-name"
-                required
-              />
+              <label className="text-sm font-medium text-[#111b3d] mb-1 block">First name</label>
+              <input value={firstName} onChange={(e) => setFirstName(e.target.value)} className={inputCls} autoComplete="given-name" required />
             </div>
             <div>
-              <label className="text-sm font-medium text-slate-900 mb-1 block">Middle initial (optional)</label>
-              <input
-                value={middleInitial}
-                onChange={(e) => setMiddleInitial(e.target.value.slice(0, 3))}
-                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-[14px] text-sm max-w-[120px]"
-                autoComplete="additional-name"
-              />
+              <label className="text-sm font-medium text-[#111b3d] mb-1 block">Middle initial (optional)</label>
+              <input value={middleInitial} onChange={(e) => setMiddleInitial(e.target.value.slice(0, 3))} className={`${inputCls} max-w-[120px]`} autoComplete="additional-name" />
             </div>
             <div>
-              <label className="text-sm font-medium text-slate-900 mb-1 block">Last name</label>
-              <input
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-[14px] text-sm"
-                autoComplete="family-name"
-                required
-              />
+              <label className="text-sm font-medium text-[#111b3d] mb-1 block">Last name</label>
+              <input value={lastName} onChange={(e) => setLastName(e.target.value)} className={inputCls} autoComplete="family-name" required />
             </div>
             <div>
-              <label className="text-sm font-medium text-slate-900 mb-1 block">Phone number</label>
-              <input
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                type="tel"
-                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-[14px] text-sm"
-                autoComplete="tel"
-              />
+              <label className="text-sm font-medium text-[#111b3d] mb-1 block">Phone number</label>
+              <input value={phone} onChange={(e) => setPhone(e.target.value)} type="tel" className={inputCls} autoComplete="tel" />
             </div>
             <div>
-              <label className="text-sm font-medium text-slate-900 mb-1 block">Address line 1</label>
-              <input
-                value={addressLine1}
-                onChange={(e) => setAddressLine1(e.target.value)}
-                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-[14px] text-sm"
-                autoComplete="street-address"
-                required
-              />
+              <label className="text-sm font-medium text-[#111b3d] mb-1 block">Address line 1</label>
+              <input value={addressLine1} onChange={(e) => setAddressLine1(e.target.value)} className={inputCls} autoComplete="street-address" required />
             </div>
             <div>
-              <label className="text-sm font-medium text-slate-900 mb-1 block">Address line 2 (optional)</label>
-              <input
-                value={addressLine2}
-                onChange={(e) => setAddressLine2(e.target.value)}
-                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-[14px] text-sm"
-              />
+              <label className="text-sm font-medium text-[#111b3d] mb-1 block">Address line 2 (optional)</label>
+              <input value={addressLine2} onChange={(e) => setAddressLine2(e.target.value)} className={inputCls} />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="col-span-2 sm:col-span-1">
-                <label className="text-sm font-medium text-slate-900 mb-1 block">City</label>
-                <input
-                  value={city}
-                  onChange={(e) => setCity(e.target.value)}
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-[14px] text-sm"
-                  autoComplete="address-level2"
-                  required
-                />
+                <label className="text-sm font-medium text-[#111b3d] mb-1 block">City</label>
+                <input value={city} onChange={(e) => setCity(e.target.value)} className={inputCls} autoComplete="address-level2" required />
               </div>
               <div className="col-span-2 sm:col-span-1">
-                <label className="text-sm font-medium text-slate-900 mb-1 block">State</label>
-                <input
-                  value={state}
-                  onChange={(e) => setState(e.target.value)}
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-[14px] text-sm"
-                  autoComplete="address-level1"
-                  required
-                />
+                <label className="text-sm font-medium text-[#111b3d] mb-1 block">State</label>
+                <input value={state} onChange={(e) => setState(e.target.value)} className={inputCls} autoComplete="address-level1" required />
               </div>
             </div>
             <div>
-              <label className="text-sm font-medium text-slate-900 mb-1 block">ZIP code</label>
-              <input
-                value={zip}
-                onChange={(e) => setZip(e.target.value)}
-                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-[14px] text-sm"
-                autoComplete="postal-code"
-                required
-              />
+              <label className="text-sm font-medium text-[#111b3d] mb-1 block">ZIP code</label>
+              <input value={zip} onChange={(e) => setZip(e.target.value)} className={inputCls} autoComplete="postal-code" required />
             </div>
 
             <button
               type="submit"
               disabled={submitting}
-              className="w-full mt-4 bg-slate-900 text-white py-4 px-6 rounded-[14px] hover:bg-slate-800 font-medium flex items-center justify-center gap-2 disabled:opacity-60"
+              className="w-full mt-4 bg-[#6d4aff] text-white py-4 px-6 rounded-[14px] hover:bg-[#5b39e6] font-medium flex items-center justify-center gap-2 disabled:opacity-60"
             >
               Continue to dashboard
               <ArrowRight className="w-5 h-5" />
