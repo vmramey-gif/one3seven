@@ -41,6 +41,8 @@ export type DocumentFacts = {
   text_truncated?: boolean;
   /** Phase 2b: every explicitly-stated date in the document, each with a short context label. */
   document_dates?: import('./documentDateExtraction').DocumentDate[];
+  /** Phase 2b: documents this file explicitly references (may not themselves be uploaded). */
+  referenced_documents?: string[];
 };
 
 export type FileWithFacts = {

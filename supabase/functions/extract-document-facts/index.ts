@@ -80,6 +80,8 @@ type DocumentFacts = {
   text_truncated?: boolean;
   // Phase 2b: every explicitly-stated date in the document, each with a short context label.
   document_dates?: Array<{ date: string; context: string }>;
+  // Phase 2b: documents this file explicitly references (may not themselves be uploaded).
+  referenced_documents?: string[];
 };
 
 // ---------------------------------------------------------------------------
@@ -164,6 +166,7 @@ const JSON_SCHEMA = `{
   "relationship_to_worker": string | null,
   "key_quote": string | null,
   "document_dates": [{ "date": string, "context": string }],
+  "referenced_documents": string[],
   "confidence": "high" | "medium" | "low",
   "flags": string[]
 }`;
@@ -182,6 +185,7 @@ File name: ${fileName}${truncated ? `\nNote: this document is long; only the fir
 
 Reminders: quote verbatim for key_quote (under 200 characters); use null / [] for anything not explicitly present; no legal conclusions; raw JSON only.
 Capture EVERY date explicitly stated in the document in "document_dates", each as { "date": "<as written>", "context": "<short factual label, e.g. 'complaint filed', 'warning issued'>" }. Include only dates the text actually states; never infer a date. Keep context labels factual, never conclusory.
+In "referenced_documents", list other documents this file explicitly mentions or refers to but does not itself contain (e.g. "performance improvement plan", "offer letter dated March 2021", "the attached schedule"). Use the document's own wording. Include only documents the text actually references; never infer documents that "should" exist.
 
 CATEGORY-SPECIFIC GUIDANCE:
 ${guidance}
@@ -221,6 +225,7 @@ File name: ${fileName}
 
 Reminders: quote verbatim for key_quote (under 200 characters); use null / [] for anything not explicitly present; no legal conclusions; raw JSON only.
 Capture EVERY date explicitly stated in the document in "document_dates", each as { "date": "<as written>", "context": "<short factual label, e.g. 'complaint filed', 'warning issued'>" }. Include only dates the text actually states; never infer a date. Keep context labels factual, never conclusory.
+In "referenced_documents", list other documents this file explicitly mentions or refers to but does not itself contain (e.g. "performance improvement plan", "offer letter dated March 2021", "the attached schedule"). Use the document's own wording. Include only documents the text actually references; never infer documents that "should" exist.
 
 CATEGORY-SPECIFIC GUIDANCE:
 ${guidance}
@@ -529,6 +534,7 @@ async function processSingleFile(params: {
     extracted_at: new Date().toISOString(),
     text_truncated: textTruncated,
     document_dates: sanitizeDocumentDates(facts.document_dates),
+    referenced_documents: sanitizeReferencedDocuments(facts.referenced_documents),
   };
 
   const { error: writeErr } = await supabase.from('file_text_extractions').update({
@@ -566,6 +572,27 @@ function sanitizeDocumentDates(raw: unknown): Array<{ date: string; context: str
     if (seen.has(key)) continue;
     seen.add(key);
     out.push({ date, context });
+    if (out.length >= 12) break;
+  }
+  return out;
+}
+
+// Phase 2b: validate referenced-document mentions before storage. Drops non-strings
+// and any reference carrying a conclusory term. Compact mirror of the client-side
+// normalizeReferencedDocuments banned-vocabulary guard.
+function sanitizeReferencedDocuments(raw: unknown): string[] {
+  if (!Array.isArray(raw)) return [];
+  const out: string[] = [];
+  const seen = new Set<string>();
+  for (const entry of raw) {
+    if (typeof entry !== 'string') continue;
+    const trimmed = entry.trim();
+    if (!trimmed || trimmed.length > 200) continue;
+    if (DOCUMENT_DATE_BANNED.test(trimmed)) continue;
+    const key = trimmed.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(trimmed);
     if (out.length >= 12) break;
   }
   return out;
