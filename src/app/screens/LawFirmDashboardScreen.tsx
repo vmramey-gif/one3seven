@@ -363,7 +363,7 @@ export function LawFirmDashboardScreen({
                   </p>
                   {firmIntakeLink ? (
                     <div className="rounded-2xl border border-[#E7E1FF] bg-[#F7F3FF] p-5 mb-5">
-                      <p className="text-[10px] font-700 uppercase tracking-[0.18em] text-[#6D4AFF] mb-2" style={{ fontWeight: 700 }}>
+                      <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#6D4AFF] mb-2">
                         Your client intake link
                       </p>
                       <div className="flex items-center gap-2">
@@ -581,7 +581,7 @@ export function LawFirmDashboardScreen({
                   key={tab}
                   type="button"
                   onClick={() => setActiveTab(tab)}
-                  className={`rounded-full border px-3 py-1.5 text-xs transition-colors ${
+                  className={`rounded-full border px-4 py-2 text-sm min-h-[36px] transition-colors ${
                     activeTab === tab
                       ? 'border-[#6D4AFF] bg-[#6D4AFF] text-white shadow-[0_10px_24px_rgba(109,74,255,0.18)]'
                       : 'border-[#DCD3FF] bg-white text-[#1E1B4B]/60 hover:border-[#B8A8FF] hover:bg-[#F7F3FF]'
@@ -650,7 +650,7 @@ export function LawFirmDashboardScreen({
                   </p>
 
                   <div className="mt-5 flex flex-wrap items-center gap-3">
-                    <span className="rounded-full border border-[#DCD3FF] bg-[#F8F6FF] px-3 py-1 text-xs text-[#1E1B4B]/62">
+                    <span className="rounded-full border border-[#DCD3FF] bg-[#F8F6FF] px-3 py-1.5 text-xs text-[#1E1B4B]/62">
                       {statusLineForRoute(
                         intake.routeStatus,
                         intake.submissionType,
@@ -662,7 +662,7 @@ export function LawFirmDashboardScreen({
                       Latest activity: {intake.lastActivity}
                     </span>
                     {intake.requestedDocumentsStatus ? (
-                      <span className="rounded-full border border-[#6D4AFF]/28 bg-[#F7F3FF] px-3 py-1 text-xs text-[#5B35D5]">
+                      <span className="rounded-full border border-[#6D4AFF]/28 bg-[#F7F3FF] px-3 py-1.5 text-xs text-[#5B35D5]">
                         {intake.requestedDocumentsStatus}
                       </span>
                     ) : null}
@@ -687,7 +687,7 @@ export function LawFirmDashboardScreen({
                 </p>
                 {firmIntakeLink ? (
                   <div className="mt-5 rounded-xl border border-[#E7E1FF] bg-[#F7F3FF] p-4">
-                    <p className="text-[10px] font-700 uppercase tracking-[0.18em] text-[#6D4AFF] mb-2" style={{ fontWeight: 700 }}>
+                    <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#6D4AFF] mb-2">
                       Your client intake link
                     </p>
                     <div className="flex items-center gap-2">

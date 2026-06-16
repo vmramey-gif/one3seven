@@ -51,26 +51,26 @@ function CategoryCard({
         selected
           ? 'border-[#6d4aff] bg-[#6d4aff] text-white'
           : 'border-[#e5def8] bg-white text-[#111b3d] hover:border-[#d5c9f3]'
-      }`}
+      } touch-manipulation`}
     >
       <div className="flex items-center justify-between gap-2">
         <h2 className={`font-semibold ${compact ? 'text-sm' : 'text-sm'}`}>{category.name}</h2>
         <ArrowRight className={`h-4 w-4 shrink-0 ${selected ? 'text-white' : 'text-[#66708f]'}`} />
       </div>
       {hint && !compact ? (
-        <p className={`mt-1 text-[11px] ${selected ? 'text-white/80' : 'text-[#66708f]'}`}>{hint}</p>
+        <p className={`mt-1 text-xs ${selected ? 'text-white/80' : 'text-[#66708f]'}`}>{hint}</p>
       ) : null}
       {!compact ? (
         <>
-          <p className={`mt-2 text-xs leading-relaxed ${selected ? 'text-white/90' : 'text-[#39415f]'}`}>
+          <p className={`mt-2 text-sm leading-relaxed ${selected ? 'text-white/90' : 'text-[#39415f]'}`}>
             {category.description}
           </p>
-          <p className={`mt-2 text-[11px] leading-relaxed ${selected ? 'text-white/80' : 'text-[#66708f]'}`}>
+          <p className={`mt-2 text-xs leading-relaxed ${selected ? 'text-white/80' : 'text-[#66708f]'}`}>
             Helpful records: {category.helpfulRecords.join(', ')}
           </p>
         </>
       ) : (
-        <p className={`mt-1 text-xs leading-relaxed line-clamp-2 ${selected ? 'text-white/90' : 'text-[#39415f]'}`}>
+        <p className={`mt-1 text-sm leading-relaxed line-clamp-2 ${selected ? 'text-white/90' : 'text-[#39415f]'}`}>
           {category.description}
         </p>
       )}
@@ -104,7 +104,7 @@ export function CaseCategorySelectionScreen({
             {INTAKE_OPENING_MICROCOPY.beforeUpload}. {INTAKE_OPENING_MICROCOPY.shareWhatRelevant}
           </p>
           {intakeNumber ? (
-            <p className="mt-2 text-[11px] text-[#66708f]">Intake {intakeNumber}</p>
+            <p className="mt-2 text-xs text-[#66708f]">Intake {intakeNumber}</p>
           ) : null}
         </div>
       </header>

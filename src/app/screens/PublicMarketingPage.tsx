@@ -1174,7 +1174,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, firm
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="flex flex-col gap-1.5 p-1 sm:hidden"
+            className="flex flex-col gap-1.5 p-2.5 sm:hidden touch-manipulation"
             aria-label="Toggle menu"
           >
             <span className={`block h-0.5 w-5 bg-[#1E1B4B] transition-all ${mobileMenuOpen ? 'translate-y-2 rotate-45' : ''}`} />
@@ -1185,10 +1185,10 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, firm
         {/* Mobile menu */}
         {mobileMenuOpen && (
           <div className="border-t border-[#F0EBFF] bg-white px-5 py-4 sm:hidden">
-            <div className="flex flex-col gap-3">
-              <button type="button" onClick={onSignIn} className="text-sm font-medium text-[#1E1B4B]/60 text-left">Sign in</button>
-              <button type="button" onClick={openBetaModal} className="flex items-center gap-1.5 text-sm font-semibold text-[#6D4AFF] text-left">For attorneys <ArrowRight className="h-3.5 w-3.5" /></button>
-              <button type="button" onClick={openBetaModal} className="flex items-center gap-1.5 text-sm font-semibold text-[#1E1B4B]/70 text-left">Organize my case <ArrowRight className="h-3.5 w-3.5" /></button>
+            <div className="flex flex-col">
+              <button type="button" onClick={onSignIn} className="flex items-center min-h-[48px] text-base font-medium text-[#1E1B4B]/60 text-left py-3">Sign in</button>
+              <button type="button" onClick={openBetaModal} className="flex items-center gap-1.5 min-h-[48px] text-base font-semibold text-[#6D4AFF] text-left py-3">For attorneys <ArrowRight className="h-4 w-4" /></button>
+              <button type="button" onClick={openBetaModal} className="flex items-center gap-1.5 min-h-[48px] text-base font-semibold text-[#1E1B4B]/70 text-left py-3">Organize my case <ArrowRight className="h-4 w-4" /></button>
             </div>
           </div>
         )}
@@ -1225,7 +1225,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, firm
                     Sent by {firmDirectedContext.firmName}
                   </div>
 
-                  <h1 className="mb-5 text-[38px] font-bold leading-[1.06] tracking-tight text-[#1E1B4B] sm:text-[48px] lg:text-[54px]">
+                  <h1 className="mb-5 text-[32px] font-bold leading-[1.1] tracking-tight text-[#1E1B4B] sm:text-[44px] lg:text-[54px]">
                     {firmDirectedContext.firmName}
                     <br />
                     <span className="text-[#6D4AFF]">asked you to</span>
@@ -1248,7 +1248,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, firm
                     </button>
                   </div>
 
-                  <p className="mt-4 text-xs text-[#1E1B4B]/40">
+                  <p className="mt-4 text-sm text-[#1E1B4B]/50">
                     Free to submit · Your records stay private until you approve sharing
                   </p>
                 </>
@@ -1260,7 +1260,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, firm
                     AI-powered employment intake engine
                   </div>
 
-                  <h1 className="mb-5 text-[38px] font-bold leading-[1.06] tracking-tight text-[#1E1B4B] sm:text-[48px] lg:text-[54px]">
+                  <h1 className="mb-5 text-[32px] font-bold leading-[1.1] tracking-tight text-[#1E1B4B] sm:text-[44px] lg:text-[54px]">
                     Workers deserve
                     <br />
                     organized
@@ -1295,7 +1295,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, firm
                     </button>
                   </div>
 
-                  <p className="mt-4 text-xs text-[#1E1B4B]/40">
+                  <p className="mt-4 text-sm text-[#1E1B4B]/50">
                     No credit card required · Cancel anytime · Built for California employment matters
                   </p>
                 </>
@@ -1312,9 +1312,9 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, firm
               <div className="w-full max-w-[520px]">
                 <HeroVisual />
                 {/* Caption beneath visual */}
-                <div className="mt-3 flex items-center justify-center gap-6 text-[11px] text-[#1E1B4B]/40">
+                <div className="mt-3 hidden items-center justify-center gap-6 text-xs text-[#1E1B4B]/40 sm:flex">
                   <span>Scattered evidence</span>
-                  <span className="text-[#6D4AFF]/60">→ one3Seven →</span>
+                  <span className="text-[#6D4AFF]/60">→ one3seven →</span>
                   <span>Attorney-ready intake</span>
                 </div>
               </div>

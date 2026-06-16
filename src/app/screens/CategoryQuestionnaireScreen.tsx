@@ -101,7 +101,7 @@ export function CategoryQuestionnaireScreen({
             {INTAKE_OPENING_MICROCOPY.organizesTimeline}
           </p>
           {intakeNumber ? (
-            <p className="mt-2 text-[11px] text-[#66708f]">Intake {intakeNumber}</p>
+            <p className="mt-2 text-xs text-[#66708f]">Intake {intakeNumber}</p>
           ) : null}
         </div>
       </header>
@@ -130,12 +130,12 @@ export function CategoryQuestionnaireScreen({
                         <label htmlFor={`scaffold-q-${idx}`} className="text-sm font-medium text-[#111b3d] leading-snug">
                           {question}
                         </label>
-                        <span className="shrink-0 text-[10px] font-medium uppercase tracking-wide text-[#66708f]">
+                        <span className="shrink-0 text-xs font-medium uppercase tracking-wide text-[#66708f]">
                           {INTAKE_OPENING_MICROCOPY.optionalField}
                         </span>
                       </div>
                       {questions.length > 1 ? (
-                        <p className="text-[11px] text-[#66708f] mb-2">
+                        <p className="text-xs text-[#66708f] mb-2">
                           {idx + 1} of {questions.length}
                         </p>
                       ) : null}
