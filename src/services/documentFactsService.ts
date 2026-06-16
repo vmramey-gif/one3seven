@@ -318,7 +318,7 @@ export function synthesizeIntakeIntelligence(files: FileWithFacts[]): IntakeInte
   const lowConfidenceCount = files.filter((f) => f.document_facts?.confidence === 'low').length;
   if (lowConfidenceCount > 0) {
     confirmationNeeded.push(
-      `${lowConfidenceCount} document${lowConfidenceCount === 1 ? '' : 's'} produced low-confidence extractions — review those fields against the source.`
+      `${lowConfidenceCount} document${lowConfidenceCount === 1 ? '' : 's'} need clarification — review those fields against the source.`
     );
   }
 

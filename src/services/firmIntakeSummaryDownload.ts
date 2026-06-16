@@ -336,18 +336,18 @@ function sortFilesByPriority(files: ResolvedFile[]): ResolvedFile[] {
 }
 
 // ---------------------------------------------------------------------------
-// Evidence support table
+// Supporting materials table
 // ---------------------------------------------------------------------------
 
-interface EvidenceRow {
+interface SupportingMaterialRow {
   question: string;
   support: string;
 }
 
-function buildEvidenceSupportRows(
+function buildSupportingMaterialRows(
   linkedEvents: Array<{ title: string; sourceFile: string | null }>
-): EvidenceRow[] {
-  const rows: EvidenceRow[] = [];
+): SupportingMaterialRow[] {
+  const rows: SupportingMaterialRow[] = [];
 
   for (const e of linkedEvents) {
     const title = e.title.toLowerCase();
@@ -843,11 +843,11 @@ function buildFirmPolishedPacketPdfLines(
     blank(lines);
   }
 
-  // --- 7. Evidence Support ---
+  // --- 7. Supporting Materials ---
   if (tier !== 'limited_preview') {
-    const evidenceRows = buildEvidenceSupportRows(linkedEvents);
+    const evidenceRows = buildSupportingMaterialRows(linkedEvents);
     if (evidenceRows.length > 0) {
-      section(lines, '7.  Evidence Support');
+      section(lines, '7.  Supporting Materials');
       for (const row of evidenceRows) {
         tableRow(lines, row.question, row.support);
       }

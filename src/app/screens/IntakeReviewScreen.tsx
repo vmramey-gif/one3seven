@@ -1894,8 +1894,16 @@ export function IntakeReviewScreen({
                       <p className="text-[10px] uppercase tracking-wider text-[#1E1B4B]/40 mb-2">Key document language</p>
                       <div className="space-y-3">
                         {intelKeyQuotes.slice(0, 4).map((q) => {
+                          // Extraction quality is internal metadata; the firm-facing label uses
+                          // review language (per the one3seven dictionary), never "confidence".
                           const conf = (q.confidence || '').toLowerCase();
-                          const confStyle =
+                          const extractionLabel =
+                            conf === 'high'
+                              ? 'Clear record match'
+                              : conf === 'low'
+                              ? 'Needs clarification'
+                              : 'Review recommended';
+                          const labelStyle =
                             conf === 'high'
                               ? 'bg-emerald-50 text-emerald-700 border-emerald-100'
                               : conf === 'low'
@@ -1906,8 +1914,8 @@ export function IntakeReviewScreen({
                               <div className="mb-1 flex items-center justify-between gap-2">
                                 <p className="text-[10px] text-[#6D4AFF]">{q.category.replace(/_/g, ' ')} — {q.file_name.replace(/_/g, ' ').replace(/\.[^.]+$/, '')}</p>
                                 {conf && (
-                                  <span className={`shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-semibold capitalize ${confStyle}`}>
-                                    {conf} confidence
+                                  <span className={`shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-semibold ${labelStyle}`}>
+                                    {extractionLabel}
                                   </span>
                                 )}
                               </div>
