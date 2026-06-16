@@ -246,10 +246,14 @@ function buildEventFirstClusters(
 
     const dateKey = normalizeDateKey(record.likely_date);
     const topicKey = event.key;
+    // Same topic + same date → same event. A dated record may also enrich an
+    // existing UNDATED same-topic cluster (giving it a date). It must NOT merge
+    // into a same-topic cluster that already carries a DIFFERENT concrete date —
+    // distinct dates are distinct events, even when cross-referenced.
     let target =
       clusters.find((c) => c.topicKey === topicKey && c.dateKey === dateKey) ??
       (dateKey !== 'undated'
-        ? clusters.find((c) => c.topicKey === topicKey && c.dateKey !== 'undated')
+        ? clusters.find((c) => c.topicKey === topicKey && c.dateKey === 'undated')
         : null);
 
     if (!target) {
