@@ -783,7 +783,7 @@ export function GuidedIntakeScreen({
                   ) : null}
 
                   <p className="mt-3 text-[11px] leading-relaxed text-[var(--o3s-text-muted)]">
-                    one3Seven organizes what you choose to save. one3Seven is not a law firm and does not provide legal advice.
+                    one3seven organizes what you choose to save. one3seven is not a law firm and does not provide legal advice.
                   </p>
                 </div>
 

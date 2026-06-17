@@ -47,7 +47,7 @@ export class AppErrorBoundary extends Component<Props, State> {
       return (
         <div className="min-h-screen bg-[#f6f2ff] flex flex-col items-center justify-center px-6 text-center">
           <div className="max-w-sm w-full">
-            <p className="text-xl font-bold text-[#1e1b4b] mb-2">one3Seven</p>
+            <p className="text-xl font-bold text-[#1e1b4b] mb-2">one3seven</p>
             <p className="text-sm text-[#1e1b4b]/60 mb-8">
               Something went wrong loading the app.
             </p>

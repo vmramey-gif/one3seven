@@ -320,6 +320,10 @@ export function IntakeSummaryScreen({
   shellMode = false,
 }: IntakeSummaryScreenProps) {
   const [showEmailModal, setShowEmailModal] = useState(false);
+  // Temporary: the worker engine is public, but routing to the participating-firm
+  // NETWORK isn't live yet — surface it as "coming soon". Firm-code direct routing
+  // (invited workers who hold a firm's code) stays available. Flip to true to re-enable.
+  const PARTICIPATING_ROUTING_LIVE = false;
   const [showShareModal, setShowShareModal] = useState(false);
   const [concernsAcknowledged, setConcernsAcknowledged] = useState<boolean | null>(null);
   const [routingSubpanel, setRoutingSubpanel] = useState<'menu' | 'firm_code'>('menu');
@@ -989,7 +993,7 @@ export function IntakeSummaryScreen({
 
     if (intakeMaturityState === 'minimal') {
       return [
-        { label: 'Story Needed', complete: false, detail: 'A few sentences can help one3Seven organize the intake.' },
+        { label: 'Story Needed', complete: false, detail: 'A few sentences can help one3seven organize the intake.' },
         { label: 'Records Optional', complete: false, detail: 'You can begin with story or records.' },
         { label: 'Timeline Not Started', complete: false, detail: 'A timeline can be created once more information is available.' },
       ];
@@ -1121,7 +1125,7 @@ export function IntakeSummaryScreen({
 
           <div className="mb-4 rounded-[18px] border border-[#DCD3FF] bg-white/90 p-3 shadow-[0_14px_36px_rgba(91,53,213,0.08)]">
             <p className="mb-3 text-sm leading-relaxed text-[#1E1B4B]/72">
-              This is the organized summary one3Seven created from your story and records.
+              This is the organized summary one3seven created from your story and records.
             </p>
             <div className="grid grid-cols-2 gap-2 rounded-[14px] bg-[#F7F3FF] p-1">
               <button
@@ -1178,7 +1182,7 @@ export function IntakeSummaryScreen({
             </div>
 
             <div className="border-t border-[#EEE9FF] pt-4">
-              <h2 className="text-sm font-semibold text-[#0B1033]">What one3Seven Organized</h2>
+              <h2 className="text-sm font-semibold text-[#0B1033]">What one3seven Organized</h2>
               <div className="mt-3 grid gap-2 sm:grid-cols-2">
                 {confidenceItems.map((item) => (
                   <div
@@ -1265,7 +1269,7 @@ export function IntakeSummaryScreen({
                 <>
                   <h2 className="text-sm font-semibold text-slate-900 mb-1">Potential concerns (to review)</h2>
                   <EmploymentMatterChipList tags={employmentMatterTags} />
-                  <p className="mt-2 text-xs text-slate-500 leading-relaxed">You can add more detail to your story or upload additional records — one3Seven will update your organized file.</p>
+                  <p className="mt-2 text-xs text-slate-500 leading-relaxed">You can add more detail to your story or upload additional records — one3seven will update your organized file.</p>
                 </>
               )}
             </section>
@@ -1316,7 +1320,7 @@ export function IntakeSummaryScreen({
                           </a>
                         ) : null}
                         <p className="mt-1.5 text-[10px] text-slate-500 leading-relaxed">
-                          Credentials are attorney-provided. one3Seven does not independently verify bar status.
+                          Credentials are attorney-provided. one3seven does not independently verify bar status.
                         </p>
                       </div>
                     ) : null}
@@ -1876,6 +1880,16 @@ export function IntakeSummaryScreen({
                   {PARTICIPATING_NETWORK_COPY.postSendTitle}. {PARTICIPATING_NETWORK_COPY.firmsSeeNow}{' '}
                   {PARTICIPATING_NETWORK_COPY.firmsDoNotSee}
                 </p>
+              ) : !PARTICIPATING_ROUTING_LIVE ? (
+                <div
+                  className="flex w-full items-center justify-center gap-2 rounded-[14px] border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-400 cursor-not-allowed select-none"
+                  title="Sending your organized intake to participating firms is coming soon. For now, download or print your packet to bring to any attorney consultation."
+                  aria-disabled="true"
+                >
+                  <Share2 className="w-5 h-5" />
+                  Send to participating firms
+                  <span className="ml-1 rounded-full bg-slate-200 px-2 py-0.5 text-[11px] font-semibold text-slate-500">Coming soon</span>
+                </div>
               ) : canShareSummary ? (
                 <button
                   onClick={() => {
@@ -2138,7 +2152,7 @@ export function IntakeSummaryScreen({
                 the network either way.
               </p>
               <p className="text-sm text-slate-700 leading-relaxed mb-4">
-                A firm&apos;s next step does not change what one3Seven organizes for you. {ONE3SEVEN_NOTICES.positioning}
+                A firm&apos;s next step does not change what one3seven organizes for you. {ONE3SEVEN_NOTICES.positioning}
               </p>
               <p className="text-sm text-slate-600 leading-relaxed">
                 You may continue uploading documents, updating timelines, saving summaries, or sharing organized records elsewhere.
@@ -2150,7 +2164,7 @@ export function IntakeSummaryScreen({
         {/* Footer Disclaimer */}
         <footer className={sx.footer}>
           <div className="bg-slate-50 rounded-[16px] p-6 border border-slate-200">
-            <h3 className="text-sm font-semibold text-slate-900 mb-4">About one3Seven</h3>
+            <h3 className="text-sm font-semibold text-slate-900 mb-4">About one3seven</h3>
             <p className="text-xs text-slate-600 leading-relaxed mb-3">{ONE3SEVEN_NOTICES.positioning}</p>
             <p className="text-xs text-slate-600 leading-relaxed">
               Intake summaries, timeline snapshots, category tags, and readiness notes are organizational aids for review preparation only.

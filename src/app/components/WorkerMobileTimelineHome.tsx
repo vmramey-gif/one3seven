@@ -340,7 +340,7 @@ export function WorkerMobileTimelineHome({
         className="shrink-0 px-0 pt-3 pb-1"
         summaryClassName="text-[10px] text-[var(--o3s-text-muted)]"
         bodyClassName="text-[10px] leading-relaxed text-[var(--o3s-text-muted)]"
-        summary="About one3Seven"
+        summary="About one3seven"
       />
     </div>
   );

@@ -1025,7 +1025,7 @@ export function LandingScreen({
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-slate-600">
               Deleting this intake will remove its summary, timeline, uploaded file records, and firm
-              connections. one3Seven will also request cleanup of associated stored file objects.
+              connections. one3seven will also request cleanup of associated stored file objects.
               This cannot be undone.
             </p>
             {deleteIntakeError ? (
@@ -1095,7 +1095,7 @@ export function LandingScreen({
               ? WORKER_HUB_COPY.hubSubline(hubRecordCount, hubEventCount)
               : firmDirectedContext
               ? `This takes about 10–15 minutes. Your records will be organized and sent directly to ${firmDirectedContext.firmName} — no emails or follow-up calls needed.`
-              : 'one3Seven helps organize scattered records into a structured summary you can review, save, and share when you are ready—across employment, housing, injury, family, and more.'}
+              : 'one3seven helps organize scattered records into a structured summary you can review, save, and share when you are ready—across employment, housing, injury, family, and more.'}
           </p>
 
           <div className={`space-y-3 ${workerDashboardCompact ? 'mb-4' : 'mb-16'}`}>
@@ -1337,7 +1337,7 @@ export function LandingScreen({
         {workerDashboardCompact ? (
           <details className="group overflow-hidden rounded-2xl border border-[#E7E1FF] bg-white/86 shadow-[0_12px_32px_rgba(31,27,75,0.07)]">
             <summary className="flex cursor-pointer list-none items-center justify-between gap-2 px-4 py-3 text-sm font-medium text-[#1E1B4B] hover:bg-[#F7F3FF]">
-              About one3Seven
+              About one3seven
               <span className="text-[11px] font-normal text-[#64748B] group-open:hidden">Show</span>
               <span className="hidden text-[11px] font-normal text-[#64748B] group-open:inline">Hide</span>
             </summary>
@@ -1439,7 +1439,7 @@ export function LandingScreen({
               Terms
             </a>
             <a
-              href="mailto:support@one3seven.com?subject=one3Seven%20contact"
+              href="mailto:support@one3seven.com?subject=one3seven%20contact"
               className="hover:text-slate-900 transition-colors"
             >
               Contact

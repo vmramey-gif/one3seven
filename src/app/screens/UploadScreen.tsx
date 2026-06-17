@@ -317,7 +317,7 @@ export function UploadScreen({
   useEffect(() => {
     if (!supabaseWorkerIntakeMissing) return;
     console.warn(
-      '[one3Seven] UploadScreen is open for a signed-in worker in Supabase mode without currentIntakeId; new files will not persist until an intake is created.'
+      '[one3seven] UploadScreen is open for a signed-in worker in Supabase mode without currentIntakeId; new files will not persist until an intake is created.'
     );
   }, [supabaseWorkerIntakeMissing]);
 
@@ -962,7 +962,7 @@ export function UploadScreen({
 
                     {detectedCategoryLabels.length > 0 ? (
                       <p className="text-xs text-slate-600 text-center max-w-sm">
-                        one3Seven identified {detectedCategoryLabels.length}{' '}
+                        one3seven identified {detectedCategoryLabels.length}{' '}
                         {detectedCategoryLabels.length === 1 ? 'type' : 'types'} from your files (for example:{' '}
                         {detectedCategoryLabels.slice(0, 2).join(', ')}
                         {detectedCategoryLabels.length > 2 ? '…' : ''}).
@@ -1056,7 +1056,7 @@ export function UploadScreen({
               className="mb-4"
             >
               <p className="text-xs text-slate-600 mb-3 leading-relaxed">
-                Clear file names help one3Seven organize your intake more accurately and help firms review your
+                Clear file names help one3seven organize your intake more accurately and help firms review your
                 records faster.
               </p>
               <div className="flex items-center justify-between mb-4">
@@ -1238,7 +1238,7 @@ export function UploadScreen({
                     <div>
                       <p className="text-sm font-semibold text-[#15112f]">Intake Completeness</p>
                       <p className="mt-0.5 text-xs leading-relaxed text-slate-600">
-                        These optional details help one3Seven connect your story to the records you upload.
+                        These optional details help one3seven connect your story to the records you upload.
                       </p>
                     </div>
                     <span className="shrink-0 rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold text-violet-700 ring-1 ring-violet-200">
@@ -1660,7 +1660,7 @@ export function UploadScreen({
             >
               <h2 className="text-lg font-semibold text-[#15112f] mb-2">Are you working with a law firm?</h2>
               <p className="text-sm text-slate-600 leading-relaxed mb-4">
-                If your law firm gave you a one3Seven Firm Code, you can enter it now so your organized intake routes directly to their dashboard after processing.
+                If your law firm gave you a one3seven Firm Code, you can enter it now so your organized intake routes directly to their dashboard after processing.
               </p>
               <p className="text-xs text-[#475569] mb-4">
                 Firm Code is the official routing code assigned to a participating law firm—not a random invite code.

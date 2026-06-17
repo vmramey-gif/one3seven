@@ -361,7 +361,7 @@ export function FirmSettingsScreen({
             <div className="mt-5 rounded-2xl border border-[#E7E1FF] bg-[#F8F6FF] p-5">
               <p className="mb-1 text-sm font-semibold text-[#1E1B4B]">Attorney credentials</p>
               <p className="mb-4 text-xs text-[#1E1B4B]/58 leading-relaxed">
-                Your bar number and state are shown to workers when they review access requests. Workers can use this to verify your licensure through their state bar directory. These credentials are attorney-provided — one3Seven does not independently verify bar status.
+                Your bar number and state are shown to workers when they review access requests. Workers can use this to verify your licensure through their state bar directory. These credentials are attorney-provided — one3seven does not independently verify bar status.
               </p>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
@@ -675,7 +675,7 @@ export function FirmSettingsScreen({
               <div>
                 <h3 className="mb-2 text-sm font-semibold text-[#1E1B4B]">About intake workflow signals</h3>
                 <p className="mb-3 text-xs leading-relaxed text-[#1E1B4B]/64">
-                  Status labels inside your dashboard describe operational routing and review preparation only. They are not legal conclusions, outcomes, or rankings from one3Seven.
+                  Status labels inside your dashboard describe operational routing and review preparation only. They are not legal conclusions, outcomes, or rankings from one3seven.
                 </p>
                 <p className="text-xs leading-relaxed text-[#1E1B4B]/64">
                   When a preview is not advanced by a firm, it usually reflects capacity, focus areas, or internal intake preferences - not a reflection on the worker's records.

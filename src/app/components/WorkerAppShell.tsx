@@ -82,7 +82,7 @@ export function WorkerAppShell({
           type="button"
           onClick={() => onNavigate('landing')}
           className="mb-4 text-[10px] font-medium tracking-[0.2em] text-[var(--o3s-subtle)] hover:text-[var(--o3s-fg)] transition-colors"
-          aria-label="one3Seven home"
+          aria-label="one3seven home"
         >
           137
         </button>
@@ -141,7 +141,7 @@ export function WorkerAppShell({
                 onClick={() => onNavigate('landing')}
                 className="text-lg font-medium tracking-tight text-[var(--o3s-text)] transition-opacity hover:opacity-80 sm:text-[var(--o3s-fg)]"
               >
-                one3Seven
+                one3seven
               </button>
               <div className="flex items-center gap-0.5">
                 <NotificationsBell

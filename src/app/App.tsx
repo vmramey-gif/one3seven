@@ -2047,7 +2047,7 @@ export default function App() {
       return;
     }
     console.warn(
-      '[one3Seven] Upload requested without active intake or completed pending onboarding; returning to home.'
+      '[one3seven] Upload requested without active intake or completed pending onboarding; returning to home.'
     );
     setCurrentScreen('landing');
   }, [isAuthenticated, profile?.role, getPendingOnboarding]);

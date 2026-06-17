@@ -2,7 +2,7 @@
  * Public attorney search pages for each supported state.
  * Links go to the state bar's search tool — not deep links — so workers
  * can look up the attorney by name or bar number themselves.
- * one3Seven displays these links; it does not verify bar status.
+ * one3seven displays these links; it does not verify bar status.
  */
 export const STATE_BAR_SEARCH_URLS: Record<string, string> = {
   CA: 'https://apps.calbar.ca.gov/attorney/LicenseeSearch/QuickSearch',

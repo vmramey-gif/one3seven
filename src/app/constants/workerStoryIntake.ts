@@ -10,7 +10,7 @@ export const STORY_FIRST_STEP_LABELS = {
 export const WORKER_STORY_HEADING = 'Tell your story';
 
 export const WORKER_STORY_INTRO =
-  "Don't worry about legal terms or perfect wording. Simply explain what happened in your own words. one3Seven will help organize the records and build a timeline from there.";
+  "Don't worry about legal terms or perfect wording. Simply explain what happened in your own words. one3seven will help organize the records and build a timeline from there.";
 
 export const WORKER_STORY_PLACEHOLDER =
   'Explain what happened in your own words — a few sentences is enough.';
@@ -28,10 +28,10 @@ export const WORKER_STORY_EXAMPLES = [
 export const STORY_FIRST_UPLOAD_HEADING = 'Add records';
 
 export const STORY_FIRST_UPLOAD_INTRO =
-  'Drag and drop files here or browse from your device. You do not need to sort or label them — one3Seven infers document types automatically.';
+  'Drag and drop files here or browse from your device. You do not need to sort or label them — one3seven infers document types automatically.';
 
 export const STORY_FIRST_UPLOAD_NOTICE =
-  'By uploading documents, you confirm that you are choosing to share these records with one3Seven for organization and intake-preparation purposes. Upload only records you feel comfortable sharing. Sensitive information such as Social Security numbers, banking information, account numbers, medical record numbers, or unrelated personal information may be removed or redacted before upload at your discretion.';
+  'By uploading documents, you confirm that you are choosing to share these records with one3seven for organization and intake-preparation purposes. Upload only records you feel comfortable sharing. Sensitive information such as Social Security numbers, banking information, account numbers, medical record numbers, or unrelated personal information may be removed or redacted before upload at your discretion.';
 
 export const STORY_FIRST_UPLOAD_EXAMPLES = [
   'Emails',

@@ -40,7 +40,7 @@ export function IntakePacketPreview({ model, generatedLabel, darkPresentation = 
     <div className={shell}>
       <div className={header}>
         <p className={kicker}>Story packet preview</p>
-        <h3 className={title}>one3Seven Story Packet</h3>
+        <h3 className={title}>one3seven Story Packet</h3>
         <p className={meta}>
           {model.metadata.intakeId} / {dateLabel}
         </p>

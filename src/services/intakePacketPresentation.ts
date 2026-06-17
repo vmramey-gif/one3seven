@@ -886,7 +886,7 @@ function renderPacketHeader(m: PacketMetadataBar): string {
     ['Workflow status', m.intakeStatus],
   ];
   return `<header class="packet-header card">
-    <h1>one3Seven Intake Review Packet</h1>
+    <h1>one3seven Intake Review Packet</h1>
     <p class="muted">What happened · How do we know · What may still be missing</p>
     <dl class="meta-grid">${fields
       .map(

@@ -1,5 +1,5 @@
 /**
- * Worker demo — guided simulation of the real one3Seven 3-step intake flow,
+ * Worker demo — guided simulation of the real one3seven 3-step intake flow,
  * followed by the post-intake processing and organized review.
  *
  * Accessible via /?worker-demo. Fully click-through with Marcus Rivera's data.
@@ -264,7 +264,7 @@ function Step2Records({ onNext }: { onNext: () => void }) {
             </div>
           ))}
         </div>
-        <p className="mt-3 text-[11px] text-[#1E1B4B]/35">Not sure what to include? Upload anything and one3Seven will organize it.</p>
+        <p className="mt-3 text-[11px] text-[#1E1B4B]/35">Not sure what to include? Upload anything and one3seven will organize it.</p>
       </div>
 
       {/* Drop zone */}
@@ -369,7 +369,7 @@ function Step3Details({ onSubmit }: { onSubmit: () => void }) {
     <motion.div key="step3" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }} className="mx-auto max-w-2xl px-5 py-10">
       <StepLabel step={3} total={3} title="Helpful details if you know them" />
       <p className="mb-2 text-[14px] leading-relaxed text-[#1E1B4B]/55">
-        These optional details help one3Seven connect your story to the records you upload.
+        These optional details help one3seven connect your story to the records you upload.
       </p>
 
       {/* Completeness bar — sticky so it's always readable */}
@@ -487,7 +487,7 @@ function PostProcessing({ onNext }: { onNext: () => void }) {
   return (
     <motion.div key="processing" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }} className="mx-auto max-w-2xl px-5 py-12">
       <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-[#DCD3FF] bg-[#F7F3FF] px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[#6D4AFF]">
-        What one3Seven builds from this
+        What one3seven builds from this
       </div>
       <h2 className="mb-8 text-[24px] font-bold leading-tight tracking-tight text-[#1E1B4B]">Organizing your intake</h2>
 
@@ -516,7 +516,7 @@ function PostProcessing({ onNext }: { onNext: () => void }) {
       </div>
 
       <p className="mt-8 text-center text-[11px] text-[#1E1B4B]/35">
-        one3Seven organizes records for attorney review. It does not provide legal advice or determine legal outcomes.
+        one3seven organizes records for attorney review. It does not provide legal advice or determine legal outcomes.
       </p>
     </motion.div>
   );
@@ -536,7 +536,7 @@ function PostSummary({ onNext }: { onNext: () => void }) {
   return (
     <motion.div key="postsummary" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }} className="mx-auto max-w-2xl px-5 py-12">
       <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-[#DCD3FF] bg-[#F7F3FF] px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[#6D4AFF]">
-        What one3Seven builds from this
+        What one3seven builds from this
       </div>
       <div className="mb-2 mt-3 flex items-center gap-3">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-100">
@@ -598,7 +598,7 @@ function PostDashboard({ onNext }: { onNext: () => void }) {
   return (
     <motion.div key="dashboard" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }} className="mx-auto max-w-2xl px-5 py-10">
       <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-[#DCD3FF] bg-[#F7F3FF] px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[#6D4AFF]">
-        What one3Seven builds from this
+        What one3seven builds from this
       </div>
 
       <div className="mb-5 mt-3 flex items-start justify-between gap-4">
@@ -758,7 +758,7 @@ function PostControl({ onSignUp }: { onSignUp: () => void }) {
   return (
     <motion.div key="control" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }} className="mx-auto max-w-2xl px-5 py-10">
       <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-[#DCD3FF] bg-[#F7F3FF] px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[#6D4AFF]">
-        What one3Seven builds from this
+        What one3seven builds from this
       </div>
 
       {/* Privacy banner */}
@@ -821,7 +821,7 @@ function PostControl({ onSignUp }: { onSignUp: () => void }) {
       </div>
 
       <p className="mb-6 text-[11px] leading-relaxed text-[#1E1B4B]/35">
-        one3Seven surfaces dates and timing for attorney review. It does not determine applicable deadlines or filing requirements.
+        one3seven surfaces dates and timing for attorney review. It does not determine applicable deadlines or filing requirements.
       </p>
 
       <div className="flex flex-col gap-3 sm:flex-row">

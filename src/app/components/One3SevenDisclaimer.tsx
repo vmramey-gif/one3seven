@@ -14,7 +14,7 @@ export function One3SevenDisclaimer({
   className = '',
   summaryClassName = 'text-[10px] text-slate-500',
   bodyClassName = 'text-[10px] leading-relaxed text-slate-500',
-  summary = 'About one3Seven',
+  summary = 'About one3seven',
 }: One3SevenDisclaimerProps) {
   if (variant === 'compact') {
     return (

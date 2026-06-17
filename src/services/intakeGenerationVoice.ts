@@ -2,7 +2,7 @@
  * Calm intake-organizer phrasing for deterministic organization output.
  * Describes what records mention — not legal conclusions or outcomes.
  *
- * one3Seven organizes; attorneys interpret. Chronology is the primary review
+ * one3seven organizes; attorneys interpret. Chronology is the primary review
  * surface, events matter more than categories, and records support events.
  * Output should identify what remains unclear and what records may help complete
  * the timeline, while avoiding legal conclusions, case scoring, value estimates,

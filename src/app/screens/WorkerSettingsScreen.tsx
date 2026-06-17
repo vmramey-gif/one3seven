@@ -105,7 +105,7 @@ export function WorkerSettingsScreen({ onNavigate, userEmail, profileId, onSignO
                 <p className="mb-1 text-xs text-[#1E1B4B]/64">Price: Free during beta</p>
                 <p className="mb-3 text-xs text-[#1E1B4B]/64">Payment method: Not required</p>
                 <p className="text-sm leading-relaxed text-[#1E1B4B]/64">
-                  During beta, one3Seven is free for workers. You can organize your records and generate an intake
+                  During beta, one3seven is free for workers. You can organize your records and generate an intake
                   summary at no cost while we continue refining the platform.
                 </p>
               </div>

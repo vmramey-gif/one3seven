@@ -189,7 +189,7 @@ export function DemoApp() {
       {/* Slim fixed banner — brand + CTA only, stays out of the way */}
       <div className="fixed bottom-0 left-0 right-0 z-[999] bg-[#1e1b4b]/95 backdrop-blur text-white px-4 py-2.5 flex items-center justify-between gap-3 border-t border-white/10">
         <p className="text-xs text-white/50 truncate">
-          one3Seven · Sample intake preview
+          one3seven · Sample intake preview
         </p>
         <button
           onClick={handleSignUp}

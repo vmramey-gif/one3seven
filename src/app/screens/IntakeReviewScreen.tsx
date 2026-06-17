@@ -2090,7 +2090,7 @@ export function IntakeReviewScreen({
               className="rounded-[16px] border border-[#E7E1FF]/60 bg-[#FBFAFF] px-5 py-4"
             >
               <p className="text-[11px] leading-relaxed text-[#1E1B4B]/52">
-                <span className="font-medium text-[#1E1B4B]/70">How this intake was organized:</span> one3Seven organizes file names, extracted dates, worker-provided context, and document categories into a review structure. Automated organization may require confirmation against the original source records. one3Seven does not provide legal conclusions, case scoring, or outcome predictions. Source documents are available for direct review.
+                <span className="font-medium text-[#1E1B4B]/70">How this intake was organized:</span> one3seven organizes file names, extracted dates, worker-provided context, and document categories into a review structure. Automated organization may require confirmation against the original source records. one3seven does not provide legal conclusions, case scoring, or outcome predictions. Source documents are available for direct review.
               </p>
             </motion.div>
 
@@ -2759,7 +2759,7 @@ export function IntakeReviewScreen({
                 {ONE3SEVEN_NOTICES.positioning}
                 <br />
                 <br />
-                Participating firms choose their own next steps inside their organization. one3Seven does not score intakes or rank people.
+                Participating firms choose their own next steps inside their organization. one3seven does not score intakes or rank people.
               </p>
             </motion.div>
 
@@ -2774,7 +2774,7 @@ export function IntakeReviewScreen({
               >
                 <div className="px-7 py-8">
                   <p className="text-[10px] font-700 uppercase tracking-[0.2em] text-[#A78BFA] mb-3" style={{ fontWeight: 700 }}>
-                    Your practice · one3Seven
+                    Your practice · one3seven
                   </p>
                   <h3 className="text-2xl font-black text-white leading-tight mb-2" style={{ letterSpacing: '-0.02em' }}>
                     Your next intake<br />could look like this.

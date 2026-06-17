@@ -89,7 +89,7 @@ export function TimelineDetailScreen({
             onClick={() => onNavigate(backScreen)}
             className="text-xl font-semibold text-slate-900 hover:opacity-70 transition-opacity duration-200"
           >
-            one3Seven
+            one3seven
           </button>
           <NotificationsBell items={workerBellNotifications} />
         </div>

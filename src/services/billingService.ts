@@ -1,5 +1,5 @@
 /**
- * one3Seven billing service — Stripe via Supabase Edge Functions.
+ * one3seven billing service — Stripe via Supabase Edge Functions.
  *
  * Plans:
  *   solo       $199/mo   up to 15 intakes · 1 seat

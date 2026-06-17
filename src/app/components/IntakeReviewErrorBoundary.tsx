@@ -48,7 +48,7 @@ export class IntakeReviewErrorBoundary extends Component<Props, State> {
       return (
         <div className="min-h-screen bg-[#F6F2FF] flex flex-col items-center justify-center px-6 text-center">
           <div className="max-w-sm w-full">
-            <p className="text-lg font-semibold text-[#1E1B4B] mb-1">one3Seven</p>
+            <p className="text-lg font-semibold text-[#1E1B4B] mb-1">one3seven</p>
             <p className="text-sm text-[#1E1B4B]/60 mb-8">
               This intake couldn't be loaded. Your dashboard is unaffected.
             </p>

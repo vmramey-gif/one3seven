@@ -43,7 +43,7 @@ const FIRM_FEATURES = [
   { icon: Clock, label: 'Event timing cards', desc: 'Displays elapsed time between worker-reported concerns and later workplace actions.', tip: 'Dates and events are pulled from uploaded records and worker-provided context.' },
   { icon: Shield, label: 'Time-sensitive date flag', desc: 'Surfaces dates that may affect agency or court filing periods for attorney review.' },
   { icon: FileText, label: 'Document checklist', desc: 'Requested vs. received — at a glance, no manual cross-referencing.' },
-  { icon: Zap, label: 'Source-linked information extraction', desc: 'Key language, dates, and employer responses linked to the uploaded source records.', tip: 'Records are structured for attorney review. one3Seven does not make legal conclusions.' },
+  { icon: Zap, label: 'Source-linked information extraction', desc: 'Key language, dates, and employer responses linked to the uploaded source records.', tip: 'Records are structured for attorney review. one3seven does not make legal conclusions.' },
   { icon: CheckCircle2, label: 'Intake link sharing', desc: 'One URL you share — workers go through guided intake and land in your dashboard.' },
 ];
 
@@ -760,7 +760,7 @@ function _WorkerWorkflowScrollCanvas_unused() {
     const INFOS = [
       { lo: 0,   hi: .35, num: 'Step 1 of 3', title: 'Worker uploads their documents', body: 'Pay stubs, HR complaints, texts, medical records — uploaded directly from their phone in minutes. No preparation required.', step: 0 },
       { lo: .35, hi: .45, num: '', title: '', body: '', step: -1 },
-      { lo: .45, hi: .70, num: 'Step 2 of 3', title: 'AI organizes your record', body: 'one3Seven clusters your documents, flags missing items, extracts key dates, and surfaces time-sensitive events automatically.', step: 1 },
+      { lo: .45, hi: .70, num: 'Step 2 of 3', title: 'AI organizes your record', body: 'one3seven clusters your documents, flags missing items, extracts key dates, and surfaces time-sensitive events automatically.', step: 1 },
       { lo: .70, hi: .80, num: '', title: '', body: '', step: -1 },
       { lo: .80, hi: 1.0, num: 'Step 3 of 3', title: 'Firms receive a structured intake', body: 'Attorneys open a clean, organized packet before the first consultation — no sorting, no follow-up calls needed.', step: 2 },
     ];
@@ -1189,7 +1189,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, firm
             <div className="flex flex-col">
               <button type="button" onClick={onSignIn} className="flex items-center min-h-[48px] text-base font-medium text-[#1E1B4B]/60 text-left py-3">Sign in</button>
               <button type="button" onClick={openBetaModal} className="flex items-center gap-1.5 min-h-[48px] text-base font-semibold text-[#6D4AFF] text-left py-3">For attorneys <ArrowRight className="h-4 w-4" /></button>
-              <button type="button" onClick={openBetaModal} className="flex items-center gap-1.5 min-h-[48px] text-base font-semibold text-[#1E1B4B]/70 text-left py-3">Organize my intake <ArrowRight className="h-4 w-4" /></button>
+              <button type="button" onClick={onWorkerStart} className="flex items-center gap-1.5 min-h-[48px] text-base font-semibold text-[#1E1B4B]/70 text-left py-3">Organize my intake <ArrowRight className="h-4 w-4" /></button>
             </div>
           </div>
         )}
@@ -1270,7 +1270,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, firm
                   </h1>
 
                   <p className="mb-5 max-w-[480px] text-[16px] leading-relaxed text-[#1E1B4B]/62 sm:text-[17px]">
-                    one3seven turns scattered employment records, notes, and documents into a structured intake packet — organized before the attorney ever reviews it.
+                    Organize your employment records into a structured intake packet — ready to bring to any attorney consultation.
                   </p>
 
                   <p className="mb-7 flex items-center gap-2 text-sm font-medium text-[#1E1B4B]/70">
@@ -1281,18 +1281,11 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, firm
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                     <button
                       type="button"
-                      onClick={openBetaModal}
+                      onClick={onWorkerStart}
                       className="flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#6D4AFF] to-[#7C3AED] px-7 py-3.5 text-[15px] font-semibold text-white shadow-[0_16px_48px_rgba(109,74,255,0.32)] transition hover:shadow-[0_20px_60px_rgba(109,74,255,0.45)] hover:-translate-y-0.5 active:scale-[0.97]"
                     >
                       Organize my intake
                       <ArrowRight className="h-4 w-4" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={openBetaModal}
-                      className="flex items-center justify-center gap-2 rounded-full border border-[#E7E1FF] bg-white px-7 py-3.5 text-[15px] font-semibold text-[#1E1B4B] transition hover:bg-[#F7F3FF]"
-                    >
-                      Organize my intake
                     </button>
                   </div>
 
@@ -1344,7 +1337,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, firm
               {
                 icon: '⏱',
                 title: 'Attorney time wasted',
-                body: 'First-consult time is often spent organizing documents rather than evaluating the matter. one3Seven performs an initial organization pass before the attorney sees the intake.',
+                body: 'First-consult time is often spent organizing documents rather than evaluating the matter. one3seven performs an initial organization pass before the attorney sees the intake.',
               },
               {
                 icon: '📁',
@@ -1489,11 +1482,11 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, firm
                 ))}
               </ul>
               <p className="mt-5 text-[12px] leading-relaxed text-[#1E1B4B]/40">
-                one3Seven organizes records and surfaces information from documents. It does not provide legal advice, case predictions, or legal conclusions. All source documents remain available for direct attorney review. Attorneys are responsible for independently verifying AI-organized content before relying on it.
+                one3seven organizes records and surfaces information from documents. It does not provide legal advice, case predictions, or legal conclusions. All source documents remain available for direct attorney review. Attorneys are responsible for independently verifying AI-organized content before relying on it.
               </p>
               <p className="mt-3 text-[12px] leading-relaxed text-[#1E1B4B]/40">
                 <span className="font-semibold text-[#1E1B4B]/55">Time-sensitive filing periods may apply.</span>{' '}
-                Depending on the allegations and jurisdiction, a matter may involve deadlines associated with agencies such as the EEOC, California Civil Rights Department, or Labor Commissioner. one3Seven surfaces relevant dates for attorney review — it does not determine the applicable agency or filing deadline.
+                Depending on the allegations and jurisdiction, a matter may involve deadlines associated with agencies such as the EEOC, California Civil Rights Department, or Labor Commissioner. one3seven surfaces relevant dates for attorney review — it does not determine the applicable agency or filing deadline.
               </p>
             </div>
           </div>
@@ -1566,7 +1559,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, firm
             </div>
             <div className="flex flex-wrap gap-5">
               {[
-                { label: 'For workers', action: openBetaModal },
+                { label: 'For workers', action: onWorkerStart },
                 { label: 'For attorneys', action: openBetaModal },
                 { label: 'Sign in', action: onSignIn },
               ].map((l) => (
@@ -1582,7 +1575,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, firm
             </div>
           </div>
           <div className="mt-8 border-t border-white/8 pt-8 text-[11px] text-white/28">
-            © {new Date().getFullYear()} one3Seven. one3Seven is not a law firm and does not provide legal advice. Use of this platform does not create an attorney-client relationship. All AI-organized intake content requires independent verification by a licensed attorney before use. Submission of an intake does not require any firm to review, accept, or represent the worker. An attorney-client relationship is created only through a separate written agreement between the worker and a law firm.
+            © {new Date().getFullYear()} one3seven. one3seven is not a law firm and does not provide legal advice. Use of this platform does not create an attorney-client relationship. All AI-organized intake content requires independent verification by a licensed attorney before use. Submission of an intake does not require any firm to review, accept, or represent the worker. An attorney-client relationship is created only through a separate written agreement between the worker and a law firm.
           </div>
         </div>
       </footer>
@@ -1606,7 +1599,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, firm
               </div>
               <h2 className="mb-3 text-[20px] font-bold leading-snug text-[#1E1B4B]">Controlled beta</h2>
               <p className="mb-6 text-[14px] leading-relaxed text-[#1E1B4B]/60">
-                one3Seven is currently in controlled beta while Terms, Privacy, and consent language are under legal review. You can view the demos now. Real intake access is by invitation only.
+                one3seven is currently in controlled beta while Terms, Privacy, and consent language are under legal review. You can view the demos now. Real intake access is by invitation only.
               </p>
               <div className="flex flex-col gap-2.5">
                 <a
