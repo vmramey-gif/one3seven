@@ -9,57 +9,40 @@ const MESSAGES = [
   'Structuring uploaded information...',
 ];
 
-type ShapeType = 'square' | 'circle' | 'triangle' | 'diamond';
-const SHAPES: ShapeType[] = ['square', 'circle', 'triangle', 'diamond'];
-
-interface Particle {
-  type: ShapeType;
-  angle: number;
-  startR: number;
-  size: number;
-  phase: number;
-  speed: number;
-}
-
 const CANVAS_SIZE = 280;
 
-function spawn(maxR: number, phase = Math.random()): Particle {
-  return {
-    type: SHAPES[Math.floor(Math.random() * SHAPES.length)],
-    angle: Math.random() * Math.PI * 2,
-    startR: maxR * (0.52 + Math.random() * 0.44),
-    size: 9 + Math.random() * 11,   // larger shapes — more visible
-    phase,
-    speed: 0.0032 + Math.random() * 0.0025,
-  };
+// 137.5° — the golden angle. one3seven's namesake, and the angle that turns a
+// scatter of seeds into an organized phyllotaxis seed-head (sunflower spiral).
+const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
+const SEED_COUNT = 137;
+const SPIRAL_TURNS = 0.32; // a soft inward arc, not a spin
+const FORM_MS = 2400; // scatter → formed (seeds accelerate inward)
+const STAGGER = 0.55; // staggered arrival gathered into a collective rush
+
+// Scattered lavender → organized brand purple (#5B21B6 = 91,33,182).
+const LAV: [number, number, number] = [198, 190, 232];
+const BRAND: [number, number, number] = [91, 33, 182];
+
+interface Seed {
+  tAngle: number; // target angle (phyllotaxis)
+  tR: number; // target radius
+  scatterR: number; // starting radius (beyond the head)
+  size: number;
 }
 
-function drawShape(ctx: CanvasRenderingContext2D, type: ShapeType, x: number, y: number, s: number) {
-  const h = s / 2;
-  ctx.beginPath();
-  switch (type) {
-    case 'square':
-      ctx.rect(x - h, y - h, s, s);
-      break;
-    case 'circle':
-      ctx.arc(x, y, h, 0, Math.PI * 2);
-      break;
-    case 'triangle':
-      ctx.moveTo(x, y - h);
-      ctx.lineTo(x + h, y + h);
-      ctx.lineTo(x - h, y + h);
-      ctx.closePath();
-      break;
-    case 'diamond':
-      ctx.moveTo(x, y - h * 1.25);
-      ctx.lineTo(x + h * 0.82, y);
-      ctx.lineTo(x, y + h * 1.25);
-      ctx.lineTo(x - h * 0.82, y);
-      ctx.closePath();
-      break;
-  }
-  ctx.fill();
+function buildSeeds(maxR: number): Seed[] {
+  const seedScale = maxR / Math.sqrt(SEED_COUNT);
+  return Array.from({ length: SEED_COUNT }, (_, i) => ({
+    tAngle: i * GOLDEN_ANGLE,
+    tR: seedScale * Math.sqrt(i),
+    scatterR: maxR * (1.1 + Math.random() * 0.6),
+    size: 2.1 + 1.7 * (1 - i / SEED_COUNT), // inner seeds slightly larger
+  }));
 }
+
+// Ease-in cubic: seeds hang at the edge, gather speed, and accelerate into place.
+const easeIn = (t: number) => t * t * t;
+const clamp01 = (t: number) => Math.max(0, Math.min(1, t));
 
 export function OneThreeSevenLoader({ size = 'lg' }: { size?: 'lg' | 'sm' }) {
   const reduced = useReducedMotion() ?? false;
@@ -67,13 +50,13 @@ export function OneThreeSevenLoader({ size = 'lg' }: { size?: 'lg' | 'sm' }) {
   const [msgIdx, setMsgIdx] = useState(0);
   const [msgVis, setMsgVis] = useState(true);
 
-  // Microcopy rotation
+  // Microcopy rotation (lg only)
   useEffect(() => {
     if (size !== 'lg') return;
     const iv = setInterval(() => {
       setMsgVis(false);
       const t = setTimeout(() => {
-        setMsgIdx(i => (i + 1) % MESSAGES.length);
+        setMsgIdx((i) => (i + 1) % MESSAGES.length);
         setMsgVis(true);
       }, 340);
       return () => clearTimeout(t);
@@ -81,9 +64,9 @@ export function OneThreeSevenLoader({ size = 'lg' }: { size?: 'lg' | 'sm' }) {
     return () => clearInterval(iv);
   }, [size]);
 
-  // Canvas — shapes drift from scatter toward center "137"
+  // Golden-angle seed animation: scatter → spiral into the mark → hold.
   useEffect(() => {
-    if (size !== 'lg' || reduced) return;
+    if (size !== 'lg') return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -91,59 +74,54 @@ export function OneThreeSevenLoader({ size = 'lg' }: { size?: 'lg' | 'sm' }) {
 
     canvas.width = CANVAS_SIZE;
     canvas.height = CANVAS_SIZE;
-
     const cx = CANVAS_SIZE / 2;
     const cy = CANVAS_SIZE / 2;
     const maxR = CANVAS_SIZE * 0.46;
-    const NUM = 12;
+    const seeds = buildSeeds(maxR);
 
-    const particles = Array.from({ length: NUM }, (_, i) => spawn(maxR, i / NUM));
+    const drawSeed = (s: Seed, eased: number, extraAngle: number, alpha: number) => {
+      const ang = s.tAngle + (1 - eased) * SPIRAL_TURNS * Math.PI * 2 + extraAngle;
+      const rad = s.scatterR + (s.tR - s.scatterR) * eased;
+      const x = cx + Math.cos(ang) * rad;
+      const y = cy + Math.sin(ang) * rad;
+      const r = Math.round(LAV[0] + (BRAND[0] - LAV[0]) * eased);
+      const g = Math.round(LAV[1] + (BRAND[1] - LAV[1]) * eased);
+      const b = Math.round(LAV[2] + (BRAND[2] - LAV[2]) * eased);
+      ctx.globalAlpha = alpha * 0.92;
+      ctx.fillStyle = `rgb(${r},${g},${b})`;
+      ctx.beginPath();
+      ctx.arc(x, y, s.size, 0, Math.PI * 2);
+      ctx.fill();
+    };
+
+    // Reduced motion: draw the organized seed-head once, statically.
+    if (reduced) {
+      ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+      for (const s of seeds) drawSeed(s, 1, 0, 1);
+      ctx.globalAlpha = 1;
+      return;
+    }
 
     let raf = 0;
+    let start = 0;
+    function tick(now: number) {
+      if (!start) start = now;
+      const e = now - start;
+      const global = e / FORM_MS;
+      const held = global >= 1;
+      const holdRot = held ? (e - FORM_MS) * 0.00006 : 0; // barely-there drift once settled
 
-    function tick() {
       ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
-
-      for (const p of particles) {
-        p.phase += p.speed;
-        if (p.phase >= 1) Object.assign(p, spawn(maxR, 0));
-
-        const t = p.phase;
-        let alpha: number;
-        let posT: number;
-
-        if (t < 0.12) {
-          alpha = t / 0.12;
-          posT = 0;
-        } else if (t < 0.82) {
-          alpha = 1;
-          posT = (t - 0.12) / 0.70;
-        } else {
-          alpha = 1 - (t - 0.82) / 0.18;
-          posT = 1;
-        }
-
-        // Smoothstep: slow start, accelerates toward center
-        const eased = posT * posT * (3 - 2 * posT);
-
-        const px = cx + Math.cos(p.angle) * p.startR * (1 - eased);
-        const py = cy + Math.sin(p.angle) * p.startR * (1 - eased);
-
-        // Muted lavender → indigo as they organize
-        const cT = Math.min(eased * 1.3, 1);
-        const r = Math.round(198 + (109 - 198) * cT);
-        const g = Math.round(190 + (74 - 190) * cT);
-        const b = Math.round(232 + (255 - 232) * cT);
-
-        ctx.globalAlpha = alpha * 0.72;
-        ctx.fillStyle = `rgb(${r},${g},${b})`;
-        drawShape(ctx, p.type, px, py, p.size);
+      for (let i = 0; i < SEED_COUNT; i++) {
+        const s = seeds[i];
+        const stagger = (i / SEED_COUNT) * STAGGER;
+        const local = clamp01((Math.min(global, 1) - stagger) / (1 - STAGGER));
+        const appear = clamp01(local / 0.3); // faint at the edge, brightens as it rushes in
+        drawSeed(s, easeIn(local), holdRot, appear);
       }
-
       ctx.globalAlpha = 1;
       raf = requestAnimationFrame(tick);
     }
-
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
   }, [size, reduced]);
@@ -153,7 +131,7 @@ export function OneThreeSevenLoader({ size = 'lg' }: { size?: 'lg' | 'sm' }) {
       <span className="inline-flex items-center gap-2 text-sm text-[#1E1B4B]/60" role="status" aria-label="Organizing records">
         <span className="text-[15px] leading-none" aria-hidden="true">
           <span className="font-normal text-[#1E1B4B]/70">1</span>
-          <span className="font-black text-[#6D4AFF]">3</span>
+          <span className="font-black text-[#5B21B6]">3</span>
           <span className="font-normal text-[#1E1B4B]/70">7</span>
         </span>
         Organizing records...
@@ -163,38 +141,16 @@ export function OneThreeSevenLoader({ size = 'lg' }: { size?: 'lg' | 'sm' }) {
 
   return (
     <div className="flex flex-col items-center gap-5 select-none" role="status" aria-label={MESSAGES[msgIdx]}>
-      {/* Canvas + 137 overlay */}
       <div className="relative" style={{ width: CANVAS_SIZE, height: CANVAS_SIZE }}>
-        {!reduced && (
-          <canvas ref={canvasRef} className="absolute inset-0" aria-hidden="true" />
-        )}
-        {/* 137 — center and organizing force, styled like the logo */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span
-            style={{ animation: reduced ? 'none' : 'o3s-pulse 2.6s ease-in-out infinite', lineHeight: 1 }}
-            aria-hidden="true"
-          >
-            <span className="text-[54px] font-normal text-[#1E1B4B]/60">1</span>
-            <span className="text-[54px] font-black text-[#6D4AFF]">3</span>
-            <span className="text-[54px] font-normal text-[#1E1B4B]/60">7</span>
-          </span>
-        </div>
+        <canvas ref={canvasRef} className="absolute inset-0" aria-hidden="true" />
       </div>
 
-      {/* Rotating microcopy */}
       <p
         className="text-sm font-medium text-[#1E1B4B]/60 transition-opacity duration-300"
         style={{ opacity: msgVis ? 1 : 0, minHeight: '1.25rem' }}
       >
         {MESSAGES[msgIdx]}
       </p>
-
-      <style>{`
-        @keyframes o3s-pulse {
-          0%, 100% { opacity: 0.78; transform: scale(1); }
-          50% { opacity: 1; transform: scale(1.04); }
-        }
-      `}</style>
     </div>
   );
 }
