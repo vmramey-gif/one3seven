@@ -9,7 +9,6 @@ import {
   buildWorkerSummaryModel,
   collectIntakePacketPdfLines,
 } from './intakePacketPresentation';
-import { renderWorkerSummaryPdf } from './firmIntakePdfRenderer';
 import { extractStoryFollowUpFromOverview } from './storyFollowUpPersistence';
 import { ONE3SEVEN_UNIVERSAL_DISCLAIMER } from '../app/constants/one3sevenProduct';
 import type { IntakeOrganizationSections } from './intakeOrganizationTypes';
@@ -950,6 +949,8 @@ export async function downloadIntakeSummaryDocument(payload: IntakeSummaryDownlo
   // matches the worker workflow exactly. Falls back to the text PDF on any failure.
   try {
     const model = buildWorkerSummaryModel(payload);
+    // Lazy-load the pdf-lib renderer so pdf-lib stays out of the initial bundle.
+    const { renderWorkerSummaryPdf } = await import('./firmIntakePdfRenderer');
     const bytes = await renderWorkerSummaryPdf(model);
     triggerPdfDownload(bytes, INTAKE_SUMMARY_PDF_FILENAME);
   } catch {

@@ -14,7 +14,7 @@ import {
   type CategoryCountRow,
   type IntakeSummaryDownloadPayload,
 } from './intakeSummaryDownload';
-import { renderFirmIntakePacketPdf, type FirmPacketModel } from './firmIntakePdfRenderer';
+import type { FirmPacketModel } from './firmIntakePdfRenderer';
 import {
   buildFirmIntakeOverviewFields,
   partitionFirmReadinessPresentation,
@@ -1174,6 +1174,8 @@ export function buildFirmIntakePacketModel(view: FirmLiveIntakeView): FirmPacket
 
 export async function downloadFirmIntakeReviewDocument(view: FirmLiveIntakeView): Promise<void> {
   const model = buildFirmIntakePacketModel(view);
+  // Lazy-load the pdf-lib renderer so pdf-lib stays out of the initial bundle.
+  const { renderFirmIntakePacketPdf } = await import('./firmIntakePdfRenderer');
   const bytes = await renderFirmIntakePacketPdf(model);
   triggerPdfDownload(bytes, firmIntakeReviewPdfFilename(view.intakeNumber));
 }
