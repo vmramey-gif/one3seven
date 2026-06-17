@@ -43,6 +43,8 @@ export type DocumentFacts = {
   document_dates?: import('./documentDateExtraction').DocumentDate[];
   /** Phase 2b: documents this file explicitly references (may not themselves be uploaded). */
   referenced_documents?: string[];
+  /** Phase 2b: people party to communications in this document, with stated roles. */
+  communication_parties?: import('./communicationPartyExtraction').CommunicationParty[];
 };
 
 export type FileWithFacts = {

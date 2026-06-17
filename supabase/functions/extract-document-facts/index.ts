@@ -82,6 +82,8 @@ type DocumentFacts = {
   document_dates?: Array<{ date: string; context: string }>;
   // Phase 2b: documents this file explicitly references (may not themselves be uploaded).
   referenced_documents?: string[];
+  // Phase 2b: people party to communications in this document, with stated roles.
+  communication_parties?: Array<{ name: string; role: string }>;
 };
 
 // ---------------------------------------------------------------------------
@@ -167,6 +169,7 @@ const JSON_SCHEMA = `{
   "key_quote": string | null,
   "document_dates": [{ "date": string, "context": string }],
   "referenced_documents": string[],
+  "communication_parties": [{ "name": string, "role": string }],
   "confidence": "high" | "medium" | "low",
   "flags": string[]
 }`;
@@ -186,6 +189,7 @@ File name: ${fileName}${truncated ? `\nNote: this document is long; only the fir
 Reminders: quote verbatim for key_quote (under 200 characters); use null / [] for anything not explicitly present; no legal conclusions; raw JSON only.
 Capture EVERY date explicitly stated in the document in "document_dates", each as { "date": "<as written>", "context": "<short factual label, e.g. 'complaint filed', 'warning issued'>" }. Include only dates the text actually states; never infer a date. Keep context labels factual, never conclusory.
 In "referenced_documents", list other documents this file explicitly mentions or refers to but does not itself contain (e.g. "performance improvement plan", "offer letter dated March 2021", "the attached schedule"). Use the document's own wording. Include only documents the text actually references; never infer documents that "should" exist.
+In "communication_parties", list the people party to any communication in this document — sender, recipient, and anyone explicitly named — as { "name": "<as written>", "role": "<role/title exactly as the document states it, e.g. 'sender', 'recipient', 'HR representative', 'supervisor'; empty string if none stated>" }. Include only people the document actually names; never infer a person or a role.
 
 CATEGORY-SPECIFIC GUIDANCE:
 ${guidance}
@@ -226,6 +230,7 @@ File name: ${fileName}
 Reminders: quote verbatim for key_quote (under 200 characters); use null / [] for anything not explicitly present; no legal conclusions; raw JSON only.
 Capture EVERY date explicitly stated in the document in "document_dates", each as { "date": "<as written>", "context": "<short factual label, e.g. 'complaint filed', 'warning issued'>" }. Include only dates the text actually states; never infer a date. Keep context labels factual, never conclusory.
 In "referenced_documents", list other documents this file explicitly mentions or refers to but does not itself contain (e.g. "performance improvement plan", "offer letter dated March 2021", "the attached schedule"). Use the document's own wording. Include only documents the text actually references; never infer documents that "should" exist.
+In "communication_parties", list the people party to any communication in this document — sender, recipient, and anyone explicitly named — as { "name": "<as written>", "role": "<role/title exactly as the document states it, e.g. 'sender', 'recipient', 'HR representative', 'supervisor'; empty string if none stated>" }. Include only people the document actually names; never infer a person or a role.
 
 CATEGORY-SPECIFIC GUIDANCE:
 ${guidance}
@@ -535,6 +540,7 @@ async function processSingleFile(params: {
     text_truncated: textTruncated,
     document_dates: sanitizeDocumentDates(facts.document_dates),
     referenced_documents: sanitizeReferencedDocuments(facts.referenced_documents),
+    communication_parties: sanitizeCommunicationParties(facts.communication_parties),
   };
 
   const { error: writeErr } = await supabase.from('file_text_extractions').update({
@@ -593,6 +599,30 @@ function sanitizeReferencedDocuments(raw: unknown): string[] {
     if (seen.has(key)) continue;
     seen.add(key);
     out.push(trimmed);
+    if (out.length >= 12) break;
+  }
+  return out;
+}
+
+// Phase 2b: validate communication parties before storage. Drops malformed/blank
+// entries and scrubs any conclusory term from name or role. Mirror of the client-side
+// normalizeCommunicationParties guard.
+function sanitizeCommunicationParties(raw: unknown): Array<{ name: string; role: string }> {
+  if (!Array.isArray(raw)) return [];
+  const out: Array<{ name: string; role: string }> = [];
+  const seen = new Set<string>();
+  for (const entry of raw) {
+    if (!entry || typeof entry !== 'object') continue;
+    const rawName = (entry as { name?: unknown }).name;
+    const rawRole = (entry as { role?: unknown }).role;
+    const name = typeof rawName === 'string' ? rawName.trim() : '';
+    if (!name || name.length > 120 || DOCUMENT_DATE_BANNED.test(name)) continue;
+    let role = typeof rawRole === 'string' ? rawRole.trim() : '';
+    if (role.length > 80 || DOCUMENT_DATE_BANNED.test(role)) role = '';
+    const key = name.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push({ name, role });
     if (out.length >= 12) break;
   }
   return out;
