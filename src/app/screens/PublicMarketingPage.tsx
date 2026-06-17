@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { WordMark } from '../components/WordMark';
+import { SeedMark } from '../components/ui/SeedMark';
 import { motion, useReducedMotion } from 'motion/react';
 import { ArrowRight, CheckCircle2, Shield, Clock, FileText, Users, Zap, ChevronRight } from 'lucide-react';
 
@@ -1150,7 +1151,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, firm
       <nav className="sticky top-0 z-50 border-b border-[#F0EBFF] bg-white/90 backdrop-blur-sm">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-5 sm:h-16 sm:px-8">
           <div className="flex items-center gap-2">
-            <div className="h-5 w-5 rounded-[5px] bg-gradient-to-br from-[#6D4AFF] to-[#A78BFA] shadow-sm" />
+            <SeedMark size={24} />
             <div className="text-[17px] font-bold tracking-tight text-[#1E1B4B]"><WordMark /></div>
           </div>
           <div className="hidden items-center gap-6 sm:flex">
