@@ -1559,7 +1559,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, firm
           <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <div className="mb-1 flex items-center gap-2">
-                <div className="h-4 w-4 rounded-[4px] bg-gradient-to-br from-[#6D4AFF] to-[#A78BFA]" />
+                <SeedMark size={20} color="#c7b9ff" />
                 <div className="text-[16px] font-bold text-white"><WordMark className="text-white [&>span]:text-[#c7b9ff]" /></div>
               </div>
               <div className="text-[12px] text-white/40">AI-powered employment intake engine</div>

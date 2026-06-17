@@ -15,11 +15,14 @@ export function SeedMark({
   size = 26,
   count = 55,
   mono = false,
+  color,
   className,
 }: {
   size?: number;
   count?: number;
   mono?: boolean;
+  /** Force a single fill (e.g. a light tone for dark backgrounds). Overrides mono/spread. */
+  color?: string;
   className?: string;
 }) {
   const cx = 100, cy = 100, maxR = 86;
@@ -32,7 +35,7 @@ export function SeedMark({
       cx: +(cx + Math.cos(ang) * rad).toFixed(2),
       cy: +(cy + Math.sin(ang) * rad).toFixed(2),
       r: Math.max(4 * (1 - 0.45 * t), 1.2),
-      fill: mono ? hex(BRAND) : hex(lerp(BRAND, LAV, t)),
+      fill: color ?? (mono ? hex(BRAND) : hex(lerp(BRAND, LAV, t))),
     };
   });
 
