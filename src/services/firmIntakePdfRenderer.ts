@@ -1,0 +1,611 @@
+/**
+ * Prestige PDF renderer for the firm intake packet (pdf-lib).
+ * PRESENTATION ONLY — it consumes a fully-built FirmPacketModel and lays it out.
+ * It performs no content selection, no language generation, and no interpretation;
+ * every string handed to it has already passed the dictionary/guardrail layer.
+ *
+ * Brand color: #5B21B6 ("bold confidence").
+ */
+
+import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage, type RGB } from 'pdf-lib';
+
+// ── Brand + palette ──────────────────────────────────────────────────────────
+const BRAND = rgb(0x5b / 255, 0x21 / 255, 0xb6 / 255); // #5B21B6
+const BRAND_SOFT = rgb(0xf3 / 255, 0xef / 255, 0xff / 255); // tint fill
+const BRAND_LINE = rgb(0xe5 / 255, 0xde / 255, 0xf8 / 255); // hairline
+const INK = rgb(0.07, 0.08, 0.12);
+const SOFT = rgb(0.22, 0.25, 0.37);
+const MUTED = rgb(0.45, 0.47, 0.55);
+const WHITE = rgb(1, 1, 1);
+const AMBER_FILL = rgb(1.0, 0.97, 0.9);
+const AMBER_INK = rgb(0.6, 0.4, 0.05);
+
+const PAGE_W = 612;
+const PAGE_H = 792;
+const MARGIN = 56;
+const CONTENT_W = PAGE_W - MARGIN * 2;
+const BOTTOM = MARGIN + 28; // reserve room for footer
+
+// ── Model contract (built upstream from FirmLiveIntakeView) ───────────────────
+export type FirmPacketModel = {
+  cover: {
+    workerName: string | null;
+    employer: string | null;
+    employmentPeriod: string | null;
+    recordCount: number;
+    eventCount: number;
+    preparedDate: string;
+  };
+  reviewSnapshot: string[];
+  whyReview: string;
+  extracted: {
+    confirmedFacts: Array<{ label: string; value: string }>;
+    coworkerCorroboration: string | null;
+    timingIntervals: Array<{ label: string; days: number; description: string }>;
+    keyQuotes: Array<{ category: string; fileName: string; quote: string }>;
+    overtimeNote: string | null;
+  } | null;
+  overviewFields: Array<{ label: string; value: string }>;
+  sequence:
+    | { kind: 'preview' | 'empty'; note: string }
+    | { kind: 'events'; events: Array<{ date: string; title: string; interval: string | null; sourceFile: string | null }> };
+  priorityQuestions: string[];
+  records:
+    | { kind: 'preview' | 'empty'; note: string }
+    | { kind: 'list'; priority: Array<{ name: string; category: string }>; supporting: Array<{ name: string; category: string }> };
+  dvwRows: Array<{ question: string; support: string }>;
+  confirmationItems: string[];
+  clarificationQuestions: string[];
+  workerContext: { kind: 'hidden'; } | { kind: 'text'; paragraphs: string[] } | { kind: 'none' };
+  reviewOptions: {
+    unresolvedCount: number;
+    priorityCount: number;
+    totalRecords: number;
+    additionalRecords: string[];
+    actions: string;
+  };
+  disclaimer: string[];
+  documentWorkflow: Array<{ heading: string; lines: string[] }>;
+};
+
+// ── Tiny layout engine over pdf-lib ───────────────────────────────────────────
+class Cursor {
+  page: PDFPage;
+  y = PAGE_H - MARGIN;
+  pageNo = 0;
+  constructor(
+    private doc: PDFDocument,
+    public font: PDFFont,
+    public bold: PDFFont,
+  ) {
+    this.page = this.addPage();
+  }
+
+  private addPage(): PDFPage {
+    this.pageNo += 1;
+    const p = this.doc.addPage([PAGE_W, PAGE_H]);
+    this.page = p;
+    this.y = PAGE_H - MARGIN;
+    return p;
+  }
+
+  newPage(): void {
+    this.addPage();
+  }
+
+  ensure(height: number): void {
+    if (this.y - height < BOTTOM) this.addPage();
+  }
+
+  gap(h: number): void {
+    this.y -= h;
+  }
+
+  /** Width-aware word wrap. */
+  wrap(text: string, size: number, font: PDFFont, maxWidth = CONTENT_W): string[] {
+    const words = (text ?? '').replace(/\s+/g, ' ').trim().split(' ').filter(Boolean);
+    if (!words.length) return [''];
+    const out: string[] = [];
+    let line = '';
+    for (const w of words) {
+      const next = line ? `${line} ${w}` : w;
+      if (font.widthOfTextAtSize(next, size) <= maxWidth) {
+        line = next;
+      } else {
+        if (line) out.push(line);
+        // hard-break a single overlong token
+        if (font.widthOfTextAtSize(w, size) > maxWidth) {
+          let chunk = '';
+          for (const ch of w) {
+            if (font.widthOfTextAtSize(chunk + ch, size) > maxWidth) {
+              out.push(chunk);
+              chunk = ch;
+            } else chunk += ch;
+          }
+          line = chunk;
+        } else {
+          line = w;
+        }
+      }
+    }
+    if (line) out.push(line);
+    return out;
+  }
+
+  /** Draw wrapped paragraph text. Returns nothing; advances cursor. */
+  text(
+    str: string,
+    opts: { size?: number; font?: PDFFont; color?: RGB; x?: number; maxWidth?: number; leading?: number } = {},
+  ): void {
+    const size = opts.size ?? 10;
+    const font = opts.font ?? this.font;
+    const color = opts.color ?? SOFT;
+    const x = opts.x ?? MARGIN;
+    const maxWidth = opts.maxWidth ?? CONTENT_W - (x - MARGIN);
+    const leading = opts.leading ?? size * 1.45;
+    for (const line of this.wrap(str, size, font, maxWidth)) {
+      this.ensure(leading);
+      this.page.drawText(line, { x, y: this.y - size, size, font, color });
+      this.y -= leading;
+    }
+  }
+}
+
+function rule(c: Cursor, color = BRAND_LINE, thickness = 1): void {
+  c.ensure(8);
+  c.page.drawLine({ start: { x: MARGIN, y: c.y }, end: { x: PAGE_W - MARGIN, y: c.y }, thickness, color });
+  c.y -= 8;
+}
+
+function sectionHeading(c: Cursor, label: string): void {
+  c.gap(10);
+  c.ensure(26);
+  // brand tab + heading text
+  c.page.drawRectangle({ x: MARGIN, y: c.y - 14, width: 3, height: 15, color: BRAND });
+  c.page.drawText(label, { x: MARGIN + 10, y: c.y - 12, size: 12.5, font: c.bold, color: INK });
+  c.y -= 20;
+  rule(c, BRAND_LINE, 0.75);
+}
+
+function bullet(c: Cursor, text: string): void {
+  c.ensure(14);
+  c.page.drawText('•', { x: MARGIN + 2, y: c.y - 10, size: 10, font: c.bold, color: BRAND });
+  c.text(text, { x: MARGIN + 16, size: 10, color: SOFT });
+  c.gap(2);
+}
+
+// ── Cover page (shared by firm + worker; framing differs) ─────────────────────
+type CoverData = FirmPacketModel['cover'];
+
+function drawCover(c: Cursor, cover: CoverData, bandTitle: string, subtitle: string, footerNote: string): void {
+  // brand band
+  c.page.drawRectangle({ x: 0, y: PAGE_H - 170, width: PAGE_W, height: 170, color: BRAND });
+  c.page.drawText('one3seven', { x: MARGIN, y: PAGE_H - 86, size: 26, font: c.bold, color: WHITE });
+  c.page.drawText(bandTitle, { x: MARGIN, y: PAGE_H - 116, size: 12, font: c.bold, color: rgb(0.86, 0.82, 0.98) });
+  c.page.drawText(subtitle, { x: MARGIN, y: PAGE_H - 138, size: 10.5, font: c.font, color: rgb(0.82, 0.78, 0.96) });
+
+  c.y = PAGE_H - 230;
+
+  const big = (label: string, value: string) => {
+    c.page.drawText(label.toUpperCase(), { x: MARGIN, y: c.y, size: 8.5, font: c.bold, color: MUTED });
+    c.y -= 16;
+    for (const line of c.wrap(value, 16, c.bold, CONTENT_W)) {
+      c.page.drawText(line, { x: MARGIN, y: c.y - 4, size: 16, font: c.bold, color: INK });
+      c.y -= 22;
+    }
+    c.y -= 12;
+  };
+
+  if (cover.workerName) big('Worker', cover.workerName);
+  if (cover.employer) big('Employer', cover.employer);
+  if (cover.employmentPeriod) big('Employment period', cover.employmentPeriod);
+
+  // stat strip
+  c.y -= 6;
+  const stripY = c.y;
+  c.page.drawRectangle({
+    x: MARGIN,
+    y: stripY - 54,
+    width: CONTENT_W,
+    height: 54,
+    color: BRAND_SOFT,
+    borderColor: BRAND_LINE,
+    borderWidth: 1,
+  });
+  const stat = (x: number, value: string, label: string) => {
+    c.page.drawText(value, { x, y: stripY - 26, size: 20, font: c.bold, color: BRAND });
+    c.page.drawText(label.toUpperCase(), { x, y: stripY - 44, size: 8, font: c.bold, color: MUTED });
+  };
+  stat(MARGIN + 22, String(cover.recordCount), 'Records');
+  stat(MARGIN + 22 + CONTENT_W / 3, String(cover.eventCount), 'Timeline events');
+  stat(MARGIN + 22 + (2 * CONTENT_W) / 3, cover.preparedDate, 'Prepared');
+
+  c.page.drawText(footerNote, { x: MARGIN, y: MARGIN + 6, size: 8.5, font: c.font, color: MUTED });
+}
+
+// ── Timing callouts (boxed) ────────────────────────────────────────────────────
+function drawTimingCallouts(c: Cursor, intervals: Array<{ label: string; days: number; description: string }>): void {
+  const cols = 3;
+  const gapX = 12;
+  const boxW = (CONTENT_W - gapX * (cols - 1)) / cols;
+  const boxH = 56;
+  for (let i = 0; i < intervals.length; i += cols) {
+    const rowItems = intervals.slice(i, i + cols);
+    c.ensure(boxH + 10);
+    const rowTop = c.y;
+    rowItems.forEach((it, j) => {
+      const x = MARGIN + j * (boxW + gapX);
+      c.page.drawRectangle({
+        x,
+        y: rowTop - boxH,
+        width: boxW,
+        height: boxH,
+        color: BRAND_SOFT,
+        borderColor: BRAND_LINE,
+        borderWidth: 1,
+      });
+      c.page.drawText(`${it.days}d`, { x: x + 12, y: rowTop - 26, size: 18, font: c.bold, color: BRAND });
+      const lbl = c.wrap(it.label, 8, c.bold, boxW - 24)[0] ?? it.label;
+      c.page.drawText(lbl.toUpperCase(), { x: x + 12, y: rowTop - 42, size: 8, font: c.bold, color: MUTED });
+    });
+    c.y = rowTop - boxH - 10;
+  }
+}
+
+// ── Chronology table ────────────────────────────────────────────────────────────
+function drawChronologyTable(
+  c: Cursor,
+  events: Array<{ date: string; title: string; interval: string | null; sourceFile: string | null }>,
+): void {
+  const dateW = 96;
+  const srcW = 150;
+  const eventW = CONTENT_W - dateW - srcW;
+  const xDate = MARGIN;
+  const xEvent = MARGIN + dateW;
+  const xSrc = MARGIN + dateW + eventW;
+
+  // header row
+  c.ensure(20);
+  c.page.drawRectangle({ x: MARGIN, y: c.y - 16, width: CONTENT_W, height: 16, color: BRAND });
+  c.page.drawText('DATE', { x: xDate + 6, y: c.y - 12, size: 8, font: c.bold, color: WHITE });
+  c.page.drawText('EVENT', { x: xEvent + 6, y: c.y - 12, size: 8, font: c.bold, color: WHITE });
+  c.page.drawText('SOURCE', { x: xSrc + 6, y: c.y - 12, size: 8, font: c.bold, color: WHITE });
+  c.y -= 16;
+
+  events.forEach((e, idx) => {
+    const dateLines = c.wrap(e.date, 8.5, c.font, dateW - 12);
+    const titleStr = e.interval ? `${e.title}  [${e.interval}]` : e.title;
+    const titleLines = c.wrap(titleStr, 8.5, c.font, eventW - 12);
+    const srcLines = c.wrap(e.sourceFile ?? '—', 8, c.font, srcW - 12);
+    const rows = Math.max(dateLines.length, titleLines.length, srcLines.length);
+    const rowH = rows * 11 + 8;
+    c.ensure(rowH);
+    const top = c.y;
+    if (idx % 2 === 1) {
+      c.page.drawRectangle({ x: MARGIN, y: top - rowH, width: CONTENT_W, height: rowH, color: BRAND_SOFT });
+    }
+    const drawCol = (lines: string[], x: number, font: PDFFont, color: RGB) => {
+      let yy = top - 12;
+      for (const ln of lines) {
+        c.page.drawText(ln, { x: x + 6, y: yy, size: 8.5, font, color });
+        yy -= 11;
+      }
+    };
+    drawCol(dateLines, xDate, c.bold, INK);
+    drawCol(titleLines, xEvent, c.font, SOFT);
+    drawCol(srcLines, xSrc, c.font, MUTED);
+    c.y = top - rowH;
+    c.page.drawLine({ start: { x: MARGIN, y: c.y }, end: { x: PAGE_W - MARGIN, y: c.y }, thickness: 0.5, color: BRAND_LINE });
+  });
+  c.y -= 6;
+}
+
+// ── Quote block ──────────────────────────────────────────────────────────────
+function drawQuote(c: Cursor, q: { category: string; fileName: string; quote: string }): void {
+  const innerX = MARGIN + 14;
+  const innerW = CONTENT_W - 22;
+  const headLines = c.wrap(`${q.category} — ${q.fileName}`, 8, c.bold, innerW);
+  const quoteLines = c.wrap(`“${q.quote}”`, 9.5, c.font, innerW);
+  const blockH = headLines.length * 11 + quoteLines.length * 14 + 16;
+  c.ensure(blockH + 6);
+  const top = c.y;
+  c.page.drawRectangle({ x: MARGIN, y: top - blockH, width: CONTENT_W, height: blockH, color: BRAND_SOFT });
+  c.page.drawRectangle({ x: MARGIN, y: top - blockH, width: 3, height: blockH, color: BRAND });
+  let yy = top - 14;
+  for (const ln of headLines) {
+    c.page.drawText(ln, { x: innerX, y: yy, size: 8, font: c.bold, color: BRAND });
+    yy -= 11;
+  }
+  yy -= 2;
+  for (const ln of quoteLines) {
+    c.page.drawText(ln, { x: innerX, y: yy, size: 9.5, font: c.font, color: INK });
+    yy -= 14;
+  }
+  c.y = top - blockH - 8;
+}
+
+// ── DvW provenance rows ─────────────────────────────────────────────────────────
+function drawDvwRows(c: Cursor, rows: Array<{ question: string; support: string }>): void {
+  for (const r of rows) {
+    c.ensure(28);
+    c.text(r.question, { size: 9.5, font: c.bold, color: INK });
+    c.page.drawText('->', { x: MARGIN + 14, y: c.y - 9, size: 9, font: c.bold, color: BRAND });
+    c.text(r.support, { x: MARGIN + 30, size: 9, color: SOFT });
+    c.gap(4);
+  }
+}
+
+// ── Main render ──────────────────────────────────────────────────────────────
+export async function renderFirmIntakePacketPdf(model: FirmPacketModel): Promise<Uint8Array> {
+  const doc = await PDFDocument.create();
+  doc.setTitle('one3seven — Firm Intake Review');
+  doc.setCreator('one3seven');
+  const font = await doc.embedFont(StandardFonts.Helvetica);
+  const bold = await doc.embedFont(StandardFonts.HelveticaBold);
+
+  const c = new Cursor(doc, font, bold);
+
+  // Cover (own page)
+  drawCover(
+    c,
+    model.cover,
+    'FIRM INTAKE REVIEW',
+    'Organized for attorney review',
+    'one3seven organizes uploaded records for firm intake review. It is not legal advice.',
+  );
+  c.newPage();
+
+  // 1. Review Snapshot
+  sectionHeading(c, '1.  Review Snapshot');
+  for (const s of model.reviewSnapshot) c.text(s, { size: 10, color: SOFT });
+
+  // 2. Why this intake requires review
+  sectionHeading(c, '2.  Why This Intake Requires Review');
+  c.text(model.whyReview, { size: 10, color: SOFT });
+
+  // 2B. Extracted from documents
+  if (model.extracted) {
+    sectionHeading(c, '2B.  Extracted From Documents');
+    const ex = model.extracted;
+    if (ex.confirmedFacts.length) {
+      c.text('Confirmed from documents', { size: 9, font: bold, color: MUTED });
+      c.gap(2);
+      for (const f of ex.confirmedFacts) {
+        c.ensure(13);
+        c.page.drawText(`${f.label}:`, { x: MARGIN, y: c.y - 10, size: 9, font: bold, color: INK });
+        c.text(f.value, { x: MARGIN + 110, size: 9.5, color: SOFT });
+        c.gap(2);
+      }
+    }
+    if (ex.coworkerCorroboration) {
+      c.gap(4);
+      c.text(`Coworker confirms: ${ex.coworkerCorroboration}`, { size: 9.5, color: SOFT });
+    }
+    if (ex.timingIntervals.length) {
+      c.gap(6);
+      c.text('Timing from complaint date', { size: 9, font: bold, color: MUTED });
+      c.gap(6);
+      drawTimingCallouts(c, ex.timingIntervals);
+    }
+    if (ex.keyQuotes.length) {
+      c.gap(4);
+      c.text('Key document language', { size: 9, font: bold, color: MUTED });
+      c.gap(6);
+      for (const q of ex.keyQuotes) drawQuote(c, q);
+    }
+    if (ex.overtimeNote) {
+      c.gap(2);
+      c.text(ex.overtimeNote, { size: 9, font: bold, color: AMBER_INK });
+    }
+  }
+
+  // 3. Intake Overview
+  if (model.overviewFields.length) {
+    sectionHeading(c, '3.  Intake Overview');
+    for (const f of model.overviewFields) {
+      c.ensure(13);
+      c.page.drawText(`${f.label}:`, { x: MARGIN, y: c.y - 10, size: 9.5, font: bold, color: INK });
+      c.text(f.value, { x: MARGIN + 130, size: 9.5, color: SOFT });
+      c.gap(2);
+    }
+  }
+
+  // 4. Sequence for Firm Review
+  sectionHeading(c, '4.  Sequence for Attorney Review');
+  if (model.sequence.kind === 'events') {
+    drawChronologyTable(c, model.sequence.events);
+  } else {
+    c.text(model.sequence.note, { size: 10, color: SOFT });
+  }
+
+  // 5. Priority Questions
+  if (model.priorityQuestions.length) {
+    sectionHeading(c, '5.  Priority Questions');
+    for (const q of model.priorityQuestions) bullet(c, q);
+  }
+
+  // 6. Supporting Records
+  sectionHeading(c, '6.  Supporting Records');
+  if (model.records.kind === 'list') {
+    if (model.records.priority.length) {
+      c.text('Priority Review Records', { size: 9, font: bold, color: MUTED });
+      c.gap(4);
+      model.records.priority.forEach((f, i) => bullet(c, `${i + 1}.  ${f.name} — ${f.category}`));
+    }
+    if (model.records.supporting.length) {
+      c.gap(4);
+      c.text('Supporting Records', { size: 9, font: bold, color: MUTED });
+      c.gap(4);
+      for (const f of model.records.supporting) bullet(c, `${f.name} — ${f.category}`);
+    }
+  } else {
+    c.text(model.records.note, { size: 10, color: SOFT });
+  }
+
+  // 7. Documented vs. Worker-Reported
+  if (model.dvwRows.length) {
+    sectionHeading(c, '7.  Documented vs. Worker-Reported');
+    drawDvwRows(c, model.dvwRows);
+  }
+
+  // 8. Items Requiring Confirmation
+  if (model.confirmationItems.length) {
+    sectionHeading(c, '8.  Items Requiring Confirmation');
+    for (const it of model.confirmationItems) bullet(c, it);
+  }
+
+  // 9. Questions That May Help Complete the Intake
+  if (model.clarificationQuestions.length) {
+    sectionHeading(c, '9.  Questions That May Help Complete the Intake');
+    for (const q of model.clarificationQuestions) bullet(c, q);
+  }
+
+  // 10. Worker Context
+  if (model.workerContext.kind !== 'hidden') {
+    sectionHeading(c, '10.  Worker Context');
+    if (model.workerContext.kind === 'text') {
+      for (const p of model.workerContext.paragraphs) {
+        c.text(p, { size: 10, color: SOFT });
+        c.gap(4);
+      }
+    } else {
+      c.text('No narrative was provided with this intake.', { size: 10, color: MUTED });
+    }
+  }
+
+  // 11. Firm Review Options
+  sectionHeading(c, '11.  Firm Review Options');
+  c.text(`Current items requiring confirmation: ${model.reviewOptions.unresolvedCount}`, { size: 9.5, color: SOFT });
+  c.text(
+    `Priority records available for review: ${model.reviewOptions.priorityCount} of ${model.reviewOptions.totalRecords}`,
+    { size: 9.5, color: SOFT },
+  );
+  if (model.reviewOptions.additionalRecords.length) {
+    c.gap(6);
+    c.text('Additional records that may help complete this review', { size: 9, font: bold, color: MUTED });
+    c.gap(4);
+    for (const r of model.reviewOptions.additionalRecords) bullet(c, r);
+  }
+  c.gap(4);
+  c.text(model.reviewOptions.actions, { size: 9, color: MUTED });
+
+  // Document workflow supplement
+  for (const block of model.documentWorkflow) {
+    sectionHeading(c, block.heading);
+    for (const ln of block.lines) c.text(ln, { size: 9.5, color: SOFT });
+  }
+
+  // Disclaimer (boxed, amber-neutral)
+  c.gap(10);
+  const discText = model.disclaimer.join('\n');
+  void discText;
+  c.ensure(40);
+  sectionHeading(c, 'Disclaimer');
+  for (const d of model.disclaimer) {
+    c.text(d, { size: 8.5, color: MUTED });
+    c.gap(3);
+  }
+  void AMBER_FILL;
+
+  return doc.save();
+}
+
+// ── Worker "Your organized intake" packet ─────────────────────────────────────
+// Same prestige system, worker framing. Built from the worker Story Packet data
+// (buildWorkerSummaryModel) so content matches the worker workflow exactly.
+export type WorkerPacketModel = {
+  cover: CoverData;
+  intakeNumber: string;
+  currentUnderstanding: string;
+  caseSnapshot: {
+    employmentPeriod: string;
+    primaryConcerns: string[];
+    recordsOrganized: number;
+    timelineEvents: number;
+    namedIndividuals: number;
+  };
+  workerStory: Array<{ heading: string; body: string }>;
+  questionsForReview: string[];
+  chronology: string[];
+  supportingDocuments: string[];
+  missingInformation: string[];
+  disclaimer: string[];
+};
+
+export async function renderWorkerSummaryPdf(model: WorkerPacketModel): Promise<Uint8Array> {
+  const doc = await PDFDocument.create();
+  doc.setTitle('one3seven — Your Organized Intake');
+  doc.setCreator('one3seven');
+  const font = await doc.embedFont(StandardFonts.Helvetica);
+  const bold = await doc.embedFont(StandardFonts.HelveticaBold);
+  const c = new Cursor(doc, font, bold);
+
+  drawCover(
+    c,
+    model.cover,
+    'YOUR ORGANIZED INTAKE',
+    'Organized for your review',
+    'one3seven organizes your uploaded records. It is not legal advice. You control what you share.',
+  );
+  c.newPage();
+
+  if (model.intakeNumber) {
+    c.text(`Intake reference: ${model.intakeNumber}`, { size: 9, color: MUTED });
+  }
+
+  sectionHeading(c, 'Current Understanding');
+  c.text(model.currentUnderstanding || 'Your organized summary will appear as records are added.', { size: 10, color: SOFT });
+
+  sectionHeading(c, 'Case Snapshot');
+  const snap = model.caseSnapshot;
+  const snapRow = (label: string, value: string) => {
+    c.ensure(13);
+    c.page.drawText(`${label}:`, { x: MARGIN, y: c.y - 10, size: 9.5, font: bold, color: INK });
+    c.text(value, { x: MARGIN + 140, size: 9.5, color: SOFT });
+    c.gap(2);
+  };
+  snapRow('Employment Period', snap.employmentPeriod);
+  if (snap.primaryConcerns.length) {
+    c.gap(2);
+    c.text('Primary Concerns', { size: 9, font: bold, color: MUTED });
+    c.gap(2);
+    for (const concern of snap.primaryConcerns) bullet(c, concern);
+  }
+  snapRow('Records Organized', String(snap.recordsOrganized));
+  snapRow('Timeline Events', String(snap.timelineEvents));
+  snapRow('Named Individuals', String(snap.namedIndividuals));
+
+  if (model.workerStory.length) {
+    sectionHeading(c, 'Your Story');
+    for (const s of model.workerStory) {
+      c.text(s.heading, { size: 9.5, font: bold, color: INK });
+      c.gap(2);
+      c.text(s.body, { size: 10, color: SOFT });
+      c.gap(4);
+    }
+  }
+
+  sectionHeading(c, 'Questions for Review');
+  if (model.questionsForReview.length) for (const q of model.questionsForReview) bullet(c, q);
+  else c.text('Topics will appear as records are organized.', { size: 10, color: MUTED });
+
+  sectionHeading(c, 'Timeline');
+  if (model.chronology.length) for (const line of model.chronology) bullet(c, line);
+  else c.text('No timeline entries are available yet.', { size: 10, color: MUTED });
+
+  sectionHeading(c, 'Supporting Records');
+  if (model.supportingDocuments.length) for (const r of model.supportingDocuments) bullet(c, r);
+  else c.text('No related records found yet.', { size: 10, color: MUTED });
+
+  sectionHeading(c, 'Additional Information That May Help');
+  if (model.missingInformation.length) for (const m of model.missingInformation) bullet(c, m);
+  else c.text('No additional records listed yet.', { size: 10, color: MUTED });
+
+  sectionHeading(c, 'Disclaimer');
+  for (const d of model.disclaimer) {
+    c.text(d, { size: 8.5, color: MUTED });
+    c.gap(3);
+  }
+
+  return doc.save();
+}

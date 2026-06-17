@@ -658,7 +658,7 @@ export function IntakeSummaryScreen({
         console.error('[o3s-export] fresh export payload failed', e);
       }
     }
-    downloadIntakeSummaryDocument(payload);
+    await downloadIntakeSummaryDocument(payload);
   };
 
   const handleSaveForLater = async () => {

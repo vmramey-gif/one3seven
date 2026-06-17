@@ -604,13 +604,13 @@ export function IntakeReviewScreen({
     }
   };
 
-  const handleDownloadSummary = () => {
+  const handleDownloadSummary = async () => {
     if (!firmLiveView) {
       showToastMessage('Load an intake before downloading the review packet.');
       return;
     }
     try {
-      downloadFirmIntakeReviewDocument(firmLiveView);
+      await downloadFirmIntakeReviewDocument(firmLiveView);
       showToastMessage('Firm intake review packet downloaded.');
     } catch {
       showToastMessage('Could not generate the review packet. Try again.');

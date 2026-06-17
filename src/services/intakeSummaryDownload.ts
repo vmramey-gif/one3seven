@@ -6,8 +6,10 @@
 import {
   buildIntakePacketHtml,
   buildPacketCoreStoryDisplay,
+  buildWorkerSummaryModel,
   collectIntakePacketPdfLines,
 } from './intakePacketPresentation';
+import { renderWorkerSummaryPdf } from './firmIntakePdfRenderer';
 import { extractStoryFollowUpFromOverview } from './storyFollowUpPersistence';
 import { ONE3SEVEN_UNIVERSAL_DISCLAIMER } from '../app/constants/one3sevenProduct';
 import type { IntakeOrganizationSections } from './intakeOrganizationTypes';
@@ -15,7 +17,7 @@ import type { IntakeOrganizationSections } from './intakeOrganizationTypes';
 export type CategoryCountRow = { name: string; count: number };
 
 /** Fixed download filename for the worker “Print / Download PDF” action. */
-export const INTAKE_SUMMARY_PDF_FILENAME = 'one3Seven-intake-summary.pdf';
+export const INTAKE_SUMMARY_PDF_FILENAME = 'one3seven-intake-summary.pdf';
 
 type KvRow = { label: string; value: string };
 
@@ -920,7 +922,7 @@ function buildAsciiTextPdf(allLines: string[]): Uint8Array {
   return out;
 }
 
-function triggerPdfDownload(bytes: Uint8Array, filename: string): void {
+export function triggerPdfDownload(bytes: Uint8Array, filename: string): void {
   const blob = new Blob([bytes], { type: 'application/pdf' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -943,8 +945,16 @@ export function buildIntakeSummaryHtml(payload: IntakeSummaryDownloadPayload): s
   return buildIntakePacketHtml(payload);
 }
 
-export function downloadIntakeSummaryDocument(payload: IntakeSummaryDownloadPayload): void {
-  renderIntakeSummaryPdfDownload(payload);
+export async function downloadIntakeSummaryDocument(payload: IntakeSummaryDownloadPayload): Promise<void> {
+  // Prestige (pdf-lib) renderer, built from the worker Story Packet data so content
+  // matches the worker workflow exactly. Falls back to the text PDF on any failure.
+  try {
+    const model = buildWorkerSummaryModel(payload);
+    const bytes = await renderWorkerSummaryPdf(model);
+    triggerPdfDownload(bytes, INTAKE_SUMMARY_PDF_FILENAME);
+  } catch {
+    renderIntakeSummaryPdfDownload(payload);
+  }
 }
 
 /** Build and download a text PDF from pre-wrapped lines (firm review packets, etc.). */

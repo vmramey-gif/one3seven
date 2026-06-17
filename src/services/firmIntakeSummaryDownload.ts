@@ -10,10 +10,11 @@ import type { FirmAccessibleUploadFile } from './intakeDataService';
 import {
   appendPdfBlankLine,
   appendPdfWrappedLines,
-  downloadPdfFromTextLines,
+  triggerPdfDownload,
   type CategoryCountRow,
   type IntakeSummaryDownloadPayload,
 } from './intakeSummaryDownload';
+import { renderFirmIntakePacketPdf, type FirmPacketModel } from './firmIntakePdfRenderer';
 import {
   buildFirmIntakeOverviewFields,
   partitionFirmReadinessPresentation,
@@ -273,7 +274,7 @@ function buildWhyThisIntakeRequiresReview(
     .join('; ');
 
   const timingNote = complaintDate
-    ? ' The sequence, timing, and relationship between these events require attorney review to assess.'
+    ? ' The sequence and timing are organized here for attorney review.'
     : '';
 
   return `Records document the following sequence: ${sequence}.${timingNote} Firm review is needed to determine whether these events are related and what the underlying records establish.`;
@@ -399,7 +400,7 @@ function buildSupportingMaterialRows(
     } else if (/terminat/i.test(title)) {
       rows.push({
         question: 'Termination documented',
-        support: hasDoc ? 'Document available — stated reason requires review' : 'Worker reported only',
+        support: hasDoc ? 'Termination record available — stated reason included for attorney review' : 'Worker reported only',
       });
     } else if (/coworker|witness/i.test(title)) {
       rows.push({
@@ -810,7 +811,7 @@ function buildFirmPolishedPacketPdfLines(
   }
 
   // --- 4. Timeline With Source Links + Timing ---
-  section(lines, '4.  Sequence for Firm Review');
+  section(lines, '4.  Sequence for Attorney Review');
   if (tier === 'limited_preview') {
     push(lines, 'Full timeline available upon approval.');
     blank(lines);
@@ -993,7 +994,186 @@ export function buildFirmIntakeReviewPdfLines(view: FirmLiveIntakeView): string[
   return [...body, ...buildFirmDocumentWorkflowLines(view)];
 }
 
-export function downloadFirmIntakeReviewDocument(view: FirmLiveIntakeView): void {
-  const pdfLines = buildFirmIntakeReviewPdfLines(view);
-  downloadPdfFromTextLines(pdfLines, firmIntakeReviewPdfFilename(view.intakeNumber));
+// ---------------------------------------------------------------------------
+// Structured model for the prestige (pdf-lib) renderer.
+// Reuses the same content helpers as the line builder so there is zero content
+// drift — this only changes the SHAPE of the data passed to the PDF layer.
+// ---------------------------------------------------------------------------
+export function buildFirmIntakePacketModel(view: FirmLiveIntakeView): FirmPacketModel {
+  const tier = resolveFirmExportAccessTier(view);
+  const payload = firmViewToExportPayload(view, tier);
+  const vm = buildIntakePacketViewModel(payload);
+  const overviewFields = buildFirmIntakeOverviewFields(view, vm);
+  const preview = tier === 'limited_preview';
+
+  const workerStory = preview ? '' : (view.workerProvidedContext || '').trim() || payload.workerContext || '';
+
+  const resolvedFiles: ResolvedFile[] = view.files.map((f) => ({
+    file_name: f.file_name || '',
+    category: (() => {
+      const stored = (f.category ?? '').trim();
+      return stored && stored !== 'Uncategorized' ? stored : inferCategoryFromFileName(f.file_name || '');
+    })(),
+  }));
+
+  const seen = new Set<string>();
+  const cleanEvents = (payload.timelineEvents ?? [])
+    .map((e) => {
+      const sanitized = sanitizeEventTitle(polishFirmFacingText(e.title) || 'Timeline event');
+      const corrected = correctEventTitle(sanitized, e.category);
+      const crossChecked = crossReferenceEventTitle(corrected, e.date, resolvedFiles);
+      return { ...e, title: crossChecked };
+    })
+    .filter((e) => {
+      const key = `${e.date}::${e.title.toLowerCase()}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+
+  const linkedEvents = linkEventsToFiles(cleanEvents, resolvedFiles);
+  const complaintEvent = cleanEvents.find((e) => /complaint/i.test(e.title));
+  const complaintDate = complaintEvent ? parseEventDate(complaintEvent.date) : null;
+
+  const meaningfulFields = overviewFields.filter((f) => {
+    const v = (f.value ?? '').trim().toLowerCase();
+    return v && v !== 'n/a' && v !== 'na' && v !== 'not provided' && v !== 'none';
+  });
+
+  const intel = view.intelligence;
+  const extracted: FirmPacketModel['extracted'] = intel
+    ? {
+        confirmedFacts: (
+          [
+            ['HR complaint topic', intel.confirmedComplaintTopic],
+            ['Complaint date', intel.confirmedComplaintDate],
+            ['HR response', intel.confirmedHrResponseSummary],
+            ['Warning states', intel.confirmedWarningReason],
+            ['Warning date', intel.confirmedWarningDate],
+            ['Termination states', intel.confirmedTerminationReason],
+            ['Termination date', intel.confirmedTerminationDate],
+          ] as Array<[string, string | null]>
+        )
+          .filter((p): p is [string, string] => Boolean(p[1]))
+          .map(([label, value]) => ({ label, value })),
+        coworkerCorroboration: intel.coworkerCorroboration.length ? intel.coworkerCorroboration.join('; ') : null,
+        timingIntervals: intel.timingIntervals,
+        keyQuotes: intel.keyQuotes.slice(0, 4).map((q) => ({
+          category: q.category,
+          fileName: q.file_name.replace(/_/g, ' ').replace(/\.[^.]+$/, ''),
+          quote: q.quote,
+        })),
+        overtimeNote: intel.overtimeIssueDetected
+          ? 'Overtime hours recorded without matching overtime rate — payroll review required.'
+          : null,
+      }
+    : null;
+
+  // Sequence (with timing interval) — mirrors buildSequenceWithTiming logic.
+  let sequence: FirmPacketModel['sequence'];
+  if (preview) {
+    sequence = { kind: 'preview', note: 'Full timeline available upon approval.' };
+  } else if (!linkedEvents.length) {
+    sequence = { kind: 'empty', note: 'Timeline entries will appear as dated records are organized.' };
+  } else {
+    sequence = {
+      kind: 'events',
+      events: linkedEvents.map((e) => {
+        const evDate = parseEventDate(e.date);
+        let interval: string | null = null;
+        if (complaintDate && evDate && evDate > complaintDate) {
+          interval = intervalLabel(daysBetween(complaintDate, evDate));
+        }
+        return { date: e.date, title: e.title, interval, sourceFile: e.sourceFile };
+      }),
+    };
+  }
+
+  // Records
+  let records: FirmPacketModel['records'];
+  if (preview) {
+    records = { kind: 'preview', note: 'Individual file titles are withheld in limited preview exports.' };
+  } else if (resolvedFiles.length) {
+    const sorted = sortFilesByPriority(resolvedFiles);
+    records = {
+      kind: 'list',
+      priority: sorted
+        .filter((f) => isPriorityCategory(f.category))
+        .map((f) => ({ name: humanizeFileName(f.file_name), category: f.category })),
+      supporting: sorted
+        .filter((f) => !isPriorityCategory(f.category))
+        .map((f) => ({ name: humanizeFileName(f.file_name), category: f.category })),
+    };
+  } else {
+    records = { kind: 'empty', note: 'No records listed for this intake yet.' };
+  }
+
+  const confirmItems = intel?.confirmationNeeded?.length
+    ? intel.confirmationNeeded
+    : buildItemsRequiringConfirmation(view, linkedEvents, resolvedFiles, overviewFields);
+
+  const priorityCount = resolvedFiles.filter((f) => isPriorityCategory(f.category)).length;
+  const noReimburse = view.workerFollowUp?.reimbursed === 'no' || view.workerFollowUp?.workedRemotely === 'no';
+  const additionalRecords = [
+    'Timecards or time records for the full employment period',
+    'Wage statements for any periods not covered by uploaded paystubs',
+    'Applicable employer policies (attendance, discipline, accommodation)',
+    !noReimburse ? 'Expense reimbursement records if applicable' : null,
+    'Any communications explaining or leading to the termination decision',
+  ].filter(Boolean) as string[];
+
+  const docWorkflowLines = buildFirmDocumentWorkflowLines(view)
+    .map((l) => l.trim())
+    .filter(Boolean);
+  const documentWorkflow = docWorkflowLines.length
+    ? [{ heading: 'Supplement — Document Request and Worker Response', lines: docWorkflowLines.filter((l) => !/^Supplement/i.test(l)) }]
+    : [];
+
+  const employer = overviewFields.find((f) => /^employer/i.test(f.label))?.value ?? null;
+  const employmentPeriod = overviewFields.find((f) => /employment date/i.test(f.label))?.value ?? null;
+
+  return {
+    cover: {
+      workerName: view.workerFollowUp?.employmentName?.trim() || null,
+      employer: employer && employer.trim() ? employer : null,
+      employmentPeriod: employmentPeriod && employmentPeriod.trim() ? employmentPeriod : null,
+      recordCount: resolvedFiles.length,
+      eventCount: cleanEvents.length,
+      preparedDate: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }),
+    },
+    reviewSnapshot: buildReviewSnapshot(view, overviewFields, cleanEvents, resolvedFiles),
+    whyReview: buildWhyThisIntakeRequiresReview(cleanEvents, complaintDate),
+    extracted,
+    overviewFields: meaningfulFields,
+    sequence,
+    priorityQuestions: preview ? [] : buildPriorityQuestions(cleanEvents, resolvedFiles, workerStory, view.workerFollowUp),
+    records,
+    dvwRows: preview ? [] : buildSupportingMaterialRows(linkedEvents),
+    confirmationItems: confirmItems,
+    clarificationQuestions: preview ? [] : intel?.clarificationQuestions ?? [],
+    workerContext: preview
+      ? { kind: 'hidden' }
+      : workerStory
+        ? { kind: 'text', paragraphs: workerStory.split(/\n+/).map((p) => p.trim()).filter(Boolean) }
+        : { kind: 'none' },
+    reviewOptions: {
+      unresolvedCount: confirmItems.length,
+      priorityCount,
+      totalRecords: resolvedFiles.length,
+      additionalRecords,
+      actions:
+        'Actions available: Review priority documents · Request clarification · Request additional records · Schedule consultation · Accept intake · Decline intake',
+    },
+    disclaimer: [
+      ONE3SEVEN_NOTICES.positioning,
+      'This packet organizes uploaded employment-related records for firm intake review. It is not a legal analysis, theory of the case, or outcome prediction.',
+    ],
+    documentWorkflow,
+  };
+}
+
+export async function downloadFirmIntakeReviewDocument(view: FirmLiveIntakeView): Promise<void> {
+  const model = buildFirmIntakePacketModel(view);
+  const bytes = await renderFirmIntakePacketPdf(model);
+  triggerPdfDownload(bytes, firmIntakeReviewPdfFilename(view.intakeNumber));
 }

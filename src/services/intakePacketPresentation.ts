@@ -15,6 +15,7 @@ import {
   type PacketCaseSnapshot,
 } from './packetStoryPresentation';
 import { buildPacketChronologyPresentation } from './packetStoryPresentation';
+import type { WorkerPacketModel } from './firmIntakePdfRenderer';
 import {
   filterEmploymentDateTokens,
   formatPacketDateRange,
@@ -1055,7 +1056,7 @@ export function collectOrganizedSectionsPdfLines(
     for (const item of items) push(`- ${item}`);
   };
 
-  push('one3Seven Story Packet');
+  push('one3seven Story Packet');
   push(`Intake reference: ${payload.intakeNumber}`);
   blank();
 
@@ -1117,6 +1118,51 @@ export function collectOrganizedSectionsPdfLines(
   return lines;
 }
 
+/**
+ * Structured worker "Your organized intake" model for the prestige renderer.
+ * Built from the SAME helpers as collectOrganizedSectionsPdfLines, so the
+ * prestige worker PDF carries identical factual content to the worker workflow.
+ */
+export function buildWorkerSummaryModel(payload: IntakeSummaryDownloadPayload): WorkerPacketModel {
+  const sections = payload.orgSections;
+  const snapshot = buildCaseSnapshot(payload);
+  const account = buildWorkerAccount(payload);
+
+  const missingFromHelper = buildMissingRecordBullets(payload);
+  const missingInformation = missingFromHelper.length
+    ? missingFromHelper
+    : (sections?.potential_gaps ?? []).slice(0, 5).map(normalizeMissingRecordBullet).filter(Boolean);
+
+  const employer = inferEmployer(payload);
+  const workerName = inferWorkerName(payload);
+
+  return {
+    cover: {
+      workerName: workerName && workerName.trim() ? workerName.trim() : null,
+      employer: employer && employer.trim() ? employer.trim() : null,
+      employmentPeriod: snapshot.employmentPeriod && snapshot.employmentPeriod.trim() ? snapshot.employmentPeriod : null,
+      recordCount: Number(snapshot.recordsOrganized) || 0,
+      eventCount: Number(snapshot.timelineEvents) || 0,
+      preparedDate: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }),
+    },
+    intakeNumber: payload.intakeNumber,
+    currentUnderstanding: buildExecutiveSummary(payload),
+    caseSnapshot: {
+      employmentPeriod: snapshot.employmentPeriod,
+      primaryConcerns: snapshot.primaryConcerns,
+      recordsOrganized: Number(snapshot.recordsOrganized) || 0,
+      timelineEvents: Number(snapshot.timelineEvents) || 0,
+      namedIndividuals: Number(snapshot.namedIndividuals) || 0,
+    },
+    workerStory: account.narrative ? account.sections.map((s) => ({ heading: s.heading, body: s.body })) : [],
+    questionsForReview: buildReviewTopicBullets(payload),
+    chronology: (sections?.chronology ?? []).map(polishChronologyLine),
+    supportingDocuments: (sections?.supporting_records ?? []).map((r) => r.file_name),
+    missingInformation,
+    disclaimer: [sections?.disclaimer || payload.disclaimer].filter((d): d is string => Boolean(d && d.trim())),
+  };
+}
+
 export function collectIntakePacketPdfLines(payload: IntakeSummaryDownloadPayload): string[] {
   const organized = collectOrganizedSectionsPdfLines(payload);
   if (organized) return organized;
@@ -1132,7 +1178,7 @@ export function collectIntakePacketPdfLines(payload: IntakeSummaryDownloadPayloa
     if (lines.length && lines[lines.length - 1] !== '') lines.push('');
   };
 
-  push('one3Seven Story Packet');
+  push('one3seven Story Packet');
   push(`Intake ID: ${vm.metadata.intakeId}`);
   push(`Generated: ${vm.metadata.dateGenerated}`);
   blank();

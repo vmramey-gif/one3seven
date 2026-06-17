@@ -59,7 +59,7 @@ describe('firm intake summary download', () => {
     expect(text).toContain('Access Level: Limited preview');
     expect(text).toContain('1. Review Snapshot');
     expect(text).toContain('3. Intake Overview');
-    expect(text).toContain('4. Sequence for Firm Review');
+    expect(text).toContain('4. Sequence for Attorney Review');
     expect(text).toContain('6. Supporting Records');
 
     expect(text).not.toContain('O3S_RECORD_STORY');
