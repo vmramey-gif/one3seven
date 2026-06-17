@@ -26,16 +26,21 @@ const BRAND: [number, number, number] = [91, 33, 182];
 interface Seed {
   tAngle: number; // target angle (phyllotaxis)
   tR: number; // target radius
-  scatterR: number; // starting radius (beyond the head)
+  sx: number; // random scatter origin x
+  sy: number; // random scatter origin y
   size: number;
 }
 
 function buildSeeds(maxR: number): Seed[] {
   const seedScale = maxR / Math.sqrt(SEED_COUNT);
+  const c = CANVAS_SIZE / 2;
   return Array.from({ length: SEED_COUNT }, (_, i) => ({
     tAngle: i * GOLDEN_ANGLE,
     tR: seedScale * Math.sqrt(i),
-    scatterR: maxR * (1.1 + Math.random() * 0.6),
+    // scattered anywhere across (and a little beyond) the field, so the seeds
+    // visibly converge from chaos into the organized spiral.
+    sx: c + (Math.random() - 0.5) * CANVAS_SIZE * 1.5,
+    sy: c + (Math.random() - 0.5) * CANVAS_SIZE * 1.5,
     size: 2.1 + 1.7 * (1 - i / SEED_COUNT), // inner seeds slightly larger
   }));
 }
@@ -80,10 +85,12 @@ export function OneThreeSevenLoader({ size = 'lg' }: { size?: 'lg' | 'sm' }) {
     const seeds = buildSeeds(maxR);
 
     const drawSeed = (s: Seed, eased: number, extraAngle: number, alpha: number) => {
+      // Spiraling target (unwinds as it settles); seed converges to it from its scatter point.
       const ang = s.tAngle + (1 - eased) * SPIRAL_TURNS * Math.PI * 2 + extraAngle;
-      const rad = s.scatterR + (s.tR - s.scatterR) * eased;
-      const x = cx + Math.cos(ang) * rad;
-      const y = cy + Math.sin(ang) * rad;
+      const tx = cx + Math.cos(ang) * s.tR;
+      const ty = cy + Math.sin(ang) * s.tR;
+      const x = s.sx + (tx - s.sx) * eased;
+      const y = s.sy + (ty - s.sy) * eased;
       const r = Math.round(LAV[0] + (BRAND[0] - LAV[0]) * eased);
       const g = Math.round(LAV[1] + (BRAND[1] - LAV[1]) * eased);
       const b = Math.round(LAV[2] + (BRAND[2] - LAV[2]) * eased);
