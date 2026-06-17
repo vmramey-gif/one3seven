@@ -214,8 +214,10 @@ function buildClarificationQuestions(input: {
   if ((input.hasComplaintRecord || input.confirmedComplaintTopic) && !input.confirmedComplaintDate) {
     q.push('A workplace concern is noted but its date is not clear in the records. When did you first raise it?');
   }
-  if ((input.hasSeparationRecord || input.confirmedTerminationDate) && !input.finalPayPresent) {
-    q.push('The records reference a separation from employment. Do you have a termination letter, final paystub, or related message to upload?');
+  if (input.hasSeparationRecord && !input.finalPayPresent) {
+    // A separation record is already present — ask only for the genuinely-missing final pay,
+    // not for the termination letter (which is what hasSeparationRecord means is uploaded).
+    q.push('A separation is documented, but a final paystub for that period was not detected. Do you have the final paystub or wage statement to upload?');
   }
   if (!input.confirmedStartDate && !input.hasOffer) {
     q.push('The records do not yet show an employment start date. Do you have an offer letter or an early paystub that shows when you started?');
@@ -325,7 +327,14 @@ export function synthesizeIntakeIntelligence(files: FileWithFacts[]): IntakeInte
     (p) => p.flags?.includes('overtime_rate_missing') ||
       (p.overtime_hours && parseFloat(p.overtime_hours) > 0 && !p.overtime_rate)
   );
-  const finalPayPresent = paystubs.some((p) => p.flags?.includes('final_pay'));
+  // Detect a final paystub regardless of how it was categorized — final-pay docs are
+  // often filed under Separation Records, not Pay Records, so a Pay-Records-only check
+  // misses them and causes "do you have a final paystub?" to fire when one is present.
+  const finalPayPresent = files.some(
+    (f) =>
+      f.document_facts?.flags?.includes('final_pay') ||
+      /final[\s_]?pay(stub|check)?/i.test(f.file_name || ''),
+  );
 
   // Witness corroboration
   const coworkerCorroboration = witness.flatMap((w) => w.events_corroborated ?? []);
@@ -334,7 +343,12 @@ export function synthesizeIntakeIntelligence(files: FileWithFacts[]): IntakeInte
   const keyQuotes: IntakeIntelligence['keyQuotes'] = files
     .filter((f) => f.document_facts?.key_quote)
     .map((f) => ({
-      category: f.category || f.document_facts!.category,
+      // Prefer a real category; fall back to the facts' category before "Uncategorized"
+      // so the key-quote label matches the Supporting Records list (no split identity).
+      category:
+        f.category && f.category !== 'Uncategorized'
+          ? f.category
+          : f.document_facts!.category || f.category || 'Uncategorized',
       file_name: f.file_name,
       quote: f.document_facts!.key_quote!,
       confidence: f.document_facts!.confidence,
@@ -345,10 +359,14 @@ export function synthesizeIntakeIntelligence(files: FileWithFacts[]): IntakeInte
 
   // Items requiring confirmation
   const confirmationNeeded: string[] = [];
+  // A quote from the relevant document already surfaces the reason for review — don't
+  // then ask the firm to confirm something the packet has already shown.
+  const hasSeparationQuote = keyQuotes.some((q) => /separation|termination/i.test(q.category));
+  const hasWarningQuote = keyQuotes.some((q) => /discipline|warning|performance/i.test(q.category));
   if (!confirmedStartDate) confirmationNeeded.push('Employment start date not confirmed by documents.');
   if (!confirmedComplaintDate) confirmationNeeded.push('HR complaint date not confirmed by documents.');
-  if (!confirmedTerminationReason) confirmationNeeded.push('Employer-stated reason for termination not yet extracted.');
-  if (!confirmedWarningReason) confirmationNeeded.push('Employer-stated reason for written warning not yet extracted.');
+  if (!confirmedTerminationReason && !hasSeparationQuote) confirmationNeeded.push('Employer-stated reason for termination not yet extracted.');
+  if (!confirmedWarningReason && !hasWarningQuote) confirmationNeeded.push('Employer-stated reason for written warning not yet extracted.');
   if (overtimeIssueDetected) confirmationNeeded.push('Overtime hours recorded without matching overtime rate — payroll review required.');
   if (mealBreaks.some((m) => m.flags?.includes('missed_breaks_recorded'))) {
     confirmationNeeded.push('Meal-break log shows missed breaks — count and dates require review.');
