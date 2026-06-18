@@ -3,6 +3,7 @@ import { FileText, Home, Menu, Settings, Upload } from 'lucide-react';
 import type { Screen } from '../App';
 import { NotificationsBell } from './NotificationsBell';
 import type { AppNotificationItem } from './NotificationsBell';
+import { WordMark } from './WordMark';
 import {
   WorkerMobileBottomNav,
   type WorkerMobileHubView,
@@ -141,7 +142,7 @@ export function WorkerAppShell({
                 onClick={() => onNavigate('landing')}
                 className="text-lg font-medium tracking-tight text-[var(--o3s-text)] transition-opacity hover:opacity-80 sm:text-[var(--o3s-fg)]"
               >
-                one3seven
+                <WordMark />
               </button>
               <div className="flex items-center gap-0.5">
                 <NotificationsBell

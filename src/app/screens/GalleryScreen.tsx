@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
+import { WordMark } from '../components/WordMark';
 import { AuthWelcomeScreen } from './AuthWelcomeScreen';
 import { SignInScreen } from './SignInScreen';
 import { CreateAccountScreen } from './CreateAccountScreen';
@@ -84,7 +85,7 @@ export function GalleryScreen({ onNavigate, submittedIntakes }: GalleryScreenPro
     <div className="min-h-screen bg-slate-100 p-6">
       {/* Header */}
       <div className="mb-6 bg-white border border-slate-200 rounded-xl p-4">
-        <h1 className="text-xl font-semibold text-slate-900 mb-2">One3Seven Gallery</h1>
+        <h1 className="text-xl font-semibold text-slate-900 mb-2"><WordMark /> Gallery</h1>
         <p className="text-sm text-slate-600 mb-3">Click to focus, double-click to enter full screen</p>
         <div className="flex gap-2">
           <button

@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight, Mail, Lock } from 'lucide-react';
 import { Screen } from '../App';
 import { One3SevenDisclaimer } from '../components/One3SevenDisclaimer';
 import { WordMark } from '../components/WordMark';
+import { SeedMark } from '../components/ui/SeedMark';
 
 // TODO(Supabase): Enable Google in Auth → Providers and wire `signInWithOAuth` instead of the placeholder handler from App.
 
@@ -60,6 +61,7 @@ export function SignInScreen({ onNavigate, onSignIn, onGoogleAuth }: SignInScree
           >
             {/* Logo */}
             <div className="mb-8 text-center">
+              <SeedMark size={36} className="mx-auto mb-3" />
               <h1 className="mb-2 text-xl font-semibold text-[#1E1B4B]"><WordMark /></h1>
               <p className="text-sm text-[#1E1B4B]/64">Sign in to continue</p>
             </div>

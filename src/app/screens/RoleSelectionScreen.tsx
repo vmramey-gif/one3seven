@@ -4,6 +4,7 @@ import { FileText, Briefcase, ArrowRight, ArrowLeft } from 'lucide-react';
 import { Screen } from '../App';
 import { One3SevenDisclaimer } from '../components/One3SevenDisclaimer';
 import { WordMark } from '../components/WordMark';
+import { SeedMark } from '../components/ui/SeedMark';
 
 interface RoleSelectionScreenProps {
   onNavigate: (screen: Screen) => void;
@@ -77,6 +78,7 @@ export function RoleSelectionScreen({ onNavigate, onSelectRole, onCommitRole, al
         >
           {/* Header */}
           <div className="mb-12 text-center">
+            <SeedMark size={36} className="mx-auto mb-3" />
             <h1 className="mb-2 text-xl font-semibold text-[#1E1B4B]"><WordMark /></h1>
             <h2 className="mb-3 text-2xl font-semibold tracking-tight text-[#1E1B4B]">
               How will you use <WordMark />?
