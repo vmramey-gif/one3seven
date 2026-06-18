@@ -2,6 +2,7 @@ import { defineConfig } from 'vite'
 import path from 'path'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
+import { VitePWA } from 'vite-plugin-pwa'
 
 
 function figmaAssetResolver() {
@@ -28,6 +29,36 @@ export default defineConfig({
     // Tailwind is not being actively used – do not remove them
     react(),
     tailwindcss(),
+    VitePWA({
+      registerType: 'autoUpdate',
+      includeAssets: ['favicon.svg', 'icons/apple-touch-icon.png'],
+      manifest: {
+        name: 'one3seven — Employment Intake Organization',
+        short_name: 'one3seven',
+        description:
+          'Organize your employment records into a structured intake packet — ready to bring to any attorney consultation.',
+        theme_color: '#5B21B6',
+        background_color: '#FAFAFF',
+        display: 'standalone',
+        start_url: '/',
+        scope: '/',
+        icons: [
+          { src: '/icons/pwa-192.png', sizes: '192x192', type: 'image/png' },
+          { src: '/icons/pwa-512.png', sizes: '512x512', type: 'image/png' },
+          { src: '/icons/maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+        ],
+      },
+      workbox: {
+        // Precache the app shell only. Supabase API calls are cross-origin and pass
+        // through to the network — we never cache intake data. Maps excluded.
+        globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
+        maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
+        navigateFallback: '/index.html',
+        cleanupOutdatedCaches: true,
+        clientsClaim: true,
+        skipWaiting: true,
+      },
+    }),
   ],
   resolve: {
     alias: {
