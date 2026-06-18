@@ -348,5 +348,48 @@ function synthesize(files: any[]): unknown {
     allFlags,
     confirmationNeeded,
     clarificationQuestions,
+    wageFacts: buildWageFacts(files),
   };
+}
+
+// Forward raw wage figures + verbatim snippets per document (pass-through; no parsing).
+// Mirrors documentFactsService.buildWageFacts. Parsing/guarding happens client-side in
+// damagesAssembly so the risky logic lives in exactly one place.
+function buildWageFacts(files: any[]): Array<{
+  docId: string;
+  docName: string;
+  category: string | null;
+  payRate: string | null;
+  overtimeHours: string | null;
+  overtimeRate: string | null;
+  missedBreaks: string | null;
+  sources: { pay_rate?: string; overtime_hours?: string; overtime_rate?: string; missed_breaks?: string };
+}> {
+  const out = [];
+  for (const f of files) {
+    const df = f.document_facts;
+    if (!df) continue;
+    const payRate = df.pay_rate ?? null;
+    const overtimeHours = df.overtime_hours ?? null;
+    const overtimeRate = df.overtime_rate ?? null;
+    const missedBreaks = df.missed_breaks ?? null;
+    if (!payRate && !overtimeHours && !overtimeRate && !missedBreaks) continue;
+    const s = df.damages_sources ?? {};
+    out.push({
+      docId: f.uploaded_file_id,
+      docName: f.file_name || 'Document',
+      category: f.category ?? null,
+      payRate,
+      overtimeHours,
+      overtimeRate,
+      missedBreaks,
+      sources: {
+        pay_rate: typeof s.pay_rate === 'string' ? s.pay_rate : undefined,
+        overtime_hours: typeof s.overtime_hours === 'string' ? s.overtime_hours : undefined,
+        overtime_rate: typeof s.overtime_rate === 'string' ? s.overtime_rate : undefined,
+        missed_breaks: typeof s.missed_breaks === 'string' ? s.missed_breaks : undefined,
+      },
+    });
+  }
+  return out;
 }

@@ -3929,11 +3929,12 @@ export type FirmLiveIntakeView = {
 
 /** Signed URL for firm users when route has full_access (storage RLS). */
 export async function createFirmIntakeFileSignedUrl(
-  filePath: string
+  filePath: string,
+  expirySeconds = 300
 ): Promise<{ url?: string; error?: string }> {
   const path = filePath.trim();
   if (!path) return { error: 'File path is missing.' };
-  const { data, error } = await supabase.storage.from(INTAKE_FILES_BUCKET).createSignedUrl(path, 300);
+  const { data, error } = await supabase.storage.from(INTAKE_FILES_BUCKET).createSignedUrl(path, expirySeconds);
   if (error) return { error: error.message };
   if (!data?.signedUrl) return { error: 'Could not create download link.' };
   return { url: data.signedUrl };

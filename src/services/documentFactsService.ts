@@ -45,6 +45,13 @@ export type DocumentFacts = {
   referenced_documents?: string[];
   /** Phase 2b: people party to communications in this document, with stated roles. */
   communication_parties?: import('./communicationPartyExtraction').CommunicationParty[];
+  /** Phase 2c: verbatim source snippet per wage field (firm-only wage-exposure provenance). */
+  damages_sources?: {
+    pay_rate?: string;
+    overtime_hours?: string;
+    overtime_rate?: string;
+    missed_breaks?: string;
+  };
 };
 
 export type FileWithFacts = {
@@ -182,7 +189,59 @@ export type IntakeIntelligence = {
   confirmationNeeded: string[];
   // Phase 2a: deterministic clarification questions (template-based, from known gaps)
   clarificationQuestions: string[];
+  // Phase 2c: raw per-document wage facts + verbatim snippets, for the firm-only
+  // wage-exposure estimate. Parsing/selection/guarding happens in damagesAssembly
+  // (one pure place), never here. null/empty when no wage records exist.
+  wageFacts: WageFactsDocument[];
 };
+
+/** Raw wage figures + verbatim source snippets forwarded for the wage-exposure estimate. */
+export type WageFactsDocument = {
+  docId: string;
+  docName: string;
+  category: string | null;
+  payRate: string | null;
+  overtimeHours: string | null;
+  overtimeRate: string | null;
+  missedBreaks: string | null;
+  sources: {
+    pay_rate?: string;
+    overtime_hours?: string;
+    overtime_rate?: string;
+    missed_breaks?: string;
+  };
+};
+
+/** Forward raw wage figures + snippets per document. Pass-through only — no parsing. */
+function buildWageFacts(files: FileWithFacts[]): WageFactsDocument[] {
+  const out: WageFactsDocument[] = [];
+  for (const f of files) {
+    const df = f.document_facts;
+    if (!df) continue;
+    const payRate = df.pay_rate ?? null;
+    const overtimeHours = df.overtime_hours ?? null;
+    const overtimeRate = df.overtime_rate ?? null;
+    const missedBreaks = df.missed_breaks ?? null;
+    if (!payRate && !overtimeHours && !overtimeRate && !missedBreaks) continue;
+    const s = df.damages_sources ?? {};
+    out.push({
+      docId: f.uploaded_file_id,
+      docName: f.file_name || 'Document',
+      category: f.category ?? null,
+      payRate,
+      overtimeHours,
+      overtimeRate,
+      missedBreaks,
+      sources: {
+        pay_rate: typeof s.pay_rate === 'string' ? s.pay_rate : undefined,
+        overtime_hours: typeof s.overtime_hours === 'string' ? s.overtime_hours : undefined,
+        overtime_rate: typeof s.overtime_rate === 'string' ? s.overtime_rate : undefined,
+        missed_breaks: typeof s.missed_breaks === 'string' ? s.missed_breaks : undefined,
+      },
+    });
+  }
+  return out;
+}
 
 /**
  * Phase 2a Clarification Engine (deterministic, no LLM).
@@ -443,5 +502,6 @@ export function synthesizeIntakeIntelligence(files: FileWithFacts[]): IntakeInte
     allFlags,
     confirmationNeeded,
     clarificationQuestions,
+    wageFacts: buildWageFacts(files),
   };
 }

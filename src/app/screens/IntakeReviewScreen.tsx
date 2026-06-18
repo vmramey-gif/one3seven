@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { OneThreeSevenLoader } from '../components/ui/OneThreeSevenLoader';
 import { motion, AnimatePresence } from 'motion/react';
 import {
@@ -25,8 +25,11 @@ import {
 } from '../types/IntakeWorkspace';
 
 import type { FirmLiveIntakeView } from '../../services/intakeDataService';
-import { downloadFirmIntakeReviewDocument } from '../../services/firmIntakeSummaryDownload';
+import { downloadFirmIntakeReviewDocument, resolveWageExposure } from '../../services/firmIntakeSummaryDownload';
 import { triggerIntakeFactExtraction } from '../../services/documentFactsService';
+import type { SourceCitation } from '../../services/damagesCalculator';
+import { CitationPanel } from '../components/CitationPanel';
+import { WageExposureReviewSection } from '../components/WageExposureReviewSection';
 import {
   createFirmIntakeFileSignedUrl,
   FIRM_ADDITIONAL_DOCUMENT_CATEGORIES,
@@ -276,6 +279,50 @@ export function IntakeReviewScreen({
   const [firmFileOpenError, setFirmFileOpenError] = useState<string | null>(null);
   const [showDeclineConfirm, setShowDeclineConfirm] = useState(false);
   const [declineSubmitting, setDeclineSubmitting] = useState(false);
+
+  // Section 8B wage-exposure estimate (firm/full-access only; fully guarded upstream).
+  const wageExposure = useMemo(
+    () => (firmLiveView ? resolveWageExposure(firmLiveView) : null),
+    [firmLiveView],
+  );
+  const [openCitation, setOpenCitation] = useState<SourceCitation | null>(null);
+  const [citationUrls, setCitationUrls] = useState<Record<string, string>>({});
+
+  // Pre-generate 3600s signed URLs for the documents cited by the wage estimate, so the
+  // CitationPanel opens with no round-trip. Full-access only (storage RLS enforces it too).
+  useEffect(() => {
+    if (!wageExposure || !firmLiveView || firmLiveView.previewOnly) {
+      setCitationUrls({});
+      return;
+    }
+    const r = wageExposure.report;
+    const docIds = new Set<string>();
+    for (const li of [r.baseHourlyRate, r.overtimeHoursUnderpaid, r.mealBreaksMissed]) {
+      if (li?.citation?.docId) docIds.add(li.citation.docId);
+    }
+    if (docIds.size === 0) {
+      setCitationUrls({});
+      return;
+    }
+    const pathById = new Map<string, string>();
+    for (const f of firmLiveView.files) {
+      if (f.uploaded_file_id && f.file_path) pathById.set(f.uploaded_file_id, f.file_path);
+    }
+    let cancelled = false;
+    void (async () => {
+      const entries: Record<string, string> = {};
+      for (const id of docIds) {
+        const path = pathById.get(id);
+        if (!path) continue;
+        const res = await createFirmIntakeFileSignedUrl(path, 3600);
+        if (res.url) entries[id] = res.url;
+      }
+      if (!cancelled) setCitationUrls(entries);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [wageExposure, firmLiveView]);
 
   // Scroll to top when component mounts — wrapped defensively for iOS Safari
   useEffect(() => {
@@ -2475,6 +2522,12 @@ export function IntakeReviewScreen({
               </FirmExpandableSection>
             </div>
 
+            {wageExposure ? (
+              <div className="mt-4">
+                <WageExposureReviewSection wage={wageExposure} onOpenCitation={setOpenCitation} />
+              </div>
+            ) : null}
+
             <div className="hidden">
             <FirmExpandableSection
               title={FIRM_REVIEW_SECTION.timelineHighlights}
@@ -3015,6 +3068,11 @@ export function IntakeReviewScreen({
           </motion.div>
         )}
       </AnimatePresence>
+      <CitationPanel
+        citation={openCitation}
+        signedUrl={openCitation ? citationUrls[openCitation.docId] ?? null : null}
+        onClose={() => setOpenCitation(null)}
+      />
     </div>
   );
 }

@@ -84,6 +84,15 @@ type DocumentFacts = {
   referenced_documents?: string[];
   // Phase 2b: people party to communications in this document, with stated roles.
   communication_parties?: Array<{ name: string; role: string }>;
+  // Phase 2c: verbatim source snippet for each wage field, for the firm-facing
+  // wage-exposure estimate. Snippet only — the panel locates/highlights it in the
+  // rendered PDF (pdf.js). source_doc_id is the row's uploaded_file_id (known already).
+  damages_sources?: {
+    pay_rate?: string | null;
+    overtime_hours?: string | null;
+    overtime_rate?: string | null;
+    missed_breaks?: string | null;
+  };
 };
 
 // ---------------------------------------------------------------------------
@@ -170,6 +179,7 @@ const JSON_SCHEMA = `{
   "document_dates": [{ "date": string, "context": string }],
   "referenced_documents": string[],
   "communication_parties": [{ "name": string, "role": string }],
+  "damages_sources": { "pay_rate": string | null, "overtime_hours": string | null, "overtime_rate": string | null, "missed_breaks": string | null },
   "confidence": "high" | "medium" | "low",
   "flags": string[]
 }`;
@@ -190,6 +200,7 @@ Reminders: quote verbatim for key_quote (under 200 characters); use null / [] fo
 Capture EVERY date explicitly stated in the document in "document_dates", each as { "date": "<as written>", "context": "<short factual label, e.g. 'complaint filed', 'warning issued'>" }. Include only dates the text actually states; never infer a date. Keep context labels factual, never conclusory.
 In "referenced_documents", list other documents this file explicitly mentions or refers to but does not itself contain (e.g. "performance improvement plan", "offer letter dated March 2021", "the attached schedule"). Use the document's own wording. Include only documents the text actually references; never infer documents that "should" exist.
 In "communication_parties", list the people party to any communication in this document — sender, recipient, and anyone explicitly named — as { "name": "<as written>", "role": "<role/title exactly as the document states it, e.g. 'sender', 'recipient', 'HR representative', 'supervisor'; empty string if none stated>" }. Include only people the document actually names; never infer a person or a role.
+For each wage field you fill (pay_rate, overtime_hours, overtime_rate, missed_breaks), also return in "damages_sources" the VERBATIM sentence or line the value was read from — copied exactly as written, under 200 characters, never paraphrased — e.g. "damages_sources": { "pay_rate": "Regular rate of pay: $22.00 per hour" }. Omit a field (or use null) when its value is null. This is a quotation only; it asserts nothing about the value.
 
 CATEGORY-SPECIFIC GUIDANCE:
 ${guidance}
@@ -231,6 +242,7 @@ Reminders: quote verbatim for key_quote (under 200 characters); use null / [] fo
 Capture EVERY date explicitly stated in the document in "document_dates", each as { "date": "<as written>", "context": "<short factual label, e.g. 'complaint filed', 'warning issued'>" }. Include only dates the text actually states; never infer a date. Keep context labels factual, never conclusory.
 In "referenced_documents", list other documents this file explicitly mentions or refers to but does not itself contain (e.g. "performance improvement plan", "offer letter dated March 2021", "the attached schedule"). Use the document's own wording. Include only documents the text actually references; never infer documents that "should" exist.
 In "communication_parties", list the people party to any communication in this document — sender, recipient, and anyone explicitly named — as { "name": "<as written>", "role": "<role/title exactly as the document states it, e.g. 'sender', 'recipient', 'HR representative', 'supervisor'; empty string if none stated>" }. Include only people the document actually names; never infer a person or a role.
+For each wage field you fill (pay_rate, overtime_hours, overtime_rate, missed_breaks), also return in "damages_sources" the VERBATIM sentence or line the value was read from — copied exactly as written, under 200 characters, never paraphrased — e.g. "damages_sources": { "pay_rate": "Regular rate of pay: $22.00 per hour" }. Omit a field (or use null) when its value is null. This is a quotation only; it asserts nothing about the value.
 
 CATEGORY-SPECIFIC GUIDANCE:
 ${guidance}
@@ -541,6 +553,7 @@ async function processSingleFile(params: {
     document_dates: sanitizeDocumentDates(facts.document_dates),
     referenced_documents: sanitizeReferencedDocuments(facts.referenced_documents),
     communication_parties: sanitizeCommunicationParties(facts.communication_parties),
+    damages_sources: sanitizeDamagesSources(facts.damages_sources),
   };
 
   const { error: writeErr } = await supabase.from('file_text_extractions').update({
@@ -548,6 +561,7 @@ async function processSingleFile(params: {
     fact_extraction_status: 'completed',
     fact_extraction_error: null,
     extraction_status: 'completed',
+    damages_provenance_version: 1,
   }).eq('uploaded_file_id', uploadedFileId);
 
   if (writeErr) return { ok: false, error: writeErr.message };
@@ -607,6 +621,29 @@ function sanitizeReferencedDocuments(raw: unknown): string[] {
 // Phase 2b: validate communication parties before storage. Drops malformed/blank
 // entries and scrubs any conclusory term from name or role. Mirror of the client-side
 // normalizeCommunicationParties guard.
+// Phase 2c: keep only verbatim wage-field source snippets. Drops non-strings, blanks,
+// over-long entries, and any snippet carrying a conclusory term (the snippet is a plain
+// quotation; if it trips the banned-vocab guard we omit it rather than risk conclusory copy).
+function sanitizeDamagesSources(raw: unknown): {
+  pay_rate?: string;
+  overtime_hours?: string;
+  overtime_rate?: string;
+  missed_breaks?: string;
+} {
+  const out: Record<string, string> = {};
+  if (!raw || typeof raw !== 'object') return out;
+  const allowed = ['pay_rate', 'overtime_hours', 'overtime_rate', 'missed_breaks'] as const;
+  for (const key of allowed) {
+    const v = (raw as Record<string, unknown>)[key];
+    if (typeof v !== 'string') continue;
+    const trimmed = v.trim();
+    if (!trimmed || trimmed.length > 200) continue;
+    if (DOCUMENT_DATE_BANNED.test(trimmed)) continue;
+    out[key] = trimmed;
+  }
+  return out;
+}
+
 function sanitizeCommunicationParties(raw: unknown): Array<{ name: string; role: string }> {
   if (!Array.isArray(raw)) return [];
   const out: Array<{ name: string; role: string }> = [];

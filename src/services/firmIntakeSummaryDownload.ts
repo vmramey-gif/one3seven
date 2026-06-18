@@ -15,6 +15,31 @@ import {
   type IntakeSummaryDownloadPayload,
 } from './intakeSummaryDownload';
 import type { FirmPacketModel } from './firmIntakePdfRenderer';
+import { assembleDamagesInput } from './damagesAssembly';
+import { calculateDamages } from './damagesCalculator';
+
+/**
+ * Compute the firm-only wage-exposure estimate for a view, with all three guards.
+ * Returns null on preview, when no wage records exist, or when the base rate is
+ * absent/ambiguous. Shared by the PDF model builder and the on-screen attorney review.
+ */
+export function resolveWageExposure(
+  view: FirmLiveIntakeView,
+): { report: import('./damagesCalculator').DamagesReport; disclaimer: string[] } | null {
+  const preview = resolveFirmExportAccessTier(view) === 'limited_preview';
+  const intel = view.intelligence;
+  if (preview || !intel?.wageFacts?.length) return null;
+  const assembled = assembleDamagesInput(intel.wageFacts);
+  if (!assembled) return null;
+  const report = calculateDamages(assembled.input);
+  if (!report.baseHourlyRate) return null;
+  return { report, disclaimer: WAGE_EXPOSURE_DISCLAIMER };
+}
+
+/** Verbatim hard disclaimer for the wage-exposure estimate (founder-provided, 2026-06-18). */
+const WAGE_EXPOSURE_DISCLAIMER: string[] = [
+  'Figures are arithmetic calculated from uploaded document data only. one3seven does not assess legal exposure, claim viability, applicable statute of limitations, or recoverable damages. Calculations are based solely on records provided and may be incomplete. Attorney review and independent verification required for all legal determinations. This is not legal advice and does not create an attorney-client relationship.',
+];
 import {
   buildFirmIntakeOverviewFields,
   partitionFirmReadinessPresentation,
@@ -1041,6 +1066,10 @@ export function buildFirmIntakePacketModel(view: FirmLiveIntakeView): FirmPacket
   });
 
   const intel = view.intelligence;
+
+  // Section 8B wage-exposure estimate — firm/full-access only, fully guarded.
+  const wageExposure: FirmPacketModel['wageExposure'] = resolveWageExposure(view);
+
   const extracted: FirmPacketModel['extracted'] = intel
     ? {
         confirmedFacts: (
@@ -1175,6 +1204,7 @@ export function buildFirmIntakePacketModel(view: FirmLiveIntakeView): FirmPacket
       'This packet organizes uploaded employment-related records for firm intake review. It is not a legal analysis, theory of the case, or outcome prediction.',
     ],
     documentWorkflow,
+    wageExposure,
   };
 }
 

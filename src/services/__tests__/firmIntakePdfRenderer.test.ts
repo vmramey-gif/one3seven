@@ -50,6 +50,7 @@ function sampleModel(overrides: Partial<FirmPacketModel> = {}): FirmPacketModel 
     },
     disclaimer: ['one3seven is not a law firm and does not provide legal advice.'],
     documentWorkflow: [],
+    wageExposure: null,
     ...overrides,
   };
 }

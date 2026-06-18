@@ -8,6 +8,7 @@
  */
 
 import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage, type RGB } from 'pdf-lib';
+import type { DamagesReport } from './damagesCalculator';
 
 // ── Brand + palette ──────────────────────────────────────────────────────────
 const BRAND = rgb(0x5b / 255, 0x21 / 255, 0xb6 / 255); // #5B21B6
@@ -68,6 +69,12 @@ export type FirmPacketModel = {
   };
   disclaimer: string[];
   documentWorkflow: Array<{ heading: string; lines: string[] }>;
+  /**
+   * Firm-only wage-exposure estimate (section 8B). null = not calculated / not shown.
+   * Presentation-only: the report is fully computed upstream by damagesCalculator;
+   * `disclaimer` is the verbatim hard-disclaimer text. NEVER populated for worker packets.
+   */
+  wageExposure: { report: DamagesReport; disclaimer: string[] } | null;
 };
 
 // ── Tiny layout engine over pdf-lib ───────────────────────────────────────────
@@ -174,6 +181,137 @@ function bullet(c: Cursor, text: string): void {
   c.page.drawText('•', { x: MARGIN + 2, y: c.y - 10, size: 10, font: c.bold, color: BRAND });
   c.text(text, { x: MARGIN + 16, size: 10, color: SOFT });
   c.gap(2);
+}
+
+// ── Section 8B: wage-exposure estimate (firm-only) ────────────────────────────
+// Presentation-only arithmetic from records. Copy is constrained to neutral terms —
+// no "violation", "owes", "entitled", "liable". The only damages-adjacent phrase is the
+// section title "wage exposure estimate".
+
+const fmtMoney = (n: number) => `$${n.toFixed(2)}`;
+
+/** sectionHeading clone that appends a brand pill (e.g. "calculated from records"). */
+function sectionHeadingWithPill(c: Cursor, label: string, pill: string): void {
+  c.gap(10);
+  c.ensure(26);
+  c.page.drawRectangle({ x: MARGIN, y: c.y - 14, width: 3, height: 15, color: BRAND });
+  c.page.drawText(label, { x: MARGIN + 10, y: c.y - 12, size: 12.5, font: c.bold, color: INK });
+  const labelW = c.bold.widthOfTextAtSize(label, 12.5);
+  const pillText = pill.toUpperCase();
+  const pillSize = 7;
+  const pillW = c.bold.widthOfTextAtSize(pillText, pillSize) + 12;
+  const pillX = MARGIN + 10 + labelW + 12;
+  c.page.drawRectangle({ x: pillX, y: c.y - 13, width: pillW, height: 13, color: BRAND_SOFT });
+  c.page.drawText(pillText, { x: pillX + 6, y: c.y - 10, size: pillSize, font: c.bold, color: BRAND });
+  c.y -= 20;
+  rule(c, BRAND_LINE, 0.75);
+}
+
+/** Label (left) + value (right-aligned), with a muted detail line beneath. */
+function wageRow(c: Cursor, label: string, value: string, detail: string, opts: { total?: boolean } = {}): void {
+  const big = opts.total === true;
+  const labelSize = big ? 11 : 9.5;
+  const valSize = big ? 12.5 : 10;
+  c.ensure(big ? 24 : 22);
+  c.page.drawText(label, { x: MARGIN, y: c.y - 11, size: labelSize, font: c.bold, color: big ? BRAND : INK });
+  const valW = c.bold.widthOfTextAtSize(value, valSize);
+  c.page.drawText(value, { x: PAGE_W - MARGIN - valW, y: c.y - 11, size: valSize, font: c.bold, color: big ? BRAND : INK });
+  c.y -= big ? 17 : 13;
+  if (detail) {
+    c.ensure(11);
+    c.page.drawText(detail, { x: MARGIN, y: c.y - 8, size: 8, font: c.font, color: MUTED });
+    c.y -= 12;
+  }
+}
+
+function drawSection8B(c: Cursor, wage: { report: DamagesReport; disclaimer: string[] }): void {
+  const r = wage.report;
+  sectionHeadingWithPill(c, '8B.  Wage exposure estimate', 'calculated from records');
+
+  // No base rate => do not estimate. Show neutral incomplete note only.
+  if (!r.baseHourlyRate) {
+    c.text(
+      r.missingRecordsWarning ??
+        'A base hourly rate could not be determined from the records provided, so no figures were calculated.',
+      { size: 9.5, color: SOFT },
+    );
+    drawWageDisclaimer(c, wage.disclaimer);
+    return;
+  }
+
+  wageRow(c, r.baseHourlyRate.label, fmtMoney(r.baseHourlyRate.value), r.baseHourlyRate.formula);
+
+  // Overtime claim block
+  if (r.overtimeRate && r.overtimePremiumPerHour && r.overtimeHoursUnderpaid) {
+    c.gap(4);
+    c.text('Overtime', { size: 9, font: c.bold, color: MUTED });
+    c.gap(2);
+    wageRow(c, r.overtimeRate.label, fmtMoney(r.overtimeRate.value), `${r.overtimeRate.formula} · ${r.overtimeRate.statutoryRef ?? ''}`);
+    wageRow(c, r.overtimePremiumPerHour.label, fmtMoney(r.overtimePremiumPerHour.value), `${r.overtimePremiumPerHour.formula} · ${r.overtimePremiumPerHour.statutoryRef ?? ''}`);
+    wageRow(c, r.overtimeHoursUnderpaid.label, `${r.overtimeHoursUnderpaid.value} hrs`, r.overtimeHoursUnderpaid.formula);
+    rule(c, BRAND_LINE, 0.75);
+    wageRow(c, 'Estimated overtime premium', fmtMoney(r.overtimeTotalEstimate), 'Premium per hour × hours without matching premium', { total: true });
+  }
+
+  // Meal-break claim block
+  if (r.mealBreaksMissed && r.mealBreakPremiumPerBreak) {
+    c.gap(4);
+    c.text('Meal breaks', { size: 9, font: c.bold, color: MUTED });
+    c.gap(2);
+    wageRow(c, r.mealBreaksMissed.label, `${r.mealBreaksMissed.value}`, r.mealBreaksMissed.formula);
+    wageRow(c, r.mealBreakPremiumPerBreak.label, fmtMoney(r.mealBreakPremiumPerBreak.value), `${r.mealBreakPremiumPerBreak.formula} · ${r.mealBreakPremiumPerBreak.statutoryRef ?? ''}`);
+    rule(c, BRAND_LINE, 0.75);
+    wageRow(c, 'Estimated meal-break premium', fmtMoney(r.mealBreakTotalEstimate), '1 hour × base rate × occurrences', { total: true });
+  }
+
+  // Combined
+  c.gap(2);
+  rule(c, BRAND, 1);
+  wageRow(c, 'Combined estimate', fmtMoney(r.combinedEstimate), 'Sum of the estimates above, from records provided', { total: true });
+
+  // Partial-data warning (amber)
+  if (r.isPartialData && r.missingRecordsWarning) {
+    c.gap(8);
+    const lines = c.wrap(r.missingRecordsWarning, 8.5, c.font, CONTENT_W - 24);
+    const boxH = 14 + lines.length * 12;
+    c.ensure(boxH + 6);
+    c.page.drawRectangle({ x: MARGIN, y: c.y - boxH, width: CONTENT_W, height: boxH, color: AMBER_FILL });
+    let yy = c.y - 14;
+    c.page.drawText('Incomplete records', { x: MARGIN + 12, y: yy, size: 8.5, font: c.bold, color: AMBER_INK });
+    yy -= 12;
+    for (const ln of lines) {
+      c.page.drawText(ln, { x: MARGIN + 12, y: yy, size: 8.5, font: c.font, color: AMBER_INK });
+      yy -= 12;
+    }
+    c.y -= boxH + 6;
+  }
+
+  // Citation index — field → document, page, source snippet
+  const cited = [r.baseHourlyRate, r.overtimeHoursUnderpaid, r.mealBreaksMissed].filter(
+    (li): li is NonNullable<typeof li> => Boolean(li && li.citation),
+  );
+  if (cited.length) {
+    c.gap(8);
+    c.text('Source citations', { size: 9, font: c.bold, color: MUTED });
+    c.gap(2);
+    for (const li of cited) {
+      const cit = li.citation!;
+      const page = cit.page > 0 ? ` (p. ${cit.page})` : '';
+      c.text(`${li.label} → ${cit.docName}${page}`, { size: 8.5, font: c.bold, color: SOFT });
+      c.text(`“${cit.sourceText}”`, { size: 8.5, color: MUTED, x: MARGIN + 12 });
+      c.gap(2);
+    }
+  }
+
+  drawWageDisclaimer(c, wage.disclaimer);
+}
+
+function drawWageDisclaimer(c: Cursor, lines: string[]): void {
+  c.gap(8);
+  for (const d of lines) {
+    c.text(d, { size: 8, color: MUTED });
+    c.gap(2);
+  }
 }
 
 // ── Cover page (shared by firm + worker; framing differs) ─────────────────────
@@ -459,6 +597,11 @@ export async function renderFirmIntakePacketPdf(model: FirmPacketModel): Promise
   if (model.confirmationItems.length) {
     sectionHeading(c, '8.  Items Requiring Confirmation');
     for (const it of model.confirmationItems) bullet(c, it);
+  }
+
+  // 8B. Wage exposure estimate (firm-only; arithmetic from records)
+  if (model.wageExposure) {
+    drawSection8B(c, model.wageExposure);
   }
 
   // 9. Questions That May Help Complete the Intake
