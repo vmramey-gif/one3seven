@@ -120,6 +120,7 @@ import {
   extractStoryFollowUpFromOverview,
   mergeStoryFollowUpIntoLatestIntakeSummary,
 } from '../services/storyFollowUpPersistence';
+import { mergeWorkerContactIntoLatestIntakeSummary } from '../services/workerContactPersistence';
 import {
   EMPTY_STORY_FOLLOWUP,
   hasStoryFollowUpContent,
@@ -195,6 +196,8 @@ const POST_AUTH_DEFER_MS = 500;
 /** Session flags for worker email/password signup and Google OAuth (create account). */
 const O3S_SS_WORKER_PENDING_DETAILS = 'o3s_worker_pending_worker_details_v1';
 const O3S_SS_WORKER_GOOGLE_SIGNUP = 'o3s_worker_google_oauth_signup_v1';
+/** Phone captured on the Create Account form; applied to the profile row once post-auth creates it. */
+const O3S_SS_SIGNUP_PHONE = 'o3s_worker_signup_phone_v1';
 
 function o3sWorkerContactLocalKey(userId: string) {
   return `o3s_worker_contact_local_v1_${userId}`;
@@ -632,6 +635,7 @@ export default function App() {
           sessionStorage.removeItem('o3s_offline_role');
           sessionStorage.removeItem(O3S_SS_WORKER_PENDING_DETAILS);
           sessionStorage.removeItem(O3S_SS_WORKER_GOOGLE_SIGNUP);
+          sessionStorage.removeItem(O3S_SS_SIGNUP_PHONE);
         } catch {
           /* ignore */
         }
@@ -703,6 +707,34 @@ export default function App() {
             setProfile(p);
 
             let routingProfile = p;
+
+            // Apply Create Account basics now that the profile row exists. Runs before the
+            // roleSelection early-return below so we never lose name/phone for users who
+            // drop off during workspace selection. Save what we have, as soon as we have it.
+            try {
+              const metaFullName =
+                typeof signedInUser.user_metadata?.full_name === 'string'
+                  ? signedInUser.user_metadata.full_name.trim()
+                  : '';
+              if (metaFullName && !((p.full_name ?? '').trim())) {
+                const nameRes = await intakeData.updateProfileName(signedInUser.id, metaFullName);
+                if (nameRes.error) console.warn('[o3s-signup] name backfill failed', nameRes.error);
+                else routingProfile = { ...p, full_name: metaFullName };
+              }
+              let signupPhone = '';
+              try { signupPhone = sessionStorage.getItem(O3S_SS_SIGNUP_PHONE) ?? ''; } catch { /* ignore */ }
+              if (signupPhone.trim()) {
+                const phoneRes = await intakeData.saveWorkerContactDetails(signedInUser.id, {
+                  phone: signupPhone.trim(),
+                });
+                if (phoneRes.error) console.warn('[o3s-signup] phone save failed', phoneRes.error);
+                try { sessionStorage.removeItem(O3S_SS_SIGNUP_PHONE); } catch { /* ignore */ }
+              }
+            } catch (signupDetailErr) {
+              console.warn('[o3s-signup] applying create-account details failed', signupDetailErr);
+            }
+
+            setProfile(routingProfile);
 
             if (currentScreenRef.current === 'roleSelection') {
               console.info('[o3s-post-auth] on roleSelection — skip auto-routing until user commits role');
@@ -2899,6 +2931,16 @@ export default function App() {
     }
     await refreshWorkerSummaryLive(intakeId);
     void intakeData.ensureLinkedFirmPreviewRoute(intakeId);
+    // Firm-code / firm-directed intakes auto-share to the linked firm on organize (no explicit
+    // "send" click). The worker consented by entering the firm's code, so copy their contact now.
+    const routing = await intakeData.fetchWorkerIntakeRoutingDisplay(intakeId);
+    if (routing.submissionChannel === 'firm_code' || routing.linkedFirmId) {
+      const contactErr = await mergeWorkerContactIntoLatestIntakeSummary(intakeId, {
+        name: (profile?.full_name ?? '').trim() || null,
+        phone: (profile?.phone ?? '').trim() || null,
+      });
+      if (contactErr.error) console.warn('[o3s-share] worker contact merge failed', contactErr.error);
+    }
     if (profile?.id) {
       const rows = await refreshWorkerIntakesList(profile.id);
       const row = rows.find((r) => r.id === intakeId);
@@ -2991,6 +3033,13 @@ export default function App() {
         error: toBetaUserMessage(r.error, 'Could not route this intake with that firm code. Try again.'),
       };
     }
+    // Consent moment: the worker is sharing with this firm, so copy their contact into the
+    // firm-readable summary. Until now it lived only on the worker's own profile/packet.
+    const contactErr = await mergeWorkerContactIntoLatestIntakeSummary(currentIntakeId, {
+      name: (profile?.full_name ?? '').trim() || null,
+      phone: (profile?.phone ?? '').trim() || null,
+    });
+    if (contactErr.error) console.warn('[o3s-share] worker contact merge failed', contactErr.error);
     await refreshWorkerRoutingFromIntake(currentIntakeId, r.firmName ?? null);
     if (profile?.id) await refreshWorkerIntakesList(profile.id);
     setWorkerIntakeWorkflow('Under Firm Review');
@@ -3012,6 +3061,14 @@ export default function App() {
     if (!profile?.id) return { error: 'Not signed in' };
     const res = await intakeData.workerApproveFullAccess(routeId, profile.id);
     if (!res.error) {
+      // Approving full access is a consent moment too — make sure the firm now sees the contact.
+      if (currentIntakeId) {
+        const contactErr = await mergeWorkerContactIntoLatestIntakeSummary(currentIntakeId, {
+          name: (profile.full_name ?? '').trim() || null,
+          phone: (profile.phone ?? '').trim() || null,
+        });
+        if (contactErr.error) console.warn('[o3s-share] worker contact merge failed', contactErr.error);
+      }
       await refreshWorkerAccessRows();
       if (currentIntakeId) await refreshWorkerSummaryLive(currentIntakeId);
       void refreshPersistentNotifications();
@@ -3028,7 +3085,11 @@ export default function App() {
     return {};
   };
 
-  const handleCreateAccount = async (email: string, password: string) => {
+  const handleCreateAccount = async (
+    email: string,
+    password: string,
+    details?: { firstName: string; lastName: string; phone: string }
+  ) => {
     const configured = isSupabaseConfigured();
     console.info('[o3s-auth-audit] handleCreateAccount', { supabaseConfigured: configured });
 
@@ -3037,8 +3098,17 @@ export default function App() {
       return { error: SUPABASE_REQUIRED_USER_MESSAGE };
     }
 
+    const fullName = [details?.firstName, details?.lastName]
+      .map((p) => (p ?? '').trim())
+      .filter(Boolean)
+      .join(' ');
+    const phone = (details?.phone ?? '').trim();
+
     try {
       sessionStorage.removeItem(O3S_SS_WORKER_PENDING_DETAILS);
+      // Phone needs the profile row, which post-auth creates. Stash it now; apply it then.
+      if (phone) sessionStorage.setItem(O3S_SS_SIGNUP_PHONE, phone);
+      else sessionStorage.removeItem(O3S_SS_SIGNUP_PHONE);
     } catch {
       /* ignore */
     }
@@ -3047,6 +3117,8 @@ export default function App() {
     const { data, error } = await supabase.auth.signUp({
       email: email.trim(),
       password,
+      // full_name in metadata is seeded into the profile row by ensureUserProfile.
+      options: fullName ? { data: { full_name: fullName } } : undefined,
     });
 
     console.info('[o3s-auth-audit] signUp returned', {
@@ -3871,6 +3943,11 @@ export default function App() {
                   firmSignInIntentRef.current = false;
                   setCurrentScreen('signIn');
                 }}
+                onSignUpFree={() => {
+                  // Free worker sign-up — straight to Create Account, no authWelcome detour.
+                  firmSignInIntentRef.current = false;
+                  setCurrentScreen('createAccount');
+                }}
                 firmDirectedContext={firmDirectedContext}
               />
             </motion.div>
@@ -3991,6 +4068,10 @@ export default function App() {
                     ? handleCommitRole
                     : async () => ({ error: SUPABASE_REQUIRED_USER_MESSAGE })
                 }
+                // Firm signup is invite-only. Only surface the firm tile when the account
+                // arrived with firm intent (firm sign-in path). Public workers entering via
+                // onWorkerStart have firmSignInIntentRef=false and see the worker path only.
+                allowFirmRole={firmSignInIntentRef.current || profile?.role === 'firm' || authUser?.user_metadata?.role === 'firm'}
               />
             </motion.div>
           )}
@@ -4415,6 +4496,8 @@ export default function App() {
                 openFirmCodeModalSignal={firmCodeModalSignal}
                 participatingRoutingActive={participatingPreviewSent}
                 intakeNumber={currentIntakeNumber}
+                workerFullName={profile?.full_name ?? null}
+                workerPhone={profile?.phone ?? null}
                 exportIntakeId={isSupabaseConfigured() ? currentIntakeId : null}
                 preferLiveDataOnly={Boolean(isSupabaseConfigured() && currentIntakeId)}
                 submissionChannel={workerIntakeChannel}

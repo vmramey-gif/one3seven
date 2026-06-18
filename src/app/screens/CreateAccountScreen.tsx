@@ -1,19 +1,32 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
-import { ArrowLeft, ArrowRight, Mail, Lock } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Mail, Lock, User, Phone } from 'lucide-react';
 import { Screen } from '../App';
 import { One3SevenDisclaimer } from '../components/One3SevenDisclaimer';
 import { WordMark } from '../components/WordMark';
 
 // Google OAuth: wired from App via `onGoogleAuth` when Supabase is configured.
 
+export interface CreateAccountDetails {
+  firstName: string;
+  lastName: string;
+  phone: string;
+}
+
 interface CreateAccountScreenProps {
   onNavigate: (screen: Screen) => void;
-  onCreateAccount: (email: string, password: string) => Promise<{ error?: string; needsEmailConfirmation?: boolean }>;
+  onCreateAccount: (
+    email: string,
+    password: string,
+    details: CreateAccountDetails
+  ) => Promise<{ error?: string; needsEmailConfirmation?: boolean }>;
   onGoogleAuth?: () => void | Promise<void>;
 }
 
 export function CreateAccountScreen({ onNavigate, onCreateAccount, onGoogleAuth }: CreateAccountScreenProps) {
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -25,6 +38,11 @@ export function CreateAccountScreen({ onNavigate, onCreateAccount, onGoogleAuth 
     e.preventDefault();
     setError('');
     setInfo('');
+
+    if (!firstName.trim() || !lastName.trim()) {
+      setError('Please enter your first and last name');
+      return;
+    }
 
     if (!email.trim() || !password.trim() || !confirmPassword.trim()) {
       setError('Please fill in all fields');
@@ -45,8 +63,14 @@ export function CreateAccountScreen({ onNavigate, onCreateAccount, onGoogleAuth 
     try {
       console.info('[o3s-auth-audit] CreateAccountScreen: calling onCreateAccount', {
         emailLen: email.trim().length,
+        hasName: Boolean(firstName.trim() && lastName.trim()),
+        hasPhone: Boolean(phone.trim()),
       });
-      const res = await onCreateAccount(email, password);
+      const res = await onCreateAccount(email, password, {
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        phone: phone.trim(),
+      });
       if (res.needsEmailConfirmation) {
         setInfo('Check your email to confirm your account. After you confirm, sign in to continue.');
         return;
@@ -110,6 +134,52 @@ export function CreateAccountScreen({ onNavigate, onCreateAccount, onGoogleAuth 
 
             {/* Create Account Form */}
             <form onSubmit={handleSubmit} className="mb-6 space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-[#1E1B4B]">First name</label>
+                  <div className="relative">
+                    <User className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#1E1B4B]/38" />
+                    <input
+                      type="text"
+                      autoComplete="given-name"
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      placeholder="First"
+                      className="w-full rounded-2xl border border-[#DCD3FF] bg-[#F8F6FF] py-4 pl-12 pr-4 text-sm text-[#1E1B4B] placeholder:text-[#1E1B4B]/38 focus:border-[#6D4AFF] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#6D4AFF]/10"
+                      required
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-[#1E1B4B]">Last name</label>
+                  <input
+                    type="text"
+                    autoComplete="family-name"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    placeholder="Last"
+                    className="w-full rounded-2xl border border-[#DCD3FF] bg-[#F8F6FF] py-4 px-4 text-sm text-[#1E1B4B] placeholder:text-[#1E1B4B]/38 focus:border-[#6D4AFF] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#6D4AFF]/10"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-[#1E1B4B]">Phone</label>
+                <div className="relative">
+                  <Phone className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#1E1B4B]/38" />
+                  <input
+                    type="tel"
+                    autoComplete="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="(555) 555-5555"
+                    className="w-full rounded-2xl border border-[#DCD3FF] bg-[#F8F6FF] py-4 pl-12 pr-4 text-sm text-[#1E1B4B] placeholder:text-[#1E1B4B]/38 focus:border-[#6D4AFF] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#6D4AFF]/10"
+                  />
+                </div>
+                <p className="mt-1.5 text-xs text-[#1E1B4B]/52">Optional — so a firm can reach you about your intake.</p>
+              </div>
+
               <div>
                 <label className="mb-2 block text-sm font-medium text-[#1E1B4B]">Email</label>
                 <div className="relative">

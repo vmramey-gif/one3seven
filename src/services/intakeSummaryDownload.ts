@@ -26,6 +26,8 @@ export type IntakeSummaryDownloadPayload = {
   intakeNumber: string;
   /** Optional packet header fields (worker export / firm review). */
   workerName?: string;
+  /** Worker's own callback number — shown on their own packet only. */
+  workerPhone?: string;
   employerName?: string;
   firmCode?: string;
   intakeStatus?: string;

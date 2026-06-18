@@ -30,6 +30,8 @@ const BOTTOM = MARGIN + 28; // reserve room for footer
 export type FirmPacketModel = {
   cover: {
     workerName: string | null;
+    /** Optional callback number. Rendered under the worker name when present. */
+    workerPhone?: string | null;
     employer: string | null;
     employmentPeriod: string | null;
     recordCount: number;
@@ -197,6 +199,11 @@ function drawCover(c: Cursor, cover: CoverData, bandTitle: string, subtitle: str
   };
 
   if (cover.workerName) big('Worker', cover.workerName);
+  if (cover.workerPhone) {
+    // Contact line directly under the worker name — the firm's callback number, no asking required.
+    c.page.drawText(`Phone: ${cover.workerPhone}`, { x: MARGIN, y: c.y + 4, size: 11, font: c.font, color: MUTED });
+    c.y -= 18;
+  }
   if (cover.employer) big('Employer', cover.employer);
   if (cover.employmentPeriod) big('Employment period', cover.employmentPeriod);
 

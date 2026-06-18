@@ -156,6 +156,9 @@ interface IntakeSummaryScreenProps {
   participatingRoutingActive?: boolean;
   /** Supabase intake number for downloads and labeling */
   intakeNumber?: string | null;
+  /** Worker's own name/phone (profile) — printed on their own downloaded packet. */
+  workerFullName?: string | null;
+  workerPhone?: string | null;
   /** When set, export/download pulls fresh summary + uploaded_files names from Supabase. */
   exportIntakeId?: string | null;
   /** Timeline summary line from persisted summary (Supabase) */
@@ -281,6 +284,8 @@ export function IntakeSummaryScreen({
   workerWorkflowStatus,
   participatingRoutingActive,
   intakeNumber,
+  workerFullName,
+  workerPhone,
   exportIntakeId,
   liveTimelineSummary,
   liveTimelineEvents = [],
@@ -566,7 +571,8 @@ export function IntakeSummaryScreen({
     });
     return {
       intakeNumber: n,
-      workerName: undefined,
+      workerName: (workerFullName ?? '').trim() || undefined,
+      workerPhone: (workerPhone ?? '').trim() || undefined,
       employerName: undefined,
       firmCode: (connectedFirmCode ?? '').trim() || undefined,
       intakeStatus: (workerWorkflowStatus ?? '').trim() || 'In review',
@@ -879,7 +885,10 @@ export function IntakeSummaryScreen({
 
   const hasLinkedFirm = Boolean((connectedFirmCode ?? '').trim());
   const canRouteFirmCode = Boolean(onShareFirmCode);
-  const canRouteParticipating = Boolean(onShareParticipating);
+  // PARTICIPATING_ROUTING_LIVE is the single master switch for the participating-firm
+  // network. While it is false, no participating surface renders anywhere on this screen
+  // (button, share-modal option, or explainer section) — firm-code routing stays live.
+  const canRouteParticipating = PARTICIPATING_ROUTING_LIVE && Boolean(onShareParticipating);
   const linkedFirmAlreadyShared = linkedFirmIntakeAlreadyShared(connectedRouteStatus);
   const participatingPreviewActive =
     isParticipatingSubmissionChannel(submissionChannel) ||
@@ -2138,7 +2147,7 @@ export function IntakeSummaryScreen({
           </section>
         ) : null}
 
-        {BETA_ENABLE_PARTICIPATING_ROUTING ? (
+        {PARTICIPATING_ROUTING_LIVE && BETA_ENABLE_PARTICIPATING_ROUTING ? (
           <section className={sx.betaSection}>
             <motion.div
               initial={{ opacity: 0, y: 20 }}

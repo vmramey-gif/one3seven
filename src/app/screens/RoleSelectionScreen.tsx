@@ -10,9 +10,14 @@ interface RoleSelectionScreenProps {
   onSelectRole: (role: 'worker' | 'firm') => void;
   /** Persist role to Supabase profiles (optional). */
   onCommitRole?: (role: 'worker' | 'firm') => Promise<{ error?: string }>;
+  /**
+   * Firm signup is invite-only. The firm workspace tile only renders when the account
+   * arrived with firm intent. Public workers (entering via onWorkerStart) never see it.
+   */
+  allowFirmRole?: boolean;
 }
 
-export function RoleSelectionScreen({ onNavigate, onSelectRole, onCommitRole }: RoleSelectionScreenProps) {
+export function RoleSelectionScreen({ onNavigate, onSelectRole, onCommitRole, allowFirmRole = false }: RoleSelectionScreenProps) {
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
 
@@ -112,33 +117,35 @@ export function RoleSelectionScreen({ onNavigate, onSelectRole, onCommitRole }: 
               </div>
             </motion.button>
 
-            {/* Firm Option */}
-            <motion.button
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              onClick={() => void handleRoleSelection('firm')}
-              disabled={busy}
-              className="group w-full rounded-[28px] border border-[#E7E1FF] bg-white/95 p-8 text-left shadow-[0_18px_56px_rgba(31,27,75,0.09)] transition-all hover:-translate-y-0.5 hover:border-[#B8A8FF] hover:shadow-[0_24px_68px_rgba(31,27,75,0.13)]"
-            >
-              <div className="flex items-start gap-4">
-                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-[#F7F3FF] transition-colors group-hover:bg-[#6D4AFF]">
-                  <Briefcase className="h-6 w-6 text-[#6D4AFF] transition-colors group-hover:text-white" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="mb-2 text-lg font-semibold text-[#1E1B4B]">
-                    Attorney / Participating Firm
-                  </h3>
-                  <p className="mb-4 text-sm leading-relaxed text-[#1E1B4B]/64">
-                    For participating firms reviewing organized intake submissions and workflow-ready matter packets.
-                  </p>
-                  <div className="flex items-center gap-2 text-sm font-medium text-[#5B35D5]">
-                    Continue to firm dashboard
-                    <ArrowRight className="w-4 h-4" />
+            {/* Firm Option — invite-only; hidden unless the account arrived with firm intent. */}
+            {allowFirmRole ? (
+              <motion.button
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                onClick={() => void handleRoleSelection('firm')}
+                disabled={busy}
+                className="group w-full rounded-[28px] border border-[#E7E1FF] bg-white/95 p-8 text-left shadow-[0_18px_56px_rgba(31,27,75,0.09)] transition-all hover:-translate-y-0.5 hover:border-[#B8A8FF] hover:shadow-[0_24px_68px_rgba(31,27,75,0.13)]"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-[#F7F3FF] transition-colors group-hover:bg-[#6D4AFF]">
+                    <Briefcase className="h-6 w-6 text-[#6D4AFF] transition-colors group-hover:text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="mb-2 text-lg font-semibold text-[#1E1B4B]">
+                      Attorney / Participating Firm
+                    </h3>
+                    <p className="mb-4 text-sm leading-relaxed text-[#1E1B4B]/64">
+                      For participating firms reviewing organized intake submissions and workflow-ready matter packets.
+                    </p>
+                    <div className="flex items-center gap-2 text-sm font-medium text-[#5B35D5]">
+                      Continue to firm dashboard
+                      <ArrowRight className="w-4 h-4" />
+                    </div>
                   </div>
                 </div>
-              </div>
-            </motion.button>
+              </motion.button>
+            ) : null}
           </div>
 
           {/* Footer Note */}

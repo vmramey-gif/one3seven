@@ -410,6 +410,10 @@ function inferWorkerName(payload: IntakeSummaryDownloadPayload): string {
   return formatPacketMetadataValue(payload.workerName);
 }
 
+function inferWorkerPhone(payload: IntakeSummaryDownloadPayload): string | null {
+  return payload.workerPhone?.trim() || null;
+}
+
 function extractDatesFromPayload(payload: IntakeSummaryDownloadPayload): string[] {
   const found: string[] = [];
   const push = (s: string) => {
@@ -1139,6 +1143,7 @@ export function buildWorkerSummaryModel(payload: IntakeSummaryDownloadPayload): 
   return {
     cover: {
       workerName: workerName && workerName.trim() ? workerName.trim() : null,
+      workerPhone: inferWorkerPhone(payload),
       employer: employer && employer.trim() ? employer.trim() : null,
       employmentPeriod: snapshot.employmentPeriod && snapshot.employmentPeriod.trim() ? snapshot.employmentPeriod : null,
       recordCount: Number(snapshot.recordsOrganized) || 0,

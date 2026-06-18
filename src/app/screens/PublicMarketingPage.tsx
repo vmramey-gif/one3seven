@@ -8,6 +8,8 @@ interface PublicMarketingPageProps {
   onWorkerStart: () => void;
   onFirmStart: () => void;
   onSignIn: () => void;
+  /** Free worker sign-up — routes straight to Create Account (no authWelcome detour). */
+  onSignUpFree: () => void;
   firmDirectedContext?: { firmId: string; firmName: string; firmCode: string } | null;
 }
 
@@ -1137,7 +1139,7 @@ function RecordsPathSection({ reduced }: { reduced: boolean }) {
   );
 }
 
-export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, firmDirectedContext = null }: PublicMarketingPageProps) {
+export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSignUpFree, firmDirectedContext = null }: PublicMarketingPageProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showBetaModal, setShowBetaModal] = useState(false);
   const reducedMotion = useReducedMotion() ?? false;
@@ -1164,11 +1166,18 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, firm
             </button>
             <button
               type="button"
+              onClick={onSignUpFree}
+              className="flex items-center gap-1.5 rounded-full bg-[#6D4AFF] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_8px_24px_rgba(109,74,255,0.30)] transition hover:bg-[#5B35D5] hover:-translate-y-px active:scale-[0.97]"
+            >
+              Sign up for free
+              <ArrowRight className="h-3.5 w-3.5" />
+            </button>
+            <button
+              type="button"
               onClick={openBetaModal}
-              className="flex items-center gap-1.5 rounded-full bg-gradient-to-r from-[#6D4AFF] to-[#7C3AED] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_8px_24px_rgba(109,74,255,0.30)] transition hover:shadow-[0_12px_32px_rgba(109,74,255,0.40)] hover:-translate-y-px active:scale-[0.97]"
+              className="text-sm font-medium text-[#1E1B4B]/60 transition hover:text-[#1E1B4B]"
             >
               For attorneys
-              <ArrowRight className="h-3.5 w-3.5" />
             </button>
           </div>
           {/* Mobile nav toggle */}
@@ -1188,7 +1197,8 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, firm
           <div className="border-t border-[#F0EBFF] bg-white px-5 py-4 sm:hidden">
             <div className="flex flex-col">
               <button type="button" onClick={onSignIn} className="flex items-center min-h-[48px] text-base font-medium text-[#1E1B4B]/60 text-left py-3">Sign in</button>
-              <button type="button" onClick={openBetaModal} className="flex items-center gap-1.5 min-h-[48px] text-base font-semibold text-[#6D4AFF] text-left py-3">For attorneys <ArrowRight className="h-4 w-4" /></button>
+              <button type="button" onClick={onSignUpFree} className="flex items-center gap-1.5 min-h-[48px] text-base font-semibold text-[#6D4AFF] text-left py-3">Sign up for free <ArrowRight className="h-4 w-4" /></button>
+              <button type="button" onClick={openBetaModal} className="flex items-center gap-1.5 min-h-[48px] text-base font-medium text-[#1E1B4B]/60 text-left py-3">For attorneys</button>
               <button type="button" onClick={onWorkerStart} className="flex items-center gap-1.5 min-h-[48px] text-base font-semibold text-[#1E1B4B]/70 text-left py-3">Organize my intake <ArrowRight className="h-4 w-4" /></button>
             </div>
           </div>

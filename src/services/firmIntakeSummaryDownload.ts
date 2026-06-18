@@ -1134,7 +1134,13 @@ export function buildFirmIntakePacketModel(view: FirmLiveIntakeView): FirmPacket
 
   return {
     cover: {
-      workerName: view.workerFollowUp?.employmentName?.trim() || null,
+      // Prefer the worker's shared profile name; fall back to the name they gave during follow-up.
+      workerName:
+        view.workerContact?.name?.trim() ||
+        view.workerFollowUp?.employmentName?.trim() ||
+        null,
+      // Present only once the worker shared with this firm (consent-gated in loadFirmLiveIntakeView).
+      workerPhone: view.workerContact?.phone?.trim() || null,
       employer: employer && employer.trim() ? employer : null,
       employmentPeriod: employmentPeriod && employmentPeriod.trim() ? employmentPeriod : null,
       recordCount: resolvedFiles.length,

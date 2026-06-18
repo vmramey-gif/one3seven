@@ -13,6 +13,7 @@ import {
   extractStoryFollowUpFromOverview,
   formatStoryFollowUpForDisplay,
 } from './storyFollowUpPersistence';
+import { extractWorkerContactFromOverview } from './workerContactPersistence';
 import {
   buildCommunicationFactDigest,
   buildPayRecordFactDigest,
@@ -1363,6 +1364,14 @@ const FIRM_DOCUMENT_REQUEST_PATTERN =
 const WORKER_DOCUMENT_RESPONSE_PATTERN =
   /\n--- O3S_WORKER_DOCUMENT_RESPONSE ---\n([\s\S]*?)\n--- O3S_WORKER_DOCUMENT_RESPONSE_END ---\n/;
 
+/**
+ * Worker contact (name/phone) copied into the firm-readable summary at share time.
+ * Surfaced to the firm via the extracted `workerContact`, never as raw prose — so it
+ * is stripped from all firm- and worker-facing display text by sanitizeFirmFacingText.
+ */
+const WORKER_CONTACT_PATTERN =
+  /\n?---\s*O3S_WORKER_CONTACT\s*---[\s\S]*?---\s*O3S_WORKER_CONTACT_END\s*---\n?/gi;
+
 /** MVP firm → worker document request categories (checkbox labels). */
 export const FIRM_ADDITIONAL_DOCUMENT_CATEGORIES = [
   'Pay records / paystubs',
@@ -1473,6 +1482,7 @@ export function sanitizeFirmFacingText(text: string | null | undefined): string 
           .replace(FIRM_INTERNAL_MARKERS_PATTERN, '')
           .replace(FIRM_DOCUMENT_REQUEST_PATTERN, '')
           .replace(WORKER_DOCUMENT_RESPONSE_PATTERN, '')
+          .replace(WORKER_CONTACT_PATTERN, '')
       )
     )
   );
@@ -3911,6 +3921,8 @@ export type FirmLiveIntakeView = {
   orgSections?: IntakeOrganizationSections;
   /** Structured worker follow-up answers extracted before sanitization (employment status, arbitration, agency filing). */
   workerFollowUp?: import('../app/constants/workerStoryIntake').StoryFollowUpAnswers | null;
+  /** Worker name/phone, present only once the worker shared this intake with the firm (consent-gated). */
+  workerContact?: import('./workerContactPersistence').WorkerContact | null;
   /** Phase 2B: synthesized intelligence from Claude-extracted document facts. Null until extraction runs. */
   intelligence?: import('./documentFactsService').IntakeIntelligence | null;
 };
@@ -4123,6 +4135,9 @@ export async function loadFirmLiveIntakeView(
   const employmentMatterTags = extractEmploymentMatterTagsFromOverview(overviewRaw);
   const orgSections = extractOrgEngineFromOverview(overviewRaw)?.sections;
   const workerFollowUp = extractStoryFollowUpFromOverview(overviewRaw);
+  // Worker contact is only present in the overview once the worker shared with a firm.
+  // For preview-only routes (no full access yet) we withhold it, mirroring the privacy gate.
+  const workerContact = previewOnly ? null : extractWorkerContactFromOverview(overviewRaw);
 
   // Phase 2B: fetch synthesized intelligence from edge function (service role reads facts, bypasses RLS)
   let intelligence: import('./documentFactsService').IntakeIntelligence | null = null;
@@ -4161,6 +4176,7 @@ export async function loadFirmLiveIntakeView(
       : undefined,
     orgSections,
     workerFollowUp: workerFollowUp ?? null,
+    workerContact,
     intelligence,
   };
 }
