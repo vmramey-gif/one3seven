@@ -523,9 +523,21 @@ export function UploadScreen({
     void proceedToProcessing({ routeLinkedFirmAfterProcessing: true });
   };
 
-  const handleFileUpload = async (filesToUpload: File[], source: 'picker' | 'drop' | 'camera') => {
+  const handleFileUpload = async (incomingFiles: File[], source: 'picker' | 'drop' | 'camera') => {
+    // PDF-only guard. The accept attribute restricts the file picker, but drag-and-drop
+    // ignores it — and we do not yet extract images or Word documents, so a non-PDF would
+    // upload and then silently contribute nothing to the packet. Reject non-PDFs here with a
+    // clear inline message; let any valid PDFs in the same batch proceed unaffected.
+    const isPdf = (f: File) => f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf');
+    const filesToUpload = incomingFiles.filter(isPdf);
+    const rejectedCount = incomingFiles.length - filesToUpload.length;
+
     if (filesToUpload.length === 0) {
-      console.warn('[o3s-upload-ui] handleFileUpload skipped: empty selection', { source });
+      if (rejectedCount > 0) {
+        setUploadError("This file type isn't supported yet. Please upload a PDF version of this document.");
+      } else {
+        console.warn('[o3s-upload-ui] handleFileUpload skipped: empty selection', { source });
+      }
       return;
     }
 
@@ -540,7 +552,11 @@ export function UploadScreen({
     setShowPulse(true);
     setTimeout(() => setShowPulse(false), 1000);
 
-    setUploadError(null);
+    setUploadError(
+      rejectedCount > 0
+        ? `Only PDFs are supported right now, so ${rejectedCount === 1 ? 'one file was' : `${rejectedCount} files were`} skipped. Your PDF ${filesToUpload.length === 1 ? 'file was' : 'files were'} added — please upload a PDF version of the rest.`
+        : null,
+    );
     setIsUploading(true);
 
     if (!onPersistNewFiles) {
@@ -898,16 +914,8 @@ export function UploadScreen({
               ref={fileInputRef}
               type="file"
               multiple
-              accept=".pdf,.png,.jpg,.jpeg,.doc,.docx"
+              accept=".pdf,application/pdf"
               onChange={(e) => handleFileInputChange(e, 'picker')}
-              className="hidden"
-            />
-            <input
-              ref={cameraInputRef}
-              type="file"
-              accept="image/*"
-              capture="environment"
-              onChange={(e) => handleFileInputChange(e, 'camera')}
               className="hidden"
             />
             <motion.div
@@ -944,7 +952,7 @@ export function UploadScreen({
                     Browse files
                   </div>
                   <div className="mt-6 text-xs text-slate-500">
-                    PDF, PNG, JPG, JPEG, DOC, DOCX
+                    PDF files only
                   </div>
                 </>
               ) : (
@@ -979,19 +987,8 @@ export function UploadScreen({
 
             <div className="mt-3 flex flex-col items-center gap-2">
               <p className="text-[11px] text-slate-500 text-center leading-relaxed max-w-md">
-                Photograph paper records, letters, schedules, or handwritten notes.
+                Upload PDF documents — paystubs, letters, and records as PDF files work best right now. We&apos;re working on photo support.
               </p>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  openFilePicker('camera');
-                }}
-                className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${UPLOAD_SECONDARY_CTA}`}
-              >
-                <Camera className="h-4 w-4" aria-hidden />
-                Take photo / scan document
-              </button>
             </div>
           </div>
 
