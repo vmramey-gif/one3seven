@@ -22,6 +22,17 @@ import { supabase } from '../lib/supabaseClient';
 
 export type FirmPlanId = 'beta_pilot' | 'solo' | 'practice' | 'firm' | 'enterprise';
 
+/**
+ * Single source of truth for which tiers include the wage-exposure estimate (section 8B)
+ * + live source citations. Practice+, Firm+, and Enterprise only. Checked at the
+ * data-assembly layer (resolveWageExposure) so the feature never reaches an ineligible
+ * firm — not a client-side-only restriction. Compares plan-id strings directly so it does
+ * not depend on the FirmPlanId union (the new paid tiers are not yet wired into pricing).
+ */
+export function firmTierIncludesDamagesFeature(planId: string | null | undefined): boolean {
+  return planId === 'practice_plus' || planId === 'firm_plus' || planId === 'enterprise';
+}
+
 export interface FirmPlan {
   id: FirmPlanId;
   label: string;

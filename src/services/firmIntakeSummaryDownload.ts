@@ -17,6 +17,7 @@ import {
 import type { FirmPacketModel } from './firmIntakePdfRenderer';
 import { assembleDamagesInput } from './damagesAssembly';
 import { calculateDamages } from './damagesCalculator';
+import { firmTierIncludesDamagesFeature } from './billingService';
 
 /**
  * Compute the firm-only wage-exposure estimate for a view, with all three guards.
@@ -26,6 +27,10 @@ import { calculateDamages } from './damagesCalculator';
 export function resolveWageExposure(
   view: FirmLiveIntakeView,
 ): { report: import('./damagesCalculator').DamagesReport; disclaimer: string[] } | null {
+  // Gate 4 (NEW): firm's tier must include the damages feature. Checked here at the data
+  // layer — alongside the base-rate, ambiguity, and full-access guards — so section 8B
+  // and CitationPanel never render for Solo/Practice/Firm even with valid wage facts.
+  if (!firmTierIncludesDamagesFeature(view.firmPlanId)) return null;
   const preview = resolveFirmExportAccessTier(view) === 'limited_preview';
   const intel = view.intelligence;
   if (preview || !intel?.wageFacts?.length) return null;

@@ -3923,6 +3923,8 @@ export type FirmLiveIntakeView = {
   workerFollowUp?: import('../app/constants/workerStoryIntake').StoryFollowUpAnswers | null;
   /** Worker name/phone, present only once the worker shared this intake with the firm (consent-gated). */
   workerContact?: import('./workerContactPersistence').WorkerContact | null;
+  /** Caller firm's subscription tier (firm_profiles.plan_id). Drives the wage-exposure tier gate. */
+  firmPlanId?: string | null;
   /** Phase 2B: synthesized intelligence from Claude-extracted document facts. Null until extraction runs. */
   intelligence?: import('./documentFactsService').IntakeIntelligence | null;
 };
@@ -4140,6 +4142,19 @@ export async function loadFirmLiveIntakeView(
   // For preview-only routes (no full access yet) we withhold it, mirroring the privacy gate.
   const workerContact = previewOnly ? null : extractWorkerContactFromOverview(overviewRaw);
 
+  // Caller firm's subscription tier — fetched server-side (RLS: own firm row only) so the
+  // wage-exposure tier gate cannot be bypassed by a spoofed client value. Null when the
+  // row can't be read; the gate treats null as "no entitlement".
+  let firmPlanId: string | null = null;
+  if (routeFirmId) {
+    const { data: fp } = await supabase
+      .from('firm_profiles')
+      .select('plan_id')
+      .eq('id', routeFirmId)
+      .maybeSingle();
+    firmPlanId = (fp?.plan_id as string | null) ?? null;
+  }
+
   // Phase 2B: fetch synthesized intelligence from edge function (service role reads facts, bypasses RLS)
   let intelligence: import('./documentFactsService').IntakeIntelligence | null = null;
   if (!previewOnly) {
@@ -4178,6 +4193,7 @@ export async function loadFirmLiveIntakeView(
     orgSections,
     workerFollowUp: workerFollowUp ?? null,
     workerContact,
+    firmPlanId,
     intelligence,
   };
 }
