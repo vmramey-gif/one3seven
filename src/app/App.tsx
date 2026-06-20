@@ -2413,6 +2413,16 @@ export default function App() {
       }
     }
 
+    // Intake rows are deleted, but storage cleanup could not be confirmed — tell the worker
+    // honestly rather than reporting a clean delete (orphaned-file risk).
+    if (result.storageWarning) {
+      pushWorkerNotification({
+        id: `del-storage-warn-${Date.now()}`,
+        title: 'Intake deleted - storage check',
+        body: result.storageWarning,
+      });
+    }
+
     setDeleteIntakeBusyId(null);
     return {};
   };
@@ -2530,13 +2540,23 @@ export default function App() {
     if (!code?.trim()) return;
     const trimmed = code.trim().toUpperCase();
     void (async () => {
-      const firm = await intakeData.fetchFirmByCodeForWorker(trimmed);
+      let firm: { id: string; firm_name: string; firm_code?: string } | null = null;
+      try {
+        firm = await intakeData.fetchFirmByCodeForWorker(trimmed);
+      } catch (e) {
+        console.error('[o3s-fc] firm code lookup failed', e);
+      }
       if (firm?.id && firm.firm_name) {
         setFirmDirectedContext({
           firmId: firm.id,
           firmName: firm.firm_name,
           firmCode: firm.firm_code ?? trimmed,
         });
+      } else {
+        // Unresolvable or errored firm code — never leave the visitor on the infinite
+        // firm-directed "Loading..." screen. Clear the stale code and fall back to marketing.
+        try { sessionStorage.removeItem('o3s_prefill_fc'); } catch { /* ignore */ }
+        if (currentScreenRef.current === 'firmDirectedIntake') setCurrentScreen('publicMarketing');
       }
     })();
   // Intentionally runs once on mount only.
@@ -2552,6 +2572,12 @@ export default function App() {
       sessionStorage.removeItem('o3s_firm_ctx');
     } catch { /* ignore */ }
     if (firmDirectedContext) setFirmDirectedContext(null);
+    // A firm user followed a worker ?fc= link. Clearing the context above would otherwise
+    // strand them on the now context-less firm-directed "Loading..." screen, so route them
+    // to their own workspace (the firmSettings guard redirects if setup is incomplete).
+    if (currentScreenRef.current === 'firmDirectedIntake') {
+      setCurrentScreen('firmDashboard');
+    }
   }, [profile?.role, firmDirectedContext]);
 
   // Auto-start intake after anonymous sign-in settles on the landing screen.

@@ -1206,8 +1206,15 @@ export async function deleteUploadedFileAndStorage(
   const path = filePath.trim();
   if (!path) return { error: 'Missing storage path for uploaded file.' };
 
-  const { error: storageError } = await supabase.storage.from('intake-files').remove([path]);
+  const { data: removed, error: storageError } = await supabase.storage.from('intake-files').remove([path]);
   if (storageError) return { error: storageError.message };
+  // Verify the blob is actually gone before deleting its DB row. If we can't confirm removal,
+  // keep the row (the pointer) so the file is never orphaned/invisible — and report honestly.
+  const confirmed = (removed ?? []).some((o) => (o?.name ?? '').trim() === path);
+  if (!confirmed) {
+    console.error('[o3s-delete-file] storage removal not confirmed', { uploadedFileId, path });
+    return { error: 'We could not confirm this file was removed from storage. Please try again, or contact support.' };
+  }
 
   const { error: rowError } = await supabase.from('uploaded_files').delete().eq('id', uploadedFileId);
   return rowError ? { error: rowError.message } : {};
@@ -3245,8 +3252,15 @@ async function collectIntakeStoragePathsForDelete(
   return [...paths];
 }
 
-/** Deletes a worker-owned intake and related rows via security-definer RPC (do not use client multi-table delete). */
-export async function deleteWorkerOwnedIntake(intakeId: string): Promise<{ error?: string }> {
+/**
+ * Deletes a worker-owned intake and related rows via security-definer RPC (do not use client
+ * multi-table delete). Returns `error` for a hard failure (nothing deleted), or `storageWarning`
+ * when the database rows were deleted but the file blobs in Storage could not be confirmed gone
+ * (orphan risk) — callers must surface this rather than report unqualified success.
+ */
+export async function deleteWorkerOwnedIntake(
+  intakeId: string
+): Promise<{ error?: string; storageWarning?: string }> {
   const { data: intakeRow, error: intakeSelectError } = await supabase
     .from('intakes')
     .select('worker_id')
@@ -3275,16 +3289,30 @@ export async function deleteWorkerOwnedIntake(intakeId: string): Promise<{ error
   }
 
   if (storagePaths.length > 0) {
-    const { error: storageError } = await supabase.storage
+    // The DB rows are already deleted (RPC above). Now remove the file blobs and VERIFY:
+    // Supabase remove() returns `data` = the list of objects it actually removed, so a path
+    // missing from that list (or a request error) means we could not confirm deletion.
+    // We never treat "the call didn't throw" as proof.
+    const { data: removed, error: storageError } = await supabase.storage
       .from(INTAKE_FILES_BUCKET)
       .remove(storagePaths);
-    if (storageError) {
-      console.error('[o3s-delete-intake] storage cleanup failed', {
+    const removedNames = new Set((removed ?? []).map((o) => (o?.name ?? '').trim()).filter(Boolean));
+    const unconfirmed = storagePaths.filter((p) => !removedNames.has(p));
+    if (storageError || unconfirmed.length > 0) {
+      const count = unconfirmed.length || storagePaths.length;
+      console.error('[o3s-delete-intake] storage cleanup incomplete', {
         intakeId,
         workerId,
-        pathCount: storagePaths.length,
-        message: storageError.message,
+        requested: storagePaths.length,
+        confirmedRemoved: removedNames.size,
+        unconfirmed,
+        message: storageError?.message ?? null,
       });
+      return {
+        storageWarning:
+          `Your intake records were removed, but we could not confirm ${count} file${count === 1 ? '' : 's'} ` +
+          `${count === 1 ? 'was' : 'were'} cleared from storage. We're working on a way for you to verify this yourself.`,
+      };
     }
   }
 
