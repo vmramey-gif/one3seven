@@ -4,6 +4,7 @@ import { GalleryScreen } from './screens/GalleryScreen';
 import { DevNavMapScreen } from './screens/DevNavMapScreen';
 import { AuthWelcomeScreen } from './screens/AuthWelcomeScreen';
 import { PublicMarketingPage } from './screens/PublicMarketingPage';
+import { ForFirmsPage } from './screens/ForFirmsPage';
 import { SignInScreen } from './screens/SignInScreen';
 import { CreateAccountScreen } from './screens/CreateAccountScreen';
 import { RoleSelectionScreen } from './screens/RoleSelectionScreen';
@@ -186,7 +187,8 @@ export type Screen =
   | 'intakeReview'
   | 'firmSettings'
   | 'comparison'
-  | 'firmDirectedIntake';
+  | 'firmDirectedIntake'
+  | 'forFirms';
 
 const AUTH_FLOW_SCREENS: Screen[] = ['publicMarketing', 'authWelcome', 'signIn', 'createAccount', 'roleSelection', 'workerDetails'];
 
@@ -3974,7 +3976,25 @@ export default function App() {
                   firmSignInIntentRef.current = false;
                   setCurrentScreen('createAccount');
                 }}
+                onForFirms={() => setCurrentScreen('forFirms')}
                 firmDirectedContext={firmDirectedContext}
+              />
+            </motion.div>
+          )}
+          {currentScreen === 'forFirms' && (
+            <motion.div
+              key="forFirms"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.35, ease: 'easeOut' }}
+            >
+              <ForFirmsPage
+                onBack={() => setCurrentScreen('publicMarketing')}
+                onStartWorker={() => {
+                  firmSignInIntentRef.current = false;
+                  setCurrentScreen('authWelcome');
+                }}
               />
             </motion.div>
           )}

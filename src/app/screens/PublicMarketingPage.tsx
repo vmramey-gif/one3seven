@@ -10,6 +10,8 @@ interface PublicMarketingPageProps {
   onSignIn: () => void;
   /** Free worker sign-up — routes straight to Create Account (no authWelcome detour). */
   onSignUpFree: () => void;
+  /** Navigate to the dedicated For-law-firms page. */
+  onForFirms: () => void;
   firmDirectedContext?: { firmId: string; firmName: string; firmCode: string } | null;
 }
 
@@ -26,7 +28,7 @@ const HOW_IT_WORKS = [
   {
     step: '02',
     title: 'AI organizes and structures the record',
-    body: 'The engine extracts a timeline, identifies key dates, categorizes documents, surfaces timing relationships between reported concerns and later workplace actions, and flags dates that may require timely attorney review.',
+    body: 'The engine extracts a timeline, categorizes documents, sequences events chronologically, and flags dates that may require timely attorney review.',
     color: 'bg-[#f2efff] border-[#d5c9f3]',
     accent: 'text-[#5b39e6]',
     tag: 'one3seven',
@@ -42,7 +44,7 @@ const HOW_IT_WORKS = [
 ];
 
 const FIRM_FEATURES = [
-  { icon: Clock, label: 'Event timing cards', desc: 'Displays elapsed time between worker-reported concerns and later workplace actions.', tip: 'Dates and events are pulled from uploaded records and worker-provided context.' },
+  { icon: Clock, label: 'Event timing cards', desc: 'Displays the dates and elapsed time between events in the timeline.', tip: 'Dates and events are pulled from uploaded records and worker-provided context.' },
   { icon: Shield, label: 'Time-sensitive date flag', desc: 'Surfaces dates that may affect agency or court filing periods for attorney review.' },
   { icon: FileText, label: 'Document checklist', desc: 'Requested vs. received — at a glance, no manual cross-referencing.' },
   { icon: Zap, label: 'Source-linked information extraction', desc: 'Key language, dates, and employer responses linked to the uploaded source records.', tip: 'Records are structured for attorney review. one3seven does not make legal conclusions.' },
@@ -166,7 +168,7 @@ const O3S_CONCEPT_SVG = `<svg id="sv" viewBox="0 0 1280 720" xmlns="http://www.w
 <rect x="-105" y="-52" width="210" height="96" rx="16" fill="#1A1048" stroke="#6D4AFF" stroke-width="1.5" filter="url(#firmSh)"/>
 <rect id="firm3glow" x="-105" y="-52" width="210" height="96" rx="16" fill="#F5C842" opacity="0"/>
 <text x="0" y="-18" text-anchor="middle" font-size="12" fill="#C4B5FD" font-weight="700" font-family="system-ui">MURPHY &amp; ASSOC.</text>
-<text x="0" y="0" text-anchor="middle" font-size="10.5" fill="#A78BFA" font-family="system-ui">Wrongful Termination</text>
+<text x="0" y="0" text-anchor="middle" font-size="10.5" fill="#A78BFA" font-family="system-ui">Employment dispute</text>
 <rect x="-70" y="12" width="140" height="20" rx="10" fill="#6D4AFF" opacity=".28"/>
 <circle id="ck3" cx="0" cy="22" r="0" fill="#22C55E"/>
 <text id="ckT3" x="14" y="27" text-anchor="middle" font-size="11" fill="white" opacity="0">Case Received &#10003;</text>
@@ -500,7 +502,7 @@ function HeroVisual() {
       ctx.save(); ctx.beginPath(); ctx.roundRect(-cw/2, -ch/2, cw, ch, 16*s); ctx.clip();
       ctx.fillStyle = '#6D4AFF'; ctx.fillRect(-cw/2, -ch/2, cw, 60*s); ctx.restore();
       tx('INTAKE READY', 0, -ch/2+32*s, 12*s, 'white', 'center', '800');
-      tx('Employment  •  Wrongful Termination', 0, -ch/2+49*s, 7.5*s, 'rgba(255,255,255,0.75)', 'center', '500');
+      tx('Employment  •  Workplace dispute', 0, -ch/2+49*s, 7.5*s, 'rgba(255,255,255,0.75)', 'center', '500');
       const bx = -cw/2+18*s, bw = cw-36*s;
       let y2 = -ch/2+72*s;
       ctx.strokeStyle = '#e5def8'; ctx.lineWidth = 1;
@@ -807,7 +809,7 @@ function _WorkerWorkflowScrollCanvas_unused() {
     const FIRMS = [
       { name: 'Lee & Howard LLC', tag: 'Employment Law' },
       { name: 'Rivera Partners',  tag: 'Civil Rights · Labor' },
-      { name: 'Murphy & Assoc.',  tag: 'Wrongful Termination' },
+      { name: 'Murphy & Assoc.',  tag: 'Employment dispute' },
     ];
     const CHECKS = ['Intake Form', 'Pay Stub + Employment', 'Police Report + Evidence', 'Messages + Calendar'];
 
@@ -1139,7 +1141,7 @@ function RecordsPathSection({ reduced }: { reduced: boolean }) {
   );
 }
 
-export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSignUpFree, firmDirectedContext = null }: PublicMarketingPageProps) {
+export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSignUpFree, onForFirms, firmDirectedContext = null }: PublicMarketingPageProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showBetaModal, setShowBetaModal] = useState(false);
   const reducedMotion = useReducedMotion() ?? false;
@@ -1174,10 +1176,10 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
             </button>
             <button
               type="button"
-              onClick={openBetaModal}
+              onClick={onForFirms}
               className="text-sm font-medium text-[#1E1B4B]/60 transition hover:text-[#1E1B4B]"
             >
-              For attorneys
+              For law firms
             </button>
           </div>
           {/* Mobile nav toggle */}
@@ -1198,7 +1200,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
             <div className="flex flex-col">
               <button type="button" onClick={onSignIn} className="flex items-center min-h-[48px] text-base font-medium text-[#1E1B4B]/60 text-left py-3">Sign in</button>
               <button type="button" onClick={onSignUpFree} className="flex items-center gap-1.5 min-h-[48px] text-base font-semibold text-[#6D4AFF] text-left py-3">Sign up for free <ArrowRight className="h-4 w-4" /></button>
-              <button type="button" onClick={openBetaModal} className="flex items-center gap-1.5 min-h-[48px] text-base font-medium text-[#1E1B4B]/60 text-left py-3">For attorneys</button>
+              <button type="button" onClick={onForFirms} className="flex items-center gap-1.5 min-h-[48px] text-base font-medium text-[#1E1B4B]/60 text-left py-3">For law firms</button>
               <button type="button" onClick={onWorkerStart} className="flex items-center gap-1.5 min-h-[48px] text-base font-semibold text-[#1E1B4B]/70 text-left py-3">Organize my intake <ArrowRight className="h-4 w-4" /></button>
             </div>
           </div>
@@ -1272,11 +1274,9 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
                   </div>
 
                   <h1 className="mb-5 text-[32px] font-bold leading-[1.1] tracking-tight text-[#1E1B4B] sm:text-[44px] lg:text-[54px]">
-                    Workers deserve
+                    One organized intake.
                     <br />
-                    organized
-                    <br />
-                    <span className="bg-gradient-to-r from-[#6D4AFF] to-[#A78BFA] bg-clip-text text-transparent">representation.</span>
+                    <span className="bg-gradient-to-r from-[#6D4AFF] to-[#A78BFA] bg-clip-text text-transparent">One clear timeline.</span>
                   </h1>
 
                   <p className="mb-5 max-w-[480px] text-[16px] leading-relaxed text-[#1E1B4B]/62 sm:text-[17px]">
@@ -1294,7 +1294,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
                       onClick={onWorkerStart}
                       className="flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#6D4AFF] to-[#7C3AED] px-7 py-3.5 text-[15px] font-semibold text-white shadow-[0_16px_48px_rgba(109,74,255,0.32)] transition hover:shadow-[0_20px_60px_rgba(109,74,255,0.45)] hover:-translate-y-0.5 active:scale-[0.97]"
                     >
-                      Organize my intake
+                      Start organizing my records
                       <ArrowRight className="h-4 w-4" />
                     </button>
                   </div>
@@ -1324,6 +1324,72 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
               </div>
             </motion.div>
           </div>
+        </div>
+      </section>
+
+      {/* ── PAYOFF: SAMPLE CHRONOLOGY (the value, before any explanation) ── */}
+      <section className="border-y border-[#F0EBFF] bg-[#FAFAFF] px-5 py-14 sm:px-8 sm:py-20">
+        <div className="mx-auto max-w-5xl">
+          <div className="mb-2 text-center text-xs font-bold uppercase tracking-[0.2em] text-[#6D4AFF]">See it in 10 seconds</div>
+          <h2 className="mb-8 text-center text-[24px] font-bold tracking-tight text-[#1E1B4B] sm:text-[30px]">
+            Scattered PDFs in. A clear timeline out.
+          </h2>
+          <div className="grid items-center gap-5 lg:grid-cols-[1fr_auto_1.3fr]">
+            {/* Before: scattered PDF documents */}
+            <div className="rounded-[24px] border border-[#E7E1FF] bg-white p-5 shadow-[0_18px_56px_rgba(31,27,75,0.06)]">
+              <div className="mb-3 text-xs font-semibold uppercase tracking-wide text-[#1E1B4B]/45">Your documents</div>
+              <div className="flex flex-wrap gap-2">
+                {['offer-letter.pdf', 'paystub.pdf', 'timecard.pdf', 'hr-email.pdf', 'warning.pdf', 'termination-letter.pdf'].map((f, i) => (
+                  <span
+                    key={f}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-[#EFEAFE] bg-[#FAFAFF] px-2.5 py-1.5 text-[11.5px] text-[#1E1B4B]/70"
+                    style={{ transform: `rotate(${(i % 2 ? 1 : -1) * 1.5}deg)` }}
+                  >
+                    <span className="rounded bg-[#6D4AFF]/10 px-1 py-0.5 text-[9px] font-bold text-[#6D4AFF]">PDF</span>
+                    {f}
+                  </span>
+                ))}
+              </div>
+              <p className="mt-3 text-[11px] text-[#1E1B4B]/45">No order, no dates, no story.</p>
+            </div>
+
+            {/* Arrow */}
+            <div className="hidden items-center justify-center lg:flex">
+              <div className="flex flex-col items-center gap-1 text-[#6D4AFF]">
+                <ArrowRight className="h-6 w-6" />
+                <span className="text-[10px] font-semibold uppercase tracking-wide">one3seven</span>
+              </div>
+            </div>
+
+            {/* After: organized timeline */}
+            <div className="rounded-[24px] border border-[#DCD3FF] bg-white p-5 shadow-[0_24px_68px_rgba(109,74,255,0.14)]">
+              <div className="mb-3 flex items-center justify-between">
+                <div className="text-xs font-semibold uppercase tracking-wide text-[#6D4AFF]">Organized timeline</div>
+                <span className="rounded-full bg-[#F3EFFF] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[#6D4AFF]">Sample</span>
+              </div>
+              <ol className="relative space-y-3 border-l border-[#E7E1FF] pl-4">
+                {[
+                  ['Mar 2021', 'Employment begins', 'offer-letter.pdf'],
+                  ['Sep 9, 2024', 'Concern raised with HR', 'hr-email.pdf'],
+                  ['Oct 1, 2024', 'Written warning issued', 'warning.pdf'],
+                  ['Nov 8, 2024', 'Employment ends', 'termination-letter.pdf'],
+                ].map(([d, e, src]) => (
+                  <li key={d} className="relative">
+                    <span className="absolute -left-[21px] top-1 h-2.5 w-2.5 rounded-full bg-[#6D4AFF]" />
+                    <div className="text-[11px] font-semibold text-[#6D4AFF]">{d}</div>
+                    <div className="text-[14px] font-medium text-[#1E1B4B]">{e}</div>
+                    <div className="mt-0.5 inline-flex items-center gap-1 text-[11px] text-[#1E1B4B]/45">
+                      <span className="rounded bg-[#6D4AFF]/10 px-1 py-0.5 text-[8px] font-bold text-[#6D4AFF]">PDF</span>
+                      source: {src}
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </div>
+          <p className="mt-6 text-center text-[12px] text-[#1E1B4B]/45">
+            Sample timeline for illustration — not a real case. one3seven organizes your records into a timeline; it does not draw conclusions.
+          </p>
         </div>
       </section>
 
@@ -1570,7 +1636,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
             <div className="flex flex-wrap gap-5">
               {[
                 { label: 'For workers', action: onWorkerStart },
-                { label: 'For attorneys', action: openBetaModal },
+                { label: 'For law firms', action: onForFirms },
                 { label: 'Sign in', action: onSignIn },
               ].map((l) => (
                 <button
