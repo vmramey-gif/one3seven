@@ -89,7 +89,34 @@ export type StoryFollowUpAnswers = {
   arbitrationAgreement?: ArbitrationAnswer;
   priorAgencyFiling?: AgencyFilingAnswer;
   priorAgencyFilingDetails?: string;
+  /**
+   * State where the work was primarily performed (2-letter postal code). Determines which
+   * jurisdiction's wage rules apply. Jurisdiction-gated features (e.g. wage exposure) never
+   * activate unless this is set, and only for jurisdictions that have a wage-rules layer.
+   */
+  workState?: string;
 };
+
+/** US states + DC for the "where did you primarily work?" selector. */
+export const US_STATES: { code: string; name: string }[] = [
+  { code: 'AL', name: 'Alabama' }, { code: 'AK', name: 'Alaska' }, { code: 'AZ', name: 'Arizona' },
+  { code: 'AR', name: 'Arkansas' }, { code: 'CA', name: 'California' }, { code: 'CO', name: 'Colorado' },
+  { code: 'CT', name: 'Connecticut' }, { code: 'DE', name: 'Delaware' }, { code: 'DC', name: 'District of Columbia' },
+  { code: 'FL', name: 'Florida' }, { code: 'GA', name: 'Georgia' }, { code: 'HI', name: 'Hawaii' },
+  { code: 'ID', name: 'Idaho' }, { code: 'IL', name: 'Illinois' }, { code: 'IN', name: 'Indiana' },
+  { code: 'IA', name: 'Iowa' }, { code: 'KS', name: 'Kansas' }, { code: 'KY', name: 'Kentucky' },
+  { code: 'LA', name: 'Louisiana' }, { code: 'ME', name: 'Maine' }, { code: 'MD', name: 'Maryland' },
+  { code: 'MA', name: 'Massachusetts' }, { code: 'MI', name: 'Michigan' }, { code: 'MN', name: 'Minnesota' },
+  { code: 'MS', name: 'Mississippi' }, { code: 'MO', name: 'Missouri' }, { code: 'MT', name: 'Montana' },
+  { code: 'NE', name: 'Nebraska' }, { code: 'NV', name: 'Nevada' }, { code: 'NH', name: 'New Hampshire' },
+  { code: 'NJ', name: 'New Jersey' }, { code: 'NM', name: 'New Mexico' }, { code: 'NY', name: 'New York' },
+  { code: 'NC', name: 'North Carolina' }, { code: 'ND', name: 'North Dakota' }, { code: 'OH', name: 'Ohio' },
+  { code: 'OK', name: 'Oklahoma' }, { code: 'OR', name: 'Oregon' }, { code: 'PA', name: 'Pennsylvania' },
+  { code: 'RI', name: 'Rhode Island' }, { code: 'SC', name: 'South Carolina' }, { code: 'SD', name: 'South Dakota' },
+  { code: 'TN', name: 'Tennessee' }, { code: 'TX', name: 'Texas' }, { code: 'UT', name: 'Utah' },
+  { code: 'VT', name: 'Vermont' }, { code: 'VA', name: 'Virginia' }, { code: 'WA', name: 'Washington' },
+  { code: 'WV', name: 'West Virginia' }, { code: 'WI', name: 'Wisconsin' }, { code: 'WY', name: 'Wyoming' },
+];
 
 export const STORY_FOLLOWUP_REIMBURSEMENT_OPTIONS: { value: ReimbursementFollowUpAnswer; label: string }[] = [
   { value: 'yes', label: 'Yes' },
@@ -136,6 +163,7 @@ export const EMPTY_STORY_FOLLOWUP: StoryFollowUpAnswers = {
   arbitrationAgreement: '',
   priorAgencyFiling: '',
   priorAgencyFilingDetails: '',
+  workState: '',
 };
 
 export function hasStoryFollowUpContent(answers: StoryFollowUpAnswers | null | undefined): boolean {

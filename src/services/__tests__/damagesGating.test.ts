@@ -15,12 +15,17 @@ const wageDoc: WageFactsDocument = {
   sources: { pay_rate: 'Regular rate of pay: $22.00 per hour' },
 };
 
-/** Minimal full-access firm view carrying valid wage facts and a given tier. */
-function makeView(planId: string): FirmLiveIntakeView {
+/**
+ * Minimal full-access firm view carrying valid wage facts, a given tier, and a work state.
+ * Work state defaults to California (the only jurisdiction with a wage-exposure layer) so the
+ * tier tests below exercise the tier gate, not the jurisdiction gate.
+ */
+function makeView(planId: string, workState: string = 'CA'): FirmLiveIntakeView {
   return {
     previewOnly: false,
     isFirmCodeIntake: true, // → full access (not limited_preview)
     firmPlanId: planId,
+    workerFollowUp: { workState },
     intelligence: { wageFacts: [wageDoc] },
   } as unknown as FirmLiveIntakeView;
 }
@@ -56,5 +61,17 @@ describe('resolveWageExposure tier gate', () => {
   });
   it('Firm+ tier → populated', () => {
     expect(resolveWageExposure(makeView('firm_plus'))).not.toBeNull();
+  });
+});
+
+describe('resolveWageExposure jurisdiction gate', () => {
+  it('California work state + Practice+ + valid facts → populated', () => {
+    expect(resolveWageExposure(makeView('practice_plus', 'CA'))).not.toBeNull();
+  });
+  it('Texas work state → null even with Practice+ and valid facts (organize-only)', () => {
+    expect(resolveWageExposure(makeView('practice_plus', 'TX'))).toBeNull();
+  });
+  it('unset work state → null (no jurisdiction-gated feature activates without it set)', () => {
+    expect(resolveWageExposure(makeView('practice_plus', ''))).toBeNull();
   });
 });

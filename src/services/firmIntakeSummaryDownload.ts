@@ -17,6 +17,7 @@ import {
 import type { FirmPacketModel } from './firmIntakePdfRenderer';
 import { assembleDamagesInput } from './damagesAssembly';
 import { calculateDamages } from './damagesCalculator';
+import { getWageRules } from './wageRules';
 import { firmTierIncludesDamagesFeature } from './billingService';
 
 /**
@@ -27,9 +28,14 @@ import { firmTierIncludesDamagesFeature } from './billingService';
 export function resolveWageExposure(
   view: FirmLiveIntakeView,
 ): { report: import('./damagesCalculator').DamagesReport; disclaimer: string[] } | null {
-  // Gate 4 (NEW): firm's tier must include the damages feature. Checked here at the data
-  // layer — alongside the base-rate, ambiguity, and full-access guards — so section 8B
-  // and CitationPanel never render for Solo/Practice/Firm even with valid wage facts.
+  // Jurisdiction gate (FIRST): wage exposure (Section 8B) only exists where a wage-rules layer
+  // exists — California today. For Texas or any other state, or when the worker's work state is
+  // unset, there is no ruleset and we return here, before any wage assembly or calculation runs.
+  // Section 8B is therefore genuinely unreachable for those jurisdictions (organize-only), not
+  // computed-and-blanked. No jurisdiction-gated feature activates without an explicit work state.
+  if (!getWageRules(view.workerFollowUp?.workState ?? null)) return null;
+  // Tier gate: firm's tier must include the damages feature, so section 8B and CitationPanel
+  // never render for Solo/Practice/Firm even with valid wage facts in a supported jurisdiction.
   if (!firmTierIncludesDamagesFeature(view.firmPlanId)) return null;
   const preview = resolveFirmExportAccessTier(view) === 'limited_preview';
   const intel = view.intelligence;

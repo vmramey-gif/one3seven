@@ -22,6 +22,7 @@ import {
   AGENCY_FILING_OPTIONS,
   ARBITRATION_OPTIONS,
   EMPLOYMENT_STATUS_OPTIONS,
+  US_STATES,
   STORY_FOLLOWUP_REIMBURSEMENT_OPTIONS,
   STORY_FOLLOWUP_REMOTE_OPTIONS,
   STORY_FIRST_FOLLOWUP_HEADING,
@@ -1249,8 +1250,8 @@ export function UploadScreen({
                         followUp.reimbursed,
                         followUp.complainedOrReported,
                         followUp.changedAfterward,
-                        ...(isEmploymentIntake ? [followUp.employmentStatus, followUp.arbitrationAgreement, followUp.priorAgencyFiling] : []),
-                      ].filter((v) => Boolean(String(v ?? '').trim())).length} of {isEmploymentIntake ? 12 : 9}
+                        ...(isEmploymentIntake ? [followUp.workState, followUp.employmentStatus, followUp.arbitrationAgreement, followUp.priorAgencyFiling] : []),
+                      ].filter((v) => Boolean(String(v ?? '').trim())).length} of {isEmploymentIntake ? 13 : 9}
                     </span>
                   </div>
                 </div>
@@ -1408,6 +1409,27 @@ export function UploadScreen({
                 {isEmploymentIntake ? (
                   <>
                     <p className="pt-1 text-[10px] font-semibold uppercase tracking-wider text-violet-500">Additional employment details</p>
+
+                    {/* Card: Work state (determines which jurisdiction's wage rules apply) */}
+                    <div className="rounded-[14px] border border-violet-100 bg-white px-4 py-3.5 shadow-sm">
+                      <label className="text-sm font-semibold text-[#15112f]" htmlFor="followup-work-state">
+                        In what state did you primarily work?
+                      </label>
+                      <p className="mt-1 text-xs leading-relaxed text-slate-500">
+                        The state where you did the work — this can differ from where you live.
+                      </p>
+                      <select
+                        id="followup-work-state"
+                        value={followUp.workState ?? ''}
+                        onChange={(e) => updateFollowUp({ workState: e.target.value })}
+                        className="mt-2.5 w-full rounded-[10px] border border-violet-200 bg-white px-3 py-2.5 text-sm text-[#15112f] focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-100"
+                      >
+                        <option value="">Select a state…</option>
+                        {US_STATES.map((s) => (
+                          <option key={s.code} value={s.code}>{s.name}</option>
+                        ))}
+                      </select>
+                    </div>
 
                     {/* Card: Employment status */}
                     <div className="rounded-[14px] border border-violet-100 bg-white px-4 py-3.5 shadow-sm">
