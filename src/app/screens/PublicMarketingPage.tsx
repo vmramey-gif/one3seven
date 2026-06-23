@@ -1632,6 +1632,9 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
                 <div className="text-[16px] font-bold text-white"><WordMark className="text-white [&>span]:text-[#c7b9ff]" /></div>
               </div>
               <div className="text-[12px] text-white/40">AI-powered employment intake engine</div>
+              <div className="mt-1 text-[12px] text-white/40">
+                Contact: <a href="mailto:info@one3seven.com" className="text-white/60 transition hover:text-white">info@one3seven.com</a>
+              </div>
             </div>
             <div className="flex flex-wrap gap-5">
               {[
