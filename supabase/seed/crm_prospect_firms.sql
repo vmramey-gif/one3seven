@@ -1,6 +1,7 @@
 -- Seed the founder CRM with the 30-firm California plaintiff-employment prospect list (Jun 2026).
--- Run ONCE in the Supabase SQL editor (service role bypasses RLS). Firms 28 & 30 are warm leads
--- (message drafted earlier) and start at stage 'contacted'; all others start at 'target'.
+-- Run ONCE in the Supabase SQL editor (service role bypasses RLS). All firms start at stage
+-- 'target' — none have been contacted yet. Firms 28 & 30 are flagged in notes as warm-lead
+-- candidates (a message was drafted earlier but not sent) to prioritize for first outreach.
 
 insert into public.crm_firms (name, phone, website, region, focus_areas, source, stage, notes) values
 ('Moon Law Group, PC', '(310) 893-6200', 'moonlawgroup.com', 'Los Angeles', 'Wrongful term., retaliation, wage & hour, class actions', '30-firm prospect list (Jun 2026)', 'target', 'Large plaintiff firm, solo & class actions - Solo/Practice tier'),
@@ -30,6 +31,6 @@ insert into public.crm_firms (name, phone, website, region, focus_areas, source,
 ('Ackermann & Tilajef, PC', '(916) 779-7000', 'ackermanntilajef.com', 'Sacramento', 'Wage & hour, wrongful term., class actions, PAGA', '30-firm prospect list (Jun 2026)', 'target', 'High-volume plaintiff firm, well-known in Sacramento'),
 ('Donahoo & Associates, PC', '(714) 953-1010', 'donahoolaw.com', 'Orange County', 'Wrongful term., discrimination, wage & hour', '30-firm prospect list (Jun 2026)', 'target', 'OC plaintiff boutique - solo/small firm pitch'),
 ('Law Offices of Cathe Caraway-Howard', '(714) 634-2522', 'carawayhoward.com', 'Orange County', 'Employment discrimination, wrongful term., harassment', '30-firm prospect list (Jun 2026)', 'target', 'Long-established OC plaintiff firm'),
-('Advocacy Center for Employment Law', '(408) 293-8959', 'employmentadvocacy.com', 'San Jose', 'Wage & hour, wrongful term., retaliation', '30-firm prospect list (Jun 2026)', 'contacted', 'WARM - message drafted earlier; follow up first. Already identified warm lead'),
+('Advocacy Center for Employment Law', '(408) 293-8959', 'employmentadvocacy.com', 'San Jose', 'Wage & hour, wrongful term., retaliation', '30-firm prospect list (Jun 2026)', 'target', 'Warm-lead candidate - message was drafted earlier but NOT yet sent; prioritize for first outreach'),
 ('Costello Law Group', '(408) 892-7455', 'costellolawgroup.com', 'San Jose', 'Discrimination, wrongful term., wage & hour', '30-firm prospect list (Jun 2026)', 'target', 'Plaintiff-only Silicon Valley firm'),
-('California Labor & Employment Law', '(323) 450-5755', 'calaborlaw.com', 'Los Angeles', 'Wrongful term., retaliation, wage & hour, meal breaks', '30-firm prospect list (Jun 2026)', 'contacted', 'WARM - message drafted earlier; follow up first. Already identified warm lead');
+('California Labor & Employment Law', '(323) 450-5755', 'calaborlaw.com', 'Los Angeles', 'Wrongful term., retaliation, wage & hour, meal breaks', '30-firm prospect list (Jun 2026)', 'target', 'Warm-lead candidate - message was drafted earlier but NOT yet sent; prioritize for first outreach');

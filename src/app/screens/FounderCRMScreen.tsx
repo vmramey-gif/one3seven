@@ -9,6 +9,7 @@ import { useEffect, useMemo, useState } from 'react';
 import {
   Phone, Mail, Calendar, ArrowLeft, Plus, X, TrendingUp,
   ClipboardList, LayoutGrid, Building2, BookOpen, BarChart3, CheckCircle2,
+  GraduationCap, AlertTriangle, Flame,
 } from 'lucide-react';
 import {
   listFirms, listActivity, addFirm, logActivity,
@@ -16,8 +17,9 @@ import {
 } from '../../services/crmService';
 import { CRM_STAGES, CRM_STAGE_LABELS, type CrmStage } from '../../services/crmStageLogic';
 import { CRM_WEEKLY_TARGETS, CRM_CALL_SCRIPT, CRM_OBJECTIONS, CRM_COLD_EMAIL } from '../constants/crmReference';
+import { FIRE_DEMO_TRAINING, PI_RULES, CRM_COMMISSIONS } from '../constants/crmTraining';
 
-type Tab = 'dashboard' | 'pipeline' | 'firms' | 'activity' | 'metrics' | 'scripts' | 'add';
+type Tab = 'dashboard' | 'pipeline' | 'firms' | 'activity' | 'metrics' | 'scripts' | 'training' | 'add';
 
 const TABS: { id: Tab; label: string; icon: typeof LayoutGrid }[] = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutGrid },
@@ -26,6 +28,7 @@ const TABS: { id: Tab; label: string; icon: typeof LayoutGrid }[] = [
   { id: 'activity', label: 'Activity', icon: ClipboardList },
   { id: 'metrics', label: 'Metrics', icon: BarChart3 },
   { id: 'scripts', label: 'Scripts', icon: BookOpen },
+  { id: 'training', label: 'Training', icon: GraduationCap },
   { id: 'add', label: 'Add / Log', icon: Plus },
 ];
 
@@ -156,6 +159,7 @@ export function FounderCRMScreen({ onExit }: { onExit: () => void }) {
             {tab === 'activity' && <ActivityTab activity={activity} />}
             {tab === 'metrics' && <MetricsTab firms={firms} activity={activity} />}
             {tab === 'scripts' && <ScriptsTab />}
+            {tab === 'training' && <TrainingTab />}
             {tab === 'add' && (
               <AddLogTab firms={firms} lastFirmId={lastFirmId} onSaved={(fid) => { if (fid) setLastFirmId(fid); void load(); }} setError={setError} />
             )}
@@ -477,6 +481,72 @@ function ScriptsTab() {
       <section>
         <h2 className="mb-2 text-[14px] font-bold">Cold email template</h2>
         <pre className="whitespace-pre-wrap rounded-[12px] border border-[#E7E1FF] bg-white p-4 text-[13px] leading-relaxed text-[#1E1B4B]/75">{CRM_COLD_EMAIL}</pre>
+      </section>
+    </div>
+  );
+}
+
+// ── Training (fire demo, PI rules, commissions) ──────────────────────────────
+function TrainingTab() {
+  return (
+    <div className="space-y-7">
+      {/* Fire demo */}
+      <section>
+        <div className="mb-2 flex items-center gap-2">
+          <Flame className="h-4 w-4 text-orange-500" />
+          <h2 className="text-[14px] font-bold">Fire demo — how to run it</h2>
+        </div>
+        <p className="mb-3 text-[13px] leading-relaxed text-[#1E1B4B]/65">{FIRE_DEMO_TRAINING.intro}</p>
+        <a href={`https://${FIRE_DEMO_TRAINING.link}`} target="_blank" rel="noreferrer" className="mb-3 inline-block text-[13px] font-semibold text-[#6D4AFF] hover:underline">
+          {FIRE_DEMO_TRAINING.link} ↗
+        </a>
+
+        {/* Employment focus — highlighted */}
+        <div className="mb-4 rounded-[12px] border-2 border-[#6D4AFF]/40 bg-[#F3EFFF] p-4">
+          <div className="mb-1 text-[11px] font-bold uppercase tracking-wide text-[#6D4AFF]">Employment focus — read this first</div>
+          <p className="text-[13px] leading-relaxed text-[#1E1B4B]/80">{FIRE_DEMO_TRAINING.employmentFocus}</p>
+        </div>
+
+        <div className="space-y-2.5">
+          {FIRE_DEMO_TRAINING.steps.map((s) => (
+            <div key={s.title} className="rounded-[12px] border border-[#E7E1FF] bg-white p-3.5">
+              <div className="mb-0.5 text-[13px] font-bold text-[#1E1B4B]">{s.title}</div>
+              <p className="text-[13px] leading-relaxed text-[#1E1B4B]/65">{s.text}</p>
+            </div>
+          ))}
+        </div>
+        <p className="mt-3 rounded-[10px] bg-[#EDE7FF] px-3 py-2 text-[12px] font-semibold text-[#6D4AFF]">{FIRE_DEMO_TRAINING.theAsk}</p>
+      </section>
+
+      {/* PI rules */}
+      <section>
+        <div className="mb-2 flex items-center gap-2">
+          <AlertTriangle className="h-4 w-4 text-amber-600" />
+          <h2 className="text-[14px] font-bold">PI &amp; scope rules — do not break these</h2>
+        </div>
+        <div className="space-y-2.5">
+          {PI_RULES.map((r) => (
+            <div key={r.rule} className="rounded-[12px] border border-amber-200 bg-amber-50 p-3.5">
+              <div className="mb-0.5 text-[13px] font-bold text-amber-900">{r.rule}</div>
+              <p className="text-[13px] leading-relaxed text-amber-900/75">{r.detail}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Commissions */}
+      <section>
+        <h2 className="mb-2 text-[14px] font-bold">{CRM_COMMISSIONS.headline}</h2>
+        <p className="mb-3 text-[13px] leading-relaxed text-[#1E1B4B]/65">{CRM_COMMISSIONS.intro}</p>
+        <ul className="mb-3 space-y-1.5">
+          {CRM_COMMISSIONS.lines.map((l) => (
+            <li key={l} className="flex gap-2 text-[13px] leading-relaxed text-[#1E1B4B]/75">
+              <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#8B6DFF]" />
+              <span>{l}</span>
+            </li>
+          ))}
+        </ul>
+        <p className="rounded-[10px] border border-amber-300 bg-amber-50 px-3 py-2 text-[12px] font-semibold text-amber-800">{CRM_COMMISSIONS.note}</p>
       </section>
     </div>
   );
