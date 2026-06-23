@@ -6,6 +6,7 @@ import {
   WORKER_STORY_HEADING,
   WORKER_STORY_INTRO,
   WORKER_STORY_PLACEHOLDER,
+  WORKER_STORY_REASSURANCE,
 } from '../constants/workerStoryIntake';
 import { INTAKE_OPENING_SHELL } from '../constants/intakeOpeningPresentation';
 
@@ -54,6 +55,8 @@ export function WorkerStoryIntakeScreen({
 
       <main className={`${INTAKE_OPENING_SHELL} px-6 py-8`}>
         <p className="text-sm text-slate-600 leading-relaxed mb-4">{WORKER_STORY_INTRO}</p>
+
+        <p className="text-sm text-slate-500 leading-relaxed mb-4">{WORKER_STORY_REASSURANCE}</p>
 
         <div className="rounded-[14px] border border-slate-100 bg-slate-50/80 px-4 py-3 mb-4">
           <p className="text-xs font-medium text-slate-700 mb-2">Examples</p>

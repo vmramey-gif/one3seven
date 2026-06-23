@@ -33,6 +33,7 @@ import {
   STORY_FIRST_UPLOAD_HEADING,
   STORY_FIRST_UPLOAD_INTRO,
   STORY_FIRST_UPLOAD_NOTICE,
+  WORKER_UPLOAD_SOURCING_GUIDANCE,
   type StoryFollowUpAnswers,
 } from '../constants/workerStoryIntake';
 import {
@@ -897,6 +898,22 @@ export function UploadScreen({
                 {STORY_FIRST_UPLOAD_EXAMPLES.slice(0, 4).join(' · ')}
                 {STORY_FIRST_UPLOAD_EXAMPLES.length > 4 ? ' · …' : ''}
               </p>
+              <details className="mt-3 rounded-[12px] border border-slate-200 bg-slate-50/80 px-3 py-2">
+                <summary className="cursor-pointer text-[12px] font-medium text-slate-700">
+                  {WORKER_UPLOAD_SOURCING_GUIDANCE.heading}
+                </summary>
+                <p className="mt-2 text-[11px] text-slate-600 leading-relaxed">
+                  {WORKER_UPLOAD_SOURCING_GUIDANCE.intro}
+                </p>
+                <ul className="mt-1 list-inside list-disc text-[11px] text-slate-600 space-y-1">
+                  {WORKER_UPLOAD_SOURCING_GUIDANCE.items.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+                <p className="mt-2 text-[11px] text-slate-500 leading-relaxed">
+                  {WORKER_UPLOAD_SOURCING_GUIDANCE.pdfNote}
+                </p>
+              </details>
             </div>
           )}
 

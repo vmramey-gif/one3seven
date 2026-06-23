@@ -4583,6 +4583,10 @@ export default function App() {
                 employmentMatterTags={
                   currentIntakeId ? resolveEmploymentMatterTags(currentIntakeId) : []
                 }
+                caseCategory={
+                  (currentIntakeId ? categoryFromGuidedAnswers(currentIntakeId) : null) ??
+                  selectedCaseCategory
+                }
                 onSaveWorkerIntakeNotes={
                   isSupabaseConfigured() && currentIntakeId
                     ? async (notes: string) => {

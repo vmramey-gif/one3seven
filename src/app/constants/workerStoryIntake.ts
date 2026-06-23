@@ -33,17 +33,64 @@ export const STORY_FIRST_UPLOAD_INTRO =
 export const STORY_FIRST_UPLOAD_NOTICE =
   'By uploading documents, you confirm that you are choosing to share these records with one3seven for organization and intake-preparation purposes. Upload only records you feel comfortable sharing. Sensitive information such as Social Security numbers, banking information, account numbers, medical record numbers, or unrelated personal information may be removed or redacted before upload at your discretion.';
 
+// NOTE: Uploads are PDF-only. These describe the *kinds of records* that are useful, not file
+// formats. Entries that implied image upload ("Screenshots", "Photos") were removed because the
+// picker rejects image files; guidance for converting those to PDF lives in
+// WORKER_UPLOAD_SOURCING_GUIDANCE below.
 export const STORY_FIRST_UPLOAD_EXAMPLES = [
+  'Pay stubs',
+  'Schedules or time records',
   'Emails',
-  'Text messages',
-  'Screenshots',
-  'Pay records',
-  'Reviews',
-  'Policies',
-  'Notes',
-  'PDFs',
-  'Photos',
+  'Text messages (saved as PDF)',
+  'HR or termination letters',
+  'Reviews or write-ups',
+  'Policies or handbooks',
+  'Notes you wrote',
 ] as const;
+
+/**
+ * Practical "what can I upload / where do I find it" helper for workers who lost access to
+ * physical records (e.g. displaced workers). PDF-only: the helper tells people how to convert
+ * records to PDF rather than implying photos/screenshots upload directly. No banned vocabulary,
+ * no legal conclusions, no deadlines.
+ */
+export const WORKER_UPLOAD_SOURCING_GUIDANCE = {
+  heading: "Don't have your records handy?",
+  intro: 'Many work records can still be found even if you lost the originals:',
+  items: [
+    'Pay stubs and W-2s — often in your employer’s HR or payroll portal, or with past tax records (irs.gov/individuals/get-transcript).',
+    'Wage and work history — available through your EDD online account (edd.ca.gov).',
+    'Emails and termination letters — check your email inbox and saved messages.',
+    'Text messages — most phones can save or print a conversation as a PDF.',
+  ],
+  pdfNote: 'Uploads need to be PDFs. A screenshot, photo, or email can be saved or printed as a PDF from your phone or computer before uploading.',
+} as const;
+
+/**
+ * Crisis-aware, low-pressure reassurance shown on the story step. Deliberately disaster-neutral
+ * (no mention of any specific event, displacement, or health impact) so it reads correctly for
+ * every worker. No banned vocabulary, no legal conclusions.
+ */
+export const WORKER_STORY_REASSURANCE =
+  "You don't have to do this all at once. Share what you have now — you can come back and add more anytime.";
+
+/**
+ * Personal Injury handoff shown on the completion/summary screen. Names the attorney *type*,
+ * never the claim; makes no legal conclusion ("may be reviewed", not "should" or "is"). Lines are
+ * shown conditionally: employmentLine for employment intakes, injuryLine for Personal Injury
+ * intakes, and bothNote only when both apply. No banned vocabulary.
+ */
+export const WORKER_RECORD_HANDOFF = {
+  heading: 'Where these records can go',
+  intro:
+    "one3seven organizes your records — it doesn't give legal advice or decide what your situation means.",
+  employmentLine:
+    'Records about your job, pay, hours, or treatment at work may be reviewed by an employment attorney.',
+  injuryLine:
+    'Records about a physical injury or an exposure may be reviewed by a personal injury or toxic tort attorney.',
+  bothNote:
+    'If your situation involves more than one of these, you can share your organized records with more than one attorney.',
+} as const;
 
 export const STORY_FIRST_FOLLOWUP_HEADING = 'Helpful details if you know them';
 

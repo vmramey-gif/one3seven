@@ -39,6 +39,7 @@ import {
   linkedFirmSendButtonLabel,
   linkedFirmShareModalButtonLabel,
 } from '../constants/one3sevenProduct';
+import { WORKER_RECORD_HANDOFF } from '../constants/workerStoryIntake';
 import {
   downloadIntakeSummaryDocument,
 } from '../../services/intakeSummaryDownload';
@@ -223,6 +224,8 @@ interface IntakeSummaryScreenProps {
   /** Guided Step 2 narrative before merge, or persisted story from summary. */
   workerStoryPreview?: string | null;
   employmentMatterTags?: EmploymentMatterTagId[];
+  /** Worker's selected case category — drives the records-handoff guidance (employment vs. PI). */
+  caseCategory?: string | null;
   shellMode?: boolean;
 }
 
@@ -322,6 +325,7 @@ export function IntakeSummaryScreen({
   docRequestConfirmScrollSignal = 0,
   workerStoryPreview = null,
   employmentMatterTags = [],
+  caseCategory = null,
   shellMode = false,
 }: IntakeSummaryScreenProps) {
   const [showEmailModal, setShowEmailModal] = useState(false);
@@ -927,8 +931,17 @@ export function IntakeSummaryScreen({
     story_only: 'We organized your story. Supporting records may help strengthen the timeline.',
     records_only: 'We organized your records. Additional context may help create a more complete summary.',
     story_and_records: 'Your story and records have been organized into a timeline and summary.',
-    minimal: 'We need a little more information before a meaningful summary can be created.',
+    minimal:
+      "We've started organizing what you shared. Even a few sentences about what happened helps — and you can add records like pay stubs, emails, or letters whenever you find them.",
   };
+
+  // Records-handoff guidance (Personal Injury vs. employment). Names the attorney type only —
+  // no legal conclusion. Injury line shows for a Personal Injury intake; employment line shows
+  // for employment intakes (the beta default) or whenever employment matter tags are present;
+  // the "more than one" note shows only when both apply.
+  const showInjuryHandoff = (caseCategory ?? '').trim() === 'Personal Injury';
+  const showEmploymentHandoff = !showInjuryHandoff || employmentMatterTags.length > 0;
+  const showBothHandoffNote = showInjuryHandoff && showEmploymentHandoff;
 
   const organizedSummaryParagraphs = useMemo(() => {
     const text = intakeMaturityState === 'minimal' ? '' : recordStoryExcerpt.trim();
@@ -1216,6 +1229,20 @@ export function IntakeSummaryScreen({
                 ))}
               </div>
             </div>
+
+            {(showEmploymentHandoff || showInjuryHandoff) ? (
+              <div className="border-t border-[#EEE9FF] pt-4">
+                <h2 className="text-sm font-semibold text-[#0B1033]">{WORKER_RECORD_HANDOFF.heading}</h2>
+                <p className="mt-2 text-sm leading-relaxed text-[#475569]">{WORKER_RECORD_HANDOFF.intro}</p>
+                <ul className="mt-2 space-y-1 text-sm leading-relaxed text-[#475569]">
+                  {showEmploymentHandoff ? <li>{WORKER_RECORD_HANDOFF.employmentLine}</li> : null}
+                  {showInjuryHandoff ? <li>{WORKER_RECORD_HANDOFF.injuryLine}</li> : null}
+                </ul>
+                {showBothHandoffNote ? (
+                  <p className="mt-2 text-sm leading-relaxed text-[#475569]">{WORKER_RECORD_HANDOFF.bothNote}</p>
+                ) : null}
+              </div>
+            ) : null}
 
             <div className="mt-4 grid gap-3 border-t border-[#EEE9FF] pt-4 lg:grid-cols-2">
               <div className="rounded-[14px] border border-[#EEE9FF] bg-[#FBFAFF] px-3 py-3">
