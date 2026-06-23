@@ -1648,6 +1648,8 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
                   {l.label}
                 </button>
               ))}
+              <a href="/terms" className="text-[13px] text-white/50 transition hover:text-white">Terms</a>
+              <a href="/privacy" className="text-[13px] text-white/50 transition hover:text-white">Privacy</a>
             </div>
           </div>
           <div className="mt-8 border-t border-white/8 pt-8 text-[11px] text-white/28">
@@ -1675,7 +1677,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
               </div>
               <h2 className="mb-3 text-[20px] font-bold leading-snug text-[#1E1B4B]">Controlled beta</h2>
               <p className="mb-6 text-[14px] leading-relaxed text-[#1E1B4B]/60">
-                one3seven is currently in controlled beta while Terms, Privacy, and consent language are under legal review. You can view the demos now. Real intake access is by invitation only.
+                one3seven is currently in controlled beta. Our Terms and Privacy Policy are published and remain under final legal review. You can view the demos now. Real intake access is by invitation only.
               </p>
               <div className="flex flex-col gap-2.5">
                 <a
