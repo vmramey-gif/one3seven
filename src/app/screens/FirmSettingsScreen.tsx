@@ -402,7 +402,7 @@ export function FirmSettingsScreen({
                 <span className="font-medium">{sub.subscriptionStatus}</span>
               </p>
               <p className="mt-2 text-xs text-[#1E1B4B]/52">
-                Beta Pilot is free while trialing. Starter Firm, Growth Firm, and Enterprise plans will connect through Stripe before paid launch.
+                Beta Pilot is free while trialing. Solo, Practice, Firm, and Enterprise plans will connect through Stripe before paid launch.
               </p>
             </div>
 
@@ -563,7 +563,7 @@ export function FirmSettingsScreen({
                 <p className="text-xs text-[#1E1B4B]/50">Unlimited intakes · Unlimited seats · Custom onboarding</p>
               </div>
               <a
-                href="mailto:hello@one3seven.com?subject=Enterprise%20inquiry"
+                href="mailto:info@one3seven.com?subject=Enterprise%20inquiry"
                 className="rounded-xl border border-[#DCD3FF] bg-white px-4 py-2 text-xs font-semibold text-[#6D4AFF] transition hover:bg-[#F7F3FF]"
               >
                 Contact us →

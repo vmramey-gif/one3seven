@@ -538,11 +538,20 @@ function TrainingTab() {
       <section>
         <h2 className="mb-2 text-[14px] font-bold">{CRM_COMMISSIONS.headline}</h2>
         <p className="mb-3 text-[13px] leading-relaxed text-[#1E1B4B]/65">{CRM_COMMISSIONS.intro}</p>
+        <div className="mb-3 rounded-[12px] border-2 border-[#6D4AFF]/40 bg-[#F3EFFF] p-4">
+          <div className="mb-2 text-[14px] font-bold text-[#1E1B4B]">{CRM_COMMISSIONS.rule}</div>
+          <ul className="space-y-1">
+            {CRM_COMMISSIONS.examples.map((e) => (
+              <li key={e} className="flex gap-2 text-[13px] text-[#1E1B4B]/75">
+                <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#8B6DFF]" /><span>{e}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
         <ul className="mb-3 space-y-1.5">
-          {CRM_COMMISSIONS.lines.map((l) => (
+          {CRM_COMMISSIONS.rules.map((l) => (
             <li key={l} className="flex gap-2 text-[13px] leading-relaxed text-[#1E1B4B]/75">
-              <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#8B6DFF]" />
-              <span>{l}</span>
+              <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#8B6DFF]" /><span>{l}</span>
             </li>
           ))}
         </ul>

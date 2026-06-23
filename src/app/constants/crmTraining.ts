@@ -49,14 +49,19 @@ export const PI_RULES = [
 export const CRM_COMMISSIONS = {
   headline: 'Commission — paid after a free demo converts',
   intro:
-    'You earn commission when a firm you worked converts to a PAID plan after the free 30-day pilot. The free demo and the pilot are not commissionable on their own — commission is tied to a paid conversion.',
-  // PLACEHOLDERS — founder to replace with the real, agreed figures.
-  lines: [
-    'Demo booked: [SET BY FOUNDER] (e.g., flag only, no payout)',
-    'Pilot started (free 30-day): [SET BY FOUNDER]',
-    'Paid conversion after pilot: [SET BY FOUNDER — e.g., $___ flat and/or ___% of first-year subscription]',
-    'Payout timing: [SET BY FOUNDER — e.g., after the firm’s first paid invoice clears]',
+    'You earn commission when a firm you sourced converts to a PAID plan after the free 30-day pilot. The free demo and the pilot pay nothing on their own — commission is tied to a paid conversion and pays out after the firm’s first invoice clears.',
+  rule: 'Your commission = the firm’s FIRST MONTH of subscription, paid once.',
+  examples: [
+    'Solo plan ($199/mo) → $199',
+    'Practice plan ($499/mo) → $499',
+    'Firm plan ($899/mo) → $899',
+    'Enterprise (custom) → set per deal',
+  ],
+  rules: [
+    'Paid on collection — after the firm’s first paid invoice clears, not at signature.',
+    'Demos and free pilots are not commissionable. Only paid conversions count.',
+    '60-day clawback — if the firm cancels within 60 days, the commission reverses.',
   ],
   note:
-    'DRAFT — these figures are placeholders, not a contract. The founder sets the actual commission plan; nothing here is binding until confirmed in writing.',
+    'Paid billing is not live yet (beta pilots are free), so payouts begin once paid plans go live — build the pipeline now, get paid when firms convert. Commission terms must be confirmed in a written rep agreement before any payout (required in California).',
 };
