@@ -117,6 +117,44 @@ export async function revokeRepInvite(id: string): Promise<{ error?: string }> {
   return {};
 }
 
+// ── Team chat (founder + reps share one channel) ─────────────────────────────
+
+export interface CrmMessage {
+  id: string;
+  sender_id: string;
+  sender_name: string | null;
+  body: string;
+  created_at: string;
+}
+
+/** Current member's display name + id, for labeling their messages. */
+export async function getCurrentMember(): Promise<{ id: string | null; name: string }> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { id: null, name: 'Member' };
+  const { data } = await supabase.from('profiles').select('full_name, email').eq('id', user.id).maybeSingle();
+  const name = (data?.full_name && data.full_name.trim()) || data?.email || user.email || 'Member';
+  return { id: user.id, name };
+}
+
+export async function listMessages(limit = 200): Promise<{ data: CrmMessage[]; error?: string }> {
+  const { data, error } = await supabase
+    .from('crm_messages')
+    .select('*')
+    .order('created_at', { ascending: true })
+    .limit(limit);
+  if (error) return { data: [], error: error.message };
+  return { data: (data ?? []) as CrmMessage[] };
+}
+
+export async function sendMessage(body: string, senderName: string): Promise<{ error?: string }> {
+  const text = body.trim();
+  if (!text) return { error: 'Message is empty.' };
+  // sender_id defaults to auth.uid() in the DB; RLS checks it matches the caller.
+  const { error } = await supabase.from('crm_messages').insert({ body: text, sender_name: senderName });
+  if (error) return { error: error.message };
+  return {};
+}
+
 /**
  * For a signed-in non-founder: provisions rep access if their email is on the allowlist.
  * Returns true if the caller is now (or already) an active rep. Errors are swallowed to false

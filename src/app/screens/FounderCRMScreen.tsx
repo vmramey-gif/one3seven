@@ -5,21 +5,22 @@
  * the database. Never shown to workers or firms.
  */
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Phone, Mail, Calendar, ArrowLeft, Plus, X, TrendingUp,
   ClipboardList, LayoutGrid, Building2, BookOpen, BarChart3, CheckCircle2,
-  GraduationCap, AlertTriangle, Flame, ListChecks, Check,
+  GraduationCap, AlertTriangle, Flame, ListChecks, Check, MessageSquare, Send,
 } from 'lucide-react';
 import {
   listFirms, listActivity, addFirm, logActivity,
-  type CrmFirm, type CrmActivityWithFirm, type NewFirmInput, type LogActivityInput,
+  listMessages, sendMessage, getCurrentMember,
+  type CrmFirm, type CrmActivityWithFirm, type NewFirmInput, type LogActivityInput, type CrmMessage,
 } from '../../services/crmService';
 import { CRM_STAGES, CRM_STAGE_LABELS, type CrmStage } from '../../services/crmStageLogic';
 import { CRM_WEEKLY_TARGETS, CRM_CALL_SCRIPT, CRM_OBJECTIONS, CRM_COLD_EMAIL } from '../constants/crmReference';
 import { FIRE_DEMO_TRAINING, PI_RULES, CRM_COMMISSIONS, LAUNCH_CHECKLIST } from '../constants/crmTraining';
 
-type Tab = 'dashboard' | 'pipeline' | 'firms' | 'activity' | 'metrics' | 'scripts' | 'training' | 'checklist' | 'add';
+type Tab = 'dashboard' | 'pipeline' | 'firms' | 'activity' | 'metrics' | 'team' | 'scripts' | 'training' | 'checklist' | 'add';
 
 // `founderOnly` tabs are hidden from sales reps.
 const TABS: { id: Tab; label: string; icon: typeof LayoutGrid; founderOnly?: boolean }[] = [
@@ -28,6 +29,7 @@ const TABS: { id: Tab; label: string; icon: typeof LayoutGrid; founderOnly?: boo
   { id: 'firms', label: 'Firms', icon: Building2 },
   { id: 'activity', label: 'Activity', icon: ClipboardList },
   { id: 'metrics', label: 'Metrics', icon: BarChart3 },
+  { id: 'team', label: 'Team', icon: MessageSquare },
   { id: 'scripts', label: 'Scripts', icon: BookOpen },
   { id: 'training', label: 'Training', icon: GraduationCap },
   { id: 'checklist', label: 'Checklist', icon: ListChecks, founderOnly: true },
@@ -160,6 +162,7 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
             {tab === 'firms' && <FirmsTab firms={firms} onLog={openFast} />}
             {tab === 'activity' && <ActivityTab activity={activity} />}
             {tab === 'metrics' && <MetricsTab firms={firms} activity={activity} />}
+            {tab === 'team' && <TeamTab />}
             {tab === 'scripts' && <ScriptsTab />}
             {tab === 'training' && <TrainingTab />}
             {tab === 'checklist' && isFounder && <ChecklistTab />}
@@ -485,6 +488,78 @@ function ScriptsTab() {
         <h2 className="mb-2 text-[14px] font-bold">Cold email template</h2>
         <pre className="whitespace-pre-wrap rounded-[12px] border border-[#E7E1FF] bg-white p-4 text-[13px] leading-relaxed text-[#1E1B4B]/75">{CRM_COLD_EMAIL}</pre>
       </section>
+    </div>
+  );
+}
+
+// ── Team chat (founder + reps, one shared channel) ───────────────────────────
+function TeamTab() {
+  const [messages, setMessages] = useState<CrmMessage[]>([]);
+  const [me, setMe] = useState<{ id: string | null; name: string }>({ id: null, name: 'Member' });
+  const [body, setBody] = useState('');
+  const [sending, setSending] = useState(false);
+  const [err, setErr] = useState('');
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  const load = async () => { const r = await listMessages(); if (!r.error) setMessages(r.data); };
+
+  useEffect(() => {
+    let active = true;
+    void (async () => { setMe(await getCurrentMember()); if (active) await load(); })();
+    const iv = setInterval(() => { if (active) void load(); }, 10000); // light poll so it feels live
+    return () => { active = false; clearInterval(iv); };
+  }, []);
+
+  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages.length]);
+
+  const send = async () => {
+    if (!body.trim()) return;
+    setSending(true); setErr('');
+    const r = await sendMessage(body, me.name);
+    setSending(false);
+    if (r.error) { setErr(r.error); return; }
+    setBody('');
+    await load();
+  };
+
+  return (
+    <div className="flex flex-col" style={{ minHeight: '62vh' }}>
+      <p className="mb-3 text-[12px] leading-relaxed text-[#1E1B4B]/55">
+        Team chat — the founder and all sales reps share this channel. Everyone here sees these messages.
+      </p>
+      <div className="flex-1 space-y-2 overflow-y-auto rounded-[12px] border border-[#E7E1FF] bg-white p-3">
+        {messages.length === 0 ? (
+          <p className="py-12 text-center text-[13px] text-[#1E1B4B]/40">No messages yet. Say hi 👋</p>
+        ) : (
+          messages.map((m) => {
+            const mine = !!me.id && m.sender_id === me.id;
+            return (
+              <div key={m.id} className={`flex ${mine ? 'justify-end' : 'justify-start'}`}>
+                <div className={`max-w-[82%] rounded-[14px] px-3.5 py-2 ${mine ? 'bg-[#6D4AFF] text-white' : 'bg-[#F3EFFF] text-[#1E1B4B]'}`}>
+                  {!mine && <div className="mb-0.5 text-[11px] font-bold text-[#6D4AFF]">{m.sender_name || 'Member'}</div>}
+                  <div className="whitespace-pre-wrap text-[13px] leading-relaxed">{m.body}</div>
+                  <div className={`mt-0.5 text-[10px] ${mine ? 'text-white/60' : 'text-[#1E1B4B]/40'}`}>{new Date(m.created_at).toLocaleString()}</div>
+                </div>
+              </div>
+            );
+          })
+        )}
+        <div ref={bottomRef} />
+      </div>
+      {err && <p className="mt-2 text-[12px] text-red-600">{err}</p>}
+      <div className="mt-2 flex gap-2">
+        <textarea
+          value={body}
+          onChange={(e) => setBody(e.target.value)}
+          placeholder="Message the team… (Ctrl/⌘+Enter to send)"
+          rows={2}
+          onKeyDown={(e) => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); void send(); } }}
+          className="flex-1 rounded-[12px] border border-[#E7E1FF] px-3 py-2.5 text-sm outline-none focus:border-[#6D4AFF]"
+        />
+        <button type="button" onClick={send} disabled={sending || !body.trim()} className={`flex ${tap} shrink-0 items-center gap-1.5 rounded-full bg-[#6D4AFF] px-5 font-semibold text-white disabled:opacity-40`}>
+          <Send className="h-4 w-4" /> Send
+        </button>
+      </div>
     </div>
   );
 }
