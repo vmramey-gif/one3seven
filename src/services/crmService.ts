@@ -79,6 +79,59 @@ const clean = (v: string | undefined | null): string | null => {
   return t ? t : null;
 };
 
+// ── Sales reps (founder-managed invite allowlist) ────────────────────────────
+
+export interface CrmInvite {
+  id: string;
+  email: string;
+  name: string | null;
+  status: 'invited' | 'accepted' | 'revoked';
+  created_at: string;
+}
+
+export async function addRepInvite(input: { name: string; email: string }): Promise<{ error?: string }> {
+  const email = input.email.trim().toLowerCase();
+  if (!email || !email.includes('@')) return { error: 'Enter a valid email address.' };
+  const { error } = await supabase
+    .from('crm_invites')
+    .insert({ email, name: clean(input.name), status: 'invited' });
+  if (error) {
+    if (error.code === '23505') return { error: 'That email is already invited.' };
+    return { error: error.message };
+  }
+  return {};
+}
+
+export async function listRepInvites(): Promise<{ data: CrmInvite[]; error?: string }> {
+  const { data, error } = await supabase
+    .from('crm_invites')
+    .select('*')
+    .order('created_at', { ascending: false });
+  if (error) return { data: [], error: error.message };
+  return { data: (data ?? []) as CrmInvite[] };
+}
+
+export async function revokeRepInvite(id: string): Promise<{ error?: string }> {
+  const { error } = await supabase.from('crm_invites').update({ status: 'revoked' }).eq('id', id);
+  if (error) return { error: error.message };
+  return {};
+}
+
+/**
+ * For a signed-in non-founder: provisions rep access if their email is on the allowlist.
+ * Returns true if the caller is now (or already) an active rep. Errors are swallowed to false
+ * (e.g. if the migration isn't applied yet) so founder access is never affected.
+ */
+export async function claimRepAccess(): Promise<boolean> {
+  try {
+    const { data, error } = await supabase.rpc('claim_crm_rep_access');
+    if (error) return false;
+    return data === true;
+  } catch {
+    return false;
+  }
+}
+
 export async function listFirms(): Promise<{ data: CrmFirm[]; error?: string }> {
   const { data, error } = await supabase
     .from('crm_firms')

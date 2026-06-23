@@ -1,18 +1,19 @@
 /**
- * one3sevenHQ — dedicated internal entry for the founder. Separate from the worker/firm
- * product: its own branded landing + sign-in, gating into the founder CRM. Reached at /hq.
+ * one3sevenHQ — dedicated internal entry. Founder + invited sales reps. Reached at /hq.
  *
- * Access is gated two ways: this screen only opens the CRM for a session whose profile has
- * is_founder = true, AND the CRM's data is protected by founder-only RLS at the database level.
- * A non-founder who signs in here sees an "not authorized" state and no data.
+ * Auth is plain email (no SMS/phone provider needed). Access is gated two ways: the founder is
+ * is_founder; reps are provisioned only if their signed-in email is on the founder's invite
+ * allowlist (claim_crm_rep_access). All CRM data is RLS-locked to CRM members at the database
+ * level, so the UI gate is backed by the database.
  */
 
 import { useEffect, useState } from 'react';
-import { ArrowRight, Lock, ShieldCheck } from 'lucide-react';
+import { ArrowRight, Lock, ShieldCheck, Users, Plus, Check, Trash2 } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
 import { FounderCRMScreen } from './FounderCRMScreen';
+import { addRepInvite, listRepInvites, revokeRepInvite, claimRepAccess, type CrmInvite } from '../../services/crmService';
 
-type Status = 'loading' | 'anon' | 'not_founder' | 'founder';
+type Status = 'loading' | 'anon' | 'rep' | 'founder' | 'not_authorized';
 
 function HQWordMark() {
   return (
@@ -23,46 +24,56 @@ function HQWordMark() {
   );
 }
 
+const fieldCls =
+  'min-h-[48px] w-full rounded-[12px] border border-white/15 bg-white/5 px-4 text-[15px] text-white placeholder:text-white/35 outline-none focus:border-[#A78BFA]';
+
 export function FounderHQ() {
   const [status, setStatus] = useState<Status>('loading');
   const [showCRM, setShowCRM] = useState(false);
+
+  // Auth form
+  const [mode, setMode] = useState<'signin' | 'signup'>('signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [signingIn, setSigningIn] = useState(false);
+  const [notice, setNotice] = useState('');
+  const [busy, setBusy] = useState(false);
 
   const check = async () => {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session?.user) { setStatus('anon'); return; }
-    const { data } = await supabase
-      .from('profiles')
-      .select('is_founder')
-      .eq('id', session.user.id)
-      .maybeSingle();
-    setStatus(data?.is_founder ? 'founder' : 'not_founder');
+    const { data } = await supabase.from('profiles').select('is_founder').eq('id', session.user.id).maybeSingle();
+    if (data?.is_founder) { setStatus('founder'); return; }
+    const isRep = await claimRepAccess();
+    setStatus(isRep ? 'rep' : 'not_authorized');
   };
 
   useEffect(() => { void check(); }, []);
 
-  const signIn = async (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    setSigningIn(true);
-    const { error: err } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
-    setSigningIn(false);
-    if (err) { setError('Sign in failed. Check your email and password.'); return; }
-    setStatus('loading');
-    await check();
+    setError(''); setNotice(''); setBusy(true);
+    if (mode === 'signin') {
+      const { error: err } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+      setBusy(false);
+      if (err) { setError('Sign in failed. Check your email and password.'); return; }
+      setStatus('loading'); await check();
+    } else {
+      const { data, error: err } = await supabase.auth.signUp({ email: email.trim(), password });
+      setBusy(false);
+      if (err) { setError(err.message); return; }
+      if (data.session) { setStatus('loading'); await check(); }
+      else { setNotice('Account created. Check your email to confirm, then sign in.'); setMode('signin'); }
+    }
   };
 
   const signOut = async () => {
     await supabase.auth.signOut();
-    setShowCRM(false);
-    setEmail(''); setPassword('');
+    setShowCRM(false); setEmail(''); setPassword(''); setError(''); setNotice('');
     setStatus('anon');
   };
 
-  if (showCRM && status === 'founder') {
+  if (showCRM && (status === 'founder' || status === 'rep')) {
     return <FounderCRMScreen onExit={() => setShowCRM(false)} />;
   }
 
@@ -72,19 +83,19 @@ export function FounderHQ() {
         <div className="mx-auto max-w-md"><HQWordMark /></div>
       </header>
 
-      <main className="mx-auto flex max-w-md flex-col px-5 py-16">
-        {status === 'loading' && (
-          <div className="py-16 text-center text-sm text-white/40">Loading…</div>
-        )}
+      <main className="mx-auto flex max-w-md flex-col px-5 py-14">
+        {status === 'loading' && <div className="py-16 text-center text-sm text-white/40">Loading…</div>}
 
-        {status === 'founder' && (
+        {(status === 'founder' || status === 'rep') && (
           <div>
             <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#6D4AFF]/40 bg-[#6D4AFF]/15 px-3 py-1.5 text-xs font-semibold text-[#C7B9FF]">
-              <ShieldCheck className="h-3.5 w-3.5" /> Founder access
+              <ShieldCheck className="h-3.5 w-3.5" /> {status === 'founder' ? 'Founder access' : 'Sales rep access'}
             </div>
             <h1 className="mb-3 text-[30px] font-bold leading-tight tracking-tight">one3seven HQ</h1>
-            <p className="mb-8 text-[15px] leading-relaxed text-white/60">
-              Internal command center. Your sales pipeline, firm outreach, and activity tracker — for your eyes only.
+            <p className="mb-7 text-[15px] leading-relaxed text-white/60">
+              {status === 'founder'
+                ? 'Internal command center. Your sales pipeline, firm outreach, and team.'
+                : 'Your team sales pipeline — firm outreach and call logging.'}
             </p>
             <button
               type="button"
@@ -93,20 +104,19 @@ export function FounderHQ() {
             >
               Open Sales CRM <ArrowRight className="h-5 w-5" />
             </button>
-            <button type="button" onClick={signOut} className="mt-6 w-full text-center text-[13px] text-white/40 hover:text-white/70">
-              Sign out
-            </button>
+
+            {status === 'founder' && <RepsManager />}
+
+            <button type="button" onClick={signOut} className="mt-8 w-full text-center text-[13px] text-white/40 hover:text-white/70">Sign out</button>
           </div>
         )}
 
-        {status === 'not_founder' && (
+        {status === 'not_authorized' && (
           <div className="text-center">
-            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-white/10">
-              <Lock className="h-6 w-6 text-white/60" />
-            </div>
-            <h1 className="mb-2 text-[22px] font-bold">Not authorized</h1>
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-white/10"><Lock className="h-6 w-6 text-white/60" /></div>
+            <h1 className="mb-2 text-[22px] font-bold">Not on the team yet</h1>
             <p className="mb-6 text-[14px] leading-relaxed text-white/55">
-              This account doesn’t have HQ access. one3seven HQ is internal tooling for the founder only.
+              This account isn’t on the one3seven HQ access list. Ask the founder to invite your email, then sign in here.
             </p>
             <button type="button" onClick={signOut} className="text-[13px] text-[#C7B9FF] hover:underline">Sign in with a different account</button>
             <div className="mt-4"><a href="/" className="text-[13px] text-white/40 hover:text-white/70">Back to one3seven</a></div>
@@ -116,40 +126,97 @@ export function FounderHQ() {
         {status === 'anon' && (
           <div>
             <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/15 px-3 py-1.5 text-xs font-semibold text-white/55">
-              <Lock className="h-3.5 w-3.5" /> Internal · founder only
+              <Lock className="h-3.5 w-3.5" /> Internal · invite only
             </div>
             <h1 className="mb-2 text-[28px] font-bold leading-tight tracking-tight">one3seven HQ</h1>
-            <p className="mb-7 text-[14px] leading-relaxed text-white/55">Sign in to access the command center.</p>
-            <form onSubmit={signIn} className="space-y-3">
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Email"
-                autoComplete="username"
-                className="min-h-[48px] w-full rounded-[12px] border border-white/15 bg-white/5 px-4 text-[15px] text-white placeholder:text-white/35 outline-none focus:border-[#A78BFA]"
-              />
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password"
-                autoComplete="current-password"
-                className="min-h-[48px] w-full rounded-[12px] border border-white/15 bg-white/5 px-4 text-[15px] text-white placeholder:text-white/35 outline-none focus:border-[#A78BFA]"
-              />
+            <p className="mb-7 text-[14px] leading-relaxed text-white/55">
+              {mode === 'signin' ? 'Sign in to access the command center.' : 'Create your account with the email you were invited on.'}
+            </p>
+            <form onSubmit={submit} className="space-y-3">
+              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" autoComplete="username" className={fieldCls} />
+              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" autoComplete={mode === 'signin' ? 'current-password' : 'new-password'} className={fieldCls} />
               {error && <p className="text-[13px] text-red-300">{error}</p>}
-              <button
-                type="submit"
-                disabled={signingIn || !email || !password}
-                className="flex min-h-[52px] w-full items-center justify-center gap-2 rounded-full bg-[#6D4AFF] text-[16px] font-semibold text-white transition hover:bg-[#5B35D5] disabled:opacity-40"
-              >
-                {signingIn ? 'Signing in…' : 'Sign in'} <ArrowRight className="h-5 w-5" />
+              {notice && <p className="text-[13px] text-emerald-300">{notice}</p>}
+              <button type="submit" disabled={busy || !email || !password} className="flex min-h-[52px] w-full items-center justify-center gap-2 rounded-full bg-[#6D4AFF] text-[16px] font-semibold text-white transition hover:bg-[#5B35D5] disabled:opacity-40">
+                {busy ? 'Working…' : mode === 'signin' ? 'Sign in' : 'Create account'} <ArrowRight className="h-5 w-5" />
               </button>
             </form>
+            <button
+              type="button"
+              onClick={() => { setMode(mode === 'signin' ? 'signup' : 'signin'); setError(''); setNotice(''); }}
+              className="mt-4 w-full text-center text-[13px] text-[#C7B9FF] hover:underline"
+            >
+              {mode === 'signin' ? 'Invited rep? Create your account' : 'Already have an account? Sign in'}
+            </button>
             <div className="mt-6 text-center"><a href="/" className="text-[13px] text-white/40 hover:text-white/70">Back to one3seven</a></div>
           </div>
         )}
       </main>
+    </div>
+  );
+}
+
+// ── Founder-only: manage sales reps ──────────────────────────────────────────
+function RepsManager() {
+  const [invites, setInvites] = useState<CrmInvite[]>([]);
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
+
+  const load = async () => { const r = await listRepInvites(); if (!r.error) setInvites(r.data); };
+  useEffect(() => { void load(); }, []);
+
+  const add = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(''); setBusy(true);
+    const r = await addRepInvite({ name, email });
+    setBusy(false);
+    if (r.error) { setError(r.error); return; }
+    setName(''); setEmail(''); void load();
+  };
+
+  const revoke = async (id: string) => { await revokeRepInvite(id); void load(); };
+  const hqLink = typeof window !== 'undefined' ? `${window.location.origin}/hq` : '/hq';
+
+  return (
+    <div className="mt-8 rounded-[16px] border border-white/10 bg-white/5 p-5">
+      <div className="mb-3 flex items-center gap-2 text-[14px] font-bold"><Users className="h-4 w-4 text-[#A78BFA]" /> Sales reps</div>
+      <form onSubmit={add} className="space-y-2.5">
+        <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Rep name" className={fieldCls} />
+        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Rep email" className={fieldCls} />
+        {error && <p className="text-[13px] text-red-300">{error}</p>}
+        <button type="submit" disabled={busy || !email} className="flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full bg-white/10 text-[14px] font-semibold text-white transition hover:bg-white/15 disabled:opacity-40">
+          <Plus className="h-4 w-4" /> {busy ? 'Adding…' : 'Add sales rep'}
+        </button>
+      </form>
+
+      <p className="mt-3 rounded-[10px] bg-[#6D4AFF]/15 px-3 py-2 text-[12px] leading-relaxed text-[#C7B9FF]">
+        Share this link with reps: <span className="font-semibold text-white">{hqLink}</span> — they create an account / sign in with the email you invited.
+      </p>
+
+      {invites.length > 0 && (
+        <div className="mt-4 space-y-2">
+          {invites.map((i) => (
+            <div key={i.id} className="flex items-center justify-between gap-2 rounded-[10px] border border-white/10 px-3 py-2">
+              <div className="min-w-0">
+                <div className="truncate text-[13px] font-semibold text-white">{i.name || i.email}</div>
+                <div className="truncate text-[11px] text-white/45">{i.email}</div>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${i.status === 'accepted' ? 'bg-emerald-500/20 text-emerald-300' : i.status === 'revoked' ? 'bg-white/10 text-white/40' : 'bg-amber-500/20 text-amber-200'}`}>
+                  {i.status === 'accepted' ? <Check className="inline h-3 w-3" /> : null} {i.status}
+                </span>
+                {i.status !== 'revoked' && (
+                  <button type="button" onClick={() => revoke(i.id)} className="flex h-8 w-8 items-center justify-center rounded-full text-white/40 hover:bg-white/10 hover:text-red-300" aria-label="Revoke">
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
