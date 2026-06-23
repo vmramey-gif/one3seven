@@ -79,6 +79,40 @@ const clean = (v: string | undefined | null): string | null => {
   return t ? t : null;
 };
 
+// ── Shared team notes board ──────────────────────────────────────────────────
+
+export interface CrmNote {
+  id: string;
+  author_id: string;
+  author_name: string | null;
+  body: string;
+  created_at: string;
+}
+
+export async function listNotes(limit = 200): Promise<{ data: CrmNote[]; error?: string }> {
+  const { data, error } = await supabase
+    .from('crm_notes')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(limit);
+  if (error) return { data: [], error: error.message };
+  return { data: (data ?? []) as CrmNote[] };
+}
+
+export async function addNote(body: string, authorName: string): Promise<{ error?: string }> {
+  const text = body.trim();
+  if (!text) return { error: 'Note is empty.' };
+  const { error } = await supabase.from('crm_notes').insert({ body: text, author_name: authorName });
+  if (error) return { error: error.message };
+  return {};
+}
+
+export async function deleteNote(id: string): Promise<{ error?: string }> {
+  const { error } = await supabase.from('crm_notes').delete().eq('id', id);
+  if (error) return { error: error.message };
+  return {};
+}
+
 // ── Sales reps (founder-managed invite allowlist) ────────────────────────────
 
 export interface CrmInvite {

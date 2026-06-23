@@ -9,18 +9,19 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Phone, Mail, Calendar, ArrowLeft, Plus, X, TrendingUp,
   ClipboardList, LayoutGrid, Building2, BookOpen, BarChart3, CheckCircle2,
-  GraduationCap, AlertTriangle, Flame, ListChecks, Check, MessageSquare, Send,
+  GraduationCap, AlertTriangle, Flame, ListChecks, Check, MessageSquare, Send, StickyNote, Trash2,
 } from 'lucide-react';
 import {
   listFirms, listActivity, addFirm, logActivity,
   listMessages, sendMessage, getCurrentMember,
-  type CrmFirm, type CrmActivityWithFirm, type NewFirmInput, type LogActivityInput, type CrmMessage,
+  listNotes, addNote, deleteNote,
+  type CrmFirm, type CrmActivityWithFirm, type NewFirmInput, type LogActivityInput, type CrmMessage, type CrmNote,
 } from '../../services/crmService';
 import { CRM_STAGES, CRM_STAGE_LABELS, type CrmStage } from '../../services/crmStageLogic';
 import { CRM_WEEKLY_TARGETS, CRM_CALL_SCRIPT, CRM_OBJECTIONS, CRM_COLD_EMAIL } from '../constants/crmReference';
 import { FIRE_DEMO_TRAINING, PI_RULES, CRM_COMMISSIONS, LAUNCH_CHECKLIST } from '../constants/crmTraining';
 
-type Tab = 'dashboard' | 'pipeline' | 'firms' | 'activity' | 'metrics' | 'team' | 'scripts' | 'training' | 'checklist' | 'add';
+type Tab = 'dashboard' | 'pipeline' | 'firms' | 'activity' | 'metrics' | 'team' | 'notes' | 'scripts' | 'training' | 'checklist' | 'add';
 
 // `founderOnly` tabs are hidden from sales reps.
 const TABS: { id: Tab; label: string; icon: typeof LayoutGrid; founderOnly?: boolean }[] = [
@@ -30,6 +31,7 @@ const TABS: { id: Tab; label: string; icon: typeof LayoutGrid; founderOnly?: boo
   { id: 'activity', label: 'Activity', icon: ClipboardList },
   { id: 'metrics', label: 'Metrics', icon: BarChart3 },
   { id: 'team', label: 'Team', icon: MessageSquare },
+  { id: 'notes', label: 'Notes', icon: StickyNote },
   { id: 'scripts', label: 'Scripts', icon: BookOpen },
   { id: 'training', label: 'Training', icon: GraduationCap },
   { id: 'checklist', label: 'Checklist', icon: ListChecks, founderOnly: true },
@@ -163,6 +165,7 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
             {tab === 'activity' && <ActivityTab activity={activity} />}
             {tab === 'metrics' && <MetricsTab firms={firms} activity={activity} />}
             {tab === 'team' && <TeamTab />}
+            {tab === 'notes' && <NotesTab isFounder={isFounder} />}
             {tab === 'scripts' && <ScriptsTab />}
             {tab === 'training' && <TrainingTab />}
             {tab === 'checklist' && isFounder && <ChecklistTab />}
@@ -560,6 +563,80 @@ function TeamTab() {
           <Send className="h-4 w-4" /> Send
         </button>
       </div>
+    </div>
+  );
+}
+
+// ── Shared team notes board ──────────────────────────────────────────────────
+function NotesTab({ isFounder }: { isFounder: boolean }) {
+  const [notes, setNotes] = useState<CrmNote[]>([]);
+  const [me, setMe] = useState<{ id: string | null; name: string }>({ id: null, name: 'Member' });
+  const [body, setBody] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState('');
+
+  const load = async () => { const r = await listNotes(); if (!r.error) setNotes(r.data); };
+  useEffect(() => { void (async () => { setMe(await getCurrentMember()); await load(); })(); }, []);
+
+  const post = async () => {
+    if (!body.trim()) return;
+    setBusy(true); setErr('');
+    const r = await addNote(body, me.name);
+    setBusy(false);
+    if (r.error) { setErr(r.error); return; }
+    setBody(''); await load();
+  };
+
+  const remove = async (id: string) => {
+    const r = await deleteNote(id);
+    if (r.error) { setErr(r.error); return; }
+    void load();
+  };
+
+  return (
+    <div className="space-y-4">
+      <p className="text-[12px] leading-relaxed text-[#1E1B4B]/55">
+        Shared team notes — tips, reminders, what’s working. Everyone on the team sees these.
+      </p>
+      <div className="rounded-[12px] border border-[#E7E1FF] bg-white p-3">
+        <textarea
+          value={body}
+          onChange={(e) => setBody(e.target.value)}
+          placeholder="Add a note for the team…"
+          rows={3}
+          className="w-full rounded-[10px] border border-[#E7E1FF] px-3 py-2.5 text-sm outline-none focus:border-[#6D4AFF]"
+        />
+        {err && <p className="mt-2 text-[12px] text-red-600">{err}</p>}
+        <button type="button" onClick={post} disabled={busy || !body.trim()} className={`mt-2 flex ${tap} w-full items-center justify-center gap-2 rounded-full bg-[#6D4AFF] font-semibold text-white disabled:opacity-40`}>
+          <Plus className="h-4 w-4" /> {busy ? 'Posting…' : 'Add note'}
+        </button>
+      </div>
+
+      {notes.length === 0 ? (
+        <p className="rounded-[12px] border border-[#E7E1FF] bg-white px-4 py-3 text-[13px] text-[#1E1B4B]/45">No notes yet. Add the first one.</p>
+      ) : (
+        <div className="space-y-2">
+          {notes.map((n) => {
+            const canDelete = isFounder || (!!me.id && n.author_id === me.id);
+            return (
+              <div key={n.id} className="rounded-[12px] border border-[#E7E1FF] bg-white p-3.5">
+                <div className="mb-1 flex items-center justify-between gap-2">
+                  <span className="text-[12px] font-bold text-[#6D4AFF]">{n.author_name || 'Member'}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[11px] text-[#1E1B4B]/40">{new Date(n.created_at).toLocaleString()}</span>
+                    {canDelete && (
+                      <button type="button" onClick={() => remove(n.id)} className="flex h-7 w-7 items-center justify-center rounded-full text-[#1E1B4B]/35 hover:bg-red-50 hover:text-red-500" aria-label="Delete note">
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+                <p className="whitespace-pre-wrap text-[13px] leading-relaxed text-[#1E1B4B]/80">{n.body}</p>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
