@@ -6,6 +6,7 @@ import { SupabaseConfigRequired } from './app/components/SupabaseConfigRequired.
 import { AppErrorBoundary } from './app/components/AppErrorBoundary.tsx';
 import { DemoApp } from './app/screens/DemoApp.tsx';
 import { WorkerDemoPage } from './app/screens/WorkerDemoPage.tsx';
+import { FireWorkerDemoPage } from './app/screens/FireWorkerDemoPage.tsx';
 import { TermsPage } from './app/screens/TermsPage.tsx';
 import { PrivacyPage } from './app/screens/PrivacyPage.tsx';
 import { OFFLINE_DEV_GALLERY_ONLY } from './lib/supabaseAvailability.ts';
@@ -24,6 +25,10 @@ const isDemo =
 const isWorkerDemo =
   url.searchParams.has('worker-demo') ||
   url.pathname === '/worker-demo';
+
+const isFireDemo =
+  url.searchParams.has('fire-demo') ||
+  url.pathname === '/fire-demo';
 
 // Stripe billing return — ?billing=success|canceled|portal_return
 // Store in sessionStorage so App.tsx can surface a notification, then strip from URL.
@@ -52,6 +57,10 @@ if (url.pathname === '/terms') {
   createRoot(rootEl).render(<AppErrorBoundary><TermsPage /></AppErrorBoundary>);
 } else if (url.pathname === '/privacy') {
   createRoot(rootEl).render(<AppErrorBoundary><PrivacyPage /></AppErrorBoundary>);
+} else if (isFireDemo) {
+  createRoot(rootEl).render(
+    <AppErrorBoundary><FireWorkerDemoPage /></AppErrorBoundary>
+  );
 } else if (isWorkerDemo) {
   createRoot(rootEl).render(
     <AppErrorBoundary><WorkerDemoPage /></AppErrorBoundary>
