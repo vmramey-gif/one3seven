@@ -108,6 +108,8 @@ export type ProfileRow = {
   email: string | null;
   full_name: string | null;
   role: 'worker' | 'firm' | null;
+  /** Founder-only internal tooling (CRM) access. Set operator-side; never via the app. */
+  is_founder?: boolean | null;
   created_at: string;
   // Worker contact details (persisted in DB — see migration 20260609_worker_contact_details)
   middle_initial?: string | null;

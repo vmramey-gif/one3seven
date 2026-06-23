@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { GalleryScreen } from './screens/GalleryScreen';
 import { DevNavMapScreen } from './screens/DevNavMapScreen';
 import { AuthWelcomeScreen } from './screens/AuthWelcomeScreen';
+import { FounderCRMScreen } from './screens/FounderCRMScreen';
 import { PublicMarketingPage } from './screens/PublicMarketingPage';
 import { ForFirmsPage } from './screens/ForFirmsPage';
 import { SignInScreen } from './screens/SignInScreen';
@@ -188,7 +189,8 @@ export type Screen =
   | 'firmSettings'
   | 'comparison'
   | 'firmDirectedIntake'
-  | 'forFirms';
+  | 'forFirms'
+  | 'founderCRM';
 
 const AUTH_FLOW_SCREENS: Screen[] = ['publicMarketing', 'authWelcome', 'signIn', 'createAccount', 'roleSelection', 'workerDetails'];
 
@@ -408,6 +410,13 @@ export default function App() {
   useEffect(() => {
     currentIntakeWorkspaceIdRef.current = currentIntakeWorkspace.id;
   }, [currentIntakeWorkspace.id]);
+
+  // Founder CRM is internal-only. If a non-founder somehow lands on it, redirect home.
+  useEffect(() => {
+    if (currentScreen === 'founderCRM' && profile && !profile.is_founder) {
+      setCurrentScreen(profile.role === 'firm' ? 'firmDashboard' : 'landing');
+    }
+  }, [currentScreen, profile]);
 
   useEffect(() => {
     if (!profile?.id || profile.role !== 'worker') return;
@@ -3998,6 +4007,17 @@ export default function App() {
               />
             </motion.div>
           )}
+          {currentScreen === 'founderCRM' && profile?.is_founder && (
+            <motion.div
+              key="founderCRM"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+            >
+              <FounderCRMScreen onExit={() => setCurrentScreen(profile?.role === 'firm' ? 'firmDashboard' : 'landing')} />
+            </motion.div>
+          )}
           {currentScreen === 'firmDirectedIntake' && !firmDirectedContext && (
             <motion.div key="firmDirectedIntakeLoading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               className="flex min-h-screen items-center justify-center bg-[#F6F2FF]">
@@ -4963,6 +4983,16 @@ export default function App() {
             </motion.div>
           )}
         </AnimatePresence>
+        {isAuthenticated && profile?.is_founder && (currentScreen === 'landing' || currentScreen === 'firmDashboard') && (
+          <button
+            type="button"
+            onClick={() => setCurrentScreen('founderCRM')}
+            className="fixed bottom-5 right-5 z-40 flex min-h-[44px] items-center rounded-full bg-[#1E1B4B] px-5 text-sm font-semibold text-white shadow-lg transition hover:bg-[#2A2560]"
+            aria-label="Open sales CRM"
+          >
+            CRM
+          </button>
+        )}
       </div>
     </div>
   );
