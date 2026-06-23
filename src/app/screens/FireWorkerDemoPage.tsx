@@ -27,18 +27,24 @@ const INTAKE_STEPS = 3;
 const STORY_TEXT =
   "I worked at the Medline warehouse in Tracy for almost four years. For most of it I was missing overtime and barely getting meal breaks — I've got some pay stubs that show it. In March 2025 I finally filed a complaint with HR. A few weeks later I was passed over for a promotion and a written warning showed up on my file. Then on June 11th the warehouse burned down and the job was just gone. Now Medline is offering me a settlement with a release I'm supposed to sign — and I lost a lot of my paperwork in everything that happened. I don't even know what I still have.";
 
+// The real product's helpful-details set (employment intake) — 13 fields, matching
+// UploadScreen's follow-up section and its "Intake Completeness — X of 13" counter.
+// The settlement offer is NOT an intake question in the real product; it is a record
+// (an uploaded document) and surfaces in the timeline, not here.
 const OPTIONAL_FIELDS = [
-  { label: 'Full name used during employment', answer: 'Marcus Reyes' },
+  { label: 'Full Name Used During Employment', answer: 'Marcus Reyes' },
   { label: 'What employer or organization are these records connected to?', answer: 'Medline Industries — Tracy Distribution Center' },
-  { label: 'In what state did you primarily work?', answer: 'California' },
   { label: 'Approximate employment dates?', answer: 'June 2022 – June 11, 2026 (warehouse fire)' },
   { label: 'Are there key people involved?', answer: 'Supervisor Dana Kimura · HR Manager Rob Pacheco' },
+  { label: 'Were you working remotely at any point?', answer: 'No — on-site warehouse work' },
+  { label: 'Did you use your own phone, internet, vehicle, equipment, tools, or supplies for work?', answer: 'Sometimes used my own phone for shift coordination' },
+  { label: 'Were you reimbursed?', answer: 'No reimbursement received' },
   { label: 'Did you complain, report something, or ask HR/management for help?', answer: 'Yes — emailed HR a formal complaint March 14, 2025' },
   { label: 'Did anything change afterward?', answer: 'Passed over for promotion · written warning weeks later' },
+  { label: 'In what state did you primarily work?', answer: 'California' },
   { label: 'Are you currently employed there, or has employment ended?', answer: 'Employment ended — warehouse fire, June 11, 2026' },
-  { label: 'Have you received any settlement or separation offer?', answer: 'Yes — settlement offer with a release, received June 15, 2026' },
-  { label: 'Did you lose access to any records?', answer: 'Yes — many originals lost; recovering pay records through EDD and email' },
-  { label: 'Is there anything you\'d like to add before we begin organizing?', answer: 'I want everything in one place before I decide anything about the settlement.' },
+  { label: 'Do you recall signing an arbitration agreement?', answer: 'Not sure — no copy on hand' },
+  { label: 'Have you filed a complaint with any agency?', answer: 'Not yet' },
 ];
 
 type DemoDoc = {
@@ -504,7 +510,7 @@ function Step3Details({ onSubmit }: { onSubmit: () => void }) {
       <AnimatePresence>
         {allDone && (
           <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
-            <NextButton onClick={onSubmit} label="Submit intake" />
+            <NextButton onClick={onSubmit} label="Begin Organizing" />
           </motion.div>
         )}
       </AnimatePresence>
@@ -650,17 +656,11 @@ function PostDashboard({ onNext }: { onNext: () => void }) {
         <div className="shrink-0 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-[10px] font-bold text-emerald-700">Organized</div>
       </div>
 
-      {/* Readiness — an organization signal, never a judgment about the merits. */}
-      <div className="mb-5 rounded-[16px] border border-emerald-200 bg-emerald-50 p-5">
-        <div className="mb-1.5 flex items-center gap-2">
-          <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" />
-          <span className="text-[13px] font-bold text-emerald-800">Well-organized — ready to share</span>
-        </div>
-        <p className="text-[12px] leading-relaxed text-emerald-800/75">
-          {DOCS.length} records organized across 6 categories · a {TIMELINE.length}-event timeline · pay records, a written complaint, and employer documents all present.
-        </p>
-        <p className="mt-2 text-[11px] leading-relaxed text-emerald-800/55">
-          This reflects how organized your records are — not a judgment about your situation.
+      {/* Maturity message — matches the real summary screen (IntakeSummaryScreen),
+          not the demo-only Readiness band (which is gated behind counsel review). */}
+      <div className="mb-5 rounded-[16px] border border-[#DCD3FF] bg-[#F7F3FF] p-5">
+        <p className="text-[13px] leading-relaxed text-[#1E1B4B]/80">
+          Your story and records have been organized into a timeline and summary.
         </p>
       </div>
 
