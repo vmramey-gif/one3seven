@@ -8,6 +8,7 @@ import {
 } from '../../services/guidedFollowUpQuestionSuggestions';
 import { UPLOAD_REDACTION_NOTICE } from '../constants/caseCategories';
 import { INTAKE_OPENING_MICROCOPY, INTAKE_OPENING_SHELL } from '../constants/intakeOpeningPresentation';
+import { WORKER_STORY_REASSURANCE } from '../constants/workerStoryIntake';
 import { One3SevenDisclaimer } from '../components/One3SevenDisclaimer';
 
 const STEP_CONTEXT_EXAMPLES = [
@@ -531,6 +532,9 @@ export function GuidedIntakeScreen({
                 </h1>
                 <p className="text-sm text-[var(--o3s-text-muted)] leading-relaxed">
                   Optional — A few sentences is enough. You can add or edit details later.
+                </p>
+                <p className="text-sm text-[var(--o3s-text-muted)] leading-relaxed">
+                  {WORKER_STORY_REASSURANCE}
                 </p>
               </div>
               <div className="rounded-[14px] border border-[var(--o3s-border)] bg-[var(--o3s-bg)]/80 px-4 py-3">
