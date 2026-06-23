@@ -46,6 +46,39 @@ export const PI_RULES = [
   },
 ];
 
+/**
+ * Founder-only launch checklist — the plain-English path from "built" to "charging customers."
+ * Founder-facing only (reps never see it). Checkbox state persists in localStorage.
+ */
+export const LAUNCH_CHECKLIST: { group: string; items: { id: string; label: string; why: string }[] }[] = [
+  {
+    group: 'Legal & company — do these with a lawyer',
+    items: [
+      { id: 'llc', label: 'Finish forming One3Seven Ventures LLC', why: 'It’s submitted and pending. Confirm California approved it — until then there’s no liability shield protecting you personally.' },
+      { id: 'upl', label: 'Have a lawyer review the product for “are we practicing law?” (UPL)', why: 'one3seven organizes, never concludes. A one-hour review confirms you’re on the right side of that line.' },
+      { id: 'terms', label: 'Get the lawyer to finalize the Terms of Service & Privacy Policy', why: 'They’re published as drafts “pending review.” Counsel makes them final and binding.' },
+      { id: 'rep-agreement', label: 'Put the rep commission plan in a written agreement', why: 'California requires a written commission agreement. Use the “first month” rule from the Training tab.' },
+      { id: 'insurance', label: 'Look into E&O / liability insurance (optional but smart)', why: 'Standard protection for software that touches legal work.' },
+    ],
+  },
+  {
+    group: 'Payments — needed before you can charge firms',
+    items: [
+      { id: 'stripe-products', label: 'Create the Stripe prices: Solo $199, Practice $499, Firm $899', why: 'These are the plans already in the app; Stripe needs matching products to bill them.' },
+      { id: 'stripe-env', label: 'Add the Stripe price IDs to the app settings (env vars)', why: 'VITE_STRIPE_PRICE_SOLO / PRACTICE / FIRM — this “lights up” the paid plans so firms can subscribe.' },
+      { id: 'stripe-webhook', label: 'Turn on the payment webhook (stripe-webhook)', why: 'It’s built but not deployed yet. It flips a firm to “paid” automatically after they subscribe.' },
+      { id: 'stripe-test', label: 'Test a checkout in Stripe test mode', why: 'Confirm a firm can actually subscribe end-to-end before you go live.' },
+    ],
+  },
+  {
+    group: 'Safety checks',
+    items: [
+      { id: 'rls', label: 'Run the CRM access check (RLS spot-check)', why: 'Confirms no worker, firm, or non-invited person can see your pipeline. Do this before reps load real data.' },
+      { id: 'readiness-gate', label: 'Keep “Readiness”/exposure features demo-only until counsel signs off', why: 'They’re gated to the fire demo on purpose — don’t ship them to real users without a lawyer’s OK.' },
+    ],
+  },
+];
+
 export const CRM_COMMISSIONS = {
   headline: 'Commission — paid after a free demo converts',
   intro:

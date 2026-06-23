@@ -9,7 +9,7 @@ import { useEffect, useMemo, useState } from 'react';
 import {
   Phone, Mail, Calendar, ArrowLeft, Plus, X, TrendingUp,
   ClipboardList, LayoutGrid, Building2, BookOpen, BarChart3, CheckCircle2,
-  GraduationCap, AlertTriangle, Flame,
+  GraduationCap, AlertTriangle, Flame, ListChecks, Check,
 } from 'lucide-react';
 import {
   listFirms, listActivity, addFirm, logActivity,
@@ -17,11 +17,12 @@ import {
 } from '../../services/crmService';
 import { CRM_STAGES, CRM_STAGE_LABELS, type CrmStage } from '../../services/crmStageLogic';
 import { CRM_WEEKLY_TARGETS, CRM_CALL_SCRIPT, CRM_OBJECTIONS, CRM_COLD_EMAIL } from '../constants/crmReference';
-import { FIRE_DEMO_TRAINING, PI_RULES, CRM_COMMISSIONS } from '../constants/crmTraining';
+import { FIRE_DEMO_TRAINING, PI_RULES, CRM_COMMISSIONS, LAUNCH_CHECKLIST } from '../constants/crmTraining';
 
-type Tab = 'dashboard' | 'pipeline' | 'firms' | 'activity' | 'metrics' | 'scripts' | 'training' | 'add';
+type Tab = 'dashboard' | 'pipeline' | 'firms' | 'activity' | 'metrics' | 'scripts' | 'training' | 'checklist' | 'add';
 
-const TABS: { id: Tab; label: string; icon: typeof LayoutGrid }[] = [
+// `founderOnly` tabs are hidden from sales reps.
+const TABS: { id: Tab; label: string; icon: typeof LayoutGrid; founderOnly?: boolean }[] = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutGrid },
   { id: 'pipeline', label: 'Pipeline', icon: TrendingUp },
   { id: 'firms', label: 'Firms', icon: Building2 },
@@ -29,6 +30,7 @@ const TABS: { id: Tab; label: string; icon: typeof LayoutGrid }[] = [
   { id: 'metrics', label: 'Metrics', icon: BarChart3 },
   { id: 'scripts', label: 'Scripts', icon: BookOpen },
   { id: 'training', label: 'Training', icon: GraduationCap },
+  { id: 'checklist', label: 'Checklist', icon: ListChecks, founderOnly: true },
   { id: 'add', label: 'Add / Log', icon: Plus },
 ];
 
@@ -64,7 +66,7 @@ function PriorityBadge({ priority }: { priority: 'A' | 'B' | 'C' | null }) {
   return <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${c}`}>{priority}</span>;
 }
 
-export function FounderCRMScreen({ onExit }: { onExit: () => void }) {
+export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => void; isFounder?: boolean }) {
   const [tab, setTab] = useState<Tab>('dashboard');
   const [firms, setFirms] = useState<CrmFirm[]>([]);
   const [activity, setActivity] = useState<CrmActivityWithFirm[]>([]);
@@ -131,7 +133,7 @@ export function FounderCRMScreen({ onExit }: { onExit: () => void }) {
         {/* Tab bar — horizontally scrollable on mobile */}
         <div className="mx-auto max-w-3xl overflow-x-auto px-2 pb-1">
           <div className="flex gap-1">
-            {TABS.map((t) => (
+            {TABS.filter((t) => !t.founderOnly || isFounder).map((t) => (
               <button
                 key={t.id}
                 type="button"
@@ -160,6 +162,7 @@ export function FounderCRMScreen({ onExit }: { onExit: () => void }) {
             {tab === 'metrics' && <MetricsTab firms={firms} activity={activity} />}
             {tab === 'scripts' && <ScriptsTab />}
             {tab === 'training' && <TrainingTab />}
+            {tab === 'checklist' && isFounder && <ChecklistTab />}
             {tab === 'add' && (
               <AddLogTab firms={firms} lastFirmId={lastFirmId} onSaved={(fid) => { if (fid) setLastFirmId(fid); void load(); }} setError={setError} />
             )}
@@ -482,6 +485,68 @@ function ScriptsTab() {
         <h2 className="mb-2 text-[14px] font-bold">Cold email template</h2>
         <pre className="whitespace-pre-wrap rounded-[12px] border border-[#E7E1FF] bg-white p-4 text-[13px] leading-relaxed text-[#1E1B4B]/75">{CRM_COLD_EMAIL}</pre>
       </section>
+    </div>
+  );
+}
+
+// ── Launch checklist (founder-only) ──────────────────────────────────────────
+function ChecklistTab() {
+  const KEY = 'o3s_crm_checklist_v1';
+  const [done, setDone] = useState<Record<string, boolean>>(() => {
+    try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch { return {}; }
+  });
+  const toggle = (id: string) =>
+    setDone((prev) => {
+      const next = { ...prev, [id]: !prev[id] };
+      try { localStorage.setItem(KEY, JSON.stringify(next)); } catch { /* ignore */ }
+      return next;
+    });
+
+  const allItems = LAUNCH_CHECKLIST.flatMap((g) => g.items);
+  const completed = allItems.filter((i) => done[i.id]).length;
+  const pct = Math.round((completed / allItems.length) * 100);
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <div className="mb-1.5 flex items-center justify-between text-[13px] font-bold">
+          <span>Launch checklist</span>
+          <span className="text-[#6D4AFF]">{completed} of {allItems.length} done</span>
+        </div>
+        <div className="h-2.5 overflow-hidden rounded-full bg-[#EDE7FF]">
+          <div className="h-full rounded-full bg-[#6D4AFF] transition-all duration-500" style={{ width: `${pct}%` }} />
+        </div>
+        <p className="mt-2 text-[12px] leading-relaxed text-[#1E1B4B]/55">
+          Plain-English steps from “built” to “charging customers.” Tap to check off — saved on this device.
+        </p>
+      </div>
+
+      {LAUNCH_CHECKLIST.map((group) => (
+        <section key={group.group}>
+          <h3 className="mb-2 text-[13px] font-bold text-[#1E1B4B]">{group.group}</h3>
+          <div className="space-y-2">
+            {group.items.map((item) => {
+              const checked = !!done[item.id];
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => toggle(item.id)}
+                  className={`flex w-full items-start gap-3 rounded-[12px] border p-3.5 text-left transition ${checked ? 'border-emerald-200 bg-emerald-50' : 'border-[#E7E1FF] bg-white hover:border-[#C9BEF5]'}`}
+                >
+                  <span className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border ${checked ? 'border-emerald-500 bg-emerald-500 text-white' : 'border-[#C9BEF5] bg-white'}`}>
+                    {checked && <Check className="h-3.5 w-3.5" />}
+                  </span>
+                  <span className="min-w-0">
+                    <span className={`block text-[13px] font-semibold ${checked ? 'text-emerald-800 line-through' : 'text-[#1E1B4B]'}`}>{item.label}</span>
+                    <span className="mt-0.5 block text-[12px] leading-relaxed text-[#1E1B4B]/55">{item.why}</span>
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </section>
+      ))}
     </div>
   );
 }

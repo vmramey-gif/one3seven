@@ -74,7 +74,7 @@ export function FounderHQ() {
   };
 
   if (showCRM && (status === 'founder' || status === 'rep')) {
-    return <FounderCRMScreen onExit={() => setShowCRM(false)} />;
+    return <FounderCRMScreen onExit={() => setShowCRM(false)} isFounder={status === 'founder'} />;
   }
 
   return (
