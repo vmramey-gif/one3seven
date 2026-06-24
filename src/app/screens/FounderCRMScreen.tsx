@@ -9,7 +9,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Phone, Mail, Calendar, ArrowLeft, Plus, X, TrendingUp,
   ClipboardList, LayoutGrid, Building2, BookOpen, BarChart3, CheckCircle2,
-  GraduationCap, ListChecks, Check, MessageSquare, Send, StickyNote, Trash2, ChevronRight,
+  GraduationCap, ListChecks, Check, MessageSquare, Send, StickyNote, Trash2, ChevronRight, ShieldCheck, RefreshCw, AlertTriangle,
 } from 'lucide-react';
 import {
   listFirms, listActivity, addFirm, logActivity,
@@ -20,8 +20,9 @@ import {
 import { CRM_STAGES, CRM_STAGE_LABELS, type CrmStage } from '../../services/crmStageLogic';
 import { CRM_WEEKLY_TARGETS, CRM_CALL_SCRIPT, CRM_OBJECTIONS, CRM_COLD_EMAIL } from '../constants/crmReference';
 import { FIRE_DEMO_TRAINING, PI_RULES, CRM_COMMISSIONS, CRM_SUBSCRIPTION_TIERS, LAUNCH_CHECKLIST } from '../constants/crmTraining';
+import { AUDIT_SITE_CHECKS, AUDIT_MANUAL_GROUPS } from '../constants/crmAudit';
 
-type Tab = 'dashboard' | 'pipeline' | 'firms' | 'activity' | 'metrics' | 'team' | 'notes' | 'scripts' | 'training' | 'checklist' | 'add';
+type Tab = 'dashboard' | 'pipeline' | 'firms' | 'activity' | 'metrics' | 'team' | 'notes' | 'scripts' | 'training' | 'checklist' | 'audit' | 'add';
 
 // `founderOnly` tabs are hidden from sales reps.
 const TABS: { id: Tab; label: string; icon: typeof LayoutGrid; founderOnly?: boolean }[] = [
@@ -35,6 +36,7 @@ const TABS: { id: Tab; label: string; icon: typeof LayoutGrid; founderOnly?: boo
   { id: 'scripts', label: 'Scripts', icon: BookOpen },
   { id: 'training', label: 'Training', icon: GraduationCap },
   { id: 'checklist', label: 'Checklist', icon: ListChecks, founderOnly: true },
+  { id: 'audit', label: 'Audit', icon: ShieldCheck, founderOnly: true },
   { id: 'add', label: 'Add / Log', icon: Plus },
 ];
 
@@ -169,6 +171,7 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
             {tab === 'scripts' && <ScriptsTab />}
             {tab === 'training' && <TrainingTab />}
             {tab === 'checklist' && isFounder && <ChecklistTab />}
+            {tab === 'audit' && isFounder && <AuditTab />}
             {tab === 'add' && (
               <AddLogTab firms={firms} lastFirmId={lastFirmId} onSaved={(fid) => { if (fid) setLastFirmId(fid); void load(); }} setError={setError} />
             )}
@@ -660,6 +663,166 @@ function NotesTab({ isFounder }: { isFounder: boolean }) {
           })}
         </div>
       )}
+    </div>
+  );
+}
+
+// ── Daily audit (founder-only) ───────────────────────────────────────────────
+type AuditState = 'pass' | 'fail' | 'warn' | 'checking' | null;
+
+function AuditPill({ state }: { state: AuditState }) {
+  if (state === 'checking') return <span className="text-[11px] font-bold text-[#1E1B4B]/40">checking…</span>;
+  if (state === 'pass') return <span className="flex items-center gap-1 text-[12px] font-bold text-emerald-600"><CheckCircle2 className="h-4 w-4" /> Pass</span>;
+  if (state === 'fail') return <span className="flex items-center gap-1 text-[12px] font-bold text-red-600"><X className="h-4 w-4" /> Fail</span>;
+  if (state === 'warn') return <span className="flex items-center gap-1 text-[12px] font-bold text-amber-600"><AlertTriangle className="h-4 w-4" /> Warn</span>;
+  return <span className="text-[11px] text-[#1E1B4B]/30">—</span>;
+}
+
+function AuditTab() {
+  const MKEY = 'o3s_audit_manual_v1';
+  const HKEY = 'o3s_audit_history_v1';
+  const [site, setSite] = useState<Record<string, AuditState>>({});
+  const [crm, setCrm] = useState<{ id: string; label: string; state: AuditState; detail: string }[]>([]);
+  const [running, setRunning] = useState(false);
+  const [manual, setManual] = useState<Record<string, AuditState>>(() => {
+    try { return JSON.parse(localStorage.getItem(MKEY) || '{}'); } catch { return {}; }
+  });
+  const [history, setHistory] = useState<{ ts: string; site: string; crm: string; manual: string }[]>(() => {
+    try { return JSON.parse(localStorage.getItem(HKEY) || '[]'); } catch { return []; }
+  });
+
+  const setManualState = (id: string, s: AuditState) => {
+    setManual((prev) => { const n = { ...prev, [id]: s }; try { localStorage.setItem(MKEY, JSON.stringify(n)); } catch {} return n; });
+  };
+
+  const runAudit = async () => {
+    setRunning(true);
+    // Site checks (relative URLs → the origin you're on, i.e. production at one3seven.com).
+    const siteStart: Record<string, AuditState> = {};
+    AUDIT_SITE_CHECKS.forEach((c) => { siteStart[c.id] = 'checking'; });
+    setSite(siteStart);
+    const siteResults: Record<string, AuditState> = {};
+    await Promise.all(AUDIT_SITE_CHECKS.map(async (c) => {
+      try { const r = await fetch(c.path, { method: 'GET', cache: 'no-store' }); siteResults[c.id] = r.ok ? 'pass' : 'fail'; }
+      catch { siteResults[c.id] = 'fail'; }
+    }));
+    setSite(siteResults);
+
+    // CRM checks.
+    const crmChecks: { id: string; label: string; state: AuditState; detail: string }[] = [];
+    const f = await listFirms();
+    if (f.error) {
+      crmChecks.push({ id: 'storage', label: 'CRM storage reachable', state: 'fail', detail: f.error });
+      crmChecks.push({ id: 'firms', label: 'Firms in pipeline', state: 'fail', detail: '—' });
+      crmChecks.push({ id: 'followups', label: 'Follow-up dates set', state: 'fail', detail: '—' });
+    } else {
+      const firms = f.data;
+      crmChecks.push({ id: 'storage', label: 'CRM storage reachable', state: 'pass', detail: 'Supabase responding' });
+      crmChecks.push({ id: 'firms', label: 'Firms in pipeline', state: firms.length > 0 ? 'pass' : 'warn', detail: `${firms.length} firms` });
+      const withFollowup = firms.filter((x) => x.next_followup).length;
+      crmChecks.push({ id: 'followups', label: 'Follow-up dates set', state: withFollowup > 0 ? 'pass' : 'warn', detail: `${withFollowup} with a date` });
+    }
+    const a = await listActivity();
+    crmChecks.push({ id: 'activity', label: 'Activity logs written', state: a.error ? 'fail' : (a.data.length > 0 ? 'pass' : 'warn'), detail: a.error ? a.error : `${a.data.length} entries` });
+    setCrm(crmChecks);
+
+    // Snapshot to history.
+    const sitePass = Object.values(siteResults).filter((s) => s === 'pass').length;
+    const crmPass = crmChecks.filter((c) => c.state === 'pass').length;
+    const mp = Object.values(manual).filter((s) => s === 'pass').length;
+    const mf = Object.values(manual).filter((s) => s === 'fail').length;
+    const mw = Object.values(manual).filter((s) => s === 'warn').length;
+    const entry = {
+      ts: new Date().toLocaleString(),
+      site: `${sitePass}/${AUDIT_SITE_CHECKS.length}`,
+      crm: `${crmPass}/${crmChecks.length}`,
+      manual: `${mp}P · ${mf}F · ${mw}W`,
+    };
+    setHistory((prev) => { const n = [entry, ...prev].slice(0, 7); try { localStorage.setItem(HKEY, JSON.stringify(n)); } catch {} return n; });
+    setRunning(false);
+  };
+
+  return (
+    <div className="space-y-4">
+      <button type="button" onClick={runAudit} disabled={running} className="flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full bg-[#6D4AFF] font-semibold text-white transition hover:bg-[#5B35D5] disabled:opacity-50">
+        <RefreshCw className={`h-4 w-4 ${running ? 'animate-spin' : ''}`} /> {running ? 'Running audit…' : 'Run audit'}
+      </button>
+      <p className="text-[12px] leading-relaxed text-[#1E1B4B]/55">
+        Morning routine: run this first. If anything automated is red, fix it before any outreach goes out. Then rotate through a few manual checks.
+      </p>
+
+      <Collapsible title="Website checks (automated)" defaultOpen>
+        <div className="space-y-1.5">
+          {AUDIT_SITE_CHECKS.map((c) => (
+            <div key={c.id} className="flex items-center justify-between rounded-[10px] border border-[#F0EBFF] px-3 py-2">
+              <span className="text-[13px] text-[#1E1B4B]">{c.label} <span className="text-[#1E1B4B]/35">{c.path}</span></span>
+              <AuditPill state={site[c.id] ?? null} />
+            </div>
+          ))}
+        </div>
+      </Collapsible>
+
+      <Collapsible title="CRM checks (automated)" defaultOpen>
+        {crm.length === 0 ? (
+          <p className="text-[12px] text-[#1E1B4B]/40">Run the audit to populate.</p>
+        ) : (
+          <div className="space-y-1.5">
+            {crm.map((c) => (
+              <div key={c.id} className="flex items-center justify-between rounded-[10px] border border-[#F0EBFF] px-3 py-2">
+                <span className="text-[13px] text-[#1E1B4B]">{c.label} <span className="text-[#1E1B4B]/35">{c.detail}</span></span>
+                <AuditPill state={c.state} />
+              </div>
+            ))}
+          </div>
+        )}
+      </Collapsible>
+
+      {AUDIT_MANUAL_GROUPS.map((g) => (
+        <Collapsible key={g.group} title={`${g.group} (manual)`}>
+          <div className="space-y-2">
+            {g.items.map((item) => (
+              <div key={item.id} className="rounded-[10px] border border-[#F0EBFF] px-3 py-2.5">
+                <div className="mb-1.5 text-[13px] text-[#1E1B4B]">{item.label}</div>
+                <div className="flex gap-1.5">
+                  {(['pass', 'warn', 'fail'] as const).map((s) => {
+                    const active = manual[item.id] === s;
+                    const styles = {
+                      pass: { on: 'bg-emerald-500 text-white', off: 'bg-emerald-50 text-emerald-700' },
+                      warn: { on: 'bg-amber-500 text-white', off: 'bg-amber-50 text-amber-700' },
+                      fail: { on: 'bg-red-500 text-white', off: 'bg-red-50 text-red-700' },
+                    }[s];
+                    return (
+                      <button
+                        key={s}
+                        type="button"
+                        onClick={() => setManualState(item.id, active ? null : s)}
+                        className={`rounded-full px-3 py-1 text-[11px] font-bold capitalize transition ${active ? styles.on : styles.off}`}
+                      >
+                        {s}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        </Collapsible>
+      ))}
+
+      <Collapsible title="Audit history (last 7 runs)">
+        {history.length === 0 ? (
+          <p className="text-[12px] text-[#1E1B4B]/40">No runs yet. Hit “Run audit” to start your history.</p>
+        ) : (
+          <div className="space-y-1.5">
+            {history.map((h, i) => (
+              <div key={i} className="flex flex-wrap items-center justify-between gap-2 rounded-[10px] border border-[#F0EBFF] px-3 py-2 text-[12px]">
+                <span className="text-[#1E1B4B]/55">{h.ts}</span>
+                <span className="text-[#1E1B4B]/75">Site {h.site} · CRM {h.crm} · Manual {h.manual}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </Collapsible>
     </div>
   );
 }
