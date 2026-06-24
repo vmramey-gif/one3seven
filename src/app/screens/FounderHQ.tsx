@@ -13,7 +13,7 @@ import { supabase } from '../../lib/supabaseClient';
 import { FounderCRMScreen } from './FounderCRMScreen';
 import { addRepInvite, listRepInvites, revokeRepInvite, claimRepAccess, type CrmInvite } from '../../services/crmService';
 
-type Status = 'loading' | 'anon' | 'rep' | 'founder' | 'not_authorized';
+type Status = 'loading' | 'anon' | 'rep' | 'founder' | 'not_authorized' | 'recovery';
 
 function HQWordMark() {
   return (
@@ -38,6 +38,7 @@ export function FounderHQ() {
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [busy, setBusy] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
 
   const check = async () => {
     const { data: { session } } = await supabase.auth.getSession();
@@ -53,7 +54,43 @@ export function FounderHQ() {
     }
   };
 
-  useEffect(() => { void check(); }, []);
+  useEffect(() => {
+    // Arriving from a password-reset email link → show the "set new password" form.
+    const hash = typeof window !== 'undefined' ? window.location.hash : '';
+    if (hash.includes('type=recovery')) {
+      setStatus('recovery');
+    } else {
+      void check();
+    }
+    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'PASSWORD_RECOVERY') setStatus('recovery');
+    });
+    return () => sub.subscription.unsubscribe();
+  }, []);
+
+  const forgotPassword = async () => {
+    setError(''); setNotice('');
+    const target = email.trim();
+    if (!target) { setError('Enter your email above first, then tap reset.'); return; }
+    setBusy(true);
+    const { error: err } = await supabase.auth.resetPasswordForEmail(target, {
+      redirectTo: `${window.location.origin}/hq`,
+    });
+    setBusy(false);
+    if (err) { setError(err.message); return; }
+    setNotice('If that email has an account, a reset link is on its way. Check your inbox and spam.');
+  };
+
+  const submitNewPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(''); setNotice(''); setBusy(true);
+    const { error: err } = await supabase.auth.updateUser({ password: newPassword });
+    setBusy(false);
+    if (err) { setError(err.message); return; }
+    setNewPassword('');
+    setStatus('loading');
+    await check();
+  };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -117,6 +154,24 @@ export function FounderHQ() {
           </div>
         )}
 
+        {status === 'recovery' && (
+          <div>
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/15 px-3 py-1.5 text-xs font-semibold text-white/55">
+              <Lock className="h-3.5 w-3.5" /> Reset password
+            </div>
+            <h1 className="mb-2 text-[28px] font-bold leading-tight tracking-tight">Set a new password</h1>
+            <p className="mb-7 text-[14px] leading-relaxed text-white/55">Choose a new password for your one3seven HQ account.</p>
+            <form onSubmit={submitNewPassword} className="space-y-3">
+              <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="New password (8+ characters)" autoComplete="new-password" className={fieldCls} />
+              {error && <p className="text-[13px] text-red-300">{error}</p>}
+              {notice && <p className="text-[13px] text-emerald-300">{notice}</p>}
+              <button type="submit" disabled={busy || newPassword.length < 8} className="flex min-h-[52px] w-full items-center justify-center gap-2 rounded-full bg-[#6D4AFF] text-[16px] font-semibold text-white transition hover:bg-[#5B35D5] disabled:opacity-40">
+                {busy ? 'Saving…' : 'Save new password'} <ArrowRight className="h-5 w-5" />
+              </button>
+            </form>
+          </div>
+        )}
+
         {status === 'not_authorized' && (
           <div className="text-center">
             <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-white/10"><Lock className="h-6 w-6 text-white/60" /></div>
@@ -154,6 +209,11 @@ export function FounderHQ() {
             >
               {mode === 'signin' ? 'Invited rep? Create your account' : 'Already have an account? Sign in'}
             </button>
+            {mode === 'signin' && (
+              <button type="button" onClick={forgotPassword} disabled={busy} className="mt-2 w-full text-center text-[13px] text-white/45 hover:text-white/70 disabled:opacity-40">
+                Forgot password?
+              </button>
+            )}
             <div className="mt-6 text-center"><a href="/" className="text-[13px] text-white/40 hover:text-white/70">Back to one3seven</a></div>
           </div>
         )}
