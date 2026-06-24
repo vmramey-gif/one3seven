@@ -9,7 +9,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Phone, Mail, Calendar, ArrowLeft, Plus, X, TrendingUp,
   ClipboardList, LayoutGrid, Building2, BookOpen, BarChart3, CheckCircle2,
-  GraduationCap, AlertTriangle, Flame, ListChecks, Check, MessageSquare, Send, StickyNote, Trash2,
+  GraduationCap, ListChecks, Check, MessageSquare, Send, StickyNote, Trash2, ChevronRight,
 } from 'lucide-react';
 import {
   listFirms, listActivity, addFirm, logActivity,
@@ -231,32 +231,58 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
 }
 
 // ── Firm card (shared) ───────────────────────────────────────────────────────
+// Reusable collapsible section — keeps long tabs compact.
+function Collapsible({ title, defaultOpen = false, children }: { title: string; defaultOpen?: boolean; children: React.ReactNode }) {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <div className="overflow-hidden rounded-[12px] border border-[#E7E1FF] bg-white">
+      <button type="button" onClick={() => setOpen((o) => !o)} className={`flex ${tap} w-full items-center justify-between px-4 text-left`}>
+        <span className="text-[13px] font-bold text-[#1E1B4B]">{title}</span>
+        <ChevronRight className={`h-4 w-4 shrink-0 text-[#1E1B4B]/35 transition-transform ${open ? 'rotate-90' : ''}`} />
+      </button>
+      {open && <div className="border-t border-[#F0EBFF] p-4">{children}</div>}
+    </div>
+  );
+}
+
+// Compact, collapsible firm row. Tap-to-call lives in the header so it's reachable without expanding.
 function FirmCard({ firm, onLog, today }: { firm: CrmFirm; onLog: (id: string) => void; today?: string }) {
+  const [open, setOpen] = useState(false);
   const due = today && firm.next_followup && firm.next_followup <= today;
   return (
-    <div className="rounded-[14px] border border-[#E7E1FF] bg-white p-4">
-      <div className="mb-1.5 flex items-start justify-between gap-2">
-        <div className="min-w-0">
-          <div className="flex items-center gap-2">
-            <span className="truncate text-[15px] font-bold">{firm.name}</span>
-            <PriorityBadge priority={firm.priority} />
-          </div>
-          {firm.attorney_name && <div className="text-[12px] text-[#1E1B4B]/50">{firm.attorney_name}</div>}
-        </div>
+    <div className="overflow-hidden rounded-[14px] border border-[#E7E1FF] bg-white">
+      <div className="flex items-center gap-2 p-2.5">
+        <button type="button" onClick={() => setOpen((o) => !o)} className="flex min-w-0 flex-1 items-center gap-2 text-left">
+          <ChevronRight className={`h-4 w-4 shrink-0 text-[#1E1B4B]/30 transition-transform ${open ? 'rotate-90' : ''}`} />
+          <span className="truncate text-[14px] font-bold">{firm.name}</span>
+          <PriorityBadge priority={firm.priority} />
+          {due && <span className="shrink-0 rounded-full bg-red-100 px-1.5 py-0.5 text-[10px] font-bold text-red-600">due</span>}
+        </button>
         <StageTag stage={firm.stage} />
-      </div>
-      <div className="mb-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[13px]">
-        <span className="flex items-center gap-1.5"><Phone className="h-3.5 w-3.5 text-[#1E1B4B]/35" /><PhoneLink phone={firm.phone} /></span>
-        {firm.next_followup && (
-          <span className={`flex items-center gap-1.5 ${due ? 'font-semibold text-red-600' : 'text-[#1E1B4B]/50'}`}>
-            <Calendar className="h-3.5 w-3.5" /> {firm.next_followup}{due ? ' · due' : ''}
-          </span>
+        {firm.phone && (
+          <a href={`tel:${digitsOf(firm.phone)}`} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-600" aria-label={`Call ${firm.name}`}>
+            <Phone className="h-4 w-4" />
+          </a>
         )}
       </div>
-      {firm.notes && <p className="mb-2.5 line-clamp-2 text-[12px] leading-relaxed text-[#1E1B4B]/55">{firm.notes}</p>}
-      <button type="button" onClick={() => onLog(firm.id)} className={`flex ${tap} w-full items-center justify-center gap-2 rounded-[12px] bg-[#EDE7FF] font-semibold text-[#6D4AFF]`}>
-        <Phone className="h-4 w-4" /> Log call
-      </button>
+      {open && (
+        <div className="space-y-2 border-t border-[#F0EBFF] p-3">
+          {firm.attorney_name && <div className="text-[12px] text-[#1E1B4B]/55">{firm.attorney_name}</div>}
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[13px]">
+            <span className="flex items-center gap-1.5"><Phone className="h-3.5 w-3.5 text-[#1E1B4B]/35" /><PhoneLink phone={firm.phone} /></span>
+            {firm.next_followup && (
+              <span className={`flex items-center gap-1.5 ${due ? 'font-semibold text-red-600' : 'text-[#1E1B4B]/50'}`}>
+                <Calendar className="h-3.5 w-3.5" /> {firm.next_followup}
+              </span>
+            )}
+            {firm.region && <span className="text-[#1E1B4B]/45">{firm.region}</span>}
+          </div>
+          {firm.notes && <p className="text-[12px] leading-relaxed text-[#1E1B4B]/60">{firm.notes}</p>}
+          <button type="button" onClick={() => onLog(firm.id)} className={`flex ${tap} w-full items-center justify-center gap-2 rounded-[12px] bg-[#EDE7FF] font-semibold text-[#6D4AFF]`}>
+            <Phone className="h-4 w-4" /> Log call
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -464,33 +490,30 @@ function MetricsTab({ firms, activity }: { firms: CrmFirm[]; activity: CrmActivi
 // ── Scripts & objections ─────────────────────────────────────────────────────
 function ScriptsTab() {
   return (
-    <div className="space-y-6">
-      <section>
-        <h2 className="mb-2 text-[14px] font-bold">Call script</h2>
+    <div className="space-y-3">
+      <Collapsible title="Call script" defaultOpen>
         <div className="space-y-3">
           {CRM_CALL_SCRIPT.map((s) => (
-            <div key={s.step} className="rounded-[12px] border border-[#E7E1FF] bg-white p-4">
+            <div key={s.step}>
               <div className="mb-1 text-[11px] font-bold uppercase tracking-wide text-[#6D4AFF]">{s.step}</div>
               <p className="text-[14px] leading-relaxed text-[#1E1B4B]/75">{s.text}</p>
             </div>
           ))}
         </div>
-      </section>
-      <section>
-        <h2 className="mb-2 text-[14px] font-bold">Objections</h2>
+      </Collapsible>
+      <Collapsible title="Objections (5)">
         <div className="space-y-3">
           {CRM_OBJECTIONS.map((o) => (
-            <div key={o.objection} className="rounded-[12px] border border-[#E7E1FF] bg-white p-4">
+            <div key={o.objection}>
               <div className="mb-1 text-[13px] font-bold text-[#1E1B4B]">{o.objection}</div>
               <p className="text-[13px] leading-relaxed text-[#1E1B4B]/65">{o.response}</p>
             </div>
           ))}
         </div>
-      </section>
-      <section>
-        <h2 className="mb-2 text-[14px] font-bold">Cold email template</h2>
-        <pre className="whitespace-pre-wrap rounded-[12px] border border-[#E7E1FF] bg-white p-4 text-[13px] leading-relaxed text-[#1E1B4B]/75">{CRM_COLD_EMAIL}</pre>
-      </section>
+      </Collapsible>
+      <Collapsible title="Cold email template">
+        <pre className="whitespace-pre-wrap text-[13px] leading-relaxed text-[#1E1B4B]/75">{CRM_COLD_EMAIL}</pre>
+      </Collapsible>
     </div>
   );
 }
@@ -706,24 +729,16 @@ function ChecklistTab() {
 // ── Training (fire demo, PI rules, commissions) ──────────────────────────────
 function TrainingTab() {
   return (
-    <div className="space-y-7">
-      {/* Fire demo */}
-      <section>
-        <div className="mb-2 flex items-center gap-2">
-          <Flame className="h-4 w-4 text-orange-500" />
-          <h2 className="text-[14px] font-bold">Fire demo — how to run it</h2>
-        </div>
+    <div className="space-y-3">
+      <Collapsible title="🔥 Fire demo — how to run it" defaultOpen>
         <p className="mb-3 text-[13px] leading-relaxed text-[#1E1B4B]/65">{FIRE_DEMO_TRAINING.intro}</p>
         <a href={`https://${FIRE_DEMO_TRAINING.link}`} target="_blank" rel="noreferrer" className="mb-3 inline-block text-[13px] font-semibold text-[#6D4AFF] hover:underline">
           {FIRE_DEMO_TRAINING.link} ↗
         </a>
-
-        {/* Employment focus — highlighted */}
         <div className="mb-4 rounded-[12px] border-2 border-[#6D4AFF]/40 bg-[#F3EFFF] p-4">
           <div className="mb-1 text-[11px] font-bold uppercase tracking-wide text-[#6D4AFF]">Employment focus — read this first</div>
           <p className="text-[13px] leading-relaxed text-[#1E1B4B]/80">{FIRE_DEMO_TRAINING.employmentFocus}</p>
         </div>
-
         <div className="space-y-2.5">
           {FIRE_DEMO_TRAINING.steps.map((s) => (
             <div key={s.title} className="rounded-[12px] border border-[#E7E1FF] bg-white p-3.5">
@@ -733,14 +748,9 @@ function TrainingTab() {
           ))}
         </div>
         <p className="mt-3 rounded-[10px] bg-[#EDE7FF] px-3 py-2 text-[12px] font-semibold text-[#6D4AFF]">{FIRE_DEMO_TRAINING.theAsk}</p>
-      </section>
+      </Collapsible>
 
-      {/* PI rules */}
-      <section>
-        <div className="mb-2 flex items-center gap-2">
-          <AlertTriangle className="h-4 w-4 text-amber-600" />
-          <h2 className="text-[14px] font-bold">PI &amp; scope rules — do not break these</h2>
-        </div>
+      <Collapsible title="⚠️ PI & scope rules — do not break these">
         <div className="space-y-2.5">
           {PI_RULES.map((r) => (
             <div key={r.rule} className="rounded-[12px] border border-amber-200 bg-amber-50 p-3.5">
@@ -749,38 +759,29 @@ function TrainingTab() {
             </div>
           ))}
         </div>
-      </section>
+      </Collapsible>
 
-      {/* Commissions */}
-      <section>
-        <h2 className="mb-2 text-[14px] font-bold">{CRM_COMMISSIONS.headline}</h2>
+      <Collapsible title={CRM_COMMISSIONS.headline}>
         <p className="mb-3 text-[13px] leading-relaxed text-[#1E1B4B]/65">{CRM_COMMISSIONS.intro}</p>
         <div className="mb-3 rounded-[12px] border-2 border-[#6D4AFF]/40 bg-[#F3EFFF] p-4">
           <div className="mb-2 text-[14px] font-bold text-[#1E1B4B]">{CRM_COMMISSIONS.rule}</div>
           <ul className="space-y-1">
             {CRM_COMMISSIONS.examples.map((e) => (
-              <li key={e} className="flex gap-2 text-[13px] text-[#1E1B4B]/75">
-                <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#8B6DFF]" /><span>{e}</span>
-              </li>
+              <li key={e} className="flex gap-2 text-[13px] text-[#1E1B4B]/75"><span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#8B6DFF]" /><span>{e}</span></li>
             ))}
           </ul>
         </div>
         <ul className="mb-3 space-y-1.5">
           {CRM_COMMISSIONS.rules.map((l) => (
-            <li key={l} className="flex gap-2 text-[13px] leading-relaxed text-[#1E1B4B]/75">
-              <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#8B6DFF]" /><span>{l}</span>
-            </li>
+            <li key={l} className="flex gap-2 text-[13px] leading-relaxed text-[#1E1B4B]/75"><span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#8B6DFF]" /><span>{l}</span></li>
           ))}
         </ul>
         <p className="rounded-[10px] border border-amber-300 bg-amber-50 px-3 py-2 text-[12px] font-semibold text-amber-800">{CRM_COMMISSIONS.note}</p>
-      </section>
+      </Collapsible>
 
-      {/* Contact */}
-      <section>
-        <div className="rounded-[12px] border border-[#E7E1FF] bg-white p-3.5 text-[13px] leading-relaxed text-[#1E1B4B]/70">
-          To contact one3seven, email <a href="mailto:info@one3seven.com" className="font-semibold text-[#6D4AFF] hover:underline">info@one3seven.com</a>.
-        </div>
-      </section>
+      <div className="rounded-[12px] border border-[#E7E1FF] bg-white p-3.5 text-[13px] leading-relaxed text-[#1E1B4B]/70">
+        To contact one3seven, email <a href="mailto:info@one3seven.com" className="font-semibold text-[#6D4AFF] hover:underline">info@one3seven.com</a>.
+      </div>
     </div>
   );
 }

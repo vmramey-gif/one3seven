@@ -1439,7 +1439,7 @@ export function LandingScreen({
               Terms
             </a>
             <a
-              href="mailto:support@one3seven.com?subject=one3seven%20contact"
+              href="mailto:info@one3seven.com?subject=one3seven%20contact"
               className="hover:text-slate-900 transition-colors"
             >
               Contact

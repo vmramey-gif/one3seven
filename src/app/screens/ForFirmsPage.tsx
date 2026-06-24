@@ -217,6 +217,9 @@ export function ForFirmsPage({ onBack, onStartWorker }: ForFirmsPageProps) {
           <button type="button" onClick={onBack} className="inline-flex items-center gap-1.5 text-sm font-medium text-[#6D4AFF]">
             <ArrowLeft className="h-3.5 w-3.5" /> Back to one3seven
           </button>
+          <p className="text-[12px] text-[#1E1B4B]/55">
+            Contact: <a href="mailto:info@one3seven.com" className="font-semibold text-[#6D4AFF] hover:underline">info@one3seven.com</a>
+          </p>
           <p className="max-w-[640px] text-[11px] leading-relaxed text-[#1E1B4B]/45">
             one3seven is not a law firm and does not provide legal advice. It organizes records and surfaces
             information for review preparation. Attorneys independently evaluate all information.
