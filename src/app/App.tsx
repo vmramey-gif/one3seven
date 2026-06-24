@@ -1361,6 +1361,7 @@ export default function App() {
    * Persist pending onboarding as a draft intake (category + guided/questionnaire in session/local refs).
    * No-op when an intake id is already active.
    */
+  const commitIntakeInFlightRef = useRef<Promise<string | null> | null>(null);
   const commitPendingWorkerIntake = useCallback(async (): Promise<string | null> => {
     if (!isSupabaseConfigured()) return currentIntakeIdRef.current;
     if (!isAuthenticated || !authUser?.id || profile?.role !== 'worker' || !profile?.id) {
@@ -1370,6 +1371,10 @@ export default function App() {
       return null;
     }
     if (currentIntakeIdRef.current) return currentIntakeIdRef.current;
+    // Concurrent step transitions can both pass the guard above before the first insert
+    // finishes — share one in-flight creation so we never insert two intakes/numbers.
+    if (commitIntakeInFlightRef.current) return commitIntakeInFlightRef.current;
+    commitIntakeInFlightRef.current = (async (): Promise<string | null> => {
 
     const pending = getPendingOnboarding();
     if (!isPendingOnboardingReadyToPersist(pending)) {
@@ -1483,6 +1488,12 @@ export default function App() {
     setWorkerOnboardingPrePersist(false);
     skipAnchorIntakeSyncRef.current = false;
     return intakeId;
+    })();
+    try {
+      return await commitIntakeInFlightRef.current;
+    } finally {
+      commitIntakeInFlightRef.current = null;
+    }
   }, [
     isAuthenticated,
     authUser?.id,

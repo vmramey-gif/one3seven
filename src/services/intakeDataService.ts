@@ -972,7 +972,13 @@ export async function createDraftIntake(
     insert.linked_firm_id = opts.linked_firm_id;
     insert.submission_channel = opts.submission_channel ?? 'firm_code';
   }
-  const { data, error } = await supabase.from('intakes').insert(insert).select('id, intake_number').single();
+  let { data, error } = await supabase.from('intakes').insert(insert).select('id, intake_number').single();
+  // Safety net: if the chosen intake_number collides (e.g. a stale display sequence), retry
+  // once with a uniquified number rather than hard-failing the worker mid-intake.
+  if (error && (error as { code?: string }).code === '23505') {
+    insert.intake_number = `${intake_number}-${Math.random().toString(36).slice(2, 5).toUpperCase()}`;
+    ({ data, error } = await supabase.from('intakes').insert(insert).select('id, intake_number').single());
+  }
   if (error) return { error: error.message };
   return { id: data.id, intake_number: data.intake_number };
 }

@@ -43,9 +43,14 @@ export function FounderHQ() {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session?.user) { setStatus('anon'); return; }
     const { data } = await supabase.from('profiles').select('is_founder').eq('id', session.user.id).maybeSingle();
-    if (data?.is_founder) { setStatus('founder'); return; }
-    const isRep = await claimRepAccess();
-    setStatus(isRep ? 'rep' : 'not_authorized');
+    let resolved: Status;
+    if (data?.is_founder) resolved = 'founder';
+    else resolved = (await claimRepAccess()) ? 'rep' : 'not_authorized';
+    setStatus(resolved);
+    // Keep the CRM open across refreshes so members aren't dropped back to the landing.
+    if (resolved === 'founder' || resolved === 'rep') {
+      try { if (sessionStorage.getItem('o3s_hq_open_crm') === '1') setShowCRM(true); } catch { /* ignore */ }
+    }
   };
 
   useEffect(() => { void check(); }, []);
@@ -70,11 +75,12 @@ export function FounderHQ() {
   const signOut = async () => {
     await supabase.auth.signOut();
     setShowCRM(false); setEmail(''); setPassword(''); setError(''); setNotice('');
+    try { sessionStorage.removeItem('o3s_hq_open_crm'); } catch { /* ignore */ }
     setStatus('anon');
   };
 
   if (showCRM && (status === 'founder' || status === 'rep')) {
-    return <FounderCRMScreen onExit={() => setShowCRM(false)} isFounder={status === 'founder'} />;
+    return <FounderCRMScreen onExit={() => { setShowCRM(false); try { sessionStorage.removeItem('o3s_hq_open_crm'); } catch { /* ignore */ } }} isFounder={status === 'founder'} />;
   }
 
   return (
@@ -99,7 +105,7 @@ export function FounderHQ() {
             </p>
             <button
               type="button"
-              onClick={() => setShowCRM(true)}
+              onClick={() => { setShowCRM(true); try { sessionStorage.setItem('o3s_hq_open_crm', '1'); } catch { /* ignore */ } }}
               className="flex min-h-[52px] w-full items-center justify-center gap-2 rounded-full bg-[#6D4AFF] text-[16px] font-semibold text-white shadow-[0_12px_40px_rgba(109,74,255,0.4)] transition hover:bg-[#5B35D5]"
             >
               Open Sales CRM <ArrowRight className="h-5 w-5" />
