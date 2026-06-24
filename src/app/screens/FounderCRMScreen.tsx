@@ -19,7 +19,7 @@ import {
 } from '../../services/crmService';
 import { CRM_STAGES, CRM_STAGE_LABELS, type CrmStage } from '../../services/crmStageLogic';
 import { CRM_WEEKLY_TARGETS, CRM_CALL_SCRIPT, CRM_OBJECTIONS, CRM_COLD_EMAIL } from '../constants/crmReference';
-import { FIRE_DEMO_TRAINING, PI_RULES, CRM_COMMISSIONS, LAUNCH_CHECKLIST } from '../constants/crmTraining';
+import { FIRE_DEMO_TRAINING, PI_RULES, CRM_COMMISSIONS, CRM_SUBSCRIPTION_TIERS, LAUNCH_CHECKLIST } from '../constants/crmTraining';
 
 type Tab = 'dashboard' | 'pipeline' | 'firms' | 'activity' | 'metrics' | 'team' | 'notes' | 'scripts' | 'training' | 'checklist' | 'add';
 
@@ -761,21 +761,57 @@ function TrainingTab() {
         </div>
       </Collapsible>
 
+      <Collapsible title="💵 Subscription tiers — what firms pay">
+        <div className="space-y-2">
+          {CRM_SUBSCRIPTION_TIERS.map((t) => (
+            <div key={t.tier} className="flex items-center justify-between gap-3 rounded-[10px] border border-[#E7E1FF] bg-white px-3 py-2.5">
+              <div>
+                <div className="text-[13px] font-bold text-[#1E1B4B]">{t.tier}</div>
+                <div className="text-[11px] text-[#1E1B4B]/55">{t.detail}</div>
+              </div>
+              <div className="shrink-0 text-[13px] font-bold text-[#6D4AFF]">{t.price}</div>
+            </div>
+          ))}
+        </div>
+      </Collapsible>
+
       <Collapsible title={CRM_COMMISSIONS.headline}>
         <p className="mb-3 text-[13px] leading-relaxed text-[#1E1B4B]/65">{CRM_COMMISSIONS.intro}</p>
-        <div className="mb-3 rounded-[12px] border-2 border-[#6D4AFF]/40 bg-[#F3EFFF] p-4">
-          <div className="mb-2 text-[14px] font-bold text-[#1E1B4B]">{CRM_COMMISSIONS.rule}</div>
-          <ul className="space-y-1">
-            {CRM_COMMISSIONS.examples.map((e) => (
-              <li key={e} className="flex gap-2 text-[13px] text-[#1E1B4B]/75"><span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#8B6DFF]" /><span>{e}</span></li>
-            ))}
-          </ul>
+
+        <div className="mb-1.5 text-[11px] font-bold uppercase tracking-wide text-[#6D4AFF]">Your commission by tier (20%)</div>
+        <div className="mb-4 overflow-hidden rounded-[12px] border border-[#E7E1FF]">
+          {CRM_COMMISSIONS.perTier.map((r, i) => (
+            <div key={r.tier} className={`flex items-center justify-between gap-2 px-3 py-2.5 text-[13px] ${i > 0 ? 'border-t border-[#F0EBFF]' : ''}`}>
+              <span className="font-bold text-[#1E1B4B]">{r.tier} <span className="font-normal text-[#1E1B4B]/45">{r.price}</span></span>
+              <span className="text-right"><span className="font-bold text-[#6D4AFF]">{r.perMo}</span> <span className="text-[#1E1B4B]/45">· {r.perYr}</span></span>
+            </div>
+          ))}
         </div>
+
+        <div className="mb-1.5 text-[11px] font-bold uppercase tracking-wide text-[#6D4AFF]">How it compounds as you build your book</div>
+        <div className="mb-4 overflow-hidden rounded-[12px] border border-[#E7E1FF]">
+          {CRM_COMMISSIONS.compounding.map((r, i) => (
+            <div key={r.firms} className={`px-3 py-2.5 ${i > 0 ? 'border-t border-[#F0EBFF]' : ''}`}>
+              <div className="flex items-center justify-between text-[13px]">
+                <span className="font-bold text-[#1E1B4B]">{r.firms}</span>
+                <span><span className="font-bold text-[#6D4AFF]">{r.mo}/mo</span> <span className="text-[#1E1B4B]/45">· {r.yr}/yr</span></span>
+              </div>
+              <div className="text-[11px] text-[#1E1B4B]/50">{r.mix}</div>
+            </div>
+          ))}
+        </div>
+
         <ul className="mb-3 space-y-1.5">
-          {CRM_COMMISSIONS.rules.map((l) => (
+          {CRM_COMMISSIONS.terms.map((l) => (
             <li key={l} className="flex gap-2 text-[13px] leading-relaxed text-[#1E1B4B]/75"><span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#8B6DFF]" /><span>{l}</span></li>
           ))}
         </ul>
+
+        <div className="mb-3 rounded-[10px] border border-[#E7E1FF] bg-[#FAFAFF] p-3">
+          <div className="mb-1 text-[11px] font-bold uppercase tracking-wide text-[#1E1B4B]/45">Not offered at this stage</div>
+          <div className="text-[12px] text-[#1E1B4B]/60">{CRM_COMMISSIONS.notOffered.join(' · ')}</div>
+        </div>
+
         <p className="rounded-[10px] border border-amber-300 bg-amber-50 px-3 py-2 text-[12px] font-semibold text-amber-800">{CRM_COMMISSIONS.note}</p>
       </Collapsible>
 

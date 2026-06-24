@@ -79,22 +79,38 @@ export const LAUNCH_CHECKLIST: { group: string; items: { id: string; label: stri
   },
 ];
 
+/** What a firm pays — the monthly subscription tiers reps are selling. */
+export const CRM_SUBSCRIPTION_TIERS = [
+  { tier: 'Solo', price: '$199 / month', detail: 'Up to 15 intakes · 1 seat' },
+  { tier: 'Practice', price: '$499 / month', detail: 'Up to 50 intakes · 3 seats' },
+  { tier: 'Firm', price: '$899 / month', detail: 'Unlimited intakes · 10 seats' },
+  { tier: 'Enterprise', price: 'Custom', detail: 'Contact info@one3seven.com' },
+];
+
 export const CRM_COMMISSIONS = {
-  headline: 'Commission — paid after a free demo converts',
+  headline: 'Commission — 20% recurring, every month the firm stays',
   intro:
-    'You earn commission when a firm you sourced converts to a PAID plan after the free 30-day pilot. The free demo and the pilot pay nothing on their own — commission is tied to a paid conversion and pays out after the firm’s first invoice clears.',
-  rule: 'Your commission = the firm’s FIRST MONTH of subscription, paid once.',
-  examples: [
-    'Solo plan ($199/mo) → $199',
-    'Practice plan ($499/mo) → $499',
-    'Firm plan ($899/mo) → $899',
-    'Enterprise (custom) → set per deal',
+    '20% recurring monthly commission on every firm you close — paid every month that firm stays active. No salary, no draw, no base. You earn when a firm converts and keep earning every month they stay. Your incentive is tied to retention, not just the close — so you have a reason to make sure the firm actually uses the product and stays.',
+  perTier: [
+    { tier: 'Solo', price: '$199/mo', perMo: '$39.80/mo', perYr: '$477.60/yr' },
+    { tier: 'Practice', price: '$499/mo', perMo: '$99.80/mo', perYr: '$1,197.60/yr' },
+    { tier: 'Firm', price: '$899/mo', perMo: '$179.80/mo', perYr: '$2,157.60/yr' },
   ],
-  rules: [
-    'Paid on collection — after the firm’s first paid invoice clears, not at signature.',
-    'Demos and free pilots are not commissionable. Only paid conversions count.',
-    '60-day clawback — if the firm cancels within 60 days, the commission reverses.',
+  compounding: [
+    { firms: '1 firm', mix: 'Practice ($499)', mo: '$99.80', yr: '$1,197' },
+    { firms: '3 firms', mix: '1 Solo + 2 Practice', mo: '$239.40', yr: '$2,872' },
+    { firms: '5 firms', mix: '2 Solo + 2 Practice + 1 Firm', mo: '$518.80', yr: '$6,225' },
+    { firms: '10 firms', mix: '4 Solo + 4 Practice + 2 Firm', mo: '$918.40', yr: '$11,020' },
   ],
+  terms: [
+    'When you get paid: monthly, within 5 business days of one3seven receiving the firm’s subscription payment.',
+    'How long you earn: every month the firm stays active on a paid plan. If a firm cancels, commission stops that month.',
+    'What triggers a close: the firm signs up for a paid plan through your outreach and you are the documented source.',
+    'Free pilot firms: no commission during the free 30-day pilot — commission starts when the firm converts to a paid plan.',
+    'Chargebacks: if a firm’s payment fails and is not recovered, that month’s commission is not paid.',
+    'Tax: you are an independent contractor, responsible for all taxes on commission income.',
+  ],
+  notOffered: ['Salary or guaranteed draw', 'Equity or ownership for sales activity', 'Expense reimbursement', 'Benefits or employment status'],
   note:
-    'Paid billing is not live yet (beta pilots are free), so payouts begin once paid plans go live — build the pipeline now, get paid when firms convert. Commission terms must be confirmed in a written rep agreement before any payout (required in California).',
+    'Independent contractor commission arrangement offered by One3Seven Ventures LLC (an entity submitted for formation in California and pending review). A formal independent contractor agreement will be provided and signed before any sales activity begins.',
 };
