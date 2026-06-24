@@ -9,7 +9,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Phone, Mail, Calendar, ArrowLeft, Plus, X, TrendingUp,
   ClipboardList, LayoutGrid, Building2, BookOpen, BarChart3, CheckCircle2,
-  GraduationCap, ListChecks, Check, MessageSquare, Send, StickyNote, Trash2, ChevronRight, ShieldCheck, RefreshCw, AlertTriangle, DollarSign, Flame,
+  GraduationCap, ListChecks, Check, MessageSquare, Send, StickyNote, Trash2, ChevronRight, ShieldCheck, RefreshCw, AlertTriangle, DollarSign, Flame, Sparkles,
 } from 'lucide-react';
 import {
   listFirms, listActivity, addFirm, logActivity,
@@ -24,8 +24,9 @@ import { CRM_STAGES, CRM_STAGE_LABELS, type CrmStage } from '../../services/crmS
 import { CRM_WEEKLY_TARGETS, CRM_CALL_SCRIPT, CRM_OBJECTIONS, CRM_COLD_EMAIL } from '../constants/crmReference';
 import { FIRE_DEMO_TRAINING, PI_RULES, CRM_COMMISSIONS, CRM_SUBSCRIPTION_TIERS, LAUNCH_CHECKLIST } from '../constants/crmTraining';
 import { AUDIT_SITE_CHECKS, AUDIT_MANUAL_GROUPS } from '../constants/crmAudit';
+import { STARTER_QUESTIONS, askAssistant, type ChatMessage } from '../../services/chatAssistant';
 
-type Tab = 'dashboard' | 'pipeline' | 'firms' | 'activity' | 'metrics' | 'revenue' | 'team' | 'notes' | 'scripts' | 'training' | 'checklist' | 'audit' | 'add';
+type Tab = 'dashboard' | 'pipeline' | 'firms' | 'activity' | 'metrics' | 'revenue' | 'team' | 'notes' | 'scripts' | 'training' | 'askai' | 'checklist' | 'audit' | 'add';
 
 // `founderOnly` tabs are hidden from sales reps.
 const TABS: { id: Tab; label: string; icon: typeof LayoutGrid; founderOnly?: boolean }[] = [
@@ -38,6 +39,7 @@ const TABS: { id: Tab; label: string; icon: typeof LayoutGrid; founderOnly?: boo
   { id: 'notes', label: 'Notes', icon: StickyNote },
   { id: 'scripts', label: 'Scripts', icon: BookOpen },
   { id: 'training', label: 'Training', icon: GraduationCap },
+  { id: 'askai', label: 'Ask one3seven AI', icon: Sparkles },
   { id: 'checklist', label: 'Checklist', icon: ListChecks, founderOnly: true },
   { id: 'audit', label: 'Audit', icon: ShieldCheck, founderOnly: true },
   { id: 'revenue', label: 'Revenue', icon: DollarSign, founderOnly: true },
@@ -176,6 +178,7 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
             {tab === 'notes' && <NotesTab isFounder={isFounder} />}
             {tab === 'scripts' && <ScriptsTab />}
             {tab === 'training' && <TrainingTab />}
+            {tab === 'askai' && <AskAITab />}
             {tab === 'checklist' && isFounder && <ChecklistTab />}
             {tab === 'audit' && isFounder && <AuditTab />}
             {tab === 'revenue' && isFounder && <RevenueTab firms={firms} />}
@@ -855,6 +858,87 @@ function NotesTab({ isFounder }: { isFounder: boolean }) {
           })}
         </div>
       )}
+    </div>
+  );
+}
+
+// ── Ask one3seven AI (founder + reps) ────────────────────────────────────────
+function AskAITab() {
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages.length, loading]);
+
+  const send = async (text: string) => {
+    const content = text.trim();
+    if (!content || loading) return;
+    const next: ChatMessage[] = [...messages, { role: 'user', content }];
+    setMessages(next);
+    setInput('');
+    setLoading(true);
+    const res = await askAssistant(next);
+    setLoading(false);
+    const reply =
+      res.status === 401 ? 'Session expired — please sign in again.'
+      : res.error || res.content === undefined ? 'Something went wrong. Try again or ask Victoria.'
+      : (res.content || '');
+    setMessages((m) => [...m, { role: 'assistant', content: reply }]);
+  };
+
+  return (
+    <div className="flex flex-col" style={{ minHeight: '64vh' }}>
+      <div className="mb-2 flex items-center justify-between gap-3">
+        <p className="text-[12px] leading-relaxed text-[#1E1B4B]/55">Internal sales assistant — product, pitch, objections. Not legal advice.</p>
+        {messages.length > 0 && (
+          <button type="button" onClick={() => setMessages([])} className="shrink-0 text-[12px] font-semibold text-[#6D4AFF] hover:underline">Clear conversation</button>
+        )}
+      </div>
+
+      <div className="flex-1 space-y-2 overflow-y-auto rounded-[12px] border border-[#E7E1FF] bg-white p-3">
+        {messages.length === 0 ? (
+          <div className="space-y-2 py-6">
+            <p className="px-1 text-[13px] font-semibold text-[#1E1B4B]/70">Ask anything about selling one3seven:</p>
+            {STARTER_QUESTIONS.map((q) => (
+              <button key={q} type="button" onClick={() => send(q)} className="block w-full rounded-[12px] border border-[#E7E1FF] bg-[#FAFAFF] px-3 py-2.5 text-left text-[13px] text-[#1E1B4B] transition hover:border-[#C9BEF5]">
+                {q}
+              </button>
+            ))}
+          </div>
+        ) : (
+          messages.map((m, i) => (
+            <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+              <div className={`max-w-[85%] whitespace-pre-wrap rounded-[14px] px-3.5 py-2 text-[13px] leading-relaxed ${m.role === 'user' ? 'bg-[#5B21B6] text-white' : 'bg-[#F3EFFF] text-[#1E1B4B]'}`}>
+                {m.content}
+              </div>
+            </div>
+          ))
+        )}
+        {loading && (
+          <div className="flex justify-start">
+            <div className="flex items-center gap-1 rounded-[14px] bg-[#F3EFFF] px-4 py-3">
+              <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-[#6D4AFF]/50" style={{ animationDelay: '0ms' }} />
+              <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-[#6D4AFF]/50" style={{ animationDelay: '150ms' }} />
+              <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-[#6D4AFF]/50" style={{ animationDelay: '300ms' }} />
+            </div>
+          </div>
+        )}
+        <div ref={bottomRef} />
+      </div>
+
+      <div className="mt-2 flex gap-2">
+        <input
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void send(input); } }}
+          placeholder="Ask the assistant…"
+          className="flex-1 rounded-[12px] border border-[#E7E1FF] px-3 py-2.5 text-sm outline-none focus:border-[#6D4AFF]"
+        />
+        <button type="button" onClick={() => send(input)} disabled={loading || !input.trim()} className={`flex ${tap} shrink-0 items-center gap-1.5 rounded-full bg-[#6D4AFF] px-5 font-semibold text-white disabled:opacity-40`}>
+          <Send className="h-4 w-4" /> Send
+        </button>
+      </div>
     </div>
   );
 }
