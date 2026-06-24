@@ -9,20 +9,23 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Phone, Mail, Calendar, ArrowLeft, Plus, X, TrendingUp,
   ClipboardList, LayoutGrid, Building2, BookOpen, BarChart3, CheckCircle2,
-  GraduationCap, ListChecks, Check, MessageSquare, Send, StickyNote, Trash2, ChevronRight, ShieldCheck, RefreshCw, AlertTriangle,
+  GraduationCap, ListChecks, Check, MessageSquare, Send, StickyNote, Trash2, ChevronRight, ShieldCheck, RefreshCw, AlertTriangle, DollarSign, Flame,
 } from 'lucide-react';
 import {
   listFirms, listActivity, addFirm, logActivity,
   listMessages, sendMessage, getCurrentMember,
-  listNotes, addNote, deleteNote,
+  listNotes, addNote, deleteNote, getIntakesCount, setFirmStage,
   type CrmFirm, type CrmActivityWithFirm, type NewFirmInput, type LogActivityInput, type CrmMessage, type CrmNote,
 } from '../../services/crmService';
+import {
+  computeRevenue, targetColor, dailyTargetsContext, tierPrice, DAILY_TARGETS, PHASE1_PAYING_TARGET, COMMISSION_RATE, TIER_PRICES,
+} from '../../services/crmAnalytics';
 import { CRM_STAGES, CRM_STAGE_LABELS, type CrmStage } from '../../services/crmStageLogic';
 import { CRM_WEEKLY_TARGETS, CRM_CALL_SCRIPT, CRM_OBJECTIONS, CRM_COLD_EMAIL } from '../constants/crmReference';
 import { FIRE_DEMO_TRAINING, PI_RULES, CRM_COMMISSIONS, CRM_SUBSCRIPTION_TIERS, LAUNCH_CHECKLIST } from '../constants/crmTraining';
 import { AUDIT_SITE_CHECKS, AUDIT_MANUAL_GROUPS } from '../constants/crmAudit';
 
-type Tab = 'dashboard' | 'pipeline' | 'firms' | 'activity' | 'metrics' | 'team' | 'notes' | 'scripts' | 'training' | 'checklist' | 'audit' | 'add';
+type Tab = 'dashboard' | 'pipeline' | 'firms' | 'activity' | 'metrics' | 'revenue' | 'team' | 'notes' | 'scripts' | 'training' | 'checklist' | 'audit' | 'add';
 
 // `founderOnly` tabs are hidden from sales reps.
 const TABS: { id: Tab; label: string; icon: typeof LayoutGrid; founderOnly?: boolean }[] = [
@@ -37,6 +40,7 @@ const TABS: { id: Tab; label: string; icon: typeof LayoutGrid; founderOnly?: boo
   { id: 'training', label: 'Training', icon: GraduationCap },
   { id: 'checklist', label: 'Checklist', icon: ListChecks, founderOnly: true },
   { id: 'audit', label: 'Audit', icon: ShieldCheck, founderOnly: true },
+  { id: 'revenue', label: 'Revenue', icon: DollarSign, founderOnly: true },
   { id: 'add', label: 'Add / Log', icon: Plus },
 ];
 
@@ -76,6 +80,7 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
   const [tab, setTab] = useState<Tab>('dashboard');
   const [firms, setFirms] = useState<CrmFirm[]>([]);
   const [activity, setActivity] = useState<CrmActivityWithFirm[]>([]);
+  const [workerCount, setWorkerCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [lastFirmId, setLastFirmId] = useState<string>('');
@@ -89,11 +94,12 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
 
   const load = async () => {
     setLoading(true);
-    const [f, a] = await Promise.all([listFirms(), listActivity(200)]);
+    const [f, a, wc] = await Promise.all([listFirms(), listActivity(200), getIntakesCount()]);
     if (f.error) setError(f.error);
     if (a.error) setError(a.error);
     setFirms(f.data);
     setActivity(a.data);
+    setWorkerCount(wc);
     setLoading(false);
   };
 
@@ -161,8 +167,8 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
           <div className="py-20 text-center text-sm text-[#1E1B4B]/40">Loading…</div>
         ) : (
           <>
-            {tab === 'dashboard' && <DashboardTab firms={firms} activity={activity} today={today} onLog={openFast} />}
-            {tab === 'pipeline' && <PipelineTab firms={firms} onLog={openFast} />}
+            {tab === 'dashboard' && <DashboardTab firms={firms} activity={activity} today={today} onLog={openFast} workerCount={workerCount} onChanged={load} />}
+            {tab === 'pipeline' && <PipelineTab firms={firms} onLog={openFast} workerCount={workerCount} />}
             {tab === 'firms' && <FirmsTab firms={firms} onLog={openFast} />}
             {tab === 'activity' && <ActivityTab activity={activity} />}
             {tab === 'metrics' && <MetricsTab firms={firms} activity={activity} />}
@@ -172,6 +178,7 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
             {tab === 'training' && <TrainingTab />}
             {tab === 'checklist' && isFounder && <ChecklistTab />}
             {tab === 'audit' && isFounder && <AuditTab />}
+            {tab === 'revenue' && isFounder && <RevenueTab firms={firms} />}
             {tab === 'add' && (
               <AddLogTab firms={firms} lastFirmId={lastFirmId} onSaved={(fid) => { if (fid) setLastFirmId(fid); void load(); }} setError={setError} />
             )}
@@ -291,12 +298,13 @@ function FirmCard({ firm, onLog, today }: { firm: CrmFirm; onLog: (id: string) =
 }
 
 // ── Dashboard ────────────────────────────────────────────────────────────────
-function DashboardTab({ firms, activity, today, onLog }: { firms: CrmFirm[]; activity: CrmActivityWithFirm[]; today: string; onLog: (id: string) => void }) {
+function DashboardTab({ firms, activity, today, onLog, workerCount, onChanged }: { firms: CrmFirm[]; activity: CrmActivityWithFirm[]; today: string; onLog: (id: string) => void; workerCount: number; onChanged: () => void }) {
   const stats = [
     { label: 'Firms', value: firms.length },
     { label: 'Calls', value: activity.filter((a) => a.activity_type === 'call').length },
     { label: 'Demos booked', value: firms.filter((f) => f.stage === 'demo_booked').length },
     { label: 'Active pilots', value: firms.filter((f) => f.stage === 'pilot').length },
+    { label: 'Workers organized', value: workerCount },
   ];
   const due = firms
     .filter((f) => f.next_followup && f.next_followup <= today)
@@ -305,7 +313,7 @@ function DashboardTab({ firms, activity, today, onLog }: { firms: CrmFirm[]; act
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
         {stats.map((s) => (
           <div key={s.label} className="rounded-[14px] border border-[#E7E1FF] bg-white p-4">
             <div className="text-[26px] font-black leading-none text-[#6D4AFF]">{s.value}</div>
@@ -313,6 +321,8 @@ function DashboardTab({ firms, activity, today, onLog }: { firms: CrmFirm[]; act
           </div>
         ))}
       </div>
+
+      <DemoPrepCard firms={firms} today={today} onChanged={onChanged} />
 
       <section>
         <h2 className="mb-2 text-[14px] font-bold">Follow-ups due today</h2>
@@ -322,6 +332,8 @@ function DashboardTab({ firms, activity, today, onLog }: { firms: CrmFirm[]; act
           <div className="space-y-3">{due.map((f) => <FirmCard key={f.id} firm={f} onLog={onLog} today={today} />)}</div>
         )}
       </section>
+
+      <DailyTargetsScoreboard activity={activity} today={today} />
 
       <section>
         <h2 className="mb-2 text-[14px] font-bold">Recent activity</h2>
@@ -335,12 +347,192 @@ function DashboardTab({ firms, activity, today, onLog }: { firms: CrmFirm[]; act
   );
 }
 
+// ── Demo prep card (top of Dashboard; only when a demo is booked) ────────────
+function DemoPrepCard({ firms, today, onChanged }: { firms: CrmFirm[]; today: string; onChanged: () => void }) {
+  const [busyId, setBusyId] = useState<string | null>(null);
+  const booked = firms.filter((f) => f.stage === 'demo_booked');
+  if (booked.length === 0) return null;
+
+  const markDone = async (id: string) => { setBusyId(id); await setFirmStage(id, 'demo_done'); setBusyId(null); onChanged(); };
+
+  const daysUntil = (date: string | null): string => {
+    if (!date) return 'date not set';
+    const d = Math.round((new Date(date + 'T00:00:00').getTime() - new Date(today + 'T00:00:00').getTime()) / 86400000);
+    if (d === 0) return 'today';
+    if (d === 1) return 'tomorrow';
+    return d < 0 ? `${Math.abs(d)}d ago` : `in ${d}d`;
+  };
+
+  const discoveryQuestions = (focus: string | null): string[] => {
+    const f = (focus ?? '').toLowerCase();
+    const QW = 'Who sorts the records before attorney review?';
+    const QR = 'How does a new employment intake usually come in today?';
+    const QD = 'What makes an intake a waste of time?';
+    if (/wage|hour/.test(f)) return [QW, QR, QD];
+    if (/retaliation|termination/.test(f)) return [QR, QW, QD];
+    return [QD, QW, QR];
+  };
+
+  const fireAngle = (region: string | null): boolean => {
+    const r = (region ?? '').toLowerCase();
+    return r.includes('los angeles') || r.includes('sacramento');
+  };
+
+  return (
+    <section className="space-y-3">
+      <div className="flex items-center gap-2"><Flame className="h-4 w-4 text-amber-600" /><h2 className="text-[14px] font-bold">Demo prep</h2></div>
+      {booked.map((f) => (
+        <div key={f.id} className="rounded-[16px] border-2 border-amber-300 bg-amber-50 p-4">
+          <div className="mb-1 flex items-start justify-between gap-2">
+            <div className="min-w-0">
+              <div className="truncate text-[15px] font-bold text-[#1E1B4B]">{f.name}</div>
+              {f.attorney_name && <div className="text-[12px] text-[#1E1B4B]/55">{f.attorney_name}</div>}
+            </div>
+            <span className="shrink-0 rounded-full bg-amber-200 px-2 py-0.5 text-[11px] font-bold text-amber-800">Demo {daysUntil(f.next_followup)}</span>
+          </div>
+          <div className="mb-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[13px]">
+            {f.phone && <span className="flex items-center gap-1.5"><Phone className="h-3.5 w-3.5 text-[#1E1B4B]/40" /><PhoneLink phone={f.phone} /></span>}
+            {f.region && <span className="text-[#1E1B4B]/55">{f.region}</span>}
+          </div>
+          {f.focus_areas && <p className="mb-2 text-[12px] leading-relaxed text-[#1E1B4B]/60">Focus: {f.focus_areas}</p>}
+          <div className="mb-1 text-[11px] font-bold uppercase tracking-wide text-amber-800/70">Lead with these</div>
+          <ol className="mb-2 list-decimal space-y-1 pl-5 text-[13px] text-[#1E1B4B]/80">
+            {discoveryQuestions(f.focus_areas).map((q) => <li key={q}>{q}</li>)}
+          </ol>
+          {fireAngle(f.region) && (
+            <p className="mb-3 rounded-[10px] bg-amber-200/60 px-3 py-2 text-[12px] font-medium leading-relaxed text-amber-900">
+              Tracy/Medline and Boyle Heights fire-displaced workers are the most urgent intake population right now — use this as the opening hook.
+            </p>
+          )}
+          <button type="button" onClick={() => markDone(f.id)} disabled={busyId === f.id} className={`flex ${tap} w-full items-center justify-center gap-2 rounded-[12px] bg-amber-600 font-semibold text-white disabled:opacity-50`}>
+            <Check className="h-4 w-4" /> {busyId === f.id ? 'Saving…' : 'Mark demo done'}
+          </button>
+        </div>
+      ))}
+    </section>
+  );
+}
+
+// ── Daily targets scoreboard (Dashboard) ─────────────────────────────────────
+function DailyTargetsScoreboard({ activity, today }: { activity: CrmActivityWithFirm[]; today: string }) {
+  const monday = startOfWeekISO();
+  const calls = activity.filter((a) => a.activity_type === 'call' && a.activity_date === today).length;
+  const emails = activity.filter((a) => a.activity_type === 'email' && a.activity_date === today).length;
+  const demos = activity.filter((a) => a.activity_type === 'demo' && (a.activity_date ?? '') >= monday).length;
+  const cards = [
+    { label: 'Calls today', count: calls, target: DAILY_TARGETS.calls },
+    { label: 'Emails today', count: emails, target: DAILY_TARGETS.emails },
+    { label: 'Demos this week', count: demos, target: DAILY_TARGETS.demos },
+  ];
+  const colorMap = {
+    green: { text: 'text-emerald-600', bar: 'bg-emerald-500' },
+    amber: { text: 'text-amber-600', bar: 'bg-amber-500' },
+    gray: { text: 'text-[#1E1B4B]/35', bar: 'bg-[#1E1B4B]/25' },
+  };
+  return (
+    <section>
+      <h2 className="mb-2 text-[14px] font-bold">Today’s targets</h2>
+      <div className="grid grid-cols-3 gap-2">
+        {cards.map((c) => {
+          const color = colorMap[targetColor(c.count, c.target)];
+          const pct = Math.min(100, Math.round((c.count / c.target) * 100));
+          return (
+            <div key={c.label} className="rounded-[14px] border border-[#E7E1FF] bg-white p-3">
+              <div className={`text-[26px] font-black leading-none ${color.text}`}>{c.count}</div>
+              <div className="mt-1 text-[10px] font-semibold leading-tight text-[#1E1B4B]/55">{c.label}</div>
+              <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[#F0EBFF]"><div className={`h-full rounded-full ${color.bar}`} style={{ width: `${pct}%` }} /></div>
+              <div className="mt-1 text-[10px] text-[#1E1B4B]/40">target: {c.target}</div>
+            </div>
+          );
+        })}
+      </div>
+      <p className="mt-2 text-[12px] font-medium text-[#6D4AFF]">{dailyTargetsContext(calls, emails, demos)}</p>
+    </section>
+  );
+}
+
+// ── Revenue (founder-only) ───────────────────────────────────────────────────
+function RevenueTab({ firms }: { firms: CrmFirm[] }) {
+  const r = computeRevenue(firms);
+  const paid = firms.filter((f) => f.stage === 'paid');
+  const usd = (n: number) => `$${n.toLocaleString()}`;
+  const progressPct = Math.min(100, Math.round((r.paidCount / PHASE1_PAYING_TARGET) * 100));
+  return (
+    <div className="space-y-5">
+      <section>
+        <h2 className="mb-2 text-[14px] font-bold">Current MRR (actual)</h2>
+        <div className="rounded-[16px] border border-[#DCD3FF] bg-[#F7F3FF] p-4">
+          <div className="text-[32px] font-black leading-none text-[#6D4AFF]">{usd(r.currentMrr)}<span className="text-[14px] font-semibold text-[#1E1B4B]/40">/mo</span></div>
+          <div className="mt-1 text-[12px] text-[#1E1B4B]/55">{r.paidCount} paying firm{r.paidCount === 1 ? '' : 's'}</div>
+          <div className="mt-3 grid grid-cols-3 gap-2">
+            {r.perTier.map((t) => (
+              <div key={t.tier} className="rounded-[10px] border border-[#E7E1FF] bg-white px-2 py-2 text-center">
+                <div className="text-[15px] font-black text-[#1E1B4B]">{t.count}</div>
+                <div className="text-[10px] font-semibold capitalize text-[#1E1B4B]/55">{t.tier} · ${TIER_PRICES[t.tier]}</div>
+              </div>
+            ))}
+          </div>
+          {r.currentMrr === 0 && <p className="mt-3 text-[12px] text-[#1E1B4B]/45">No firms on paid plans yet — $0 until conversions begin (Stripe billing not live yet).</p>}
+        </div>
+      </section>
+
+      <section>
+        <h2 className="mb-2 text-[14px] font-bold">Pipeline forecast</h2>
+        <div className="rounded-[16px] border border-[#E7E1FF] bg-white p-4">
+          <div className="text-[26px] font-black leading-none text-[#1E1B4B]">{usd(r.projectedMrr)}<span className="text-[13px] font-semibold text-[#1E1B4B]/40">/mo</span></div>
+          <div className="mt-1 text-[12px] text-[#1E1B4B]/55">projected — 30% conversion estimate on {r.candidateCount} pipeline firm{r.candidateCount === 1 ? '' : 's'} at Practice tier</div>
+        </div>
+      </section>
+
+      <section>
+        <h2 className="mb-2 text-[14px] font-bold">Phase 1 target: {PHASE1_PAYING_TARGET} paying firms</h2>
+        <div className="rounded-[16px] border border-[#E7E1FF] bg-white p-4">
+          <div className="mb-2 flex items-center justify-between text-[13px] font-semibold"><span>{r.paidCount} of {PHASE1_PAYING_TARGET}</span><span className="text-[#6D4AFF]">{progressPct}%</span></div>
+          <div className="h-2.5 overflow-hidden rounded-full bg-[#F0EBFF]"><div className="h-full rounded-full bg-[#6D4AFF]" style={{ width: `${progressPct}%` }} /></div>
+        </div>
+      </section>
+
+      <section>
+        <h2 className="mb-2 text-[14px] font-bold">Commission liability ({Math.round(COMMISSION_RATE * 100)}% recurring)</h2>
+        {paid.length === 0 ? (
+          <p className="rounded-[12px] border border-[#E7E1FF] bg-white px-4 py-3 text-[13px] text-[#1E1B4B]/45">No paying firms yet — $0 commission liability.</p>
+        ) : (
+          <div className="space-y-2">
+            {paid.map((f) => (
+              <div key={f.id} className="flex items-center justify-between rounded-[12px] border border-[#E7E1FF] bg-white px-4 py-2.5">
+                <span className="truncate text-[13px] font-semibold">{f.name}</span>
+                <span className="text-[13px] text-[#1E1B4B]/70">{usd(Math.round(tierPrice(f.subscription_tier) * COMMISSION_RATE))}/mo</span>
+              </div>
+            ))}
+            <div className="flex items-center justify-between rounded-[12px] bg-[#EDE7FF] px-4 py-2.5">
+              <span className="text-[13px] font-bold text-[#6D4AFF]">Total monthly commission</span>
+              <span className="text-[13px] font-bold text-[#6D4AFF]">{usd(r.commissionMonthly)}/mo</span>
+            </div>
+          </div>
+        )}
+      </section>
+
+      <p className="text-[11px] leading-relaxed text-[#1E1B4B]/40">Figures derive from the CRM pipeline only (no Stripe integration). Forecast is an estimate, not booked revenue.</p>
+    </div>
+  );
+}
+
 // ── Pipeline ─────────────────────────────────────────────────────────────────
-function PipelineTab({ firms, onLog }: { firms: CrmFirm[]; onLog: (id: string) => void }) {
+function PipelineTab({ firms, onLog, workerCount }: { firms: CrmFirm[]; onLog: (id: string) => void; workerCount: number }) {
   const counts = CRM_STAGES.map((s) => ({ stage: s, n: firms.filter((f) => f.stage === s).length }));
   const priorityA = firms.filter((f) => f.priority === 'A');
   return (
     <div className="space-y-6">
+      <div className="grid grid-cols-2 gap-3">
+        <div className="rounded-[14px] border border-[#E7E1FF] bg-white p-4">
+          <div className="text-[26px] font-black leading-none text-[#6D4AFF]">{firms.length}</div>
+          <div className="mt-1 text-[11px] font-semibold text-[#1E1B4B]/55">Firms in pipeline</div>
+        </div>
+        <div className="rounded-[14px] border border-[#E7E1FF] bg-white p-4">
+          <div className="text-[26px] font-black leading-none text-[#6D4AFF]">{workerCount}</div>
+          <div className="mt-1 text-[11px] font-semibold text-[#1E1B4B]/55">Workers organized</div>
+        </div>
+      </div>
       <section>
         <h2 className="mb-2 text-[14px] font-bold">Stage counts</h2>
         <div className="grid grid-cols-3 gap-2 sm:grid-cols-3">

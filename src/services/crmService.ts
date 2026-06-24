@@ -25,6 +25,7 @@ export interface CrmFirm {
   source: string | null;
   next_followup: string | null;
   notes: string | null;
+  subscription_tier: 'solo' | 'practice' | 'firm' | null;
   created_at: string;
 }
 
@@ -78,6 +79,28 @@ const clean = (v: string | undefined | null): string | null => {
   const t = (v ?? '').trim();
   return t ? t : null;
 };
+
+/** Update a firm's stage directly (e.g. "Mark demo done"). */
+export async function setFirmStage(firmId: string, stage: string): Promise<{ error?: string }> {
+  const { error } = await supabase.from('crm_firms').update({ stage }).eq('id', firmId);
+  if (error) return { error: error.message };
+  return {};
+}
+
+/**
+ * Founder-only COUNT of worker intakes (proof of traction). Calls the intakes_count() RPC,
+ * which returns an integer only — never rows or PII. Returns 0 on any error or non-numeric
+ * result (e.g. before the migration is applied), so founder access is never affected.
+ */
+export async function getIntakesCount(): Promise<number> {
+  try {
+    const { data, error } = await supabase.rpc('intakes_count');
+    if (error || typeof data !== 'number') return 0;
+    return data;
+  } catch {
+    return 0;
+  }
+}
 
 // ── Shared team notes board ──────────────────────────────────────────────────
 
