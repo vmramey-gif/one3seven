@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { OneThreeSevenLoader } from '../components/ui/OneThreeSevenLoader';
 import { motion } from 'motion/react';
-import { ArrowLeft, Calendar, FileText, Clock } from 'lucide-react';
+import { ArrowLeft, FileText, Clock } from 'lucide-react';
 import { Screen } from '../App';
 import { isSupabaseConfigured } from '../../lib/supabaseClient';
 import * as intakeData from '../../services/intakeDataService';
@@ -88,13 +88,13 @@ export function WorkerTimelineScreen({
       : [];
 
   return (
-    <div className="min-h-screen bg-white">
-      <nav className="sticky top-0 bg-white/80 backdrop-blur-md border-b border-slate-100 z-50">
+    <div className="min-h-screen bg-[#FAF9F6]">
+      <nav className="sticky top-0 bg-[#FAF9F6]/85 backdrop-blur-md border-b border-[#ECE7F5] z-50">
         <div className="px-6 py-5 flex items-center justify-between gap-2">
           <button
             type="button"
             onClick={onBackToDashboard}
-            className="text-xl font-semibold text-[#1E1B4B] hover:opacity-70 transition-opacity"
+            className="text-xl font-semibold text-[#14112E] hover:opacity-70 transition-opacity"
           >
             <WordMark />
           </button>
@@ -104,7 +104,7 @@ export function WorkerTimelineScreen({
               <button
                 type="button"
                 onClick={onOpenSettings}
-                className="text-xs text-slate-600 hover:text-slate-900 px-2 py-1.5 rounded-lg hover:bg-slate-50"
+                className="text-xs text-[#6B6685] hover:text-[#14112E] px-2 py-1.5 rounded-lg hover:bg-[#F1ECFE]"
               >
                 Settings
               </button>
@@ -113,7 +113,7 @@ export function WorkerTimelineScreen({
               <button
                 type="button"
                 onClick={onSignOut}
-                className="text-xs text-slate-600 hover:text-slate-900 px-2 py-1.5 rounded-lg hover:bg-slate-50"
+                className="text-xs text-[#6B6685] hover:text-[#14112E] px-2 py-1.5 rounded-lg hover:bg-[#F1ECFE]"
               >
                 Sign out
               </button>
@@ -126,7 +126,7 @@ export function WorkerTimelineScreen({
         <button
           type="button"
           onClick={onBackToDashboard}
-          className="flex items-center gap-1.5 text-xs uppercase tracking-wide text-slate-500 hover:text-slate-700"
+          className="flex items-center gap-1.5 text-xs uppercase tracking-wide text-[#8B86A0] hover:text-[#5B21B6]"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           Your dashboard
@@ -135,8 +135,8 @@ export function WorkerTimelineScreen({
 
       <div className="px-6 pt-6 pb-16">
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
-          <h1 className="text-2xl font-semibold text-slate-900 mb-2">Timeline</h1>
-          <p className="text-sm text-slate-600 leading-relaxed">
+          <h1 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="text-[28px] font-medium tracking-[-0.01em] text-[#14112E] mb-2">Timeline</h1>
+          <p className="text-sm text-[#6B6685] leading-relaxed">
             Your key events organized in order. Tap an event for details.
           </p>
         </motion.div>
@@ -146,55 +146,49 @@ export function WorkerTimelineScreen({
         ) : err ? (
           <p className="text-sm text-red-600">{err}</p>
         ) : !intakeId ? (
-          <div className="rounded-[14px] border border-slate-200 bg-slate-50 p-6 text-center">
-            <p className="text-sm text-slate-700 mb-4">No active intake selected.</p>
+          <div className="rounded-2xl border border-[#ECE7F5] bg-white p-6 text-center">
+            <p className="text-sm text-[#6B6685] mb-4">No active intake selected.</p>
             <button
               type="button"
               onClick={() => onNavigate('upload')}
-              className="text-sm font-medium bg-slate-900 text-white px-4 py-2 rounded-[12px] hover:bg-slate-800"
+              className="text-sm font-semibold bg-[#5B21B6] text-white px-5 py-2.5 rounded-full hover:bg-[#4C1D96] transition"
             >
               Start organizing
             </button>
           </div>
         ) : displayRows.length > 0 ? (
-          <ul className="space-y-3">
+          <ol className="relative ml-1 space-y-4 border-l border-[#E7DEF7] pl-6">
             {displayRows.map((item, i) => (
-              <li key={item.timelineEventId ?? `${item.date}-${item.event}-${i}`}>
+              <li key={item.timelineEventId ?? `${item.date}-${item.event}-${i}`} className="relative">
+                <span className="absolute -left-[31px] top-4 h-3 w-3 rounded-full bg-[#5B21B6] ring-4 ring-[#5B21B6]/10" />
                 <button
                   type="button"
                   onClick={() => onSelectItem(item)}
-                  className="w-full text-left rounded-[14px] border border-slate-200 bg-white p-4 hover:border-slate-300 hover:shadow-sm transition-all"
+                  className="w-full text-left rounded-2xl border border-[#ECE7F5] bg-white p-4 transition-all hover:border-[#C9B8F0] hover:shadow-[0_8px_28px_rgba(91,33,182,0.08)]"
                 >
-                  <div className="flex items-start gap-3">
-                    <div className="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0">
-                      <Calendar className="w-4 h-4 text-slate-600" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-xs text-slate-500 mb-1">{item.date}</p>
-                      <p className="text-sm font-medium text-slate-900 mb-1">{item.event}</p>
-                      <p className="text-xs text-slate-600 line-clamp-2">{item.summary}</p>
-                      {(item.workerAddedContext ?? '').trim() ? (
-                        <p className="text-[11px] text-slate-500 mt-1">
-                          <span className="font-medium text-slate-700">Added context</span> · present
-                        </p>
-                      ) : null}
-                      <div className="flex items-center gap-2 mt-2 text-xs text-slate-500">
-                        <FileText className="w-3.5 h-3.5" />
-                        <span>{item.category}</span>
-                        {item.relatedDocs > 0 ? (
-                          <>
-                            <span className="text-slate-300">·</span>
-                            <Clock className="w-3.5 h-3.5" />
-                            <span>{item.relatedDocs} related</span>
-                          </>
-                        ) : null}
-                      </div>
-                    </div>
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-[#5B21B6] mb-1">{item.date}</p>
+                  <p className="text-[15px] font-medium text-[#14112E] mb-1">{item.event}</p>
+                  <p className="text-xs text-[#6B6685] line-clamp-2">{item.summary}</p>
+                  {(item.workerAddedContext ?? '').trim() ? (
+                    <p className="text-[11px] text-[#8B86A0] mt-1">
+                      <span className="font-medium text-[#6B6685]">Added context</span> · present
+                    </p>
+                  ) : null}
+                  <div className="flex items-center gap-2 mt-2 text-xs text-[#8B86A0]">
+                    <FileText className="w-3.5 h-3.5" />
+                    <span>{item.category}</span>
+                    {item.relatedDocs > 0 ? (
+                      <>
+                        <span className="text-[#D6CEE8]">·</span>
+                        <Clock className="w-3.5 h-3.5" />
+                        <span>{item.relatedDocs} related</span>
+                      </>
+                    ) : null}
                   </div>
                 </button>
               </li>
             ))}
-          </ul>
+          </ol>
         ) : rows.length === 0 && SHOW_SAMPLE_INTAKE && !(uploadFallbackTimeline && uploadFallbackTimeline.length) ? (
           <div className="rounded-[14px] border border-dashed border-amber-200 bg-amber-50/60 p-6">
             <p className="text-xs font-semibold text-amber-950 mb-1">{SAMPLE_DEMO_LABEL}</p>
@@ -212,22 +206,22 @@ export function WorkerTimelineScreen({
                   workerAddedContext: null,
                 })
               }
-              className="w-full text-left rounded-[14px] border border-slate-200 bg-white p-4 hover:border-slate-300 hover:shadow-sm transition-all"
+              className="w-full text-left rounded-2xl border border-[#ECE7F5] bg-white p-4 hover:border-[#C9B8F0] hover:shadow-[0_8px_28px_rgba(91,33,182,0.08)] transition-all"
             >
-              <p className="text-xs text-slate-500 mb-1">Jan – Mar 2026</p>
-              <p className="text-sm font-medium text-slate-900 mb-1">Payroll and schedule alignment window</p>
-              <p className="text-xs text-slate-600 line-clamp-3">{SAMPLE_INTAKE_SUMMARY_PREVIEW.timelineSummary}</p>
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-[#5B21B6] mb-1">Jan – Mar 2026</p>
+              <p className="text-[15px] font-medium text-[#14112E] mb-1">Payroll and schedule alignment window</p>
+              <p className="text-xs text-[#6B6685] line-clamp-3">{SAMPLE_INTAKE_SUMMARY_PREVIEW.timelineSummary}</p>
             </button>
           </div>
         ) : (
-          <div className="rounded-[14px] border border-slate-200 bg-slate-50 p-6 text-center">
-            <p className="text-sm text-slate-700 mb-4">
+          <div className="rounded-2xl border border-[#ECE7F5] bg-white p-6 text-center">
+            <p className="text-sm text-[#6B6685] mb-4">
               No timeline yet. Add your story or records to begin organizing.
             </p>
             <button
               type="button"
               onClick={() => onNavigate('upload')}
-              className="text-sm font-medium bg-slate-900 text-white px-4 py-2 rounded-[12px] hover:bg-slate-800"
+              className="text-sm font-semibold bg-[#5B21B6] text-white px-5 py-2.5 rounded-full hover:bg-[#4C1D96] transition"
             >
               Go to upload
             </button>
