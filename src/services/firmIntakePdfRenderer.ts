@@ -7,8 +7,16 @@
  * Brand color: #5B21B6 ("bold confidence").
  */
 
-import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage, type RGB } from 'pdf-lib';
+import { PDFDocument, StandardFonts, rgb, PDFName, PDFArray, type PDFFont, type PDFPage, type RGB } from 'pdf-lib';
 import type { DamagesReport } from './damagesCalculator';
+
+/**
+ * A cited source document, supplied so the renderer can embed its pages as an appendix
+ * and hyperlink each citation to the exact reproduced page (self-contained, forwardable).
+ * docId must match SourceCitation.docId. Unsupported/undecodable files are skipped
+ * gracefully (the citation then renders as plain text, as before).
+ */
+export type PdfSourceDoc = { docId: string; fileName: string; mime: string; bytes: Uint8Array };
 
 // ── Brand + palette ──────────────────────────────────────────────────────────
 const BRAND = rgb(0x5b / 255, 0x21 / 255, 0xb6 / 255); // #5B21B6
@@ -82,12 +90,24 @@ class Cursor {
   page: PDFPage;
   y = PAGE_H - MARGIN;
   pageNo = 0;
+  /** Citation link hot-spots captured during body render; resolved once the source
+   *  appendix is embedded and the docId→page destination map is known. */
+  pendingLinks: Array<{ page: PDFPage; rect: [number, number, number, number]; docId: string }> = [];
   constructor(
     private doc: PDFDocument,
     public font: PDFFont,
     public bold: PDFFont,
   ) {
     this.page = this.addPage();
+  }
+
+  get document(): PDFDocument {
+    return this.doc;
+  }
+
+  /** Register a clickable rectangle on the current page to be linked to `docId`'s source page. */
+  linkRect(rect: [number, number, number, number], docId: string): void {
+    this.pendingLinks.push({ page: this.page, rect, docId });
   }
 
   private addPage(): PDFPage {
@@ -297,7 +317,7 @@ function drawSection8B(c: Cursor, wage: { report: DamagesReport; disclaimer: str
     for (const li of cited) {
       const cit = li.citation!;
       const page = cit.page > 0 ? ` (p. ${cit.page})` : '';
-      c.text(`${li.label} → ${cit.docName}${page}`, { size: 8.5, font: c.bold, color: SOFT });
+      drawCitationLink(c, `${li.label} -> ${cit.docName}${page}  »`, cit.docId);
       c.text(`“${cit.sourceText}”`, { size: 8.5, color: MUTED, x: MARGIN + 12 });
       c.gap(2);
     }
@@ -311,6 +331,131 @@ function drawWageDisclaimer(c: Cursor, lines: string[]): void {
   for (const d of lines) {
     c.text(d, { size: 8, color: MUTED });
     c.gap(2);
+  }
+}
+
+// ── Source-linked citations (clickable → embedded source page) ────────────────
+
+/** Draw a single citation as brand-colored text and register it as a link hot-spot. */
+function drawCitationLink(c: Cursor, label: string, docId: string): void {
+  const size = 8.5;
+  const leading = size * 1.5;
+  c.ensure(leading);
+  const x = MARGIN;
+  const yText = c.y - size;
+  c.page.drawText(label, { x, y: yText, size, font: c.bold, color: BRAND });
+  const w = c.bold.widthOfTextAtSize(label, size);
+  c.linkRect([x - 1, yText - 2, x + w + 2, yText + size + 1], docId);
+  c.y -= leading;
+}
+
+/** Low-level pdf-lib internal link annotation: a rectangle on `fromPage` that jumps to `destPage`. */
+function addInternalLink(
+  doc: PDFDocument,
+  fromPage: PDFPage,
+  rect: [number, number, number, number],
+  destPage: PDFPage,
+): void {
+  const ctx = doc.context;
+  const dest = PDFArray.withContext(ctx);
+  dest.push(destPage.ref);
+  dest.push(PDFName.of('Fit'));
+  const annot = ctx.obj({
+    Type: PDFName.of('Annot'),
+    Subtype: PDFName.of('Link'),
+    Rect: rect,
+    Border: [0, 0, 0],
+    Dest: dest,
+  });
+  const ref = ctx.register(annot);
+  const existing = fromPage.node.Annots();
+  if (existing) existing.push(ref);
+  else fromPage.node.set(PDFName.of('Annots'), ctx.obj([ref]));
+}
+
+/** Thin brand tab drawn on top of an embedded source page so the reader sees its filename. */
+function drawSourceTab(page: PDFPage, font: PDFFont, fileName: string): void {
+  const h = 20;
+  const { width, height } = page.getSize();
+  page.drawRectangle({ x: 0, y: height - h, width, height: h, color: BRAND });
+  const label = `Source · ${fileName}`;
+  page.drawText(label.length > 90 ? label.slice(0, 89) + '…' : label, {
+    x: 10,
+    y: height - h + 6,
+    size: 8,
+    font,
+    color: WHITE,
+  });
+}
+
+/**
+ * Embed each cited source document's pages as an appendix. Returns a map of docId → the
+ * first reproduced page (the jump destination). Unsupported/undecodable files are skipped.
+ */
+async function embedSourceRecords(c: Cursor, sources: PdfSourceDoc[]): Promise<Map<string, PDFPage>> {
+  const doc = c.document;
+  const destMap = new Map<string, PDFPage>();
+  if (!sources.length) return destMap;
+
+  c.newPage();
+  sectionHeading(c, 'Source Records');
+  c.text(
+    'Cited documents, reproduced here for verification. Each citation above links to the exact page.',
+    { size: 9, color: MUTED },
+  );
+
+  for (const src of sources) {
+    const name = (src.fileName || '').toLowerCase();
+    const mime = (src.mime || '').toLowerCase();
+    try {
+      if (mime.includes('pdf') || name.endsWith('.pdf')) {
+        const srcDoc = await PDFDocument.load(src.bytes, { ignoreEncryption: true });
+        const eps = await doc.embedPdf(srcDoc, srcDoc.getPageIndices());
+        eps.forEach((ep, idx) => {
+          const p = doc.addPage([ep.width, ep.height]);
+          p.drawPage(ep, { x: 0, y: 0, width: ep.width, height: ep.height });
+          drawSourceTab(p, c.font, src.fileName);
+          if (idx === 0) destMap.set(src.docId, p);
+        });
+      } else if (mime.includes('png') || name.endsWith('.png')) {
+        const img = await doc.embedPng(src.bytes);
+        destMap.set(src.docId, addImagePage(doc, c.font, img.width, img.height, (p, w, h) => p.drawImage(img, { x: 0, y: 0, width: w, height: h }), src.fileName));
+      } else if (mime.includes('jp') || name.endsWith('.jpg') || name.endsWith('.jpeg')) {
+        const img = await doc.embedJpg(src.bytes);
+        destMap.set(src.docId, addImagePage(doc, c.font, img.width, img.height, (p, w, h) => p.drawImage(img, { x: 0, y: 0, width: w, height: h }), src.fileName));
+      }
+      // Other types (docx, etc.) can't be embedded as pages — skipped; citation stays text.
+    } catch {
+      // Corrupt/undecodable file — skip; citation gracefully falls back to plain text.
+    }
+  }
+  return destMap;
+}
+
+/** Add a full page sized to an embedded image (capped to letter width), draw it, return the page. */
+function addImagePage(
+  doc: PDFDocument,
+  font: PDFFont,
+  imgW: number,
+  imgH: number,
+  draw: (page: PDFPage, w: number, h: number) => void,
+  fileName: string,
+): PDFPage {
+  const maxW = PAGE_W;
+  const scale = Math.min(1, maxW / imgW);
+  const w = imgW * scale;
+  const h = imgH * scale;
+  const p = doc.addPage([w, h]);
+  draw(p, w, h);
+  drawSourceTab(p, font, fileName);
+  return p;
+}
+
+/** After the appendix is embedded, wire every captured citation hot-spot to its source page. */
+function resolveCitationLinks(c: Cursor, destMap: Map<string, PDFPage>): void {
+  for (const pl of c.pendingLinks) {
+    const dest = destMap.get(pl.docId);
+    if (dest) addInternalLink(c.document, pl.page, pl.rect, dest);
   }
 }
 
@@ -481,7 +626,10 @@ function drawDvwRows(c: Cursor, rows: Array<{ question: string; support: string 
 }
 
 // ── Main render ──────────────────────────────────────────────────────────────
-export async function renderFirmIntakePacketPdf(model: FirmPacketModel): Promise<Uint8Array> {
+export async function renderFirmIntakePacketPdf(
+  model: FirmPacketModel,
+  sources: PdfSourceDoc[] = [],
+): Promise<Uint8Array> {
   const doc = await PDFDocument.create();
   doc.setTitle('one3seven — Firm Intake Review');
   doc.setCreator('one3seven');
@@ -656,6 +804,12 @@ export async function renderFirmIntakePacketPdf(model: FirmPacketModel): Promise
     c.gap(3);
   }
   void AMBER_FILL;
+
+  // Appendix: embed cited source pages, then wire each citation to its page.
+  if (sources.length) {
+    const destMap = await embedSourceRecords(c, sources);
+    resolveCitationLinks(c, destMap);
+  }
 
   return doc.save();
 }

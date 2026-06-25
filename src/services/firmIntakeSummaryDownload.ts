@@ -14,7 +14,8 @@ import {
   type CategoryCountRow,
   type IntakeSummaryDownloadPayload,
 } from './intakeSummaryDownload';
-import type { FirmPacketModel } from './firmIntakePdfRenderer';
+import type { FirmPacketModel, PdfSourceDoc } from './firmIntakePdfRenderer';
+import { supabase } from '../lib/supabaseClient';
 import { assembleDamagesInput } from './damagesAssembly';
 import { calculateDamages } from './damagesCalculator';
 import { getWageRules } from './wageRules';
@@ -1219,10 +1220,47 @@ export function buildFirmIntakePacketModel(view: FirmLiveIntakeView): FirmPacket
   };
 }
 
+/**
+ * Fetch the byte content of every document cited in the wage-exposure report, so the
+ * renderer can embed those pages and hyperlink each citation to them. Best-effort:
+ * any file that can't be resolved or downloaded is silently skipped (the citation
+ * then renders as plain text).
+ */
+async function loadCitedSourceDocs(view: FirmLiveIntakeView, model: FirmPacketModel): Promise<PdfSourceDoc[]> {
+  const report = model.wageExposure?.report;
+  if (!report) return [];
+  const citedIds = new Set<string>();
+  for (const li of [report.baseHourlyRate, report.overtimeHoursUnderpaid, report.mealBreaksMissed]) {
+    const docId = li?.citation?.docId;
+    if (docId) citedIds.add(docId);
+  }
+  if (!citedIds.size) return [];
+
+  const out: PdfSourceDoc[] = [];
+  for (const f of view.files ?? []) {
+    const id = f.uploaded_file_id;
+    if (!id || !citedIds.has(id) || !f.file_path) continue;
+    try {
+      const { data: blob, error } = await supabase.storage.from('intake-files').download(f.file_path);
+      if (error || !blob) continue;
+      out.push({
+        docId: id,
+        fileName: f.file_name,
+        mime: blob.type || '',
+        bytes: new Uint8Array(await blob.arrayBuffer()),
+      });
+    } catch {
+      // skip unreadable file
+    }
+  }
+  return out;
+}
+
 export async function downloadFirmIntakeReviewDocument(view: FirmLiveIntakeView): Promise<void> {
   const model = buildFirmIntakePacketModel(view);
   // Lazy-load the pdf-lib renderer so pdf-lib stays out of the initial bundle.
   const { renderFirmIntakePacketPdf } = await import('./firmIntakePdfRenderer');
-  const bytes = await renderFirmIntakePacketPdf(model);
+  const sources = await loadCitedSourceDocs(view, model);
+  const bytes = await renderFirmIntakePacketPdf(model, sources);
   triggerPdfDownload(bytes, firmIntakeReviewPdfFilename(view.intakeNumber));
 }

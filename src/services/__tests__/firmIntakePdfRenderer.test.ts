@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'vitest';
-import { renderFirmIntakePacketPdf, renderWorkerSummaryPdf, type FirmPacketModel, type WorkerPacketModel } from '../firmIntakePdfRenderer';
+import { PDFDocument, PDFName } from 'pdf-lib';
+import { renderFirmIntakePacketPdf, renderWorkerSummaryPdf, type FirmPacketModel, type PdfSourceDoc, type WorkerPacketModel } from '../firmIntakePdfRenderer';
 
 function sampleModel(overrides: Partial<FirmPacketModel> = {}): FirmPacketModel {
   return {
@@ -78,6 +79,91 @@ describe('renderFirmIntakePacketPdf', () => {
     );
     expect(bytes.length).toBeGreaterThan(800);
     expect(bytes[0]).toBe(0x25);
+  });
+});
+
+// ── Source-linked citations (clickable → embedded source page) ────────────────
+
+async function makeSourcePdf(): Promise<Uint8Array> {
+  const d = await PDFDocument.create();
+  const p = d.addPage([300, 400]);
+  p.drawText('PAYSTUB SOURCE', { x: 20, y: 350, size: 14 });
+  return d.save();
+}
+
+function citedLineItem(label: string, value: number, docId: string | null) {
+  return {
+    label,
+    formula: 'from record',
+    value,
+    isStatutory: false,
+    citation: docId
+      ? { docId, docName: 'Paystub.pdf', page: 1, charStart: 0, charEnd: 10, sourceText: 'rate $30/hr' }
+      : null,
+  };
+}
+
+function wageModelWithCitation(): FirmPacketModel {
+  const report = {
+    baseHourlyRate: citedLineItem('Base hourly rate', 30, 'doc-1'),
+    overtimeRate: null,
+    overtimeHoursUnderpaid: citedLineItem('Overtime hours without matching premium', 30, 'doc-1'),
+    overtimePremiumPerHour: null,
+    overtimeTotalEstimate: 0,
+    mealBreaksMissed: null,
+    mealBreakPremiumPerBreak: null,
+    mealBreakTotalEstimate: 0,
+    combinedEstimate: 900,
+    isPartialData: false,
+    missingRecordsWarning: null,
+    calculatedAt: '2026-06-25',
+  };
+  return sampleModel({
+    wageExposure: { report, disclaimer: ['Estimate from records only; not a legal conclusion.'] },
+  } as Partial<FirmPacketModel>);
+}
+
+function countLinkAnnotations(doc: PDFDocument): number {
+  let links = 0;
+  for (const page of doc.getPages()) {
+    const annots = page.node.Annots();
+    if (!annots) continue;
+    for (let i = 0; i < annots.size(); i++) {
+      const a = annots.lookup(i) as { get?: (n: PDFName) => unknown } | undefined;
+      const sub = a?.get?.(PDFName.of('Subtype'));
+      if (sub?.toString() === '/Link') links += 1;
+    }
+  }
+  return links;
+}
+
+describe('source-linked citations', () => {
+  test('embeds cited source pages and links citations to them', async () => {
+    const model = wageModelWithCitation();
+    const sources: PdfSourceDoc[] = [
+      { docId: 'doc-1', fileName: 'Paystub.pdf', mime: 'application/pdf', bytes: await makeSourcePdf() },
+    ];
+
+    const withoutSources = await PDFDocument.load(await renderFirmIntakePacketPdf(model));
+    const withSources = await PDFDocument.load(await renderFirmIntakePacketPdf(model, sources));
+
+    // Appendix added pages (Source Records heading + embedded source page).
+    expect(withSources.getPageCount()).toBeGreaterThan(withoutSources.getPageCount());
+    // Citations became clickable link annotations.
+    expect(countLinkAnnotations(withSources)).toBeGreaterThan(0);
+    // No sources supplied → graceful text-only fallback, no link annotations.
+    expect(countLinkAnnotations(withoutSources)).toBe(0);
+  });
+
+  test('skips unembeddable source types without throwing (citation stays text)', async () => {
+    const model = wageModelWithCitation();
+    const sources: PdfSourceDoc[] = [
+      { docId: 'doc-1', fileName: 'notes.docx', mime: 'application/vnd.openxmlformats', bytes: new Uint8Array([1, 2, 3]) },
+    ];
+    const bytes = await renderFirmIntakePacketPdf(model, sources);
+    expect(bytes[0]).toBe(0x25); // still a valid PDF
+    const doc = await PDFDocument.load(bytes);
+    expect(countLinkAnnotations(doc)).toBe(0); // nothing to link to
   });
 });
 
