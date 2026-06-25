@@ -15,10 +15,11 @@ describe('Ask one3seven AI — system prompt integrity', () => {
 });
 
 describe('buildChatRequest', () => {
-  it('attaches the system prompt and the correct model, passing messages through', () => {
+  it('attaches the system prompt (cached) and the correct model, passing messages through', () => {
     const msgs = [{ role: 'user', content: 'hi' }];
     const r = buildChatRequest(msgs);
-    expect(r.system).toBe(SYSTEM_PROMPT);
+    expect(r.system[0].text).toBe(SYSTEM_PROMPT);
+    expect(r.system[0].cache_control.type).toBe('ephemeral');
     expect(r.model).toBe('claude-sonnet-4-6');
     expect(r.messages).toEqual(msgs);
   });

@@ -62,12 +62,16 @@ Do not invent. Do not expand scope. Do not answer legal, regulatory, settlement,
 FINAL RULE:
 When in doubt, narrow the answer. one3seven organizes employment records. Attorneys evaluate legal meaning.`;
 
-/** Builds the Anthropic Messages API request body with the system prompt attached. */
+/**
+ * Builds the Anthropic Messages API request body with the system prompt attached.
+ * The system prompt is large and unchanging, so it is marked with cache_control so repeat
+ * calls within the cache window bill the cheap cached-read rate instead of full input tokens.
+ */
 export function buildChatRequest(messages: { role: string; content: string }[]) {
   return {
     model: MODEL,
     max_tokens: 1024,
-    system: SYSTEM_PROMPT,
+    system: [{ type: 'text', text: SYSTEM_PROMPT, cache_control: { type: 'ephemeral' } }],
     messages,
   };
 }

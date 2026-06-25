@@ -32,7 +32,7 @@ export const TERMS_OF_SERVICE: LegalDoc = {
     {
       heading: '1. What one3seven is',
       blocks: [
-        { type: 'p', text: 'one3seven is a document organization platform operated by One3Seven Ventures LLC, an entity submitted for formation in California and pending review. one3seven helps workers organize their employment-related documents — including pay stubs, termination letters, HR communications, schedules, and related records — into a structured intake packet.' },
+        { type: 'p', text: 'one3seven is a document organization platform operated by One3Seven Ventures LLC, a California limited liability company. one3seven helps workers organize their employment-related documents — including pay stubs, termination letters, HR communications, schedules, and related records — into a structured intake packet.' },
         { type: 'p', text: 'one3seven is not a law firm. one3seven does not provide legal advice. Use of one3seven does not create an attorney-client relationship between you and one3seven or between you and any participating law firm. one3seven organizes records — attorneys independently evaluate them.' },
       ],
     },

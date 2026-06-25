@@ -294,7 +294,8 @@ async function callClaude(
         model: MODEL,
         max_tokens: MAX_TOKENS,
         temperature: 0, // deterministic extraction — reproducible for legal review
-        system: SYSTEM_PROMPT,
+        // cache_control bills repeat calls within the cache window at the cheaper cached-read rate.
+        system: [{ type: 'text', text: SYSTEM_PROMPT, cache_control: { type: 'ephemeral' } }],
         messages,
       }),
     });
