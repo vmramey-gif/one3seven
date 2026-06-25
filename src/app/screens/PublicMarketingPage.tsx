@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { WordMark } from '../components/WordMark';
 import { SeedMark } from '../components/ui/SeedMark';
 import { motion, useReducedMotion } from 'motion/react';
-import { ArrowRight, CheckCircle2, Shield, Clock, FileText, Users, Zap, ChevronRight, FolderOpen, CalendarClock } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Shield, Clock, FileText, Users, Zap, ChevronRight, FolderOpen, CalendarClock, Lock, MessageSquare, CalendarDays, Handshake } from 'lucide-react';
 
 interface PublicMarketingPageProps {
   onWorkerStart: () => void;
@@ -21,24 +21,24 @@ const HOW_IT_WORKS = [
     step: '01',
     title: 'Worker uploads their documents',
     body: 'Pay stubs, emails, HR complaints, text messages, doctor notes — anything relevant. No legal knowledge needed.',
-    color: 'bg-white border-[#e5def8]',
-    accent: 'text-[#6d4aff]',
+    color: 'bg-white/[0.04] border-white/10',
+    accent: 'text-[#A78BFA]',
     tag: 'Worker',
   },
   {
     step: '02',
     title: 'AI organizes and structures the record',
     body: 'The engine extracts a timeline, categorizes documents, sequences events chronologically, and flags dates that may require timely attorney review.',
-    color: 'bg-[#f2efff] border-[#d5c9f3]',
-    accent: 'text-[#5b39e6]',
+    color: 'bg-[#6D4AFF]/[0.08] border-[#6D4AFF]/25',
+    accent: 'text-[#C4B5FD]',
     tag: 'one3seven',
   },
   {
     step: '03',
     title: 'Attorney receives a structured intake',
     body: 'A clean, organized packet arrives in the firm dashboard before the first consultation — no sorting, no follow-up calls.',
-    color: 'bg-white border-[#e5def8]',
-    accent: 'text-[#4A30CC]',
+    color: 'bg-white/[0.04] border-white/10',
+    accent: 'text-[#A78BFA]',
     tag: 'Firm',
   },
 ];
@@ -658,12 +658,12 @@ function HeroVisual() {
 // ── WorkerWorkflowScroll ─────────────────────────────────────────────────────
 function WorkerWorkflowScroll() {
   return (
-    <section className="px-5 py-20 sm:px-8 sm:py-28 bg-[#f8f6ff]">
+    <section className="px-5 py-20 sm:px-8 sm:py-28 bg-[#14112E]">
       <div className="mx-auto max-w-2xl">
         {/* Header */}
         <div className="mb-14 text-center">
-          <p className="mb-3 text-xs font-bold uppercase tracking-[0.18em] text-[#6d4aff]">How it works</p>
-          <h2 className="text-[28px] font-bold leading-snug text-[#111b3d] sm:text-[34px]">
+          <p className="mb-3 text-xs font-bold uppercase tracking-[0.18em] text-[#A78BFA]">How it works</p>
+          <h2 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="text-[28px] font-medium leading-snug tracking-[-0.01em] text-white sm:text-[34px]">
             From scattered records<br className="hidden sm:block" /> to review-ready intake
           </h2>
         </div>
@@ -671,7 +671,7 @@ function WorkerWorkflowScroll() {
         {/* Steps */}
         <div className="relative">
           {/* Connecting line */}
-          <div className="absolute left-[27px] top-10 bottom-10 w-px bg-[#e5def8] sm:left-[35px]" aria-hidden />
+          <div className="absolute left-[27px] top-10 bottom-10 w-px bg-white/15 sm:left-[35px]" aria-hidden />
 
           <div className="space-y-6">
             {HOW_IT_WORKS.map((s, i) => (
@@ -694,8 +694,8 @@ function WorkerWorkflowScroll() {
                   <div className="mb-1 flex items-center gap-2">
                     <span className={`text-[10px] font-bold uppercase tracking-widest ${s.accent}`}>{s.tag}</span>
                   </div>
-                  <h3 className="mb-2 text-[17px] font-bold leading-snug text-[#111b3d] sm:text-[18px]">{s.title}</h3>
-                  <p className="text-sm leading-relaxed text-[#39415f]">{s.body}</p>
+                  <h3 className="mb-2 text-[17px] font-bold leading-snug text-white sm:text-[18px]">{s.title}</h3>
+                  <p className="text-sm leading-relaxed text-[#C9C4E6]">{s.body}</p>
                 </div>
               </motion.div>
             ))}
@@ -708,10 +708,10 @@ function WorkerWorkflowScroll() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-40px' }}
           transition={{ duration: 0.45, delay: 0.3 }}
-          className="mt-10 flex items-center justify-center gap-3 rounded-2xl border border-[#e5def8] bg-white px-6 py-4"
+          className="mt-10 flex items-center justify-center gap-3 rounded-2xl border border-white/10 bg-white/[0.04] px-6 py-4"
         >
-          <CheckCircle2 className="h-5 w-5 shrink-0 text-[#6d4aff]" />
-          <p className="text-sm font-medium text-[#111b3d]">
+          <CheckCircle2 className="h-5 w-5 shrink-0 text-[#A78BFA]" />
+          <p className="text-sm font-medium text-white">
             Attorneys open an organized packet — before the first call.
           </p>
         </motion.div>
@@ -1148,7 +1148,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
   const openBetaModal = () => setShowBetaModal(true);
 
   return (
-    <div className="min-h-screen bg-white text-[#1E1B4B] antialiased">
+    <div className="min-h-screen bg-[#14112E] text-[#E8E5F5] antialiased">
 
       {/* ── NAV ── */}
       <nav className="sticky top-0 z-50 border-b border-white/10 bg-[#14112E]/90 backdrop-blur-sm">
@@ -1439,23 +1439,23 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
       <WorkerWorkflowScroll />
 
       {/* ── FOR ATTORNEYS ── */}
-      <section className="px-5 py-16 sm:px-8 sm:py-24">
+      <section className="bg-[#14112E] px-5 py-16 sm:px-8 sm:py-24">
         <div className="mx-auto max-w-6xl">
           <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
             <div>
-              <div className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-[#6D4AFF]">For attorneys</div>
-              <h2 className="mb-5 text-[30px] font-bold leading-tight tracking-tight text-[#1E1B4B] sm:text-[36px]">
+              <div className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-[#A78BFA]">For attorneys</div>
+              <h2 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="mb-5 text-[30px] font-medium leading-tight tracking-[-0.01em] text-white sm:text-[36px]">
                 Everything you need
                 <br />
                 before the consultation starts
               </h2>
-              <p className="mb-8 text-[15px] leading-relaxed text-[#1E1B4B]/60">
+              <p className="mb-8 text-[15px] leading-relaxed text-[#C9C4E6]">
                 Every intake arrives organized, timestamped, and structured for attorney review. Spend less time assembling the record and more time evaluating the matter.
               </p>
               <button
                 type="button"
                 onClick={openBetaModal}
-                className="flex items-center gap-2 rounded-full bg-gradient-to-r from-[#6D4AFF] to-[#7C3AED] px-7 py-3.5 text-[15px] font-semibold text-white shadow-[0_16px_48px_rgba(109,74,255,0.28)] transition hover:shadow-[0_20px_60px_rgba(109,74,255,0.42)] hover:-translate-y-0.5 active:scale-[0.97]"
+                className="flex items-center gap-2 rounded-full bg-[#6D4AFF] px-7 py-3.5 text-[15px] font-semibold text-white shadow-[0_16px_48px_rgba(109,74,255,0.40)] transition hover:bg-[#5B35D5] hover:-translate-y-0.5 active:scale-[0.97]"
               >
                 Start free pilot
                 <ArrowRight className="h-4 w-4" />
@@ -1466,16 +1466,16 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
               {FIRM_FEATURES.map((f) => (
                 <motion.div
                   key={f.label}
-                  className="rounded-[18px] border border-[#F0EBFF] bg-white p-5 shadow-sm cursor-default"
-                  whileHover={{ y: -5, boxShadow: '0 12px 32px rgba(109,74,255,0.10)' }}
+                  className="rounded-[18px] border border-white/10 bg-white/[0.04] p-5 cursor-default"
+                  whileHover={{ y: -5, backgroundColor: 'rgba(255,255,255,0.07)' }}
                   transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
                 >
-                  <f.icon className="mb-3 h-5 w-5 text-[#6D4AFF]" />
-                  <div className="mb-1 flex items-center text-[13px] font-bold text-[#1E1B4B]">
+                  <f.icon className="mb-3 h-5 w-5 text-[#A78BFA]" />
+                  <div className="mb-1 flex items-center text-[13px] font-bold text-white">
                     {f.label}
                     {f.tip && <InfoTooltip tip={f.tip} />}
                   </div>
-                  <div className="text-[12px] leading-relaxed text-[#1E1B4B]/55">{f.desc}</div>
+                  <div className="text-[12px] leading-relaxed text-[#C9C4E6]">{f.desc}</div>
                 </motion.div>
               ))}
             </div>
@@ -1484,17 +1484,17 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
       </section>
 
       {/* ── FOR WORKERS ── */}
-      <section className="relative overflow-hidden bg-[#1E1B4B] px-5 py-16 sm:px-8 sm:py-24">
-        <div className="pointer-events-none absolute -left-40 -top-40 h-[500px] w-[500px] rounded-full bg-[#6D4AFF]/10 blur-3xl" />
-        <div className="pointer-events-none absolute -right-40 bottom-0 h-[400px] w-[400px] rounded-full bg-[#A78BFA]/8 blur-3xl" />
+      <section className="relative overflow-hidden bg-[#14112E] px-5 py-16 sm:px-8 sm:py-24">
+        <div className="pointer-events-none absolute -left-40 -top-40 h-[500px] w-[500px] rounded-full bg-[#6D4AFF]/14 blur-3xl" />
+        <div className="pointer-events-none absolute -right-40 bottom-0 h-[400px] w-[400px] rounded-full bg-[#A78BFA]/10 blur-3xl" />
         <div className="mx-auto max-w-6xl">
           <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
             <div>
               <div className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-[#A78BFA]">For workers</div>
-              <h2 className="mb-5 text-[30px] font-bold leading-tight tracking-tight text-white sm:text-[36px]">
+              <h2 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="mb-5 text-[30px] font-medium leading-tight tracking-[-0.01em] text-white sm:text-[36px]">
                 Your story, organized.
                 <br />
-                <span className="bg-gradient-to-r from-[#A78BFA] to-[#C4B5FD] bg-clip-text text-transparent">You control what's shared.</span>
+                <span className="text-[#C4B5FD]">You control what's shared.</span>
               </h2>
               <p className="mb-8 text-[15px] leading-relaxed text-white/60">
                 Upload your documents. The AI does the rest. You see your own timeline, your status, and you decide when — and with whom — to share your intake.
@@ -1511,18 +1511,18 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
 
             <div className="grid gap-3">
               {[
-                { emoji: '🔒', title: 'You control sharing', body: 'Your intake is not shared with a firm until you approve sharing or submit through that firm\'s intake link, subject to the platform\'s Privacy Policy and Terms.' },
-                { emoji: '📱', title: 'Plain language, always', body: 'No legal jargon. Your status updates are written in plain English. View available status updates at any time.' },
-                { emoji: '📅', title: 'Your timeline, organized', body: 'Dates, events, and documents are organized into a clear timeline — so your story is easier to follow before you walk into a consultation.' },
-                { emoji: '🤝', title: 'Choose how to share', body: 'Submit directly to a participating firm using its intake link, or authorize your intake to be made available through the participating-firm network.' },
+                { Icon: Lock, title: 'You control sharing', body: 'Your intake is not shared with a firm until you approve sharing or submit through that firm\'s intake link, subject to the platform\'s Privacy Policy and Terms.' },
+                { Icon: MessageSquare, title: 'Plain language, always', body: 'No legal jargon. Your status updates are written in plain English. View available status updates at any time.' },
+                { Icon: CalendarDays, title: 'Your timeline, organized', body: 'Dates, events, and documents are organized into a clear timeline — so your story is easier to follow before you walk into a consultation.' },
+                { Icon: Handshake, title: 'Choose how to share', body: 'Submit directly to a participating firm using its intake link, or authorize your intake to be made available through the participating-firm network.' },
               ].map((w) => (
                 <motion.div
                   key={w.title}
-                  className="flex gap-4 rounded-[18px] border border-white/8 bg-white/5 p-5 cursor-default"
+                  className="flex gap-4 rounded-[18px] border border-white/10 bg-white/5 p-5 cursor-default"
                   whileHover={{ backgroundColor: 'rgba(255,255,255,0.09)', y: -3 }}
                   transition={{ duration: 0.2, ease: 'easeOut' }}
                 >
-                  <div className="text-[22px] shrink-0">{w.emoji}</div>
+                  <w.Icon className="h-5 w-5 shrink-0 text-[#A78BFA]" strokeWidth={1.5} />
                   <div>
                     <div className="mb-1 text-[14px] font-bold text-white">{w.title}</div>
                     <div className="text-[12px] leading-relaxed text-white/55">{w.body}</div>
@@ -1535,15 +1535,15 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
       </section>
 
       {/* ── TRUST / COMPLIANCE ── */}
-      <section className="border-y border-[#F0EBFF] bg-white px-5 py-12 sm:px-8">
+      <section className="border-y border-white/10 bg-[#14112E] px-5 py-12 sm:px-8">
         <div className="mx-auto max-w-6xl">
           <div className="flex flex-col items-center gap-8 sm:flex-row sm:items-start sm:gap-16">
             <div className="shrink-0 sm:w-[280px]">
-              <div className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-[#6D4AFF]">Built for legal</div>
-              <h3 className="text-[22px] font-bold leading-snug text-[#1E1B4B]">
+              <div className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-[#A78BFA]">Built for legal</div>
+              <h3 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="text-[22px] font-medium leading-snug text-white">
                 Built for attorney review.
               </h3>
-              <p className="mt-2 text-[13px] leading-relaxed text-[#1E1B4B]/55">
+              <p className="mt-2 text-[13px] leading-relaxed text-[#C9C4E6]">
                 Organized intake information with source records preserved for independent review.
               </p>
             </div>
@@ -1551,16 +1551,16 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
               <ul className="grid gap-3 sm:grid-cols-2">
                 {TRUST_ITEMS.map((item) => (
                   <li key={item} className="flex items-start gap-2.5">
-                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#6D4AFF]" />
-                    <span className="text-[13px] text-[#1E1B4B]/70">{item}</span>
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#A78BFA]" />
+                    <span className="text-[13px] text-[#C9C4E6]">{item}</span>
                   </li>
                 ))}
               </ul>
-              <p className="mt-5 text-[12px] leading-relaxed text-[#1E1B4B]/40">
+              <p className="mt-5 text-[12px] leading-relaxed text-[#8E88B5]">
                 one3seven organizes records and surfaces information from documents. It does not provide legal advice, case predictions, or legal conclusions. All source documents remain available for direct attorney review. Attorneys are responsible for independently verifying AI-organized content before relying on it.
               </p>
-              <p className="mt-3 text-[12px] leading-relaxed text-[#1E1B4B]/40">
-                <span className="font-semibold text-[#1E1B4B]/55">Time-sensitive filing periods may apply.</span>{' '}
+              <p className="mt-3 text-[12px] leading-relaxed text-[#8E88B5]">
+                <span className="font-semibold text-[#C9C4E6]">Time-sensitive filing periods may apply.</span>{' '}
                 Depending on the allegations and jurisdiction, a matter may involve deadlines associated with agencies such as the EEOC, California Civil Rights Department, or Labor Commissioner. one3seven surfaces relevant dates for attorney review — it does not determine the applicable agency or filing deadline.
               </p>
             </div>
@@ -1569,11 +1569,11 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
       </section>
 
       {/* ── PILOT CTA ── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#5B35D5] via-[#6D4AFF] to-[#7C3AED] px-5 py-16 sm:px-8 sm:py-24">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(167,139,250,0.18)_0%,transparent_60%)]" />
+      <section className="relative overflow-hidden bg-[#14112E] px-5 py-16 sm:px-8 sm:py-24">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(124,92,255,0.22)_0%,transparent_60%)]" />
         <div className="mx-auto max-w-6xl">
           <div className="mx-auto max-w-[640px] text-center">
-            <h2 className="mb-5 text-[32px] font-bold leading-tight tracking-tight text-white sm:text-[42px]">
+            <h2 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="mb-5 text-[32px] font-medium leading-tight tracking-[-0.01em] text-white sm:text-[42px]">
               Ready to stop losing time
               <br />
               on disorganized intakes?
@@ -1585,7 +1585,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
               <button
                 type="button"
                 onClick={openBetaModal}
-                className="flex items-center gap-2 rounded-full bg-white px-8 py-4 text-[15px] font-bold text-[#6D4AFF] shadow-[0_16px_48px_rgba(0,0,0,0.20)] transition hover:bg-white/93 hover:-translate-y-0.5 hover:shadow-[0_24px_64px_rgba(0,0,0,0.28)] active:scale-[0.97]"
+                className="flex items-center gap-2 rounded-full bg-white px-8 py-4 text-[15px] font-bold text-[#5B21B6] shadow-[0_16px_48px_rgba(0,0,0,0.30)] transition hover:bg-white/93 hover:-translate-y-0.5 active:scale-[0.97]"
               >
                 Start free pilot
                 <ArrowRight className="h-4 w-4" />
