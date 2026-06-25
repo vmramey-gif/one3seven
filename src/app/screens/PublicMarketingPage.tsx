@@ -1169,7 +1169,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
             <button
               type="button"
               onClick={onSignUpFree}
-              className="flex items-center gap-1.5 rounded-full bg-[#6D4AFF] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_8px_24px_rgba(109,74,255,0.30)] transition hover:bg-[#5B35D5] hover:-translate-y-px active:scale-[0.97]"
+              className="flex items-center gap-1.5 rounded-full bg-[#5B21B6] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(91,33,182,0.22)] transition hover:bg-[#4C1D96] hover:-translate-y-px active:scale-[0.97]"
             >
               Sign up for free
               <ArrowRight className="h-3.5 w-3.5" />
@@ -1208,7 +1208,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
       </nav>
 
       {/* ── HERO ── */}
-      <section className="relative overflow-hidden bg-[#FAFAFF] px-5 pb-16 pt-14 sm:px-8 sm:pb-24 sm:pt-20">
+      <section className="relative overflow-hidden bg-[#FAF9F6] px-5 pb-16 pt-14 sm:px-8 sm:pb-24 sm:pt-20">
         {/* Background blobs — slow drift */}
         <motion.div
           className="pointer-events-none absolute -left-32 -top-32 h-[500px] w-[500px] rounded-full bg-[#6D4AFF]/5 blur-3xl"
@@ -1238,10 +1238,10 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
                     Sent by {firmDirectedContext.firmName}
                   </div>
 
-                  <h1 className="mb-5 text-[32px] font-bold leading-[1.1] tracking-tight text-[#1E1B4B] sm:text-[44px] lg:text-[54px]">
+                  <h1 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="mb-5 text-[32px] font-medium leading-[1.05] tracking-[-0.01em] text-[#14112E] sm:text-[44px] lg:text-[54px]">
                     {firmDirectedContext.firmName}
                     <br />
-                    <span className="text-[#6D4AFF]">asked you to</span>
+                    <span className="text-[#5B21B6]">asked you to</span>
                     <br />
                     submit here.
                   </h1>
@@ -1268,15 +1268,15 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
               ) : (
                 /* ── Journey 1: self-discovered worker ── */
                 <>
-                  <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#DCD3FF] bg-white px-4 py-1.5 text-xs font-semibold text-[#6D4AFF] shadow-[0_2px_12px_rgba(109,74,255,0.12)]">
-                    <span className="h-1.5 w-1.5 rounded-full bg-gradient-to-r from-[#6D4AFF] to-[#A78BFA] animate-pulse" />
+                  <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#E7E1FF] bg-white px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#5B21B6]">
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#5B21B6]" />
                     Employment intake · California beta
                   </div>
 
-                  <h1 className="mb-5 text-[32px] font-bold leading-[1.1] tracking-tight text-[#1E1B4B] sm:text-[44px] lg:text-[54px]">
-                    One organized intake.
+                  <h1 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="mb-5 text-[34px] font-medium leading-[1.04] tracking-[-0.01em] text-[#14112E] sm:text-[48px] lg:text-[56px]">
+                    Scattered records in.
                     <br />
-                    <span className="bg-gradient-to-r from-[#6D4AFF] to-[#A78BFA] bg-clip-text text-transparent">One clear timeline.</span>
+                    <span className="text-[#5B21B6]">A clear timeline out.</span>
                   </h1>
 
                   <p className="mb-5 max-w-[480px] text-[16px] leading-relaxed text-[#1E1B4B]/62 sm:text-[17px]">
@@ -1292,7 +1292,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
                     <button
                       type="button"
                       onClick={onWorkerStart}
-                      className="flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#6D4AFF] to-[#7C3AED] px-7 py-3.5 text-[15px] font-semibold text-white shadow-[0_16px_48px_rgba(109,74,255,0.32)] transition hover:shadow-[0_20px_60px_rgba(109,74,255,0.45)] hover:-translate-y-0.5 active:scale-[0.97]"
+                      className="flex items-center justify-center gap-2 rounded-full bg-[#5B21B6] px-7 py-3.5 text-[15px] font-semibold text-white shadow-[0_12px_32px_rgba(91,33,182,0.28)] transition hover:bg-[#4C1D96] hover:-translate-y-0.5 active:scale-[0.97]"
                     >
                       Start organizing my records
                       <ArrowRight className="h-4 w-4" />
