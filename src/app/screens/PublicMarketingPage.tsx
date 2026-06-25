@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { WordMark } from '../components/WordMark';
 import { SeedMark } from '../components/ui/SeedMark';
 import { motion, useReducedMotion } from 'motion/react';
-import { ArrowRight, CheckCircle2, Shield, Clock, FileText, Users, Zap, ChevronRight } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Shield, Clock, FileText, Users, Zap, ChevronRight, FolderOpen, CalendarClock } from 'lucide-react';
 
 interface PublicMarketingPageProps {
   onWorkerStart: () => void;
@@ -1151,17 +1151,17 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
     <div className="min-h-screen bg-white text-[#1E1B4B] antialiased">
 
       {/* ── NAV ── */}
-      <nav className="sticky top-0 z-50 border-b border-[#F0EBFF] bg-white/90 backdrop-blur-sm">
+      <nav className="sticky top-0 z-50 border-b border-white/10 bg-[#14112E]/90 backdrop-blur-sm">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-5 sm:h-16 sm:px-8">
           <div className="flex items-center gap-2">
             <SeedMark size={24} />
-            <div className="text-[17px] font-bold tracking-tight text-[#1E1B4B]"><WordMark /></div>
+            <div className="text-[17px] font-bold tracking-tight text-white"><WordMark /></div>
           </div>
           <div className="hidden items-center gap-6 sm:flex">
             <button
               type="button"
               onClick={onSignIn}
-              className="text-sm font-medium text-[#1E1B4B]/60 transition hover:text-[#1E1B4B]"
+              className="text-sm font-medium text-white/60 transition hover:text-white"
             >
               Sign in
             </button>
@@ -1176,7 +1176,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
             <button
               type="button"
               onClick={onForFirms}
-              className="text-sm font-medium text-[#1E1B4B]/60 transition hover:text-[#1E1B4B]"
+              className="text-sm font-medium text-white/60 transition hover:text-white"
             >
               For law firms
             </button>
@@ -1188,19 +1188,19 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
             className="flex flex-col gap-1.5 p-2.5 sm:hidden touch-manipulation"
             aria-label="Toggle menu"
           >
-            <span className={`block h-0.5 w-5 bg-[#1E1B4B] transition-all ${mobileMenuOpen ? 'translate-y-2 rotate-45' : ''}`} />
-            <span className={`block h-0.5 w-5 bg-[#1E1B4B] transition-all ${mobileMenuOpen ? 'opacity-0' : ''}`} />
-            <span className={`block h-0.5 w-5 bg-[#1E1B4B] transition-all ${mobileMenuOpen ? '-translate-y-2 -rotate-45' : ''}`} />
+            <span className={`block h-0.5 w-5 bg-white transition-all ${mobileMenuOpen ? 'translate-y-2 rotate-45' : ''}`} />
+            <span className={`block h-0.5 w-5 bg-white transition-all ${mobileMenuOpen ? 'opacity-0' : ''}`} />
+            <span className={`block h-0.5 w-5 bg-white transition-all ${mobileMenuOpen ? '-translate-y-2 -rotate-45' : ''}`} />
           </button>
         </div>
         {/* Mobile menu */}
         {mobileMenuOpen && (
-          <div className="border-t border-[#F0EBFF] bg-white px-5 py-4 sm:hidden">
+          <div className="border-t border-white/10 bg-[#14112E] px-5 py-4 sm:hidden">
             <div className="flex flex-col">
-              <button type="button" onClick={onSignIn} className="flex items-center min-h-[48px] text-base font-medium text-[#1E1B4B]/60 text-left py-3">Sign in</button>
-              <button type="button" onClick={onSignUpFree} className="flex items-center gap-1.5 min-h-[48px] text-base font-semibold text-[#6D4AFF] text-left py-3">Sign up for free <ArrowRight className="h-4 w-4" /></button>
-              <button type="button" onClick={onForFirms} className="flex items-center gap-1.5 min-h-[48px] text-base font-medium text-[#1E1B4B]/60 text-left py-3">For law firms</button>
-              <button type="button" onClick={onWorkerStart} className="flex items-center gap-1.5 min-h-[48px] text-base font-semibold text-[#1E1B4B]/70 text-left py-3">Organize my intake <ArrowRight className="h-4 w-4" /></button>
+              <button type="button" onClick={onSignIn} className="flex items-center min-h-[48px] text-base font-medium text-white/60 text-left py-3">Sign in</button>
+              <button type="button" onClick={onSignUpFree} className="flex items-center gap-1.5 min-h-[48px] text-base font-semibold text-[#C4B5FD] text-left py-3">Sign up for free <ArrowRight className="h-4 w-4" /></button>
+              <button type="button" onClick={onForFirms} className="flex items-center gap-1.5 min-h-[48px] text-base font-medium text-white/60 text-left py-3">For law firms</button>
+              <button type="button" onClick={onWorkerStart} className="flex items-center gap-1.5 min-h-[48px] text-base font-semibold text-white/70 text-left py-3">Organize my intake <ArrowRight className="h-4 w-4" /></button>
             </div>
           </div>
         )}
@@ -1327,10 +1327,10 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
       </section>
 
       {/* ── PAYOFF: SAMPLE CHRONOLOGY (the value, before any explanation) ── */}
-      <section className="border-y border-[#F0EBFF] bg-[#FAFAFF] px-5 py-14 sm:px-8 sm:py-20">
+      <section className="border-y border-white/10 bg-[#14112E] px-5 py-14 sm:px-8 sm:py-20">
         <div className="mx-auto max-w-5xl">
-          <div className="mb-2 text-center text-xs font-bold uppercase tracking-[0.2em] text-[#6D4AFF]">See it in 10 seconds</div>
-          <h2 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="mb-8 text-center text-[26px] font-medium tracking-[-0.01em] text-[#14112E] sm:text-[32px]">
+          <div className="mb-2 text-center text-xs font-bold uppercase tracking-[0.2em] text-[#A78BFA]">See it in 10 seconds</div>
+          <h2 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="mb-8 text-center text-[26px] font-medium tracking-[-0.01em] text-white sm:text-[32px]">
             The same records, organized.
           </h2>
           <div className="grid items-center gap-5 lg:grid-cols-[1fr_auto_1.3fr]">
@@ -1386,7 +1386,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
               </ol>
             </div>
           </div>
-          <p className="mt-6 text-center text-[12px] text-[#1E1B4B]/45">
+          <p className="mt-6 text-center text-[12px] text-[#8E88B5]">
             Sample timeline for illustration — not a real case. one3seven organizes your records into a timeline; it does not draw conclusions.
           </p>
         </div>
@@ -1394,14 +1394,14 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
 
 
       {/* ── THE PROBLEM ── */}
-      <section className="px-5 py-16 sm:px-8 sm:py-24">
+      <section className="bg-[#14112E] px-5 py-16 sm:px-8 sm:py-24">
         <div className="mx-auto max-w-6xl">
           <div className="mx-auto max-w-[640px] text-center">
-            <div className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-[#6D4AFF]">The problem</div>
-            <h2 className="mb-5 text-[30px] font-bold leading-tight tracking-tight text-[#1E1B4B] sm:text-[38px]">
+            <div className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-[#A78BFA]">The problem</div>
+            <h2 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="mb-5 text-[30px] font-medium leading-tight tracking-[-0.01em] text-white sm:text-[38px]">
               Employment matters rarely arrive organized
             </h2>
-            <p className="text-[15px] leading-relaxed text-[#1E1B4B]/60 sm:text-[16px]">
+            <p className="text-[15px] leading-relaxed text-[#C9C4E6] sm:text-[16px]">
               Workers show up with documents scattered across phones, emails, and folders — no order, no timeline, no clear story. Attorneys spend the first consultation assembling the record instead of evaluating the matter. When intake is disorganized, important information gets missed, decisions get delayed, and time-sensitive issues can slip through.
             </p>
           </div>
@@ -1410,25 +1410,25 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
           <div className="mt-12 grid gap-4 sm:grid-cols-3">
             {[
               {
-                icon: '⏱',
+                Icon: Clock,
                 title: 'Attorney time wasted',
                 body: 'First-consult time is often spent organizing documents rather than evaluating the matter. one3seven performs an initial organization pass before the attorney sees the intake.',
               },
               {
-                icon: '📁',
+                Icon: FolderOpen,
                 title: 'Documents go missing',
                 body: 'Critical pay stubs, HR complaints, and text messages may never make it to counsel. Missing records can make the matter harder to evaluate and may require additional follow-up.',
               },
               {
-                icon: '⏳',
+                Icon: CalendarClock,
                 title: 'Filing periods vary',
                 body: 'Employment matters may involve different filing periods depending on the events, allegations, and jurisdiction. Critical dates can be difficult to identify when the record is incomplete.',
               },
             ].map((c) => (
-              <div key={c.title} className="rounded-[20px] border border-[#F0EBFF] bg-[#FAFAFF] p-6">
-                <div className="mb-3 text-[28px]">{c.icon}</div>
-                <h3 className="mb-2 text-[15px] font-bold text-[#1E1B4B]">{c.title}</h3>
-                <p className="text-[13px] leading-relaxed text-[#1E1B4B]/55">{c.body}</p>
+              <div key={c.title} className="rounded-[20px] border border-white/10 bg-white/[0.04] p-6">
+                <c.Icon className="mb-3 h-7 w-7 text-[#A78BFA]" strokeWidth={1.5} />
+                <h3 className="mb-2 text-[15px] font-bold text-white">{c.title}</h3>
+                <p className="text-[13px] leading-relaxed text-[#C9C4E6]">{c.body}</p>
               </div>
             ))}
           </div>
