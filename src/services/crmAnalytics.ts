@@ -85,3 +85,51 @@ export function dailyTargetsContext(calls: number, emails: number, demos: number
     return 'Calls are moving. Push for the demo booking.';
   return 'Log every call and email — the data tells you where to push.';
 }
+
+// ── Compensation: First-3 bonus + commission calculator ──────────────────────
+
+/** Escalating one-time bonus for the first three firms that convert pilot -> paid. */
+export const BONUS_LADDER = [100, 150, 250] as const;
+/** Extra one-time bonus if all three land inside the sprint window (date-gated, founder-set). */
+export const SPRINT_BONUS = 250;
+
+export interface BonusProgress {
+  paidCount: number;
+  earned: number;            // total bonus earned so far from the ladder
+  steps: { n: number; amount: number; hit: boolean }[];
+  nextAmount: number | null; // bonus for the next firm, or null once 3 are paid
+  complete: boolean;         // all three paid
+}
+
+/** Bonus earned from the first-3 ladder given how many firms are at the 'paid' stage. */
+export function firstThreeBonus(paidCount: number): BonusProgress {
+  const n = Math.max(0, Math.floor(paidCount));
+  const steps = BONUS_LADDER.map((amount, i) => ({ n: i + 1, amount, hit: n >= i + 1 }));
+  const earned = steps.filter((s) => s.hit).reduce((sum, s) => sum + s.amount, 0);
+  const nextAmount = n < BONUS_LADDER.length ? BONUS_LADDER[n] : null;
+  return { paidCount: n, earned, steps, nextAmount, complete: n >= BONUS_LADDER.length };
+}
+
+export interface CommissionScenario {
+  firmCount: number;
+  tier: 'solo' | 'practice' | 'firm';
+  months: number;
+}
+export interface CommissionResult {
+  mrr: number;               // monthly recurring revenue from these firms
+  monthlyCommission: number; // 20% of MRR
+  totalCommission: number;   // monthlyCommission * months
+  bonus: number;             // first-3 ladder bonus for these firms
+  total: number;             // totalCommission + bonus
+}
+
+/** Pure "what could I earn" calculator for the rep sandbox. Bonus counts the first 3 firms. */
+export function commissionProjection({ firmCount, tier, months }: CommissionScenario): CommissionResult {
+  const firms = Math.max(0, Math.floor(firmCount));
+  const m = Math.max(0, Math.floor(months));
+  const mrr = firms * TIER_PRICES[tier];
+  const monthlyCommission = Math.round(mrr * COMMISSION_RATE);
+  const totalCommission = monthlyCommission * m;
+  const bonus = firstThreeBonus(firms).earned;
+  return { mrr, monthlyCommission, totalCommission, bonus, total: totalCommission + bonus };
+}

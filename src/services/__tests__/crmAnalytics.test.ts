@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
-  tierPrice, computeRevenue, targetColor, dailyTargetsContext, avgMinutesSaved, type SubscriptionTier,
+  tierPrice, computeRevenue, targetColor, dailyTargetsContext, avgMinutesSaved,
+  firstThreeBonus, commissionProjection, type SubscriptionTier,
 } from '../crmAnalytics';
 import type { CrmFirm } from '../crmService';
 
@@ -75,4 +76,38 @@ describe('dailyTargetsContext (five branches)', () => {
   it('nothing logged', () => { expect(dailyTargetsContext(0, 0, 0)).toBe('Nothing logged yet today. First call of the day is the hardest.'); });
   it('calls moving, no demo', () => { expect(dailyTargetsContext(6, 0, 0)).toBe('Calls are moving. Push for the demo booking.'); });
   it('default', () => { expect(dailyTargetsContext(3, 3, 0)).toBe('Log every call and email — the data tells you where to push.'); });
+});
+
+describe('firstThreeBonus', () => {
+  it('earns nothing at zero paid firms', () => {
+    const b = firstThreeBonus(0);
+    expect(b.earned).toBe(0);
+    expect(b.nextAmount).toBe(100);
+    expect(b.complete).toBe(false);
+  });
+  it('escalates 100 -> 250 -> 500 across the first three', () => {
+    expect(firstThreeBonus(1).earned).toBe(100);
+    expect(firstThreeBonus(2).earned).toBe(250);
+    expect(firstThreeBonus(3).earned).toBe(500);
+  });
+  it('caps at three (a 4th firm adds no ladder bonus)', () => {
+    const b = firstThreeBonus(4);
+    expect(b.earned).toBe(500);
+    expect(b.nextAmount).toBeNull();
+    expect(b.complete).toBe(true);
+  });
+});
+
+describe('commissionProjection', () => {
+  it('3 practice firms held 12 months = recurring commission + the $500 ladder', () => {
+    const r = commissionProjection({ firmCount: 3, tier: 'practice', months: 12 });
+    expect(r.mrr).toBe(1497);              // 3 * 499
+    expect(r.monthlyCommission).toBe(299); // round(1497 * 0.2)
+    expect(r.totalCommission).toBe(3588);  // 299 * 12
+    expect(r.bonus).toBe(500);
+    expect(r.total).toBe(4088);
+  });
+  it('zero firms earns zero', () => {
+    expect(commissionProjection({ firmCount: 0, tier: 'firm', months: 6 }).total).toBe(0);
+  });
 });

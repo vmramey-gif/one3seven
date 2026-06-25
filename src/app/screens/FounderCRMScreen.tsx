@@ -9,7 +9,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Phone, Mail, Calendar, ArrowLeft, Plus, X, TrendingUp,
   ClipboardList, LayoutGrid, Building2, BookOpen, BarChart3, CheckCircle2,
-  GraduationCap, ListChecks, Check, MessageSquare, Send, StickyNote, Trash2, ChevronRight, ShieldCheck, RefreshCw, AlertTriangle, DollarSign, Flame, Sparkles,
+  GraduationCap, ListChecks, Check, MessageSquare, Send, StickyNote, Trash2, ChevronRight, ShieldCheck, RefreshCw, AlertTriangle, DollarSign, Flame, Sparkles, Trophy,
 } from 'lucide-react';
 import {
   listFirms, listActivity, addFirm, logActivity,
@@ -19,6 +19,7 @@ import {
 } from '../../services/crmService';
 import {
   computeRevenue, targetColor, dailyTargetsContext, tierPrice, avgMinutesSaved, DAILY_TARGETS, PHASE1_PAYING_TARGET, COMMISSION_RATE, TIER_PRICES,
+  firstThreeBonus, commissionProjection, BONUS_LADDER, SPRINT_BONUS,
 } from '../../services/crmAnalytics';
 import { CRM_STAGES, CRM_STAGE_LABELS, type CrmStage } from '../../services/crmStageLogic';
 import { CRM_WEEKLY_TARGETS, CRM_CALL_SCRIPT, CRM_OBJECTIONS, CRM_COLD_EMAIL } from '../constants/crmReference';
@@ -27,7 +28,7 @@ import { AUDIT_SITE_CHECKS, AUDIT_MANUAL_GROUPS } from '../constants/crmAudit';
 import { crmFirmIntel } from '../constants/crmFirmIntel';
 import { STARTER_QUESTIONS, askAssistant, type ChatMessage } from '../../services/chatAssistant';
 
-type Tab = 'dashboard' | 'pipeline' | 'firms' | 'activity' | 'metrics' | 'revenue' | 'team' | 'notes' | 'scripts' | 'training' | 'askai' | 'checklist' | 'audit' | 'add';
+type Tab = 'dashboard' | 'pipeline' | 'firms' | 'activity' | 'metrics' | 'revenue' | 'comp' | 'team' | 'notes' | 'scripts' | 'training' | 'askai' | 'checklist' | 'audit' | 'add';
 
 // `founderOnly` tabs are hidden from sales reps.
 const TABS: { id: Tab; label: string; icon: typeof LayoutGrid; founderOnly?: boolean }[] = [
@@ -40,6 +41,7 @@ const TABS: { id: Tab; label: string; icon: typeof LayoutGrid; founderOnly?: boo
   { id: 'notes', label: 'Notes', icon: StickyNote },
   { id: 'scripts', label: 'Scripts', icon: BookOpen },
   { id: 'training', label: 'Training', icon: GraduationCap },
+  { id: 'comp', label: 'Earnings', icon: Trophy },
   { id: 'askai', label: 'Ask one3seven AI', icon: Sparkles },
   { id: 'checklist', label: 'Checklist', icon: ListChecks, founderOnly: true },
   { id: 'audit', label: 'Audit', icon: ShieldCheck, founderOnly: true },
@@ -183,6 +185,7 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
             {tab === 'checklist' && isFounder && <ChecklistTab />}
             {tab === 'audit' && isFounder && <AuditTab />}
             {tab === 'revenue' && isFounder && <RevenueTab firms={firms} />}
+            {tab === 'comp' && <CompTab firms={firms} />}
             {tab === 'add' && (
               <AddLogTab firms={firms} lastFirmId={lastFirmId} onSaved={(fid) => { if (fid) setLastFirmId(fid); void load(); }} setError={setError} />
             )}
@@ -493,6 +496,106 @@ function DailyTargetsScoreboard({ activity, today }: { activity: CrmActivityWith
 }
 
 // ── Revenue (founder-only) ───────────────────────────────────────────────────
+function CompStat({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
+  return (
+    <div>
+      <div className="text-[11px] font-semibold text-[#1E1B4B]/55">{label}</div>
+      <div className={`text-[18px] font-black ${highlight ? 'text-[#6D4AFF]' : 'text-[#1E1B4B]'}`}>{value}</div>
+    </div>
+  );
+}
+
+/** Earnings tab — visible bonus tracker (the "bonus earned" signal) + a calculator sandbox. */
+function CompTab({ firms }: { firms: CrmFirm[] }) {
+  const usd = (n: number) => `$${n.toLocaleString()}`;
+  const paidCount = firms.filter((f) => f.stage === 'paid').length;
+  const bonus = firstThreeBonus(paidCount);
+
+  const [firmCount, setFirmCount] = useState(3);
+  const [tier, setTier] = useState<'solo' | 'practice' | 'firm'>('practice');
+  const [months, setMonths] = useState(12);
+  const calc = commissionProjection({ firmCount, tier, months });
+
+  return (
+    <div className="space-y-5">
+      {/* Bonus tracker — the "bonus earned" signal */}
+      <section>
+        <h2 className="mb-2 text-[14px] font-bold">First 3 paying firms — launch bonus</h2>
+        <div className="rounded-[16px] border border-[#DCD3FF] bg-[#F7F3FF] p-4">
+          {bonus.earned > 0 ? (
+            <div className="mb-3 rounded-[12px] bg-[#6D4AFF] px-4 py-3 text-white">
+              <div className="text-[11px] font-bold uppercase tracking-wide text-white/70">Bonus earned</div>
+              <div className="text-[26px] font-black leading-tight">{usd(bonus.earned)}</div>
+              <div className="text-[12px] text-white/80">{paidCount} of {BONUS_LADDER.length} paying firms · pay within 1–2 business days of the cleared invoice</div>
+            </div>
+          ) : (
+            <p className="mb-3 text-[13px] text-[#1E1B4B]/55">No paying firms yet. The first conversion earns {usd(BONUS_LADDER[0])}.</p>
+          )}
+          <div className="grid grid-cols-3 gap-2">
+            {bonus.steps.map((s) => (
+              <div key={s.n} className={`rounded-[10px] border px-2 py-2.5 text-center ${s.hit ? 'border-[#6D4AFF] bg-white' : 'border-[#E7E1FF] bg-white/60'}`}>
+                <div className={`text-[15px] font-black ${s.hit ? 'text-[#6D4AFF]' : 'text-[#1E1B4B]/30'}`}>{usd(s.amount)}</div>
+                <div className="text-[10px] font-semibold text-[#1E1B4B]/55">Firm {s.n}{s.hit ? ' ✓' : ''}</div>
+              </div>
+            ))}
+          </div>
+          {!bonus.complete && bonus.nextAmount != null && (
+            <p className="mt-3 text-[12px] text-[#1E1B4B]/55">Next conversion: <b className="text-[#6D4AFF]">{usd(bonus.nextAmount)}</b></p>
+          )}
+          <p className="mt-3 text-[12px] text-[#1E1B4B]/45">
+            + {usd(SPRINT_BONUS)} sprint bonus if all 3 land in the sprint window — plus {Math.round(COMMISSION_RATE * 100)}% recurring on every firm, every month.
+          </p>
+        </div>
+        <p className="mt-2 text-[11px] leading-relaxed text-[#1E1B4B]/45">
+          A firm counts when it's marked <b>Paid</b> — set that the moment Stripe confirms the first cleared invoice. 30-day clawback: if a firm cancels within 30 days, its bonus reverses.
+        </p>
+      </section>
+
+      {/* Calculator sandbox */}
+      <section>
+        <h2 className="mb-2 text-[14px] font-bold">Earnings calculator</h2>
+        <div className="space-y-4 rounded-[16px] border border-[#E7E1FF] bg-white p-4">
+          <div>
+            <label className="mb-1 block text-[12px] font-semibold text-[#1E1B4B]/70">Paying firms: <b className="text-[#6D4AFF]">{firmCount}</b></label>
+            <input type="range" min={0} max={10} value={firmCount} onChange={(e) => setFirmCount(+e.target.value)} className="w-full accent-[#6D4AFF]" />
+          </div>
+          <div>
+            <div className="mb-1 text-[12px] font-semibold text-[#1E1B4B]/70">Tier</div>
+            <div className="flex gap-2">
+              {(['solo', 'practice', 'firm'] as const).map((t) => (
+                <button key={t} type="button" onClick={() => setTier(t)} className={`flex-1 rounded-[10px] border px-2 py-2 text-[12px] font-semibold capitalize transition ${tier === t ? 'border-[#6D4AFF] bg-[#6D4AFF] text-white' : 'border-[#E7E1FF] text-[#1E1B4B]/60 hover:border-[#B8A8FF]'}`}>
+                  {t} ${TIER_PRICES[t]}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <div className="mb-1 text-[12px] font-semibold text-[#1E1B4B]/70">Months retained</div>
+            <div className="flex gap-2">
+              {[1, 3, 6, 12].map((m) => (
+                <button key={m} type="button" onClick={() => setMonths(m)} className={`flex-1 rounded-[10px] border px-2 py-2 text-[12px] font-semibold transition ${months === m ? 'border-[#6D4AFF] bg-[#6D4AFF] text-white' : 'border-[#E7E1FF] text-[#1E1B4B]/60 hover:border-[#B8A8FF]'}`}>
+                  {m} mo
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="rounded-[12px] bg-[#F7F3FF] p-4">
+            <div className="grid grid-cols-2 gap-3">
+              <CompStat label="Monthly commission" value={`${usd(calc.monthlyCommission)}/mo`} />
+              <CompStat label={`Commission over ${months} mo`} value={usd(calc.totalCommission)} />
+              <CompStat label="First-3 bonus" value={usd(calc.bonus)} />
+              <CompStat label="Total potential" value={usd(calc.total)} highlight />
+            </div>
+          </div>
+          <p className="text-[11px] leading-relaxed text-[#1E1B4B]/45">
+            Illustration only — assumes all firms on the {tier} tier, retained {months} month{months === 1 ? '' : 's'}. The {Math.round(COMMISSION_RATE * 100)}% commission keeps paying every month a firm stays.
+          </p>
+        </div>
+      </section>
+    </div>
+  );
+}
+
 function RevenueTab({ firms }: { firms: CrmFirm[] }) {
   const r = computeRevenue(firms);
   const paid = firms.filter((f) => f.stage === 'paid');
