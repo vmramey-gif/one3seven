@@ -3622,7 +3622,7 @@ export default function App() {
   };
 
   const isFirmView = currentScreen === 'firmDashboard' || currentScreen === 'intakeReview' || currentScreen === 'firmSettings';
-  const isMarketingView = currentScreen === 'publicMarketing';
+  const isMarketingView = currentScreen === 'publicMarketing' || currentScreen === 'forFirms';
   const isComparisonView = currentScreen === 'comparison';
   const isAuthView =
     currentScreen === 'authWelcome' ||
