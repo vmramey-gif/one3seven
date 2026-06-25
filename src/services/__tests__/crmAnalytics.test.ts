@@ -110,4 +110,12 @@ describe('commissionProjection', () => {
   it('zero firms earns zero', () => {
     expect(commissionProjection({ firmCount: 0, tier: 'firm', months: 6 }).total).toBe(0);
   });
+  it('scales to 500 firms (bonus still caps at the first 3)', () => {
+    const r = commissionProjection({ firmCount: 500, tier: 'firm', months: 12 });
+    expect(r.mrr).toBe(449500);              // 500 * 899
+    expect(r.monthlyCommission).toBe(89900); // round(449500 * 0.2)
+    expect(r.totalCommission).toBe(1078800); // 89900 * 12
+    expect(r.bonus).toBe(500);               // ladder caps at 3
+    expect(r.total).toBe(1079300);
+  });
 });

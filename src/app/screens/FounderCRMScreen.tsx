@@ -556,8 +556,25 @@ function CompTab({ firms }: { firms: CrmFirm[] }) {
         <h2 className="mb-2 text-[14px] font-bold">Earnings calculator</h2>
         <div className="space-y-4 rounded-[16px] border border-[#E7E1FF] bg-white p-4">
           <div>
-            <label className="mb-1 block text-[12px] font-semibold text-[#1E1B4B]/70">Paying firms: <b className="text-[#6D4AFF]">{firmCount}</b></label>
-            <input type="range" min={0} max={10} value={firmCount} onChange={(e) => setFirmCount(+e.target.value)} className="w-full accent-[#6D4AFF]" />
+            <div className="mb-1 flex items-center justify-between">
+              <label className="text-[12px] font-semibold text-[#1E1B4B]/70">Paying firms</label>
+              <input
+                type="number"
+                min={0}
+                max={500}
+                value={firmCount}
+                onChange={(e) => setFirmCount(Math.max(0, Math.min(500, Math.floor(+e.target.value) || 0)))}
+                className="w-20 rounded-[8px] border border-[#E7E1FF] px-2 py-1 text-right text-[13px] font-bold text-[#6D4AFF] outline-none focus:border-[#6D4AFF]"
+              />
+            </div>
+            <input type="range" min={0} max={500} value={firmCount} onChange={(e) => setFirmCount(+e.target.value)} className="w-full accent-[#6D4AFF]" />
+            <div className="mt-1.5 flex gap-1.5">
+              {[10, 50, 100, 250, 500].map((n) => (
+                <button key={n} type="button" onClick={() => setFirmCount(n)} className={`flex-1 rounded-[8px] border px-1 py-1 text-[11px] font-semibold transition ${firmCount === n ? 'border-[#6D4AFF] bg-[#6D4AFF] text-white' : 'border-[#E7E1FF] text-[#1E1B4B]/55 hover:border-[#B8A8FF]'}`}>
+                  {n}
+                </button>
+              ))}
+            </div>
           </div>
           <div>
             <div className="mb-1 text-[12px] font-semibold text-[#1E1B4B]/70">Tier</div>
