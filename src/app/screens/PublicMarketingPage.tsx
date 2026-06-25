@@ -1208,15 +1208,15 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
       </nav>
 
       {/* ── HERO ── */}
-      <section className="relative overflow-hidden bg-[#FAF9F6] px-5 pb-16 pt-14 sm:px-8 sm:pb-24 sm:pt-20">
-        {/* Background blobs — slow drift */}
+      <section className="relative overflow-hidden bg-[#14112E] px-5 pb-16 pt-14 sm:px-8 sm:pb-24 sm:pt-20">
+        {/* Background glow — slow drift */}
         <motion.div
-          className="pointer-events-none absolute -left-32 -top-32 h-[500px] w-[500px] rounded-full bg-[#6D4AFF]/5 blur-3xl"
+          className="pointer-events-none absolute -left-32 -top-32 h-[500px] w-[500px] rounded-full bg-[#6D4AFF]/20 blur-3xl"
           animate={{ x: [0, 24, -12, 0], y: [0, -18, 14, 0] }}
           transition={{ duration: 14, repeat: Infinity, ease: 'easeInOut' }}
         />
         <motion.div
-          className="pointer-events-none absolute -right-32 top-1/2 h-[400px] w-[400px] rounded-full bg-[#6D4AFF]/4 blur-3xl"
+          className="pointer-events-none absolute -right-32 top-1/2 h-[400px] w-[400px] rounded-full bg-[#A78BFA]/12 blur-3xl"
           animate={{ x: [0, -20, 10, 0], y: [0, 16, -10, 0] }}
           transition={{ duration: 11, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
         />
@@ -1233,20 +1233,20 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
               {firmDirectedContext ? (
                 /* ── Journey 2: firm-directed worker entry ── */
                 <>
-                  <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#DCD3FF] bg-white px-4 py-1.5 text-xs font-semibold text-[#6D4AFF] shadow-sm">
-                    <span className="h-1.5 w-1.5 rounded-full bg-[#6D4AFF] animate-pulse" />
+                  <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-semibold text-[#C4B5FD]">
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#C4B5FD] animate-pulse" />
                     Sent by {firmDirectedContext.firmName}
                   </div>
 
-                  <h1 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="mb-5 text-[32px] font-medium leading-[1.05] tracking-[-0.01em] text-[#14112E] sm:text-[44px] lg:text-[54px]">
+                  <h1 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="mb-5 text-[32px] font-medium leading-[1.05] tracking-[-0.01em] text-white sm:text-[44px] lg:text-[54px]">
                     {firmDirectedContext.firmName}
                     <br />
-                    <span className="text-[#5B21B6]">asked you to</span>
+                    <span className="text-[#C4B5FD]">asked you to</span>
                     <br />
                     submit here.
                   </h1>
 
-                  <p className="mb-8 max-w-[480px] text-[16px] leading-relaxed text-[#1E1B4B]/62 sm:text-[17px]">
+                  <p className="mb-8 max-w-[480px] text-[16px] leading-relaxed text-[#C9C4E6] sm:text-[17px]">
                     This takes about 10–15 minutes. Your records will be organized and sent directly to {firmDirectedContext.firmName} — no emails or follow-up calls needed.
                   </p>
 
@@ -1261,30 +1261,30 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
                     </button>
                   </div>
 
-                  <p className="mt-4 text-sm text-[#1E1B4B]/50">
+                  <p className="mt-4 text-sm text-[#8E88B5]">
                     Free to submit · Your records stay private until you approve sharing
                   </p>
                 </>
               ) : (
                 /* ── Journey 1: self-discovered worker ── */
                 <>
-                  <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#E7E1FF] bg-white px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#5B21B6]">
-                    <span className="h-1.5 w-1.5 rounded-full bg-[#5B21B6]" />
+                  <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#C4B5FD]">
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#C4B5FD]" />
                     Employment intake · California beta
                   </div>
 
-                  <h1 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="mb-5 text-[34px] font-medium leading-[1.04] tracking-[-0.01em] text-[#14112E] sm:text-[48px] lg:text-[56px]">
+                  <h1 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="mb-5 text-[34px] font-medium leading-[1.04] tracking-[-0.01em] text-white sm:text-[48px] lg:text-[56px]">
                     Scattered records in.
                     <br />
-                    <span className="text-[#5B21B6]">A clear timeline out.</span>
+                    <span className="text-[#C4B5FD]">A clear timeline out.</span>
                   </h1>
 
-                  <p className="mb-5 max-w-[480px] text-[16px] leading-relaxed text-[#1E1B4B]/62 sm:text-[17px]">
+                  <p className="mb-5 max-w-[480px] text-[16px] leading-relaxed text-[#C9C4E6] sm:text-[17px]">
                     Organize your employment records into a structured intake packet — ready to bring to any attorney consultation.
                   </p>
 
-                  <p className="mb-7 flex items-center gap-2 text-sm font-medium text-[#1E1B4B]/70">
-                    <Shield className="h-4 w-4 flex-shrink-0 text-[#6D4AFF]" />
+                  <p className="mb-7 flex items-center gap-2 text-sm font-medium text-[#C9C4E6]">
+                    <Shield className="h-4 w-4 flex-shrink-0 text-[#A78BFA]" />
                     Your records stay private until you decide to share them.
                   </p>
 
@@ -1292,14 +1292,14 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
                     <button
                       type="button"
                       onClick={onWorkerStart}
-                      className="flex items-center justify-center gap-2 rounded-full bg-[#5B21B6] px-7 py-3.5 text-[15px] font-semibold text-white shadow-[0_12px_32px_rgba(91,33,182,0.28)] transition hover:bg-[#4C1D96] hover:-translate-y-0.5 active:scale-[0.97]"
+                      className="flex items-center justify-center gap-2 rounded-full bg-[#6D4AFF] px-7 py-3.5 text-[15px] font-semibold text-white shadow-[0_16px_48px_rgba(109,74,255,0.40)] transition hover:bg-[#5B35D5] hover:-translate-y-0.5 active:scale-[0.97]"
                     >
                       Start organizing my records
                       <ArrowRight className="h-4 w-4" />
                     </button>
                   </div>
 
-                  <p className="mt-4 text-sm text-[#1E1B4B]/50">
+                  <p className="mt-4 text-sm text-[#8E88B5]">
                     Free to submit · Built for California employment matters · You control what's shared
                   </p>
                 </>
@@ -1316,9 +1316,9 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
               <div className="w-full max-w-[520px]">
                 <HeroVisual />
                 {/* Caption beneath visual */}
-                <div className="mt-3 hidden items-center justify-center gap-6 text-xs text-[#1E1B4B]/40 sm:flex">
+                <div className="mt-3 hidden items-center justify-center gap-6 text-xs text-[#8E88B5] sm:flex">
                   <span>Scattered records</span>
-                  <span className="text-[#6D4AFF]/60">→ one3seven →</span>
+                  <span className="text-[#A78BFA]">→ one3seven →</span>
                   <span>Organized for attorney review</span>
                 </div>
               </div>
@@ -1331,8 +1331,8 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
       <section className="border-y border-[#F0EBFF] bg-[#FAFAFF] px-5 py-14 sm:px-8 sm:py-20">
         <div className="mx-auto max-w-5xl">
           <div className="mb-2 text-center text-xs font-bold uppercase tracking-[0.2em] text-[#6D4AFF]">See it in 10 seconds</div>
-          <h2 className="mb-8 text-center text-[24px] font-bold tracking-tight text-[#1E1B4B] sm:text-[30px]">
-            Scattered PDFs in. A clear timeline out.
+          <h2 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="mb-8 text-center text-[26px] font-medium tracking-[-0.01em] text-[#14112E] sm:text-[32px]">
+            The same records, organized.
           </h2>
           <div className="grid items-center gap-5 lg:grid-cols-[1fr_auto_1.3fr]">
             {/* Before: scattered PDF documents */}
