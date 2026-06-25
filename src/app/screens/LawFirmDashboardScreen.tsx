@@ -305,23 +305,23 @@ export function LawFirmDashboardScreen({
 
   const filterPillClass = (active: boolean) =>
     active
-      ? 'bg-[#6D4AFF] text-white border-[#6D4AFF] shadow-[0_10px_24px_rgba(109,74,255,0.18)]'
-      : 'bg-white text-[#1E1B4B]/70 border-[#DCD3FF] hover:border-[#B8A8FF] hover:bg-[#F7F3FF]';
+      ? 'bg-[#5B21B6] text-white border-[#5B21B6] shadow-[0_10px_24px_rgba(91,33,182,0.18)]'
+      : 'bg-white text-[#14112E]/70 border-[#ECE7F5] hover:border-[#C9B8F0] hover:bg-[#F5F1FB]';
 
   return (
-    <div className="min-h-screen bg-[#F6F2FF] text-[#1E1B4B]">
-      <nav className="sticky top-0 z-50 border-b border-[#E7E1FF] bg-white/90 backdrop-blur">
+    <div className="min-h-screen bg-[#FAF9F6] text-[#14112E]">
+      <nav className="sticky top-0 z-50 border-b border-[#ECE7F5] bg-white/90 backdrop-blur">
         <div className="px-6 py-5">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
-              <h1 className="text-xl font-semibold text-[#1E1B4B]"><WordMark /></h1>
+              <h1 className="text-xl font-semibold text-[#14112E]"><WordMark /></h1>
             </div>
             <div className="flex flex-wrap items-center gap-2">
               <NotificationsBell items={firmBellNotifications} />
               <button
                 type="button"
                 onClick={() => onNavigate('firmSettings')}
-                className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#1E1B4B]/65 hover:bg-[#F7F3FF] hover:text-[#1E1B4B]"
+                className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#14112E]/65 hover:bg-[#F5F1FB] hover:text-[#14112E]"
               >
                 <Settings className="h-4 w-4" />
                 Settings
@@ -330,7 +330,7 @@ export function LawFirmDashboardScreen({
                 <button
                   type="button"
                   onClick={onSignOut}
-                  className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#1E1B4B]/52 hover:bg-[#F7F3FF] hover:text-[#1E1B4B]"
+                  className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#14112E]/52 hover:bg-[#F5F1FB] hover:text-[#14112E]"
                 >
                   <LogOut className="h-4 w-4" />
                   Sign out
@@ -350,35 +350,35 @@ export function LawFirmDashboardScreen({
       >
         {dashboardView === 'firmHome' ? (
           <section className="w-full">
-            <div className="mx-auto flex min-h-[min(520px,calc(100vh-14rem))] w-full max-w-[680px] flex-col justify-center rounded-[32px] border border-[#E7E1FF] bg-white/95 px-6 py-10 text-center shadow-[0_28px_90px_rgba(31,27,75,0.12)] sm:px-10 sm:py-12">
-              <h2 className="font-display text-[clamp(1.75rem,5.8vw,2.25rem)] font-medium leading-[1.12] tracking-[-0.02em] text-transparent bg-[linear-gradient(110deg,#1E1B4B_0%,#5B35D5_42%,#1E1B4B_78%)] bg-[length:220%_100%] bg-clip-text animate-[pulse_3s_ease-in-out_infinite]">
+            <div className="mx-auto flex min-h-[min(520px,calc(100vh-14rem))] w-full max-w-[680px] flex-col justify-center rounded-[24px] border border-[#ECE7F5] bg-white/95 px-6 py-10 text-center shadow-[0_16px_50px_rgba(20,17,46,0.07)] sm:px-10 sm:py-12">
+              <h2 className="font-display text-[clamp(1.75rem,5.8vw,2.25rem)] font-medium leading-[1.12] tracking-[-0.02em] text-transparent bg-[linear-gradient(110deg,#14112E_0%,#4C1D96_42%,#14112E_78%)] bg-[length:220%_100%] bg-clip-text animate-[pulse_3s_ease-in-out_infinite]">
                 {firmGreetingName ? `${timeGreeting}, ${firmGreetingName}.` : `${timeGreeting}.`}
               </h2>
 
               {allIntakes.length === 0 ? (
                 /* ── Zero state: guide firm to their intake link ── */
                 <div className="mt-8 w-full text-left">
-                  <p className="text-center text-lg font-medium text-[#1E1B4B]/70 mb-6">
+                  <p className="text-center text-lg font-medium text-[#14112E]/70 mb-6">
                     Your intake queue is ready. Send your link to get started.
                   </p>
                   {firmIntakeLink ? (
-                    <div className="rounded-2xl border border-[#E7E1FF] bg-[#F7F3FF] p-5 mb-5">
-                      <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#6D4AFF] mb-2">
+                    <div className="rounded-2xl border border-[#ECE7F5] bg-[#F5F1FB] p-5 mb-5">
+                      <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#5B21B6] mb-2">
                         Your client intake link
                       </p>
                       <div className="flex items-center gap-2">
-                        <p className="flex-1 truncate font-mono text-xs text-[#1E1B4B]/70 bg-white border border-[#E7E1FF] rounded-lg px-3 py-2">
+                        <p className="flex-1 truncate font-mono text-xs text-[#14112E]/70 bg-white border border-[#ECE7F5] rounded-lg px-3 py-2">
                           {firmIntakeLink}
                         </p>
                         <button
                           type="button"
                           onClick={copyIntakeLink}
-                          className="shrink-0 rounded-full bg-[#6D4AFF] px-4 py-2 text-xs font-semibold text-white hover:bg-[#5B35D5] transition-colors"
+                          className="shrink-0 rounded-full bg-[#5B21B6] px-4 py-2 text-xs font-semibold text-white hover:bg-[#4C1D96] transition-colors"
                         >
                           {intakeLinkCopied ? 'Copied ✓' : 'Copy link'}
                         </button>
                       </div>
-                      <p className="text-[11px] text-[#1E1B4B]/45 mt-2.5 leading-relaxed">
+                      <p className="text-[11px] text-[#14112E]/45 mt-2.5 leading-relaxed">
                         Share this with a client. They upload their documents. The organized intake arrives here before your first call.
                       </p>
                     </div>
@@ -387,7 +387,7 @@ export function LawFirmDashboardScreen({
                     <button
                       type="button"
                       onClick={() => onNavigate('firmSettings')}
-                      className="inline-flex min-h-12 items-center justify-center rounded-full border border-[#DCD3FF] bg-white px-7 py-3 text-[14px] font-semibold text-[#1E1B4B] shadow-sm transition hover:border-[#C8BAFF] hover:bg-[#F7F3FF]"
+                      className="inline-flex min-h-12 items-center justify-center rounded-full border border-[#ECE7F5] bg-white px-7 py-3 text-[14px] font-semibold text-[#14112E] shadow-sm transition hover:border-[#C9B8F0] hover:bg-[#F5F1FB]"
                     >
                       Firm settings
                     </button>
@@ -395,7 +395,7 @@ export function LawFirmDashboardScreen({
                       <button
                         type="button"
                         onClick={onViewSampleIntakeFlow}
-                        className="inline-flex min-h-12 items-center justify-center rounded-full border border-[#DCD3FF] bg-white px-7 py-3 text-[14px] font-semibold text-[#5B35D5] shadow-sm transition hover:border-[#C8BAFF] hover:bg-[#F7F3FF]"
+                        className="inline-flex min-h-12 items-center justify-center rounded-full border border-[#ECE7F5] bg-white px-7 py-3 text-[14px] font-semibold text-[#4C1D96] shadow-sm transition hover:border-[#C9B8F0] hover:bg-[#F5F1FB]"
                       >
                         View sample intake
                       </button>
@@ -405,18 +405,18 @@ export function LawFirmDashboardScreen({
               ) : (
                 /* ── Intakes exist: show count + actions ── */
                 <>
-                  <p className="mx-auto mt-8 max-w-xl text-[1.62rem] font-semibold leading-tight tracking-[-0.02em] text-[#1E1B4B] sm:text-[2rem]">
+                  <p className="mx-auto mt-8 max-w-xl text-[1.62rem] font-medium leading-tight tracking-[-0.02em] text-[#14112E] sm:text-[2rem]" style={{ fontFamily: "'Fraunces', Georgia, serif" }}>
                     {allIntakes.length === 1
                       ? '1 intake is ready for review.'
                       : `${allIntakes.length} intakes are ready for review.`}
                   </p>
                   {firmIntakeLink ? (
-                    <p className="mt-3 text-sm text-[#1E1B4B]/45">
+                    <p className="mt-3 text-sm text-[#14112E]/45">
                       Your intake link is in{' '}
                       <button
                         type="button"
                         onClick={() => onNavigate('firmSettings')}
-                        className="text-[#6D4AFF] hover:underline"
+                        className="text-[#5B21B6] hover:underline"
                       >
                         Firm Settings
                       </button>
@@ -430,7 +430,7 @@ export function LawFirmDashboardScreen({
                         setNewIntakeSourceTab('connected');
                         setActiveTab('all');
                       }}
-                      className="inline-flex min-h-14 items-center justify-center rounded-full bg-[#6D4AFF] px-9 py-4 text-[15px] font-semibold text-white shadow-[0_18px_48px_rgba(109,74,255,0.30)] transition hover:-translate-y-0.5 hover:bg-[#5B35D5] hover:shadow-[0_20px_54px_rgba(109,74,255,0.36)]"
+                      className="inline-flex min-h-14 items-center justify-center rounded-full bg-[#5B21B6] px-9 py-4 text-[15px] font-semibold text-white shadow-[0_18px_48px_rgba(91,33,182,0.30)] transition hover:-translate-y-0.5 hover:bg-[#4C1D96] hover:shadow-[0_20px_54px_rgba(91,33,182,0.36)]"
                     >
                       Review New Intakes
                     </button>
@@ -440,7 +440,7 @@ export function LawFirmDashboardScreen({
                         setDashboardView('continueReviews');
                         setActiveTab('all');
                       }}
-                      className="inline-flex min-h-14 items-center justify-center rounded-full border border-[#DCD3FF] bg-white px-9 py-4 text-[15px] font-semibold text-[#1E1B4B] shadow-[0_14px_38px_rgba(31,27,75,0.10)] transition hover:-translate-y-0.5 hover:border-[#C8BAFF] hover:bg-[#F7F3FF]"
+                      className="inline-flex min-h-14 items-center justify-center rounded-full border border-[#ECE7F5] bg-white px-9 py-4 text-[15px] font-semibold text-[#14112E] shadow-[0_14px_38px_rgba(20,17,46,0.10)] transition hover:-translate-y-0.5 hover:border-[#C9B8F0] hover:bg-[#F5F1FB]"
                     >
                       Continue My Reviews
                     </button>
@@ -458,17 +458,17 @@ export function LawFirmDashboardScreen({
                 <button
                   type="button"
                   onClick={() => setDashboardView('firmHome')}
-                  className="mb-5 rounded-full border border-[#DCD3FF] bg-white px-4 py-2 text-sm text-[#1E1B4B]/70 shadow-[0_10px_28px_rgba(31,27,75,0.08)] hover:border-[#B8A8FF] hover:text-[#1E1B4B]"
+                  className="mb-5 rounded-full border border-[#ECE7F5] bg-white px-4 py-2 text-sm text-[#14112E]/70 shadow-[0_10px_28px_rgba(20,17,46,0.08)] hover:border-[#C9B8F0] hover:text-[#14112E]"
                 >
                   Back to Firm Home
                 </button>
-                <p className="text-xs uppercase tracking-[0.22em] text-[#6D4AFF]">Review Workspace</p>
-                <h2 className="mt-2 text-3xl font-semibold text-[#1E1B4B]">
+                <p className="text-xs uppercase tracking-[0.22em] text-[#5B21B6]">Review Workspace</p>
+                <h2 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="mt-2 text-3xl font-medium tracking-[-0.01em] text-[#14112E]">
                   {dashboardView === 'continueReviews' ? 'Continue My Reviews' : 'Review New Intakes'}
                 </h2>
               </div>
               {dashboardView === 'reviewNew' ? (
-                <div className="flex rounded-full border border-[#DCD3FF] bg-white p-1 shadow-[0_14px_34px_rgba(31,27,75,0.10)]">
+                <div className="flex rounded-full border border-[#ECE7F5] bg-white p-1 shadow-[0_14px_34px_rgba(20,17,46,0.10)]">
                   {(
                     [
                       ['connected', 'Connected Intakes'],
@@ -481,8 +481,8 @@ export function LawFirmDashboardScreen({
                       onClick={() => setNewIntakeSourceTab(tab)}
                       className={`rounded-full px-4 py-2 text-sm transition-colors ${
                         newIntakeSourceTab === tab
-                          ? 'bg-[#6D4AFF] text-white shadow-[0_10px_24px_rgba(109,74,255,0.22)]'
-                          : 'text-[#1E1B4B]/64 hover:bg-[#F7F3FF] hover:text-[#1E1B4B]'
+                          ? 'bg-[#5B21B6] text-white shadow-[0_10px_24px_rgba(91,33,182,0.22)]'
+                          : 'text-[#14112E]/64 hover:bg-[#F5F1FB] hover:text-[#14112E]'
                       }`}
                     >
                       {label}
@@ -492,22 +492,22 @@ export function LawFirmDashboardScreen({
               ) : null}
             </div>
 
-            <section className="rounded-[32px] border border-[#E7E1FF] bg-white/95 p-5 shadow-[0_28px_90px_rgba(31,27,75,0.12)] sm:p-7">
+            <section className="rounded-[24px] border border-[#ECE7F5] bg-white/95 p-5 shadow-[0_16px_50px_rgba(20,17,46,0.07)] sm:p-7">
             <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center">
               <div className="relative flex-1">
-                <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#1E1B4B]/38" />
+                <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#14112E]/38" />
                 <input
                   type="text"
                   placeholder="Find a case file by timeline, record type, intake number, or review note"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full rounded-2xl border border-[#DCD3FF] bg-[#F8F6FF] py-3 pl-11 pr-4 text-sm text-[#1E1B4B] placeholder:text-[#1E1B4B]/38 focus:border-[#6D4AFF] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#6D4AFF]/10"
+                  className="w-full rounded-2xl border border-[#ECE7F5] bg-[#FAF9F6] py-3 pl-11 pr-4 text-sm text-[#14112E] placeholder:text-[#14112E]/38 focus:border-[#5B21B6] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#5B21B6]/10"
                 />
               </div>
               <button
                 type="button"
                 onClick={() => setShowFilters((v) => !v)}
-                className="flex items-center justify-center gap-2 rounded-2xl border border-[#DCD3FF] bg-white px-4 py-3 text-sm font-medium text-[#1E1B4B]/72 shadow-[0_10px_24px_rgba(31,27,75,0.07)] hover:border-[#B8A8FF] hover:bg-[#F7F3FF]"
+                className="flex items-center justify-center gap-2 rounded-2xl border border-[#ECE7F5] bg-white px-4 py-3 text-sm font-medium text-[#14112E]/72 shadow-[0_10px_24px_rgba(20,17,46,0.07)] hover:border-[#C9B8F0] hover:bg-[#F5F1FB]"
               >
                 <Filter className="h-4 w-4" />
                 Refine queue
@@ -518,10 +518,10 @@ export function LawFirmDashboardScreen({
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
-                className="mb-6 rounded-2xl border border-[#E7E1FF] bg-[#FBFAFF] p-4"
+                className="mb-6 rounded-2xl border border-[#ECE7F5] bg-[#FAF9F6] p-4"
               >
                 <div className="mb-4">
-                  <p className="mb-2 text-xs font-medium text-[#1E1B4B]/58">Chronology state</p>
+                  <p className="mb-2 text-xs font-medium text-[#14112E]/58">Chronology state</p>
                   <div className="flex flex-wrap gap-2">
                     {[
                       ['all', 'All files'],
@@ -541,7 +541,7 @@ export function LawFirmDashboardScreen({
                   </div>
                 </div>
                 <div>
-                  <p className="mb-2 text-xs font-medium text-[#1E1B4B]/58">Record focus</p>
+                  <p className="mb-2 text-xs font-medium text-[#14112E]/58">Record focus</p>
                   <div className="flex flex-wrap gap-2">
                     {(
                       [
@@ -583,8 +583,8 @@ export function LawFirmDashboardScreen({
                   onClick={() => setActiveTab(tab)}
                   className={`rounded-full border px-4 py-2 text-sm min-h-[36px] transition-colors ${
                     activeTab === tab
-                      ? 'border-[#6D4AFF] bg-[#6D4AFF] text-white shadow-[0_10px_24px_rgba(109,74,255,0.18)]'
-                      : 'border-[#DCD3FF] bg-white text-[#1E1B4B]/60 hover:border-[#B8A8FF] hover:bg-[#F7F3FF]'
+                      ? 'border-[#5B21B6] bg-[#5B21B6] text-white shadow-[0_10px_24px_rgba(91,33,182,0.18)]'
+                      : 'border-[#ECE7F5] bg-white text-[#14112E]/60 hover:border-[#C9B8F0] hover:bg-[#F5F1FB]'
                   }`}
                 >
                   {label}
@@ -594,7 +594,7 @@ export function LawFirmDashboardScreen({
 
             <div className="space-y-6">
               {activeTab === 'archived' && !BETA_HIDE_FIRM_ARCHIVED_TAB ? (
-                <div className="rounded-2xl border border-dashed border-[#DCD3FF] bg-[#F8F6FF] p-8 text-sm text-[#1E1B4B]/62">
+                <div className="rounded-2xl border border-dashed border-[#ECE7F5] bg-[#FAF9F6] p-8 text-sm text-[#14112E]/62">
                   Closed case files will appear here in a future update.
                 </div>
               ) : null}
@@ -629,40 +629,40 @@ export function LawFirmDashboardScreen({
                       intakeNumber: intake.intakeNumber,
                     })
                   }
-                  className="group w-full rounded-3xl border border-[#E7E1FF] bg-white p-6 text-left shadow-[0_16px_44px_rgba(31,27,75,0.09)] transition hover:-translate-y-0.5 hover:border-[#B8A8FF] hover:shadow-[0_22px_58px_rgba(31,27,75,0.13)] sm:p-7"
+                  className="group w-full rounded-3xl border border-[#ECE7F5] bg-white p-6 text-left shadow-[0_16px_44px_rgba(20,17,46,0.09)] transition hover:-translate-y-0.5 hover:border-[#C9B8F0] hover:shadow-[0_22px_58px_rgba(20,17,46,0.13)] sm:p-7"
                 >
                   <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
                     <div className="min-w-0">
-                      <p className="text-xs uppercase tracking-[0.2em] text-[#1E1B4B]/34">Case file {intake.intakeNumber}</p>
-                      <h3 className="mt-2 text-2xl font-semibold text-[#1E1B4B]">{workerLabel}</h3>
-                      <p className="mt-3 text-sm font-medium text-[#6D4AFF]">{timelineState}</p>
-                      <p className="mt-2 text-sm leading-relaxed text-[#1E1B4B]/72">{recordLine}</p>
-                      <p className="mt-1 text-sm leading-relaxed text-[#1E1B4B]/58">{gapLine}</p>
+                      <p className="text-xs uppercase tracking-[0.2em] text-[#14112E]/34">Case file {intake.intakeNumber}</p>
+                      <h3 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="mt-2 text-2xl font-medium tracking-[-0.01em] text-[#14112E]">{workerLabel}</h3>
+                      <p className="mt-3 text-sm font-medium text-[#5B21B6]">{timelineState}</p>
+                      <p className="mt-2 text-sm leading-relaxed text-[#14112E]/72">{recordLine}</p>
+                      <p className="mt-1 text-sm leading-relaxed text-[#14112E]/58">{gapLine}</p>
                     </div>
-                    <div className="flex items-center gap-2 text-sm font-medium text-[#6D4AFF]">
+                    <div className="flex items-center gap-2 text-sm font-medium text-[#5B21B6]">
                       Review Timeline
                       <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                     </div>
                   </div>
 
-                  <p className="mt-6 max-w-3xl border-t border-[#E7E1FF] pt-5 text-sm leading-relaxed text-[#1E1B4B]/62 line-clamp-2">
+                  <p className="mt-6 max-w-3xl border-t border-[#ECE7F5] pt-5 text-sm leading-relaxed text-[#14112E]/62 line-clamp-2">
                     {summary}
                   </p>
 
                   <div className="mt-5 flex flex-wrap items-center gap-3">
-                    <span className="rounded-full border border-[#DCD3FF] bg-[#F8F6FF] px-3 py-1.5 text-xs text-[#1E1B4B]/62">
+                    <span className="rounded-full border border-[#ECE7F5] bg-[#FAF9F6] px-3 py-1.5 text-xs text-[#14112E]/62">
                       {statusLineForRoute(
                         intake.routeStatus,
                         intake.submissionType,
                         intake.workflowStatusLabel
                       )}
                     </span>
-                    <span className="flex items-center gap-1.5 text-xs text-[#1E1B4B]/48">
+                    <span className="flex items-center gap-1.5 text-xs text-[#14112E]/48">
                       <Clock className="h-3.5 w-3.5" />
                       Latest activity: {intake.lastActivity}
                     </span>
                     {intake.requestedDocumentsStatus ? (
-                      <span className="rounded-full border border-[#6D4AFF]/28 bg-[#F7F3FF] px-3 py-1.5 text-xs text-[#5B35D5]">
+                      <span className="rounded-full border border-[#5B21B6]/28 bg-[#F5F1FB] px-3 py-1.5 text-xs text-[#4C1D96]">
                         {intake.requestedDocumentsStatus}
                       </span>
                     ) : null}
@@ -679,25 +679,25 @@ export function LawFirmDashboardScreen({
             </div>
 
             {activeTab !== 'archived' && noRealFirmIntakes ? (
-              <div className="max-w-2xl rounded-3xl border border-[#E7E1FF] bg-white p-8 shadow-[0_16px_44px_rgba(31,27,75,0.09)]">
-                <FileText className="mb-4 h-7 w-7 text-[#6D4AFF]" />
-                <h3 className="text-lg font-semibold text-[#1E1B4B]">No intakes yet</h3>
-                <p className="mt-2 text-sm leading-relaxed text-[#1E1B4B]/62">
+              <div className="max-w-2xl rounded-3xl border border-[#ECE7F5] bg-white p-8 shadow-[0_16px_44px_rgba(20,17,46,0.09)]">
+                <FileText className="mb-4 h-7 w-7 text-[#5B21B6]" />
+                <h3 className="text-lg font-semibold text-[#14112E]">No intakes yet</h3>
+                <p className="mt-2 text-sm leading-relaxed text-[#14112E]/62">
                   Send your intake link to a client. Once they submit their documents, the organized intake appears here before your first call.
                 </p>
                 {firmIntakeLink ? (
-                  <div className="mt-5 rounded-xl border border-[#E7E1FF] bg-[#F7F3FF] p-4">
-                    <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#6D4AFF] mb-2">
+                  <div className="mt-5 rounded-xl border border-[#ECE7F5] bg-[#F5F1FB] p-4">
+                    <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#5B21B6] mb-2">
                       Your client intake link
                     </p>
                     <div className="flex items-center gap-2">
-                      <p className="flex-1 truncate font-mono text-xs text-[#1E1B4B]/70 bg-white border border-[#E7E1FF] rounded-lg px-3 py-2">
+                      <p className="flex-1 truncate font-mono text-xs text-[#14112E]/70 bg-white border border-[#ECE7F5] rounded-lg px-3 py-2">
                         {firmIntakeLink}
                       </p>
                       <button
                         type="button"
                         onClick={copyIntakeLink}
-                        className="shrink-0 rounded-full bg-[#6D4AFF] px-4 py-2 text-xs font-semibold text-white hover:bg-[#5B35D5] transition-colors"
+                        className="shrink-0 rounded-full bg-[#5B21B6] px-4 py-2 text-xs font-semibold text-white hover:bg-[#4C1D96] transition-colors"
                       >
                         {intakeLinkCopied ? 'Copied ✓' : 'Copy'}
                       </button>
@@ -709,7 +709,7 @@ export function LawFirmDashboardScreen({
                     <button
                       type="button"
                       onClick={onViewSampleIntakeFlow}
-                      className="rounded-full border border-[#DCD3FF] bg-white px-4 py-2.5 text-left text-sm font-medium text-[#5B35D5] hover:bg-[#F7F3FF]"
+                      className="rounded-full border border-[#ECE7F5] bg-white px-4 py-2.5 text-left text-sm font-medium text-[#4C1D96] hover:bg-[#F5F1FB]"
                     >
                       View sample intake
                     </button>
@@ -717,15 +717,15 @@ export function LawFirmDashboardScreen({
                   <button
                     type="button"
                     onClick={() => onNavigate('firmSettings')}
-                    className="rounded-full border border-[#DCD3FF] bg-white px-4 py-2.5 text-left text-sm font-medium text-[#1E1B4B]/70 hover:bg-[#F7F3FF]"
+                    className="rounded-full border border-[#ECE7F5] bg-white px-4 py-2.5 text-left text-sm font-medium text-[#14112E]/70 hover:bg-[#F5F1FB]"
                   >
                     Firm settings
                   </button>
                 </div>
               </div>
             ) : activeTab !== 'archived' && !noRealFirmIntakes && filteredIntakes.length === 0 ? (
-              <div className="rounded-3xl border border-[#E7E1FF] bg-[#F8F6FF] p-10 text-center">
-                <p className="text-sm text-[#1E1B4B]/70">No case files match this review lens.</p>
+              <div className="rounded-3xl border border-[#ECE7F5] bg-[#FAF9F6] p-10 text-center">
+                <p className="text-sm text-[#14112E]/70">No case files match this review lens.</p>
               </div>
             ) : null}
             </section>
