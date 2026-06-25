@@ -12,6 +12,12 @@ describe('Ask one3seven AI — system prompt integrity', () => {
   it('contains the 30-day pilot duration', () => {
     expect(SYSTEM_PROMPT).toContain('30-day');
   });
+  it('contains the security posture and the no-overclaim guardrail', () => {
+    expect(SYSTEM_PROMPT).toContain('SECURITY AND DATA POSTURE');
+    expect(SYSTEM_PROMPT).toContain('independently verified');
+    expect(SYSTEM_PROMPT).toContain('DO NOT CLAIM');
+    expect(SYSTEM_PROMPT).toContain('SOC 2');
+  });
 });
 
 describe('buildChatRequest', () => {
@@ -26,7 +32,10 @@ describe('buildChatRequest', () => {
 });
 
 describe('starter questions', () => {
-  it('has exactly three items', () => {
-    expect(STARTER_QUESTIONS).toHaveLength(3);
+  it('has exactly four items', () => {
+    expect(STARTER_QUESTIONS).toHaveLength(4);
+  });
+  it('includes the data-security starter', () => {
+    expect(STARTER_QUESTIONS.some((q) => q.toLowerCase().includes('security'))).toBe(true);
   });
 });

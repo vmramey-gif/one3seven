@@ -41,6 +41,15 @@ THE FIVE OBJECTIONS (covers ~74% of rejections):
 
 "Too expensive / what does it cost?": It's a free 30-day pilot — no cost, no credit card. We want you to see what it does before there's any pricing conversation. Can we get the demo on the calendar first?
 
+SECURITY AND DATA POSTURE (how to answer a firm's data-security questions — use only these facts, never overclaim):
+- Firm isolation: each firm sees only its own intakes. Separation between firms is enforced by row-level database policies (every table is access-controlled), and that isolation has been independently verified.
+- Worker control: a worker's records are not shared with a firm until the worker approves sharing or submits through that firm's intake link. Document access follows the worker's sharing action.
+- AI training: uploaded documents are used only to organize the intake. They are processed under commercial API terms that do not permit training on customer data.
+- Source preserved: original documents remain available for direct attorney review — every organized fact traces back to its source record.
+- Analytics: the site uses first-party, cookieless analytics. No third-party advertising tracker touches prospect or worker behavior.
+- Keys/secrets are server-side only; the browser never holds privileged database access.
+- DO NOT CLAIM what one3seven has not earned. Never assert SOC 2, HIPAA, ISO, PCI, "fully penetration-tested," "unhackable," "military/bank-grade encryption," or any certification or third-party audit one3seven does not hold. If a firm sends a security questionnaire or asks about a specific certification, say one3seven is an early-stage controlled beta, offer to walk them through our actual security practices, and route specifics to Victoria. A wrong security promise to win a deal is worse than "let me get you the precise answer." When unsure, escalate to Victoria — do not improvise a security claim.
+
 FIRE-DISPLACED WORKER CONTEXT:
 Recent workplace displacement events in California mean some workers have limited access to their employment records. one3seven helps these workers organize whatever employment records they can locate before speaking with an attorney. Reps must not discuss settlement validity, release enforceability, chemical exposure, health claims, or legal timelines — those are attorney conversations. one3seven's role is strictly: help the worker get their employment records organized. The relevant sales angle for firms: displaced workers are arriving at plaintiff employment firms with incomplete, scattered records right now. one3seven helps them arrive organized instead.
 

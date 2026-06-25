@@ -14,6 +14,7 @@ export const STARTER_QUESTIONS: string[] = [
   'What do I say when an attorney says they already have a process?',
   'How do I explain one3seven in one sentence?',
   "What's the right tone for a cold call?",
+  "How do I answer a firm's data-security questions?",
 ];
 
 export interface AskAssistantResult {
