@@ -8,6 +8,9 @@ import { DemoApp } from './app/screens/DemoApp.tsx';
 import { WorkerDemoPage } from './app/screens/WorkerDemoPage.tsx';
 import { FireWorkerDemoPage } from './app/screens/FireWorkerDemoPage.tsx';
 import { FounderHQ } from './app/screens/FounderHQ.tsx';
+import { CompanyDemoGuide } from './app/screens/CompanyDemoGuide.tsx';
+import { CompanyDemoDebrief } from './app/screens/CompanyDemoDebrief.tsx';
+import { CrmAccessGate } from './app/components/CrmAccessGate.tsx';
 import { TermsPage } from './app/screens/TermsPage.tsx';
 import { PrivacyPage } from './app/screens/PrivacyPage.tsx';
 import { OFFLINE_DEV_GALLERY_ONLY } from './lib/supabaseAvailability.ts';
@@ -63,6 +66,14 @@ if (url.pathname === '/terms') {
   createRoot(rootEl).render(<AppErrorBoundary><TermsPage /></AppErrorBoundary>);
 } else if (url.pathname === '/privacy') {
   createRoot(rootEl).render(<AppErrorBoundary><PrivacyPage /></AppErrorBoundary>);
+} else if (url.pathname === '/company-demo/debrief') {
+  createRoot(rootEl).render(
+    <AppErrorBoundary><CrmAccessGate><CompanyDemoDebrief /></CrmAccessGate></AppErrorBoundary>
+  );
+} else if (url.pathname === '/company-demo') {
+  createRoot(rootEl).render(
+    <AppErrorBoundary><CrmAccessGate><CompanyDemoGuide /></CrmAccessGate></AppErrorBoundary>
+  );
 } else if (isHQ) {
   createRoot(rootEl).render(
     <AppErrorBoundary><FounderHQ /></AppErrorBoundary>

@@ -1,0 +1,438 @@
+<!--
+  one3seven — Company Demo Guide
+  Route: www.one3seven.com/company-demo
+  A guided, click-by-click coach for running the Rosa Villanueva demo.
+  Self-contained. No build step, no external dependencies.
+  Two modes: "Coach" (Tad reads bubbles, runs alongside the live app)
+  and "Present" (full-screen, distraction-free, for screen-share).
+-->
+<div id="demo-root"></div>
+
+<style>
+  /* ---------- tokens ---------- */
+  #demo-root {
+    --ink: #16121f;
+    --ink-soft: #4b4458;
+    --paper: #ffffff;
+    --wash: #faf8fe;
+    --line: #e8e3f2;
+    --purple: #5b21b6;
+    --purple-soft: #7c4dd6;
+    --purple-wash: #f3edfd;
+    --amber: #b45309;
+    --amber-wash: #fdf4e3;
+    --green: #15803d;
+    --shadow: 0 12px 40px -12px rgba(46, 16, 80, .28);
+    --shadow-sm: 0 4px 16px -6px rgba(46, 16, 80, .22);
+
+    --display: "Syne", system-ui, sans-serif;
+    --body: "Inter", system-ui, -apple-system, sans-serif;
+
+    font-family: var(--body);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    container-type: inline-size;
+  }
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@400;450;500;600;700&display=swap');
+
+  #demo-root * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  #demo-root .stage {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 28px 20px 64px;
+  }
+
+  /* ---------- header ---------- */
+  #demo-root .masthead {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px; margin-bottom: 22px; flex-wrap: wrap;
+  }
+  #demo-root .brand {
+    font-family: var(--display); font-weight: 800; font-size: 20px;
+    letter-spacing: -.02em; color: var(--ink);
+  }
+  #demo-root .brand b { color: var(--purple); font-weight: 800; }
+  #demo-root .mode-toggle {
+    display: inline-flex; background: var(--wash); border: 1px solid var(--line);
+    border-radius: 999px; padding: 3px; gap: 2px;
+  }
+  #demo-root .mode-toggle button {
+    font-family: var(--body); font-size: 12.5px; font-weight: 600;
+    border: 0; background: transparent; color: var(--ink-soft);
+    padding: 7px 14px; border-radius: 999px; cursor: pointer;
+    transition: all .18s ease;
+  }
+  #demo-root .mode-toggle button[aria-pressed="true"] {
+    background: var(--purple); color: #fff;
+    box-shadow: var(--shadow-sm);
+  }
+
+  /* ---------- title block ---------- */
+  #demo-root .titleblock { margin-bottom: 18px; }
+  #demo-root .eyebrow {
+    font-size: 12px; font-weight: 600; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--purple-soft); margin-bottom: 8px;
+  }
+  #demo-root .titleblock h1 {
+    font-family: var(--display); font-weight: 800; font-size: clamp(28px, 7cqw, 40px);
+    letter-spacing: -.03em; line-height: 1.02; color: var(--ink);
+  }
+  #demo-root .titleblock p {
+    margin-top: 10px; color: var(--ink-soft); font-size: 15.5px; max-width: 58ch;
+  }
+
+  /* ---------- the one rule banner ---------- */
+  #demo-root .rule-banner {
+    margin: 18px 0 26px; background: var(--amber-wash);
+    border-left: 4px solid var(--amber); border-radius: 12px;
+    padding: 14px 16px; font-size: 14px; color: #6b4410;
+  }
+  #demo-root .rule-banner strong { color: var(--amber); }
+
+  /* ---------- progress rail ---------- */
+  #demo-root .rail {
+    display: flex; gap: 6px; margin-bottom: 22px; align-items: stretch;
+  }
+  #demo-root .rail .seg {
+    flex: 1; height: 5px; border-radius: 999px; background: var(--line);
+    overflow: hidden; cursor: pointer; position: relative;
+  }
+  #demo-root .rail .seg i {
+    position: absolute; inset: 0; background: var(--purple);
+    transform: scaleX(0); transform-origin: left; transition: transform .3s ease;
+  }
+  #demo-root .rail .seg.done i { transform: scaleX(1); }
+  #demo-root .rail .seg.active i { transform: scaleX(1); background: var(--purple-soft); }
+
+  /* ---------- step card ---------- */
+  #demo-root .card {
+    background: var(--paper); border: 1px solid var(--line);
+    border-radius: 20px; box-shadow: var(--shadow);
+    overflow: hidden; position: relative;
+  }
+  #demo-root .card .topstrip {
+    height: 5px; width: 100%;
+    background: linear-gradient(90deg, var(--purple), var(--purple-soft));
+  }
+  #demo-root .card .inner { padding: 26px 26px 22px; }
+
+  #demo-root .step-meta {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 14px;
+  }
+  #demo-root .step-num {
+    font-family: var(--display); font-weight: 800; font-size: 13px;
+    color: #fff; background: var(--purple); width: 30px; height: 30px;
+    border-radius: 9px; display: grid; place-items: center; flex: none;
+    letter-spacing: 0;
+  }
+  #demo-root .step-phase {
+    font-size: 11.5px; font-weight: 700; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--purple-soft);
+  }
+  #demo-root .step-kicker {
+    font-size: 12px; color: var(--ink-soft); margin-left: auto; font-weight: 500;
+  }
+
+  #demo-root .card h2 {
+    font-family: var(--display); font-weight: 700; font-size: 23px;
+    letter-spacing: -.02em; line-height: 1.12; color: var(--ink);
+    margin-bottom: 16px;
+  }
+
+  /* ---------- the click instruction ---------- */
+  #demo-root .do-row {
+    display: flex; gap: 12px; align-items: flex-start;
+    background: var(--purple-wash); border-radius: 13px;
+    padding: 14px 15px; margin-bottom: 16px;
+  }
+  #demo-root .do-icon {
+    flex: none; width: 26px; height: 26px; border-radius: 8px;
+    background: var(--purple); color: #fff; display: grid; place-items: center;
+    font-size: 14px; margin-top: 1px;
+  }
+  #demo-root .do-row .do-text { font-size: 14.5px; color: var(--ink); }
+  #demo-root .do-row .do-text b { color: var(--purple); font-weight: 700; }
+  #demo-root .do-label {
+    font-size: 10.5px; font-weight: 700; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--purple-soft);
+    display: block; margin-bottom: 3px;
+  }
+
+  /* ---------- the speech bubble ---------- */
+  #demo-root .bubble {
+    position: relative; background: var(--ink); color: #fff;
+    border-radius: 15px; padding: 17px 18px 16px; margin: 6px 0 4px;
+    font-size: 15.5px; line-height: 1.5;
+  }
+  #demo-root .bubble::before {
+    content: ""; position: absolute; left: 26px; top: -9px;
+    border-left: 9px solid transparent; border-right: 9px solid transparent;
+    border-bottom: 9px solid var(--ink);
+  }
+  #demo-root .bubble .say-label {
+    font-size: 10.5px; font-weight: 700; letter-spacing: .12em;
+    text-transform: uppercase; color: #b79aec; display: block; margin-bottom: 6px;
+  }
+  #demo-root .bubble .you { color: #fff; }
+  #demo-root .bubble em { color: #d8c6f7; font-style: normal; font-weight: 600; }
+
+  /* ---------- coaching note ---------- */
+  #demo-root .note {
+    margin-top: 14px; font-size: 13px; color: var(--ink-soft);
+    padding-left: 14px; border-left: 2px solid var(--line);
+  }
+  #demo-root .note b { color: var(--ink); font-weight: 650; }
+
+  /* watch-for tag (for the learning loop) */
+  #demo-root .watch {
+    margin-top: 14px; display: flex; gap: 9px; align-items: flex-start;
+    background: var(--amber-wash); border-radius: 11px; padding: 11px 13px;
+    font-size: 13px; color: #6b4410;
+  }
+  #demo-root .watch b { color: var(--amber); }
+  #demo-root .watch .eye { flex: none; }
+
+  /* ---------- nav ---------- */
+  #demo-root .nav {
+    display: flex; align-items: center; gap: 12px; margin-top: 22px;
+  }
+  #demo-root .nav .count {
+    font-size: 13px; color: var(--ink-soft); font-weight: 500;
+    margin: 0 auto;
+  }
+  #demo-root button.nav-btn {
+    font-family: var(--body); font-weight: 600; font-size: 14.5px;
+    border-radius: 11px; padding: 12px 20px; cursor: pointer;
+    border: 1px solid var(--line); background: var(--paper); color: var(--ink);
+    transition: all .16s ease; display: inline-flex; align-items: center; gap: 8px;
+  }
+  #demo-root button.nav-btn:hover { border-color: var(--purple-soft); }
+  #demo-root button.nav-btn.primary {
+    background: var(--purple); color: #fff; border-color: var(--purple);
+    box-shadow: var(--shadow-sm);
+  }
+  #demo-root button.nav-btn.primary:hover { background: #4c1a9c; }
+  #demo-root button.nav-btn:disabled { opacity: .35; cursor: not-allowed; }
+
+  /* ---------- panic strip ---------- */
+  #demo-root .panic {
+    margin-top: 26px; border: 1px dashed var(--line); border-radius: 14px;
+    padding: 16px 18px; background: var(--wash);
+  }
+  #demo-root .panic h3 {
+    font-family: var(--display); font-size: 13px; font-weight: 700;
+    letter-spacing: .04em; text-transform: uppercase; color: var(--ink-soft);
+    margin-bottom: 10px;
+  }
+  #demo-root .panic ol { list-style: none; display: grid; gap: 7px; }
+  #demo-root .panic li {
+    display: flex; gap: 10px; font-size: 14px; color: var(--ink);
+  }
+  #demo-root .panic li span {
+    flex: none; width: 19px; height: 19px; border-radius: 6px; background: var(--purple);
+    color: #fff; font-size: 11px; font-weight: 700; display: grid; place-items: center;
+  }
+
+  /* ---------- present mode ---------- */
+  #demo-root.present .masthead .mode-toggle,
+  #demo-root.present .titleblock p,
+  #demo-root.present .panic,
+  #demo-root.present .note,
+  #demo-root.present .watch { /* keep watch hidden on screen-share */ }
+  #demo-root.present .watch { display: none; }
+  #demo-root.present .stage { max-width: 880px; }
+  #demo-root.present .card .inner { padding: 38px 40px 32px; }
+  #demo-root.present .card h2 { font-size: 30px; }
+  #demo-root.present .bubble { font-size: 19px; }
+  #demo-root.present .do-row .do-text { font-size: 17px; }
+
+  /* ---------- responsive ---------- */
+  @container (max-width: 540px) {
+    #demo-root .stage { padding: 20px 14px 48px; }
+    #demo-root .card .inner { padding: 20px 18px 18px; }
+    #demo-root .nav { flex-wrap: wrap; }
+    #demo-root .nav .count { order: -1; width: 100%; text-align: center; margin-bottom: 4px; }
+    #demo-root button.nav-btn { flex: 1; justify-content: center; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #demo-root * { transition: none !important; }
+  }
+  #demo-root :focus-visible { outline: 2px solid var(--purple-soft); outline-offset: 2px; }
+</style>
+
+<script>
+(function () {
+  const root = document.getElementById("demo-root");
+
+  // ---------------- content ----------------
+  // Each step: phase, kicker, title, do (HTML), say (HTML), note, watch
+  const STEPS = [
+    {
+      phase: "Open",
+      kicker: "Before you share screen",
+      title: "Hand Renia the floor first",
+      do: 'Do <b>not</b> share your screen yet. Camera on, app ready in the background. Ask one question, then go quiet.',
+      say: 'Before I show you anything &mdash; when a new wage or wrongful-termination case comes in through your intake form, who organizes all the answers and the documents the worker uploads, and how long does that take before you can actually evaluate it?',
+      note: 'Then <b>stop talking.</b> Let her answer in full. Write down the exact words she uses for the pain &mdash; you&rsquo;ll repeat her phrase back during the demo. The prospect carrying the first two minutes takes the pressure off you.',
+      watch: 'Capture her literal phrase for the intake problem. That sentence becomes our landing-page headline.'
+    },
+    {
+      phase: "Beat 1",
+      kicker: "Show the scattered state",
+      title: "This is how the case arrives",
+      do: 'Share screen. Land on Rosa&rsquo;s <b>raw uploaded documents</b> &mdash; the unsorted pile: pay stubs, text screenshots, termination letter, HR emails. Scroll it slowly. Let it look like a lot.',
+      say: 'This is how Rosa&rsquo;s case arrives &mdash; same as yours. A worker fills out the form and uploads whatever they have. Screenshots, PDFs, a termination letter, text threads. Out of order, nothing labeled. Right now, someone on your side has to read all of this and rebuild what happened, and when, before you can even decide if it&rsquo;s a case.',
+      note: 'Don&rsquo;t rush past the mess &mdash; the mess is the whole point. End the beat looking right at her: <em>&ldquo;That reconstruction is what I want to show you.&rdquo;</em>',
+      watch: null
+    },
+    {
+      phase: "Beat 2",
+      kicker: "Show the cited timeline",
+      title: "Same records. Now they&rsquo;re a timeline",
+      do: 'Click into Rosa&rsquo;s <b>organized intake / timeline</b>. Let the clean chronology load. Point to the events that match <b>her</b> form fields: HR complaint, termination date + employer&rsquo;s reason vs. Rosa&rsquo;s, the wage flags.',
+      say: 'Same records &mdash; now they&rsquo;re a timeline. Hired here. First complaint to HR here. Retaliation here. Termination here. And notice: these are the exact things your intake form asks for. The employer&rsquo;s reason for termination versus hers. The break and overtime flags. Already pulled, already in order.',
+      note: 'Then land it with <b>her own number</b> from the opening: <em>&ldquo;This is the couple hours your paralegal spends.&rdquo;</em> Don&rsquo;t narrate every row &mdash; let it breathe.',
+      watch: 'Note which moment made her lean in &mdash; the mess, the timeline, or the citation click. That&rsquo;s your strongest demo beat.'
+    },
+    {
+      phase: "Beat 3",
+      kicker: "The trust beat &mdash; do not skip",
+      title: "Click one fact. Prove where it came from",
+      do: 'Pick <b>one</b> important fact &mdash; the termination date or the HR complaint. <b>Click its citation.</b> The view jumps to the exact source document and location. Sit on it for a second.',
+      say: 'And you never have to take our word for it. Watch &mdash; I click this fact&hellip; and it takes me straight to the exact document it came from. Every fact in here traces back to the record. You verify any line in one click. It organizes and reflects. It never concludes &mdash; the legal judgment stays entirely yours.',
+      note: 'This is the beat that answers an attorney&rsquo;s real objection: <b>&ldquo;can I trust this without re-reading everything?&rdquo;</b> If you do only one thing well, do this one. It&rsquo;s the mic-drop.',
+      watch: null
+    },
+    {
+      phase: "Close",
+      kicker: "Make the ask, from strength",
+      title: "One real case through the system",
+      do: 'Stop showing features &mdash; resist the urge to keep clicking. Move to the ask. Use the controlled-beta framing: you&rsquo;re checking fit, not begging.',
+      say: 'We&rsquo;re in a controlled beta &mdash; selectively bringing on a few California employment firms where intake quality really matters. Based on what you do, you&rsquo;d be a strong fit. The next step is getting one of your real cases through it, so you see it on your own work. Want to try that?',
+      note: 'Small, concrete ask &mdash; one real case, not &ldquo;sign up.&rdquo; If yes, <b>schedule the follow-up before you hang up.</b> If &ldquo;not now,&rdquo; leave warm: <em>&ldquo;Can I check back when your caseload picks up?&rdquo;</em>',
+      watch: 'Write objections down verbatim, and note any feature she asked for &mdash; especially if she wants to search or interrogate the record.'
+    }
+  ];
+
+  let i = 0;
+  let present = false;
+
+  // ---------------- render ----------------
+  function el(html) { const t = document.createElement("template"); t.innerHTML = html.trim(); return t.content.firstElementChild; }
+
+  function railHTML() {
+    return STEPS.map((s, idx) =>
+      `<div class="seg ${idx < i ? "done" : ""} ${idx === i ? "active" : ""}" data-go="${idx}" role="button" tabindex="0" aria-label="Go to ${s.phase}"><i></i></div>`
+    ).join("");
+  }
+
+  function stepHTML() {
+    const s = STEPS[i];
+    return `
+      <div class="card" role="group" aria-roledescription="demo step" aria-label="${s.phase}: ${s.title}">
+        <div class="topstrip"></div>
+        <div class="inner">
+          <div class="step-meta">
+            <div class="step-num">${i + 1}</div>
+            <div class="step-phase">${s.phase}</div>
+            <div class="step-kicker">${s.kicker}</div>
+          </div>
+          <h2>${s.title}</h2>
+
+          <div class="do-row">
+            <div class="do-icon" aria-hidden="true">&#9655;</div>
+            <div class="do-text"><span class="do-label">Do this</span>${s.do}</div>
+          </div>
+
+          <div class="bubble">
+            <span class="say-label">Say &mdash; word for word</span>
+            <span class="you">${s.say}</span>
+          </div>
+
+          ${s.note ? `<div class="note">${s.note}</div>` : ""}
+          ${s.watch ? `<div class="watch"><span class="eye" aria-hidden="true">&#128065;</span><div><b>Capture after:</b> ${s.watch}</div></div>` : ""}
+        </div>
+      </div>
+
+      <div class="nav">
+        <button class="nav-btn" data-prev ${i === 0 ? "disabled" : ""}>&larr; Back</button>
+        <span class="count">${i + 1} of ${STEPS.length}</span>
+        ${i === STEPS.length - 1
+          ? `<button class="nav-btn primary" data-restart>Run it again &#8635;</button>`
+          : `<button class="nav-btn primary" data-next>Next &rarr;</button>`}
+      </div>
+    `;
+  }
+
+  function panicHTML() {
+    return `
+      <div class="panic">
+        <h3>If you freeze &mdash; the entire demo in 3 sentences</h3>
+        <ol>
+          <li><span>1</span> &ldquo;This is how the case arrives &mdash; scattered.&rdquo;</li>
+          <li><span>2</span> &ldquo;This is it organized into a sourced timeline.&rdquo;</li>
+          <li><span>3</span> &ldquo;Click any fact, it proves where it came from.&rdquo;</li>
+        </ol>
+      </div>
+    `;
+  }
+
+  function render() {
+    root.className = present ? "present" : "";
+    root.innerHTML = `
+      <div class="stage">
+        <div class="masthead">
+          <div class="brand">one<b>3</b>seven</div>
+          <div class="mode-toggle" role="group" aria-label="View mode">
+            <button data-mode="coach" aria-pressed="${!present}">Coach</button>
+            <button data-mode="present" aria-pressed="${present}">Present</button>
+          </div>
+        </div>
+
+        <div class="titleblock">
+          <div class="eyebrow">Company demo &middot; Rosa Villanueva</div>
+          <h1>Run the demo, click&nbsp;by&nbsp;click.</h1>
+          <p>Each step tells you what to click and exactly what to say. Three beats carry the whole thing: show the mess, show the cited timeline, click one fact to its source.</p>
+        </div>
+
+        <div class="rule-banner">
+          <strong>The one rule:</strong> talk less than you want to. The product does the showing. If Renia is talking more than you, you&rsquo;re winning.
+        </div>
+
+        <div class="rail" role="tablist" aria-label="Demo progress">${railHTML()}</div>
+
+        <div id="step-host">${stepHTML()}</div>
+
+        ${present ? "" : panicHTML()}
+      </div>
+    `;
+    wire();
+  }
+
+  function go(n) { i = Math.max(0, Math.min(STEPS.length - 1, n)); render(); window.scrollTo({ top: 0, behavior: "smooth" }); }
+
+  function wire() {
+    root.querySelectorAll("[data-mode]").forEach(b =>
+      b.addEventListener("click", () => { present = b.dataset.mode === "present"; render(); }));
+    const next = root.querySelector("[data-next]"); if (next) next.addEventListener("click", () => go(i + 1));
+    const prev = root.querySelector("[data-prev]"); if (prev) prev.addEventListener("click", () => go(i - 1));
+    const restart = root.querySelector("[data-restart]"); if (restart) restart.addEventListener("click", () => go(0));
+    root.querySelectorAll(".seg[data-go]").forEach(seg => {
+      seg.addEventListener("click", () => go(+seg.dataset.go));
+      seg.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(+seg.dataset.go); } });
+    });
+  }
+
+  // keyboard arrows
+  document.addEventListener("keydown", e => {
+    if (e.key === "ArrowRight") { if (i < STEPS.length - 1) go(i + 1); }
+    if (e.key === "ArrowLeft") { if (i > 0) go(i - 1); }
+  });
+
+  render();
+})();
+</script>
