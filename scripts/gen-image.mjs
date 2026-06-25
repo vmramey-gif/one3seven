@@ -53,18 +53,41 @@ function loadEnvKey() {
   return null;
 }
 
+function loadPresets() {
+  const p = join(ROOT, 'scripts', 'brand-image-presets.json');
+  if (!existsSync(p)) return {};
+  try { return JSON.parse(readFileSync(p, 'utf8')); } catch { return {}; }
+}
+
 function parseArgs(argv) {
   const positional = [];
-  const opts = { model: DEFAULT_MODEL, raw: false, n: 1 };
+  const opts = { model: null, raw: false, n: 1, preset: null };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--raw') opts.raw = true;
     else if (a === '--model') opts.model = argv[++i];
     else if (a === '--n') opts.n = Math.max(1, parseInt(argv[++i], 10) || 1);
+    else if (a === '--preset') opts.preset = argv[++i];
     else positional.push(a);
   }
-  opts.prompt = positional[0];
-  opts.out = positional[1];
+
+  if (opts.preset) {
+    // With a preset, the only positional is the output path; prompt + model come from JSON.
+    const presets = loadPresets();
+    const preset = presets[opts.preset];
+    if (!preset) {
+      console.error(`Unknown preset "${opts.preset}". Available: ${Object.keys(presets).join(', ') || '(none)'}`);
+      process.exit(1);
+    }
+    opts.prompt = preset.prompt;
+    opts.model = opts.model ?? preset.model ?? DEFAULT_MODEL;
+    opts.raw = true; // presets are already fully art-directed — use verbatim
+    opts.out = positional[0];
+  } else {
+    opts.model = opts.model ?? DEFAULT_MODEL;
+    opts.prompt = positional[0];
+    opts.out = positional[1];
+  }
   return opts;
 }
 
@@ -111,6 +134,7 @@ async function main() {
   const opts = parseArgs(process.argv.slice(2));
   if (!opts.prompt || !opts.out) {
     console.error('Usage: node scripts/gen-image.mjs "<prompt>" <out.png> [--model <id>] [--raw] [--n <count>]');
+    console.error('   or: node scripts/gen-image.mjs --preset <name> <out.png> [--n <count>]');
     process.exit(1);
   }
   const key = loadEnvKey();

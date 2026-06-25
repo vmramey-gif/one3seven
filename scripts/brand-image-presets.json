@@ -1,0 +1,18 @@
+{
+  "hero": {
+    "model": "gemini-2.5-flash-image",
+    "prompt": "Editorial macro photograph: dozens of small translucent vellum paper fragments drifting from disordered scatter on the right into a single clean ordered horizontal line on the left, soft directional studio light from the upper left with deep ink shadows, shallow depth of field with the scattered fragments falling to gentle bokeh, generous negative space across the upper third for a headline, monochromatic palette of deep violet #5B21B6 and near-black ink with one warm off-white highlight, matte paper texture with subtle film grain, Aesop-meets-Kinfolk editorial restraint, 16:9 aspect ratio, no text, no lettering, no logos."
+  },
+  "social": {
+    "model": "gemini-2.5-flash-image",
+    "prompt": "Studio macro still life: a few translucent vellum document fragments resolving into one crisp ordered line, centered composition with calm negative space around all edges for a text overlay, soft directional light from upper left with deep ink shadows, shallow depth of field, monochromatic palette of deep violet #5B21B6 and near-black ink with a single warm off-white highlight, matte paper texture with subtle grain, Aesop-meets-Kinfolk editorial restraint, 1:1 square aspect ratio, no text, no lettering, no logos."
+  },
+  "deck-bg": {
+    "model": "gemini-2.5-flash-image",
+    "prompt": "Minimal abstract editorial background: a faint golden-angle seed spiral of soft violet light emerging from deep near-black ink, almost entirely empty with vast negative space for presentation text, very subtle, low contrast, restrained, soft directional glow from upper left, monochromatic deep violet #5B21B6 over near-black ink with one faint warm highlight, fine film grain, Teenage-Engineering-meets-Aesop restraint, 16:9 aspect ratio, no text, no lettering, no logos."
+  },
+  "about-texture": {
+    "model": "gemini-2.5-flash-image",
+    "prompt": "Studio macro texture photograph: layered matte vellum and linen paper surfaces in warm off-white with a single deep violet #5B21B6 thread of light running through, soft raking directional light from the left revealing fiber and grain, extreme detail, calm and tactile, monochromatic warm-neutral palette with one violet accent, 3:2 aspect ratio, no text, no lettering, no logos."
+  }
+}
