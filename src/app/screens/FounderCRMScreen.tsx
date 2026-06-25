@@ -24,6 +24,7 @@ import { CRM_STAGES, CRM_STAGE_LABELS, type CrmStage } from '../../services/crmS
 import { CRM_WEEKLY_TARGETS, CRM_CALL_SCRIPT, CRM_OBJECTIONS, CRM_COLD_EMAIL } from '../constants/crmReference';
 import { FIRE_DEMO_TRAINING, PI_RULES, CRM_COMMISSIONS, CRM_SUBSCRIPTION_TIERS, LAUNCH_CHECKLIST } from '../constants/crmTraining';
 import { AUDIT_SITE_CHECKS, AUDIT_MANUAL_GROUPS } from '../constants/crmAudit';
+import { crmFirmIntel } from '../constants/crmFirmIntel';
 import { STARTER_QUESTIONS, askAssistant, type ChatMessage } from '../../services/chatAssistant';
 
 type Tab = 'dashboard' | 'pipeline' | 'firms' | 'activity' | 'metrics' | 'revenue' | 'team' | 'notes' | 'scripts' | 'training' | 'askai' | 'checklist' | 'audit' | 'add';
@@ -262,6 +263,7 @@ function Collapsible({ title, defaultOpen = false, children }: { title: string; 
 function FirmCard({ firm, onLog, today }: { firm: CrmFirm; onLog: (id: string) => void; today?: string }) {
   const [open, setOpen] = useState(false);
   const due = today && firm.next_followup && firm.next_followup <= today;
+  const intel = crmFirmIntel[firm.name];
   return (
     <div className="overflow-hidden rounded-[14px] border border-[#E7E1FF] bg-white">
       <div className="flex items-center gap-2 p-2.5">
@@ -291,6 +293,33 @@ function FirmCard({ firm, onLog, today }: { firm: CrmFirm; onLog: (id: string) =
             {firm.region && <span className="text-[#1E1B4B]/45">{firm.region}</span>}
           </div>
           {firm.notes && <p className="text-[12px] leading-relaxed text-[#1E1B4B]/60">{firm.notes}</p>}
+
+          {/* Call strip — quick-glance intel for use during the call */}
+          {intel && (
+            <div className="rounded-[12px] border border-[#DCD3FF] bg-[#F7F3FF] p-3">
+              {intel.fireCaseSignal && (
+                <span className="mb-1.5 inline-flex items-center gap-1 rounded-full bg-orange-100 px-2 py-0.5 text-[10px] font-bold text-orange-700">🔥 Fire case signal</span>
+              )}
+              <p className="text-[12px] font-semibold text-[#1E1B4B]">{intel.headlineWin}</p>
+              <p className="mt-1.5 text-[12px] leading-relaxed text-[#1E1B4B]/75"><span className="font-bold text-[#6D4AFF]">Opener: </span>{intel.opener}</p>
+            </div>
+          )}
+
+          {/* Full brief — deeper research, collapsed by default */}
+          {intel && (
+            <Collapsible title="Full brief">
+              <ul className="mb-2 space-y-1">
+                {intel.topWins.map((w) => (
+                  <li key={w} className="flex gap-2 text-[12px] leading-relaxed text-[#1E1B4B]/70">
+                    <span className="mt-[6px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#8B6DFF]" /><span>{w}</span>
+                  </li>
+                ))}
+              </ul>
+              <p className="text-[12px] leading-relaxed text-[#1E1B4B]/60">{intel.awardsRecognition}</p>
+              <p className="mt-1.5 text-[12px] leading-relaxed text-[#1E1B4B]/60">{intel.intakeNotes}</p>
+            </Collapsible>
+          )}
+
           <button type="button" onClick={() => onLog(firm.id)} className={`flex ${tap} w-full items-center justify-center gap-2 rounded-[12px] bg-[#EDE7FF] font-semibold text-[#6D4AFF]`}>
             <Phone className="h-4 w-4" /> Log call
           </button>
@@ -384,7 +413,9 @@ function DemoPrepCard({ firms, today, onChanged }: { firms: CrmFirm[]; today: st
   return (
     <section className="space-y-3">
       <div className="flex items-center gap-2"><Flame className="h-4 w-4 text-amber-600" /><h2 className="text-[14px] font-bold">Demo prep</h2></div>
-      {booked.map((f) => (
+      {booked.map((f) => {
+        const intel = crmFirmIntel[f.name];
+        return (
         <div key={f.id} className="rounded-[16px] border-2 border-amber-300 bg-amber-50 p-4">
           <div className="mb-1 flex items-start justify-between gap-2">
             <div className="min-w-0">
@@ -398,6 +429,12 @@ function DemoPrepCard({ firms, today, onChanged }: { firms: CrmFirm[]; today: st
             {f.region && <span className="text-[#1E1B4B]/55">{f.region}</span>}
           </div>
           {f.focus_areas && <p className="mb-2 text-[12px] leading-relaxed text-[#1E1B4B]/60">Focus: {f.focus_areas}</p>}
+          {intel && (
+            <div className="mb-2 rounded-[10px] border border-amber-300/60 bg-white/70 p-2.5">
+              <p className="text-[12px] font-semibold text-[#1E1B4B]">{intel.headlineWin}</p>
+              <p className="mt-1 text-[12px] leading-relaxed text-[#1E1B4B]/75"><span className="font-bold text-[#6D4AFF]">Opener: </span>{intel.opener}</p>
+            </div>
+          )}
           <div className="mb-1 text-[11px] font-bold uppercase tracking-wide text-amber-800/70">Lead with these</div>
           <ol className="mb-2 list-decimal space-y-1 pl-5 text-[13px] text-[#1E1B4B]/80">
             {discoveryQuestions(f.focus_areas).map((q) => <li key={q}>{q}</li>)}
@@ -411,7 +448,8 @@ function DemoPrepCard({ firms, today, onChanged }: { firms: CrmFirm[]; today: st
             <Check className="h-4 w-4" /> {busyId === f.id ? 'Saving…' : 'Mark demo done'}
           </button>
         </div>
-      ))}
+        );
+      })}
     </section>
   );
 }
