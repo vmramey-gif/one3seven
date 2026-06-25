@@ -475,7 +475,7 @@ function HeroVisual() {
       const s = sc(), dw = 100*s, dh = 70*s;
       ctx.save();
       ctx.translate(x, y); ctx.rotate(rotDeg * Math.PI / 180); ctx.scale(scale, scale); ctx.globalAlpha = alpha;
-      ctx.shadowColor = 'rgba(24,31,67,0.10)'; ctx.shadowBlur = 14; ctx.shadowOffsetY = 5;
+      ctx.shadowColor = 'rgba(140,107,255,0.45)'; ctx.shadowBlur = 20; ctx.shadowOffsetY = 0;
       rr(-dw/2, -dh/2, dw, dh, 8*s, d.bc);
       ctx.shadowBlur = 0;
       ctx.save(); ctx.beginPath(); ctx.roundRect(-dw/2, -dh/2, dw, dh, 8*s); ctx.clip();
@@ -493,10 +493,10 @@ function HeroVisual() {
       const s = sc(), cw = 242*s, ch = 326*s;
       ctx.save();
       ctx.translate(x, y); ctx.scale(scale, scale); ctx.globalAlpha = alpha;
-      const g = ctx.createRadialGradient(0, 0, 0, 0, 0, 190*s);
-      g.addColorStop(0, 'rgba(109,74,255,0.08)'); g.addColorStop(1, 'rgba(109,74,255,0)');
-      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(0, 0, 190*s, 0, Math.PI*2); ctx.fill();
-      ctx.shadowColor = 'rgba(24,31,67,0.12)'; ctx.shadowBlur = 40; ctx.shadowOffsetY = 16*s;
+      const g = ctx.createRadialGradient(0, 0, 0, 0, 0, 210*s);
+      g.addColorStop(0, 'rgba(124,92,255,0.22)'); g.addColorStop(1, 'rgba(124,92,255,0)');
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(0, 0, 210*s, 0, Math.PI*2); ctx.fill();
+      ctx.shadowColor = 'rgba(140,107,255,0.55)'; ctx.shadowBlur = 60; ctx.shadowOffsetY = 0;
       rr(-cw/2, -ch/2, cw, ch, 16*s, 'white');
       ctx.shadowBlur = 0;
       ctx.save(); ctx.beginPath(); ctx.roundRect(-cw/2, -ch/2, cw, ch, 16*s); ctx.clip();
@@ -558,7 +558,6 @@ function HeroVisual() {
       const s = sc();
 
       ctx.clearRect(0, 0, W, H);
-      ctx.fillStyle = '#f8f6ff'; ctx.fillRect(0, 0, W, H);
 
       const inDocs  = T < PH.swirl;
       const inSwirl = T >= PH.swirl && T < PH.form;
@@ -569,7 +568,7 @@ function HeroVisual() {
       if (inSwirl) {
         const gt = cl((T - PH.swirl) / (PH.form - PH.swirl));
         const g2 = ctx.createRadialGradient(CX, CY, 0, CX, CY, 100*s);
-        g2.addColorStop(0, `rgba(109,74,255,${eIO(gt)*0.18})`); g2.addColorStop(1, 'rgba(109,74,255,0)');
+        g2.addColorStop(0, `rgba(124,92,255,${eIO(gt)*0.32})`); g2.addColorStop(1, 'rgba(124,92,255,0)');
         ctx.fillStyle = g2; ctx.beginPath(); ctx.arc(CX, CY, 100*s, 0, Math.PI*2); ctx.fill();
       }
 
@@ -632,7 +631,7 @@ function HeroVisual() {
     }
 
     if (prefersReduced) {
-      ctx.fillStyle = '#f8f6ff'; ctx.fillRect(0, 0, W, H);
+      ctx.clearRect(0, 0, W, H);
       drawCard(CX, CY, 1, 1);
       ro.disconnect();
       return;
@@ -648,8 +647,8 @@ function HeroVisual() {
   return (
     <div
       ref={containerRef}
-      className="relative w-full overflow-hidden rounded-[16px] border border-[#e5def8]"
-      style={{ aspectRatio: '4/3', background: '#f8f6ff' }}
+      className="relative w-full overflow-hidden rounded-[16px] border border-white/10"
+      style={{ aspectRatio: '4/3', background: 'transparent' }}
     >
       <canvas className="absolute inset-0 w-full h-full" />
     </div>
