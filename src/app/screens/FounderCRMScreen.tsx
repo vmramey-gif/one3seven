@@ -14,11 +14,11 @@ import {
 import {
   listFirms, listActivity, addFirm, logActivity,
   listMessages, sendMessage, getCurrentMember,
-  listNotes, addNote, deleteNote, getIntakesCount, setFirmStage,
+  listNotes, addNote, deleteNote, getIntakesCount, setFirmStage, setFirmMinutesSaved,
   type CrmFirm, type CrmActivityWithFirm, type NewFirmInput, type LogActivityInput, type CrmMessage, type CrmNote,
 } from '../../services/crmService';
 import {
-  computeRevenue, targetColor, dailyTargetsContext, tierPrice, DAILY_TARGETS, PHASE1_PAYING_TARGET, COMMISSION_RATE, TIER_PRICES,
+  computeRevenue, targetColor, dailyTargetsContext, tierPrice, avgMinutesSaved, DAILY_TARGETS, PHASE1_PAYING_TARGET, COMMISSION_RATE, TIER_PRICES,
 } from '../../services/crmAnalytics';
 import { CRM_STAGES, CRM_STAGE_LABELS, type CrmStage } from '../../services/crmStageLogic';
 import { CRM_WEEKLY_TARGETS, CRM_CALL_SCRIPT, CRM_OBJECTIONS, CRM_COLD_EMAIL } from '../constants/crmReference';
@@ -689,8 +689,23 @@ function MetricsTab({ firms, activity }: { firms: CrmFirm[]; activity: CrmActivi
   }, [activity]);
   const maxObj = objectionCounts[0]?.[1] ?? 1;
 
+  const mins = avgMinutesSaved(firms);
+
   return (
     <div className="space-y-6">
+      <section>
+        <h2 className="mb-2 text-[14px] font-bold">Time saved (the value claim)</h2>
+        <div className="rounded-[14px] border border-[#DCD3FF] bg-[#F7F3FF] p-4">
+          {mins.n > 0 ? (
+            <>
+              <div className="text-[28px] font-black leading-none text-[#6D4AFF]">{mins.avg} min</div>
+              <div className="mt-1 text-[12px] text-[#1E1B4B]/60">avg attorney time saved per intake — firm estimate · n={mins.n} firm{mins.n === 1 ? '' : 's'}</div>
+            </>
+          ) : (
+            <div className="text-[12px] leading-relaxed text-[#1E1B4B]/55">No estimates yet. On a demo, ask the firm how long assembling a worker's records takes them today, and log it in the "minutes saved" field — that's the number you quote on every call.</div>
+          )}
+        </div>
+      </section>
       <section className="space-y-3">
         <h2 className="text-[14px] font-bold">This week vs targets</h2>
         <Bar label="Firms in pipeline" value={firms.length} target={CRM_WEEKLY_TARGETS.firms} />
@@ -1363,15 +1378,21 @@ function FullLogForm({ firms, lastFirmId, onSaved, setError }: { firms: CrmFirm[
   const [l, setL] = useState<LogActivityInput>({ firm_id: lastFirmId || (firms[0]?.id ?? ''), activity_type: 'call', activity_date: todayISO() });
   const [saving, setSaving] = useState(false);
   const [ok, setOk] = useState(false);
+  const [minutesSaved, setMinutesSaved] = useState('');
   const set = (patch: Partial<LogActivityInput>) => setL((p) => ({ ...p, ...patch }));
   const submit = async () => {
     if (!l.firm_id) { setError('Pick a firm.'); return; }
     setSaving(true);
     const r = await logActivity(l);
+    if (!r.error) {
+      const m = parseInt(minutesSaved, 10);
+      if (Number.isFinite(m) && m >= 0) await setFirmMinutesSaved(l.firm_id, m);
+    }
     setSaving(false);
     if (r.error) { setError(r.error); return; }
     setOk(true); onSaved(l.firm_id);
     setL({ firm_id: l.firm_id, activity_type: 'call', activity_date: todayISO() });
+    setMinutesSaved('');
     setTimeout(() => setOk(false), 2500);
   };
   return (
@@ -1400,6 +1421,7 @@ function FullLogForm({ firms, lastFirmId, onSaved, setError }: { firms: CrmFirm[
           {CRM_STAGES.map((s) => <option key={s} value={s}>{CRM_STAGE_LABELS[s]}</option>)}
         </select>
       </div>
+      <input className={inputCls} type="number" min="0" placeholder="Minutes saved per intake (firm's estimate)" value={minutesSaved} onChange={(e) => setMinutesSaved(e.target.value)} />
       <label className="block text-[12px] font-semibold text-[#1E1B4B]/45">Next follow-up</label>
       <input className={inputCls} type="date" value={l.next_followup ?? ''} onChange={(e) => set({ next_followup: e.target.value })} />
       <textarea className="min-h-[64px] w-full rounded-[12px] border border-[#E7E1FF] px-3 py-2.5 text-sm outline-none focus:border-[#6D4AFF]" placeholder="Notes" value={l.notes ?? ''} onChange={(e) => set({ notes: e.target.value })} />

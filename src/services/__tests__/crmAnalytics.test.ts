@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
-  tierPrice, computeRevenue, targetColor, dailyTargetsContext, type SubscriptionTier,
+  tierPrice, computeRevenue, targetColor, dailyTargetsContext, avgMinutesSaved, type SubscriptionTier,
 } from '../crmAnalytics';
 import type { CrmFirm } from '../crmService';
 
@@ -9,9 +9,19 @@ function firm(stage: string, subscription_tier: SubscriptionTier | null = null):
     id: Math.random().toString(36).slice(2),
     name: 'Test', attorney_name: null, phone: null, email: null, website: null,
     region: null, priority: null, stage: stage as CrmFirm['stage'], focus_areas: null,
-    source: null, next_followup: null, notes: null, subscription_tier, created_at: '',
+    source: null, next_followup: null, notes: null, subscription_tier, est_minutes_saved: null, created_at: '',
   };
 }
+
+describe('avgMinutesSaved', () => {
+  it('returns 0/0 when no firm has an estimate', () => {
+    expect(avgMinutesSaved([{ est_minutes_saved: null }, {}])).toEqual({ avg: 0, n: 0 });
+  });
+  it('averages only the firms that gave an estimate (ignoring null)', () => {
+    expect(avgMinutesSaved([{ est_minutes_saved: 30 }, { est_minutes_saved: 60 }, { est_minutes_saved: 0 }, { est_minutes_saved: null }]))
+      .toEqual({ avg: 30, n: 3 });
+  });
+});
 
 describe('tierPrice', () => {
   it('prices each tier; null/unknown = Practice', () => {

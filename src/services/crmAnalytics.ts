@@ -11,6 +11,19 @@ export const PIPELINE_CONVERSION_RATE = 0.3;
 export const COMMISSION_RATE = 0.2;
 const FORECAST_TIER_PRICE = TIER_PRICES.practice; // forecast assumes Practice tier
 
+/**
+ * Average firm-estimated minutes saved per intake, across firms that gave an estimate.
+ * This is the core value claim made measurable. Returns the rounded average and the sample
+ * size n (so it's quotable honestly: "firms report ~X min saved, n=Y").
+ */
+export function avgMinutesSaved(firms: { est_minutes_saved?: number | null }[]): { avg: number; n: number } {
+  const vals = firms
+    .map((f) => f.est_minutes_saved)
+    .filter((v): v is number => typeof v === 'number' && v >= 0);
+  if (vals.length === 0) return { avg: 0, n: 0 };
+  return { avg: Math.round(vals.reduce((s, v) => s + v, 0) / vals.length), n: vals.length };
+}
+
 /** Monthly price for a tier; null/unknown defaults to Practice ($499). */
 export function tierPrice(tier: string | null | undefined): number {
   if (tier === 'solo') return TIER_PRICES.solo;

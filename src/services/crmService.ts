@@ -26,6 +26,8 @@ export interface CrmFirm {
   next_followup: string | null;
   notes: string | null;
   subscription_tier: 'solo' | 'practice' | 'firm' | null;
+  /** Firm's own estimate of minutes saved per intake — the value claim, measured. */
+  est_minutes_saved: number | null;
   created_at: string;
 }
 
@@ -83,6 +85,13 @@ const clean = (v: string | undefined | null): string | null => {
 /** Update a firm's stage directly (e.g. "Mark demo done"). */
 export async function setFirmStage(firmId: string, stage: string): Promise<{ error?: string }> {
   const { error } = await supabase.from('crm_firms').update({ stage }).eq('id', firmId);
+  if (error) return { error: error.message };
+  return {};
+}
+
+/** Record the firm's estimate of minutes saved per intake (the value claim, measured). */
+export async function setFirmMinutesSaved(firmId: string, minutes: number): Promise<{ error?: string }> {
+  const { error } = await supabase.from('crm_firms').update({ est_minutes_saved: minutes }).eq('id', firmId);
   if (error) return { error: error.message };
   return {};
 }
