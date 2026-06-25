@@ -49,6 +49,18 @@ Deno.serve(async (req: Request) => {
   const { firmProfileId, priceId } = body;
   if (!firmProfileId || !priceId) return json({ error: 'firmProfileId and priceId required' }, 400);
 
+  // ── Allowlist the price ──────────────────────────────────────────────────
+  // priceId is client-supplied; only accept our own configured plan prices (same env vars
+  // the webhook maps price -> plan with). If none are configured yet, skip (setup phase).
+  const allowedPriceIds = new Set(
+    ['STRIPE_PRICE_SOLO', 'STRIPE_PRICE_PRACTICE', 'STRIPE_PRICE_FIRM', 'STRIPE_PRICE_PRACTICE_PLUS', 'STRIPE_PRICE_FIRM_PLUS']
+      .map((k) => Deno.env.get(k)?.trim())
+      .filter((v): v is string => Boolean(v)),
+  );
+  if (allowedPriceIds.size > 0 && !allowedPriceIds.has(priceId)) {
+    return json({ error: 'Unknown price' }, 400);
+  }
+
   // ── Service-role client ───────────────────────────────────────────────────
   const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 

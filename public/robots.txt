@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /hq
+Disallow: /one3sevenhq
+Disallow: /company-demo
+Disallow: /demo
+Disallow: /worker-demo
+Disallow: /fire-demo
+
+Sitemap: https://www.one3seven.com/sitemap.xml

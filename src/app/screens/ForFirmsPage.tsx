@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { ArrowRight, ArrowLeft, ShieldCheck, FileText, Check } from 'lucide-react';
 import { WordMark } from '../components/WordMark';
 import { submitPilotInterest } from '../../services/pilotInterestService';
+import { track } from '../../lib/analytics';
 
 interface ForFirmsPageProps {
   onBack: () => void;
@@ -20,13 +21,17 @@ export function ForFirmsPage({ onBack, onStartWorker }: ForFirmsPageProps) {
   const [submitting, setSubmitting] = useState(false);
   const [sent, setSent] = useState(false);
 
+  useEffect(() => { track('pilot_view'); }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setSubmitting(true);
+    track('pilot_submit');
     const res = await submitPilotInterest({ name, firmName: firm, email, note });
     setSubmitting(false);
     if (res.error) { setError(res.error); return; }
+    track('pilot_success');
     setSent(true);
   };
 

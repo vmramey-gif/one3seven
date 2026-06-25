@@ -3,6 +3,7 @@ import { WordMark } from '../components/WordMark';
 import { SeedMark } from '../components/ui/SeedMark';
 import { motion, useReducedMotion } from 'motion/react';
 import { ArrowRight, CheckCircle2, Shield, Clock, FileText, Users, Zap, ChevronRight, FolderOpen, CalendarClock, Lock, MessageSquare, CalendarDays, Handshake } from 'lucide-react';
+import { track } from '../../lib/analytics';
 
 interface PublicMarketingPageProps {
   onWorkerStart: () => void;
@@ -1175,7 +1176,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
             </button>
             <button
               type="button"
-              onClick={onForFirms}
+              onClick={() => { track('nav_for_firms'); onForFirms(); }}
               className="text-sm font-medium text-white/60 transition hover:text-white"
             >
               For law firms
@@ -1290,7 +1291,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                     <button
                       type="button"
-                      onClick={onWorkerStart}
+                      onClick={() => { track('cta_worker_start'); onWorkerStart(); }}
                       className="flex items-center justify-center gap-2 rounded-full bg-[#6D4AFF] px-7 py-3.5 text-[15px] font-semibold text-white shadow-[0_16px_48px_rgba(109,74,255,0.40)] transition hover:bg-[#5B35D5] hover:-translate-y-0.5 active:scale-[0.97]"
                     >
                       Start organizing my records

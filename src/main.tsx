@@ -15,8 +15,12 @@ import { TermsPage } from './app/screens/TermsPage.tsx';
 import { PrivacyPage } from './app/screens/PrivacyPage.tsx';
 import { OFFLINE_DEV_GALLERY_ONLY } from './lib/supabaseAvailability.ts';
 import { isSupabaseConfigured } from './lib/supabaseClient';
+import { pageview } from './lib/analytics';
 
 const rootEl = document.getElementById('root')!;
+
+// First-party pageview (cookieless, no PII, honors DNT).
+pageview();
 
 // Public demo route — no login required.
 // Triggered by /?demo, /demo, or #demo in the URL.
