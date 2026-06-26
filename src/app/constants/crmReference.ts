@@ -60,15 +60,53 @@ export const CRM_OBJECTIONS: { objection: string; response: string }[] = [
   },
 ];
 
-export const CRM_COLD_EMAIL = `Subject: organized intakes before your first call — quick look?
+export const CRM_COLD_EMAIL = `EMAIL 1 — opener (Day 0)
+Subject: organized employment intakes — free pilot for [Firm]
 
-Hi [Attorney],
+Hi [First name],
 
-Quick one. California employment firms tell us the same thing: the first consult gets eaten by assembling a worker's scattered records — pay stubs, HR complaints, write-ups — before the matter can even be evaluated.
+Plaintiff employment clients often arrive with records scattered across pay stubs, texts, HR emails, and memory — and someone has to spend unbilled time assembling it before the matter can even be reviewed.
 
-one3seven hands you that intake already organized: a source-linked timeline and categorized records, before the first call. It organizes records — it doesn't give legal advice or decide the matter. You evaluate.
+one3seven organizes a worker's employment records into a structured, source-linked intake packet: a clear timeline, categorized records, and surfaced dates where each fact traces back to the original document.
 
-We're running a free pilot with a few California firms. Worth a 15-minute look at a sample intake to see if it saves you time?
+It organizes and reflects. It does not draw legal conclusions. You evaluate everything.
 
-[Rep]
-one3seven · one3seven.com`;
+We're opening a free 30-day pilot to a small number of California employment firms — no credit card required. You can see what it produces here:
+
+https://www.one3seven.com/for-firms
+
+Worth a look? I'd be happy to organize one real intake for free so you can review the output against your own records.
+
+— [Name]
+one3seven
+[email] · https://one3seven.com
+[mailing address]
+Reply "stop" and I won't follow up.
+
+———
+
+EMAIL 2 — the gift (Day 4, reply on the same thread)
+
+Hi [First name] — a simpler offer than a demo.
+
+Send me your next messy intake — the pile of pay stubs, texts, and HR emails. I'll return it as an organized, source-linked packet within 24 hours. No call, no commitment. If it's useful, we talk; if not, you've lost nothing.
+
+— [Name]
+
+———
+
+EMAIL 3 — break-up (Day 9)
+
+Hi [First name], I'll stop here so I'm not cluttering your inbox.
+
+If organizing intake before it reaches an attorney's desk is ever worth 15 minutes, the free pilot is here: https://www.one3seven.com/for-firms. I'll leave the door open.
+
+— [Name]
+
+———
+
+HOW TO RUN IT
+• Personalize the first line of Email 1 per firm (practice focus, a recent win). Generic = deleted.
+• One CTA per email. Send from a person (name@one3seven.com), not info@.
+• CAN-SPAM: every email needs a real mailing address (PO box / business — never a home address) and an honest opt-out.
+• Keep the wording: "organizes and reflects — it does not draw legal conclusions." That's the UPL guardrail. Don't let it drift into outcome or claim language.`;

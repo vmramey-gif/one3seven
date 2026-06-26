@@ -1069,7 +1069,7 @@ function ScriptsTab() {
           ))}
         </div>
       </Collapsible>
-      <Collapsible title="Cold email template">
+      <Collapsible title="Cold email sequence (free pilot · 3-touch)">
         <pre className="whitespace-pre-wrap text-[13px] leading-relaxed text-[#1E1B4B]/75">{CRM_COLD_EMAIL}</pre>
       </Collapsible>
     </div>
