@@ -8,8 +8,8 @@
  */
 
 const CSS = `
-.ha-wrap{position:relative;container-type:inline-size;width:100%;max-width:520px;margin:0 auto;aspect-ratio:380/384;overflow:hidden}
-.ha-stage{position:absolute;top:0;left:0;width:380px;height:384px;transform-origin:top left;transform:scale(calc(100cqw / 380))}
+.ha-wrap{position:relative;container-type:inline-size;width:100%;max-width:460px;margin:0 auto;aspect-ratio:380/312;overflow:hidden}
+.ha-stage{position:absolute;top:0;left:0;width:380px;height:312px;transform-origin:top left;transform:scale(calc(100cqw / 380))}
 .ha-glow{position:absolute;width:300px;height:300px;left:50%;top:50%;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(124,92,255,0.22),transparent 60%);opacity:0;animation:haGlow 1.4s 2.4s ease forwards}
 .ha-doc{position:absolute;width:94px;border-radius:9px;background:#FAF9F6;padding:8px 9px;opacity:0;box-shadow:0 10px 28px rgba(0,0,0,0.40)}
 .ha-lbl{font:700 7px/1 -apple-system,BlinkMacSystemFont,sans-serif;letter-spacing:0.08em;margin-bottom:6px}
@@ -17,20 +17,19 @@ const CSS = `
 .ha-ln{height:4px;border-radius:2px;background:#E2DAF3;margin-bottom:4px}
 .ha-prow{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
 .ha-cell{width:13px;height:11px;border-radius:2px;background:#ECE7F8}
-.ha-card{position:absolute;left:50%;top:50%;width:300px;transform:translate(-50%,-50%) scale(0.9);opacity:0;background:#FAF9F6;border-radius:14px;padding:14px 16px;animation:haCard 1s 2.3s cubic-bezier(.34,1.4,.64,1) forwards}
+.ha-card{position:absolute;left:50%;top:50%;width:272px;transform:translate(-50%,-50%) scale(0.9);opacity:0;background:#FAF9F6;border-radius:14px;padding:11px 13px;animation:haCard 1s 2.3s cubic-bezier(.34,1.4,.64,1) forwards}
 .ha-tag{font:700 9px/1 -apple-system,sans-serif;letter-spacing:0.14em;color:#5B21B6}
 .ha-pill{float:right;font:600 9px/1 -apple-system,sans-serif;color:#0F6E56;background:rgba(29,158,117,0.14);border-radius:20px;padding:4px 8px}
 .ha-sub{font:500 10px/1.3 -apple-system,sans-serif;color:#6B6685;margin-top:4px}
-.ha-cats{display:flex;gap:5px;margin:9px 0 4px;flex-wrap:wrap}
-.ha-cat{font:600 8px/1 -apple-system,sans-serif;color:#5B21B6;background:#F1ECFE;border-radius:20px;padding:4px 8px}
-.ha-tl{font:700 8px/1 -apple-system,sans-serif;letter-spacing:0.1em;color:#8B86A0;margin:9px 0 7px}
-.ha-row{display:flex;gap:9px;opacity:0;transform:translateX(6px);margin-bottom:9px;animation:haRow .5s ease forwards}
+.ha-cats{margin:6px 0 2px;font:600 8px/1.4 -apple-system,sans-serif;color:#5B21B6}
+.ha-tl{font:700 8px/1 -apple-system,sans-serif;letter-spacing:0.1em;color:#8B86A0;margin:7px 0 5px}
+.ha-row{display:flex;gap:9px;opacity:0;transform:translateX(6px);margin-bottom:6px;animation:haRow .5s ease forwards}
 .ha-r1{animation-delay:3s}.ha-r2{animation-delay:3.25s}.ha-r3{animation-delay:3.5s}
 .ha-node{width:10px;height:10px;border-radius:50%;background:#6D4AFF;flex:none;margin-top:2px}
 .ha-date{font:600 8.5px/1.2 -apple-system,sans-serif;color:#7C5CF0}
 .ha-ev{font:600 11px/1.3 -apple-system,sans-serif;color:#14112E}
 .ha-src{display:inline-flex;gap:4px;margin-top:4px;font:600 8px/1 -apple-system,sans-serif;color:#5B21B6;background:rgba(109,74,255,0.10);border-radius:5px;padding:3px 6px}
-.ha-foot{border-top:0.5px solid #E7DEF7;margin-top:6px;padding-top:8px;font:500 8.5px/1.4 -apple-system,sans-serif;color:#8B86A0}
+.ha-foot{border-top:0.5px solid #E7DEF7;margin-top:5px;padding-top:6px;font:500 8.5px/1.4 -apple-system,sans-serif;color:#8B86A0}
 .ha-f1{animation:haF1 3s cubic-bezier(.5,0,.2,1) forwards}
 .ha-f2{animation:haF2 3s .1s cubic-bezier(.5,0,.2,1) forwards}
 .ha-f3{animation:haF3 3s .05s cubic-bezier(.5,0,.2,1) forwards}
@@ -100,12 +99,12 @@ export function HeroAnimation() {
         <div className="ha-card">
           <div><span className="ha-tag">INTAKE READY</span><span className="ha-pill">● Ready for review</span></div>
           <div className="ha-sub">Employment matter · California · 7 records organized</div>
-          <div className="ha-cats"><span className="ha-cat">Payroll</span><span className="ha-cat">HR &amp; complaints</span><span className="ha-cat">Communications</span><span className="ha-cat">Separation</span></div>
+          <div className="ha-cats">Payroll · HR &amp; complaints · Communications · Separation</div>
           <div className="ha-tl">TIMELINE</div>
           <div className="ha-row ha-r1"><span className="ha-node" /><span><span className="ha-date">Sep 9, 2024</span><br /><span className="ha-ev">Concern raised with HR</span><br /><span className="ha-src">⎘ hr-complaint.pdf · p.1</span></span></div>
           <div className="ha-row ha-r2"><span className="ha-node" /><span><span className="ha-date">May 14, 2025</span><br /><span className="ha-ev">Written warning issued</span><br /><span className="ha-src">⎘ warning-notice.pdf · p.1</span></span></div>
           <div className="ha-row ha-r3"><span className="ha-node" style={{ background: '#39415f' }} /><span><span className="ha-date">Jun 2, 2025</span><br /><span className="ha-ev">Termination</span><br /><span className="ha-src">⎘ separation-letter.pdf · p.2</span></span></div>
-          <div className="ha-foot">Organizes &amp; reflects — every fact traces to its source record. Not legal advice.</div>
+          <div className="ha-foot">Every fact traces to its source · not legal advice.</div>
         </div>
       </div>
     </div>
