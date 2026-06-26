@@ -9,8 +9,9 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Phone, Mail, Calendar, ArrowLeft, Plus, X, TrendingUp,
   ClipboardList, LayoutGrid, Building2, BookOpen, BarChart3, CheckCircle2,
-  GraduationCap, ListChecks, Check, MessageSquare, Send, StickyNote, Trash2, ChevronRight, ShieldCheck, RefreshCw, AlertTriangle, DollarSign, Flame, Sparkles, Trophy,
+  GraduationCap, ListChecks, Check, MessageSquare, Send, StickyNote, Trash2, ChevronRight, ShieldCheck, RefreshCw, AlertTriangle, DollarSign, Flame, Sparkles, Trophy, Calculator,
 } from 'lucide-react';
+import { supabase } from '../../lib/supabaseClient';
 import {
   listFirms, listActivity, addFirm, logActivity,
   listMessages, sendMessage, getCurrentMember,
@@ -20,6 +21,7 @@ import {
 import {
   computeRevenue, targetColor, dailyTargetsContext, tierPrice, avgMinutesSaved, DAILY_TARGETS, PHASE1_PAYING_TARGET, COMMISSION_RATE, TIER_PRICES,
   firstThreeBonus, commissionProjection, BONUS_LADDER, SPRINT_BONUS,
+  companyEconomics, ECON_DEFAULTS, type EconomicsInput,
 } from '../../services/crmAnalytics';
 import { CRM_STAGES, CRM_STAGE_LABELS, type CrmStage } from '../../services/crmStageLogic';
 import { CRM_WEEKLY_TARGETS, CRM_CALL_SCRIPT, CRM_OBJECTIONS, CRM_COLD_EMAIL } from '../constants/crmReference';
@@ -28,10 +30,13 @@ import { AUDIT_SITE_CHECKS, AUDIT_MANUAL_GROUPS } from '../constants/crmAudit';
 import { crmFirmIntel } from '../constants/crmFirmIntel';
 import { STARTER_QUESTIONS, askAssistant, type ChatMessage } from '../../services/chatAssistant';
 
-type Tab = 'dashboard' | 'pipeline' | 'firms' | 'activity' | 'metrics' | 'revenue' | 'comp' | 'team' | 'notes' | 'scripts' | 'training' | 'askai' | 'checklist' | 'audit' | 'add';
+type Tab = 'dashboard' | 'pipeline' | 'firms' | 'activity' | 'metrics' | 'revenue' | 'comp' | 'economics' | 'team' | 'notes' | 'scripts' | 'training' | 'askai' | 'checklist' | 'audit' | 'add';
 
-// `founderOnly` tabs are hidden from sales reps.
-const TABS: { id: Tab; label: string; icon: typeof LayoutGrid; founderOnly?: boolean }[] = [
+// The Company Economics tab is restricted to these specific accounts only.
+const ECON_ALLOWED_EMAILS = ['vmramey@gmail.com', 'tadmor86@gmail.com'];
+
+// `founderOnly` tabs are hidden from sales reps. `econOnly` tabs show only for ECON_ALLOWED_EMAILS.
+const TABS: { id: Tab; label: string; icon: typeof LayoutGrid; founderOnly?: boolean; econOnly?: boolean }[] = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutGrid },
   { id: 'pipeline', label: 'Pipeline', icon: TrendingUp },
   { id: 'firms', label: 'Firms', icon: Building2 },
@@ -42,6 +47,7 @@ const TABS: { id: Tab; label: string; icon: typeof LayoutGrid; founderOnly?: boo
   { id: 'scripts', label: 'Scripts', icon: BookOpen },
   { id: 'training', label: 'Training', icon: GraduationCap },
   { id: 'comp', label: 'Earnings', icon: Trophy },
+  { id: 'economics', label: 'Company Economics', icon: Calculator, econOnly: true },
   { id: 'askai', label: 'Ask one3seven AI', icon: Sparkles },
   { id: 'checklist', label: 'Checklist', icon: ListChecks, founderOnly: true },
   { id: 'audit', label: 'Audit', icon: ShieldCheck, founderOnly: true },
@@ -83,6 +89,11 @@ function PriorityBadge({ priority }: { priority: 'A' | 'B' | 'C' | null }) {
 
 export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => void; isFounder?: boolean }) {
   const [tab, setTab] = useState<Tab>('dashboard');
+  const [userEmail, setUserEmail] = useState('');
+  const showEconomics = ECON_ALLOWED_EMAILS.includes(userEmail.trim().toLowerCase());
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setUserEmail(data.user?.email ?? ''));
+  }, []);
   const [firms, setFirms] = useState<CrmFirm[]>([]);
   const [activity, setActivity] = useState<CrmActivityWithFirm[]>([]);
   const [workerCount, setWorkerCount] = useState(0);
@@ -150,7 +161,7 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
         {/* Tab bar — horizontally scrollable on mobile */}
         <div className="mx-auto max-w-3xl overflow-x-auto px-2 pb-1">
           <div className="flex gap-1">
-            {TABS.filter((t) => !t.founderOnly || isFounder).map((t) => (
+            {TABS.filter((t) => (!t.founderOnly || isFounder) && (!t.econOnly || showEconomics)).map((t) => (
               <button
                 key={t.id}
                 type="button"
@@ -186,6 +197,7 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
             {tab === 'audit' && isFounder && <AuditTab />}
             {tab === 'revenue' && isFounder && <RevenueTab firms={firms} />}
             {tab === 'comp' && <CompTab firms={firms} />}
+            {tab === 'economics' && showEconomics && <CompanyEconomicsTab firms={firms} />}
             {tab === 'add' && (
               <AddLogTab firms={firms} lastFirmId={lastFirmId} onSaved={(fid) => { if (fid) setLastFirmId(fid); void load(); }} setError={setError} />
             )}
@@ -606,6 +618,104 @@ function CompTab({ firms }: { firms: CrmFirm[] }) {
           </div>
           <p className="text-[11px] leading-relaxed text-[#1E1B4B]/45">
             Illustration only — assumes all firms on the {tier} tier, retained {months} month{months === 1 ? '' : 's'}. The {Math.round(COMMISSION_RATE * 100)}% commission keeps paying every month a firm stays.
+          </p>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+/** Company Economics — net to one3seven after overhead. Restricted to ECON_ALLOWED_EMAILS. */
+function CompanyEconomicsTab({ firms }: { firms: CrmFirm[] }) {
+  const usd = (n: number) => `$${n.toLocaleString()}`;
+  const paidCount = firms.filter((f) => f.stage === 'paid').length;
+
+  const [firmCount, setFirmCount] = useState(Math.max(3, paidCount));
+  const [tier, setTier] = useState<'solo' | 'practice' | 'firm'>('practice');
+  const [months, setMonths] = useState(12);
+  const [a, setA] = useState({ ...ECON_DEFAULTS });
+  const setNum = (k: keyof typeof a) => (e: React.ChangeEvent<HTMLInputElement>) =>
+    setA((prev) => ({ ...prev, [k]: Math.max(0, +e.target.value || 0) }));
+
+  const input: EconomicsInput = { firmCount, tier, months, ...a };
+  const r = companyEconomics(input);
+
+  const numCls = 'w-20 rounded-[8px] border border-[#E7E1FF] px-2 py-1 text-right text-[13px] font-bold text-[#6D4AFF] outline-none focus:border-[#6D4AFF]';
+
+  return (
+    <div className="space-y-5">
+      <section>
+        <h2 className="mb-2 text-[14px] font-bold">Company economics — net after overhead</h2>
+        <p className="mb-3 text-[11px] leading-relaxed text-[#1E1B4B]/45">
+          The mirror of the rep calculator, from one3seven's side. Restricted view. AI and infra are estimates — tune them as real usage comes in.
+        </p>
+        <div className="space-y-4 rounded-[16px] border border-[#E7E1FF] bg-white p-4">
+          {/* Firm count */}
+          <div>
+            <div className="mb-1 flex items-center justify-between">
+              <label className="text-[12px] font-semibold text-[#1E1B4B]/70">Paying firms</label>
+              <input type="number" min={0} max={500} value={firmCount} onChange={(e) => setFirmCount(Math.max(0, Math.min(500, Math.floor(+e.target.value) || 0)))} className={numCls} />
+            </div>
+            <input type="range" min={0} max={500} value={firmCount} onChange={(e) => setFirmCount(+e.target.value)} className="w-full accent-[#6D4AFF]" />
+            <div className="mt-1.5 flex gap-1.5">
+              {[10, 50, 100, 250, 500].map((n) => (
+                <button key={n} type="button" onClick={() => setFirmCount(n)} className={`flex-1 rounded-[8px] border px-1 py-1 text-[11px] font-semibold transition ${firmCount === n ? 'border-[#6D4AFF] bg-[#6D4AFF] text-white' : 'border-[#E7E1FF] text-[#1E1B4B]/55 hover:border-[#B8A8FF]'}`}>{n}</button>
+              ))}
+            </div>
+          </div>
+          {/* Tier */}
+          <div>
+            <div className="mb-1 text-[12px] font-semibold text-[#1E1B4B]/70">Tier</div>
+            <div className="flex gap-2">
+              {(['solo', 'practice', 'firm'] as const).map((t) => (
+                <button key={t} type="button" onClick={() => setTier(t)} className={`flex-1 rounded-[10px] border px-2 py-2 text-[12px] font-semibold capitalize transition ${tier === t ? 'border-[#6D4AFF] bg-[#6D4AFF] text-white' : 'border-[#E7E1FF] text-[#1E1B4B]/60 hover:border-[#B8A8FF]'}`}>{t} ${TIER_PRICES[t]}</button>
+              ))}
+            </div>
+          </div>
+          {/* Months */}
+          <div>
+            <div className="mb-1 text-[12px] font-semibold text-[#1E1B4B]/70">Months retained</div>
+            <div className="flex gap-2">
+              {[1, 3, 6, 12].map((m) => (
+                <button key={m} type="button" onClick={() => setMonths(m)} className={`flex-1 rounded-[10px] border px-2 py-2 text-[12px] font-semibold transition ${months === m ? 'border-[#6D4AFF] bg-[#6D4AFF] text-white' : 'border-[#E7E1FF] text-[#1E1B4B]/60 hover:border-[#B8A8FF]'}`}>{m} mo</button>
+              ))}
+            </div>
+          </div>
+
+          {/* Editable assumptions */}
+          <div className="rounded-[12px] border border-[#E7E1FF] bg-[#FBFAFF] p-3">
+            <div className="mb-2 text-[11px] font-bold uppercase tracking-wide text-[#1E1B4B]/55">Overhead assumptions</div>
+            <div className="space-y-2">
+              {([
+                ['commissionPct', 'Sales commission %'],
+                ['stripePct', 'Stripe fee %'],
+                ['stripeFlat', 'Stripe flat $/charge'],
+                ['aiCostPerFirm', 'AI cost $/firm/mo (est.)'],
+                ['fixedInfraMonthly', 'Fixed infra $/mo'],
+              ] as const).map(([k, label]) => (
+                <div key={k} className="flex items-center justify-between">
+                  <label className="text-[12px] text-[#1E1B4B]/65">{label}</label>
+                  <input type="number" min={0} step="any" value={a[k]} onChange={setNum(k)} className={numCls} />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Results */}
+          <div className="rounded-[12px] bg-[#F7F3FF] p-4">
+            <div className="grid grid-cols-2 gap-3">
+              <CompStat label="Gross revenue" value={usd(r.grossTotal)} />
+              <CompStat label="− Commission" value={usd(r.commission)} />
+              <CompStat label="− Stripe fees" value={usd(r.stripe)} />
+              <CompStat label="− AI (est.)" value={usd(r.ai)} />
+              <CompStat label="− Fixed infra" value={usd(r.fixed)} />
+              <CompStat label="Total overhead" value={usd(r.totalCost)} />
+              <CompStat label={`Net / mo`} value={`${usd(r.netMonthly)}/mo`} />
+              <CompStat label={`Net over ${months} mo · ${r.marginPct}% margin`} value={usd(r.netTotal)} highlight />
+            </div>
+          </div>
+          <p className="text-[11px] leading-relaxed text-[#1E1B4B]/45">
+            Illustration only — assumes all firms on the {tier} tier, retained {months} month{months === 1 ? '' : 's'}. Margin improves with scale as fixed infra amortizes. Excludes founder time, counsel, and E&O.
           </p>
         </div>
       </section>

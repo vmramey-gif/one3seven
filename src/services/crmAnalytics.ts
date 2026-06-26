@@ -133,3 +133,64 @@ export function commissionProjection({ firmCount, tier, months }: CommissionScen
   const bonus = firstThreeBonus(firms).earned;
   return { mrr, monthlyCommission, totalCommission, bonus, total: totalCommission + bonus };
 }
+
+// ── Company economics: net to one3seven after overhead ───────────────────────
+
+/** Default overhead assumptions — all editable in the UI. */
+export const ECON_DEFAULTS = {
+  commissionPct: 20,   // rep commission, % of revenue
+  stripePct: 2.9,      // Stripe % fee
+  stripeFlat: 0.3,     // Stripe per-charge flat fee
+  aiCostPerFirm: 25,   // est. Anthropic extraction cost per firm / month
+  fixedInfraMonthly: 75, // Supabase + Vercel + domains/email, company-wide
+} as const;
+
+export interface EconomicsInput {
+  firmCount: number;
+  tier: 'solo' | 'practice' | 'firm';
+  months: number;
+  commissionPct: number;
+  stripePct: number;
+  stripeFlat: number;
+  aiCostPerFirm: number;
+  fixedInfraMonthly: number;
+}
+export interface EconomicsResult {
+  mrr: number;          // monthly recurring revenue
+  grossTotal: number;   // revenue over the period
+  commission: number;
+  stripe: number;
+  ai: number;
+  fixed: number;
+  totalCost: number;
+  netTotal: number;     // company net over the period
+  netMonthly: number;   // company net per month
+  marginPct: number;    // netTotal / grossTotal * 100
+}
+
+/** Company net revenue after overhead. Pure; all assumptions are inputs. */
+export function companyEconomics(i: EconomicsInput): EconomicsResult {
+  const firms = Math.max(0, Math.floor(i.firmCount));
+  const m = Math.max(0, Math.floor(i.months));
+  const mrr = firms * TIER_PRICES[i.tier];
+  const grossTotal = mrr * m;
+  const charges = firms * m; // one subscription charge per firm per month
+  const commission = grossTotal * (i.commissionPct / 100);
+  const stripe = grossTotal * (i.stripePct / 100) + charges * i.stripeFlat;
+  const ai = firms * i.aiCostPerFirm * m;
+  const fixed = i.fixedInfraMonthly * m;
+  const totalCost = commission + stripe + ai + fixed;
+  const netTotal = grossTotal - totalCost;
+  return {
+    mrr,
+    grossTotal: Math.round(grossTotal),
+    commission: Math.round(commission),
+    stripe: Math.round(stripe),
+    ai: Math.round(ai),
+    fixed: Math.round(fixed),
+    totalCost: Math.round(totalCost),
+    netTotal: Math.round(netTotal),
+    netMonthly: m > 0 ? Math.round(netTotal / m) : 0,
+    marginPct: grossTotal > 0 ? Math.round((netTotal / grossTotal) * 100) : 0,
+  };
+}

@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   tierPrice, computeRevenue, targetColor, dailyTargetsContext, avgMinutesSaved,
-  firstThreeBonus, commissionProjection, type SubscriptionTier,
+  firstThreeBonus, commissionProjection, companyEconomics, ECON_DEFAULTS, type SubscriptionTier,
 } from '../crmAnalytics';
 import type { CrmFirm } from '../crmService';
 
@@ -109,6 +109,16 @@ describe('commissionProjection', () => {
   });
   it('zero firms earns zero', () => {
     expect(commissionProjection({ firmCount: 0, tier: 'firm', months: 6 }).total).toBe(0);
+  });
+  it('company economics: 3 practice firms, 12 months, default overhead', () => {
+    const r = companyEconomics({ firmCount: 3, tier: 'practice', months: 12, ...ECON_DEFAULTS });
+    expect(r.mrr).toBe(1497);
+    expect(r.grossTotal).toBe(17964);     // 1497 * 12
+    expect(r.commission).toBe(3593);      // 20%
+    expect(r.ai).toBe(900);               // 3 * 25 * 12
+    expect(r.fixed).toBe(900);            // 75 * 12
+    expect(r.netTotal).toBeGreaterThan(11000);
+    expect(r.marginPct).toBeGreaterThan(60);
   });
   it('scales to 500 firms (bonus still caps at the first 3)', () => {
     const r = commissionProjection({ firmCount: 500, tier: 'firm', months: 12 });
