@@ -158,6 +158,21 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
   };
   const closeFast = () => setFastFirmId(null);
 
+  /** One-tap "I emailed this firm" — logs an email + claims credit, no form. */
+  const quickEmail = async (firmId: string) => {
+    const f = firmsById[firmId];
+    const r = await logActivity({
+      firm_id: firmId,
+      activity_type: 'email',
+      activity_date: today,
+      outcome: 'Emailed',
+      new_stage: f && f.stage === 'target' ? 'contacted' : '',
+    });
+    if (r.error) { setError(r.error); return; }
+    setLastFirmId(firmId);
+    await load();
+  };
+
   const saveFast = async () => {
     if (!fastFirmId || !fastOutcome) return;
     setSaving(true);
@@ -208,9 +223,9 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
           <div className="py-20 text-center text-sm text-[#1E1B4B]/40">Loading…</div>
         ) : (
           <>
-            {tab === 'dashboard' && <DashboardTab firms={firms} activity={activity} today={today} onLog={openFast} workerCount={workerCount} onChanged={load} />}
+            {tab === 'dashboard' && <DashboardTab firms={firms} activity={activity} today={today} onLog={openFast} workerCount={workerCount} onChanged={load} onQuickEmail={quickEmail} />}
             {tab === 'pipeline' && <PipelineTab firms={firms} onLog={openFast} workerCount={workerCount} />}
-            {tab === 'firms' && <FirmsTab firms={firms} onLog={openFast} userId={userId} />}
+            {tab === 'firms' && <FirmsTab firms={firms} onLog={openFast} userId={userId} onQuickEmail={quickEmail} />}
             {tab === 'activity' && <ActivityTab activity={activity} />}
             {tab === 'metrics' && <MetricsTab firms={firms} activity={activity} />}
             {tab === 'team' && <TeamTab />}
@@ -301,8 +316,9 @@ function Collapsible({ title, defaultOpen = false, children }: { title: string; 
 }
 
 // Compact, collapsible firm row. Tap-to-call lives in the header so it's reachable without expanding.
-function FirmCard({ firm, onLog, today }: { firm: CrmFirm; onLog: (id: string) => void; today?: string }) {
+function FirmCard({ firm, onLog, today, onQuickEmail }: { firm: CrmFirm; onLog: (id: string) => void; today?: string; onQuickEmail?: (id: string) => Promise<void> }) {
   const [open, setOpen] = useState(false);
+  const [busy, setBusy] = useState(false);
   const due = today && firm.next_followup && firm.next_followup <= today;
   const intel = crmFirmIntel[firm.name];
   return (
@@ -320,6 +336,17 @@ function FirmCard({ firm, onLog, today }: { firm: CrmFirm; onLog: (id: string) =
           </span>
         )}
         <StageTag stage={firm.stage} />
+        {onQuickEmail && !firm.contacted_by && (
+          <button
+            type="button"
+            disabled={busy}
+            onClick={async () => { setBusy(true); try { await onQuickEmail(firm.id); } finally { setBusy(false); } }}
+            className="flex h-9 shrink-0 items-center gap-1 rounded-full bg-[#EDE7FF] px-2.5 text-[11px] font-bold text-[#6D4AFF] transition hover:bg-[#E0D6FF] disabled:opacity-50"
+            aria-label={`Log email to ${firm.name}`}
+          >
+            <Mail className="h-3.5 w-3.5" /> {busy ? '…' : 'Emailed'}
+          </button>
+        )}
         {firm.phone && (
           <a href={`tel:${digitsOf(firm.phone)}`} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-600" aria-label={`Call ${firm.name}`}>
             <Phone className="h-4 w-4" />
@@ -376,7 +403,7 @@ function FirmCard({ firm, onLog, today }: { firm: CrmFirm; onLog: (id: string) =
 }
 
 // ── Dashboard ────────────────────────────────────────────────────────────────
-function DashboardTab({ firms, activity, today, onLog, workerCount, onChanged }: { firms: CrmFirm[]; activity: CrmActivityWithFirm[]; today: string; onLog: (id: string) => void; workerCount: number; onChanged: () => void }) {
+function DashboardTab({ firms, activity, today, onLog, workerCount, onChanged, onQuickEmail }: { firms: CrmFirm[]; activity: CrmActivityWithFirm[]; today: string; onLog: (id: string) => void; workerCount: number; onChanged: () => void; onQuickEmail?: (id: string) => Promise<void> }) {
   const stats = [
     { label: 'Firms', value: firms.length },
     { label: 'Calls', value: activity.filter((a) => a.activity_type === 'call').length },
@@ -407,7 +434,7 @@ function DashboardTab({ firms, activity, today, onLog, workerCount, onChanged }:
         {due.length === 0 ? (
           <p className="rounded-[12px] border border-[#E7E1FF] bg-white px-4 py-3 text-[13px] text-[#1E1B4B]/45">Nothing due. Nice.</p>
         ) : (
-          <div className="space-y-3">{due.map((f) => <FirmCard key={f.id} firm={f} onLog={onLog} today={today} />)}</div>
+          <div className="space-y-3">{due.map((f) => <FirmCard key={f.id} firm={f} onLog={onLog} today={today} onQuickEmail={onQuickEmail} />)}</div>
         )}
       </section>
 
@@ -903,7 +930,7 @@ function PipelineTab({ firms, onLog, workerCount }: { firms: CrmFirm[]; onLog: (
         {priorityA.length === 0 ? (
           <p className="rounded-[12px] border border-[#E7E1FF] bg-white px-4 py-3 text-[13px] text-[#1E1B4B]/45">No Priority A firms yet.</p>
         ) : (
-          <div className="space-y-3">{priorityA.map((f) => <FirmCard key={f.id} firm={f} onLog={onLog} />)}</div>
+          <div className="space-y-3">{priorityA.map((f) => <FirmCard key={f.id} firm={f} onLog={onLog} onQuickEmail={onQuickEmail} />)}</div>
         )}
       </section>
     </div>
@@ -911,7 +938,7 @@ function PipelineTab({ firms, onLog, workerCount }: { firms: CrmFirm[]; onLog: (
 }
 
 // ── Firms ────────────────────────────────────────────────────────────────────
-function FirmsTab({ firms, onLog, userId }: { firms: CrmFirm[]; onLog: (id: string) => void; userId: string | null }) {
+function FirmsTab({ firms, onLog, userId, onQuickEmail }: { firms: CrmFirm[]; onLog: (id: string) => void; userId: string | null; onQuickEmail?: (id: string) => Promise<void> }) {
   const [stage, setStage] = useState<CrmStage | ''>('');
   const [priority, setPriority] = useState<'A' | 'B' | 'C' | ''>('');
   const [owner, setOwner] = useState<'all' | 'mine' | 'uncontacted'>('all');
@@ -947,7 +974,7 @@ function FirmsTab({ firms, onLog, userId }: { firms: CrmFirm[]; onLog: (id: stri
       {filtered.length === 0 ? (
         <p className="rounded-[12px] border border-[#E7E1FF] bg-white px-4 py-3 text-[13px] text-[#1E1B4B]/45">No firms match this filter.</p>
       ) : (
-        <div className="space-y-3">{filtered.map((f) => <FirmCard key={f.id} firm={f} onLog={onLog} today={todayISO()} />)}</div>
+        <div className="space-y-3">{filtered.map((f) => <FirmCard key={f.id} firm={f} onLog={onLog} today={todayISO()} onQuickEmail={onQuickEmail} />)}</div>
       )}
     </div>
   );
