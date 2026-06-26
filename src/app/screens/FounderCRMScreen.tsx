@@ -9,7 +9,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Phone, Mail, Calendar, ArrowLeft, Plus, X, TrendingUp,
   ClipboardList, LayoutGrid, Building2, BookOpen, BarChart3, CheckCircle2,
-  GraduationCap, ListChecks, Check, MessageSquare, Send, StickyNote, Trash2, ChevronRight, ShieldCheck, RefreshCw, AlertTriangle, DollarSign, Flame, Sparkles, Trophy, Calculator,
+  GraduationCap, ListChecks, Check, MessageSquare, Send, StickyNote, Trash2, ChevronRight, ShieldCheck, RefreshCw, AlertTriangle, DollarSign, Flame, Sparkles, Trophy, Calculator, Link2, Copy, ExternalLink,
 } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
 import {
@@ -30,7 +30,29 @@ import { AUDIT_SITE_CHECKS, AUDIT_MANUAL_GROUPS } from '../constants/crmAudit';
 import { crmFirmIntel } from '../constants/crmFirmIntel';
 import { STARTER_QUESTIONS, askAssistant, type ChatMessage } from '../../services/chatAssistant';
 
-type Tab = 'dashboard' | 'pipeline' | 'firms' | 'activity' | 'metrics' | 'revenue' | 'comp' | 'economics' | 'team' | 'notes' | 'scripts' | 'training' | 'askai' | 'checklist' | 'audit' | 'add';
+type Tab = 'dashboard' | 'pipeline' | 'firms' | 'activity' | 'metrics' | 'revenue' | 'comp' | 'economics' | 'team' | 'notes' | 'scripts' | 'training' | 'askai' | 'checklist' | 'audit' | 'links' | 'add';
+
+// Every URL off www.one3seven.com, grouped — the founder "links in one place" directory.
+const SITE_BASE = 'https://www.one3seven.com';
+const SITE_LINK_GROUPS: { group: string; items: { path: string; label: string; desc: string }[] }[] = [
+  { group: 'Public', items: [
+    { path: '/', label: 'Marketing home', desc: 'Worker-facing landing page' },
+  ]},
+  { group: 'Demos', items: [
+    { path: '/demo', label: 'Firm demo', desc: 'Attorney / firm walkthrough' },
+    { path: '/worker-demo', label: 'Worker demo', desc: 'Worker experience walkthrough' },
+    { path: '/fire-demo', label: 'Fire-displaced demo', desc: 'Marcus Reyes scenario (counsel-gated wording)' },
+  ]},
+  { group: 'Internal — founder + reps', items: [
+    { path: '/hq', label: 'HQ / CRM', desc: 'Sales CRM, pipeline, earnings' },
+    { path: '/company-demo', label: 'Demo coach', desc: 'Rep demo guide (Coach / Present)' },
+    { path: '/company-demo/debrief', label: 'Demo debrief', desc: 'Post-demo debrief form' },
+  ]},
+  { group: 'Legal', items: [
+    { path: '/terms', label: 'Terms of Service', desc: 'Legal terms' },
+    { path: '/privacy', label: 'Privacy Policy', desc: 'Privacy policy' },
+  ]},
+];
 
 // The Company Economics tab is restricted to these specific accounts only.
 const ECON_ALLOWED_EMAILS = ['vmramey@gmail.com', 'tadmor86@gmail.com'];
@@ -48,6 +70,7 @@ const TABS: { id: Tab; label: string; icon: typeof LayoutGrid; founderOnly?: boo
   { id: 'training', label: 'Training', icon: GraduationCap },
   { id: 'comp', label: 'Earnings', icon: Trophy },
   { id: 'economics', label: 'Company Economics', icon: Calculator, econOnly: true },
+  { id: 'links', label: 'Links', icon: Link2, founderOnly: true },
   { id: 'askai', label: 'Ask one3seven AI', icon: Sparkles },
   { id: 'checklist', label: 'Checklist', icon: ListChecks, founderOnly: true },
   { id: 'audit', label: 'Audit', icon: ShieldCheck, founderOnly: true },
@@ -198,6 +221,7 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
             {tab === 'revenue' && isFounder && <RevenueTab firms={firms} />}
             {tab === 'comp' && <CompTab firms={firms} />}
             {tab === 'economics' && showEconomics && <CompanyEconomicsTab firms={firms} />}
+            {tab === 'links' && isFounder && <LinksTab />}
             {tab === 'add' && (
               <AddLogTab firms={firms} lastFirmId={lastFirmId} onSaved={(fid) => { if (fid) setLastFirmId(fid); void load(); }} setError={setError} />
             )}
@@ -718,6 +742,58 @@ function CompanyEconomicsTab({ firms }: { firms: CrmFirm[] }) {
             Illustration only — assumes all firms on the {tier} tier, retained {months} month{months === 1 ? '' : 's'}. Margin improves with scale as fixed infra amortizes. Excludes founder time, counsel, and E&O.
           </p>
         </div>
+      </section>
+    </div>
+  );
+}
+
+/** Founder directory — every link off www.one3seven.com in one place (open + copy). */
+function LinksTab() {
+  const [copied, setCopied] = useState<string | null>(null);
+  const copy = (url: string) => {
+    try {
+      void navigator.clipboard.writeText(url);
+      setCopied(url);
+      window.setTimeout(() => setCopied((c) => (c === url ? null : c)), 1500);
+    } catch { /* clipboard unavailable */ }
+  };
+  return (
+    <div className="space-y-5">
+      <section>
+        <h2 className="mb-1 text-[14px] font-bold">All one3seven links</h2>
+        <p className="mb-3 text-[11px] leading-relaxed text-[#1E1B4B]/45">
+          Every page off <b>www.one3seven.com</b>. Tap to open, or copy to share. Internal links require sign-in.
+        </p>
+        <div className="space-y-4">
+          {SITE_LINK_GROUPS.map((g) => (
+            <div key={g.group}>
+              <div className="mb-1.5 text-[11px] font-bold uppercase tracking-wide text-[#6D4AFF]">{g.group}</div>
+              <div className="space-y-2">
+                {g.items.map((it) => {
+                  const url = `${SITE_BASE}${it.path === '/' ? '' : it.path}`;
+                  return (
+                    <div key={it.path} className="flex items-center gap-2 rounded-[12px] border border-[#E7E1FF] bg-white p-3">
+                      <div className="min-w-0 flex-1">
+                        <div className="text-[13px] font-semibold text-[#1E1B4B]">{it.label}</div>
+                        <div className="truncate text-[11px] text-[#1E1B4B]/50">{it.desc}</div>
+                        <div className="truncate text-[11px] font-medium text-[#6D4AFF]">{url}</div>
+                      </div>
+                      <button type="button" onClick={() => copy(url)} aria-label="Copy link" className="rounded-lg border border-[#E7E1FF] p-2 text-[#1E1B4B]/55 transition hover:border-[#B8A8FF] hover:bg-[#F7F3FF]">
+                        {copied === url ? <Check className="h-4 w-4 text-emerald-600" /> : <Copy className="h-4 w-4" />}
+                      </button>
+                      <a href={url} target="_blank" rel="noreferrer" aria-label="Open link" className="rounded-lg border border-[#E7E1FF] p-2 text-[#1E1B4B]/55 transition hover:border-[#B8A8FF] hover:bg-[#F7F3FF]">
+                        <ExternalLink className="h-4 w-4" />
+                      </a>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+        <p className="mt-4 text-[11px] leading-relaxed text-[#1E1B4B]/45">
+          The <b>For law firms</b> page opens from the marketing site's top nav (no standalone URL yet — ask if you want a direct <code>/for-firms</code> link to send prospects).
+        </p>
       </section>
     </div>
   );
