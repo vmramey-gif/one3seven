@@ -37,6 +37,7 @@ const SITE_BASE = 'https://www.one3seven.com';
 const SITE_LINK_GROUPS: { group: string; items: { path: string; label: string; desc: string }[] }[] = [
   { group: 'Public', items: [
     { path: '/', label: 'Marketing home', desc: 'Worker-facing landing page' },
+    { path: '/for-firms', label: 'For law firms', desc: 'Firm pitch + pilot request — send to prospects' },
   ]},
   { group: 'Demos', items: [
     { path: '/demo', label: 'Firm demo', desc: 'Attorney / firm walkthrough' },
@@ -792,7 +793,7 @@ function LinksTab() {
           ))}
         </div>
         <p className="mt-4 text-[11px] leading-relaxed text-[#1E1B4B]/45">
-          The <b>For law firms</b> page opens from the marketing site's top nav (no standalone URL yet — ask if you want a direct <code>/for-firms</code> link to send prospects).
+          Tip: <b>/for-firms</b> is the page to send prospects — it opens straight to the pitch and pilot request.
         </p>
       </section>
     </div>

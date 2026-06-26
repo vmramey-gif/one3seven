@@ -13,6 +13,7 @@ import { CompanyDemoDebrief } from './app/screens/CompanyDemoDebrief.tsx';
 import { CrmAccessGate } from './app/components/CrmAccessGate.tsx';
 import { TermsPage } from './app/screens/TermsPage.tsx';
 import { PrivacyPage } from './app/screens/PrivacyPage.tsx';
+import { ForFirmsPage } from './app/screens/ForFirmsPage.tsx';
 import { OFFLINE_DEV_GALLERY_ONLY } from './lib/supabaseAvailability.ts';
 import { isSupabaseConfigured } from './lib/supabaseClient';
 import { pageview } from './lib/analytics';
@@ -42,6 +43,10 @@ const isHQ =
   url.searchParams.has('hq') ||
   url.pathname === '/hq' ||
   url.pathname === '/one3sevenhq';
+
+const isForFirms =
+  url.searchParams.has('for-firms') ||
+  url.pathname === '/for-firms';
 
 // Stripe billing return — ?billing=success|canceled|portal_return
 // Store in sessionStorage so App.tsx can surface a notification, then strip from URL.
@@ -93,6 +98,15 @@ if (url.pathname === '/terms') {
 } else if (isDemo) {
   createRoot(rootEl).render(
     <AppErrorBoundary><DemoApp /></AppErrorBoundary>
+  );
+} else if (isForFirms) {
+  createRoot(rootEl).render(
+    <AppErrorBoundary>
+      <ForFirmsPage
+        onBack={() => { window.location.href = '/'; }}
+        onStartWorker={() => { window.location.href = '/'; }}
+      />
+    </AppErrorBoundary>
   );
 } else if (!isSupabaseConfigured() && !OFFLINE_DEV_GALLERY_ONLY) {
   createRoot(rootEl).render(
