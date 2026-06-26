@@ -8,16 +8,16 @@
  */
 
 const CSS = `
-.ha-wrap{position:relative;container-type:inline-size;width:100%;max-width:520px;margin:0 auto;aspect-ratio:380/340;overflow:hidden}
-.ha-stage{position:absolute;top:0;left:0;width:380px;height:340px;transform-origin:top left;transform:scale(calc(100cqw / 380))}
-.ha-glow{position:absolute;width:300px;height:300px;left:50%;top:48%;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(124,92,255,0.22),transparent 60%);opacity:0;animation:haGlow 1.4s 2.4s ease forwards}
+.ha-wrap{position:relative;container-type:inline-size;width:100%;max-width:520px;margin:0 auto;aspect-ratio:380/384;overflow:hidden}
+.ha-stage{position:absolute;top:0;left:0;width:380px;height:384px;transform-origin:top left;transform:scale(calc(100cqw / 380))}
+.ha-glow{position:absolute;width:300px;height:300px;left:50%;top:50%;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(124,92,255,0.22),transparent 60%);opacity:0;animation:haGlow 1.4s 2.4s ease forwards}
 .ha-doc{position:absolute;width:94px;border-radius:9px;background:#FAF9F6;padding:8px 9px;opacity:0;box-shadow:0 10px 28px rgba(0,0,0,0.40)}
 .ha-lbl{font:700 7px/1 -apple-system,BlinkMacSystemFont,sans-serif;letter-spacing:0.08em;margin-bottom:6px}
 .ha-bub{height:9px;border-radius:6px;margin-bottom:4px}
 .ha-ln{height:4px;border-radius:2px;background:#E2DAF3;margin-bottom:4px}
 .ha-prow{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
 .ha-cell{width:13px;height:11px;border-radius:2px;background:#ECE7F8}
-.ha-card{position:absolute;left:50%;top:48%;width:300px;transform:translate(-50%,-50%) scale(0.82);opacity:0;background:#FAF9F6;border-radius:14px;padding:14px 16px;animation:haCard 1s 2.3s cubic-bezier(.34,1.56,.64,1) forwards}
+.ha-card{position:absolute;left:50%;top:50%;width:300px;transform:translate(-50%,-50%) scale(0.9);opacity:0;background:#FAF9F6;border-radius:14px;padding:14px 16px;animation:haCard 1s 2.3s cubic-bezier(.34,1.4,.64,1) forwards}
 .ha-tag{font:700 9px/1 -apple-system,sans-serif;letter-spacing:0.14em;color:#5B21B6}
 .ha-pill{float:right;font:600 9px/1 -apple-system,sans-serif;color:#0F6E56;background:rgba(29,158,117,0.14);border-radius:20px;padding:4px 8px}
 .ha-sub{font:500 10px/1.3 -apple-system,sans-serif;color:#6B6685;margin-top:4px}
