@@ -842,6 +842,41 @@ function GrowthTab() {
         </div>
       </section>
 
+      {data.daily.length > 0 && (
+        <section>
+          <h2 className="mb-2 text-[14px] font-bold">Last 7 days</h2>
+          <div className="space-y-2 rounded-[12px] border border-[#E7E1FF] bg-white p-4">
+            {(() => {
+              const max = Math.max(1, ...data.daily.map((d) => d.visits));
+              return data.daily.map((d) => (
+                <div key={d.day} className="flex items-center gap-2">
+                  <span className="w-14 shrink-0 text-[11px] text-[#1E1B4B]/55">{d.day}</span>
+                  <div className="h-4 flex-1 overflow-hidden rounded bg-[#F3EFFF]">
+                    <div className="h-full rounded bg-[#6D4AFF]" style={{ width: `${Math.round((d.visits / max) * 100)}%` }} />
+                  </div>
+                  <span className="w-10 shrink-0 text-right text-[11px] font-semibold text-[#1E1B4B]">{d.visits}</span>
+                  <span className="w-16 shrink-0 text-right text-[11px] text-[#6D4AFF]">{d.signups} new</span>
+                </div>
+              ));
+            })()}
+          </div>
+          <p className="mt-1.5 text-[11px] text-[#1E1B4B]/45">Bar = page visits · right = new signups</p>
+        </section>
+      )}
+
+      {data.tier_breakdown.length > 0 && (
+        <section>
+          <h2 className="mb-2 text-[14px] font-bold">Tier breakdown</h2>
+          <div className="flex flex-wrap gap-2">
+            {data.tier_breakdown.map((t) => (
+              <span key={t.tier} className="rounded-full border border-[#E7E1FF] bg-white px-3 py-1.5 text-[12px] text-[#1E1B4B]">
+                <b className="capitalize text-[#6D4AFF]">{t.tier}</b> · {t.count}
+              </span>
+            ))}
+          </div>
+        </section>
+      )}
+
       <section>
         <h2 className="mb-2 text-[14px] font-bold">Signups ({data.recent_signups.length})</h2>
         {data.recent_signups.length === 0 ? (

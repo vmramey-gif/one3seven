@@ -249,6 +249,8 @@ export interface SignupRow {
   tier: string | null;
   sub_status: string;
 }
+export interface TierCount { tier: string; count: number; }
+export interface DailyPoint { day: string; visits: number; signups: number; }
 export interface SiteAnalytics {
   landing_visits: number;
   for_firms_visits: number;
@@ -259,6 +261,8 @@ export interface SiteAnalytics {
   pilot_submits: number;
   pilot_success: number;
   signups_count: number;
+  tier_breakdown: TierCount[];
+  daily: DailyPoint[];
   recent_signups: SignupRow[];
 }
 
