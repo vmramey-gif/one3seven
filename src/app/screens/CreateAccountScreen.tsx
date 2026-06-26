@@ -85,12 +85,12 @@ export function CreateAccountScreen({ onNavigate, onCreateAccount, onGoogleAuth 
   };
 
   return (
-    <div className="min-h-screen bg-[#F6F2FF] text-[#1E1B4B]">
+    <div className="min-h-screen bg-[#FAF9F6] text-[#14112E]">
       {/* Back Navigation */}
       <div className="px-6 pt-6">
         <button
           onClick={() => onNavigate('authWelcome')}
-          className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-normal uppercase tracking-wide text-[#1E1B4B]/60 transition-colors duration-200 hover:bg-[#F7F3FF] hover:text-[#1E1B4B]"
+          className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-normal uppercase tracking-wide text-[#14112E]/60 transition-colors duration-200 hover:bg-[#F5F1FB] hover:text-[#14112E]"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           Back
@@ -104,13 +104,13 @@ export function CreateAccountScreen({ onNavigate, onCreateAccount, onGoogleAuth 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="rounded-[32px] border border-[#E7E1FF] bg-white/95 p-6 shadow-[0_28px_90px_rgba(31,27,75,0.12)] sm:p-8"
+            className="rounded-[32px] border border-[#ECE7F5] bg-white/95 p-6 shadow-[0_28px_90px_rgba(31,27,75,0.12)] sm:p-8"
           >
             {/* Logo */}
             <div className="mb-8 text-center">
               <SeedMark size={36} className="mx-auto mb-3" />
-              <h1 className="mb-2 text-xl font-semibold text-[#1E1B4B]"><WordMark /></h1>
-              <p className="text-sm text-[#1E1B4B]/64">Create your account, then choose your workspace type.</p>
+              <h1 className="mb-2 text-xl font-semibold text-[#14112E]"><WordMark /></h1>
+              <p className="text-sm text-[#14112E]/64">Create your account, then choose your workspace type.</p>
             </div>
 
             {/* Error Message */}
@@ -128,7 +128,7 @@ export function CreateAccountScreen({ onNavigate, onCreateAccount, onGoogleAuth 
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mb-4 rounded-[14px] border border-[#DCD3FF] bg-[#F8F6FF] px-4 py-3 text-sm text-[#1E1B4B]"
+                className="mb-4 rounded-[14px] border border-[#ECE7F5] bg-[#FAF9F6] px-4 py-3 text-sm text-[#14112E]"
               >
                 {info}
               </motion.div>
@@ -138,91 +138,91 @@ export function CreateAccountScreen({ onNavigate, onCreateAccount, onGoogleAuth 
             <form onSubmit={handleSubmit} className="mb-6 space-y-4">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-[#1E1B4B]">First name</label>
+                  <label className="mb-2 block text-sm font-medium text-[#14112E]">First name</label>
                   <div className="relative">
-                    <User className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#1E1B4B]/38" />
+                    <User className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#14112E]/38" />
                     <input
                       type="text"
                       autoComplete="given-name"
                       value={firstName}
                       onChange={(e) => setFirstName(e.target.value)}
                       placeholder="First"
-                      className="w-full rounded-2xl border border-[#DCD3FF] bg-[#F8F6FF] py-4 pl-12 pr-4 text-sm text-[#1E1B4B] placeholder:text-[#1E1B4B]/38 focus:border-[#6D4AFF] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#6D4AFF]/10"
+                      className="w-full rounded-2xl border border-[#ECE7F5] bg-[#FAF9F6] py-4 pl-12 pr-4 text-sm text-[#14112E] placeholder:text-[#14112E]/38 focus:border-[#5B21B6] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#5B21B6]/10"
                       required
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-[#1E1B4B]">Last name</label>
+                  <label className="mb-2 block text-sm font-medium text-[#14112E]">Last name</label>
                   <input
                     type="text"
                     autoComplete="family-name"
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
                     placeholder="Last"
-                    className="w-full rounded-2xl border border-[#DCD3FF] bg-[#F8F6FF] py-4 px-4 text-sm text-[#1E1B4B] placeholder:text-[#1E1B4B]/38 focus:border-[#6D4AFF] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#6D4AFF]/10"
+                    className="w-full rounded-2xl border border-[#ECE7F5] bg-[#FAF9F6] py-4 px-4 text-sm text-[#14112E] placeholder:text-[#14112E]/38 focus:border-[#5B21B6] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#5B21B6]/10"
                     required
                   />
                 </div>
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-[#1E1B4B]">Phone</label>
+                <label className="mb-2 block text-sm font-medium text-[#14112E]">Phone</label>
                 <div className="relative">
-                  <Phone className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#1E1B4B]/38" />
+                  <Phone className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#14112E]/38" />
                   <input
                     type="tel"
                     autoComplete="tel"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="(555) 555-5555"
-                    className="w-full rounded-2xl border border-[#DCD3FF] bg-[#F8F6FF] py-4 pl-12 pr-4 text-sm text-[#1E1B4B] placeholder:text-[#1E1B4B]/38 focus:border-[#6D4AFF] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#6D4AFF]/10"
+                    className="w-full rounded-2xl border border-[#ECE7F5] bg-[#FAF9F6] py-4 pl-12 pr-4 text-sm text-[#14112E] placeholder:text-[#14112E]/38 focus:border-[#5B21B6] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#5B21B6]/10"
                   />
                 </div>
-                <p className="mt-1.5 text-xs text-[#1E1B4B]/52">Optional — so a firm can reach you about your intake.</p>
+                <p className="mt-1.5 text-xs text-[#14112E]/52">Optional — so a firm can reach you about your intake.</p>
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-[#1E1B4B]">Email</label>
+                <label className="mb-2 block text-sm font-medium text-[#14112E]">Email</label>
                 <div className="relative">
-                  <Mail className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#1E1B4B]/38" />
+                  <Mail className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#14112E]/38" />
                   <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="your@email.com"
-                    className="w-full rounded-2xl border border-[#DCD3FF] bg-[#F8F6FF] py-4 pl-12 pr-4 text-sm text-[#1E1B4B] placeholder:text-[#1E1B4B]/38 focus:border-[#6D4AFF] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#6D4AFF]/10"
+                    className="w-full rounded-2xl border border-[#ECE7F5] bg-[#FAF9F6] py-4 pl-12 pr-4 text-sm text-[#14112E] placeholder:text-[#14112E]/38 focus:border-[#5B21B6] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#5B21B6]/10"
                     required
                   />
                 </div>
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-[#1E1B4B]">Password</label>
+                <label className="mb-2 block text-sm font-medium text-[#14112E]">Password</label>
                 <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#1E1B4B]/38" />
+                  <Lock className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#14112E]/38" />
                   <input
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full rounded-2xl border border-[#DCD3FF] bg-[#F8F6FF] py-4 pl-12 pr-4 text-sm text-[#1E1B4B] placeholder:text-[#1E1B4B]/38 focus:border-[#6D4AFF] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#6D4AFF]/10"
+                    className="w-full rounded-2xl border border-[#ECE7F5] bg-[#FAF9F6] py-4 pl-12 pr-4 text-sm text-[#14112E] placeholder:text-[#14112E]/38 focus:border-[#5B21B6] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#5B21B6]/10"
                     required
                   />
                 </div>
-                <p className="mt-1.5 text-xs text-[#1E1B4B]/52">Must be at least 8 characters</p>
+                <p className="mt-1.5 text-xs text-[#14112E]/52">Must be at least 8 characters</p>
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-[#1E1B4B]">Confirm Password</label>
+                <label className="mb-2 block text-sm font-medium text-[#14112E]">Confirm Password</label>
                 <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#1E1B4B]/38" />
+                  <Lock className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#14112E]/38" />
                   <input
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full rounded-2xl border border-[#DCD3FF] bg-[#F8F6FF] py-4 pl-12 pr-4 text-sm text-[#1E1B4B] placeholder:text-[#1E1B4B]/38 focus:border-[#6D4AFF] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#6D4AFF]/10"
+                    className="w-full rounded-2xl border border-[#ECE7F5] bg-[#FAF9F6] py-4 pl-12 pr-4 text-sm text-[#14112E] placeholder:text-[#14112E]/38 focus:border-[#5B21B6] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#5B21B6]/10"
                     required
                   />
                 </div>
@@ -231,7 +231,7 @@ export function CreateAccountScreen({ onNavigate, onCreateAccount, onGoogleAuth 
               <button
                 type="submit"
                 disabled={submitting}
-                className="flex w-full items-center justify-center gap-2 rounded-full bg-[#6D4AFF] px-6 py-4 font-medium text-white shadow-[0_18px_48px_rgba(109,74,255,0.26)] transition hover:-translate-y-0.5 hover:bg-[#5B35D5] disabled:translate-y-0 disabled:opacity-60"
+                className="flex w-full items-center justify-center gap-2 rounded-full bg-[#5B21B6] px-6 py-4 font-medium text-white shadow-[0_18px_48px_rgba(109,74,255,0.26)] transition hover:-translate-y-0.5 hover:bg-[#4C1D96] disabled:translate-y-0 disabled:opacity-60"
               >
                 Continue
                 <ArrowRight className="w-5 h-5" />
@@ -241,10 +241,10 @@ export function CreateAccountScreen({ onNavigate, onCreateAccount, onGoogleAuth 
             {/* Divider */}
             <div className="relative mb-6">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-[#E7E1FF]"></div>
+                <div className="w-full border-t border-[#ECE7F5]"></div>
               </div>
               <div className="relative flex justify-center text-xs">
-                <span className="bg-white px-3 uppercase tracking-wide text-[#1E1B4B]/52">Or</span>
+                <span className="bg-white px-3 uppercase tracking-wide text-[#14112E]/52">Or</span>
               </div>
             </div>
 
@@ -252,17 +252,17 @@ export function CreateAccountScreen({ onNavigate, onCreateAccount, onGoogleAuth 
             <button
               type="button"
               onClick={() => void onGoogleAuth?.()}
-              className="w-full rounded-full border border-[#DCD3FF] bg-white px-6 py-4 text-sm font-medium text-[#1E1B4B] shadow-[0_12px_32px_rgba(31,27,75,0.08)] transition-colors hover:bg-[#F7F3FF]"
+              className="w-full rounded-full border border-[#ECE7F5] bg-white px-6 py-4 text-sm font-medium text-[#14112E] shadow-[0_12px_32px_rgba(31,27,75,0.08)] transition-colors hover:bg-[#F5F1FB]"
             >
               Continue with Google
             </button>
 
             {/* Sign In Link */}
             <div className="mt-8 text-center">
-              <span className="text-sm text-[#1E1B4B]/64">Already have an account? </span>
+              <span className="text-sm text-[#14112E]/64">Already have an account? </span>
               <button
                 onClick={() => onNavigate('signIn')}
-                className="text-sm font-medium text-[#5B35D5] hover:underline"
+                className="text-sm font-medium text-[#4C1D96] hover:underline"
               >
                 Sign in
               </button>

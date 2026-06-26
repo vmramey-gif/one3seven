@@ -105,7 +105,6 @@ export async function triggerIntakeFactExtraction(
     body: { intake_id: intakeId, batch: true },
   });
 
-  console.log('[o3s-extraction] invoke response:', { data, error });
 
   if (error) return { triggered: 0, skipped: 0, errors: [error.message] };
   if (data?.error) return { triggered: 0, skipped: 0, errors: [data.error] };

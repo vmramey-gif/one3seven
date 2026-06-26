@@ -677,7 +677,6 @@ export function IntakeReviewScreen({
 
     try {
       const result = await triggerIntakeFactExtraction(intakeId);
-      console.log('[o3s-extraction] result:', JSON.stringify(result));
 
       clearTimeout(timeoutId);
 

@@ -196,7 +196,7 @@ export function WorkerTimelineScreen({
         ) : rows.length === 0 && SHOW_SAMPLE_INTAKE && !(uploadFallbackTimeline && uploadFallbackTimeline.length) ? (
           <div className="rounded-[14px] border border-dashed border-amber-200 bg-amber-50/60 p-6">
             <p className="text-xs font-semibold text-amber-950 mb-1">{SAMPLE_DEMO_LABEL}</p>
-            <p className="text-sm text-slate-800 mb-3">Sample timeline entry (layout preview only).</p>
+            <p className="text-sm text-[#14112E] mb-3">Sample timeline entry (layout preview only).</p>
             <button
               type="button"
               onClick={() =>

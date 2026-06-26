@@ -881,29 +881,12 @@ export default function App() {
                 const firmScreen = intakeData.firmProfileNeedsSetup(firmProfileForRouting)
                   ? 'firmSettings'
                   : 'firmDashboard';
-                console.log('sign-in role:', routingProfile.role, 'firm intent:', firmIntent, 'routing to:', firmScreen);
                 firmSignInIntentRef.current = false;
                 setCurrentScreen(firmScreen);
               } else if (routingProfile?.role === 'worker') {
-                console.log(
-                  'sign-in role:',
-                  routingProfile.role,
-                  'firm intent:',
-                  firmIntent,
-                  'routing to:',
-                  firmIntent ? 'firmDashboard' : 'landing'
-                );
                 firmSignInIntentRef.current = false;
                 setCurrentScreen(firmIntent ? 'firmDashboard' : 'landing');
               } else {
-                console.log(
-                  'sign-in role:',
-                  routingProfile?.role ?? 'none',
-                  'firm intent:',
-                  firmIntent,
-                  'routing to:',
-                  'roleSelection'
-                );
                 setUserRole(null);
                 firmSignInIntentRef.current = false;
                 setCurrentScreen('roleSelection');
@@ -1063,7 +1046,6 @@ export default function App() {
     setWorkerIntakeChannel('participating');
     setWorkerIntakeWorkflow('Matching Participating Firms');
     setParticipatingPreviewSent(true);
-    console.log(`Intake ${submittedIntake.id} routed to ${eligibleFirmIds.length} eligible firms:`, eligibleFirmIds);
   };
 
   const updateSubmittedIntake = (intakeId: string, updates: Partial<IntakeWorkspace>) => {
@@ -2462,7 +2444,7 @@ export default function App() {
       provider: 'google',
       options: { redirectTo },
     });
-    if (error) window.alert(error.message);
+    if (error) window.alert(/not enabled|unsupported provider/i.test(error.message) ? 'Google sign-in isn’t available yet — please continue with email and password.' : error.message);
   };
 
   /** Link firm on intake row only (upload gate / modal). Does not submit or create firm route. */
@@ -3214,7 +3196,7 @@ export default function App() {
       } catch {
         /* ignore */
       }
-      window.alert(error.message);
+      window.alert(/not enabled|unsupported provider/i.test(error.message) ? 'Google sign-in isn’t available yet — please continue with email and password.' : error.message);
     }
   };
 
