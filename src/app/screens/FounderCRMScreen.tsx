@@ -114,9 +114,10 @@ function PriorityBadge({ priority }: { priority: 'A' | 'B' | 'C' | null }) {
 export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => void; isFounder?: boolean }) {
   const [tab, setTab] = useState<Tab>('dashboard');
   const [userEmail, setUserEmail] = useState('');
+  const [userId, setUserId] = useState<string | null>(null);
   const showEconomics = ECON_ALLOWED_EMAILS.includes(userEmail.trim().toLowerCase());
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUserEmail(data.user?.email ?? ''));
+    supabase.auth.getUser().then(({ data }) => { setUserEmail(data.user?.email ?? ''); setUserId(data.user?.id ?? null); });
   }, []);
   const [firms, setFirms] = useState<CrmFirm[]>([]);
   const [activity, setActivity] = useState<CrmActivityWithFirm[]>([]);
@@ -209,7 +210,7 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
           <>
             {tab === 'dashboard' && <DashboardTab firms={firms} activity={activity} today={today} onLog={openFast} workerCount={workerCount} onChanged={load} />}
             {tab === 'pipeline' && <PipelineTab firms={firms} onLog={openFast} workerCount={workerCount} />}
-            {tab === 'firms' && <FirmsTab firms={firms} onLog={openFast} />}
+            {tab === 'firms' && <FirmsTab firms={firms} onLog={openFast} userId={userId} />}
             {tab === 'activity' && <ActivityTab activity={activity} />}
             {tab === 'metrics' && <MetricsTab firms={firms} activity={activity} />}
             {tab === 'team' && <TeamTab />}
@@ -313,6 +314,11 @@ function FirmCard({ firm, onLog, today }: { firm: CrmFirm; onLog: (id: string) =
           <PriorityBadge priority={firm.priority} />
           {due && <span className="shrink-0 rounded-full bg-red-100 px-1.5 py-0.5 text-[10px] font-bold text-red-600">due</span>}
         </button>
+        {firm.contacted_by_name && (
+          <span className="shrink-0 rounded-full bg-[#EDE7FF] px-2 py-0.5 text-[10px] font-semibold text-[#6D4AFF]" title={`Contacted by ${firm.contacted_by_name}`}>
+            {firm.contacted_by_name.split(' ')[0]}
+          </span>
+        )}
         <StageTag stage={firm.stage} />
         {firm.phone && (
           <a href={`tel:${digitsOf(firm.phone)}`} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-600" aria-label={`Call ${firm.name}`}>
@@ -905,12 +911,29 @@ function PipelineTab({ firms, onLog, workerCount }: { firms: CrmFirm[]; onLog: (
 }
 
 // ── Firms ────────────────────────────────────────────────────────────────────
-function FirmsTab({ firms, onLog }: { firms: CrmFirm[]; onLog: (id: string) => void }) {
+function FirmsTab({ firms, onLog, userId }: { firms: CrmFirm[]; onLog: (id: string) => void; userId: string | null }) {
   const [stage, setStage] = useState<CrmStage | ''>('');
   const [priority, setPriority] = useState<'A' | 'B' | 'C' | ''>('');
-  const filtered = firms.filter((f) => (!stage || f.stage === stage) && (!priority || f.priority === priority));
+  const [owner, setOwner] = useState<'all' | 'mine' | 'uncontacted'>('all');
+  const filtered = firms.filter((f) =>
+    (!stage || f.stage === stage) &&
+    (!priority || f.priority === priority) &&
+    (owner === 'all' ||
+      (owner === 'mine' && !!userId && f.contacted_by === userId) ||
+      (owner === 'uncontacted' && !f.contacted_by))
+  );
+  const mineCount = userId ? firms.filter((f) => f.contacted_by === userId).length : 0;
+  const uncontacted = firms.filter((f) => !f.contacted_by).length;
   return (
     <div className="space-y-4">
+      {/* Owner filter — separates each rep's credit and the remaining list */}
+      <div className="flex gap-1.5">
+        {([['all', `All (${firms.length})`], ['mine', `Mine (${mineCount})`], ['uncontacted', `To contact (${uncontacted})`]] as const).map(([key, label]) => (
+          <button key={key} type="button" onClick={() => setOwner(key)} className={`flex-1 rounded-[10px] border px-2 py-2 text-[12px] font-semibold transition ${owner === key ? 'border-[#6D4AFF] bg-[#6D4AFF] text-white' : 'border-[#E7E1FF] text-[#1E1B4B]/60 hover:border-[#B8A8FF]'}`}>
+            {label}
+          </button>
+        ))}
+      </div>
       <div className="flex flex-wrap gap-2">
         <select value={stage} onChange={(e) => setStage(e.target.value as CrmStage | '')} className={`${tap} rounded-[10px] border border-[#E7E1FF] bg-white px-3 text-[13px]`}>
           <option value="">All stages</option>
@@ -922,7 +945,7 @@ function FirmsTab({ firms, onLog }: { firms: CrmFirm[]; onLog: (id: string) => v
         </select>
       </div>
       {filtered.length === 0 ? (
-        <p className="rounded-[12px] border border-[#E7E1FF] bg-white px-4 py-3 text-[13px] text-[#1E1B4B]/45">No firms match. Add some in the Add / Log tab.</p>
+        <p className="rounded-[12px] border border-[#E7E1FF] bg-white px-4 py-3 text-[13px] text-[#1E1B4B]/45">No firms match this filter.</p>
       ) : (
         <div className="space-y-3">{filtered.map((f) => <FirmCard key={f.id} firm={f} onLog={onLog} today={todayISO()} />)}</div>
       )}
@@ -998,8 +1021,33 @@ function MetricsTab({ firms, activity }: { firms: CrmFirm[]; activity: CrmActivi
 
   const mins = avgMinutesSaved(firms);
 
+  const creditByRep = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const f of firms) {
+      if (f.contacted_by_name) m.set(f.contacted_by_name, (m.get(f.contacted_by_name) ?? 0) + 1);
+    }
+    return [...m.entries()].sort((a, b) => b[1] - a[1]);
+  }, [firms]);
+
   return (
     <div className="space-y-6">
+      <section>
+        <h2 className="mb-2 text-[14px] font-bold">Firms contacted — credit by rep</h2>
+        <div className="rounded-[14px] border border-[#E7E1FF] bg-white p-4">
+          {creditByRep.length === 0 ? (
+            <p className="text-[13px] text-[#1E1B4B]/45">No firms contacted yet. Logging a firm credits the rep who logged it first.</p>
+          ) : (
+            <div className="space-y-2">
+              {creditByRep.map(([name, n]) => (
+                <div key={name} className="flex items-center justify-between text-[13px]">
+                  <span className="font-semibold text-[#1E1B4B]">{name}</span>
+                  <span className="rounded-full bg-[#EDE7FF] px-2.5 py-0.5 text-[12px] font-bold text-[#6D4AFF]">{n} firm{n === 1 ? '' : 's'}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
       <section>
         <h2 className="mb-2 text-[14px] font-bold">Time saved (the value claim)</h2>
         <div className="rounded-[14px] border border-[#DCD3FF] bg-[#F7F3FF] p-4">

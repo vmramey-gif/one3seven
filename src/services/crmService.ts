@@ -28,6 +28,10 @@ export interface CrmFirm {
   subscription_tier: 'solo' | 'practice' | 'firm' | null;
   /** Firm's own estimate of minutes saved per intake — the value claim, measured. */
   est_minutes_saved: number | null;
+  /** Rep attribution — who first contacted this firm (claim model) and when. */
+  contacted_by: string | null;
+  contacted_by_name: string | null;
+  contacted_at: string | null;
   created_at: string;
 }
 
@@ -43,6 +47,8 @@ export interface CrmActivity {
   next_followup: string | null;
   new_stage: CrmStage | null;
   notes: string | null;
+  logged_by: string | null;
+  logged_by_name: string | null;
   created_at: string;
 }
 
@@ -297,10 +303,13 @@ export async function listActivity(limit = 100): Promise<{ data: CrmActivityWith
 export async function logActivity(input: LogActivityInput): Promise<{ error?: string }> {
   const { data: firm, error: fErr } = await supabase
     .from('crm_firms')
-    .select('stage, next_followup')
+    .select('stage, next_followup, contacted_by')
     .eq('id', input.firm_id)
     .single();
   if (fErr || !firm) return { error: fErr?.message ?? 'Firm not found.' };
+
+  // Who is logging this — for per-rep credit.
+  const me = await getCurrentMember();
 
   const activityRow = {
     firm_id: input.firm_id,
@@ -313,6 +322,8 @@ export async function logActivity(input: LogActivityInput): Promise<{ error?: st
     next_followup: input.next_followup || null,
     new_stage: input.new_stage ? input.new_stage : null,
     notes: clean(input.notes),
+    logged_by: me.id,
+    logged_by_name: me.name,
   };
   const { error: aErr } = await supabase.from('crm_activity').insert(activityRow);
   if (aErr) return { error: aErr.message };
@@ -326,9 +337,17 @@ export async function logActivity(input: LogActivityInput): Promise<{ error?: st
     (firm.next_followup as string | null) ?? null
   );
 
+  // Claim model: the first rep to log a firm owns the credit. Don't overwrite once set.
+  const firmUpdate: Record<string, unknown> = { stage: nextStage, next_followup: nextFollowup };
+  if (!firm.contacted_by && me.id) {
+    firmUpdate.contacted_by = me.id;
+    firmUpdate.contacted_by_name = me.name;
+    firmUpdate.contacted_at = new Date().toISOString();
+  }
+
   const { error: uErr } = await supabase
     .from('crm_firms')
-    .update({ stage: nextStage, next_followup: nextFollowup })
+    .update(firmUpdate)
     .eq('id', input.firm_id);
   if (uErr) return { error: uErr.message };
   return {};
