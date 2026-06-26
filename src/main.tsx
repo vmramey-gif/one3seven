@@ -16,12 +16,13 @@ import { PrivacyPage } from './app/screens/PrivacyPage.tsx';
 import { ForFirmsPage } from './app/screens/ForFirmsPage.tsx';
 import { OFFLINE_DEV_GALLERY_ONLY } from './lib/supabaseAvailability.ts';
 import { isSupabaseConfigured } from './lib/supabaseClient';
-import { pageview } from './lib/analytics';
+import { pageview, startHeartbeat } from './lib/analytics';
 
 const rootEl = document.getElementById('root')!;
 
-// First-party pageview (cookieless, no PII, honors DNT).
+// First-party pageview (cookieless, no PII, honors DNT) + session-length heartbeat.
 pageview();
+startHeartbeat();
 
 // Public demo route — no login required.
 // Triggered by /?demo, /demo, or #demo in the URL.

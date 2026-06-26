@@ -46,3 +46,20 @@ export function track(event: string, props?: Record<string, unknown>): void {
 export function pageview(): void {
   track('pageview');
 }
+
+let heartbeatStarted = false;
+/**
+ * Periodic heartbeat so session length is measurable: a session's duration is the time
+ * between its first and last web_events row. Only beats while the tab is visible. Idempotent.
+ */
+export function startHeartbeat(): void {
+  try {
+    if (heartbeatStarted || typeof window === 'undefined' || dntEnabled() || !isSupabaseConfigured()) return;
+    heartbeatStarted = true;
+    const beat = () => { if (document.visibilityState === 'visible') track('heartbeat'); };
+    window.setTimeout(beat, 15000);
+    window.setInterval(beat, 30000);
+  } catch {
+    /* analytics never breaks the app */
+  }
+}

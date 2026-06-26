@@ -9,14 +9,14 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Phone, Mail, Calendar, ArrowLeft, Plus, X, TrendingUp,
   ClipboardList, LayoutGrid, Building2, BookOpen, BarChart3, CheckCircle2,
-  GraduationCap, ListChecks, Check, MessageSquare, Send, StickyNote, Trash2, ChevronRight, ShieldCheck, RefreshCw, AlertTriangle, DollarSign, Flame, Sparkles, Trophy, Calculator, Link2, Copy, ExternalLink,
+  GraduationCap, ListChecks, Check, MessageSquare, Send, StickyNote, Trash2, ChevronRight, ShieldCheck, RefreshCw, AlertTriangle, DollarSign, Flame, Sparkles, Trophy, Calculator, Link2, Copy, ExternalLink, Globe,
 } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
 import {
   listFirms, listActivity, addFirm, logActivity,
   listMessages, sendMessage, getCurrentMember,
-  listNotes, addNote, deleteNote, getIntakesCount, setFirmStage, setFirmMinutesSaved,
-  type CrmFirm, type CrmActivityWithFirm, type NewFirmInput, type LogActivityInput, type CrmMessage, type CrmNote,
+  listNotes, addNote, deleteNote, getIntakesCount, setFirmStage, setFirmMinutesSaved, getSiteAnalytics,
+  type CrmFirm, type CrmActivityWithFirm, type NewFirmInput, type LogActivityInput, type CrmMessage, type CrmNote, type SiteAnalytics,
 } from '../../services/crmService';
 import {
   computeRevenue, targetColor, dailyTargetsContext, tierPrice, avgMinutesSaved, DAILY_TARGETS, PHASE1_PAYING_TARGET, COMMISSION_RATE, TIER_PRICES,
@@ -30,7 +30,7 @@ import { AUDIT_SITE_CHECKS, AUDIT_MANUAL_GROUPS } from '../constants/crmAudit';
 import { crmFirmIntel } from '../constants/crmFirmIntel';
 import { STARTER_QUESTIONS, askAssistant, type ChatMessage } from '../../services/chatAssistant';
 
-type Tab = 'dashboard' | 'pipeline' | 'firms' | 'activity' | 'metrics' | 'revenue' | 'comp' | 'economics' | 'team' | 'notes' | 'scripts' | 'training' | 'askai' | 'checklist' | 'audit' | 'links' | 'add';
+type Tab = 'dashboard' | 'pipeline' | 'firms' | 'activity' | 'metrics' | 'revenue' | 'comp' | 'economics' | 'growth' | 'team' | 'notes' | 'scripts' | 'training' | 'askai' | 'checklist' | 'audit' | 'links' | 'add';
 
 // Every URL off www.one3seven.com, grouped — the founder "links in one place" directory.
 const SITE_BASE = 'https://www.one3seven.com';
@@ -71,6 +71,7 @@ const TABS: { id: Tab; label: string; icon: typeof LayoutGrid; founderOnly?: boo
   { id: 'training', label: 'Training', icon: GraduationCap },
   { id: 'comp', label: 'Earnings', icon: Trophy },
   { id: 'economics', label: 'Company Economics', icon: Calculator, econOnly: true },
+  { id: 'growth', label: 'Growth', icon: Globe, econOnly: true },
   { id: 'links', label: 'Links', icon: Link2, founderOnly: true },
   { id: 'askai', label: 'Ask one3seven AI', icon: Sparkles },
   { id: 'checklist', label: 'Checklist', icon: ListChecks, founderOnly: true },
@@ -238,6 +239,7 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
             {tab === 'revenue' && isFounder && <RevenueTab firms={firms} />}
             {tab === 'comp' && <CompTab firms={firms} />}
             {tab === 'economics' && showEconomics && <CompanyEconomicsTab firms={firms} />}
+            {tab === 'growth' && showEconomics && <GrowthTab />}
             {tab === 'links' && isFounder && <LinksTab />}
             {tab === 'add' && (
               <AddLogTab firms={firms} lastFirmId={lastFirmId} onSaved={(fid) => { if (fid) setLastFirmId(fid); void load(); }} setError={setError} />
@@ -776,6 +778,94 @@ function CompanyEconomicsTab({ firms }: { firms: CrmFirm[] }) {
             Illustration only — assumes all firms on the {tier} tier, retained {months} month{months === 1 ? '' : 's'}. Margin improves with scale as fixed infra amortizes. Excludes founder time, counsel, and E&O.
           </p>
         </div>
+      </section>
+    </div>
+  );
+}
+
+/** Growth analytics — site traffic, demo engagement, and the signup log (allowlisted accounts). */
+function GrowthTab() {
+  const [data, setData] = useState<SiteAnalytics | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [err, setErr] = useState('');
+
+  useEffect(() => {
+    void (async () => {
+      setLoading(true);
+      const r = await getSiteAnalytics();
+      if (r.error) setErr(r.error);
+      else setData(r.data ?? null);
+      setLoading(false);
+    })();
+  }, []);
+
+  const fmtDuration = (sec: number) => {
+    const s = Math.round(sec);
+    if (s < 60) return `${s}s`;
+    const m = Math.floor(s / 60);
+    return `${m}m ${s % 60}s`;
+  };
+  const fmtDate = (iso: string) => { try { return new Date(iso).toLocaleDateString(); } catch { return iso; } };
+
+  if (loading) return <p className="text-[13px] text-[#1E1B4B]/45">Loading analytics…</p>;
+  if (err) return <p className="rounded-[12px] border border-red-200 bg-red-50 px-4 py-3 text-[13px] text-red-700">{err}</p>;
+  if (!data) return <p className="text-[13px] text-[#1E1B4B]/45">No data yet.</p>;
+
+  const Stat = ({ label, value }: { label: string; value: string | number }) => (
+    <div className="rounded-[12px] border border-[#E7E1FF] bg-white p-4">
+      <div className="text-[24px] font-black leading-none text-[#6D4AFF]">{value}</div>
+      <div className="mt-1 text-[11px] font-semibold text-[#1E1B4B]/55">{label}</div>
+    </div>
+  );
+
+  return (
+    <div className="space-y-5">
+      <section>
+        <h2 className="mb-2 text-[14px] font-bold">Traffic</h2>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+          <Stat label="Landing page visits" value={data.landing_visits.toLocaleString()} />
+          <Stat label="For-firms visits" value={data.for_firms_visits.toLocaleString()} />
+          <Stat label="Demo visits" value={data.demo_visits.toLocaleString()} />
+          <Stat label="Total sessions" value={data.total_sessions.toLocaleString()} />
+          <Stat label="Avg time on site" value={fmtDuration(data.avg_session_seconds)} />
+          <Stat label="Avg time in demos" value={fmtDuration(data.demo_avg_session_seconds)} />
+        </div>
+      </section>
+
+      <section>
+        <h2 className="mb-2 text-[14px] font-bold">Conversion</h2>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <Stat label="Pilot form starts" value={data.pilot_submits.toLocaleString()} />
+          <Stat label="Pilot requests sent" value={data.pilot_success.toLocaleString()} />
+          <Stat label="Accounts created" value={data.signups_count.toLocaleString()} />
+          <Stat label="Recent shown" value={data.recent_signups.length} />
+        </div>
+      </section>
+
+      <section>
+        <h2 className="mb-2 text-[14px] font-bold">Signups ({data.recent_signups.length})</h2>
+        {data.recent_signups.length === 0 ? (
+          <p className="rounded-[12px] border border-[#E7E1FF] bg-white px-4 py-3 text-[13px] text-[#1E1B4B]/45">No accounts yet.</p>
+        ) : (
+          <div className="space-y-2">
+            {data.recent_signups.map((s, i) => (
+              <div key={s.email + i} className="flex items-center gap-3 rounded-[12px] border border-[#E7E1FF] bg-white p-3">
+                <div className="min-w-0 flex-1">
+                  <div className="truncate text-[13px] font-semibold text-[#1E1B4B]">{s.name}</div>
+                  <div className="truncate text-[11px] text-[#1E1B4B]/50">{s.email} · {fmtDate(s.created_at)}</div>
+                </div>
+                {s.tier ? (
+                  <span className="shrink-0 rounded-full bg-[#F3EFFF] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-[#6D4AFF]">{s.tier}{s.sub_status && s.sub_status !== 'active' ? ` · ${s.sub_status}` : ''}</span>
+                ) : (
+                  <span className="shrink-0 rounded-full border border-[#E7E1FF] px-2.5 py-1 text-[10px] font-semibold text-[#1E1B4B]/45">worker</span>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+        <p className="mt-3 text-[11px] leading-relaxed text-[#1E1B4B]/45">
+          Time-on-site is measured from new sessions going forward (heartbeat-based). Tier shows for firm accounts with a subscription; workers have no tier.
+        </p>
       </section>
     </div>
   );

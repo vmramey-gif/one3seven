@@ -242,6 +242,33 @@ export async function claimRepAccess(): Promise<boolean> {
   }
 }
 
+export interface SignupRow {
+  name: string;
+  email: string;
+  created_at: string;
+  tier: string | null;
+  sub_status: string;
+}
+export interface SiteAnalytics {
+  landing_visits: number;
+  for_firms_visits: number;
+  demo_visits: number;
+  total_sessions: number;
+  avg_session_seconds: number;
+  demo_avg_session_seconds: number;
+  pilot_submits: number;
+  pilot_success: number;
+  signups_count: number;
+  recent_signups: SignupRow[];
+}
+
+/** Growth analytics (traffic + signups + tier). Gated server-side to founder/allowlisted emails. */
+export async function getSiteAnalytics(): Promise<{ data?: SiteAnalytics; error?: string }> {
+  const { data, error } = await supabase.rpc('crm_site_analytics');
+  if (error) return { error: error.message };
+  return { data: data as SiteAnalytics };
+}
+
 export async function listFirms(): Promise<{ data: CrmFirm[]; error?: string }> {
   const { data, error } = await supabase
     .from('crm_firms')
