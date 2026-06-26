@@ -811,6 +811,10 @@ function GrowthTab() {
   if (err) return <p className="rounded-[12px] border border-red-200 bg-red-50 px-4 py-3 text-[13px] text-red-700">{err}</p>;
   if (!data) return <p className="text-[13px] text-[#1E1B4B]/45">No data yet.</p>;
 
+  const daily = data.daily ?? [];
+  const tiers = data.tier_breakdown ?? [];
+  const signups = data.recent_signups ?? [];
+
   const Stat = ({ label, value }: { label: string; value: string | number }) => (
     <div className="rounded-[12px] border border-[#E7E1FF] bg-white p-4">
       <div className="text-[24px] font-black leading-none text-[#6D4AFF]">{value}</div>
@@ -838,17 +842,17 @@ function GrowthTab() {
           <Stat label="Pilot form starts" value={data.pilot_submits.toLocaleString()} />
           <Stat label="Pilot requests sent" value={data.pilot_success.toLocaleString()} />
           <Stat label="Accounts created" value={data.signups_count.toLocaleString()} />
-          <Stat label="Recent shown" value={data.recent_signups.length} />
+          <Stat label="Recent shown" value={signups.length} />
         </div>
       </section>
 
-      {data.daily.length > 0 && (
+      {daily.length > 0 && (
         <section>
           <h2 className="mb-2 text-[14px] font-bold">Last 7 days</h2>
           <div className="space-y-2 rounded-[12px] border border-[#E7E1FF] bg-white p-4">
             {(() => {
-              const max = Math.max(1, ...data.daily.map((d) => d.visits));
-              return data.daily.map((d) => (
+              const max = Math.max(1, ...daily.map((d) => d.visits));
+              return daily.map((d) => (
                 <div key={d.day} className="flex items-center gap-2">
                   <span className="w-14 shrink-0 text-[11px] text-[#1E1B4B]/55">{d.day}</span>
                   <div className="h-4 flex-1 overflow-hidden rounded bg-[#F3EFFF]">
@@ -864,11 +868,11 @@ function GrowthTab() {
         </section>
       )}
 
-      {data.tier_breakdown.length > 0 && (
+      {tiers.length > 0 && (
         <section>
           <h2 className="mb-2 text-[14px] font-bold">Tier breakdown</h2>
           <div className="flex flex-wrap gap-2">
-            {data.tier_breakdown.map((t) => (
+            {tiers.map((t) => (
               <span key={t.tier} className="rounded-full border border-[#E7E1FF] bg-white px-3 py-1.5 text-[12px] text-[#1E1B4B]">
                 <b className="capitalize text-[#6D4AFF]">{t.tier}</b> · {t.count}
               </span>
@@ -878,12 +882,12 @@ function GrowthTab() {
       )}
 
       <section>
-        <h2 className="mb-2 text-[14px] font-bold">Signups ({data.recent_signups.length})</h2>
-        {data.recent_signups.length === 0 ? (
+        <h2 className="mb-2 text-[14px] font-bold">Signups ({signups.length})</h2>
+        {signups.length === 0 ? (
           <p className="rounded-[12px] border border-[#E7E1FF] bg-white px-4 py-3 text-[13px] text-[#1E1B4B]/45">No accounts yet.</p>
         ) : (
           <div className="space-y-2">
-            {data.recent_signups.map((s, i) => (
+            {signups.map((s, i) => (
               <div key={s.email + i} className="flex items-center gap-3 rounded-[12px] border border-[#E7E1FF] bg-white p-3">
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-[13px] font-semibold text-[#1E1B4B]">{s.name}</div>
