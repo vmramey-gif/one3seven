@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { OneThreeSevenLoader } from '../components/ui/OneThreeSevenLoader';
 import { motion } from 'motion/react';
-import { ArrowLeft, FileText, Clock } from 'lucide-react';
+import { ArrowLeft, FileText, Clock, MessageCircle } from 'lucide-react';
 import { Screen } from '../App';
+import { ContactSheet } from '../components/ContactSheet';
 import { isSupabaseConfigured } from '../../lib/supabaseClient';
 import * as intakeData from '../../services/intakeDataService';
 import { NotificationsBell } from '../components/NotificationsBell';
@@ -87,8 +88,11 @@ export function WorkerTimelineScreen({
           : []
       : [];
 
+  const [showContact, setShowContact] = useState(false);
+
   return (
     <div className="min-h-screen bg-[#FAF9F6]">
+      {showContact && <ContactSheet source="workerTimeline" onClose={() => setShowContact(false)} />}
       <nav className="sticky top-0 bg-[#FAF9F6]/85 backdrop-blur-md border-b border-[#ECE7F5] z-50">
         <div className="px-6 py-5 flex items-center justify-between gap-2">
           <button
@@ -227,6 +231,18 @@ export function WorkerTimelineScreen({
             </button>
           </div>
         )}
+
+        {/* Contact / help */}
+        <div className="mt-10 border-t border-[#ECE7F5] pt-5 text-center">
+          <button
+            type="button"
+            onClick={() => setShowContact(true)}
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-[#5B21B6] hover:text-[#4C1D96]"
+          >
+            <MessageCircle className="h-4 w-4" />
+            Questions? Contact us
+          </button>
+        </div>
       </div>
     </div>
   );

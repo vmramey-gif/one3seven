@@ -59,7 +59,8 @@ export class IntakeReviewErrorBoundary extends Component<Props, State> {
               Back to Dashboard
             </button>
             <p className="mt-5 text-xs text-[#1E1B4B]/40">
-              If this keeps happening on the same intake, contact support.
+              If this keeps happening on the same intake, contact{' '}
+              <a href="mailto:info@one3seven.com?subject=Intake%20review%20issue" className="font-semibold text-[#6D4AFF] hover:underline">info@one3seven.com</a>.
             </p>
           </div>
         </div>
