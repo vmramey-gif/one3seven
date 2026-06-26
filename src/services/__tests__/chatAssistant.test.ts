@@ -12,6 +12,11 @@ describe('Ask one3seven AI — system prompt integrity', () => {
   it('contains the 30-day pilot duration', () => {
     expect(SYSTEM_PROMPT).toContain('30-day');
   });
+  it('contains the current scope update (links, bonus, attribution)', () => {
+    expect(SYSTEM_PROMPT).toContain('CURRENT SCOPE UPDATE');
+    expect(SYSTEM_PROMPT).toContain('/for-firms');
+    expect(SYSTEM_PROMPT).toContain('CREDIT / ATTRIBUTION');
+  });
   it('contains the security posture and the no-overclaim guardrail', () => {
     expect(SYSTEM_PROMPT).toContain('SECURITY AND DATA POSTURE');
     expect(SYSTEM_PROMPT).toContain('independently verified');

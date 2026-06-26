@@ -33,7 +33,7 @@ The gap: unbillable time, missed cases, delayed decisions. That gap already exis
 THE FIVE OBJECTIONS (covers ~74% of rejections):
 "We already have a process": Most firms have figured something out. The question is whether your team still spends time sorting records before an attorney can get a clean first look. Are your current tools handling that part?
 
-"Send me something first": Absolutely — one3seven.com, For Law Firms section. Free 30-day pilot, no credit card. I'll send that now and follow up in a couple days.
+"Send me something first": Absolutely — https://www.one3seven.com/for-firms shows exactly what it produces. Free 30-day pilot, no credit card. I'll send that now and follow up in a couple days.
 
 "Not the right time": Completely understand. When would be a better time — is next quarter more realistic, or is intake organization just not a priority right now?
 
@@ -49,6 +49,20 @@ SECURITY AND DATA POSTURE (how to answer a firm's data-security questions — us
 - Analytics: the site uses first-party, cookieless analytics. No third-party advertising tracker touches prospect or worker behavior.
 - Keys/secrets are server-side only; the browser never holds privileged database access.
 - DO NOT CLAIM what one3seven has not earned. Never assert SOC 2, HIPAA, ISO, PCI, "fully penetration-tested," "unhackable," "military/bank-grade encryption," or any certification or third-party audit one3seven does not hold. If a firm sends a security questionnaire or asks about a specific certification, say one3seven is an early-stage controlled beta, offer to walk them through our actual security practices, and route specifics to Victoria. A wrong security promise to win a deal is worse than "let me get you the precise answer." When unsure, escalate to Victoria — do not improvise a security claim.
+
+CURRENT SCOPE UPDATE (June 2026) — tools, process, and pay reps will ask about:
+
+WHERE TO SEND FIRMS: https://www.one3seven.com/for-firms is the dedicated pitch + pilot-request page — send prospects straight there (pilot submissions are captured and tracked). The worker-facing site is one3seven.com. Demos to show or link: /demo (firm view), /worker-demo, /fire-demo.
+
+COLD EMAIL: A free-pilot 3-touch email sequence lives in the CRM "Scripts" tab. Rules: personalize the first line per firm (use the firm card intel), send from a real person (name@one3seven.com), never bulk-blast from the primary domain, and every email needs a mailing address + an honest opt-out (CAN-SPAM). Strongest opener is the gift: "Send me your next messy intake and I'll return it organized in 24 hours — no commitment."
+
+DISTRIBUTION: Cold dialing attorneys is the lowest-yield channel. Higher leverage: CELA (California Employment Lawyers Association) and warm referrals from any firm that says yes. Always send the link rather than dictate it.
+
+COMPENSATION (what a rep earns): 20% recurring monthly commission on every paying firm, for as long as the firm pays. PLUS a launch bonus for the first three firms that convert to paid: $100 for the 1st, $150 for the 2nd, $250 for the 3rd ($500 total), and a $250 sprint bonus if all three land in the sprint window. A "paying firm" means the firm's first invoice has actually cleared — not signed, not pilot-started. Bonus pays within 1-2 business days of the cleared invoice; 30-day clawback if the firm cancels. Reps can model their own upside in the CRM "Earnings" tab (commission + bonus by firm count, tier, and months retained).
+
+CREDIT / ATTRIBUTION: Logging a firm in the CRM credits the rep who logs it first (claim model — credit is not reassigned later). Always log from your OWN signed-in account. Once a firm is logged it drops off the shared "To contact" list and shows your name. Use the Firms tab All / Mine / To-contact filter to see your own credit and what is left.
+
+CONTACT CAPTURE: Prospects and workers reach the team at info@one3seven.com (general) or via the pilot-request form on /for-firms and the in-app contact form. legal@one3seven.com is for legal/privacy/deletion requests only.
 
 FIRE-DISPLACED WORKER CONTEXT:
 Recent workplace displacement events in California mean some workers have limited access to their employment records. one3seven helps these workers organize whatever employment records they can locate before speaking with an attorney. Reps must not discuss settlement validity, release enforceability, chemical exposure, health claims, or legal timelines — those are attorney conversations. one3seven's role is strictly: help the worker get their employment records organized. The relevant sales angle for firms: displaced workers are arriving at plaintiff employment firms with incomplete, scattered records right now. one3seven helps them arrive organized instead.
