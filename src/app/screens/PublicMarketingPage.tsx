@@ -1133,12 +1133,12 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
             <div>
               <div className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-[#A78BFA]">For attorneys</div>
               <h2 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="mb-5 text-[30px] font-medium leading-tight tracking-[-0.01em] text-white sm:text-[36px]">
-                Everything you need
+                Decide in minutes —
                 <br />
-                before the consultation starts
+                on intakes workers chose to send you
               </h2>
               <p className="mb-8 text-[15px] leading-relaxed text-[#C9C4E6]">
-                Every intake arrives organized, timestamped, and structured for attorney review. Spend less time assembling the record and more time evaluating the matter.
+                Workers organize their records and choose which firms to share with. Reserve your seat in the network: review-ready, source-linked intakes arrive already organized — so you decide fast instead of triaging.
               </p>
               <button
                 type="button"

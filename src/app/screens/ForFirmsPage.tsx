@@ -63,15 +63,15 @@ export function ForFirmsPage({ onBack, onStartWorker }: ForFirmsPageProps) {
             Open the file. Decide in minutes.
           </h1>
           <p className="mx-auto mb-8 max-w-[620px] text-[16px] leading-relaxed text-[#C9C4E6] sm:text-[17px]">
-            Scattered client records mean unbillable hours of triage before you can even decide on a
-            matter. one3seven delivers an organized, source-linked intake the moment a worker submits —
-            so you skip the sorting and move straight to the decision.
+            Workers organize their own employment records into a clear, source-linked intake — and
+            choose which firms to send it to. Reserve your seat in the one3seven network and receive
+            review-ready intakes you decide on in minutes, instead of burning hours on triage.
           </p>
           <a
             href="#pilot-interest"
             className="inline-flex items-center justify-center gap-2 rounded-full bg-[#6D4AFF] px-7 py-3.5 text-[15px] font-semibold text-white shadow-[0_16px_48px_rgba(109,74,255,0.40)] transition hover:-translate-y-0.5 hover:bg-[#5B35D5]"
           >
-            Request pilot access
+            Reserve your seat
             <ArrowRight className="h-4 w-4" />
           </a>
         </div>
@@ -169,9 +169,10 @@ export function ForFirmsPage({ onBack, onStartWorker }: ForFirmsPageProps) {
       <section id="pilot-interest" className="px-5 py-16 sm:px-8 sm:py-20">
         <div className="mx-auto max-w-[520px]">
           <div className="mb-6 text-center">
-            <h2 style={SERIF} className="text-[26px] font-medium tracking-[-0.01em] text-white sm:text-[32px]">Request pilot access</h2>
+            <h2 style={SERIF} className="text-[26px] font-medium tracking-[-0.01em] text-white sm:text-[32px]">Reserve your seat</h2>
             <p className="mt-2 text-[14px] leading-relaxed text-[#C9C4E6]">
-              Tell us a little about your firm. We review pilot requests and reach out directly.
+              We're inviting a small number of California employment firms into the network as we build the
+              pipeline. Tell us about your firm and we'll reach out directly.
             </p>
           </div>
 
