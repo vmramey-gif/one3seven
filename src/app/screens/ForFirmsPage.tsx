@@ -60,12 +60,12 @@ export function ForFirmsPage({ onBack, onStartWorker }: ForFirmsPageProps) {
             For law firms
           </div>
           <h1 style={SERIF} className="mb-5 text-[32px] font-medium leading-[1.05] tracking-[-0.01em] text-white sm:text-[46px]">
-            Client records, organized before you open the file.
+            Open the file. Decide in minutes.
           </h1>
           <p className="mx-auto mb-8 max-w-[620px] text-[16px] leading-relaxed text-[#C9C4E6] sm:text-[17px]">
-            Your team spends unbilled hours assembling scattered client records before a matter can be
-            reviewed. one3seven delivers an organized, source-linked intake — so review starts with
-            structure instead of sorting.
+            Scattered client records mean unbillable hours of triage before you can even decide on a
+            matter. one3seven delivers an organized, source-linked intake the moment a worker submits —
+            so you skip the sorting and move straight to the decision.
           </p>
           <a
             href="#pilot-interest"
