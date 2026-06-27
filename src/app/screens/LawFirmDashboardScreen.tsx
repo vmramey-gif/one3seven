@@ -407,8 +407,8 @@ export function LawFirmDashboardScreen({
                 <>
                   <p className="mx-auto mt-8 max-w-xl text-[1.62rem] font-medium leading-tight tracking-[-0.02em] text-[#14112E] sm:text-[2rem]" style={{ fontFamily: "'Fraunces', Georgia, serif" }}>
                     {allIntakes.length === 1
-                      ? '1 intake is ready for review.'
-                      : `${allIntakes.length} intakes are ready for review.`}
+                      ? '1 intake is organized and ready — open and decide in minutes.'
+                      : `${allIntakes.length} intakes are organized and ready — open and decide in minutes.`}
                   </p>
                   {firmIntakeLink ? (
                     <p className="mt-3 text-sm text-[#14112E]/45">

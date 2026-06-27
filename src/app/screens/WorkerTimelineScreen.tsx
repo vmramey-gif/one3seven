@@ -141,7 +141,7 @@ export function WorkerTimelineScreen({
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
           <h1 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="text-[28px] font-medium tracking-[-0.01em] text-[#14112E] mb-2">Timeline</h1>
           <p className="text-sm text-[#6B6685] leading-relaxed">
-            Your key events organized in order. Tap an event for details.
+            Your records, organized and ready — no waiting on a callback. Tap an event for details.
           </p>
         </motion.div>
 
