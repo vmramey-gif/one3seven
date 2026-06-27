@@ -55,7 +55,6 @@ const FIRM_FEATURES = [
 
 const TRUST_ITEMS = [
   'No legal conclusions — attorney decides',
-  'Worker controls when intake is shared',
   'All source documents preserved for direct review',
   'Firm accounts are reviewed before receiving routed intakes',
 ];
@@ -1159,8 +1158,8 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
                   whileHover={{ y: -5, backgroundColor: 'rgba(255,255,255,0.07)' }}
                   transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
                 >
-                  <f.icon className="mb-3 h-5 w-5 text-[#A78BFA]" />
-                  <div className="mb-1 flex items-center text-[13px] font-bold text-white">
+                  <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl bg-[#6D4AFF]/15"><f.icon className="h-[18px] w-[18px] text-[#C4B5FD]" /></div>
+                  <div className="mb-1 flex items-center text-[14px] font-semibold text-white">
                     {f.label}
                     {f.tip && <InfoTooltip tip={f.tip} />}
                   </div>
@@ -1211,7 +1210,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
                   whileHover={{ backgroundColor: 'rgba(255,255,255,0.09)', y: -3 }}
                   transition={{ duration: 0.2, ease: 'easeOut' }}
                 >
-                  <w.Icon className="h-5 w-5 shrink-0 text-[#A78BFA]" strokeWidth={1.5} />
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#6D4AFF]/15"><w.Icon className="h-[18px] w-[18px] text-[#C4B5FD]" strokeWidth={1.5} /></div>
                   <div>
                     <div className="mb-1 text-[14px] font-bold text-white">{w.title}</div>
                     <div className="text-[12px] leading-relaxed text-white/55">{w.body}</div>

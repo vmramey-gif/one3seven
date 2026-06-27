@@ -58,6 +58,10 @@ export const CRM_OBJECTIONS: { objection: string; response: string }[] = [
     objection: '“Just send me some information.”',
     response: 'Happy to — and the fastest way to know if it’s relevant is 15 minutes looking at a real organized intake together. Can I send the one-pager and grab a short slot so it’s not just another email in your inbox?',
   },
+  {
+    objection: '“Why don’t you just sell me cases / leads instead?”',
+    response: 'We deliberately don’t — selling cases per-lead runs into attorney referral and fee-splitting rules (California is strict), and it would put your firm in an awkward spot. one3seven is a software tool you license: it organizes the worker’s own records into a review-ready intake, and the worker controls sharing. You stay fully in charge of who you take on. Same time savings, none of the ethics exposure.',
+  },
 ];
 
 export const CRM_COLD_EMAIL = `EMAIL 1 — opener (Day 0)
