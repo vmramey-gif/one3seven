@@ -64,8 +64,8 @@ export function ForFirmsPage({ onBack, onStartWorker }: ForFirmsPageProps) {
           </h1>
           <p className="mx-auto mb-8 max-w-[620px] text-[16px] leading-relaxed text-[#C9C4E6] sm:text-[17px]">
             Workers organize their own employment records into a clear, source-linked intake — and
-            choose which firms to send it to. Reserve your seat in the one3seven network and receive
-            review-ready intakes you decide on in minutes, instead of burning hours on triage.
+            choose which firm to send it to. Reserve your seat: get a dashboard for the intakes workers
+            send you — review-ready and source-linked — so you decide in minutes instead of triaging.
           </p>
           <a
             href="#pilot-interest"
@@ -171,8 +171,8 @@ export function ForFirmsPage({ onBack, onStartWorker }: ForFirmsPageProps) {
           <div className="mb-6 text-center">
             <h2 style={SERIF} className="text-[26px] font-medium tracking-[-0.01em] text-white sm:text-[32px]">Reserve your seat</h2>
             <p className="mt-2 text-[14px] leading-relaxed text-[#C9C4E6]">
-              We're inviting a small number of California employment firms into the network as we build the
-              pipeline. Tell us about your firm and we'll reach out directly.
+              We're onboarding a small number of California employment firms as we build out. Tell us about
+              your firm and we'll reach out directly.
             </p>
           </div>
 

@@ -182,7 +182,7 @@ const O3S_CONCEPT_SVG = `<svg id="sv" viewBox="0 0 1280 720" xmlns="http://www.w
 <rect x="490" y="288" width="300" height="144" rx="22" fill="#0D0B1E" stroke="#6D4AFF" stroke-width="1.5" filter="url(#firmSh)"/>
 <rect id="logoBling" x="490" y="288" width="300" height="144" rx="22" fill="#F5C842" opacity="0"/>
 <text x="640" y="352" text-anchor="middle" font-size="36" fill="white" font-weight="800" font-family="system-ui">one3seven</text>
-<text x="640" y="378" text-anchor="middle" font-size="12.5" fill="#A78BFA" font-family="system-ui">Organize smarter. Get matched.</text>
+<text x="640" y="378" text-anchor="middle" font-size="12.5" fill="#A78BFA" font-family="system-ui">Organize smarter. You choose.</text>
 <text x="640" y="398" text-anchor="middle" font-size="12.5" fill="#A78BFA" font-family="system-ui">Get justice.</text>
 </g>
 </svg>`;
@@ -1138,7 +1138,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
                 on intakes workers chose to send you
               </h2>
               <p className="mb-8 text-[15px] leading-relaxed text-[#C9C4E6]">
-                Workers organize their records and choose which firms to share with. Reserve your seat in the network: review-ready, source-linked intakes arrive already organized — so you decide fast instead of triaging.
+                Workers organize their records and choose which firm to send their intake to. Get a dashboard for the intakes they send you — review-ready and source-linked — so you decide fast instead of triaging.
               </p>
               <button
                 type="button"
@@ -1202,7 +1202,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
                 { Icon: Lock, title: 'You control sharing', body: 'Your intake is not shared with a firm until you approve sharing or submit through that firm\'s intake link, subject to the platform\'s Privacy Policy and Terms.' },
                 { Icon: MessageSquare, title: 'Plain language, always', body: 'No legal jargon. Your status updates are written in plain English. View available status updates at any time.' },
                 { Icon: CalendarDays, title: 'Your timeline, organized', body: 'Dates, events, and documents are organized into a clear timeline — so your story is easier to follow before you walk into a consultation.' },
-                { Icon: Handshake, title: 'Choose how to share', body: 'Submit directly to a participating firm using its intake link, or authorize your intake to be made available through the participating-firm network.' },
+                { Icon: Handshake, title: 'You choose who receives it', body: 'You decide which firm to send your organized intake to — directly, or through a firm\'s intake link. You\'re in control of who sees it.' },
               ].map((w) => (
                 <motion.div
                   key={w.title}
