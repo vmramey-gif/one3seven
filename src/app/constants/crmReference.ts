@@ -63,6 +63,10 @@ export const CRM_OBJECTIONS: { objection: string; response: string }[] = [
     response: 'We deliberately don’t — selling cases per-lead runs into attorney referral and fee-splitting rules (California is strict), and it would put your firm in an awkward spot. one3seven is a software tool you license: it organizes the worker’s own records into a review-ready intake, and the worker controls sharing. You stay fully in charge of who you take on. Same time savings, none of the ethics exposure.',
   },
   {
+    objection: '“So how do intakes get to me — are you a referral service?”',
+    response: 'No — we’re a software tool, not a referral service. The worker uses one3seven to organize their own records, then chooses which firm to send their intake to and sends it themselves. You get a dashboard for the intakes workers send you. We don’t match, rank, or steer anyone, and you pay a flat subscription — never per client. The worker’s in control of who sees it; you’re in control of what you take.',
+  },
+  {
     objection: '“We already use Eve / another legal AI.”',
     response: 'Different lane. Eve is an enterprise platform — long onboarding, and it leans into drafting and analysis, which edges toward the UPL line. one3seven is organize-only and fast: one intake link, the worker self-serves, and you get a structured, source-linked intake in minutes — so you move faster because the record’s already built. Ten-minute setup, not a 90-day implementation. We never draft, predict, or conclude — you decide.',
   },

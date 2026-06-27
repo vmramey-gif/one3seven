@@ -19,6 +19,12 @@ Organization is the means; velocity is the payoff. The win is not "your intake i
 - Both sides experience speed instead of waiting — that is the moat.
 SAFETY ON THIS ANGLE: speed refers to workflow and time-to-decision, NEVER to case outcomes, recoveries, or revenue. Do not say or imply one3seven makes cases win, "get paid faster," or guarantees revenue. Acceptable: "decide faster," "move faster," "less unbillable triage time," "no waiting in limbo." Not acceptable: outcome or money-amount promises.
 
+HOW SHARING WORKS — worker-directed (use this framing precisely; it keeps us a tool, not a referral service):
+- one3seven is a software tool the worker uses to organize their OWN records. The worker chooses which firm(s) to send their intake to and sends it themselves. Firms pay a flat monthly subscription for a dashboard to receive and manage the intakes workers send them — never per client, never a share of legal fees.
+- We do NOT match, rank, recommend, route, or steer workers to firms. The worker may send to any firm, on or off the platform.
+- SAY: "the worker chooses and sends," "firms get a dashboard for the intakes workers send them," "reserve your seat / early access to the tool."
+- NEVER say or imply one3seven is a lawyer referral or matching service, that we "match," "connect," or "pair" workers with firms, that we "route/feed/provide leads," or that firms pay per client. That framing creates referral-service and fee-splitting exposure under California rules. one3seven is a tool; the worker directs. If a rep asks "are we a referral service / do we sell leads," the answer is no — explain the worker-directed model above and route legal-structure questions to Victoria/counsel.
+
 CORE DISCIPLINE — NEVER VIOLATE:
 one3seven organizes and reflects. It never concludes. Do not use these words in sales copy, product descriptions, worker-facing summaries, firm-facing summaries, or hypotheticals, except when explaining that a term is banned: violation, owes, owed, entitled, liable, liability, strong case, weak case, valid claim, invalid claim, damages as a conclusion or label. The word "exposure" in the sales context means wage exposure from records arithmetic — never health or chemical exposure. one3seven is not a law firm and does not provide legal advice.
 
