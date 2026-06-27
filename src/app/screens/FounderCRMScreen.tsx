@@ -225,7 +225,7 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
         ) : (
           <>
             {tab === 'dashboard' && <DashboardTab firms={firms} activity={activity} today={today} onLog={openFast} workerCount={workerCount} onChanged={load} onQuickEmail={quickEmail} />}
-            {tab === 'pipeline' && <PipelineTab firms={firms} onLog={openFast} workerCount={workerCount} />}
+            {tab === 'pipeline' && <PipelineTab firms={firms} onLog={openFast} workerCount={workerCount} onQuickEmail={quickEmail} />}
             {tab === 'firms' && <FirmsTab firms={firms} onLog={openFast} userId={userId} onQuickEmail={quickEmail} />}
             {tab === 'activity' && <ActivityTab activity={activity} />}
             {tab === 'metrics' && <MetricsTab firms={firms} activity={activity} />}
@@ -1028,7 +1028,7 @@ function RevenueTab({ firms }: { firms: CrmFirm[] }) {
 }
 
 // ── Pipeline ─────────────────────────────────────────────────────────────────
-function PipelineTab({ firms, onLog, workerCount }: { firms: CrmFirm[]; onLog: (id: string) => void; workerCount: number }) {
+function PipelineTab({ firms, onLog, workerCount, onQuickEmail }: { firms: CrmFirm[]; onLog: (id: string) => void; workerCount: number; onQuickEmail?: (id: string) => Promise<void> }) {
   const counts = CRM_STAGES.map((s) => ({ stage: s, n: firms.filter((f) => f.stage === s).length }));
   const priorityA = firms.filter((f) => f.priority === 'A');
   return (

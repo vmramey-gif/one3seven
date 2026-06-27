@@ -34,6 +34,7 @@ import { attorneyCategoryLabel } from './packetStoryPresentation';
 import type { IntakeOrganizationSections, PlaceholderOrganizationResult } from './intakeOrganizationTypes';
 import { refreshSectionsReviewNotes } from './intakeOrganizationSectionsService';
 import { extractEmploymentMatterTagsFromOverview } from '../app/utils/employmentMatterPersistence';
+import type { EmploymentMatterTagId } from '../app/constants/employmentMatter';
 import { logSummarySave, logSummarySaveError, logGeneratedSummaryPreview, logSupabaseWriteResult, measurePayload, safeTrim, trimAssemblyValue } from './summarySaveDiagnostics';
 import { logOrgAudit, logOrgAuditBoundary, logOrgAuditError } from './organizationAudit';
 import {
