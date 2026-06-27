@@ -33,7 +33,7 @@ export const TERMS_OF_SERVICE: LegalDoc = {
       heading: '1. What one3seven is',
       blocks: [
         { type: 'p', text: 'one3seven is a document organization platform operated by One3Seven Ventures LLC, a California limited liability company. one3seven helps workers organize their employment-related documents — including pay stubs, termination letters, HR communications, schedules, and related records — into a structured intake packet.' },
-        { type: 'p', text: 'one3seven is not a law firm. one3seven does not provide legal advice. Use of one3seven does not create an attorney-client relationship between you and one3seven or between you and any participating law firm. one3seven organizes records — attorneys independently evaluate them.' },
+        { type: 'p', text: 'one3seven is not a law firm. one3seven does not provide legal advice. Use of one3seven does not create an attorney-client relationship between you and one3seven or between you and any law firm. one3seven organizes records — attorneys independently evaluate them.' },
       ],
     },
     {
@@ -67,9 +67,9 @@ export const TERMS_OF_SERVICE: LegalDoc = {
     {
       heading: '5. Participating law firms',
       blocks: [
-        { type: 'p', text: 'one3seven maintains a network of participating law firms that may review worker intakes. When you submit your intake to a participating firm — either through a firm-specific link or through the participating-firm network — the firm will receive access to your organized intake summary and supporting documents.' },
-        { type: 'p', text: 'Submitting your intake to a firm does not guarantee that the firm will contact you, accept your matter, or represent you. An attorney-client relationship is created only through a separate written agreement between you and the law firm.' },
-        { type: 'p', text: 'Participating firms are independent businesses. one3seven is not responsible for the conduct, advice, or decisions of participating law firms.' },
+        { type: 'p', text: 'You choose which law firm to send your organized intake to. When you send your intake to a firm — using that firm’s intake link or firm code — that firm receives access to your organized intake summary and supporting documents. one3seven is a software tool: it does not refer, match, recommend, or route you to any law firm.' },
+        { type: 'p', text: 'Sending your intake to a firm does not guarantee that the firm will contact you, accept your matter, or represent you. An attorney-client relationship is created only through a separate written agreement between you and the law firm.' },
+        { type: 'p', text: 'Law firms are independent businesses. one3seven is not responsible for the conduct, advice, or decisions of any law firm.' },
       ],
     },
     {
@@ -169,7 +169,7 @@ export const PRIVACY_POLICY: LegalDoc = {
         { type: 'bullets', items: [
           'To organize your uploaded documents into a structured intake summary — the core function of the platform.',
           'To maintain your account and allow you to access your organized intake.',
-          'To connect your intake with participating law firms when you choose to share it.',
+          'To deliver your organized intake to a law firm you choose to send it to.',
           'To communicate with you about your account or the platform.',
           'To improve the platform based on how it is being used.',
         ] },
@@ -189,8 +189,8 @@ export const PRIVACY_POLICY: LegalDoc = {
         { type: 'p', text: 'Your documents and intake records are private to your account by default. Access is controlled as follows:' },
         { type: 'bullets', items: [
           'Only you can see your full documents and intake records until you choose to share them.',
-          'Law firms can see a limited preview of your intake (organized summary, timeline structure, and record categories) once your intake enters the participating-firm pool. They do not see your full documents, personal narrative, or private notes at this stage.',
-          'Law firms receive full access to your intake only after you submit directly to a specific firm or approve expanded access.',
+          'A law firm can see your organized intake only after you choose to send it to that firm. No firm receives your intake, documents, or notes unless you send it to them.',
+          'Law firms receive access to your intake only after you send it to that specific firm.',
           'one3seven staff may access records when necessary to provide support, investigate technical issues, or comply with legal obligations. This access is limited and logged.',
         ] },
         { type: 'p', text: 'No other worker’s account can see your records. The platform uses row-level security controls at the database level to enforce this isolation.' },
