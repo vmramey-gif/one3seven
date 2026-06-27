@@ -27,3 +27,15 @@ export const BETA_HIDE_FIRM_ARCHIVED_TAB = true;
  */
 export const BETA_ENABLE_PARTICIPATING_ROUTING =
   import.meta.env.VITE_ENABLE_PARTICIPATING_ROUTING !== 'false';
+
+/**
+ * Master switch for the participating-firm NETWORK (broadcasting a worker's intake to a pool
+ * of firms). OFF by default — the safe, conventional model is worker-directed: the worker
+ * sends their intake to a specific firm they choose (firm code / direct link).
+ *
+ * GATED PENDING COUNSEL: turning this on makes one3seven route intakes across a network of
+ * firms, which may implicate California lawyer-referral-service rules (Bus. & Prof. Code
+ * §6155) and fee-splitting. Do NOT flip to true until counsel signs off and Terms §5 is
+ * updated to match. When false, no participating-network surface renders anywhere.
+ */
+export const PARTICIPATING_NETWORK_LIVE = false;

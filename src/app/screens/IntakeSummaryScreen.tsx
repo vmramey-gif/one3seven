@@ -22,7 +22,7 @@ import {
 } from 'lucide-react';
 import { Screen } from '../App';
 import { IntakeWorkspace } from '../types/IntakeWorkspace';
-import { BETA_ENABLE_PARTICIPATING_ROUTING } from '../constants/flags';
+import { BETA_ENABLE_PARTICIPATING_ROUTING, PARTICIPATING_NETWORK_LIVE } from '../constants/flags';
 import {
   ONE3SEVEN_NOTICES,
   PARTICIPATING_NETWORK_COPY,
@@ -329,10 +329,10 @@ export function IntakeSummaryScreen({
   shellMode = false,
 }: IntakeSummaryScreenProps) {
   const [showEmailModal, setShowEmailModal] = useState(false);
-  // Temporary: the worker engine is public, but routing to the participating-firm
-  // NETWORK isn't live yet — surface it as "coming soon". Firm-code direct routing
-  // (invited workers who hold a firm's code) stays available. Flip to true to re-enable.
-  const PARTICIPATING_ROUTING_LIVE = false;
+  // Worker-directed model: firm-code / direct routing (worker sends to a firm they choose)
+  // stays available; the participating-firm NETWORK broadcast is gated by the central flag
+  // PARTICIPATING_NETWORK_LIVE (off pending counsel — see flags.ts).
+  const PARTICIPATING_ROUTING_LIVE = PARTICIPATING_NETWORK_LIVE;
   const [showShareModal, setShowShareModal] = useState(false);
   const [concernsAcknowledged, setConcernsAcknowledged] = useState<boolean | null>(null);
   const [routingSubpanel, setRoutingSubpanel] = useState<'menu' | 'firm_code'>('menu');
