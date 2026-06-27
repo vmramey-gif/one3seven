@@ -372,6 +372,33 @@ Deno.serve(async (req: Request) => {
   }
 
   // ------------------------------------------------------------------
+  // AUTH + OWNERSHIP: require a signed-in caller who owns this intake.
+  // (Service-role reads below bypass RLS, so we gate access here to prevent
+  // a caller from triggering extraction on another worker's documents.)
+  // ------------------------------------------------------------------
+  const authHeader = req.headers.get('authorization') ?? '';
+  const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY')!;
+  if (!authHeader) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
+  }
+  const authClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    global: { headers: { Authorization: authHeader } },
+  });
+  const { data: { user }, error: authErr } = await authClient.auth.getUser();
+  if (authErr || !user) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
+  }
+  const { data: ownerRows } = await supabase
+    .from('uploaded_files')
+    .select('worker_id')
+    .eq('intake_id', intake_id)
+    .limit(1);
+  const ownerId = ownerRows?.[0]?.worker_id ?? null;
+  if (ownerId && ownerId !== user.id) {
+    return new Response(JSON.stringify({ error: 'Forbidden' }), { status: 403 });
+  }
+
+  // ------------------------------------------------------------------
   // BATCH MODE: look up all files for this intake via service role
   // ------------------------------------------------------------------
   if (!body.uploaded_file_id || body.batch) {

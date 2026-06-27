@@ -38,7 +38,7 @@ const HOW_IT_WORKS = [
   {
     step: '03',
     title: 'Attorney receives a structured intake',
-    body: 'A clean, organized packet arrives in the firm dashboard before the first consultation — no sorting, no follow-up calls.',
+    body: 'The intake the worker sent lands in your dashboard — organized and source-linked. You open it and decide, in minutes — no sorting, no follow-up calls.',
     color: 'bg-white/[0.04] border-white/10',
     accent: 'text-[#A78BFA]',
     tag: 'Firm',
@@ -467,7 +467,7 @@ function WorkerWorkflowScroll() {
         >
           <CheckCircle2 className="h-5 w-5 shrink-0 text-[#A78BFA]" />
           <p className="text-sm font-medium text-white">
-            Attorneys open an organized packet — before the first call.
+            Open it and decide — before the first call.
           </p>
         </motion.div>
       </div>
@@ -1034,7 +1034,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
                   </h1>
 
                   <p className="mb-5 max-w-[480px] text-[16px] leading-relaxed text-[#C9C4E6] sm:text-[17px]">
-                    Organize your employment records into a structured intake packet — ready to bring to any attorney consultation.
+                    Organize your employment records into a clear, source-linked intake — and choose which firm to send it to. No waiting on a callback. You decide who sees it.
                   </p>
 
                   <p className="mb-7 flex items-center gap-2 text-sm font-medium text-[#C9C4E6]">
