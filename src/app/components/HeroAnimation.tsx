@@ -2,14 +2,15 @@
  * Hero animation — six distinct employment records spill in, pop, and converge into a
  * source-linked "INTAKE READY" packet, then settle (plays once on mount, no loop).
  *
- * Responsive by design: the scene is authored at a fixed 380×340 "stage" and scaled to the
- * container width via CSS container queries (100cqw), so convergence stays pixel-correct and
- * never overflows on mobile. Pure CSS keyframes; respects prefers-reduced-motion.
+ * Responsive by design: the scene is authored at a fixed 380×312 "stage" and scaled to the
+ * container width via a JS-measured scale factor (ResizeObserver → --ha-scale), so convergence
+ * stays pixel-correct and never overflows on mobile. CSS keyframes; respects prefers-reduced-motion.
  */
+import { useLayoutEffect, useRef, useState } from 'react';
 
 const CSS = `
-.ha-wrap{position:relative;container-type:inline-size;width:100%;max-width:460px;margin:0 auto;aspect-ratio:380/312;overflow:hidden}
-.ha-stage{position:absolute;top:0;left:0;width:380px;height:312px;transform-origin:top left;transform:scale(calc(100cqw / 380))}
+.ha-wrap{position:relative;width:100%;max-width:460px;margin:0 auto;aspect-ratio:380/312;overflow:hidden}
+.ha-stage{position:absolute;top:0;left:0;width:380px;height:312px;transform-origin:top left;transform:scale(var(--ha-scale,1))}
 .ha-glow{position:absolute;width:300px;height:300px;left:50%;top:50%;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(124,92,255,0.22),transparent 60%);opacity:0;animation:haGlow 1.4s 2.4s ease forwards}
 .ha-doc{position:absolute;width:94px;border-radius:9px;background:#FAF9F6;padding:8px 9px;opacity:0;box-shadow:0 10px 28px rgba(0,0,0,0.40)}
 .ha-lbl{font:700 7px/1 -apple-system,BlinkMacSystemFont,sans-serif;letter-spacing:0.08em;margin-bottom:6px}
@@ -53,10 +54,23 @@ const CSS = `
 `;
 
 export function HeroAnimation() {
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1);
+
+  useLayoutEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const update = () => { if (el.clientWidth) setScale(el.clientWidth / 380); };
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
   return (
-    <div className="ha-wrap" role="img" aria-label="Scattered employment records — texts, a pay stub, an HR complaint, an email, a schedule, and a written warning — converge into an organized, source-linked intake timeline.">
+    <div ref={wrapRef} className="ha-wrap" role="img" aria-label="Scattered employment records — texts, a pay stub, an HR complaint, an email, a schedule, and a written warning — converge into an organized, source-linked intake timeline.">
       <style>{CSS}</style>
-      <div className="ha-stage">
+      <div className="ha-stage" style={{ ['--ha-scale' as string]: String(scale) }}>
         <div className="ha-glow" />
 
         <div className="ha-doc ha-f1" style={{ left: '4%', top: '7%' }}>
