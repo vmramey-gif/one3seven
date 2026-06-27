@@ -1082,37 +1082,6 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
         </div>
       </section>
 
-      {/* ── WHAT ONE3SEVEN DOES (capability grid) ── */}
-      <section className="border-y border-white/10 bg-[#14112E] px-5 py-16 sm:px-8 sm:py-24">
-        <div className="mx-auto max-w-6xl">
-          <div className="mb-3 text-center text-xs font-bold uppercase tracking-[0.2em] text-[#A78BFA]">What one3seven does</div>
-          <h2 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="mb-3 text-center text-[28px] font-medium tracking-[-0.01em] text-white sm:text-[36px]">
-            Everything organized before review.
-          </h2>
-          <p className="mx-auto mb-12 max-w-[560px] text-center text-[15px] leading-relaxed text-[#C9C4E6]">
-            One worker's scattered records become a structured, source-linked intake — ready for an attorney to evaluate.
-          </p>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {[
-              { icon: FolderOpen, t: 'Organized intake packet', d: 'Pay stubs, HR emails, texts, and write-ups — categorized into one clean packet.' },
-              { icon: CalendarClock, t: 'A clear, dated timeline', d: 'Events reconstructed in order, so the story reads at a glance.' },
-              { icon: FileText, t: 'Source-linked to every record', d: 'Every fact traces back to the exact document it came from. Verify in one click.' },
-              { icon: Clock, t: 'Key dates surfaced', d: 'Time-sensitive periods are flagged for attorney review.' },
-              { icon: Lock, t: 'The worker stays in control', d: 'Records stay private until the worker approves sharing.' },
-              { icon: Shield, t: 'Ready for attorney review', d: 'Organized and reflected — never concluded. Attorneys evaluate everything.' },
-            ].map((c) => (
-              <div key={c.t} className="rounded-[20px] border border-white/10 bg-white/[0.04] p-6 transition hover:border-white/20 hover:bg-white/[0.06]">
-                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-[#6D4AFF]/15">
-                  <c.icon className="h-5 w-5 text-[#C4B5FD]" />
-                </div>
-                <h3 className="mb-1.5 text-[16px] font-semibold text-white">{c.t}</h3>
-                <p className="text-[13.5px] leading-relaxed text-[#C9C4E6]">{c.d}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* ── THE PROBLEM ── */}
       <section className="bg-[#14112E] px-5 py-16 sm:px-8 sm:py-24">
         <div className="mx-auto max-w-6xl">
