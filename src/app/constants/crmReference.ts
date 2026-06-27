@@ -64,7 +64,7 @@ export const CRM_OBJECTIONS: { objection: string; response: string }[] = [
   },
   {
     objection: '“So how do intakes get to me — are you a referral service?”',
-    response: 'No — we’re a software tool, not a referral service. The worker uses one3seven to organize their own records, then chooses which firm to send their intake to and sends it themselves. You get a dashboard for the intakes workers send you. We don’t match, rank, or steer anyone, and you pay a flat subscription — never per client. The worker’s in control of who sees it; you’re in control of what you take.',
+    response: 'No — we’re a software tool, not a referral service. You share your own intake link with your own clients; they self-serve through a guided intake, and you get a review-ready, source-linked record in your dashboard. We don’t match, rank, or steer anyone to you, and you pay a flat subscription — never per client. The worker controls their records; you control what you take.',
   },
   {
     objection: '“We already use Eve / another legal AI.”',

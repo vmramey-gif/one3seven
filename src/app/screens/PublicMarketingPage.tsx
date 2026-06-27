@@ -1133,12 +1133,12 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
             <div>
               <div className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-[#A78BFA]">For attorneys</div>
               <h2 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="mb-5 text-[30px] font-medium leading-tight tracking-[-0.01em] text-white sm:text-[36px]">
-                Decide in minutes —
+                Your intake, organized —
                 <br />
-                on intakes workers chose to send you
+                decide in minutes
               </h2>
               <p className="mb-8 text-[15px] leading-relaxed text-[#C9C4E6]">
-                Workers organize their records and choose which firm to send their intake to. Get a dashboard for the intakes they send you — review-ready and source-linked — so you decide fast instead of triaging.
+                Share one intake link with your clients. They self-serve through a guided intake, and you get a review-ready, source-linked record in your dashboard — so you decide fast instead of triaging.
               </p>
               <button
                 type="button"

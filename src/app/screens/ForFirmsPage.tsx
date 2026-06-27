@@ -63,15 +63,15 @@ export function ForFirmsPage({ onBack, onStartWorker }: ForFirmsPageProps) {
             Open the file. Decide in minutes.
           </h1>
           <p className="mx-auto mb-8 max-w-[620px] text-[16px] leading-relaxed text-[#C9C4E6] sm:text-[17px]">
-            Workers organize their own employment records into a clear, source-linked intake — and
-            choose which firm to send it to. Reserve your seat: get a dashboard for the intakes workers
-            send you — review-ready and source-linked — so you decide in minutes instead of triaging.
+            Share one intake link with your clients. They self-serve through a guided intake, and you
+            get a review-ready, source-linked record in your dashboard — so you decide in minutes
+            instead of burning hours on triage.
           </p>
           <a
             href="#pilot-interest"
             className="inline-flex items-center justify-center gap-2 rounded-full bg-[#6D4AFF] px-7 py-3.5 text-[15px] font-semibold text-white shadow-[0_16px_48px_rgba(109,74,255,0.40)] transition hover:-translate-y-0.5 hover:bg-[#5B35D5]"
           >
-            Reserve your seat
+            Start free pilot
             <ArrowRight className="h-4 w-4" />
           </a>
         </div>
@@ -169,10 +169,10 @@ export function ForFirmsPage({ onBack, onStartWorker }: ForFirmsPageProps) {
       <section id="pilot-interest" className="px-5 py-16 sm:px-8 sm:py-20">
         <div className="mx-auto max-w-[520px]">
           <div className="mb-6 text-center">
-            <h2 style={SERIF} className="text-[26px] font-medium tracking-[-0.01em] text-white sm:text-[32px]">Reserve your seat</h2>
+            <h2 style={SERIF} className="text-[26px] font-medium tracking-[-0.01em] text-white sm:text-[32px]">Start your free pilot</h2>
             <p className="mt-2 text-[14px] leading-relaxed text-[#C9C4E6]">
-              We're onboarding a small number of California employment firms as we build out. Tell us about
-              your firm and we'll reach out directly.
+              We're onboarding a small number of California employment firms. Tell us about your firm and
+              we'll set up your intake link.
             </p>
           </div>
 
@@ -211,7 +211,7 @@ export function ForFirmsPage({ onBack, onStartWorker }: ForFirmsPageProps) {
               </div>
               <button type="submit" disabled={submitting}
                 className="flex w-full items-center justify-center gap-2 rounded-full bg-[#6D4AFF] px-6 py-4 font-medium text-white shadow-[0_18px_48px_rgba(109,74,255,0.34)] transition hover:-translate-y-0.5 hover:bg-[#5B35D5] disabled:translate-y-0 disabled:opacity-60">
-                {submitting ? 'Sending…' : 'Reserve your seat'}
+                {submitting ? 'Sending…' : 'Start free pilot'}
                 {!submitting ? <ArrowRight className="h-4 w-4" /> : null}
               </button>
             </form>
