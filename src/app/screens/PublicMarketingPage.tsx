@@ -1082,72 +1082,36 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
         </div>
       </section>
 
-      {/* ── PAYOFF: SAMPLE CHRONOLOGY (the value, before any explanation) ── */}
-      <section className="border-y border-white/10 bg-[#14112E] px-5 py-14 sm:px-8 sm:py-20">
-        <div className="mx-auto max-w-5xl">
-          <div className="mb-2 text-center text-xs font-bold uppercase tracking-[0.2em] text-[#A78BFA]">See it in 10 seconds</div>
-          <h2 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="mb-8 text-center text-[26px] font-medium tracking-[-0.01em] text-white sm:text-[32px]">
-            The same records, organized.
+      {/* ── WHAT ONE3SEVEN DOES (capability grid) ── */}
+      <section className="border-y border-white/10 bg-[#14112E] px-5 py-16 sm:px-8 sm:py-24">
+        <div className="mx-auto max-w-6xl">
+          <div className="mb-3 text-center text-xs font-bold uppercase tracking-[0.2em] text-[#A78BFA]">What one3seven does</div>
+          <h2 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="mb-3 text-center text-[28px] font-medium tracking-[-0.01em] text-white sm:text-[36px]">
+            Everything organized before review.
           </h2>
-          <div className="grid items-center gap-5 lg:grid-cols-[1fr_auto_1.3fr]">
-            {/* Before: scattered PDF documents */}
-            <div className="rounded-[24px] border border-[#E7E1FF] bg-white p-5 shadow-[0_18px_56px_rgba(31,27,75,0.06)]">
-              <div className="mb-3 text-xs font-semibold uppercase tracking-wide text-[#1E1B4B]/45">Your documents</div>
-              <div className="flex flex-wrap gap-2">
-                {['offer-letter.pdf', 'paystub.pdf', 'timecard.pdf', 'hr-email.pdf', 'warning.pdf', 'termination-letter.pdf'].map((f, i) => (
-                  <span
-                    key={f}
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-[#EFEAFE] bg-[#FAFAFF] px-2.5 py-1.5 text-[11.5px] text-[#1E1B4B]/70"
-                    style={{ transform: `rotate(${(i % 2 ? 1 : -1) * 1.5}deg)` }}
-                  >
-                    <span className="rounded bg-[#6D4AFF]/10 px-1 py-0.5 text-[9px] font-bold text-[#6D4AFF]">PDF</span>
-                    {f}
-                  </span>
-                ))}
-              </div>
-              <p className="mt-3 text-[11px] text-[#1E1B4B]/45">No order, no dates, no story.</p>
-            </div>
-
-            {/* Arrow */}
-            <div className="hidden items-center justify-center lg:flex">
-              <div className="flex flex-col items-center gap-1 text-[#6D4AFF]">
-                <ArrowRight className="h-6 w-6" />
-                <span className="text-[10px] font-semibold uppercase tracking-wide">one3seven</span>
-              </div>
-            </div>
-
-            {/* After: organized timeline */}
-            <div className="rounded-[24px] border border-[#DCD3FF] bg-white p-5 shadow-[0_24px_68px_rgba(109,74,255,0.14)]">
-              <div className="mb-3 flex items-center justify-between">
-                <div className="text-xs font-semibold uppercase tracking-wide text-[#6D4AFF]">Organized timeline</div>
-                <span className="rounded-full bg-[#F3EFFF] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[#6D4AFF]">Sample</span>
-              </div>
-              <ol className="relative space-y-3 border-l border-[#E7E1FF] pl-4">
-                {[
-                  ['Mar 2021', 'Employment begins', 'offer-letter.pdf'],
-                  ['Sep 9, 2024', 'Concern raised with HR', 'hr-email.pdf'],
-                  ['Oct 1, 2024', 'Written warning issued', 'warning.pdf'],
-                  ['Nov 8, 2024', 'Employment ends', 'termination-letter.pdf'],
-                ].map(([d, e, src]) => (
-                  <li key={d} className="relative">
-                    <span className="absolute -left-[21px] top-1 h-2.5 w-2.5 rounded-full bg-[#6D4AFF]" />
-                    <div className="text-[11px] font-semibold text-[#6D4AFF]">{d}</div>
-                    <div className="text-[14px] font-medium text-[#1E1B4B]">{e}</div>
-                    <div className="mt-0.5 inline-flex items-center gap-1 text-[11px] text-[#1E1B4B]/45">
-                      <span className="rounded bg-[#6D4AFF]/10 px-1 py-0.5 text-[8px] font-bold text-[#6D4AFF]">PDF</span>
-                      source: {src}
-                    </div>
-                  </li>
-                ))}
-              </ol>
-            </div>
-          </div>
-          <p className="mt-6 text-center text-[12px] text-[#8E88B5]">
-            Sample timeline for illustration — not a real case. one3seven organizes your records into a timeline; it does not draw conclusions.
+          <p className="mx-auto mb-12 max-w-[560px] text-center text-[15px] leading-relaxed text-[#C9C4E6]">
+            One worker's scattered records become a structured, source-linked intake — ready for an attorney to evaluate.
           </p>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              { icon: FolderOpen, t: 'Organized intake packet', d: 'Pay stubs, HR emails, texts, and write-ups — categorized into one clean packet.' },
+              { icon: CalendarClock, t: 'A clear, dated timeline', d: 'Events reconstructed in order, so the story reads at a glance.' },
+              { icon: FileText, t: 'Source-linked to every record', d: 'Every fact traces back to the exact document it came from. Verify in one click.' },
+              { icon: Clock, t: 'Key dates surfaced', d: 'Time-sensitive periods are flagged for attorney review.' },
+              { icon: Lock, t: 'The worker stays in control', d: 'Records stay private until the worker approves sharing.' },
+              { icon: Shield, t: 'Ready for attorney review', d: 'Organized and reflected — never concluded. Attorneys evaluate everything.' },
+            ].map((c) => (
+              <div key={c.t} className="rounded-[20px] border border-white/10 bg-white/[0.04] p-6 transition hover:border-white/20 hover:bg-white/[0.06]">
+                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-[#6D4AFF]/15">
+                  <c.icon className="h-5 w-5 text-[#C4B5FD]" />
+                </div>
+                <h3 className="mb-1.5 text-[16px] font-semibold text-white">{c.t}</h3>
+                <p className="text-[13.5px] leading-relaxed text-[#C9C4E6]">{c.d}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
-
 
       {/* ── THE PROBLEM ── */}
       <section className="bg-[#14112E] px-5 py-16 sm:px-8 sm:py-24">
