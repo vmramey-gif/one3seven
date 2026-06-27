@@ -211,7 +211,7 @@ export function ForFirmsPage({ onBack, onStartWorker }: ForFirmsPageProps) {
               </div>
               <button type="submit" disabled={submitting}
                 className="flex w-full items-center justify-center gap-2 rounded-full bg-[#6D4AFF] px-6 py-4 font-medium text-white shadow-[0_18px_48px_rgba(109,74,255,0.34)] transition hover:-translate-y-0.5 hover:bg-[#5B35D5] disabled:translate-y-0 disabled:opacity-60">
-                {submitting ? 'Sending…' : 'Request pilot access'}
+                {submitting ? 'Sending…' : 'Reserve your seat'}
                 {!submitting ? <ArrowRight className="h-4 w-4" /> : null}
               </button>
             </form>

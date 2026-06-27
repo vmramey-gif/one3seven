@@ -56,7 +56,7 @@ const FIRM_FEATURES = [
 const TRUST_ITEMS = [
   'No legal conclusions — attorney decides',
   'All source documents preserved for direct review',
-  'Firm accounts are reviewed before receiving routed intakes',
+  'Firm accounts are reviewed before they can receive intakes',
 ];
 
 // ── Concept animation SVG markup ─────────────────────────────────────────────
