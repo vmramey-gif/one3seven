@@ -47,6 +47,25 @@ export function pageview(): void {
   track('pageview');
 }
 
+/**
+ * Log a pageview with an explicit logical path (for SPA in-app navigation, where
+ * window.location.pathname doesn't change). Used for screen-level analytics.
+ */
+export function pageviewPath(path: string): void {
+  try {
+    if (typeof window === 'undefined' || dntEnabled() || !isSupabaseConfigured()) return;
+    void supabase.from('web_events').insert({
+      event: 'pageview',
+      path,
+      referrer: document.referrer || null,
+      session_id: sessionId(),
+      props: null,
+    });
+  } catch {
+    /* analytics never breaks the app */
+  }
+}
+
 let heartbeatStarted = false;
 /**
  * Periodic heartbeat so session length is measurable: a session's duration is the time

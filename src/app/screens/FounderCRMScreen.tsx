@@ -788,16 +788,18 @@ function GrowthTab() {
   const [data, setData] = useState<SiteAnalytics | null>(null);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState('');
+  const [refreshedAt, setRefreshedAt] = useState<Date | null>(null);
 
-  useEffect(() => {
-    void (async () => {
-      setLoading(true);
-      const r = await getSiteAnalytics();
-      if (r.error) setErr(r.error);
-      else setData(r.data ?? null);
-      setLoading(false);
-    })();
-  }, []);
+  const load = async () => {
+    setLoading(true);
+    setErr('');
+    const r = await getSiteAnalytics();
+    if (r.error) setErr(r.error);
+    else { setData(r.data ?? null); setRefreshedAt(new Date()); }
+    setLoading(false);
+  };
+
+  useEffect(() => { void load(); }, []);
 
   const fmtDuration = (sec: number) => {
     const s = Math.round(sec);
@@ -825,7 +827,13 @@ function GrowthTab() {
   return (
     <div className="space-y-5">
       <section>
-        <h2 className="mb-2 text-[14px] font-bold">Traffic</h2>
+        <div className="mb-2 flex items-center justify-between">
+          <h2 className="text-[14px] font-bold">Traffic</h2>
+          <button type="button" onClick={() => void load()} className="flex items-center gap-1.5 rounded-full border border-[#E7E1FF] px-3 py-1.5 text-[11px] font-semibold text-[#6D4AFF] transition hover:border-[#B8A8FF] hover:bg-[#F5F1FB]">
+            <RefreshCw className="h-3 w-3" /> Refresh
+          </button>
+        </div>
+        {refreshedAt && <p className="mb-2 text-[11px] text-[#1E1B4B]/40">Live · as of {refreshedAt.toLocaleTimeString()}</p>}
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           <Stat label="Landing page visits" value={data.landing_visits.toLocaleString()} />
           <Stat label="For-firms visits" value={data.for_firms_visits.toLocaleString()} />

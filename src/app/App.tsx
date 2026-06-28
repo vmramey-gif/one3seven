@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
+import { pageviewPath } from '../lib/analytics';
 import { GalleryScreen } from './screens/GalleryScreen';
 import { DevNavMapScreen } from './screens/DevNavMapScreen';
 import { AuthWelcomeScreen } from './screens/AuthWelcomeScreen';
@@ -243,6 +244,22 @@ export default function App() {
     return 'publicMarketing';
   });
   const [comparisonView, setComparisonView] = useState<'landing' | 'dashboard' | 'both'>('both');
+
+  // First-party analytics: log a pageview when the in-app screen changes (the SPA doesn't
+  // change window.location, so without this only the initial load is captured).
+  useEffect(() => {
+    const SCREEN_PATHS: Partial<Record<Screen, string>> = {
+      publicMarketing: '/',
+      forFirms: '/for-firms',
+      firmDirectedIntake: '/intake',
+      upload: '/intake/upload',
+      intakeSummary: '/intake/summary',
+      firmDashboard: '/firm',
+      roleSelection: '/get-started',
+    };
+    const p = SCREEN_PATHS[currentScreen];
+    if (p) pageviewPath(p);
+  }, [currentScreen]);
 
   // User authentication and role
   const [isAuthenticated, setIsAuthenticated] = useState(false);
