@@ -14,10 +14,12 @@ import {
 import { supabase } from '../../lib/supabaseClient';
 import {
   listFirms, listActivity, addFirm, logActivity,
-  listMessages, sendMessage, getCurrentMember, getLatestMessageAt,
+  listMessages, sendMessage, getCurrentMember, getLatestMessageAt, subscribeTeamMessages,
   listNotes, addNote, deleteNote, getIntakesCount, setFirmStage, setFirmMinutesSaved, getSiteAnalytics,
   claimFirm, releaseFirm,
+  listCrmMembers, listMyDirectMessages, sendDirectMessage, markThreadRead, getUnreadDmCount, subscribeDirectMessages,
   type CrmFirm, type CrmActivityWithFirm, type NewFirmInput, type LogActivityInput, type CrmMessage, type CrmNote, type SiteAnalytics,
+  type CrmMember, type CrmDirectMessage,
 } from '../../services/crmService';
 import {
   computeRevenue, targetColor, dailyTargetsContext, tierPrice, avgMinutesSaved, DAILY_TARGETS, PHASE1_PAYING_TARGET, COMMISSION_RATE, TIER_PRICES,
@@ -31,7 +33,7 @@ import { AUDIT_SITE_CHECKS, AUDIT_MANUAL_GROUPS } from '../constants/crmAudit';
 import { crmFirmIntel } from '../constants/crmFirmIntel';
 import { STARTER_QUESTIONS, askAssistant, type ChatMessage } from '../../services/chatAssistant';
 
-type Tab = 'dashboard' | 'pipeline' | 'firms' | 'activity' | 'metrics' | 'revenue' | 'comp' | 'economics' | 'growth' | 'team' | 'notes' | 'scripts' | 'training' | 'askai' | 'checklist' | 'audit' | 'links' | 'add';
+type Tab = 'dashboard' | 'pipeline' | 'firms' | 'activity' | 'metrics' | 'revenue' | 'comp' | 'economics' | 'growth' | 'team' | 'inbox' | 'notes' | 'scripts' | 'training' | 'askai' | 'checklist' | 'audit' | 'links' | 'add';
 
 // Every URL off www.one3seven.com, grouped — the founder "links in one place" directory.
 const SITE_BASE = 'https://www.one3seven.com';
@@ -66,7 +68,8 @@ const TABS: { id: Tab; label: string; icon: typeof LayoutGrid; founderOnly?: boo
   { id: 'firms', label: 'Firms', icon: Building2 },
   { id: 'activity', label: 'Activity', icon: ClipboardList },
   { id: 'metrics', label: 'Metrics', icon: BarChart3 },
-  { id: 'team', label: 'Team', icon: MessageSquare },
+  { id: 'team', label: 'Team chat', icon: MessageSquare },
+  { id: 'inbox', label: 'Inbox', icon: Mail },
   { id: 'notes', label: 'Notes', icon: StickyNote },
   { id: 'scripts', label: 'Scripts', icon: BookOpen },
   { id: 'training', label: 'Training', icon: GraduationCap },
@@ -91,7 +94,7 @@ const NAV_GROUPS: { id: string; label: string; icon: typeof LayoutGrid; tabIds: 
   { id: 'sell', label: 'Sell', icon: TrendingUp, tabIds: ['dashboard', 'firms', 'pipeline', 'add', 'activity'] },
   { id: 'me', label: 'My numbers', icon: Trophy, tabIds: ['comp', 'metrics'] },
   { id: 'learn', label: 'Learn', icon: BookOpen, tabIds: ['scripts', 'training', 'askai'] },
-  { id: 'team', label: 'Team', icon: MessageSquare, tabIds: ['team', 'notes'] },
+  { id: 'team', label: 'Team', icon: MessageSquare, tabIds: ['inbox', 'team', 'notes'] },
   { id: 'founder', label: 'Founder', icon: ShieldCheck, tabIds: ['revenue', 'economics', 'growth', 'checklist', 'audit', 'links'] },
 ];
 
@@ -139,6 +142,7 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
     (typeof window !== 'undefined' && window.localStorage.getItem('o3s_crm_team_seen')) || ''
   );
   const unreadTeam = !!latestMsgAt && latestMsgAt > seenTeamAt && tab !== 'team';
+  const [unreadDm, setUnreadDm] = useState(0);
   const [userEmail, setUserEmail] = useState('');
   const [userId, setUserId] = useState<string | null>(null);
   const showEconomics = ECON_ALLOWED_EMAILS.includes(userEmail.trim().toLowerCase());
@@ -172,7 +176,7 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
 
   useEffect(() => { void load(); }, []);
 
-  // Poll for new team messages (every 30s) to drive the unread dot.
+  // Team chat: real-time push the instant a message lands (poll is a slow fallback only).
   useEffect(() => {
     let active = true;
     const check = async () => {
@@ -180,8 +184,21 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
       if (active) setLatestMsgAt(at);
     };
     void check();
-    const h = window.setInterval(check, 30000);
-    return () => { active = false; window.clearInterval(h); };
+    const unsub = subscribeTeamMessages((m) => {
+      setLatestMsgAt((prev) => (!prev || m.created_at > prev ? m.created_at : prev));
+    });
+    const h = window.setInterval(check, 60000);
+    return () => { active = false; unsub(); window.clearInterval(h); };
+  }, []);
+
+  // Inbox: real-time unread count for direct messages addressed to me.
+  useEffect(() => {
+    let active = true;
+    const refreshDm = async () => { const n = await getUnreadDmCount(); if (active) setUnreadDm(n); };
+    void refreshDm();
+    const unsub = subscribeDirectMessages(() => { void refreshDm(); });
+    const iv = window.setInterval(refreshDm, 60000);
+    return () => { active = false; unsub(); window.clearInterval(iv); };
   }, []);
 
   // Opening Team marks everything up to the latest message as seen.
@@ -278,7 +295,7 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
                     <group.icon className="h-3.5 w-3.5" />
                     {activeHere && activeItem ? activeItem.label : group.label}
                     <ChevronDown className={`h-3.5 w-3.5 transition-transform ${open ? 'rotate-180' : ''}`} />
-                    {group.tabIds.includes('team') && unreadTeam && (
+                    {group.id === 'team' && (unreadTeam || unreadDm > 0) && (
                       <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 animate-pulse rounded-full bg-red-500 ring-2 ring-white" />
                     )}
                   </button>
@@ -295,6 +312,11 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
                           {t.id === 'team' && unreadTeam && (
                             <span className="ml-auto inline-flex items-center gap-1 text-[10px] font-bold text-red-600">
                               <span className="h-2 w-2 rounded-full bg-red-500" /> New
+                            </span>
+                          )}
+                          {t.id === 'inbox' && unreadDm > 0 && (
+                            <span className="ml-auto inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
+                              {unreadDm}
                             </span>
                           )}
                         </button>
@@ -331,6 +353,7 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
             {tab === 'activity' && <ActivityTab activity={activity} />}
             {tab === 'metrics' && <MetricsTab firms={firms} activity={activity} />}
             {tab === 'team' && <TeamTab />}
+            {tab === 'inbox' && <InboxTab onReadChange={async () => setUnreadDm(await getUnreadDmCount())} />}
             {tab === 'notes' && <NotesTab isFounder={isFounder} />}
             {tab === 'scripts' && <ScriptsTab />}
             {tab === 'training' && <TrainingTab />}
@@ -1437,8 +1460,9 @@ function TeamTab() {
   useEffect(() => {
     let active = true;
     void (async () => { setMe(await getCurrentMember()); if (active) await load(); })();
-    const iv = setInterval(() => { if (active) void load(); }, 10000); // light poll so it feels live
-    return () => { active = false; clearInterval(iv); };
+    const unsub = subscribeTeamMessages(() => { if (active) void load(); }); // real-time
+    const iv = setInterval(() => { if (active) void load(); }, 30000); // slow fallback
+    return () => { active = false; unsub(); clearInterval(iv); };
   }, []);
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages.length]);
@@ -1483,6 +1507,136 @@ function TeamTab() {
           value={body}
           onChange={(e) => setBody(e.target.value)}
           placeholder="Message the team… (Ctrl/⌘+Enter to send)"
+          rows={2}
+          onKeyDown={(e) => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); void send(); } }}
+          className="flex-1 rounded-[12px] border border-[#E7E1FF] px-3 py-2.5 text-sm outline-none focus:border-[#6D4AFF]"
+        />
+        <button type="button" onClick={send} disabled={sending || !body.trim()} className={`flex ${tap} shrink-0 items-center gap-1.5 rounded-full bg-[#6D4AFF] px-5 font-semibold text-white disabled:opacity-40`}>
+          <Send className="h-4 w-4" /> Send
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ── Inbox: private 1:1 direct messages between CRM members ────────────────────
+function InboxTab({ onReadChange }: { onReadChange?: () => void }) {
+  const [me, setMe] = useState<{ id: string | null; name: string }>({ id: null, name: 'Member' });
+  const [members, setMembers] = useState<CrmMember[]>([]);
+  const [messages, setMessages] = useState<CrmDirectMessage[]>([]);
+  const [selected, setSelected] = useState<CrmMember | null>(null);
+  const [body, setBody] = useState('');
+  const [sending, setSending] = useState(false);
+  const [err, setErr] = useState('');
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  const loadMsgs = async () => { const r = await listMyDirectMessages(); if (!r.error) setMessages(r.data); };
+
+  useEffect(() => {
+    let active = true;
+    void (async () => {
+      const m = await getCurrentMember();
+      if (!active) return;
+      setMe(m);
+      const mem = await listCrmMembers();
+      if (active && !mem.error) setMembers(mem.data);
+      await loadMsgs();
+    })();
+    const unsub = subscribeDirectMessages(() => { if (active) void loadMsgs(); });
+    const iv = window.setInterval(() => { if (active) void loadMsgs(); }, 30000);
+    return () => { active = false; unsub(); window.clearInterval(iv); };
+  }, []);
+
+  const threadWith = (otherId: string) =>
+    messages.filter((m) => (m.sender_id === otherId && m.recipient_id === me.id) || (m.sender_id === me.id && m.recipient_id === otherId));
+  const lastMsg = (otherId: string) => { const t = threadWith(otherId); return t.length ? t[t.length - 1] : null; };
+  const unreadFrom = (otherId: string) => messages.filter((m) => m.sender_id === otherId && m.recipient_id === me.id && !m.read_at).length;
+
+  // Mark the open thread read whenever it has unread messages (covers live arrivals).
+  useEffect(() => {
+    if (selected && unreadFrom(selected.id) > 0) {
+      void (async () => { await markThreadRead(selected.id); await loadMsgs(); onReadChange?.(); })();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messages, selected]);
+
+  useEffect(() => { if (selected) bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages.length, selected]);
+
+  const openThread = async (member: CrmMember) => {
+    setSelected(member);
+    await markThreadRead(member.id);
+    await loadMsgs();
+    onReadChange?.();
+  };
+
+  const send = async () => {
+    if (!selected || !body.trim()) return;
+    setSending(true); setErr('');
+    const r = await sendDirectMessage({ recipientId: selected.id, recipientName: selected.name, body });
+    setSending(false);
+    if (r.error) { setErr(r.error); return; }
+    setBody('');
+    await loadMsgs();
+  };
+
+  const others = members.filter((m) => m.id !== me.id);
+
+  if (!selected) {
+    const sorted = [...others].sort((a, b) => {
+      const la = lastMsg(a.id)?.created_at ?? ''; const lb = lastMsg(b.id)?.created_at ?? '';
+      return lb.localeCompare(la) || a.name.localeCompare(b.name);
+    });
+    return (
+      <div>
+        <p className="mb-3 text-[12px] leading-relaxed text-[#1E1B4B]/55">Inbox — private 1:1 messages with a teammate. Only you two see these.</p>
+        <div className="space-y-2">
+          {sorted.length === 0 ? (
+            <p className="py-12 text-center text-[13px] text-[#1E1B4B]/40">No teammates to message yet.</p>
+          ) : sorted.map((m) => {
+            const last = lastMsg(m.id); const unread = unreadFrom(m.id);
+            return (
+              <button key={m.id} type="button" onClick={() => openThread(m)} className={`flex ${tap} w-full items-center gap-3 rounded-[12px] border border-[#E7E1FF] bg-white px-3 text-left`}>
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#EDE7FF] text-[13px] font-bold text-[#6D4AFF]">{m.name.slice(0, 1).toUpperCase()}</div>
+                <div className="min-w-0 flex-1">
+                  <span className="truncate text-[14px] font-semibold">{m.name}{m.is_founder && <span className="ml-1 text-[10px] font-bold text-[#6D4AFF]">· Founder</span>}</span>
+                  <p className="truncate text-[12px] text-[#1E1B4B]/50">{last ? (last.sender_id === me.id ? 'You: ' : '') + last.body : 'Start a conversation'}</p>
+                </div>
+                {unread > 0 && <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-[11px] font-bold text-white">{unread}</span>}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
+  const thread = threadWith(selected.id);
+  return (
+    <div className="flex flex-col" style={{ minHeight: '62vh' }}>
+      <button type="button" onClick={() => setSelected(null)} className="mb-2 inline-flex items-center gap-1 text-[13px] font-semibold text-[#6D4AFF]"><ArrowLeft className="h-4 w-4" /> Inbox</button>
+      <div className="mb-2 text-[14px] font-bold">{selected.name}{selected.is_founder && <span className="ml-1 text-[11px] font-semibold text-[#6D4AFF]">· Founder</span>}</div>
+      <div className="flex-1 space-y-2 overflow-y-auto rounded-[12px] border border-[#E7E1FF] bg-white p-3">
+        {thread.length === 0 ? (
+          <p className="py-12 text-center text-[13px] text-[#1E1B4B]/40">No messages yet. Say hi 👋</p>
+        ) : thread.map((m) => {
+          const mine = m.sender_id === me.id;
+          return (
+            <div key={m.id} className={`flex ${mine ? 'justify-end' : 'justify-start'}`}>
+              <div className={`max-w-[82%] rounded-[14px] px-3.5 py-2 ${mine ? 'bg-[#6D4AFF] text-white' : 'bg-[#F3EFFF] text-[#1E1B4B]'}`}>
+                <div className="whitespace-pre-wrap text-[13px] leading-relaxed">{m.body}</div>
+                <div className={`mt-0.5 text-[10px] ${mine ? 'text-white/60' : 'text-[#1E1B4B]/40'}`}>{new Date(m.created_at).toLocaleString()}</div>
+              </div>
+            </div>
+          );
+        })}
+        <div ref={bottomRef} />
+      </div>
+      {err && <p className="mt-2 text-[12px] text-red-600">{err}</p>}
+      <div className="mt-2 flex gap-2">
+        <textarea
+          value={body}
+          onChange={(e) => setBody(e.target.value)}
+          placeholder={`Message ${selected.name}… (Ctrl/⌘+Enter to send)`}
           rows={2}
           onKeyDown={(e) => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); void send(); } }}
           className="flex-1 rounded-[12px] border border-[#E7E1FF] px-3 py-2.5 text-sm outline-none focus:border-[#6D4AFF]"

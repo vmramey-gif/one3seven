@@ -230,6 +230,102 @@ export async function getLatestMessageAt(): Promise<string | null> {
   return (data as { created_at: string }).created_at;
 }
 
+/** Subscribe to new shared team-chat messages in real time. Returns an unsubscribe fn. */
+export function subscribeTeamMessages(onInsert: (m: CrmMessage) => void): () => void {
+  const channel = supabase
+    .channel('crm_team_messages')
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'crm_messages' }, (payload) => {
+      onInsert(payload.new as CrmMessage);
+    })
+    .subscribe();
+  return () => { void supabase.removeChannel(channel); };
+}
+
+// ── Direct messages / inbox (1:1 between CRM members) ─────────────────────────
+
+export interface CrmMember { id: string; name: string; email: string | null; is_founder: boolean; }
+
+export interface CrmDirectMessage {
+  id: string;
+  sender_id: string;
+  sender_name: string | null;
+  recipient_id: string;
+  recipient_name: string | null;
+  body: string;
+  read_at: string | null;
+  created_at: string;
+}
+
+/** People you can message: founder + reps (excludes yourself in the picker, done client-side). */
+export async function listCrmMembers(): Promise<{ data: CrmMember[]; error?: string }> {
+  const { data, error } = await supabase.rpc('list_crm_members');
+  if (error) return { data: [], error: error.message };
+  return { data: (data ?? []) as CrmMember[] };
+}
+
+/** All direct messages involving the current user (both directions), newest last. */
+export async function listMyDirectMessages(limit = 500): Promise<{ data: CrmDirectMessage[]; error?: string }> {
+  const { data, error } = await supabase
+    .from('crm_direct_messages')
+    .select('*')
+    .order('created_at', { ascending: true })
+    .limit(limit);
+  if (error) return { data: [], error: error.message };
+  return { data: (data ?? []) as CrmDirectMessage[] };
+}
+
+export async function sendDirectMessage(input: { recipientId: string; recipientName: string; body: string }): Promise<{ error?: string }> {
+  const text = input.body.trim();
+  if (!text) return { error: 'Message is empty.' };
+  const me = await getCurrentMember();
+  if (!me.id) return { error: 'Sign in to send a message.' };
+  const { error } = await supabase.from('crm_direct_messages').insert({
+    sender_id: me.id,
+    sender_name: me.name,
+    recipient_id: input.recipientId,
+    recipient_name: input.recipientName,
+    body: text,
+  });
+  if (error) return { error: error.message };
+  return {};
+}
+
+/** Mark every message in a thread (from the other person to me) as read. */
+export async function markThreadRead(otherId: string): Promise<{ error?: string }> {
+  const me = await getCurrentMember();
+  if (!me.id) return {};
+  const { error } = await supabase
+    .from('crm_direct_messages')
+    .update({ read_at: new Date().toISOString() })
+    .eq('recipient_id', me.id)
+    .eq('sender_id', otherId)
+    .is('read_at', null);
+  if (error) return { error: error.message };
+  return {};
+}
+
+/** Count of unread messages addressed to the current user (for the inbox badge). */
+export async function getUnreadDmCount(): Promise<number> {
+  const me = await getCurrentMember();
+  if (!me.id) return 0;
+  const { count, error } = await supabase
+    .from('crm_direct_messages')
+    .select('id', { count: 'exact', head: true })
+    .eq('recipient_id', me.id)
+    .is('read_at', null);
+  if (error || typeof count !== 'number') return 0;
+  return count;
+}
+
+/** Subscribe to direct-message changes for the current user (sent or received). */
+export function subscribeDirectMessages(onChange: () => void): () => void {
+  const channel = supabase
+    .channel('crm_direct_messages')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'crm_direct_messages' }, () => onChange())
+    .subscribe();
+  return () => { void supabase.removeChannel(channel); };
+}
+
 export async function sendMessage(body: string, senderName: string): Promise<{ error?: string }> {
   const text = body.trim();
   if (!text) return { error: 'Message is empty.' };
