@@ -14,7 +14,7 @@ import {
 import { supabase } from '../../lib/supabaseClient';
 import {
   listFirms, listActivity, addFirm, logActivity,
-  listMessages, sendMessage, getCurrentMember,
+  listMessages, sendMessage, getCurrentMember, getLatestMessageAt,
   listNotes, addNote, deleteNote, getIntakesCount, setFirmStage, setFirmMinutesSaved, getSiteAnalytics,
   claimFirm, releaseFirm,
   type CrmFirm, type CrmActivityWithFirm, type NewFirmInput, type LogActivityInput, type CrmMessage, type CrmNote, type SiteAnalytics,
@@ -132,6 +132,13 @@ function PriorityBadge({ priority }: { priority: 'A' | 'B' | 'C' | null }) {
 export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => void; isFounder?: boolean }) {
   const [tab, setTab] = useState<Tab>('dashboard');
   const [openGroup, setOpenGroup] = useState<string | null>(null);
+  // Team-chat unread indicator: compare the latest message time to the last one this
+  // member has seen (persisted), so the Team button lights up on new posts.
+  const [latestMsgAt, setLatestMsgAt] = useState<string | null>(null);
+  const [seenTeamAt, setSeenTeamAt] = useState<string>(() =>
+    (typeof window !== 'undefined' && window.localStorage.getItem('o3s_crm_team_seen')) || ''
+  );
+  const unreadTeam = !!latestMsgAt && latestMsgAt > seenTeamAt && tab !== 'team';
   const [userEmail, setUserEmail] = useState('');
   const [userId, setUserId] = useState<string | null>(null);
   const showEconomics = ECON_ALLOWED_EMAILS.includes(userEmail.trim().toLowerCase());
@@ -164,6 +171,26 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
   };
 
   useEffect(() => { void load(); }, []);
+
+  // Poll for new team messages (every 30s) to drive the unread dot.
+  useEffect(() => {
+    let active = true;
+    const check = async () => {
+      const at = await getLatestMessageAt();
+      if (active) setLatestMsgAt(at);
+    };
+    void check();
+    const h = window.setInterval(check, 30000);
+    return () => { active = false; window.clearInterval(h); };
+  }, []);
+
+  // Opening Team marks everything up to the latest message as seen.
+  useEffect(() => {
+    if (tab === 'team' && latestMsgAt) {
+      setSeenTeamAt(latestMsgAt);
+      if (typeof window !== 'undefined') window.localStorage.setItem('o3s_crm_team_seen', latestMsgAt);
+    }
+  }, [tab, latestMsgAt]);
 
   const firmsById = useMemo(() => Object.fromEntries(firms.map((f) => [f.id, f])), [firms]);
   const today = todayISO();
@@ -246,11 +273,14 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
                   <button
                     type="button"
                     onClick={() => setOpenGroup(open ? null : group.id)}
-                    className={`flex ${tap} items-center gap-1.5 rounded-[10px] px-3 text-[13px] font-semibold transition ${activeHere ? 'bg-[#6D4AFF] text-white' : 'bg-[#F2EEFF] text-[#1E1B4B]/70 hover:bg-[#EDE7FF]'}`}
+                    className={`relative flex ${tap} items-center gap-1.5 rounded-[10px] px-3 text-[13px] font-semibold transition ${activeHere ? 'bg-[#6D4AFF] text-white' : 'bg-[#F2EEFF] text-[#1E1B4B]/70 hover:bg-[#EDE7FF]'}`}
                   >
                     <group.icon className="h-3.5 w-3.5" />
                     {activeHere && activeItem ? activeItem.label : group.label}
                     <ChevronDown className={`h-3.5 w-3.5 transition-transform ${open ? 'rotate-180' : ''}`} />
+                    {group.tabIds.includes('team') && unreadTeam && (
+                      <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 animate-pulse rounded-full bg-red-500 ring-2 ring-white" />
+                    )}
                   </button>
                   {open && (
                     <div className="absolute left-0 z-40 mt-1 min-w-[190px] rounded-[12px] border border-[#E7E1FF] bg-white p-1 shadow-[0_12px_30px_rgba(109,74,255,0.18)]">
@@ -262,6 +292,11 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
                           className={`flex ${tap} w-full items-center gap-2 rounded-[8px] px-3 text-left text-[13px] font-medium transition ${tab === t.id ? 'bg-[#EDE7FF] text-[#6D4AFF]' : 'text-[#1E1B4B]/70 hover:bg-[#F4F1FF]'}`}
                         >
                           <t.icon className="h-3.5 w-3.5 shrink-0" /> {t.label}
+                          {t.id === 'team' && unreadTeam && (
+                            <span className="ml-auto inline-flex items-center gap-1 text-[10px] font-bold text-red-600">
+                              <span className="h-2 w-2 rounded-full bg-red-500" /> New
+                            </span>
+                          )}
                         </button>
                       ))}
                     </div>

@@ -218,6 +218,18 @@ export async function listMessages(limit = 200): Promise<{ data: CrmMessage[]; e
   return { data: (data ?? []) as CrmMessage[] };
 }
 
+/** Timestamp of the most recent team message (for the unread indicator). Null if none. */
+export async function getLatestMessageAt(): Promise<string | null> {
+  const { data, error } = await supabase
+    .from('crm_messages')
+    .select('created_at')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error || !data) return null;
+  return (data as { created_at: string }).created_at;
+}
+
 export async function sendMessage(body: string, senderName: string): Promise<{ error?: string }> {
   const text = body.trim();
   if (!text) return { error: 'Message is empty.' };
