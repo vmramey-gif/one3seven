@@ -9,6 +9,7 @@ import {
   WORKER_STORY_REASSURANCE,
 } from '../constants/workerStoryIntake';
 import { INTAKE_OPENING_SHELL } from '../constants/intakeOpeningPresentation';
+import { track } from '../../lib/analytics';
 
 type WorkerStoryIntakeScreenProps = {
   intakeNumber?: string | null;
@@ -18,6 +19,16 @@ type WorkerStoryIntakeScreenProps = {
   onBackToLanding: () => void;
 };
 
+// Cognitive-interview "report everything" follow-ups: open, non-leading, no "why", strictly
+// factual recall aids (people / order / documents / moments) — never feelings or sensory
+// re-experiencing, never legal labels. Every one is optional; blanks are fine.
+const FOLLOW_UPS: { key: string; label: string; placeholder: string }[] = [
+  { key: 'order', label: 'What happened first — and then what came next?', placeholder: 'The order of events, as best you remember. "Around March…" is fine.' },
+  { key: 'people', label: 'Who else was involved or saw what happened?', placeholder: 'Names or roles are both fine — managers, HR, coworkers, witnesses.' },
+  { key: 'records', label: 'Was anything written down or sent?', placeholder: 'Emails, texts, letters, notices, write-ups — anything you remember.' },
+  { key: 'moment', label: 'Was there a specific moment that stands out?', placeholder: 'A particular day or event that feels important.' },
+];
+
 export function WorkerStoryIntakeScreen({
   intakeNumber,
   initialStory = '',
@@ -26,10 +37,32 @@ export function WorkerStoryIntakeScreen({
   onBackToLanding,
 }: WorkerStoryIntakeScreenProps) {
   const [story, setStory] = useState(initialStory);
+  const [followUps, setFollowUps] = useState<Record<string, string>>({});
 
   useEffect(() => {
     setStory(initialStory);
   }, [initialStory]);
+
+  const setFollowUp = (key: string, value: string) =>
+    setFollowUps((prev) => ({ ...prev, [key]: value }));
+
+  const handleContinue = () => {
+    const narrative = story.trim();
+    const answered = FOLLOW_UPS.filter((f) => (followUps[f.key] ?? '').trim());
+    // Combine narrative + answered follow-ups into one richer story string (no parent/DB change).
+    const combined = [
+      narrative,
+      ...answered.map((f) => `${f.label}\n${(followUps[f.key] ?? '').trim()}`),
+    ]
+      .filter(Boolean)
+      .join('\n\n');
+    // Richness metric — counts only, never the content (no PII).
+    track('intake_story_submitted', {
+      narrative_chars: narrative.length,
+      followups_answered: answered.length,
+    });
+    onContinue(combined);
+  };
 
   return (
     <div className="min-h-screen bg-[#FAF9F6]">
@@ -54,7 +87,11 @@ export function WorkerStoryIntakeScreen({
       </header>
 
       <main className={`${INTAKE_OPENING_SHELL} px-6 py-8`}>
-        <p className="text-sm text-[#6B6685] leading-relaxed mb-4">{WORKER_STORY_INTRO}</p>
+        <p className="text-sm text-[#6B6685] leading-relaxed mb-1">{WORKER_STORY_INTRO}</p>
+        {/* Velocity / no-limbo framing — answer once, completely, so you're not stuck later. */}
+        <p className="text-sm text-[#6B6685] leading-relaxed mb-4">
+          Answer once, at your own pace — so a firm can look at your full story in one sitting, instead of you waiting weeks for back-and-forth.
+        </p>
 
         <p className="text-sm text-[#8B86A0] leading-relaxed mb-4">{WORKER_STORY_REASSURANCE}</p>
 
@@ -79,6 +116,27 @@ export function WorkerStoryIntakeScreen({
           className="w-full rounded-[14px] border border-[#ECE7F5] bg-white px-4 py-3.5 text-sm text-[#14112E] placeholder:text-[#A8A3BC] focus:border-[#C9B8F0] focus:outline-none focus:ring-2 focus:ring-[#ECE7F5] leading-relaxed"
         />
 
+        {/* Optional follow-ups — surface more of the account; all skippable. */}
+        <div className="mt-7">
+          <p className="text-sm font-medium text-[#14112E]">A few things that often bring more back</p>
+          <p className="mt-1 text-xs text-[#8B86A0]">All optional — answer any that fit, skip the rest.</p>
+          <div className="mt-3 space-y-4">
+            {FOLLOW_UPS.map((f) => (
+              <div key={f.key}>
+                <label htmlFor={`fu-${f.key}`} className="block text-[13px] font-medium text-[#3A3552] mb-1.5">{f.label}</label>
+                <textarea
+                  id={`fu-${f.key}`}
+                  value={followUps[f.key] ?? ''}
+                  onChange={(e) => setFollowUp(f.key, e.target.value)}
+                  rows={2}
+                  placeholder={f.placeholder}
+                  className="w-full rounded-[12px] border border-[#ECE7F5] bg-white px-4 py-3 text-sm text-[#14112E] placeholder:text-[#A8A3BC] focus:border-[#C9B8F0] focus:outline-none focus:ring-2 focus:ring-[#ECE7F5] leading-relaxed"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+
         <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <button
             type="button"
@@ -89,7 +147,7 @@ export function WorkerStoryIntakeScreen({
           </button>
           <button
             type="button"
-            onClick={() => onContinue(story.trim())}
+            onClick={handleContinue}
             className="inline-flex items-center justify-center gap-2 rounded-[14px] bg-[#5B21B6] px-5 py-3.5 text-sm font-semibold text-white hover:bg-[#4C1D96] min-h-[48px]"
           >
             Continue to upload
