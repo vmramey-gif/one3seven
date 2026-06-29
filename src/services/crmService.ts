@@ -239,7 +239,7 @@ export function subscribeTeamMessages(
   onStatus?: (status: string) => void
 ): () => void {
   const channel = supabase
-    .channel('crm_team_messages')
+    .channel(`crm_team_messages_${Math.random().toString(36).slice(2)}`)
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'crm_messages' }, (payload) => {
       onInsert(payload.new as CrmMessage);
     })
@@ -326,7 +326,7 @@ export async function getUnreadDmCount(): Promise<number> {
 /** Subscribe to direct-message changes for the current user (sent or received). */
 export function subscribeDirectMessages(onChange: () => void): () => void {
   const channel = supabase
-    .channel('crm_direct_messages')
+    .channel(`crm_direct_messages_${Math.random().toString(36).slice(2)}`)
     .on('postgres_changes', { event: '*', schema: 'public', table: 'crm_direct_messages' }, () => onChange())
     .subscribe();
   return () => { void supabase.removeChannel(channel); };

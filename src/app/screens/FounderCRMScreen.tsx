@@ -1550,7 +1550,8 @@ function InboxTab({ onReadChange }: { onReadChange?: () => void }) {
       if (!active) return;
       setMe(m);
       const mem = await listCrmMembers();
-      if (active && !mem.error) setMembers(mem.data);
+      // Normalize so name is never null (avoids .slice/.localeCompare crashes downstream).
+      if (active && !mem.error) setMembers(mem.data.map((x) => ({ ...x, name: x.name || x.email || 'Member' })));
       await loadMsgs();
     })();
     const unsub = subscribeDirectMessages(() => { if (active) void loadMsgs(); });

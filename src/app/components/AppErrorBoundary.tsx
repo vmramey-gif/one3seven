@@ -49,9 +49,14 @@ export class AppErrorBoundary extends Component<Props, State> {
         <div className="min-h-screen bg-[#f6f2ff] flex flex-col items-center justify-center px-6 text-center">
           <div className="max-w-sm w-full">
             <p className="text-xl font-bold text-[#1e1b4b] mb-2"><WordMark /></p>
-            <p className="text-sm text-[#1e1b4b]/60 mb-8">
+            <p className="text-sm text-[#1e1b4b]/60 mb-4">
               Something went wrong loading the app.
             </p>
+            {this.state.errorMessage && (
+              <p className="mb-8 break-words rounded-lg bg-white/70 px-3 py-2 text-left font-mono text-[11px] leading-relaxed text-[#1e1b4b]/55">
+                {this.state.errorMessage}
+              </p>
+            )}
             <button
               onClick={this.handleReload}
               className="w-full rounded-full bg-[#6d4aff] py-4 text-sm font-semibold text-white shadow-lg"
