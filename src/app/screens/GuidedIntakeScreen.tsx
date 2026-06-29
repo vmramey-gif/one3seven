@@ -248,6 +248,10 @@ export function GuidedIntakeScreen({
   const silenceTimerRef = useRef<number | null>(null);
   const guidedRecordingRef = useRef(false);
   const prevListeningRef = useRef(false);
+  // Push-to-talk: answeringRef is true between tap-to-answer and tap-to-finish.
+  // manualStopRef marks an intentional stop so onend commits instead of resuming.
+  const answeringRef = useRef(false);
+  const manualStopRef = useRef(false);
   const [editingLabel, setEditingLabel] = useState<string | null>(null);
   const [editDraft, setEditDraft] = useState('');
 
@@ -260,6 +264,8 @@ export function GuidedIntakeScreen({
 
   const stopSpeechRecognition = () => {
     clearSilenceTimer();
+    manualStopRef.current = true;
+    answeringRef.current = false;
     const recognition = recognitionRef.current;
     if (!recognition) {
       setIsListening(false);
@@ -318,6 +324,10 @@ export function GuidedIntakeScreen({
     // so the worker just talks and the next question follows — no "Use answer" tap.
     const isGuided = guidedVoiceMode;
     guidedRecordingRef.current = isGuided;
+    if (isGuided) {
+      answeringRef.current = true;
+      manualStopRef.current = false;
+    }
 
     const recognition = new SpeechRecognition();
     recognitionRef.current = recognition;
@@ -342,18 +352,7 @@ export function GuidedIntakeScreen({
         setSpeechTranscript((prev) => `${prev}${prev ? ' ' : ''}${finalText.trim()}`.trim());
       }
       setSpeechInterim(interimText.trim());
-      // Reset the end-of-speech timer on every utterance; firing stops recognition,
-      // and onend triggers the auto-commit effect below.
-      if (isGuided) {
-        clearSilenceTimer();
-        silenceTimerRef.current = window.setTimeout(() => {
-          try {
-            recognition.stop();
-          } catch {
-            /* ignore */
-          }
-        }, 2600);
-      }
+      // Push-to-talk: no silence auto-stop — the answer ends only when the worker taps.
     };
     recognition.onerror = (event) => {
       if (recognitionRef.current !== recognition) return;
@@ -369,6 +368,17 @@ export function GuidedIntakeScreen({
     recognition.onend = () => {
       if (recognitionRef.current !== recognition) return;
       clearSilenceTimer();
+      // If the browser ended the mic on its own while the worker is still answering
+      // (hasn't tapped "done"), resume so nothing is lost. Transcript is preserved.
+      if (isGuided && answeringRef.current && !manualStopRef.current) {
+        try {
+          recognition.start();
+          return;
+        } catch {
+          /* fall through to stop */
+        }
+      }
+      answeringRef.current = false;
       setIsListening(false);
     };
 
@@ -591,26 +601,9 @@ export function GuidedIntakeScreen({
   // beat) open the mic automatically so the worker can just talk — hands-free. The
   // answer auto-commits on pause and advances, re-running this for the next question.
   useEffect(() => {
-    if (!guidedVoiceMode) return;
-    if (editingLabel) return; // don't hijack the mic while editing a past answer
-    let cancelled = false;
-    let timer: number | undefined;
-    const beginListening = () => {
-      if (cancelled || speechSupported === false) return;
-      startSpeechRecognition();
-    };
-    const armListen = () => {
-      timer = window.setTimeout(beginListening, 450);
-    };
-    if (voiceOn) {
-      playPrompt(activeVoiceQuestion.voiceKey, armListen);
-    } else {
-      armListen();
-    }
-    return () => {
-      cancelled = true;
-      if (timer) window.clearTimeout(timer);
-    };
+    if (!guidedVoiceMode || !voiceOn) return;
+    if (editingLabel) return;
+    playPrompt(activeVoiceQuestion.voiceKey);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [guidedVoiceMode, activeVoiceQuestionIndex, voiceOn]);
 
@@ -889,8 +882,7 @@ export function GuidedIntakeScreen({
                         <p className="mt-3 text-xs font-medium text-[#6D4AFF]">{voiceAcknowledgment}</p>
                       ) : null}
 
-                      {/* Single talk control — mic opens automatically after each question;
-                          the answer commits on pause and the next question follows. */}
+                      {/* Push-to-talk: tap to start answering, tap again to save and advance. */}
                       <button
                         type="button"
                         onClick={isListening ? stopSpeechRecognition : startSpeechRecognition}
@@ -900,10 +892,10 @@ export function GuidedIntakeScreen({
                         }`}
                       >
                         {isListening ? <Square className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-                        {playingPrompt ? 'Asking…' : isListening ? 'Listening… tap when done' : 'Tap to answer'}
+                        {playingPrompt ? 'Asking…' : isListening ? 'Tap when you’re done' : 'Tap to answer'}
                       </button>
                       <p className="mt-2 text-center text-[11px] leading-relaxed text-[#64748B]">
-                        Just talk — the mic opens after each question, your answer saves when you pause, then the next one comes up. Skip anything you don&apos;t want to answer.
+                        Tap to answer, talk as long as you need, then tap again to save it and go to the next question. Skip anything you don&apos;t want to answer.
                       </p>
 
                       {/* Footer nav */}
