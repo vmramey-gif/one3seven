@@ -143,6 +143,7 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
   );
   const unreadTeam = !!latestMsgAt && latestMsgAt > seenTeamAt && tab !== 'team';
   const [unreadDm, setUnreadDm] = useState(0);
+  const [realtimeLive, setRealtimeLive] = useState(false);
   const [userEmail, setUserEmail] = useState('');
   const [userId, setUserId] = useState<string | null>(null);
   const showEconomics = ECON_ALLOWED_EMAILS.includes(userEmail.trim().toLowerCase());
@@ -184,9 +185,10 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
       if (active) setLatestMsgAt(at);
     };
     void check();
-    const unsub = subscribeTeamMessages((m) => {
-      setLatestMsgAt((prev) => (!prev || m.created_at > prev ? m.created_at : prev));
-    });
+    const unsub = subscribeTeamMessages(
+      (m) => setLatestMsgAt((prev) => (!prev || m.created_at > prev ? m.created_at : prev)),
+      (status) => setRealtimeLive(status === 'SUBSCRIBED'),
+    );
     const h = window.setInterval(check, 60000);
     return () => { active = false; unsub(); window.clearInterval(h); };
   }, []);
@@ -271,7 +273,16 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
           <button type="button" onClick={onExit} className={`flex items-center gap-1.5 ${tap} px-1 text-sm font-medium text-[#1E1B4B]/60 hover:text-[#1E1B4B]`}>
             <ArrowLeft className="h-4 w-4" /> Exit
           </button>
-          <div className="text-[15px] font-bold tracking-tight">Sales CRM</div>
+          <div className="flex items-center gap-2">
+            <span className="text-[15px] font-bold tracking-tight">Sales CRM</span>
+            <span
+              title={realtimeLive ? 'Real-time updates are live' : 'Using periodic refresh (real-time not connected)'}
+              className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold ${realtimeLive ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}
+            >
+              <span className={`h-1.5 w-1.5 rounded-full ${realtimeLive ? 'animate-pulse bg-emerald-500' : 'bg-slate-400'}`} />
+              {realtimeLive ? 'Live' : 'Polling'}
+            </span>
+          </div>
           <span className="rounded-full bg-[#EDE7FF] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[#6D4AFF]">Founder</span>
         </div>
         {/* Categorized dropdown nav — wraps, never scrolls sideways. */}

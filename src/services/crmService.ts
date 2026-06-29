@@ -230,14 +230,20 @@ export async function getLatestMessageAt(): Promise<string | null> {
   return (data as { created_at: string }).created_at;
 }
 
-/** Subscribe to new shared team-chat messages in real time. Returns an unsubscribe fn. */
-export function subscribeTeamMessages(onInsert: (m: CrmMessage) => void): () => void {
+/**
+ * Subscribe to new shared team-chat messages in real time. Returns an unsubscribe fn.
+ * onStatus receives the channel state ('SUBSCRIBED' when the realtime socket is live).
+ */
+export function subscribeTeamMessages(
+  onInsert: (m: CrmMessage) => void,
+  onStatus?: (status: string) => void
+): () => void {
   const channel = supabase
     .channel('crm_team_messages')
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'crm_messages' }, (payload) => {
       onInsert(payload.new as CrmMessage);
     })
-    .subscribe();
+    .subscribe((status) => { onStatus?.(status); });
   return () => { void supabase.removeChannel(channel); };
 }
 
