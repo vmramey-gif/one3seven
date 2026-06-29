@@ -34,6 +34,15 @@
   "close_short": "That's it — your story is organized, and you only had to tell it once.",
   "close_next_step": "Your story is organized. From here, you can review the timeline and choose who you'd like to send it to.",
 
+  "guided_q1_what_happened": "Take your time. Start wherever it feels easiest. What happened?",
+  "guided_q2_first": "What happened first?",
+  "guided_q3_who": "Who was involved?",
+  "guided_q4_when": "When did things start changing, if you remember?",
+  "guided_q5_reported": "Did you tell anyone at work or ask for help?",
+  "guided_q6_after": "What changed after that?",
+  "guided_q7_records": "Are there messages, schedules, pay records, write-ups, photos, notes, or other records that might help show what happened?",
+  "guided_q8_else": "Is there anything important we did not ask about?",
+
   "glue_got_it": "Got it.",
   "glue_thanks": "Thanks — that's helpful.",
   "glue_take_your_time": "Take your time. Tap when you're ready.",

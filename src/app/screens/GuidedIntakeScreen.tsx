@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowLeft, ArrowRight, Mic, Square, Trash2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Mic, Square, Trash2, Volume2 } from 'lucide-react';
 import type { GuidedIntakeAnswers } from '../../services/guidedIntakePersistence';
 import {
   suggestGuidedFollowUpQuestions,
@@ -25,44 +25,55 @@ const STEP_SECTION_LABELS: Record<number, string> = {
   2: 'Step 2: Review and continue',
 };
 
+// voiceKey maps each question to a pre-rendered, vetted clip in /voice/<key>.mp3
+// (text is verbatim with scripts/voice-lines.json so audio matches the screen).
 const GUIDED_VOICE_QUESTIONS = [
   {
     question: 'Take your time. Start wherever it feels easiest. What happened?',
     label: 'What happened',
+    voiceKey: 'guided_q1_what_happened',
   },
   {
     question: 'What happened first?',
     label: 'What happened first',
+    voiceKey: 'guided_q2_first',
   },
   {
     question: 'Who was involved?',
     label: 'Who was involved',
+    voiceKey: 'guided_q3_who',
   },
   {
     question: 'When did things start changing, if you remember?',
     label: 'When things started changing',
+    voiceKey: 'guided_q4_when',
   },
   {
     question: 'Did you tell anyone at work or ask for help?',
     label: 'What was reported or asked',
+    voiceKey: 'guided_q5_reported',
   },
   {
     question: 'What changed after that?',
     label: 'What changed after that',
+    voiceKey: 'guided_q6_after',
   },
   {
     question: 'Are there messages, schedules, pay records, write-ups, photos, notes, or other records that might help show what happened?',
     label: 'Records that may help',
+    voiceKey: 'guided_q7_records',
   },
   {
     question: 'Is there anything important we did not ask about?',
     label: 'Anything else',
+    voiceKey: 'guided_q8_else',
   },
 ] as const;
 
 type GuidedVoiceQuestion = {
   question: string;
   label: string;
+  voiceKey?: string;
 };
 
 type GuidedVoiceAnswer = {
@@ -147,7 +158,25 @@ export function GuidedIntakeScreen({
   const [voiceAcknowledgment, setVoiceAcknowledgment] = useState<string | null>(null);
   const initialContext = initialAnswers?.context ?? '';
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
+  const promptAudioRef = useRef<HTMLAudioElement | null>(null);
+  const [playingPrompt, setPlayingPrompt] = useState(false);
   const contextRef = useRef(initialAnswers?.context ?? '');
+
+  // Play the pre-rendered, vetted clip for a guided question. Fixed audio only —
+  // never a live agent. Click-to-play, no-ops if the clip isn't present.
+  const playPrompt = (voiceKey?: string) => {
+    if (!voiceKey) return;
+    try {
+      promptAudioRef.current?.pause();
+      const a = new Audio(`/voice/${voiceKey}.mp3`);
+      promptAudioRef.current = a;
+      setPlayingPrompt(true);
+      a.onended = () => setPlayingPrompt(false);
+      void a.play().catch(() => setPlayingPrompt(false));
+    } catch {
+      setPlayingPrompt(false);
+    }
+  };
   const mergedGuidedVoiceLabelsRef = useRef<Set<string>>(new Set());
   const allVoiceQuestions: GuidedVoiceQuestion[] = [...GUIDED_VOICE_QUESTIONS, ...selectedFollowUpQuestions];
   const activeVoiceQuestion = allVoiceQuestions[Math.min(activeVoiceQuestionIndex, allVoiceQuestions.length - 1)];
@@ -457,6 +486,7 @@ export function GuidedIntakeScreen({
         }
       }
       recognitionRef.current = null;
+      promptAudioRef.current?.pause();
     };
   }, []);
 
@@ -615,6 +645,16 @@ export function GuidedIntakeScreen({
                           <p className="mt-2 text-lg font-semibold leading-snug text-[#0B1033]">
                             {activeVoiceQuestion.question}
                           </p>
+                          {activeVoiceQuestion.voiceKey ? (
+                            <button
+                              type="button"
+                              onClick={() => playPrompt(activeVoiceQuestion.voiceKey)}
+                              className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-[#6D4AFF] hover:text-[#5636E8]"
+                            >
+                              <Volume2 className={`h-3.5 w-3.5 ${playingPrompt ? 'animate-pulse' : ''}`} />
+                              {playingPrompt ? 'Playing…' : 'Hear this question'}
+                            </button>
+                          ) : null}
                           <p className="mt-2 text-xs leading-relaxed text-[#475569]">
                             Take your time. Skip anything you do not know or do not want to answer.
                           </p>
