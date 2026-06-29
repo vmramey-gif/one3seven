@@ -1,0 +1,33 @@
+{
+  "intake_entry": "Hi. I'm going to help you organize your story, in your own words. This takes about fifteen minutes. You can talk, or type — whatever's easier — and you can stop anytime and pick up right where you left off. Want to start?",
+  "intake_employer": "First — what was the name of the place you worked?",
+  "intake_role": "Got it. And what was your role there?",
+  "intake_start": "Thanks. Roughly when did you start — even just a year is fine.",
+  "intake_narrative": "Okay. Now, in your own words — what happened? Tell it however it comes to you. Don't worry about order or dates. I won't interrupt — just talk, and tap done when you're finished.",
+  "intake_recall_intro": "That's helpful. A few optional questions — sometimes they bring more back. Skip any of them.",
+  "intake_recall_order": "As best you remember — what happened first, then what came next?",
+  "intake_recall_people": "Was anyone else there? Names or roles are both fine.",
+  "intake_recall_records": "Was anything written down or sent — emails, texts, letters?",
+  "intake_recall_moment": "Was there a specific moment that stands out?",
+  "intake_documents": "Last part. If you have documents — pay stubs, schedules, texts, a termination letter — you can upload them on the screen. A photo of paper works too. Don't have something? Just add what you have.",
+  "intake_close": "That's it — your story is organized. You answered once, and you're done. You won't need to repeat any of this.",
+
+  "glue_got_it": "Got it.",
+  "glue_thanks": "Thanks — that's helpful.",
+  "glue_take_your_time": "Take your time. Tap when you're ready.",
+  "glue_ready_next": "Ready for the next one?",
+  "glue_finished_or_thinking": "Are you finished, or just thinking? No rush.",
+
+  "demo_fire_intro": "This is Marcus. He worked at a warehouse in Tracy for almost four years, until a fire ended the job and scattered his records. Here's how one3seven helps him walk into an attorney's office organized.",
+  "demo_fire_story": "It starts with his story, in his own words. No legal knowledge, no forms to decode — he just says what happened. one3seven listens and starts building the structure underneath.",
+  "demo_fire_records": "Then he adds what he has — pay stubs, the HR complaint, a written warning, messages. Some records were lost in the fire, so one3seven helps him figure out what's missing and where to find it, instead of leaving gaps.",
+  "demo_fire_details": "A few simple questions fill in the details — only the ones he knows. Nothing required, nothing assumed.",
+  "demo_fire_processing": "And this is the part that used to eat an attorney's first hour. one3seven sequences the events, categorizes the documents, and links every fact back to the record it came from.",
+  "demo_fire_packet": "Here's what the firm receives. Marcus's four years, on one clear, dated timeline. The HR complaint. The written warning. The fire that ended the job. Every entry traces back to its source document — verify any of it in one click.",
+  "demo_fire_discipline": "one3seven organizes and reflects. It never draws a conclusion. The summary is a starting point — the attorney evaluates everything.",
+  "demo_fire_close": "So instead of a shoebox and a story, the attorney opens a structured intake before the first call. That's one3seven. Scattered records in. A clear timeline out.",
+
+  "demo_firm_intro": "This is what a plaintiff firm opens every morning. Not a pile of scattered records waiting on staff to sort — a dashboard of intakes, already organized.",
+  "demo_firm_body": "Each one: the worker's story, a dated timeline, every fact linked to its source document. So you're not spending the first hour assembling the record — you open it and decide. Yes or no, in minutes, not next week.",
+  "demo_firm_close": "The worker wasn't stuck in limbo waiting on a callback, and your team isn't stuck in triage. one3seven organizes and reflects — you decide everything. Open the dashboard, decide in minutes. Start a free pilot at one three seven dot com slash for firms."
+}
