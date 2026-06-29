@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { ArrowLeft, ArrowRight, Volume2 } from 'lucide-react';
 import {
   STORY_FIRST_STEP_LABELS,
   WORKER_STORY_EXAMPLES,
@@ -38,10 +38,30 @@ export function WorkerStoryIntakeScreen({
 }: WorkerStoryIntakeScreenProps) {
   const [story, setStory] = useState(initialStory);
   const [followUps, setFollowUps] = useState<Record<string, string>>({});
+  const [playing, setPlaying] = useState<string | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Play a pre-rendered, vetted voice clip from /voice/<key>.mp3. Fixed audio only —
+  // never a live/generative agent. Multimodal: the text is always on screen; audio is
+  // additive. No autoplay (a click is required), and it no-ops if a clip isn't present.
+  const playClip = (key: string) => {
+    try {
+      if (audioRef.current) audioRef.current.pause();
+      const a = new Audio(`/voice/${key}.mp3`);
+      audioRef.current = a;
+      setPlaying(key);
+      a.onended = () => setPlaying(null);
+      void a.play().catch(() => setPlaying(null));
+    } catch {
+      setPlaying(null);
+    }
+  };
 
   useEffect(() => {
     setStory(initialStory);
   }, [initialStory]);
+
+  useEffect(() => () => audioRef.current?.pause(), []);
 
   const setFollowUp = (key: string, value: string) =>
     setFollowUps((prev) => ({ ...prev, [key]: value }));
@@ -104,6 +124,14 @@ export function WorkerStoryIntakeScreen({
           </ul>
         </div>
 
+        <button
+          type="button"
+          onClick={() => playClip('intake_narrative')}
+          className="mb-2 inline-flex items-center gap-1.5 text-xs font-medium text-[#5B21B6] hover:text-[#4C1D96]"
+        >
+          <Volume2 className={`h-3.5 w-3.5 ${playing === 'intake_narrative' ? 'animate-pulse' : ''}`} />
+          {playing === 'intake_narrative' ? 'Playing…' : 'Listen to this question'}
+        </button>
         <label className="sr-only" htmlFor="worker-story-intake">
           Tell your story
         </label>
@@ -123,7 +151,17 @@ export function WorkerStoryIntakeScreen({
           <div className="mt-3 space-y-4">
             {FOLLOW_UPS.map((f) => (
               <div key={f.key}>
-                <label htmlFor={`fu-${f.key}`} className="block text-[13px] font-medium text-[#3A3552] mb-1.5">{f.label}</label>
+                <div className="mb-1.5 flex items-center gap-2">
+                  <label htmlFor={`fu-${f.key}`} className="text-[13px] font-medium text-[#3A3552]">{f.label}</label>
+                  <button
+                    type="button"
+                    onClick={() => playClip(`intake_recall_${f.key}`)}
+                    aria-label="Listen to this question"
+                    className="text-[#8B86A0] hover:text-[#5B21B6]"
+                  >
+                    <Volume2 className={`h-3.5 w-3.5 ${playing === `intake_recall_${f.key}` ? 'animate-pulse text-[#5B21B6]' : ''}`} />
+                  </button>
+                </div>
                 <textarea
                   id={`fu-${f.key}`}
                   value={followUps[f.key] ?? ''}
