@@ -9,13 +9,14 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Phone, Mail, Calendar, ArrowLeft, Plus, X, TrendingUp,
   ClipboardList, LayoutGrid, Building2, BookOpen, BarChart3, CheckCircle2,
-  GraduationCap, ListChecks, Check, MessageSquare, Send, StickyNote, Trash2, ChevronRight, ShieldCheck, RefreshCw, AlertTriangle, DollarSign, Flame, Sparkles, Trophy, Calculator, Link2, Copy, ExternalLink, Globe,
+  GraduationCap, ListChecks, Check, MessageSquare, Send, StickyNote, Trash2, ChevronRight, ChevronDown, ShieldCheck, RefreshCw, AlertTriangle, DollarSign, Flame, Sparkles, Trophy, Calculator, Link2, Copy, ExternalLink, Globe, Hand, Lock,
 } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
 import {
   listFirms, listActivity, addFirm, logActivity,
   listMessages, sendMessage, getCurrentMember,
   listNotes, addNote, deleteNote, getIntakesCount, setFirmStage, setFirmMinutesSaved, getSiteAnalytics,
+  claimFirm, releaseFirm,
   type CrmFirm, type CrmActivityWithFirm, type NewFirmInput, type LogActivityInput, type CrmMessage, type CrmNote, type SiteAnalytics,
 } from '../../services/crmService';
 import {
@@ -80,6 +81,22 @@ const TABS: { id: Tab; label: string; icon: typeof LayoutGrid; founderOnly?: boo
   { id: 'add', label: 'Add / Log', icon: Plus },
 ];
 
+// Tab lookup + categorized navigation. Reps live in "Sell" + "Me" + "Learn"; founder-only
+// and economics tabs collapse into "Founder". Groups render as dropdowns so the nav never
+// sprawls sideways — it wraps and stays one or two rows on a phone.
+const TAB_BY_ID: Record<Tab, { id: Tab; label: string; icon: typeof LayoutGrid; founderOnly?: boolean; econOnly?: boolean }> =
+  Object.fromEntries(TABS.map((t) => [t.id, t])) as Record<Tab, (typeof TABS)[number]>;
+
+const NAV_GROUPS: { id: string; label: string; icon: typeof LayoutGrid; tabIds: Tab[] }[] = [
+  { id: 'sell', label: 'Sell', icon: TrendingUp, tabIds: ['dashboard', 'firms', 'pipeline', 'add', 'activity'] },
+  { id: 'me', label: 'My numbers', icon: Trophy, tabIds: ['comp', 'metrics'] },
+  { id: 'learn', label: 'Learn', icon: BookOpen, tabIds: ['scripts', 'training', 'askai'] },
+  { id: 'team', label: 'Team', icon: MessageSquare, tabIds: ['team', 'notes'] },
+  { id: 'founder', label: 'Founder', icon: ShieldCheck, tabIds: ['revenue', 'economics', 'growth', 'checklist', 'audit', 'links'] },
+];
+
+type ClaimBundle = { userId: string | null; onClaim: (id: string) => Promise<void>; onRelease: (id: string) => Promise<void> };
+
 const FAST_LOG_OUTCOMES = [
   'Demo booked', 'Left voicemail', 'No answer', 'Not interested', 'Follow up needed', 'Send something',
 ];
@@ -114,6 +131,7 @@ function PriorityBadge({ priority }: { priority: 'A' | 'B' | 'C' | null }) {
 
 export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => void; isFounder?: boolean }) {
   const [tab, setTab] = useState<Tab>('dashboard');
+  const [openGroup, setOpenGroup] = useState<string | null>(null);
   const [userEmail, setUserEmail] = useState('');
   const [userId, setUserId] = useState<string | null>(null);
   const showEconomics = ECON_ALLOWED_EMAILS.includes(userEmail.trim().toLowerCase());
@@ -159,6 +177,19 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
   };
   const closeFast = () => setFastFirmId(null);
 
+  /** Explicit claim — reserve a firm for this rep with a timestamp, before contacting. */
+  const claimFirmHandler = async (firmId: string) => {
+    const r = await claimFirm(firmId);
+    if (r.error) { setError(r.claimedBy ? `${r.error} (${r.claimedBy})` : r.error); return; }
+    await load();
+  };
+  const releaseFirmHandler = async (firmId: string) => {
+    const r = await releaseFirm(firmId);
+    if (r.error) { setError(r.error); return; }
+    await load();
+  };
+  const claim: ClaimBundle = { userId, onClaim: claimFirmHandler, onRelease: releaseFirmHandler };
+
   /** One-tap "I emailed this firm" — logs an email + claims credit, no form. */
   const quickEmail = async (firmId: string) => {
     const f = firmsById[firmId];
@@ -199,20 +230,55 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
           <div className="text-[15px] font-bold tracking-tight">Sales CRM</div>
           <span className="rounded-full bg-[#EDE7FF] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[#6D4AFF]">Founder</span>
         </div>
-        {/* Tab bar — horizontally scrollable on mobile */}
-        <div className="mx-auto max-w-3xl overflow-x-auto px-2 pb-1">
-          <div className="flex gap-1">
-            {TABS.filter((t) => (!t.founderOnly || isFounder) && (!t.econOnly || showEconomics)).map((t) => (
-              <button
-                key={t.id}
-                type="button"
-                onClick={() => setTab(t.id)}
-                className={`flex ${tap} shrink-0 items-center gap-1.5 rounded-[10px] px-3 text-[13px] font-semibold transition ${tab === t.id ? 'bg-[#6D4AFF] text-white' : 'text-[#1E1B4B]/55 hover:bg-[#EDE7FF]'}`}
-              >
-                <t.icon className="h-3.5 w-3.5" /> {t.label}
-              </button>
-            ))}
+        {/* Categorized dropdown nav — wraps, never scrolls sideways. */}
+        <div className="relative mx-auto max-w-3xl px-3 pb-2">
+          <div className="flex flex-wrap gap-1.5">
+            {NAV_GROUPS.map((group) => {
+              const items = group.tabIds
+                .map((id) => TAB_BY_ID[id])
+                .filter((t) => t && (!t.founderOnly || isFounder) && (!t.econOnly || showEconomics));
+              if (items.length === 0) return null;
+              const activeHere = items.some((t) => t.id === tab);
+              const open = openGroup === group.id;
+              const activeItem = items.find((t) => t.id === tab);
+              return (
+                <div key={group.id} className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setOpenGroup(open ? null : group.id)}
+                    className={`flex ${tap} items-center gap-1.5 rounded-[10px] px-3 text-[13px] font-semibold transition ${activeHere ? 'bg-[#6D4AFF] text-white' : 'bg-[#F2EEFF] text-[#1E1B4B]/70 hover:bg-[#EDE7FF]'}`}
+                  >
+                    <group.icon className="h-3.5 w-3.5" />
+                    {activeHere && activeItem ? activeItem.label : group.label}
+                    <ChevronDown className={`h-3.5 w-3.5 transition-transform ${open ? 'rotate-180' : ''}`} />
+                  </button>
+                  {open && (
+                    <div className="absolute left-0 z-40 mt-1 min-w-[190px] rounded-[12px] border border-[#E7E1FF] bg-white p-1 shadow-[0_12px_30px_rgba(109,74,255,0.18)]">
+                      {items.map((t) => (
+                        <button
+                          key={t.id}
+                          type="button"
+                          onClick={() => { setTab(t.id); setOpenGroup(null); }}
+                          className={`flex ${tap} w-full items-center gap-2 rounded-[8px] px-3 text-left text-[13px] font-medium transition ${tab === t.id ? 'bg-[#EDE7FF] text-[#6D4AFF]' : 'text-[#1E1B4B]/70 hover:bg-[#F4F1FF]'}`}
+                        >
+                          <t.icon className="h-3.5 w-3.5 shrink-0" /> {t.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
+          {/* Click-away backdrop to close an open dropdown */}
+          {openGroup && (
+            <button
+              type="button"
+              aria-label="Close menu"
+              onClick={() => setOpenGroup(null)}
+              className="fixed inset-0 z-30 cursor-default"
+            />
+          )}
         </div>
       </header>
 
@@ -224,9 +290,9 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
           <div className="py-20 text-center text-sm text-[#1E1B4B]/40">Loading…</div>
         ) : (
           <>
-            {tab === 'dashboard' && <DashboardTab firms={firms} activity={activity} today={today} onLog={openFast} workerCount={workerCount} onChanged={load} onQuickEmail={quickEmail} />}
-            {tab === 'pipeline' && <PipelineTab firms={firms} onLog={openFast} workerCount={workerCount} onQuickEmail={quickEmail} />}
-            {tab === 'firms' && <FirmsTab firms={firms} onLog={openFast} userId={userId} onQuickEmail={quickEmail} />}
+            {tab === 'dashboard' && <DashboardTab firms={firms} activity={activity} today={today} onLog={openFast} workerCount={workerCount} onChanged={load} onQuickEmail={quickEmail} claim={claim} />}
+            {tab === 'pipeline' && <PipelineTab firms={firms} onLog={openFast} workerCount={workerCount} onQuickEmail={quickEmail} claim={claim} />}
+            {tab === 'firms' && <FirmsTab firms={firms} onLog={openFast} userId={userId} onQuickEmail={quickEmail} claim={claim} />}
             {tab === 'activity' && <ActivityTab activity={activity} />}
             {tab === 'metrics' && <MetricsTab firms={firms} activity={activity} />}
             {tab === 'team' && <TeamTab />}
@@ -318,10 +384,13 @@ function Collapsible({ title, defaultOpen = false, children }: { title: string; 
 }
 
 // Compact, collapsible firm row. Tap-to-call lives in the header so it's reachable without expanding.
-function FirmCard({ firm, onLog, today, onQuickEmail }: { firm: CrmFirm; onLog: (id: string) => void; today?: string; onQuickEmail?: (id: string) => Promise<void> }) {
+function FirmCard({ firm, onLog, today, onQuickEmail, userId, onClaim, onRelease }: { firm: CrmFirm; onLog: (id: string) => void; today?: string; onQuickEmail?: (id: string) => Promise<void>; userId?: string | null; onClaim?: (id: string) => Promise<void>; onRelease?: (id: string) => Promise<void> }) {
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [claiming, setClaiming] = useState(false);
   const due = today && firm.next_followup && firm.next_followup <= today;
+  const mine = !!userId && firm.contacted_by === userId;
+  const claimedDate = firm.contacted_at ? firm.contacted_at.slice(0, 10) : null;
   const intel = crmFirmIntel[firm.name];
   return (
     <div className="overflow-hidden rounded-[14px] border border-[#E7E1FF] bg-white">
@@ -332,23 +401,25 @@ function FirmCard({ firm, onLog, today, onQuickEmail }: { firm: CrmFirm; onLog: 
           <PriorityBadge priority={firm.priority} />
           {due && <span className="shrink-0 rounded-full bg-red-100 px-1.5 py-0.5 text-[10px] font-bold text-red-600">due</span>}
         </button>
-        {firm.contacted_by_name && (
-          <span className="shrink-0 rounded-full bg-[#EDE7FF] px-2 py-0.5 text-[10px] font-semibold text-[#6D4AFF]" title={`Contacted by ${firm.contacted_by_name}`}>
-            {firm.contacted_by_name.split(' ')[0]}
+        {firm.contacted_by ? (
+          <span
+            className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold ${mine ? 'bg-emerald-100 text-emerald-700' : 'bg-[#EDE7FF] text-[#6D4AFF]'}`}
+            title={`Claimed by ${firm.contacted_by_name ?? 'rep'}${claimedDate ? ' · ' + claimedDate : ''}`}
+          >
+            {mine ? 'Yours' : (firm.contacted_by_name?.split(' ')[0] ?? 'Claimed')}
           </span>
-        )}
-        <StageTag stage={firm.stage} />
-        {onQuickEmail && !firm.contacted_by && (
+        ) : onClaim ? (
           <button
             type="button"
-            disabled={busy}
-            onClick={async () => { setBusy(true); try { await onQuickEmail(firm.id); } finally { setBusy(false); } }}
-            className="flex h-9 shrink-0 items-center gap-1 rounded-full bg-[#EDE7FF] px-2.5 text-[11px] font-bold text-[#6D4AFF] transition hover:bg-[#E0D6FF] disabled:opacity-50"
-            aria-label={`Log email to ${firm.name}`}
+            disabled={claiming}
+            onClick={async () => { setClaiming(true); try { await onClaim(firm.id); } finally { setClaiming(false); } }}
+            className="flex h-9 shrink-0 items-center gap-1 rounded-full bg-[#6D4AFF] px-2.5 text-[11px] font-bold text-white transition hover:bg-[#5B3FE0] disabled:opacity-50"
+            aria-label={`Claim ${firm.name}`}
           >
-            <Mail className="h-3.5 w-3.5" /> {busy ? '…' : 'Emailed'}
+            <Hand className="h-3.5 w-3.5" /> {claiming ? '…' : 'Claim'}
           </button>
-        )}
+        ) : null}
+        <StageTag stage={firm.stage} />
         {firm.phone && (
           <a href={`tel:${digitsOf(firm.phone)}`} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-600" aria-label={`Call ${firm.name}`}>
             <Phone className="h-4 w-4" />
@@ -395,9 +466,38 @@ function FirmCard({ firm, onLog, today, onQuickEmail }: { firm: CrmFirm; onLog: 
             </Collapsible>
           )}
 
-          <button type="button" onClick={() => onLog(firm.id)} className={`flex ${tap} w-full items-center justify-center gap-2 rounded-[12px] bg-[#EDE7FF] font-semibold text-[#6D4AFF]`}>
-            <Phone className="h-4 w-4" /> Log call
-          </button>
+          {firm.contacted_by && (
+            <div className="flex items-center justify-between gap-2 text-[11px] text-[#1E1B4B]/50">
+              <span className="inline-flex items-center gap-1">
+                <Lock className="h-3 w-3" />
+                Claimed by {mine ? 'you' : (firm.contacted_by_name ?? 'a rep')}{claimedDate ? ` on ${claimedDate}` : ''}
+              </span>
+              {mine && onRelease && (
+                <button
+                  type="button"
+                  onClick={() => onRelease(firm.id)}
+                  className="font-semibold text-[#1E1B4B]/45 underline-offset-2 hover:text-red-600 hover:underline"
+                >
+                  Release
+                </button>
+              )}
+            </div>
+          )}
+          <div className="flex gap-2">
+            <button type="button" onClick={() => onLog(firm.id)} className={`flex ${tap} flex-1 items-center justify-center gap-2 rounded-[12px] bg-[#EDE7FF] font-semibold text-[#6D4AFF]`}>
+              <Phone className="h-4 w-4" /> Log call
+            </button>
+            {onQuickEmail && (
+              <button
+                type="button"
+                disabled={busy}
+                onClick={async () => { setBusy(true); try { await onQuickEmail(firm.id); } finally { setBusy(false); } }}
+                className={`flex ${tap} items-center justify-center gap-1.5 rounded-[12px] border border-[#E0D6FF] px-3 font-semibold text-[#6D4AFF] disabled:opacity-50`}
+              >
+                <Mail className="h-4 w-4" /> {busy ? '…' : 'Emailed'}
+              </button>
+            )}
+          </div>
         </div>
       )}
     </div>
@@ -405,7 +505,7 @@ function FirmCard({ firm, onLog, today, onQuickEmail }: { firm: CrmFirm; onLog: 
 }
 
 // ── Dashboard ────────────────────────────────────────────────────────────────
-function DashboardTab({ firms, activity, today, onLog, workerCount, onChanged, onQuickEmail }: { firms: CrmFirm[]; activity: CrmActivityWithFirm[]; today: string; onLog: (id: string) => void; workerCount: number; onChanged: () => void; onQuickEmail?: (id: string) => Promise<void> }) {
+function DashboardTab({ firms, activity, today, onLog, workerCount, onChanged, onQuickEmail, claim }: { firms: CrmFirm[]; activity: CrmActivityWithFirm[]; today: string; onLog: (id: string) => void; workerCount: number; onChanged: () => void; onQuickEmail?: (id: string) => Promise<void>; claim?: ClaimBundle }) {
   const stats = [
     { label: 'Firms', value: firms.length },
     { label: 'Calls', value: activity.filter((a) => a.activity_type === 'call').length },
@@ -436,7 +536,7 @@ function DashboardTab({ firms, activity, today, onLog, workerCount, onChanged, o
         {due.length === 0 ? (
           <p className="rounded-[12px] border border-[#E7E1FF] bg-white px-4 py-3 text-[13px] text-[#1E1B4B]/45">Nothing due. Nice.</p>
         ) : (
-          <div className="space-y-3">{due.map((f) => <FirmCard key={f.id} firm={f} onLog={onLog} today={today} onQuickEmail={onQuickEmail} />)}</div>
+          <div className="space-y-3">{due.map((f) => <FirmCard key={f.id} firm={f} onLog={onLog} today={today} onQuickEmail={onQuickEmail} userId={claim?.userId} onClaim={claim?.onClaim} onRelease={claim?.onRelease} />)}</div>
         )}
       </section>
 
@@ -1036,7 +1136,7 @@ function RevenueTab({ firms }: { firms: CrmFirm[] }) {
 }
 
 // ── Pipeline ─────────────────────────────────────────────────────────────────
-function PipelineTab({ firms, onLog, workerCount, onQuickEmail }: { firms: CrmFirm[]; onLog: (id: string) => void; workerCount: number; onQuickEmail?: (id: string) => Promise<void> }) {
+function PipelineTab({ firms, onLog, workerCount, onQuickEmail, claim }: { firms: CrmFirm[]; onLog: (id: string) => void; workerCount: number; onQuickEmail?: (id: string) => Promise<void>; claim?: ClaimBundle }) {
   const counts = CRM_STAGES.map((s) => ({ stage: s, n: firms.filter((f) => f.stage === s).length }));
   const priorityA = firms.filter((f) => f.priority === 'A');
   return (
@@ -1067,7 +1167,7 @@ function PipelineTab({ firms, onLog, workerCount, onQuickEmail }: { firms: CrmFi
         {priorityA.length === 0 ? (
           <p className="rounded-[12px] border border-[#E7E1FF] bg-white px-4 py-3 text-[13px] text-[#1E1B4B]/45">No Priority A firms yet.</p>
         ) : (
-          <div className="space-y-3">{priorityA.map((f) => <FirmCard key={f.id} firm={f} onLog={onLog} onQuickEmail={onQuickEmail} />)}</div>
+          <div className="space-y-3">{priorityA.map((f) => <FirmCard key={f.id} firm={f} onLog={onLog} onQuickEmail={onQuickEmail} userId={claim?.userId} onClaim={claim?.onClaim} onRelease={claim?.onRelease} />)}</div>
         )}
       </section>
     </div>
@@ -1075,7 +1175,7 @@ function PipelineTab({ firms, onLog, workerCount, onQuickEmail }: { firms: CrmFi
 }
 
 // ── Firms ────────────────────────────────────────────────────────────────────
-function FirmsTab({ firms, onLog, userId, onQuickEmail }: { firms: CrmFirm[]; onLog: (id: string) => void; userId: string | null; onQuickEmail?: (id: string) => Promise<void> }) {
+function FirmsTab({ firms, onLog, userId, onQuickEmail, claim }: { firms: CrmFirm[]; onLog: (id: string) => void; userId: string | null; onQuickEmail?: (id: string) => Promise<void>; claim?: ClaimBundle }) {
   const [stage, setStage] = useState<CrmStage | ''>('');
   const [priority, setPriority] = useState<'A' | 'B' | 'C' | ''>('');
   const [owner, setOwner] = useState<'all' | 'mine' | 'uncontacted'>('all');
@@ -1111,7 +1211,7 @@ function FirmsTab({ firms, onLog, userId, onQuickEmail }: { firms: CrmFirm[]; on
       {filtered.length === 0 ? (
         <p className="rounded-[12px] border border-[#E7E1FF] bg-white px-4 py-3 text-[13px] text-[#1E1B4B]/45">No firms match this filter.</p>
       ) : (
-        <div className="space-y-3">{filtered.map((f) => <FirmCard key={f.id} firm={f} onLog={onLog} today={todayISO()} onQuickEmail={onQuickEmail} />)}</div>
+        <div className="space-y-3">{filtered.map((f) => <FirmCard key={f.id} firm={f} onLog={onLog} today={todayISO()} onQuickEmail={onQuickEmail} userId={claim?.userId ?? userId} onClaim={claim?.onClaim} onRelease={claim?.onRelease} />)}</div>
       )}
     </div>
   );

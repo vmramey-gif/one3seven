@@ -304,6 +304,44 @@ export async function addFirm(input: NewFirmInput): Promise<{ error?: string }> 
   return {};
 }
 
+/**
+ * Explicitly claim a firm for the current rep, with a timestamp. Atomic: the update only
+ * applies when the firm is still unclaimed (`contacted_by is null`), so two reps tapping at
+ * once can't both win — the second gets "already claimed". No new migration needed; reuses
+ * the existing contacted_by / contacted_by_name / contacted_at columns as the claim record.
+ */
+export async function claimFirm(firmId: string): Promise<{ error?: string; claimedBy?: string }> {
+  const me = await getCurrentMember();
+  if (!me.id) return { error: 'Sign in to claim a firm.' };
+  const { data, error } = await supabase
+    .from('crm_firms')
+    .update({ contacted_by: me.id, contacted_by_name: me.name, contacted_at: new Date().toISOString() })
+    .eq('id', firmId)
+    .is('contacted_by', null)
+    .select('id');
+  if (error) return { error: error.message };
+  if (!data || data.length === 0) {
+    // Someone else already owns it — report who, so the UI can show it.
+    const { data: firm } = await supabase
+      .from('crm_firms')
+      .select('contacted_by_name')
+      .eq('id', firmId)
+      .maybeSingle();
+    return { error: 'This firm is already claimed.', claimedBy: firm?.contacted_by_name ?? undefined };
+  }
+  return {};
+}
+
+/** Release a claim — allowed for the owning rep (or a founder via RLS). Returns it to the pool. */
+export async function releaseFirm(firmId: string): Promise<{ error?: string }> {
+  const { error } = await supabase
+    .from('crm_firms')
+    .update({ contacted_by: null, contacted_by_name: null, contacted_at: null })
+    .eq('id', firmId);
+  if (error) return { error: error.message };
+  return {};
+}
+
 export async function updateFirm(id: string, patch: Partial<CrmFirm>): Promise<{ error?: string }> {
   const { error } = await supabase.from('crm_firms').update(patch).eq('id', id);
   if (error) return { error: error.message };
