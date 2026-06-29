@@ -299,9 +299,16 @@ export function GuidedIntakeScreen({
       return;
     }
 
+    // Detach the previous instance's handlers BEFORE aborting — abort() fires its
+    // onend asynchronously, which would otherwise flip isListening back to false
+    // right after we start the new one (the bug where the 2nd answer never records).
     if (recognitionRef.current) {
+      const old = recognitionRef.current;
+      old.onresult = null;
+      old.onerror = null;
+      old.onend = null;
       try {
-        recognitionRef.current.abort();
+        old.abort();
       } catch {
         /* ignore */
       }
@@ -318,6 +325,7 @@ export function GuidedIntakeScreen({
     recognition.interimResults = true;
     recognition.lang = 'en-US';
     recognition.onresult = (event) => {
+      if (recognitionRef.current !== recognition) return;
       let finalText = '';
       let interimText = '';
       for (let i = event.resultIndex; i < event.results.length; i += 1) {
@@ -348,6 +356,7 @@ export function GuidedIntakeScreen({
       }
     };
     recognition.onerror = (event) => {
+      if (recognitionRef.current !== recognition) return;
       clearSilenceTimer();
       const error = event.error ?? '';
       const message =
@@ -358,6 +367,7 @@ export function GuidedIntakeScreen({
       setIsListening(false);
     };
     recognition.onend = () => {
+      if (recognitionRef.current !== recognition) return;
       clearSilenceTimer();
       setIsListening(false);
     };
