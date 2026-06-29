@@ -168,17 +168,27 @@ export function GuidedIntakeScreen({
 
   // Play the pre-rendered, vetted clip for a guided question. Fixed audio only —
   // never a live agent. No-ops if the clip isn't present or autoplay is blocked.
-  const playPrompt = (voiceKey?: string) => {
-    if (!voiceKey) return;
+  const playPrompt = (voiceKey?: string, onDone?: () => void) => {
+    if (!voiceKey) {
+      onDone?.();
+      return;
+    }
     try {
       promptAudioRef.current?.pause();
       const a = new Audio(`/voice/${voiceKey}.mp3`);
       promptAudioRef.current = a;
       setPlayingPrompt(true);
-      a.onended = () => setPlayingPrompt(false);
-      void a.play().catch(() => setPlayingPrompt(false));
+      a.onended = () => {
+        setPlayingPrompt(false);
+        onDone?.();
+      };
+      void a.play().catch(() => {
+        setPlayingPrompt(false);
+        onDone?.();
+      });
     } catch {
       setPlayingPrompt(false);
+      onDone?.();
     }
   };
 
@@ -567,9 +577,30 @@ export function GuidedIntakeScreen({
   // Speak each question as it appears (conventional voice-guided pattern). The click
   // that enters guided mode unlocks browser autoplay for the rest of the session;
   // if a browser still blocks it, playPrompt no-ops and the Replay button remains.
+  // Conversation loop: when a question becomes active, speak it, then (after a short
+  // beat) open the mic automatically so the worker can just talk — hands-free. The
+  // answer auto-commits on pause and advances, re-running this for the next question.
   useEffect(() => {
-    if (!guidedVoiceMode || !voiceOn) return;
-    playPrompt(activeVoiceQuestion.voiceKey);
+    if (!guidedVoiceMode) return;
+    if (editingLabel) return; // don't hijack the mic while editing a past answer
+    let cancelled = false;
+    let timer: number | undefined;
+    const beginListening = () => {
+      if (cancelled || speechSupported === false) return;
+      startSpeechRecognition();
+    };
+    const armListen = () => {
+      timer = window.setTimeout(beginListening, 450);
+    };
+    if (voiceOn) {
+      playPrompt(activeVoiceQuestion.voiceKey, armListen);
+    } else {
+      armListen();
+    }
+    return () => {
+      cancelled = true;
+      if (timer) window.clearTimeout(timer);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [guidedVoiceMode, activeVoiceQuestionIndex, voiceOn]);
 
@@ -810,22 +841,31 @@ export function GuidedIntakeScreen({
                         </div>
                       ) : null}
 
-                      {/* Current question */}
-                      <div className="mt-4">
-                        <p className="text-lg font-semibold leading-snug text-[#0B1033]">
-                          {activeVoiceQuestion.question}
-                        </p>
-                        {activeVoiceQuestion.voiceKey && voiceOn ? (
-                          <button
-                            type="button"
-                            onClick={() => playPrompt(activeVoiceQuestion.voiceKey)}
-                            className="mt-1.5 inline-flex items-center gap-1.5 text-xs font-medium text-[#6D4AFF] hover:text-[#5636E8]"
-                          >
-                            <Volume2 className={`h-3.5 w-3.5 ${playingPrompt ? 'animate-pulse' : ''}`} />
-                            {playingPrompt ? 'Playing…' : 'Replay'}
-                          </button>
-                        ) : null}
-                      </div>
+                      {/* Current question — animates in as the conversation advances */}
+                      <AnimatePresence mode="wait">
+                        <motion.div
+                          key={activeVoiceQuestionIndex}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          transition={{ duration: 0.28, ease: 'easeOut' }}
+                          className="mt-4"
+                        >
+                          <p className="text-lg font-semibold leading-snug text-[#0B1033]">
+                            {activeVoiceQuestion.question}
+                          </p>
+                          {activeVoiceQuestion.voiceKey && voiceOn ? (
+                            <button
+                              type="button"
+                              onClick={() => playPrompt(activeVoiceQuestion.voiceKey)}
+                              className="mt-1.5 inline-flex items-center gap-1.5 text-xs font-medium text-[#6D4AFF] hover:text-[#5636E8]"
+                            >
+                              <Volume2 className={`h-3.5 w-3.5 ${playingPrompt ? 'animate-pulse' : ''}`} />
+                              {playingPrompt ? 'Asking…' : 'Replay'}
+                            </button>
+                          ) : null}
+                        </motion.div>
+                      </AnimatePresence>
 
                       {/* Live transcription while listening */}
                       {isListening && speechDraftText ? (
@@ -839,20 +879,21 @@ export function GuidedIntakeScreen({
                         <p className="mt-3 text-xs font-medium text-[#6D4AFF]">{voiceAcknowledgment}</p>
                       ) : null}
 
-                      {/* Single talk control — answer commits on pause, then advances */}
+                      {/* Single talk control — mic opens automatically after each question;
+                          the answer commits on pause and the next question follows. */}
                       <button
                         type="button"
                         onClick={isListening ? stopSpeechRecognition : startSpeechRecognition}
-                        disabled={speechSupported === false}
+                        disabled={speechSupported === false || playingPrompt}
                         className={`mt-4 inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold text-white shadow-[0_12px_26px_rgba(109,74,255,0.22)] transition disabled:cursor-not-allowed disabled:opacity-50 ${
                           isListening ? 'animate-pulse bg-[#5636E8]' : 'bg-[#6D4AFF] hover:bg-[#5636E8]'
                         }`}
                       >
                         {isListening ? <Square className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-                        {isListening ? 'Listening… tap when done' : 'Tap to answer'}
+                        {playingPrompt ? 'Asking…' : isListening ? 'Listening… tap when done' : 'Tap to answer'}
                       </button>
                       <p className="mt-2 text-center text-[11px] leading-relaxed text-[#64748B]">
-                        Just talk — your answer saves when you pause, then the next question comes up. Skip anything you don&apos;t want to answer.
+                        Just talk — the mic opens after each question, your answer saves when you pause, then the next one comes up. Skip anything you don&apos;t want to answer.
                       </p>
 
                       {/* Footer nav */}
