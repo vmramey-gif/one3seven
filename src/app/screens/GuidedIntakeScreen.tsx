@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowLeft, ArrowRight, Mic, Square, Trash2, Volume2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Mic, Square, Trash2, Volume2, VolumeX } from 'lucide-react';
 import type { GuidedIntakeAnswers } from '../../services/guidedIntakePersistence';
 import {
   suggestGuidedFollowUpQuestions,
@@ -160,10 +160,14 @@ export function GuidedIntakeScreen({
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
   const promptAudioRef = useRef<HTMLAudioElement | null>(null);
   const [playingPrompt, setPlayingPrompt] = useState(false);
+  const [voiceOn, setVoiceOn] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return true;
+    return window.localStorage.getItem('o3s_guided_voice_on') !== 'false';
+  });
   const contextRef = useRef(initialAnswers?.context ?? '');
 
   // Play the pre-rendered, vetted clip for a guided question. Fixed audio only —
-  // never a live agent. Click-to-play, no-ops if the clip isn't present.
+  // never a live agent. No-ops if the clip isn't present or autoplay is blocked.
   const playPrompt = (voiceKey?: string) => {
     if (!voiceKey) return;
     try {
@@ -176,6 +180,23 @@ export function GuidedIntakeScreen({
     } catch {
       setPlayingPrompt(false);
     }
+  };
+
+  // Master sound toggle — worker controls whether questions speak themselves.
+  const toggleVoice = () => {
+    setVoiceOn((prev) => {
+      const next = !prev;
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem('o3s_guided_voice_on', String(next));
+      }
+      if (next) {
+        playPrompt(activeVoiceQuestion.voiceKey);
+      } else {
+        promptAudioRef.current?.pause();
+        setPlayingPrompt(false);
+      }
+      return next;
+    });
   };
   const mergedGuidedVoiceLabelsRef = useRef<Set<string>>(new Set());
   const allVoiceQuestions: GuidedVoiceQuestion[] = [...GUIDED_VOICE_QUESTIONS, ...selectedFollowUpQuestions];
@@ -490,6 +511,15 @@ export function GuidedIntakeScreen({
     };
   }, []);
 
+  // Speak each question as it appears (conventional voice-guided pattern). The click
+  // that enters guided mode unlocks browser autoplay for the rest of the session;
+  // if a browser still blocks it, playPrompt no-ops and the Replay button remains.
+  useEffect(() => {
+    if (!guidedVoiceMode || !voiceOn) return;
+    playPrompt(activeVoiceQuestion.voiceKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [guidedVoiceMode, activeVoiceQuestionIndex, voiceOn]);
+
   useEffect(() => {
     if (speechReviewDirty) return;
     setSpeechReviewDraft([speechTranscript, speechInterim].filter(Boolean).join(' ').trim());
@@ -639,20 +669,31 @@ export function GuidedIntakeScreen({
                     <div className="mt-4 rounded-[22px] border border-[#E4DAFF] bg-gradient-to-br from-[#F8F4FF] via-white to-[#FFF5FA] px-4 py-4 shadow-[0_18px_44px_rgba(109,74,255,0.10)]">
                       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                         <div className="min-w-0">
-                          <p className="text-[11px] font-semibold uppercase tracking-wide text-[#64748B]">
-                            Guided question {activeVoiceQuestionIndex + 1} of {allVoiceQuestions.length}
-                          </p>
+                          <div className="flex items-center gap-3">
+                            <p className="text-[11px] font-semibold uppercase tracking-wide text-[#64748B]">
+                              Guided question {activeVoiceQuestionIndex + 1} of {allVoiceQuestions.length}
+                            </p>
+                            <button
+                              type="button"
+                              onClick={toggleVoice}
+                              aria-pressed={voiceOn}
+                              className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#6D4AFF] hover:text-[#5636E8]"
+                            >
+                              {voiceOn ? <Volume2 className="h-3.5 w-3.5" /> : <VolumeX className="h-3.5 w-3.5" />}
+                              {voiceOn ? 'Voice on' : 'Voice off'}
+                            </button>
+                          </div>
                           <p className="mt-2 text-lg font-semibold leading-snug text-[#0B1033]">
                             {activeVoiceQuestion.question}
                           </p>
-                          {activeVoiceQuestion.voiceKey ? (
+                          {activeVoiceQuestion.voiceKey && voiceOn ? (
                             <button
                               type="button"
                               onClick={() => playPrompt(activeVoiceQuestion.voiceKey)}
-                              className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-[#6D4AFF] hover:text-[#5636E8]"
+                              className="mt-2 inline-flex items-center gap-1.5 text-xs font-medium text-[#6D4AFF] hover:text-[#5636E8]"
                             >
                               <Volume2 className={`h-3.5 w-3.5 ${playingPrompt ? 'animate-pulse' : ''}`} />
-                              {playingPrompt ? 'Playing…' : 'Hear this question'}
+                              {playingPrompt ? 'Playing…' : 'Replay'}
                             </button>
                           ) : null}
                           <p className="mt-2 text-xs leading-relaxed text-[#475569]">
