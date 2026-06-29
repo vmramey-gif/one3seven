@@ -254,6 +254,7 @@ export function GuidedIntakeScreen({
   const manualStopRef = useRef(false);
   const [editingLabel, setEditingLabel] = useState<string | null>(null);
   const [editDraft, setEditDraft] = useState('');
+  const [guidedDraft, setGuidedDraft] = useState('');
 
   const clearSilenceTimer = () => {
     if (silenceTimerRef.current) {
@@ -427,33 +428,20 @@ export function GuidedIntakeScreen({
     return currentIndex;
   };
 
-  const acceptGuidedVoiceAnswer = () => {
-    const transcript = speechDraftText.trim();
-    if (!transcript) return;
-    const acceptedAnswer = {
-      question: activeVoiceQuestion.question,
-      label: activeVoiceQuestion.label,
-      answer: transcript,
-    };
-    const nextAnswers = [
-      ...voiceAnswers.filter((answer) => answer.label !== activeVoiceQuestion.label),
-      acceptedAnswer,
-    ];
-    const acknowledgment = buildVoiceAcknowledgment(transcript);
-    const nextQuestionIndex = findNextUnansweredVoiceQuestionIndex(activeVoiceQuestionIndex, nextAnswers);
-    // Answers stay in voiceAnswers (source of truth) so they remain editable; they're
-    // assembled into context at "Review story"/finish, not merged per-turn.
+  // Save the current question's typed answer and advance to the next unanswered one.
+  const saveGuidedAnswerAndAdvance = (text: string) => {
+    const trimmed = text.trim();
+    const nextAnswers = trimmed
+      ? [
+          ...voiceAnswers.filter((answer) => answer.label !== activeVoiceQuestion.label),
+          { question: activeVoiceQuestion.question, label: activeVoiceQuestion.label, answer: trimmed },
+        ]
+      : voiceAnswers.filter((answer) => answer.label !== activeVoiceQuestion.label);
+    const nextIndex = findNextUnansweredVoiceQuestionIndex(activeVoiceQuestionIndex, nextAnswers);
     setVoiceAnswers(nextAnswers);
-    setVoiceAcknowledgment(acknowledgment);
-    resetSpeechDraft();
-    stopSpeechRecognition();
-    setActiveVoiceQuestionIndex(nextQuestionIndex);
-  };
-
-  const retryGuidedVoiceAnswer = () => {
-    resetSpeechDraft();
-    stopSpeechRecognition();
-    setVoiceAnswers((prev) => prev.filter((answer) => answer.label !== activeVoiceQuestion.label));
+    setVoiceAcknowledgment(trimmed ? buildVoiceAcknowledgment(trimmed) : null);
+    setGuidedDraft('');
+    setActiveVoiceQuestionIndex(nextIndex);
   };
 
   // Inline edit of any committed answer in the transcript (STT isn't perfect).
@@ -485,11 +473,6 @@ export function GuidedIntakeScreen({
     resetSpeechDraft();
     stopSpeechRecognition();
     setActiveVoiceQuestionIndex(index);
-  };
-
-  const skipGuidedVoiceQuestion = () => {
-    retryGuidedVoiceAnswer();
-    setActiveVoiceQuestionIndex((index) => Math.min(index + 1, allVoiceQuestions.length - 1));
   };
 
   const goToPreviousGuidedVoiceQuestion = () => {
@@ -607,17 +590,13 @@ export function GuidedIntakeScreen({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [guidedVoiceMode, activeVoiceQuestionIndex, voiceOn]);
 
-  // Auto-commit: when guided recording stops (silence, manual stop, or onend), turn
-  // the transcript into the answer and advance — no manual "Use answer" step.
+  // Preload the textbox with this question's existing answer (if re-answering).
   useEffect(() => {
-    const was = prevListeningRef.current;
-    prevListeningRef.current = isListening;
-    if (was && !isListening && guidedRecordingRef.current) {
-      guidedRecordingRef.current = false;
-      if (speechDraftText.trim()) acceptGuidedVoiceAnswer();
-    }
+    const existing = voiceAnswers.find((answer) => answer.label === activeVoiceQuestion.label);
+    setGuidedDraft(existing?.answer ?? '');
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isListening]);
+  }, [activeVoiceQuestionIndex, guidedVoiceMode]);
+
 
   useEffect(() => {
     if (speechReviewDirty) return;
@@ -870,33 +849,32 @@ export function GuidedIntakeScreen({
                         </motion.div>
                       </AnimatePresence>
 
-                      {/* Live transcription while listening */}
-                      {isListening && speechDraftText ? (
-                        <p className="mt-3 rounded-[14px] border border-[#E8E1FF] bg-white/80 px-3 py-2 text-sm italic leading-relaxed text-[#475569]">
-                          {speechDraftText}
-                        </p>
-                      ) : null}
-
-                      {/* Acknowledgment after a committed answer */}
-                      {voiceAcknowledgment && !isListening ? (
+                      {/* Acknowledgment after a saved answer */}
+                      {voiceAcknowledgment ? (
                         <p className="mt-3 text-xs font-medium text-[#6D4AFF]">{voiceAcknowledgment}</p>
                       ) : null}
 
-                      {/* Push-to-talk: tap to start answering, tap again to save and advance. */}
+                      {/* Answer box — type, or tap the microphone on your phone keyboard to talk */}
+                      <textarea
+                        value={guidedDraft}
+                        onChange={(e) => setGuidedDraft(e.target.value)}
+                        rows={4}
+                        placeholder="Type your answer here — or tap the microphone on your keyboard to talk."
+                        className="mt-4 w-full resize-none rounded-[14px] border border-[#E4DAFF] bg-white px-4 py-3 text-sm leading-relaxed text-[#0B1033] placeholder:text-[#94A3B8] focus:border-[#6D4AFF] focus:outline-none focus:ring-2 focus:ring-[#DED6FF]"
+                      />
+                      <p className="mt-1.5 flex items-center gap-1.5 text-[11px] leading-relaxed text-[#64748B]">
+                        <Mic className="h-3 w-3" />
+                        Prefer to talk? Tap the microphone on your keyboard and just speak.
+                      </p>
+
                       <button
                         type="button"
-                        onClick={isListening ? stopSpeechRecognition : startSpeechRecognition}
-                        disabled={speechSupported === false || playingPrompt}
-                        className={`mt-4 inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold text-white shadow-[0_12px_26px_rgba(109,74,255,0.22)] transition disabled:cursor-not-allowed disabled:opacity-50 ${
-                          isListening ? 'animate-pulse bg-[#5636E8]' : 'bg-[#6D4AFF] hover:bg-[#5636E8]'
-                        }`}
+                        onClick={() => saveGuidedAnswerAndAdvance(guidedDraft)}
+                        className="mt-4 inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full bg-[#6D4AFF] px-5 py-3 text-sm font-semibold text-white shadow-[0_12px_26px_rgba(109,74,255,0.22)] transition hover:bg-[#5636E8]"
                       >
-                        {isListening ? <Square className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-                        {playingPrompt ? 'Asking…' : isListening ? 'Tap when you’re done' : 'Tap to answer'}
+                        {guidedDraft.trim() ? 'Save & next question' : 'Skip this question'}
+                        <ArrowRight className="h-4 w-4" />
                       </button>
-                      <p className="mt-2 text-center text-[11px] leading-relaxed text-[#64748B]">
-                        Tap to answer, talk as long as you need, then tap again to save it and go to the next question. Skip anything you don&apos;t want to answer.
-                      </p>
 
                       {/* Footer nav */}
                       <div className="mt-4 flex flex-wrap items-center gap-2">
@@ -910,15 +888,8 @@ export function GuidedIntakeScreen({
                         </button>
                         <button
                           type="button"
-                          onClick={skipGuidedVoiceQuestion}
-                          className="rounded-full border border-[#E4DAFF] bg-white/85 px-3 py-2 text-xs font-semibold text-[#475569] hover:bg-white"
-                        >
-                          Skip question
-                        </button>
-                        <button
-                          type="button"
                           onClick={handleStoryStepNext}
-                          className="ml-auto rounded-full bg-[#6D4AFF] px-4 py-2 text-xs font-semibold text-white hover:bg-[#5636E8]"
+                          className="ml-auto rounded-full border border-[#CFC3FF] bg-white px-4 py-2 text-xs font-semibold text-[#1E1B4B] hover:bg-[#F8F4FF]"
                         >
                           Review story
                         </button>
