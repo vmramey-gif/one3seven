@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowLeft, ArrowRight, Mic, Square, Trash2, Volume2, VolumeX } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Mic, Pencil, Square, Trash2, Volume2, VolumeX } from 'lucide-react';
 import type { GuidedIntakeAnswers } from '../../services/guidedIntakePersistence';
 import {
   suggestGuidedFollowUpQuestions,
@@ -201,7 +201,7 @@ export function GuidedIntakeScreen({
   const mergedGuidedVoiceLabelsRef = useRef<Set<string>>(new Set());
   const allVoiceQuestions: GuidedVoiceQuestion[] = [...GUIDED_VOICE_QUESTIONS, ...selectedFollowUpQuestions];
   const activeVoiceQuestion = allVoiceQuestions[Math.min(activeVoiceQuestionIndex, allVoiceQuestions.length - 1)];
-  const activeVoiceAnswer = voiceAnswers.find((answer) => answer.label === activeVoiceQuestion.label);
+  const hasAnsweredVoiceQuestions = voiceAnswers.some((answer) => answer.answer.trim());
   const suggestionContext = [
     context,
     ...voiceAnswers.map((answer) => answer.answer),
@@ -214,9 +214,6 @@ export function GuidedIntakeScreen({
     ? speechReviewDraft
     : [speechTranscript, speechInterim].filter(Boolean).join(' ').trim();
   const hasSpeechDraft = Boolean(speechDraftText.trim());
-  const hasUnmergedVoiceAnswers = voiceAnswers.some(
-    (answer) => answer.answer.trim() && !mergedGuidedVoiceLabelsRef.current.has(answer.label)
-  );
 
   const finish = () => {
     const safeContext = resolveContextWithGuidedVoiceAnswers(contextRef.current);
@@ -237,7 +234,22 @@ export function GuidedIntakeScreen({
   const scaffoldRef = useRef(initialAnswers?.scaffoldResponses ?? []);
   scaffoldRef.current = initialAnswers?.scaffoldResponses ?? [];
 
+  // Conversation engine state: silence auto-commit + inline editing of answers.
+  const silenceTimerRef = useRef<number | null>(null);
+  const guidedRecordingRef = useRef(false);
+  const prevListeningRef = useRef(false);
+  const [editingLabel, setEditingLabel] = useState<string | null>(null);
+  const [editDraft, setEditDraft] = useState('');
+
+  const clearSilenceTimer = () => {
+    if (silenceTimerRef.current) {
+      window.clearTimeout(silenceTimerRef.current);
+      silenceTimerRef.current = null;
+    }
+  };
+
   const stopSpeechRecognition = () => {
+    clearSilenceTimer();
     const recognition = recognitionRef.current;
     if (!recognition) {
       setIsListening(false);
@@ -285,6 +297,11 @@ export function GuidedIntakeScreen({
       }
     }
 
+    // In guided mode the conversation auto-commits the answer after a short pause,
+    // so the worker just talks and the next question follows — no "Use answer" tap.
+    const isGuided = guidedVoiceMode;
+    guidedRecordingRef.current = isGuided;
+
     const recognition = new SpeechRecognition();
     recognitionRef.current = recognition;
     recognition.continuous = true;
@@ -307,8 +324,21 @@ export function GuidedIntakeScreen({
         setSpeechTranscript((prev) => `${prev}${prev ? ' ' : ''}${finalText.trim()}`.trim());
       }
       setSpeechInterim(interimText.trim());
+      // Reset the end-of-speech timer on every utterance; firing stops recognition,
+      // and onend triggers the auto-commit effect below.
+      if (isGuided) {
+        clearSilenceTimer();
+        silenceTimerRef.current = window.setTimeout(() => {
+          try {
+            recognition.stop();
+          } catch {
+            /* ignore */
+          }
+        }, 2600);
+      }
     };
     recognition.onerror = (event) => {
+      clearSilenceTimer();
       const error = event.error ?? '';
       const message =
         error === 'not-allowed' || error === 'service-not-allowed'
@@ -318,6 +348,7 @@ export function GuidedIntakeScreen({
       setIsListening(false);
     };
     recognition.onend = () => {
+      clearSilenceTimer();
       setIsListening(false);
     };
 
@@ -366,16 +397,6 @@ export function GuidedIntakeScreen({
     return currentIndex;
   };
 
-  const mergeAcceptedAnswerIntoContext = (answer: GuidedVoiceAnswer) => {
-    const trimmedAnswer = answer.answer.trim();
-    if (!trimmedAnswer || mergedGuidedVoiceLabelsRef.current.has(answer.label)) return false;
-    mergedGuidedVoiceLabelsRef.current.add(answer.label);
-    const assembled = `${answer.label}:\n${trimmedAnswer}`;
-    const nextContext = contextRef.current.trim() ? `${contextRef.current.trim()}\n\n${assembled}` : assembled;
-    setCanonicalContext(nextContext);
-    return true;
-  };
-
   const acceptGuidedVoiceAnswer = () => {
     const transcript = speechDraftText.trim();
     if (!transcript) return;
@@ -390,7 +411,8 @@ export function GuidedIntakeScreen({
     ];
     const acknowledgment = buildVoiceAcknowledgment(transcript);
     const nextQuestionIndex = findNextUnansweredVoiceQuestionIndex(activeVoiceQuestionIndex, nextAnswers);
-    mergeAcceptedAnswerIntoContext(acceptedAnswer);
+    // Answers stay in voiceAnswers (source of truth) so they remain editable; they're
+    // assembled into context at "Review story"/finish, not merged per-turn.
     setVoiceAnswers(nextAnswers);
     setVoiceAcknowledgment(acknowledgment);
     resetSpeechDraft();
@@ -402,6 +424,37 @@ export function GuidedIntakeScreen({
     resetSpeechDraft();
     stopSpeechRecognition();
     setVoiceAnswers((prev) => prev.filter((answer) => answer.label !== activeVoiceQuestion.label));
+  };
+
+  // Inline edit of any committed answer in the transcript (STT isn't perfect).
+  const startEditAnswer = (label: string, current: string) => {
+    setEditingLabel(label);
+    setEditDraft(current);
+  };
+
+  const saveEditAnswer = (label: string) => {
+    const next = editDraft.trim();
+    setVoiceAnswers((prev) =>
+      prev
+        .map((answer) => (answer.label === label ? { ...answer, answer: next } : answer))
+        .filter((answer) => answer.answer.trim())
+    );
+    setEditingLabel(null);
+    setEditDraft('');
+  };
+
+  const cancelEditAnswer = () => {
+    setEditingLabel(null);
+    setEditDraft('');
+  };
+
+  // Jump to a specific question (tap its prompt in the transcript to re-answer).
+  const goToVoiceQuestion = (label: string) => {
+    const index = allVoiceQuestions.findIndex((question) => question.label === label);
+    if (index < 0) return;
+    resetSpeechDraft();
+    stopSpeechRecognition();
+    setActiveVoiceQuestionIndex(index);
   };
 
   const skipGuidedVoiceQuestion = () => {
@@ -519,6 +572,18 @@ export function GuidedIntakeScreen({
     playPrompt(activeVoiceQuestion.voiceKey);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [guidedVoiceMode, activeVoiceQuestionIndex, voiceOn]);
+
+  // Auto-commit: when guided recording stops (silence, manual stop, or onend), turn
+  // the transcript into the answer and advance — no manual "Use answer" step.
+  useEffect(() => {
+    const was = prevListeningRef.current;
+    prevListeningRef.current = isListening;
+    if (was && !isListening && guidedRecordingRef.current) {
+      guidedRecordingRef.current = false;
+      if (speechDraftText.trim()) acceptGuidedVoiceAnswer();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isListening]);
 
   useEffect(() => {
     if (speechReviewDirty) return;
@@ -667,120 +732,131 @@ export function GuidedIntakeScreen({
 
                   {guidedVoiceMode ? (
                     <div className="mt-4 rounded-[22px] border border-[#E4DAFF] bg-gradient-to-br from-[#F8F4FF] via-white to-[#FFF5FA] px-4 py-4 shadow-[0_18px_44px_rgba(109,74,255,0.10)]">
-                      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                        <div className="min-w-0">
-                          <div className="flex items-center gap-3">
-                            <p className="text-[11px] font-semibold uppercase tracking-wide text-[#64748B]">
-                              Guided question {activeVoiceQuestionIndex + 1} of {allVoiceQuestions.length}
-                            </p>
-                            <button
-                              type="button"
-                              onClick={toggleVoice}
-                              aria-pressed={voiceOn}
-                              className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#6D4AFF] hover:text-[#5636E8]"
-                            >
-                              {voiceOn ? <Volume2 className="h-3.5 w-3.5" /> : <VolumeX className="h-3.5 w-3.5" />}
-                              {voiceOn ? 'Voice on' : 'Voice off'}
-                            </button>
-                          </div>
-                          <p className="mt-2 text-lg font-semibold leading-snug text-[#0B1033]">
-                            {activeVoiceQuestion.question}
-                          </p>
-                          {activeVoiceQuestion.voiceKey && voiceOn ? (
-                            <button
-                              type="button"
-                              onClick={() => playPrompt(activeVoiceQuestion.voiceKey)}
-                              className="mt-2 inline-flex items-center gap-1.5 text-xs font-medium text-[#6D4AFF] hover:text-[#5636E8]"
-                            >
-                              <Volume2 className={`h-3.5 w-3.5 ${playingPrompt ? 'animate-pulse' : ''}`} />
-                              {playingPrompt ? 'Playing…' : 'Replay'}
-                            </button>
-                          ) : null}
-                          <p className="mt-2 text-xs leading-relaxed text-[#475569]">
-                            Take your time. Skip anything you do not know or do not want to answer.
-                          </p>
-                        </div>
+                      {/* Conversation header */}
+                      <div className="flex items-center justify-between gap-3">
+                        <p className="text-[11px] font-semibold uppercase tracking-wide text-[#64748B]">
+                          Guided conversation · {activeVoiceQuestionIndex + 1} of {allVoiceQuestions.length}
+                        </p>
                         <button
                           type="button"
-                          onClick={isListening ? stopSpeechRecognition : startSpeechRecognition}
-                          disabled={speechSupported === false}
-                          className="inline-flex min-h-[48px] shrink-0 items-center justify-center gap-2 rounded-full bg-[#6D4AFF] px-5 py-3 text-sm font-semibold text-white shadow-[0_12px_26px_rgba(109,74,255,0.22)] transition hover:bg-[#5636E8] disabled:cursor-not-allowed disabled:opacity-50"
+                          onClick={toggleVoice}
+                          aria-pressed={voiceOn}
+                          className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#6D4AFF] hover:text-[#5636E8]"
                         >
-                          {isListening ? <Square className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-                          {isListening ? 'Listening...' : 'Record answer'}
+                          {voiceOn ? <Volume2 className="h-3.5 w-3.5" /> : <VolumeX className="h-3.5 w-3.5" />}
+                          {voiceOn ? 'Voice on' : 'Voice off'}
                         </button>
                       </div>
 
-                      {isListening ? (
-                        <p className="mt-3 rounded-full bg-white/70 px-3 py-2 text-xs font-medium text-[#475569]">
-                          Listening now. You can stop when you are ready to review.
-                        </p>
-                      ) : null}
-
-                      {voiceAcknowledgment ? (
-                        <p className="mt-3 rounded-[14px] border border-[#E8E1FF] bg-white/75 px-3 py-2 text-sm font-medium text-[#475569]">
-                          {voiceAcknowledgment}
-                        </p>
-                      ) : null}
-
-                      {activeVoiceAnswer ? (
-                        <div className="mt-4 rounded-[16px] border border-[#E8E1FF] bg-white/85 px-3 py-3">
-                          <p className="text-[11px] font-semibold uppercase tracking-wide text-[#64748B]">
-                            Accepted answer
-                          </p>
-                          <p className="mt-1 whitespace-pre-wrap break-words text-sm leading-relaxed text-[#475569]">
-                            {activeVoiceAnswer.answer}
-                          </p>
+                      {/* Transcript — answered turns as a conversation, each answer editable */}
+                      {hasAnsweredVoiceQuestions ? (
+                        <div className="mt-4 space-y-3">
+                          {allVoiceQuestions.map((q) => {
+                            const ans = voiceAnswers.find((a) => a.label === q.label && a.answer.trim());
+                            if (!ans) return null;
+                            const isEditing = editingLabel === q.label;
+                            return (
+                              <div key={q.label} className="space-y-1.5">
+                                <button
+                                  type="button"
+                                  onClick={() => goToVoiceQuestion(q.label)}
+                                  className="block max-w-[88%] rounded-[16px] rounded-tl-[4px] border border-[#ECE6FB] bg-white/70 px-3 py-2 text-left text-xs leading-relaxed text-[#475569] transition hover:border-[#CFC3FF]"
+                                >
+                                  {q.question}
+                                </button>
+                                <div className="ml-auto max-w-[88%] rounded-[16px] rounded-tr-[4px] bg-[#6D4AFF] px-3 py-2 text-sm leading-relaxed text-white">
+                                  {isEditing ? (
+                                    <div className="space-y-2">
+                                      <textarea
+                                        value={editDraft}
+                                        onChange={(e) => setEditDraft(e.target.value)}
+                                        rows={3}
+                                        className="w-full resize-none rounded-[10px] border border-white/40 bg-white/95 px-2.5 py-2 text-sm text-[#0B1033] focus:outline-none"
+                                      />
+                                      <div className="flex gap-2">
+                                        <button
+                                          type="button"
+                                          onClick={() => saveEditAnswer(q.label)}
+                                          className="rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-[#6D4AFF]"
+                                        >
+                                          Save
+                                        </button>
+                                        <button
+                                          type="button"
+                                          onClick={cancelEditAnswer}
+                                          className="rounded-full border border-white/50 px-3 py-1.5 text-xs font-semibold text-white"
+                                        >
+                                          Cancel
+                                        </button>
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <div className="flex items-start justify-between gap-2">
+                                      <p className="whitespace-pre-wrap break-words">{ans.answer}</p>
+                                      <button
+                                        type="button"
+                                        onClick={() => startEditAnswer(q.label, ans.answer)}
+                                        aria-label="Edit answer"
+                                        className="mt-0.5 shrink-0 text-white/80 hover:text-white"
+                                      >
+                                        <Pencil className="h-3.5 w-3.5" />
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })}
                         </div>
                       ) : null}
 
-                      {hasSpeechDraft ? (
-                        <div className="mt-4 rounded-[16px] border border-[#E8E1FF] bg-white/90 px-3 py-3">
-                          <label
-                            htmlFor="guided-speech-review"
-                            className="text-[11px] font-semibold uppercase tracking-wide text-[#64748B]"
+                      {/* Current question */}
+                      <div className="mt-4">
+                        <p className="text-lg font-semibold leading-snug text-[#0B1033]">
+                          {activeVoiceQuestion.question}
+                        </p>
+                        {activeVoiceQuestion.voiceKey && voiceOn ? (
+                          <button
+                            type="button"
+                            onClick={() => playPrompt(activeVoiceQuestion.voiceKey)}
+                            className="mt-1.5 inline-flex items-center gap-1.5 text-xs font-medium text-[#6D4AFF] hover:text-[#5636E8]"
                           >
-                            Review answer draft
-                          </label>
-                          <textarea
-                            id="guided-speech-review"
-                            value={speechReviewDraft}
-                            onChange={(event) => {
-                              setSpeechReviewDirty(true);
-                              setSpeechReviewDraft(event.target.value);
-                            }}
-                            rows={4}
-                            className="mt-2 w-full resize-none rounded-[12px] border border-[#E4DAFF] bg-white px-3 py-2 text-sm leading-relaxed text-[#0B1033] placeholder:text-[#64748B] focus:border-[#6D4AFF] focus:outline-none focus:ring-2 focus:ring-[#DED6FF]"
-                          />
-                          <div className="mt-3 flex flex-wrap gap-2">
-                            <button
-                              type="button"
-                              onClick={acceptGuidedVoiceAnswer}
-                              disabled={!speechDraftText.trim()}
-                              className="rounded-full bg-[#6D4AFF] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#5636E8] disabled:cursor-not-allowed disabled:opacity-45"
-                            >
-                              Use answer
-                            </button>
-                            <button
-                              type="button"
-                              onClick={retryGuidedVoiceAnswer}
-                              className="rounded-full border border-[#E4DAFF] bg-white px-4 py-2.5 text-sm font-semibold text-[#475569] hover:bg-[#F8F4FF]"
-                            >
-                              Retry
-                            </button>
-                            <button
-                              type="button"
-                              onClick={discardSpeechTranscript}
-                              className="inline-flex items-center gap-1 rounded-full border border-[#E4DAFF] bg-white px-4 py-2.5 text-sm font-semibold text-[#475569] hover:bg-[#F8F4FF]"
-                            >
-                              <Trash2 className="h-3.5 w-3.5" />
-                              Discard
-                            </button>
-                          </div>
-                        </div>
+                            <Volume2 className={`h-3.5 w-3.5 ${playingPrompt ? 'animate-pulse' : ''}`} />
+                            {playingPrompt ? 'Playing…' : 'Replay'}
+                          </button>
+                        ) : null}
+                      </div>
+
+                      {/* Live transcription while listening */}
+                      {isListening && speechDraftText ? (
+                        <p className="mt-3 rounded-[14px] border border-[#E8E1FF] bg-white/80 px-3 py-2 text-sm italic leading-relaxed text-[#475569]">
+                          {speechDraftText}
+                        </p>
                       ) : null}
 
-                      <div className="mt-4 flex flex-wrap gap-2">
+                      {/* Acknowledgment after a committed answer */}
+                      {voiceAcknowledgment && !isListening ? (
+                        <p className="mt-3 text-xs font-medium text-[#6D4AFF]">{voiceAcknowledgment}</p>
+                      ) : null}
+
+                      {/* Single talk control — answer commits on pause, then advances */}
+                      <button
+                        type="button"
+                        onClick={isListening ? stopSpeechRecognition : startSpeechRecognition}
+                        disabled={speechSupported === false}
+                        className={`mt-4 inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold text-white shadow-[0_12px_26px_rgba(109,74,255,0.22)] transition disabled:cursor-not-allowed disabled:opacity-50 ${
+                          isListening ? 'animate-pulse bg-[#5636E8]' : 'bg-[#6D4AFF] hover:bg-[#5636E8]'
+                        }`}
+                      >
+                        {isListening ? <Square className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                        {isListening ? 'Listening… tap when done' : 'Tap to answer'}
+                      </button>
+                      <p className="mt-2 text-center text-[11px] leading-relaxed text-[#64748B]">
+                        Just talk — your answer saves when you pause, then the next question comes up. Skip anything you don&apos;t want to answer.
+                      </p>
+
+                      {/* Footer nav */}
+                      <div className="mt-4 flex flex-wrap items-center gap-2">
                         <button
                           type="button"
                           onClick={goToPreviousGuidedVoiceQuestion}
@@ -799,19 +875,10 @@ export function GuidedIntakeScreen({
                         <button
                           type="button"
                           onClick={handleStoryStepNext}
-                          className="rounded-full border border-[#CFC3FF] bg-white px-3 py-2 text-xs font-semibold text-[#1E1B4B] hover:bg-[#F8F4FF]"
+                          className="ml-auto rounded-full bg-[#6D4AFF] px-4 py-2 text-xs font-semibold text-white hover:bg-[#5636E8]"
                         >
                           Review story
                         </button>
-                        {hasUnmergedVoiceAnswers ? (
-                          <button
-                            type="button"
-                            onClick={mergeGuidedVoiceAnswersIntoContext}
-                            className="rounded-full bg-[#6D4AFF] px-3 py-2 text-xs font-semibold text-white hover:bg-[#5636E8]"
-                          >
-                            Add answers to story
-                          </button>
-                        ) : null}
                       </div>
                     </div>
                   ) : null}
