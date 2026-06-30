@@ -935,6 +935,14 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
             >
               For law firms
             </button>
+            {/* Discreet team gateway — /hq is auth-gated (CrmAccessGate). */}
+            <a
+              href="/hq"
+              className="text-sm font-medium text-white/30 transition hover:text-white/80"
+              title="Sales HQ (team)"
+            >
+              HQ
+            </a>
           </div>
           {/* Mobile nav toggle */}
           <button
@@ -956,6 +964,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
               <button type="button" onClick={onSignUpFree} className="flex items-center gap-1.5 min-h-[48px] text-base font-semibold text-[#C4B5FD] text-left py-3">Sign up for free <ArrowRight className="h-4 w-4" /></button>
               <button type="button" onClick={onForFirms} className="flex items-center gap-1.5 min-h-[48px] text-base font-medium text-white/60 text-left py-3">For law firms</button>
               <button type="button" onClick={onWorkerStart} className="flex items-center gap-1.5 min-h-[48px] text-base font-semibold text-white/70 text-left py-3">Organize my intake <ArrowRight className="h-4 w-4" /></button>
+              <a href="/hq" className="flex items-center min-h-[48px] text-base font-medium text-white/30 text-left py-3">HQ</a>
             </div>
           </div>
         )}
