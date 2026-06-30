@@ -542,10 +542,48 @@ function drawTimingCallouts(c: Cursor, intervals: Array<{ label: string; days: n
   }
 }
 
+// ── Source provenance (named by SOURCE, never by worth) ──────────────────────────
+// UPL discipline: a fact either links to an embedded source page ("Source-linked"),
+// names a document on file, or is worker-stated. We never label reliability/credibility
+// ("unverified", "%", "strong") — evaluating evidence is the attorney's job (AB 316).
+type SourceIndexEntry = { docId: string; embeddable: boolean };
+
+function isEmbeddableSource(s: PdfSourceDoc): boolean {
+  const name = (s.fileName || '').toLowerCase();
+  const mime = (s.mime || '').toLowerCase();
+  return (
+    mime.includes('pdf') || name.endsWith('.pdf') ||
+    mime.includes('png') || name.endsWith('.png') ||
+    mime.includes('jp') || name.endsWith('.jpg') || name.endsWith('.jpeg')
+  );
+}
+
+/** Index supplied source docs by file name so facts can link by their stored sourceFile. */
+function buildSourceIndex(sources: PdfSourceDoc[]): Map<string, SourceIndexEntry> {
+  const idx = new Map<string, SourceIndexEntry>();
+  for (const s of sources) {
+    const key = (s.fileName || '').trim().toLowerCase();
+    if (key) idx.set(key, { docId: s.docId, embeddable: isEmbeddableSource(s) });
+  }
+  return idx;
+}
+
+function factProvenance(
+  sourceFile: string | null,
+  srcIndex: Map<string, SourceIndexEntry>,
+): { state: 'linked' | 'on_file' | 'worker'; docId?: string; label: string } {
+  const name = (sourceFile || '').trim();
+  if (!name) return { state: 'worker', label: 'Worker-stated' };
+  const hit = srcIndex.get(name.toLowerCase());
+  if (hit && hit.embeddable) return { state: 'linked', docId: hit.docId, label: name };
+  return { state: 'on_file', label: name };
+}
+
 // ── Chronology table ────────────────────────────────────────────────────────────
 function drawChronologyTable(
   c: Cursor,
   events: Array<{ date: string; title: string; interval: string | null; sourceFile: string | null }>,
+  srcIndex: Map<string, SourceIndexEntry>,
 ): void {
   const dateW = 96;
   const srcW = 150;
@@ -563,10 +601,14 @@ function drawChronologyTable(
   c.y -= 16;
 
   events.forEach((e, idx) => {
+    const prov = factProvenance(e.sourceFile, srcIndex);
+    const linked = prov.state === 'linked';
+    const srcText = linked ? `${prov.label}  »` : prov.label;
+    const srcFont = linked ? c.bold : c.font;
     const dateLines = c.wrap(e.date, 8.5, c.font, dateW - 12);
     const titleStr = e.interval ? `${e.title}  [${e.interval}]` : e.title;
     const titleLines = c.wrap(titleStr, 8.5, c.font, eventW - 12);
-    const srcLines = c.wrap(e.sourceFile ?? '—', 8, c.font, srcW - 12);
+    const srcLines = c.wrap(srcText, 8.5, srcFont, srcW - 12);
     const rows = Math.max(dateLines.length, titleLines.length, srcLines.length);
     const rowH = rows * 11 + 8;
     c.ensure(rowH);
@@ -583,7 +625,13 @@ function drawChronologyTable(
     };
     drawCol(dateLines, xDate, c.bold, INK);
     drawCol(titleLines, xEvent, c.font, SOFT);
-    drawCol(srcLines, xSrc, c.font, MUTED);
+    drawCol(srcLines, xSrc, srcFont, linked ? BRAND : MUTED);
+    // Source-linked events become a clickable hot-spot → embedded source page.
+    if (linked && prov.docId) {
+      const upperY = top - 12 + 9;
+      const lowerY = top - 12 - (srcLines.length - 1) * 11 - 2;
+      c.linkRect([xSrc + 4, lowerY, xSrc + srcW - 4, upperY], prov.docId);
+    }
     c.y = top - rowH;
     c.page.drawLine({ start: { x: MARGIN, y: c.y }, end: { x: PAGE_W - MARGIN, y: c.y }, thickness: 0.5, color: BRAND_LINE });
   });
@@ -706,7 +754,7 @@ export async function renderFirmIntakePacketPdf(
   // 4. Sequence for Firm Review
   sectionHeading(c, '4.  Sequence for Attorney Review');
   if (model.sequence.kind === 'events') {
-    drawChronologyTable(c, model.sequence.events);
+    drawChronologyTable(c, model.sequence.events, buildSourceIndex(sources));
   } else {
     c.text(model.sequence.note, { size: 10, color: SOFT });
   }

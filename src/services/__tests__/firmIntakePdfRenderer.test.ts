@@ -155,6 +155,31 @@ describe('source-linked citations', () => {
     expect(countLinkAnnotations(withoutSources)).toBe(0);
   });
 
+  test('links chronology events whose source file matches a supplied document', async () => {
+    // sampleModel has wageExposure: null, so any link annotation must come from the
+    // chronology section — proving the chronology slice wires links on its own.
+    const model = sampleModel();
+    const sources: PdfSourceDoc[] = [
+      { docId: 'evt-1', fileName: 'Rivera HR Complaint Nov2025', mime: 'application/pdf', bytes: await makeSourcePdf() },
+    ];
+    const withSources = await PDFDocument.load(await renderFirmIntakePacketPdf(model, sources));
+    expect(countLinkAnnotations(withSources)).toBeGreaterThan(0);
+    // No sources → chronology renders as plain text, no link annotations.
+    const withoutSources = await PDFDocument.load(await renderFirmIntakePacketPdf(model));
+    expect(countLinkAnnotations(withoutSources)).toBe(0);
+  });
+
+  test('worker-stated events (no source file) render without links or throwing', async () => {
+    const model = sampleModel({
+      sequence: {
+        kind: 'events',
+        events: [{ date: 'March 2022', title: 'Employment begins', interval: null, sourceFile: null }],
+      },
+    });
+    const doc = await PDFDocument.load(await renderFirmIntakePacketPdf(model));
+    expect(countLinkAnnotations(doc)).toBe(0);
+  });
+
   test('skips unembeddable source types without throwing (citation stays text)', async () => {
     const model = wageModelWithCitation();
     const sources: PdfSourceDoc[] = [
