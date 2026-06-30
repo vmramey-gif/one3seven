@@ -7,6 +7,7 @@ import { AppErrorBoundary } from './app/components/AppErrorBoundary.tsx';
 import { DemoApp } from './app/screens/DemoApp.tsx';
 import { WorkerDemoPage } from './app/screens/WorkerDemoPage.tsx';
 import { FireWorkerDemoPage } from './app/screens/FireWorkerDemoPage.tsx';
+import { TexasCriminalDemoPage } from './app/screens/TexasCriminalDemoPage.tsx';
 import { FounderHQ } from './app/screens/FounderHQ.tsx';
 import { CompanyDemoGuide } from './app/screens/CompanyDemoGuide.tsx';
 import { CompanyDemoDebrief } from './app/screens/CompanyDemoDebrief.tsx';
@@ -39,6 +40,10 @@ const isWorkerDemo =
 const isFireDemo =
   url.searchParams.has('fire-demo') ||
   url.pathname === '/fire-demo';
+
+const isTxDemo =
+  url.searchParams.has('tx-demo') ||
+  url.pathname === '/tx-demo';
 
 const isHQ =
   url.searchParams.has('hq') ||
@@ -91,6 +96,10 @@ if (url.pathname === '/terms') {
 } else if (isFireDemo) {
   createRoot(rootEl).render(
     <AppErrorBoundary><FireWorkerDemoPage /></AppErrorBoundary>
+  );
+} else if (isTxDemo) {
+  createRoot(rootEl).render(
+    <AppErrorBoundary><TexasCriminalDemoPage /></AppErrorBoundary>
   );
 } else if (isWorkerDemo) {
   createRoot(rootEl).render(
