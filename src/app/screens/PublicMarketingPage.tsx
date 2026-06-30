@@ -1031,10 +1031,15 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
               ) : (
                 /* ── Journey 1: self-discovered worker ── */
                 <>
-                  <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#C4B5FD]">
+                  <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#C4B5FD]">
                     <span className="h-1.5 w-1.5 rounded-full bg-[#C4B5FD]" />
                     Employment intake · California beta
                   </div>
+
+                  {/* Credibility line — verifiable, no endorsement claim (see reference_anthropic_trademark). */}
+                  <p className="mb-5 text-[12px] leading-relaxed text-[#9A93C2]">
+                    Built on Anthropic&apos;s Claude — the AI platform California adopted statewide for its own agencies.
+                  </p>
 
                   <h1 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="mb-5 text-[34px] font-medium leading-[1.04] tracking-[-0.01em] text-white sm:text-[48px] lg:text-[56px]">
                     Scattered records in.
