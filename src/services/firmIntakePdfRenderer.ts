@@ -639,10 +639,18 @@ function drawChronologyTable(
 }
 
 // ── Quote block ──────────────────────────────────────────────────────────────
-function drawQuote(c: Cursor, q: { category: string; fileName: string; quote: string }): void {
+function drawQuote(
+  c: Cursor,
+  q: { category: string; fileName: string; quote: string },
+  srcIndex: Map<string, SourceIndexEntry>,
+): void {
   const innerX = MARGIN + 14;
   const innerW = CONTENT_W - 22;
-  const headLines = c.wrap(`${q.category} — ${q.fileName}`, 8, c.bold, innerW);
+  // Quotes always come from a document; link the source when it's embeddable.
+  const prov = factProvenance(q.fileName, srcIndex);
+  const linked = prov.state === 'linked';
+  const headText = `${q.category} — ${q.fileName}${linked ? '  »' : ''}`;
+  const headLines = c.wrap(headText, 8, c.bold, innerW);
   const quoteLines = c.wrap(`“${q.quote}”`, 9.5, c.font, innerW);
   const blockH = headLines.length * 11 + quoteLines.length * 14 + 16;
   c.ensure(blockH + 6);
@@ -653,6 +661,11 @@ function drawQuote(c: Cursor, q: { category: string; fileName: string; quote: st
   for (const ln of headLines) {
     c.page.drawText(ln, { x: innerX, y: yy, size: 8, font: c.bold, color: BRAND });
     yy -= 11;
+  }
+  if (linked && prov.docId) {
+    const upperY = top - 14 + 8;
+    const lowerY = top - 14 - (headLines.length - 1) * 11 - 2;
+    c.linkRect([innerX - 2, lowerY, innerX + innerW, upperY], prov.docId);
   }
   yy -= 2;
   for (const ln of quoteLines) {
@@ -685,6 +698,7 @@ export async function renderFirmIntakePacketPdf(
   const bold = await doc.embedFont(StandardFonts.HelveticaBold);
 
   const c = new Cursor(doc, font, bold);
+  const srcIndex = buildSourceIndex(sources);
 
   // Cover (own page)
   drawCover(
@@ -732,7 +746,7 @@ export async function renderFirmIntakePacketPdf(
       c.gap(4);
       c.text('Key document language', { size: 9, font: bold, color: MUTED });
       c.gap(6);
-      for (const q of ex.keyQuotes) drawQuote(c, q);
+      for (const q of ex.keyQuotes) drawQuote(c, q, srcIndex);
     }
     if (ex.overtimeNote) {
       c.gap(2);
@@ -754,7 +768,7 @@ export async function renderFirmIntakePacketPdf(
   // 4. Sequence for Firm Review
   sectionHeading(c, '4.  Sequence for Attorney Review');
   if (model.sequence.kind === 'events') {
-    drawChronologyTable(c, model.sequence.events, buildSourceIndex(sources));
+    drawChronologyTable(c, model.sequence.events, srcIndex);
   } else {
     c.text(model.sequence.note, { size: 10, color: SOFT });
   }

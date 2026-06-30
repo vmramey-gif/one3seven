@@ -169,6 +169,28 @@ describe('source-linked citations', () => {
     expect(countLinkAnnotations(withoutSources)).toBe(0);
   });
 
+  test('links a key quote to its source document by file name', async () => {
+    // Isolate the quote link: events have no matching source, wageExposure is null,
+    // so the only possible link annotation comes from the key-quote block.
+    const model = sampleModel({
+      sequence: { kind: 'events', events: [{ date: 'March 2022', title: 'Employment begins', interval: null, sourceFile: null }] },
+      extracted: {
+        confirmedFacts: [],
+        coworkerCorroboration: null,
+        timingIntervals: [],
+        keyQuotes: [{ category: 'HR Communications', fileName: 'HR Complaint Nov2025', quote: 'I am formally requesting a payroll audit.' }],
+        overtimeNote: null,
+      },
+    } as Partial<FirmPacketModel>);
+    const sources: PdfSourceDoc[] = [
+      { docId: 'q-1', fileName: 'HR Complaint Nov2025', mime: 'application/pdf', bytes: await makeSourcePdf() },
+    ];
+    const withSources = await PDFDocument.load(await renderFirmIntakePacketPdf(model, sources));
+    expect(countLinkAnnotations(withSources)).toBeGreaterThan(0);
+    const withoutSources = await PDFDocument.load(await renderFirmIntakePacketPdf(model));
+    expect(countLinkAnnotations(withoutSources)).toBe(0);
+  });
+
   test('worker-stated events (no source file) render without links or throwing', async () => {
     const model = sampleModel({
       sequence: {
