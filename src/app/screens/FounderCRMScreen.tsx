@@ -502,6 +502,26 @@ function Collapsible({ title, defaultOpen = false, children }: { title: string; 
 }
 
 // Compact, collapsible firm row. Tap-to-call lives in the header so it's reachable without expanding.
+// Deal brief fallback for firms without researched crmFirmIntel (e.g. the CELA 350):
+// build a call-ready brief from data we already have. On-message, no legal conclusions.
+function suggestedOpener(firm: CrmFirm): string {
+  const who = firm.attorney_name?.trim().split(/\s+/)[0] || 'there';
+  return `Hi ${who} — I help California employment firms turn a client's scattered records into one organized, source-linked timeline, so you open an intake and decide in minutes. Could I show you a real one?`;
+}
+function practiceFit(focus: string | null): string {
+  const f = (focus || '').trim();
+  return f
+    ? `${f} — document-heavy intake; organizing scattered records before the first meeting is a strong fit.`
+    : 'Employment practice — organizing scattered client records before the first meeting is a strong fit.';
+}
+function localAngle(firm: CrmFirm): string | null {
+  const r = (firm.region || '').toLowerCase();
+  if (r.includes('central valley')) return 'Local angle: Central Valley — near Tracy. Lead with the hometown connection.';
+  if (r.includes('sacramento')) return 'Regional: Sacramento area — Northern California.';
+  if (r.includes('norcal')) return 'Regional: Northern California.';
+  return null;
+}
+
 function FirmCard({ firm, onLog, today, onQuickEmail, userId, onClaim, onRelease }: { firm: CrmFirm; onLog: (id: string) => void; today?: string; onQuickEmail?: (id: string) => Promise<void>; userId?: string | null; onClaim?: (id: string) => Promise<void>; onRelease?: (id: string) => Promise<void> }) {
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -566,6 +586,21 @@ function FirmCard({ firm, onLog, today, onQuickEmail, userId, onClaim, onRelease
               )}
               <p className="text-[12px] font-semibold text-[#1E1B4B]">{intel.headlineWin}</p>
               <p className="mt-1.5 text-[12px] leading-relaxed text-[#1E1B4B]/75"><span className="font-bold text-[#6D4AFF]">Opener: </span>{intel.opener}</p>
+            </div>
+          )}
+
+          {/* Deal brief — fallback for firms without researched intel (CELA 350). */}
+          {!intel && (
+            <div className="rounded-[12px] border border-[#DCD3FF] bg-[#F7F3FF] p-3">
+              <p className="text-[11px] font-bold uppercase tracking-wide text-[#6D4AFF]">Call brief</p>
+              <p className="mt-1 text-[12px] leading-relaxed text-[#1E1B4B]/80">{practiceFit(firm.focus_areas)}</p>
+              {localAngle(firm) && (
+                <p className="mt-1 text-[12px] font-medium text-[#1E1B4B]/70">{localAngle(firm)}</p>
+              )}
+              <p className="mt-2 text-[12px] leading-relaxed text-[#1E1B4B]/75">
+                <span className="font-bold text-[#6D4AFF]">Opener: </span>{suggestedOpener(firm)}
+              </p>
+              {firm.notes && <p className="mt-1 text-[11px] text-[#1E1B4B]/45">{firm.notes}</p>}
             </div>
           )}
 
