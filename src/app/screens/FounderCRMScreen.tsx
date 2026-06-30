@@ -141,6 +141,35 @@ function StageTag({ stage }: { stage: CrmStage }) {
   );
 }
 
+// Pipeline order vs. terminal/side states (no/nurture aren't steps, they're outcomes).
+const PIPELINE_STAGES: CrmStage[] = ['target', 'contacted', 'convo', 'demo_booked', 'demo_done', 'pilot', 'paid'];
+const SIDE_STAGES: CrmStage[] = ['no', 'nurture'];
+
+/** Always-on Dashboard diagnostic: how many firms sit in each stage right now. */
+function StageStrip({ firms }: { firms: CrmFirm[] }) {
+  const n = (s: CrmStage) => firms.filter((f) => f.stage === s).length;
+  return (
+    <section>
+      <h2 className="mb-2 text-[13px] font-bold text-[#1E1B4B]">Pipeline by stage</h2>
+      <div className="flex flex-wrap items-stretch gap-1.5">
+        {PIPELINE_STAGES.map((s) => (
+          <div key={s} className="min-w-[62px] flex-1 rounded-[10px] border border-[#E7E1FF] bg-white px-2 py-1.5 text-center">
+            <div className="text-[18px] font-black leading-none text-[#6D4AFF]">{n(s)}</div>
+            <div className="mt-0.5 text-[9px] font-semibold uppercase tracking-wide text-[#1E1B4B]/50">{CRM_STAGE_LABELS[s]}</div>
+          </div>
+        ))}
+        <div className="w-px self-stretch bg-[#E7E1FF]" />
+        {SIDE_STAGES.map((s) => (
+          <div key={s} className="min-w-[58px] rounded-[10px] border border-[#F0ECFA] bg-[#FAF9FE] px-2 py-1.5 text-center">
+            <div className="text-[18px] font-black leading-none text-[#1E1B4B]/40">{n(s)}</div>
+            <div className="mt-0.5 text-[9px] font-semibold uppercase tracking-wide text-[#1E1B4B]/40">{CRM_STAGE_LABELS[s]}</div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function PriorityBadge({ priority }: { priority: 'A' | 'B' | 'C' | null }) {
   if (!priority) return null;
   const c = priority === 'A' ? 'bg-red-100 text-red-700' : priority === 'B' ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-500';
@@ -662,6 +691,8 @@ function DashboardTab({ firms, activity, today, onLog, workerCount, onChanged, o
           </div>
         ))}
       </div>
+
+      <StageStrip firms={firms} />
 
       <DemoPrepCard firms={firms} today={today} onChanged={onChanged} />
 
