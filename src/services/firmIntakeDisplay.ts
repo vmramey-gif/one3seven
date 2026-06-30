@@ -162,7 +162,10 @@ export type FirmRecordGroup = { label: string; categories: Array<{ name: string;
 function applyVoiceRewrites(text: string): string {
   let out = text;
   for (const [pattern, replacement] of VOICE_REWRITES) {
-    out = out.replace(pattern, replacement);
+    // Narrow the string|function union so TS can resolve a String.replace overload.
+    out = typeof replacement === 'string'
+      ? out.replace(pattern, replacement)
+      : out.replace(pattern, replacement);
   }
   return out;
 }
@@ -661,10 +664,10 @@ function workflowIndicatesDocResponseComplete(
  * Display layer only; does not mutate intake state.
  */
 export function resolveFirmPersistedWorkflowStatus(
-  view: Pick<
-    FirmLiveIntakeView,
-    'intakeWorkflowStatus' | 'routeStatus' | 'documentResponse'
-  > & { isSamplePreview?: boolean }
+  view: Pick<FirmLiveIntakeView, 'intakeWorkflowStatus' | 'routeStatus'> & {
+    documentResponse?: FirmLiveIntakeView['documentResponse'];
+    isSamplePreview?: boolean;
+  }
 ): FirmPersistedWorkflowPresentation {
   if (view.isSamplePreview) {
     return {
