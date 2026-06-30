@@ -686,6 +686,70 @@ function drawDvwRows(c: Cursor, rows: Array<{ question: string; support: string 
   }
 }
 
+/**
+ * Pure count of how many organized items (timeline events + document quotes) link to a
+ * supplied source document. Arithmetic only — never a quality score (UPL discipline).
+ */
+export function countSourceCoverage(
+  model: FirmPacketModel,
+  sources: PdfSourceDoc[] = [],
+): { linked: number; total: number } {
+  const idx = buildSourceIndex(sources);
+  let linked = 0;
+  let total = 0;
+  if (model.sequence.kind === 'events') {
+    for (const e of model.sequence.events) {
+      total += 1;
+      if (factProvenance(e.sourceFile, idx).state === 'linked') linked += 1;
+    }
+  }
+  if (model.extracted?.keyQuotes) {
+    for (const q of model.extracted.keyQuotes) {
+      total += 1;
+      if (factProvenance(q.fileName, idx).state === 'linked') linked += 1;
+    }
+  }
+  return { linked, total };
+}
+
+/** Page-1 "how to read this file" box: the three source states + a pure coverage count. */
+function drawTraceabilityLegend(c: Cursor, coverage: { linked: number; total: number }): void {
+  const rows: Array<[string, string]> = [
+    ['Source-linked  »', 'click to open the cited document'],
+    ['Document on file', 'named record, included in Source Records'],
+    ['Worker-stated', "from the worker's own account"],
+  ];
+  const pad = 10;
+  const headH = 15;
+  const rowH = 12;
+  const covH = coverage.total > 0 ? 13 : 0;
+  const principleH = 14;
+  const boxH = pad * 2 + headH + rows.length * rowH + covH + principleH;
+  c.ensure(boxH + 6);
+  const top = c.y;
+  c.page.drawRectangle({ x: MARGIN, y: top - boxH, width: CONTENT_W, height: boxH, color: BRAND_SOFT });
+  c.page.drawRectangle({ x: MARGIN, y: top - boxH, width: 3, height: boxH, color: BRAND });
+  let yy = top - pad - 8;
+  c.page.drawText('How to read this file', { x: MARGIN + 12, y: yy, size: 9, font: c.bold, color: INK });
+  yy -= headH;
+  for (const [tag, desc] of rows) {
+    c.page.drawText(tag, { x: MARGIN + 12, y: yy, size: 8, font: c.bold, color: BRAND });
+    c.page.drawText(desc, { x: MARGIN + 130, y: yy, size: 8, font: c.font, color: SOFT });
+    yy -= rowH;
+  }
+  if (coverage.total > 0) {
+    c.page.drawText(
+      `${coverage.linked} of ${coverage.total} organized items link to a source document.`,
+      { x: MARGIN + 12, y: yy, size: 8.5, font: c.bold, color: INK },
+    );
+    yy -= covH;
+  }
+  c.page.drawText('one3seven only organizes and reflects — it never concludes.', {
+    x: MARGIN + 12, y: yy, size: 8.5, font: c.bold, color: BRAND,
+  });
+  c.y = top - boxH - 8;
+}
+
 // ── Main render ──────────────────────────────────────────────────────────────
 export async function renderFirmIntakePacketPdf(
   model: FirmPacketModel,
@@ -709,6 +773,9 @@ export async function renderFirmIntakePacketPdf(
     'one3seven organizes uploaded records for firm intake review. It is not legal advice.',
   );
   c.newPage();
+
+  // Traceability legend — how to read the source states + a pure coverage count.
+  drawTraceabilityLegend(c, countSourceCoverage(model, sources));
 
   // 1. Review Snapshot
   sectionHeading(c, '1.  Review Snapshot');

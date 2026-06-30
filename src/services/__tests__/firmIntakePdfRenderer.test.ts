@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import { PDFDocument, PDFName } from 'pdf-lib';
-import { renderFirmIntakePacketPdf, renderWorkerSummaryPdf, type FirmPacketModel, type PdfSourceDoc, type WorkerPacketModel } from '../firmIntakePdfRenderer';
+import { renderFirmIntakePacketPdf, renderWorkerSummaryPdf, countSourceCoverage, type FirmPacketModel, type PdfSourceDoc, type WorkerPacketModel } from '../firmIntakePdfRenderer';
 
 function sampleModel(overrides: Partial<FirmPacketModel> = {}): FirmPacketModel {
   return {
@@ -211,6 +211,28 @@ describe('source-linked citations', () => {
     expect(bytes[0]).toBe(0x25); // still a valid PDF
     const doc = await PDFDocument.load(bytes);
     expect(countLinkAnnotations(doc)).toBe(0); // nothing to link to
+  });
+});
+
+describe('countSourceCoverage', () => {
+  test('counts linked items vs total across events and quotes (arithmetic only)', () => {
+    // 2 events + 1 quote = 3 total. Supply docs matching event #1 and the quote = 2 linked.
+    const model = sampleModel({
+      extracted: {
+        confirmedFacts: [],
+        coworkerCorroboration: null,
+        timingIntervals: [],
+        keyQuotes: [{ category: 'HR Communications', fileName: 'HR Complaint Nov2025', quote: 'audit please' }],
+        overtimeNote: null,
+      },
+    } as Partial<FirmPacketModel>);
+    const sources: PdfSourceDoc[] = [
+      { docId: 'a', fileName: 'Rivera HR Complaint Nov2025', mime: 'application/pdf', bytes: new Uint8Array() },
+      { docId: 'b', fileName: 'HR Complaint Nov2025', mime: 'application/pdf', bytes: new Uint8Array() },
+    ];
+    expect(countSourceCoverage(model, sources)).toEqual({ linked: 2, total: 3 });
+    // No sources → nothing linked, total unchanged.
+    expect(countSourceCoverage(model)).toEqual({ linked: 0, total: 3 });
   });
 });
 
