@@ -170,10 +170,17 @@ function StageStrip({ firms }: { firms: CrmFirm[] }) {
   );
 }
 
+// Priority A/B/C relabeled by what it MEANS. C = "Pipeline" is the default mass, so
+// only the standouts (A/B) get a badge to avoid noise on every card.
+const PRIORITY_MEANS: Record<'A' | 'B' | 'C', string> = {
+  A: 'Priority target',
+  B: 'Warm region',
+  C: 'Pipeline',
+};
 function PriorityBadge({ priority }: { priority: 'A' | 'B' | 'C' | null }) {
-  if (!priority) return null;
-  const c = priority === 'A' ? 'bg-red-100 text-red-700' : priority === 'B' ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-500';
-  return <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${c}`}>{priority}</span>;
+  if (priority !== 'A' && priority !== 'B') return null;
+  const c = priority === 'A' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700';
+  return <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${c}`}>{PRIORITY_MEANS[priority]}</span>;
 }
 
 export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => void; isFounder?: boolean }) {
@@ -1418,10 +1425,12 @@ function PipelineTab({ firms, onLog, workerCount, onQuickEmail, claim }: { firms
 function FirmsTab({ firms, onLog, userId, onQuickEmail, claim }: { firms: CrmFirm[]; onLog: (id: string) => void; userId: string | null; onQuickEmail?: (id: string) => Promise<void>; claim?: ClaimBundle }) {
   const [stage, setStage] = useState<CrmStage | ''>('');
   const [priority, setPriority] = useState<'A' | 'B' | 'C' | ''>('');
+  const [tierFilter, setTierFilter] = useState<number | ''>('');
   const [owner, setOwner] = useState<'all' | 'mine' | 'uncontacted'>('all');
   const filtered = firms.filter((f) =>
     (!stage || f.stage === stage) &&
     (!priority || f.priority === priority) &&
+    (tierFilter === '' || f.tier === tierFilter) &&
     (owner === 'all' ||
       (owner === 'mine' && !!userId && f.contacted_by === userId) ||
       (owner === 'uncontacted' && !f.contacted_by))
@@ -1443,9 +1452,18 @@ function FirmsTab({ firms, onLog, userId, onQuickEmail, claim }: { firms: CrmFir
           <option value="">All stages</option>
           {CRM_STAGES.map((s) => <option key={s} value={s}>{CRM_STAGE_LABELS[s]}</option>)}
         </select>
+        <select value={tierFilter === '' ? '' : String(tierFilter)} onChange={(e) => setTierFilter(e.target.value === '' ? '' : Number(e.target.value))} className={`${tap} rounded-[10px] border border-[#E7E1FF] bg-white px-3 text-[13px]`}>
+          <option value="">All tiers</option>
+          <option value="1">Tier 1 · Tech-native</option>
+          <option value="2">Tier 2 · Growth</option>
+          <option value="3">Tier 3 · Modern boutique</option>
+          <option value="4">Tier 4 · Traditional</option>
+        </select>
         <select value={priority} onChange={(e) => setPriority(e.target.value as 'A' | 'B' | 'C' | '')} className={`${tap} rounded-[10px] border border-[#E7E1FF] bg-white px-3 text-[13px]`}>
-          <option value="">All priorities</option>
-          <option value="A">A</option><option value="B">B</option><option value="C">C</option>
+          <option value="">All firms</option>
+          <option value="A">Priority targets</option>
+          <option value="B">Warm region</option>
+          <option value="C">Pipeline</option>
         </select>
       </div>
       {filtered.length === 0 ? (
