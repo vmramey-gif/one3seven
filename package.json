@@ -8,7 +8,8 @@
     "dev": "vite",
     "typecheck": "tsc --noEmit",
     "sanitize-encoding": "node scripts/sanitize-src-encoding.mjs",
-    "test": "vitest run"
+    "test": "vitest run",
+    "state": "bash scripts/session-state.sh"
   },
   "dependencies": {
     "@emotion/react": "11.14.0",
