@@ -32,6 +32,8 @@ export interface CrmFirm {
   contacted_by: string | null;
   contacted_by_name: string | null;
   contacted_at: string | null;
+  /** Sales sequencing tier 1-4 (1 = tech-native, call first). Set by cela_tier_update.sql. */
+  tier?: number | null;
   created_at: string;
 }
 

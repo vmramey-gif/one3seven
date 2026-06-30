@@ -502,6 +502,31 @@ function Collapsible({ title, defaultOpen = false, children }: { title: string; 
 }
 
 // Compact, collapsible firm row. Tap-to-call lives in the header so it's reachable without expanding.
+// Per-tier call angle + objection prep (verbatim from the sales cheat sheet). Tier is
+// stored on the firm (cela_tier_update.sql); these 4 templates stay in code, not per-row.
+const TIER_PLAYS: Record<number, { label: string; angle: string; objection: string }> = {
+  1: {
+    label: 'Tier 1 · Tech-native',
+    angle: "Skip the AI-concept pitch. Lead: “You're already running a modern firm — your case lifecycle has AI. Your intake probably still has a worker arriving scattered. We close that gap before the case starts.” They get it in 30 seconds.",
+    objection: 'Price / fit / timing only. NOT AI skepticism.',
+  },
+  2: {
+    label: 'Tier 2 · Growth',
+    angle: "“Firms your size tell us the bottleneck isn't caseload — it's the staff time sorting intake before the attorney can evaluate. We eliminate that step.”",
+    objection: "“Already have a process” → ask what it is. “Who else is using this?” → have 1–2 firm names ready.",
+  },
+  3: {
+    label: 'Tier 3 · Modern boutique',
+    angle: "“Solo and boutique firms often take fewer cases but need each one to be right. We help you see the full picture before the first consult so you decide faster.”",
+    objection: "“Not the right time” / “Send something first” → follow up with the demo link same day.",
+  },
+  4: {
+    label: 'Tier 4 · Traditional',
+    angle: "“It's not complicated — worker uploads records, we organize it, you get a clean packet. No AI jargon, no learning curve. Free pilot this week.”",
+    objection: "AI skepticism — don't oversell tech. Sell the packet.",
+  },
+};
+
 // Deal brief fallback for firms without researched crmFirmIntel (e.g. the CELA 350):
 // build a call-ready brief from data we already have. On-message, no legal conclusions.
 function suggestedOpener(firm: CrmFirm): string {
@@ -590,19 +615,34 @@ function FirmCard({ firm, onLog, today, onQuickEmail, userId, onClaim, onRelease
           )}
 
           {/* Deal brief — fallback for firms without researched intel (CELA 350). */}
-          {!intel && (
-            <div className="rounded-[12px] border border-[#DCD3FF] bg-[#F7F3FF] p-3">
-              <p className="text-[11px] font-bold uppercase tracking-wide text-[#6D4AFF]">Call brief</p>
-              <p className="mt-1 text-[12px] leading-relaxed text-[#1E1B4B]/80">{practiceFit(firm.focus_areas)}</p>
-              {localAngle(firm) && (
-                <p className="mt-1 text-[12px] font-medium text-[#1E1B4B]/70">{localAngle(firm)}</p>
-              )}
-              <p className="mt-2 text-[12px] leading-relaxed text-[#1E1B4B]/75">
-                <span className="font-bold text-[#6D4AFF]">Opener: </span>{suggestedOpener(firm)}
-              </p>
-              {firm.notes && <p className="mt-1 text-[11px] text-[#1E1B4B]/45">{firm.notes}</p>}
-            </div>
-          )}
+          {!intel && (() => {
+            const play = firm.tier ? TIER_PLAYS[firm.tier] : null;
+            return (
+              <div className="rounded-[12px] border border-[#DCD3FF] bg-[#F7F3FF] p-3">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-[11px] font-bold uppercase tracking-wide text-[#6D4AFF]">Call brief</p>
+                  {play && (
+                    <span className="rounded-full bg-[#6D4AFF] px-2 py-0.5 text-[10px] font-bold text-white">{play.label}</span>
+                  )}
+                </div>
+                {play ? (
+                  <>
+                    <p className="mt-2 text-[12px] leading-relaxed text-[#1E1B4B]/80"><span className="font-bold text-[#6D4AFF]">Angle: </span>{play.angle}</p>
+                    <p className="mt-1.5 text-[12px] leading-relaxed text-[#1E1B4B]/65"><span className="font-bold text-[#1E1B4B]/75">If they push back: </span>{play.objection}</p>
+                  </>
+                ) : (
+                  <>
+                    <p className="mt-1 text-[12px] leading-relaxed text-[#1E1B4B]/80">{practiceFit(firm.focus_areas)}</p>
+                    <p className="mt-2 text-[12px] leading-relaxed text-[#1E1B4B]/75"><span className="font-bold text-[#6D4AFF]">Opener: </span>{suggestedOpener(firm)}</p>
+                  </>
+                )}
+                {localAngle(firm) && (
+                  <p className="mt-1.5 text-[12px] font-medium text-[#1E1B4B]/70">{localAngle(firm)}</p>
+                )}
+                {firm.notes && <p className="mt-1 text-[11px] text-[#1E1B4B]/45">{firm.notes}</p>}
+              </div>
+            );
+          })()}
 
           {/* Full brief — deeper research, collapsed by default */}
           {intel && (
