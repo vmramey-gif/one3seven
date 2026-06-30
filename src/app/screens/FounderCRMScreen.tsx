@@ -105,6 +105,21 @@ const FAST_LOG_OUTCOMES = [
 ];
 
 const todayISO = () => new Date().toISOString().slice(0, 10);
+
+// Time-based greeting (Pacific), matching the worker dashboard's tone.
+function crmGreeting(name: string): string {
+  const first = name?.trim().split(/\s+/)[0] ?? '';
+  try {
+    const hour = Number.parseInt(
+      new Intl.DateTimeFormat('en-US', { hour: 'numeric', hour12: false, timeZone: 'America/Los_Angeles' }).format(new Date()),
+      10,
+    );
+    const g = hour >= 5 && hour < 12 ? 'Good morning' : hour >= 12 && hour < 17 ? 'Good afternoon' : 'Good evening';
+    return first ? `${g}, ${first}` : g;
+  } catch {
+    return first ? `Welcome back, ${first}` : 'Welcome back';
+  }
+}
 const tap = 'min-h-[44px]'; // mobile touch-target floor
 const digitsOf = (p: string) => p.replace(/[^\d+]/g, '');
 
@@ -144,6 +159,8 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
   const unreadTeam = !!latestMsgAt && latestMsgAt > seenTeamAt && tab !== 'team';
   const [unreadDm, setUnreadDm] = useState(0);
   const [realtimeLive, setRealtimeLive] = useState(false);
+  const [memberName, setMemberName] = useState('');
+  useEffect(() => { void getCurrentMember().then((m) => setMemberName(m.name)); }, []);
   const [userEmail, setUserEmail] = useState('');
   const [userId, setUserId] = useState<string | null>(null);
   const showEconomics = ECON_ALLOWED_EMAILS.includes(userEmail.trim().toLowerCase());
@@ -358,6 +375,9 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
           <div className="py-20 text-center text-sm text-[#1E1B4B]/40">Loading…</div>
         ) : (
           <>
+            {tab === 'dashboard' && (
+              <SuitesHome greeting={crmGreeting(memberName)} isFounder={isFounder} showEconomics={showEconomics} activeTab={tab} onPick={setTab} />
+            )}
             {tab === 'dashboard' && <DashboardTab firms={firms} activity={activity} today={today} onLog={openFast} workerCount={workerCount} onChanged={load} onQuickEmail={quickEmail} claim={claim} />}
             {tab === 'pipeline' && <PipelineTab firms={firms} onLog={openFast} workerCount={workerCount} onQuickEmail={quickEmail} claim={claim} />}
             {tab === 'firms' && <FirmsTab firms={firms} onLog={openFast} userId={userId} onQuickEmail={quickEmail} claim={claim} />}
@@ -569,6 +589,51 @@ function FirmCard({ firm, onLog, today, onQuickEmail, userId, onClaim, onRelease
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+// Clean CRM home: greeting + the nav categories as "suite" cards.
+function SuitesHome({ greeting, isFounder, showEconomics, activeTab, onPick }: {
+  greeting: string; isFounder: boolean; showEconomics: boolean; activeTab: Tab; onPick: (t: Tab) => void;
+}) {
+  const groups = NAV_GROUPS
+    .map((g) => ({
+      ...g,
+      items: g.tabIds
+        .map((id) => TAB_BY_ID[id])
+        .filter((t) => t && (!t.founderOnly || isFounder) && (!t.econOnly || showEconomics)),
+    }))
+    .filter((g) => g.items.length > 0);
+
+  return (
+    <div className="mb-7">
+      <h1 className="font-display text-[clamp(1.5rem,5vw,2rem)] font-medium leading-[1.12] tracking-[-0.02em] text-transparent bg-[linear-gradient(110deg,#1E1B4B_0%,#5B35D5_42%,#1E1B4B_78%)] bg-[length:220%_100%] bg-clip-text">
+        {greeting}
+      </h1>
+      <p className="mt-1 text-[13px] text-[#1E1B4B]/50">Your sales suite — jump back in.</p>
+      <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
+        {groups.map((g) => (
+          <div key={g.id} className="rounded-[18px] border border-[#E7E1FF] bg-white p-4 shadow-[0_10px_30px_rgba(31,27,75,0.05)]">
+            <div className="mb-3 flex items-center gap-2">
+              <span className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-[#EDE7FF] text-[#6D4AFF]"><g.icon className="h-4 w-4" /></span>
+              <span className="text-[14px] font-bold text-[#1E1B4B]">{g.label}</span>
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {g.items.map((t) => (
+                <button
+                  key={t.id}
+                  type="button"
+                  onClick={() => onPick(t.id)}
+                  className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[12px] font-semibold transition ${activeTab === t.id ? 'bg-[#6D4AFF] text-white' : 'bg-[#F4F1FF] text-[#1E1B4B]/70 hover:bg-[#EDE7FF]'}`}
+                >
+                  <t.icon className="h-3.5 w-3.5" /> {t.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
