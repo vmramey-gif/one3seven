@@ -122,3 +122,45 @@ HOW TO RUN IT
 • One CTA per email. Send from a person (name@one3seven.com), not info@.
 • CAN-SPAM: every email needs a real mailing address (PO box / business — never a home address) and an honest opt-out.
 • Keep the wording: "organizes and reflects — it does not draw legal conclusions." That's the UPL guardrail. Don't let it drift into outcome or claim language.`;
+
+// ── Competitive & credibility talking points (mirrors the Ask AI knowledge for reps
+// who'd rather read than query). Rule: only raise a competitor if the prospect does;
+// state facts, never trash-talk, then pivot to our lane. ────────────────────────────
+export const CRM_CREDIBILITY: string[] = [
+  'Built on Anthropic’s Claude — the same AI platform California adopted statewide for its own agencies. Strongest said out loud on a call.',
+  'Safe to say: "built on / powered by Anthropic’s Claude" and the California-adopted line. NOT safe: "partner," "certified," "endorsed," any government-affiliation implication, or logos.',
+  'Pair it with our own line (needs no permission): "one3seven only organizes and reflects — it never concludes." First borrows California’s credibility; second is ours.',
+];
+
+export const CRM_COMPETITORS: { name: string; when: string; say: string }[] = [
+  {
+    name: 'Eve Legal',
+    when: 'They use / are weighing Eve (or "what about Eve?")',
+    say: 'Different lane. Eve leans into AI drafting/analysis — the "authoring" lane that edges toward the UPL line and is where the IP fights are (it was sued for patent infringement in June 2026). Drafting tools produce convincing-but-unverified output — the kind that has gotten lawyers sanctioned. We don’t draft or conclude; we organize what already exists and link every fact to its source, so there’s nothing to hallucinate. ~10-minute setup vs. long enterprise onboarding.',
+  },
+  {
+    name: 'Clio / MyCase',
+    when: 'We already use Clio (or MyCase)',
+    say: 'Great — keep it. Those manage your practice after intake. one3seven sits in front of them: it organizes the client’s scattered records into a source-linked intake so what lands in Clio is already clean. Complementary, not a replacement. (Clio is also mid-consolidation — the ~$1B vLex/Fastcase deal plus the Alexi antitrust fight — so some firms are wary of lock-in; we’re narrow and additive.)',
+  },
+];
+
+export const CRM_WHY_AI_LOVE_HATE: string[] = [
+  'Attorneys DISLIKE AI that talks to their clients — conversational intake bots feel robotic; clients give one-word answers and resent it.',
+  'Attorneys LOVE AI that does the back-office — organizing documents, timelines, summaries.',
+  'one3seven is the loved kind: no bot pretending to be the firm. The worker uploads their own records; we organize them.',
+];
+
+export const CRM_SPECIALTIES: string[] = [
+  'Source-linked intake packet — every fact links to its exact source doc/page (verify in one click).',
+  'Dated timeline / chronology built from the records and the worker’s account.',
+  'Document categorization — wage/pay, HR & complaints, communications, discipline, separation.',
+  'Information-gap surfacing — "additional information that may help" (never "weak" or "missing evidence").',
+  'Document checklist — requested vs. received, at a glance.',
+  'Time-sensitive date flags for attorney review (never determines the deadline).',
+  'Section 8B wage-exposure estimate (Practice & Firm, California only) — arithmetic from records, attorney work-product, never "damages."',
+  'Firm dashboard — review-ready intakes; open and decide in minutes.',
+  'Firm intake link — share one link with your clients; the organized intake lands in your dashboard.',
+  'Worker control — the worker owns their records and decides what and who to share.',
+  'Scope: California fully supported; Texas organize-only pending regulatory review.',
+];

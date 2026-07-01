@@ -27,7 +27,7 @@ import {
   companyEconomics, ECON_DEFAULTS, type EconomicsInput,
 } from '../../services/crmAnalytics';
 import { CRM_STAGES, CRM_STAGE_LABELS, type CrmStage } from '../../services/crmStageLogic';
-import { CRM_WEEKLY_TARGETS, CRM_CALL_SCRIPT, CRM_OBJECTIONS, CRM_COLD_EMAIL } from '../constants/crmReference';
+import { CRM_WEEKLY_TARGETS, CRM_CALL_SCRIPT, CRM_OBJECTIONS, CRM_COLD_EMAIL, CRM_CREDIBILITY, CRM_COMPETITORS, CRM_WHY_AI_LOVE_HATE, CRM_SPECIALTIES } from '../constants/crmReference';
 import { FIRE_DEMO_TRAINING, PI_RULES, CRM_COMMISSIONS, CRM_SUBSCRIPTION_TIERS, LAUNCH_CHECKLIST } from '../constants/crmTraining';
 import { AUDIT_SITE_CHECKS, AUDIT_MANUAL_GROUPS } from '../constants/crmAudit';
 import { crmFirmIntel } from '../constants/crmFirmIntel';
@@ -1688,6 +1688,47 @@ function ScriptsTab() {
       </Collapsible>
       <Collapsible title="Cold email sequence (free pilot · 3-touch)">
         <pre className="whitespace-pre-wrap text-[13px] leading-relaxed text-[#1E1B4B]/75">{CRM_COLD_EMAIL}</pre>
+      </Collapsible>
+      <Collapsible title="Competitors — what to say (only if they bring it up)">
+        <div className="space-y-3">
+          {CRM_COMPETITORS.map((c) => (
+            <div key={c.name}>
+              <div className="mb-1 text-[13px] font-bold text-[#1E1B4B]">{c.name}</div>
+              <div className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-[#6D4AFF]">{c.when}</div>
+              <p className="text-[13px] leading-relaxed text-[#1E1B4B]/65">{c.say}</p>
+            </div>
+          ))}
+          <p className="rounded-[10px] bg-[#FAFAFF] px-3 py-2 text-[12px] leading-relaxed text-[#1E1B4B]/55">
+            Rule: only raise a competitor if the prospect does. State facts, never trash-talk, then pivot to our lane.
+          </p>
+        </div>
+      </Collapsible>
+      <Collapsible title="Credibility line (California · Anthropic)">
+        <ul className="space-y-2">
+          {CRM_CREDIBILITY.map((c) => (
+            <li key={c} className="flex gap-2 text-[13px] leading-relaxed text-[#1E1B4B]/70">
+              <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#6D4AFF]" /><span>{c}</span>
+            </li>
+          ))}
+        </ul>
+      </Collapsible>
+      <Collapsible title="Why attorneys love / hate legal AI">
+        <ul className="space-y-2">
+          {CRM_WHY_AI_LOVE_HATE.map((c) => (
+            <li key={c} className="flex gap-2 text-[13px] leading-relaxed text-[#1E1B4B]/70">
+              <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#6D4AFF]" /><span>{c}</span>
+            </li>
+          ))}
+        </ul>
+      </Collapsible>
+      <Collapsible title="What we offer — specialties & specifics">
+        <ul className="space-y-2">
+          {CRM_SPECIALTIES.map((c) => (
+            <li key={c} className="flex gap-2 text-[13px] leading-relaxed text-[#1E1B4B]/70">
+              <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#8B6DFF]" /><span>{c}</span>
+            </li>
+          ))}
+        </ul>
       </Collapsible>
     </div>
   );
