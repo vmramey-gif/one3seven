@@ -74,6 +74,37 @@ export function ForFirmsPage({ onBack, onStartWorker }: ForFirmsPageProps) {
             Start free pilot
             <ArrowRight className="h-4 w-4" />
           </a>
+          <p className="mx-auto mt-5 max-w-[560px] text-[12px] leading-relaxed text-[#9A93C2]">
+            Only organizes and reflects — never concludes. Every surfaced fact traces to the worker's story or a source document.
+          </p>
+        </div>
+      </section>
+
+      {/* Metrics */}
+      <section className="px-5 pt-2 sm:px-8">
+        <div className="mx-auto grid max-w-3xl grid-cols-2 gap-4 sm:grid-cols-4">
+          {([['6', 'CA employment intake schemas'], ['<15 min', 'Upload to organized packet'], ['100%', 'Facts traceable to source'], ['0', 'Legal conclusions drawn']] as const).map(([n, l]) => (
+            <div key={l} className="text-center">
+              <div className="text-[28px] font-medium text-white" style={SERIF}>{n}</div>
+              <div className="mt-1 text-[11px] leading-snug text-[#8E88B5]">{l}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Built differently */}
+      <section className="px-5 py-14 sm:px-8">
+        <div className="mx-auto max-w-3xl rounded-[24px] border border-white/10 bg-white/[0.03] p-7 sm:p-9">
+          <div className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-[#A78BFA]">Why one3seven</div>
+          <h2 style={SERIF} className="text-[24px] font-medium text-white sm:text-[28px]">Built differently from legal-drafting AI.</h2>
+          <p className="mt-3 text-[14px] leading-relaxed text-[#C9C4E6]">
+            Most legal AI drafts, scores, or recommends — which invites hallucinated citations and blurred responsibility. one3seven is intentionally narrower.
+          </p>
+          <div className="mt-5 flex flex-wrap gap-2">
+            {['No drafting', 'No chatbot', 'No case scoring', 'No outcome estimates', 'No attorney recommendations', 'We organize the record'].map((t) => (
+              <span key={t} className="rounded-full border border-white/15 px-3 py-1.5 text-[12px] font-medium text-[#C4B5FD]">{t}</span>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -152,6 +183,7 @@ export function ForFirmsPage({ onBack, onStartWorker }: ForFirmsPageProps) {
               ['Firm data isolation', 'Each firm sees only its own intakes. Row-level database policies enforce separation between firms, and isolation has been independently verified.'],
               ['AI foundation', 'Built on the same AI platform California adopted statewide for its agencies.'],
               ['AI training', 'Uploaded documents are used to organize your intake. They are not used to train AI models.'],
+              ['Built for auditability', 'Every surfaced fact links back to the worker’s input or a source document — review never depends on trusting a black-box summary.'],
               ['Attorney-decided', 'one3seven organizes records and surfaces information from documents. It does not provide legal advice, predictions, or conclusions. Source documents remain available for direct attorney review.'],
             ].map(([title, body]) => (
               <div key={title} className="flex gap-3 rounded-2xl border border-white/10 bg-white/[0.04] p-5">
@@ -170,10 +202,10 @@ export function ForFirmsPage({ onBack, onStartWorker }: ForFirmsPageProps) {
       <section id="pilot-interest" className="px-5 py-16 sm:px-8 sm:py-20">
         <div className="mx-auto max-w-[520px]">
           <div className="mb-6 text-center">
-            <h2 style={SERIF} className="text-[26px] font-medium tracking-[-0.01em] text-white sm:text-[32px]">Start your free pilot</h2>
+            <h2 style={SERIF} className="text-[26px] font-medium tracking-[-0.01em] text-white sm:text-[32px]">Be one of the first 100 founder firms</h2>
             <p className="mt-2 text-[14px] leading-relaxed text-[#C9C4E6]">
-              We're onboarding a small number of California employment firms. Tell us about your firm and
-              we'll set up your intake link.
+              Founder pricing locked for life, priority support, and a direct line to the founders. Free
+              pilot — no credit card. Tell us about your firm and we'll set up your intake link.
             </p>
           </div>
 
@@ -230,8 +262,9 @@ export function ForFirmsPage({ onBack, onStartWorker }: ForFirmsPageProps) {
             Contact: <a href="mailto:info@one3seven.com" className="font-semibold text-[#A78BFA] hover:underline">info@one3seven.com</a>
           </p>
           <p className="max-w-[640px] text-[11px] leading-relaxed text-[#8E88B5]">
-            one3seven is not a law firm and does not provide legal advice. It organizes records and surfaces
-            information for review preparation. Attorneys independently evaluate all information.
+            one3seven is not a law firm and does not provide legal advice. Not a lawyer referral service. It
+            organizes records and surfaces information for review preparation. Attorneys independently evaluate
+            all information.
           </p>
         </div>
       </footer>
