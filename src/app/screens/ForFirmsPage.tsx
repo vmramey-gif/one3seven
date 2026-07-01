@@ -83,7 +83,7 @@ export function ForFirmsPage({ onBack, onStartWorker }: ForFirmsPageProps) {
       {/* Metrics */}
       <section className="px-5 pt-2 sm:px-8">
         <div className="mx-auto grid max-w-3xl grid-cols-2 gap-4 sm:grid-cols-4">
-          {([['6', 'CA employment intake schemas'], ['<15 min', 'Upload to organized packet'], ['100%', 'Facts traceable to source'], ['0', 'Legal conclusions drawn']] as const).map(([n, l]) => (
+          {([['0', 'Legal conclusions drawn'], ['100%', 'Source documents preserved for review'], ['1 link', 'Shared with your clients, on your terms'], ['Minutes', 'From upload to an organized packet']] as const).map(([n, l]) => (
             <div key={l} className="text-center">
               <div className="text-[28px] font-medium text-white" style={SERIF}>{n}</div>
               <div className="mt-1 text-[11px] leading-snug text-[#8E88B5]">{l}</div>

@@ -40,7 +40,7 @@ Every call outcome — yes, no, maybe, call me back — gets texted to Tad the s
 - one3seven organizes it into a dated, source-linked intake packet
 - The attorney opens a clean packet instead of running an intake meeting
 - Built on Anthropic's Claude — the same AI made broadly available to California state agencies through a statewide partnership
-- Free pilot for the first 100 firms. No credit card. 15 minutes to set up.
+- Free pilot for the first 100 firms. No credit card. Quick to set up.
 
 ---
 
