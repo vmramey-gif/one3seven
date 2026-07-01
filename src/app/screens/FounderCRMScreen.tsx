@@ -576,40 +576,47 @@ function FirmCard({ firm, onLog, today, onQuickEmail, userId, onClaim, onRelease
   const [claiming, setClaiming] = useState(false);
   const due = today && firm.next_followup && firm.next_followup <= today;
   const mine = !!userId && firm.contacted_by === userId;
+  const claimable = !firm.contacted_by && !!onClaim; // Open pool → whole row claims
+  const doClaim = async () => { setClaiming(true); try { await onClaim!(firm.id); } finally { setClaiming(false); } };
   const claimedDate = firm.contacted_at ? firm.contacted_at.slice(0, 10) : null;
   const intel = crmFirmIntel[firm.name];
   return (
     <div className="overflow-hidden rounded-[14px] border border-[#E7E1FF] bg-white">
       <div className="flex items-center gap-2 p-2.5">
-        <button type="button" onClick={() => setOpen((o) => !o)} className="flex min-w-0 flex-1 items-center gap-2 text-left">
-          <ChevronRight className={`h-4 w-4 shrink-0 text-[#1E1B4B]/30 transition-transform ${open ? 'rotate-90' : ''}`} />
-          <span className="truncate text-[14px] font-bold">{firm.name}</span>
-          <PriorityBadge priority={firm.priority} />
-          {due && <span className="shrink-0 rounded-full bg-red-100 px-1.5 py-0.5 text-[10px] font-bold text-red-600">due</span>}
-        </button>
-        {firm.contacted_by ? (
+        {claimable ? (
+          // Open pool: tapping the row claims the firm (chevron on the right opens the brief).
+          <button type="button" disabled={claiming} onClick={doClaim} className="flex min-w-0 flex-1 items-center gap-2 text-left disabled:opacity-50" aria-label={`Claim ${firm.name}`}>
+            <Hand className="h-4 w-4 shrink-0 text-[#6D4AFF]" />
+            <span className="truncate text-[14px] font-bold">{firm.name}</span>
+            <PriorityBadge priority={firm.priority} />
+            <span className="shrink-0 rounded-full bg-[#EDE7FF] px-2 py-0.5 text-[10px] font-bold text-[#6D4AFF]">{claiming ? 'Claiming…' : 'Tap to claim'}</span>
+          </button>
+        ) : (
+          <button type="button" onClick={() => setOpen((o) => !o)} className="flex min-w-0 flex-1 items-center gap-2 text-left">
+            <ChevronRight className={`h-4 w-4 shrink-0 text-[#1E1B4B]/30 transition-transform ${open ? 'rotate-90' : ''}`} />
+            <span className="truncate text-[14px] font-bold">{firm.name}</span>
+            <PriorityBadge priority={firm.priority} />
+            {due && <span className="shrink-0 rounded-full bg-red-100 px-1.5 py-0.5 text-[10px] font-bold text-red-600">due</span>}
+          </button>
+        )}
+        {firm.contacted_by && (
           <span
             className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold ${mine ? 'bg-emerald-100 text-emerald-700' : 'bg-[#EDE7FF] text-[#6D4AFF]'}`}
             title={`Claimed by ${firm.contacted_by_name ?? 'rep'}${claimedDate ? ' · ' + claimedDate : ''}`}
           >
             {mine ? 'Yours' : (firm.contacted_by_name?.split(' ')[0] ?? 'Claimed')}
           </span>
-        ) : onClaim ? (
-          <button
-            type="button"
-            disabled={claiming}
-            onClick={async () => { setClaiming(true); try { await onClaim(firm.id); } finally { setClaiming(false); } }}
-            className="flex h-9 shrink-0 items-center gap-1 rounded-full bg-[#6D4AFF] px-2.5 text-[11px] font-bold text-white transition hover:bg-[#5B3FE0] disabled:opacity-50"
-            aria-label={`Claim ${firm.name}`}
-          >
-            <Hand className="h-3.5 w-3.5" /> {claiming ? '…' : 'Claim'}
-          </button>
-        ) : null}
+        )}
         <StageTag stage={firm.stage} />
         {firm.phone && (
           <a href={`tel:${digitsOf(firm.phone)}`} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-600" aria-label={`Call ${firm.name}`}>
             <Phone className="h-4 w-4" />
           </a>
+        )}
+        {claimable && (
+          <button type="button" onClick={() => setOpen((o) => !o)} aria-label="Details" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[#1E1B4B]/40 hover:bg-[#F4F1FF]">
+            <ChevronRight className={`h-4 w-4 transition-transform ${open ? 'rotate-90' : ''}`} />
+          </button>
         )}
       </div>
       {open && (
