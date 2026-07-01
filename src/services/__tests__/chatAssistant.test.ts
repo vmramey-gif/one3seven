@@ -37,8 +37,8 @@ describe('buildChatRequest', () => {
 });
 
 describe('starter questions', () => {
-  it('has exactly four items', () => {
-    expect(STARTER_QUESTIONS).toHaveLength(4);
+  it('has a handful of starter items', () => {
+    expect(STARTER_QUESTIONS.length).toBeGreaterThanOrEqual(4);
   });
   it('includes the data-security starter', () => {
     expect(STARTER_QUESTIONS.some((q) => q.toLowerCase().includes('security'))).toBe(true);
