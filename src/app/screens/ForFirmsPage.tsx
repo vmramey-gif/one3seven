@@ -150,6 +150,7 @@ export function ForFirmsPage({ onBack, onStartWorker }: ForFirmsPageProps) {
           <div className="space-y-4">
             {[
               ['Firm data isolation', 'Each firm sees only its own intakes. Row-level database policies enforce separation between firms, and isolation has been independently verified.'],
+              ['AI foundation', 'Built on the same AI platform California adopted statewide for its agencies.'],
               ['AI training', 'Uploaded documents are used to organize your intake. They are not used to train AI models.'],
               ['Attorney-decided', 'one3seven organizes records and surfaces information from documents. It does not provide legal advice, predictions, or conclusions. Source documents remain available for direct attorney review.'],
             ].map(([title, body]) => (
