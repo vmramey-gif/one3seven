@@ -11,8 +11,7 @@
 ---
 
 ## If they say yes
-Get a date and time. Send it to Tad immediately. He runs all demos.
-Demo calendar link: [INSERT CALENDLY LINK]
+Get a day and time that works for them, then text it to Tad at [INSERT TAD'S NUMBER] right away — he runs all demos and confirms the slot personally. No calendar link needed.
 
 ## If they say "send me something first"
 "Absolutely — what's the best email?" Text Tad the name + email right away. He'll send the one-pager within the hour.
