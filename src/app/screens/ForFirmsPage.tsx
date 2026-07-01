@@ -214,7 +214,8 @@ export function ForFirmsPage({ onBack, onStartWorker }: ForFirmsPageProps) {
             <h2 style={SERIF} className="text-[26px] font-medium tracking-[-0.01em] text-white sm:text-[32px]">Be one of the first 100 founder firms</h2>
             <p className="mt-2 text-[14px] leading-relaxed text-[#C9C4E6]">
               Founder pricing locked for life, priority support, and a direct line to the founders. Free
-              pilot — no credit card. Tell us about your firm and we'll set up your intake link.
+              7-day pilot — no credit card. See a sample intake packet today, decide within the week. Tell us
+              about your firm and we'll set up your intake link.
             </p>
           </div>
 

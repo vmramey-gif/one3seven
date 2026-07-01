@@ -9,8 +9,8 @@ describe('Ask one3seven AI — system prompt integrity', () => {
   it('contains banned vocabulary "violation"', () => {
     expect(SYSTEM_PROMPT).toContain('violation');
   });
-  it('contains the 30-day pilot duration', () => {
-    expect(SYSTEM_PROMPT).toContain('30-day');
+  it('contains the 7-day pilot duration', () => {
+    expect(SYSTEM_PROMPT).toContain('7-day pilot');
   });
   it('contains the current scope update (links, bonus, attribution)', () => {
     expect(SYSTEM_PROMPT).toContain('CURRENT SCOPE UPDATE');

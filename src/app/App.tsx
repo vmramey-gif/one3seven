@@ -2614,7 +2614,7 @@ export default function App() {
         {
           id: `billing-success-${Date.now()}`,
           title: 'Subscription started',
-          body: 'Your 30-day free trial is active. You can manage billing anytime from Settings.',
+          body: 'Your 7-day free trial is active. You can manage billing anytime from Settings.',
           read: false,
         },
         ...prev,

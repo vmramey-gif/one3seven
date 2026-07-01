@@ -83,7 +83,7 @@ one3seven organizes a worker's employment records into a structured, source-link
 
 It organizes and reflects. It does not draw legal conclusions. You evaluate everything.
 
-We're opening a free 30-day pilot to a small number of California employment firms — no credit card required. You can see what it produces here:
+We're opening a free 7-day pilot to a small number of California employment firms — no credit card required. You can see what it produces here:
 
 https://www.one3seven.com/for-firms
 

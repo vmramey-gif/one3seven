@@ -29,7 +29,7 @@ CORE DISCIPLINE — NEVER VIOLATE:
 one3seven organizes and reflects. It never concludes. Do not use these words in sales copy, product descriptions, worker-facing summaries, firm-facing summaries, or hypotheticals, except when explaining that a term is banned: violation, owes, owed, entitled, liable, liability, strong case, weak case, valid claim, invalid claim, damages as a conclusion or label. The word "exposure" in the sales context means wage exposure from records arithmetic — never health or chemical exposure. one3seven is not a law firm and does not provide legal advice.
 
 PRICING AND PILOT:
-Solo: $199/month. Practice: $499/month. Firm: $899/month. Free 30-day pilot — no credit card required. Commission starts when a firm converts from pilot to paid. Practice+ and Firm+ unlock Section 8B wage exposure calculator for California employment matters only — arithmetic from records, never legal conclusions.
+Solo: $199/month. Practice: $499/month. Firm: $899/month. Free 7-day pilot — no credit card required. The 7-day pilot is a DECISION WINDOW, not a hard cutoff: send the firm to one3seven.com/demo so they see a real, finished organized intake immediately — the clock never waits on a worker showing up — and they decide within the week (extend if they're actively evaluating). Commission starts when a firm converts from pilot to paid. Practice+ and Firm+ unlock Section 8B wage exposure calculator for California employment matters only — arithmetic from records, never legal conclusions.
 
 THE SALES MOTION:
 The goal of call one is to book a 15-minute demo. Not a subscription conversation. Not a pricing conversation. A demo appointment.
@@ -46,13 +46,13 @@ The gap: unbillable time, missed cases, delayed decisions. That gap already exis
 THE FIVE OBJECTIONS (covers ~74% of rejections):
 "We already have a process": Most firms have figured something out. The question is whether your team still spends time sorting records before an attorney can get a clean first look. Are your current tools handling that part?
 
-"Send me something first": Absolutely — https://www.one3seven.com/for-firms shows exactly what it produces. Free 30-day pilot, no credit card. I'll send that now and follow up in a couple days.
+"Send me something first": Absolutely — https://www.one3seven.com/for-firms shows exactly what it produces. Free 7-day pilot, no credit card. I'll send that now and follow up in a couple days.
 
 "Not the right time": Completely understand. When would be a better time — is next quarter more realistic, or is intake organization just not a priority right now?
 
 "What does AI do with the data?": Worker and firm records are isolated at the database level, and full document access is controlled by the worker's sharing action. Documents are processed under commercial API terms that don't allow training on customer data.
 
-"Too expensive / what does it cost?": It's a free 30-day pilot — no cost, no credit card. We want you to see what it does before there's any pricing conversation. Can we get the demo on the calendar first?
+"Too expensive / what does it cost?": It's a free 7-day pilot — no cost, no credit card. We want you to see what it does before there's any pricing conversation. Can we get the demo on the calendar first?
 
 "What about Eve / other legal AI?": Different lane. Tools like Eve are enterprise platforms with long onboarding that lean toward drafting and analysis — which edges toward the UPL line. one3seven is organize-only and fast: a worker self-serves through one intake link, you get a structured, source-linked intake in minutes, and you move faster because the record is already built. We don't draft, predict, or conclude — the attorney decides. Ten-minute setup versus a 90-day implementation.
 

@@ -20,7 +20,7 @@ export const FIRE_DEMO_TRAINING = {
     { title: '6. Where these records can go', text: 'The worker-facing handoff names the attorney type (employment). This is what lands an organized intake in front of an employment firm — your buyer.' },
   ],
   theAsk:
-    'Goal of the call is one thing: book a 15-minute screen-share demo. Not pricing, not a subscription — just the appointment. Free 30-day pilot, no credit card.',
+    'Goal of the call is one thing: book a 15-minute screen-share demo. Not pricing, not a subscription — just the appointment. Free 7-day pilot, no credit card.',
 };
 
 export const PI_RULES = [
@@ -106,7 +106,7 @@ export const CRM_COMMISSIONS = {
     'When you get paid: monthly, within 5 business days of one3seven receiving the firm’s subscription payment.',
     'How long you earn: every month the firm stays active on a paid plan. If a firm cancels, commission stops that month.',
     'What triggers a close: the firm signs up for a paid plan through your outreach and you are the documented source.',
-    'Free pilot firms: no commission during the free 30-day pilot — commission starts when the firm converts to a paid plan.',
+    'Free pilot firms: no commission during the free 7-day pilot — commission starts when the firm converts to a paid plan.',
     'Chargebacks: if a firm’s payment fails and is not recovered, that month’s commission is not paid.',
     'Tax: you are an independent contractor, responsible for all taxes on commission income.',
   ],
