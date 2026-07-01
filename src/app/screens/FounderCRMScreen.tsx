@@ -17,7 +17,7 @@ import {
   listMessages, sendMessage, getCurrentMember, getLatestMessageAt, subscribeTeamMessages,
   listNotes, addNote, deleteNote, getIntakesCount, setFirmStage, setFirmMinutesSaved, getSiteAnalytics,
   claimFirm, releaseFirm,
-  listCrmMembers, listMyDirectMessages, sendDirectMessage, markThreadRead, getUnreadDmCount, subscribeDirectMessages,
+  listCrmMembers, listMyDirectMessages, sendDirectMessage, markThreadRead, getUnreadDmCount, subscribeDirectMessages, subscribeCrmFirms,
   type CrmFirm, type CrmActivityWithFirm, type NewFirmInput, type LogActivityInput, type CrmMessage, type CrmNote, type SiteAnalytics,
   type CrmMember, type CrmDirectMessage,
 } from '../../services/crmService';
@@ -232,6 +232,19 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
   };
 
   useEffect(() => { void load(); }, []);
+
+  // Live firms: when any rep claims/releases/advances a firm, refresh so pools stay
+  // in sync across the team (debounced to avoid thrash). This is what makes claiming
+  // feel live — a claimed firm vanishes from everyone else's Open list within ~1s.
+  useEffect(() => {
+    let active = true;
+    let t: number | undefined;
+    const unsub = subscribeCrmFirms(() => {
+      if (t) window.clearTimeout(t);
+      t = window.setTimeout(() => { if (active) void load(); }, 1200);
+    });
+    return () => { active = false; if (t) window.clearTimeout(t); unsub(); };
+  }, []);
 
   // Team chat: real-time push the instant a message lands (poll is a slow fallback only).
   useEffect(() => {
@@ -1426,54 +1439,70 @@ function PipelineTab({ firms, onLog, workerCount, onQuickEmail, claim }: { firms
 
 // ── Firms ────────────────────────────────────────────────────────────────────
 function FirmsTab({ firms, onLog, userId, onQuickEmail, claim }: { firms: CrmFirm[]; onLog: (id: string) => void; userId: string | null; onQuickEmail?: (id: string) => Promise<void>; claim?: ClaimBundle }) {
-  const [stage, setStage] = useState<CrmStage | ''>('');
-  const [priority, setPriority] = useState<'A' | 'B' | 'C' | ''>('');
+  const [view, setView] = useState<'open' | 'mine'>('open');
   const [tierFilter, setTierFilter] = useState<number | ''>('');
-  const [owner, setOwner] = useState<'all' | 'mine' | 'uncontacted'>('all');
-  const filtered = firms.filter((f) =>
-    (!stage || f.stage === stage) &&
-    (!priority || f.priority === priority) &&
+  const [priority, setPriority] = useState<'A' | 'B' | 'C' | ''>('');
+  const me = claim?.userId ?? userId;
+
+  const openTotal = firms.filter((f) => !f.contacted_by).length;
+  const mine = firms.filter((f) => !!me && f.contacted_by === me);
+  const open = firms.filter((f) =>
+    !f.contacted_by &&
     (tierFilter === '' || f.tier === tierFilter) &&
-    (owner === 'all' ||
-      (owner === 'mine' && !!userId && f.contacted_by === userId) ||
-      (owner === 'uncontacted' && !f.contacted_by))
+    (!priority || f.priority === priority),
   );
-  const mineCount = userId ? firms.filter((f) => f.contacted_by === userId).length : 0;
-  const uncontacted = firms.filter((f) => !f.contacted_by).length;
+  const list = view === 'open' ? open : mine;
+
   return (
-    <div className="space-y-4">
-      {/* Owner filter — separates each rep's credit and the remaining list */}
-      <div className="flex gap-1.5">
-        {([['all', `All (${firms.length})`], ['mine', `Mine (${mineCount})`], ['uncontacted', `To contact (${uncontacted})`]] as const).map(([key, label]) => (
-          <button key={key} type="button" onClick={() => setOwner(key)} className={`flex-1 rounded-[10px] border px-2 py-2 text-[12px] font-semibold transition ${owner === key ? 'border-[#6D4AFF] bg-[#6D4AFF] text-white' : 'border-[#E7E1FF] text-[#1E1B4B]/60 hover:border-[#B8A8FF]'}`}>
-            {label}
-          </button>
-        ))}
-      </div>
-      <div className="flex flex-wrap gap-2">
-        <select value={stage} onChange={(e) => setStage(e.target.value as CrmStage | '')} className={`${tap} rounded-[10px] border border-[#E7E1FF] bg-white px-3 text-[13px]`}>
-          <option value="">All stages</option>
-          {CRM_STAGES.map((s) => <option key={s} value={s}>{CRM_STAGE_LABELS[s]}</option>)}
-        </select>
-        <select value={tierFilter === '' ? '' : String(tierFilter)} onChange={(e) => setTierFilter(e.target.value === '' ? '' : Number(e.target.value))} className={`${tap} rounded-[10px] border border-[#E7E1FF] bg-white px-3 text-[13px]`}>
-          <option value="">All tiers</option>
-          <option value="1">Tier 1 · Tech-native</option>
-          <option value="2">Tier 2 · Growth</option>
-          <option value="3">Tier 3 · Modern boutique</option>
-          <option value="4">Tier 4 · Traditional</option>
-        </select>
-        <select value={priority} onChange={(e) => setPriority(e.target.value as 'A' | 'B' | 'C' | '')} className={`${tap} rounded-[10px] border border-[#E7E1FF] bg-white px-3 text-[13px]`}>
-          <option value="">All firms</option>
-          <option value="A">Priority targets</option>
-          <option value="B">Warm region</option>
-          <option value="C">Pipeline</option>
-        </select>
-      </div>
-      {filtered.length === 0 ? (
-        <p className="rounded-[12px] border border-[#E7E1FF] bg-white px-4 py-3 text-[13px] text-[#1E1B4B]/45">No firms match this filter.</p>
-      ) : (
-        <div className="space-y-3">{filtered.map((f) => <FirmCard key={f.id} firm={f} onLog={onLog} today={todayISO()} onQuickEmail={onQuickEmail} userId={claim?.userId ?? userId} onClaim={claim?.onClaim} onRelease={claim?.onRelease} />)}</div>
+    <div className="space-y-4 pb-24">
+      {view === 'open' && (
+        <div className="flex flex-wrap gap-2">
+          <select value={tierFilter === '' ? '' : String(tierFilter)} onChange={(e) => setTierFilter(e.target.value === '' ? '' : Number(e.target.value))} className={`${tap} rounded-[10px] border border-[#E7E1FF] bg-white px-3 text-[13px]`}>
+            <option value="">All tiers</option>
+            <option value="1">Tier 1 · Tech-native</option>
+            <option value="2">Tier 2 · Growth</option>
+            <option value="3">Tier 3 · Modern boutique</option>
+            <option value="4">Tier 4 · Traditional</option>
+          </select>
+          <select value={priority} onChange={(e) => setPriority(e.target.value as 'A' | 'B' | 'C' | '')} className={`${tap} rounded-[10px] border border-[#E7E1FF] bg-white px-3 text-[13px]`}>
+            <option value="">All firms</option>
+            <option value="A">Priority targets</option>
+            <option value="B">Warm region</option>
+            <option value="C">Pipeline</option>
+          </select>
+        </div>
       )}
+
+      <p className="text-[12px] leading-relaxed text-[#1E1B4B]/50">
+        {view === 'open'
+          ? 'Tap Claim on a firm and it becomes yours — it leaves everyone else’s list until you release it. Log the call whenever.'
+          : 'Firms you’ve claimed. Log calls anytime; release one to return it to the pool.'}
+      </p>
+
+      {list.length === 0 ? (
+        <p className="rounded-[12px] border border-[#E7E1FF] bg-white px-4 py-6 text-center text-[13px] text-[#1E1B4B]/45">
+          {view === 'open' ? 'No open firms match this filter.' : 'You haven’t claimed any firms yet — claim one from Open.'}
+        </p>
+      ) : (
+        <div className="space-y-3">{list.map((f) => <FirmCard key={f.id} firm={f} onLog={onLog} today={todayISO()} onQuickEmail={onQuickEmail} userId={me} onClaim={claim?.onClaim} onRelease={claim?.onRelease} />)}</div>
+      )}
+
+      {/* Bottom toggle — worker-dash style, scaled metrics. Open = shared pool; Mine = claimed. */}
+      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-[#E7E1FF] bg-white/95 px-4 py-2.5 backdrop-blur">
+        <div className="mx-auto flex max-w-3xl gap-2">
+          {([['open', 'Open', openTotal], ['mine', 'Mine', mine.length]] as const).map(([key, label, n]) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => setView(key)}
+              className={`flex flex-1 flex-col items-center rounded-[14px] border px-3 py-2 transition ${view === key ? 'border-[#6D4AFF] bg-[#6D4AFF] text-white' : 'border-[#E7E1FF] bg-white text-[#1E1B4B] hover:border-[#B8A8FF]'}`}
+            >
+              <span className="text-[22px] font-black leading-none">{n}</span>
+              <span className={`mt-0.5 text-[11px] font-bold uppercase tracking-wide ${view === key ? 'text-white/80' : 'text-[#1E1B4B]/50'}`}>{label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

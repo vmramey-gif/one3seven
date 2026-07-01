@@ -325,6 +325,15 @@ export async function getUnreadDmCount(): Promise<number> {
   return count;
 }
 
+/** Subscribe to crm_firms changes (claims/releases/stage) so views stay live across reps. */
+export function subscribeCrmFirms(onChange: () => void): () => void {
+  const channel = supabase
+    .channel(`crm_firms_${Math.random().toString(36).slice(2)}`)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'crm_firms' }, () => onChange())
+    .subscribe();
+  return () => { void supabase.removeChannel(channel); };
+}
+
 /** Subscribe to direct-message changes for the current user (sent or received). */
 export function subscribeDirectMessages(onChange: () => void): () => void {
   const channel = supabase
