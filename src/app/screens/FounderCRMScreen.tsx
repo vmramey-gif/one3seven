@@ -200,6 +200,9 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
   const [userEmail, setUserEmail] = useState('');
   const [userId, setUserId] = useState<string | null>(null);
   const showEconomics = ECON_ALLOWED_EMAILS.includes(userEmail.trim().toLowerCase());
+  // Role label by account: Victoria = Founder, Tad = Co-Founder, other founders = Founder, reps = Sales rep.
+  const email = userEmail.trim().toLowerCase();
+  const roleLabel = email === 'tadmor86@gmail.com' ? 'Co-Founder' : isFounder ? 'Founder' : 'Sales rep';
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => { setUserEmail(data.user?.email ?? ''); setUserId(data.user?.id ?? null); });
   }, []);
@@ -336,7 +339,7 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
               {realtimeLive ? 'Live' : 'Polling'}
             </span>
           </div>
-          <span className="rounded-full bg-[#EDE7FF] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[#6D4AFF]">Founder</span>
+          <span className="rounded-full bg-[#EDE7FF] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[#6D4AFF]">{roleLabel}</span>
         </div>
         {/* Categorized dropdown nav — wraps, never scrolls sideways. */}
         <div className="relative mx-auto max-w-3xl px-3 pb-2">
