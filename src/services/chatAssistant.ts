@@ -15,6 +15,9 @@ export const STARTER_QUESTIONS: string[] = [
   'How do I explain one3seven in one sentence?',
   "What's the right tone for a cold call?",
   "How do I answer a firm's data-security questions?",
+  'What do I say if they ask about Eve or Clio?',
+  'What exactly does one3seven offer? (full feature list)',
+  "What's the California / Anthropic credibility line?",
 ];
 
 export interface AskAssistantResult {
