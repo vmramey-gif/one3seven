@@ -1090,6 +1090,20 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
         </div>
       </section>
 
+      {/* ── FOUNDER ORIGIN (amber) ── */}
+      <section className="px-5 py-14 sm:px-8 sm:py-16" style={{ backgroundColor: '#F7ECD3' }}>
+        <div className="mx-auto max-w-[720px] text-center">
+          <div className="mb-3 text-xs font-bold uppercase tracking-[0.2em]" style={{ color: '#9A6B14' }}>Why one3seven exists</div>
+          <p className="mx-auto max-w-[600px] text-[15px] leading-relaxed sm:text-[16px]" style={{ color: '#4A3B1A' }}>
+            one3seven was built by someone who went through her own legal situation — and had to write out her whole story from scratch every time she talked to a new attorney. Scattered records, retold from memory, over and over. There had to be a better way.
+          </p>
+          <p className="mt-5 font-medium leading-snug" style={{ fontFamily: "'Fraunces', Georgia, serif", color: '#14112E', fontSize: 'clamp(20px, 4.5vw, 28px)' }}>
+            &ldquo;You should only have to tell your story once.&rdquo;
+          </p>
+          <p className="mt-3 text-[13px] font-semibold" style={{ color: '#9A6B14' }}>&mdash; Victoria, founder</p>
+        </div>
+      </section>
+
       {/* ── THE PROBLEM ── */}
       <section className="bg-[#14112E] px-5 py-16 sm:px-8 sm:py-24">
         <div className="mx-auto max-w-6xl">
