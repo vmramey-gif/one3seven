@@ -67,13 +67,22 @@ export function ForFirmsPage({ onBack, onStartWorker }: ForFirmsPageProps) {
             get a review-ready, source-linked record in your dashboard — so you decide in minutes
             instead of burning hours on triage.
           </p>
-          <a
-            href="#pilot-interest"
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-[#6D4AFF] px-7 py-3.5 text-[15px] font-semibold text-white shadow-[0_16px_48px_rgba(109,74,255,0.40)] transition hover:-translate-y-0.5 hover:bg-[#5B35D5]"
-          >
-            Start free pilot
-            <ArrowRight className="h-4 w-4" />
-          </a>
+          <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <a
+              href="#pilot-interest"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-[#6D4AFF] px-7 py-3.5 text-[15px] font-semibold text-white shadow-[0_16px_48px_rgba(109,74,255,0.40)] transition hover:-translate-y-0.5 hover:bg-[#5B35D5]"
+            >
+              Start free pilot
+              <ArrowRight className="h-4 w-4" />
+            </a>
+            <a
+              href="/demo"
+              onClick={() => track('firm_see_sample')}
+              className="inline-flex items-center justify-center gap-2 rounded-full border border-white/20 px-7 py-3.5 text-[15px] font-semibold text-white transition hover:border-white/40 hover:bg-white/5"
+            >
+              See a sample intake packet
+            </a>
+          </div>
           <p className="mx-auto mt-5 max-w-[560px] text-[12px] leading-relaxed text-[#9A93C2]">
             Only organizes and reflects — never concludes. Every surfaced fact traces to the worker's story or a source document.
           </p>

@@ -1163,14 +1163,23 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
               <p className="mb-8 text-[15px] leading-relaxed text-[#C9C4E6]">
                 Share one intake link with your clients. They self-serve through a guided intake, and you get a review-ready, source-linked record in your dashboard — so you decide fast instead of triaging.
               </p>
-              <button
-                type="button"
-                onClick={openBetaModal}
-                className="flex items-center gap-2 rounded-full bg-[#6D4AFF] px-7 py-3.5 text-[15px] font-semibold text-white shadow-[0_16px_48px_rgba(109,74,255,0.40)] transition hover:bg-[#5B35D5] hover:-translate-y-0.5 active:scale-[0.97]"
-              >
-                Start free pilot
-                <ArrowRight className="h-4 w-4" />
-              </button>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                <button
+                  type="button"
+                  onClick={openBetaModal}
+                  className="flex items-center justify-center gap-2 rounded-full bg-[#6D4AFF] px-7 py-3.5 text-[15px] font-semibold text-white shadow-[0_16px_48px_rgba(109,74,255,0.40)] transition hover:bg-[#5B35D5] hover:-translate-y-0.5 active:scale-[0.97]"
+                >
+                  Start free pilot
+                  <ArrowRight className="h-4 w-4" />
+                </button>
+                <a
+                  href="/demo"
+                  onClick={() => track('firm_see_sample')}
+                  className="inline-flex items-center justify-center gap-2 rounded-full border border-white/20 px-7 py-3.5 text-[15px] font-semibold text-white transition hover:border-white/40 hover:bg-white/5"
+                >
+                  See a sample intake packet
+                </a>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
