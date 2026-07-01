@@ -1010,7 +1010,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
                   </h1>
 
                   <p className="mb-8 max-w-[480px] text-[16px] leading-relaxed text-[#C9C4E6] sm:text-[17px]">
-                    This takes about 10–15 minutes. Your records will be organized and sent directly to {firmDirectedContext.firmName} — no emails or follow-up calls needed.
+                    Answer at your own pace — your records will be organized and sent directly to {firmDirectedContext.firmName}, with no emails or follow-up calls needed.
                   </p>
 
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center">

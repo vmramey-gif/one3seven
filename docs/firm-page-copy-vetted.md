@@ -35,7 +35,7 @@ Workers arrive with scattered records, partial timelines, and incomplete stories
 ## METRICS
 **6** — California employment intake schemas, structured for common worker-side fact patterns.
 
-**< 15 min** — from worker upload to an organized review packet.
+**Minutes** — from worker upload to an organized review packet.
 
 **100%** — surfaced facts traceable to worker input or a source document.
 
@@ -121,7 +121,7 @@ The first 100 California employment firms to join one3seven receive founder pric
 - ✓ Direct feedback channel with the founders
 
 `[ Request your pilot spot → ]`
-*Takes 15 minutes to set up. Cancel anytime. No long-term commitment.*
+*Quick to set up. Cancel anytime. No long-term commitment.*
 
 > Why not "territory": exclusivity/geographic-lockout language implies referral-zone
 > allocation (a lawyer-referral-service smell we must avoid) and promises we can't keep.

@@ -1094,7 +1094,7 @@ export function LandingScreen({
             {workerDashboardCompact
               ? WORKER_HUB_COPY.hubSubline(hubRecordCount, hubEventCount)
               : firmDirectedContext
-              ? `This takes about 10–15 minutes. Your records will be organized and sent directly to ${firmDirectedContext.firmName} — no emails or follow-up calls needed.`
+              ? `Answer at your own pace — your records will be organized and sent directly to ${firmDirectedContext.firmName}, with no emails or follow-up calls needed.`
               : 'one3seven helps organize scattered records into a structured summary you can review, save, and share when you are ready—across employment, housing, injury, family, and more.'}
           </p>
 
