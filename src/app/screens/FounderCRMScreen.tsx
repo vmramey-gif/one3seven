@@ -64,10 +64,10 @@ const ECON_ALLOWED_EMAILS = ['vmramey@gmail.com', 'tadmor86@gmail.com'];
 // `founderOnly` tabs are hidden from sales reps. `econOnly` tabs show only for ECON_ALLOWED_EMAILS.
 const TABS: { id: Tab; label: string; icon: typeof LayoutGrid; founderOnly?: boolean; econOnly?: boolean }[] = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutGrid },
-  { id: 'pipeline', label: 'Pipeline', icon: TrendingUp },
+  { id: 'pipeline', label: 'Pipeline', icon: TrendingUp, founderOnly: true },
   { id: 'firms', label: 'Firms', icon: Building2 },
-  { id: 'activity', label: 'Activity', icon: ClipboardList },
-  { id: 'metrics', label: 'Metrics', icon: BarChart3 },
+  { id: 'activity', label: 'Activity', icon: ClipboardList, founderOnly: true },
+  { id: 'metrics', label: 'Metrics', icon: BarChart3, founderOnly: true },
   { id: 'team', label: 'Team chat', icon: MessageSquare },
   { id: 'inbox', label: 'Inbox', icon: Mail },
   { id: 'notes', label: 'Notes', icon: StickyNote },
@@ -430,11 +430,11 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
             {tab === 'dashboard' && (
               <SuitesHome greeting={crmGreeting(memberName)} isFounder={isFounder} showEconomics={showEconomics} activeTab={tab} onPick={setTab} />
             )}
-            {tab === 'dashboard' && <DashboardTab firms={firms} activity={activity} today={today} onLog={openFast} workerCount={workerCount} onChanged={load} onQuickEmail={quickEmail} claim={claim} />}
-            {tab === 'pipeline' && <PipelineTab firms={firms} onLog={openFast} workerCount={workerCount} onQuickEmail={quickEmail} claim={claim} />}
+            {tab === 'dashboard' && <DashboardTab firms={firms} activity={activity} today={today} onLog={openFast} workerCount={workerCount} onChanged={load} onQuickEmail={quickEmail} claim={claim} isFounder={isFounder} />}
+            {tab === 'pipeline' && isFounder && <PipelineTab firms={firms} onLog={openFast} workerCount={workerCount} onQuickEmail={quickEmail} claim={claim} />}
             {tab === 'firms' && <FirmsTab firms={firms} onLog={openFast} userId={userId} onQuickEmail={quickEmail} claim={claim} />}
-            {tab === 'activity' && <ActivityTab activity={activity} />}
-            {tab === 'metrics' && <MetricsTab firms={firms} activity={activity} />}
+            {tab === 'activity' && isFounder && <ActivityTab activity={activity} />}
+            {tab === 'metrics' && isFounder && <MetricsTab firms={firms} activity={activity} />}
             {tab === 'team' && <TeamTab />}
             {tab === 'inbox' && <InboxTab onReadChange={async () => setUnreadDm(await getUnreadDmCount())} />}
             {tab === 'notes' && <NotesTab isFounder={isFounder} />}
@@ -773,7 +773,10 @@ function SuitesHome({ greeting, isFounder, showEconomics, activeTab, onPick }: {
 }
 
 // ── Dashboard ────────────────────────────────────────────────────────────────
-function DashboardTab({ firms, activity, today, onLog, workerCount, onChanged, onQuickEmail, claim }: { firms: CrmFirm[]; activity: CrmActivityWithFirm[]; today: string; onLog: (id: string) => void; workerCount: number; onChanged: () => void; onQuickEmail?: (id: string) => Promise<void>; claim?: ClaimBundle }) {
+function DashboardTab({ firms, activity, today, onLog, workerCount, onChanged, onQuickEmail, claim, isFounder }: { firms: CrmFirm[]; activity: CrmActivityWithFirm[]; today: string; onLog: (id: string) => void; workerCount: number; onChanged: () => void; onQuickEmail?: (id: string) => Promise<void>; claim?: ClaimBundle; isFounder: boolean }) {
+  // Reps see only their own numbers/activity; founders see team-wide.
+  const me = claim?.userId ?? null;
+  const myActivity = isFounder ? activity : activity.filter((a) => a.logged_by === me);
   const stats = [
     { label: 'Firms', value: firms.length },
     { label: 'Calls', value: activity.filter((a) => a.activity_type === 'call').length },
@@ -782,24 +785,26 @@ function DashboardTab({ firms, activity, today, onLog, workerCount, onChanged, o
     { label: 'Workers organized', value: workerCount },
   ];
   const due = firms
-    .filter((f) => f.next_followup && f.next_followup <= today)
+    .filter((f) => f.next_followup && f.next_followup <= today && (isFounder || (!!me && f.contacted_by === me)))
     .sort((a, b) => (a.next_followup ?? '').localeCompare(b.next_followup ?? ''));
   const recent = activity.slice(0, 6);
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
-        {stats.map((s) => (
-          <div key={s.label} className="rounded-[14px] border border-[#E7E1FF] bg-white p-4">
-            <div className="text-[26px] font-black leading-none text-[#6D4AFF]">{s.value}</div>
-            <div className="mt-1 text-[11px] font-semibold text-[#1E1B4B]/55">{s.label}</div>
-          </div>
-        ))}
-      </div>
+      {isFounder && (
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+          {stats.map((s) => (
+            <div key={s.label} className="rounded-[14px] border border-[#E7E1FF] bg-white p-4">
+              <div className="text-[26px] font-black leading-none text-[#6D4AFF]">{s.value}</div>
+              <div className="mt-1 text-[11px] font-semibold text-[#1E1B4B]/55">{s.label}</div>
+            </div>
+          ))}
+        </div>
+      )}
 
-      <StageStrip firms={firms} />
+      {isFounder && <StageStrip firms={firms} />}
 
-      <DemoPrepCard firms={firms} today={today} onChanged={onChanged} />
+      {isFounder && <DemoPrepCard firms={firms} today={today} onChanged={onChanged} />}
 
       <section>
         <h2 className="mb-2 text-[14px] font-bold">Follow-ups due today</h2>
@@ -810,16 +815,19 @@ function DashboardTab({ firms, activity, today, onLog, workerCount, onChanged, o
         )}
       </section>
 
-      <DailyTargetsScoreboard activity={activity} today={today} />
+      {/* Reps see their own daily targets (motivating + personal); founders see the team's. */}
+      <DailyTargetsScoreboard activity={myActivity} today={today} />
 
-      <section>
-        <h2 className="mb-2 text-[14px] font-bold">Recent activity</h2>
-        {recent.length === 0 ? (
-          <p className="rounded-[12px] border border-[#E7E1FF] bg-white px-4 py-3 text-[13px] text-[#1E1B4B]/45">No activity logged yet.</p>
-        ) : (
-          <div className="space-y-2">{recent.map((a) => <ActivityRow key={a.id} a={a} />)}</div>
-        )}
-      </section>
+      {isFounder && (
+        <section>
+          <h2 className="mb-2 text-[14px] font-bold">Recent activity</h2>
+          {recent.length === 0 ? (
+            <p className="rounded-[12px] border border-[#E7E1FF] bg-white px-4 py-3 text-[13px] text-[#1E1B4B]/45">No activity logged yet.</p>
+          ) : (
+            <div className="space-y-2">{recent.map((a) => <ActivityRow key={a.id} a={a} />)}</div>
+          )}
+        </section>
+      )}
     </div>
   );
 }
