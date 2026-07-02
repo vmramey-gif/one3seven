@@ -1,10 +1,10 @@
 /**
  * one3seven billing service — Stripe via Supabase Edge Functions.
  *
- * Plans:
- *   solo       $199/mo   up to 15 intakes · 1 seat
- *   practice   $499/mo   up to 50 intakes · 3 seats
- *   firm       $899/mo   unlimited intakes · 10 seats
+ * Plans (volume-based; core organize/source-link value is identical on every tier):
+ *   practice   $249/mo    up to 20 intakes · 2 seats · standard processing
+ *   firm       $549/mo    up to 60 intakes · 5 seats · priority processing
+ *   surge      $1,490/mo  unlimited intakes · unlimited seats · dedicated onboarding (annual only)
  *   enterprise custom
  *
  * Edge Functions:
@@ -12,7 +12,7 @@
  *   create-portal-session    POST { firmProfileId }          → { url }
  *
  * Stripe price IDs are pulled from env vars injected at build time.
- * Set VITE_STRIPE_PRICE_SOLO, VITE_STRIPE_PRICE_PRACTICE, VITE_STRIPE_PRICE_FIRM
+ * Set VITE_STRIPE_PRICE_PRACTICE, VITE_STRIPE_PRICE_FIRM, VITE_STRIPE_PRICE_SURGE
  * in your .env.local and in Vercel/hosting environment variables.
  */
 
@@ -20,7 +20,7 @@ import { supabase } from '../lib/supabaseClient';
 
 // ── Plan definitions ──────────────────────────────────────────────────────────
 
-export type FirmPlanId = 'beta_pilot' | 'solo' | 'practice' | 'firm' | 'enterprise';
+export type FirmPlanId = 'beta_pilot' | 'practice' | 'firm' | 'surge' | 'enterprise';
 
 /**
  * Single source of truth for which tiers include the wage-exposure estimate (section 8B)
@@ -40,36 +40,38 @@ export interface FirmPlan {
   intakesPerMonth: number | null; // null = unlimited
   seats: number | null;           // null = unlimited
   highlight: boolean;
+  annualOnly?: boolean;           // billed yearly only (Surge)
   priceId: string | null;         // Stripe price ID from env
 }
 
 export const FIRM_PLANS: FirmPlan[] = [
   {
-    id: 'solo',
-    label: 'Solo',
-    price: 199,
-    intakesPerMonth: 15,
-    seats: 1,
-    highlight: false,
-    priceId: import.meta.env.VITE_STRIPE_PRICE_SOLO ?? null,
-  },
-  {
     id: 'practice',
     label: 'Practice',
-    price: 499,
-    intakesPerMonth: 50,
-    seats: 3,
-    highlight: true,
+    price: 249,
+    intakesPerMonth: 20,
+    seats: 2,
+    highlight: false,
     priceId: import.meta.env.VITE_STRIPE_PRICE_PRACTICE ?? null,
   },
   {
     id: 'firm',
     label: 'Firm',
-    price: 899,
-    intakesPerMonth: null,
-    seats: 10,
-    highlight: false,
+    price: 549,
+    intakesPerMonth: 60,
+    seats: 5,
+    highlight: true,
     priceId: import.meta.env.VITE_STRIPE_PRICE_FIRM ?? null,
+  },
+  {
+    id: 'surge',
+    label: 'Surge',
+    price: 1490,
+    intakesPerMonth: null,
+    seats: null,
+    highlight: false,
+    annualOnly: true,
+    priceId: import.meta.env.VITE_STRIPE_PRICE_SURGE ?? null,
   },
 ];
 
@@ -94,9 +96,9 @@ export function getFirmSubscriptionStatus(
 
   const planLabel =
     id === 'beta_pilot' ? 'Beta Pilot' :
-    id === 'solo'       ? 'Solo' :
     id === 'practice'   ? 'Practice' :
     id === 'firm'       ? 'Firm' :
+    id === 'surge'      ? 'Surge' :
     id === 'enterprise' ? 'Enterprise' : id;
 
   return { planId: id, subscriptionStatus: status, isActive, isTrial, isPaid, label: planLabel };

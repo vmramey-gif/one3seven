@@ -3,8 +3,8 @@
  */
 import type { CrmFirm } from './crmService';
 
-export const TIER_PRICES = { solo: 199, practice: 499, firm: 899 } as const;
-export type SubscriptionTier = 'solo' | 'practice' | 'firm';
+export const TIER_PRICES = { practice: 249, firm: 549, surge: 1490 } as const;
+export type SubscriptionTier = 'practice' | 'firm' | 'surge';
 
 export const PHASE1_PAYING_TARGET = 3;
 export const PIPELINE_CONVERSION_RATE = 0.3;
@@ -24,10 +24,10 @@ export function avgMinutesSaved(firms: { est_minutes_saved?: number | null }[]):
   return { avg: Math.round(vals.reduce((s, v) => s + v, 0) / vals.length), n: vals.length };
 }
 
-/** Monthly price for a tier; null/unknown defaults to Practice ($499). */
+/** Monthly price for a tier; null/unknown defaults to Practice ($249). */
 export function tierPrice(tier: string | null | undefined): number {
-  if (tier === 'solo') return TIER_PRICES.solo;
   if (tier === 'firm') return TIER_PRICES.firm;
+  if (tier === 'surge') return TIER_PRICES.surge;
   return TIER_PRICES.practice;
 }
 
@@ -43,7 +43,7 @@ export interface RevenueSummary {
 /** Current MRR from paid firms + a conservative pipeline forecast. */
 export function computeRevenue(firms: CrmFirm[]): RevenueSummary {
   const paid = firms.filter((f) => f.stage === 'paid');
-  const tiers: SubscriptionTier[] = ['solo', 'practice', 'firm'];
+  const tiers: SubscriptionTier[] = ['practice', 'firm', 'surge'];
   const perTier = tiers.map((tier) => {
     const count = paid.filter((f) => (f.subscription_tier ?? 'practice') === tier).length;
     return { tier, count, mrr: count * TIER_PRICES[tier] };
@@ -112,7 +112,7 @@ export function firstThreeBonus(paidCount: number): BonusProgress {
 
 export interface CommissionScenario {
   firmCount: number;
-  tier: 'solo' | 'practice' | 'firm';
+  tier: SubscriptionTier;
   months: number;
 }
 export interface CommissionResult {
@@ -147,7 +147,7 @@ export const ECON_DEFAULTS = {
 
 export interface EconomicsInput {
   firmCount: number;
-  tier: 'solo' | 'practice' | 'firm';
+  tier: SubscriptionTier;
   months: number;
   commissionPct: number;
   stripePct: number;

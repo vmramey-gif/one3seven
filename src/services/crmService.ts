@@ -25,7 +25,7 @@ export interface CrmFirm {
   source: string | null;
   next_followup: string | null;
   notes: string | null;
-  subscription_tier: 'solo' | 'practice' | 'firm' | null;
+  subscription_tier: 'practice' | 'firm' | 'surge' | null;
   /** Firm's own estimate of minutes saved per intake — the value claim, measured. */
   est_minutes_saved: number | null;
   /** Rep attribution — who first contacted this firm (claim model) and when. */

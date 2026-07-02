@@ -26,20 +26,20 @@ describe('avgMinutesSaved', () => {
 
 describe('tierPrice', () => {
   it('prices each tier; null/unknown = Practice', () => {
-    expect(tierPrice('solo')).toBe(199);
-    expect(tierPrice('practice')).toBe(499);
-    expect(tierPrice('firm')).toBe(899);
-    expect(tierPrice(null)).toBe(499);
-    expect(tierPrice('mystery')).toBe(499);
+    expect(tierPrice('practice')).toBe(249);
+    expect(tierPrice('firm')).toBe(549);
+    expect(tierPrice('surge')).toBe(1490);
+    expect(tierPrice(null)).toBe(249);
+    expect(tierPrice('mystery')).toBe(249);
   });
 });
 
 describe('computeRevenue', () => {
   it('sums MRR by tier, commission, and pipeline forecast', () => {
     const firms = [
-      firm('paid', 'solo'),       // 199
-      firm('paid', 'firm'),       // 899
-      firm('paid', null),         // null -> practice 499
+      firm('paid', 'firm'),       // 549
+      firm('paid', 'surge'),      // 1490
+      firm('paid', null),         // null -> practice 249
       firm('pilot'),
       firm('demo_booked'),
       firm('demo_done'),
@@ -47,13 +47,13 @@ describe('computeRevenue', () => {
     ];
     const r = computeRevenue(firms);
     expect(r.paidCount).toBe(3);
-    expect(r.currentMrr).toBe(199 + 899 + 499); // 1597
-    expect(r.commissionMonthly).toBe(Math.round(1597 * 0.2)); // 319
-    expect(r.perTier.find((t) => t.tier === 'solo')).toEqual({ tier: 'solo', count: 1, mrr: 199 });
-    expect(r.perTier.find((t) => t.tier === 'practice')).toEqual({ tier: 'practice', count: 1, mrr: 499 });
-    expect(r.perTier.find((t) => t.tier === 'firm')).toEqual({ tier: 'firm', count: 1, mrr: 899 });
+    expect(r.currentMrr).toBe(549 + 1490 + 249); // 2288
+    expect(r.commissionMonthly).toBe(Math.round(2288 * 0.2)); // 458
+    expect(r.perTier.find((t) => t.tier === 'practice')).toEqual({ tier: 'practice', count: 1, mrr: 249 });
+    expect(r.perTier.find((t) => t.tier === 'firm')).toEqual({ tier: 'firm', count: 1, mrr: 549 });
+    expect(r.perTier.find((t) => t.tier === 'surge')).toEqual({ tier: 'surge', count: 1, mrr: 1490 });
     expect(r.candidateCount).toBe(3); // pilot + demo_booked + demo_done
-    expect(r.projectedMrr).toBe(Math.round(3 * 0.3 * 499)); // 449
+    expect(r.projectedMrr).toBe(Math.round(3 * 0.3 * 249)); // 224
   });
 
   it('is zero with no paid firms (honest)', () => {
@@ -101,31 +101,31 @@ describe('firstThreeBonus', () => {
 describe('commissionProjection', () => {
   it('3 practice firms held 12 months = recurring commission + the $500 ladder', () => {
     const r = commissionProjection({ firmCount: 3, tier: 'practice', months: 12 });
-    expect(r.mrr).toBe(1497);              // 3 * 499
-    expect(r.monthlyCommission).toBe(299); // round(1497 * 0.2)
-    expect(r.totalCommission).toBe(3588);  // 299 * 12
+    expect(r.mrr).toBe(747);               // 3 * 249
+    expect(r.monthlyCommission).toBe(149); // round(747 * 0.2)
+    expect(r.totalCommission).toBe(1788);  // 149 * 12
     expect(r.bonus).toBe(500);
-    expect(r.total).toBe(4088);
+    expect(r.total).toBe(2288);
   });
   it('zero firms earns zero', () => {
     expect(commissionProjection({ firmCount: 0, tier: 'firm', months: 6 }).total).toBe(0);
   });
   it('company economics: 3 practice firms, 12 months, default overhead', () => {
     const r = companyEconomics({ firmCount: 3, tier: 'practice', months: 12, ...ECON_DEFAULTS });
-    expect(r.mrr).toBe(1497);
-    expect(r.grossTotal).toBe(17964);     // 1497 * 12
-    expect(r.commission).toBe(3593);      // 20%
+    expect(r.mrr).toBe(747);
+    expect(r.grossTotal).toBe(8964);      // 747 * 12
+    expect(r.commission).toBe(1793);      // 20%
     expect(r.ai).toBe(900);               // 3 * 25 * 12
     expect(r.fixed).toBe(900);            // 75 * 12
-    expect(r.netTotal).toBeGreaterThan(11000);
-    expect(r.marginPct).toBeGreaterThan(60);
+    expect(r.netTotal).toBeGreaterThan(4000);
+    expect(r.marginPct).toBeGreaterThan(50);
   });
   it('scales to 500 firms (bonus still caps at the first 3)', () => {
     const r = commissionProjection({ firmCount: 500, tier: 'firm', months: 12 });
-    expect(r.mrr).toBe(449500);              // 500 * 899
-    expect(r.monthlyCommission).toBe(89900); // round(449500 * 0.2)
-    expect(r.totalCommission).toBe(1078800); // 89900 * 12
+    expect(r.mrr).toBe(274500);              // 500 * 549
+    expect(r.monthlyCommission).toBe(54900); // round(274500 * 0.2)
+    expect(r.totalCommission).toBe(658800);  // 54900 * 12
     expect(r.bonus).toBe(500);               // ladder caps at 3
-    expect(r.total).toBe(1079300);
+    expect(r.total).toBe(659300);
   });
 });

@@ -33,7 +33,7 @@ import { AUDIT_SITE_CHECKS, AUDIT_MANUAL_GROUPS } from '../constants/crmAudit';
 import { crmFirmIntel } from '../constants/crmFirmIntel';
 import { STARTER_QUESTIONS, askAssistant, type ChatMessage } from '../../services/chatAssistant';
 
-type Tab = 'dashboard' | 'pipeline' | 'firms' | 'activity' | 'metrics' | 'revenue' | 'comp' | 'economics' | 'growth' | 'team' | 'inbox' | 'notes' | 'scripts' | 'training' | 'askai' | 'checklist' | 'audit' | 'links' | 'add';
+type Tab = 'dashboard' | 'pipeline' | 'firms' | 'activity' | 'metrics' | 'revenue' | 'comp' | 'economics' | 'growth' | 'team' | 'inbox' | 'notes' | 'scripts' | 'training' | 'askai' | 'checklist' | 'audit' | 'links' | 'email_fu' | 'add';
 
 // Every URL off www.one3seven.com, grouped — the founder "links in one place" directory.
 const SITE_BASE = 'https://www.one3seven.com';
@@ -66,6 +66,7 @@ const TABS: { id: Tab; label: string; icon: typeof LayoutGrid; founderOnly?: boo
   { id: 'dashboard', label: 'Dashboard', icon: LayoutGrid },
   { id: 'pipeline', label: 'Pipeline', icon: TrendingUp, founderOnly: true },
   { id: 'firms', label: 'Firms', icon: Building2 },
+  { id: 'email_fu', label: 'Victoria email f/u', icon: Mail, founderOnly: true },
   { id: 'activity', label: 'Activity', icon: ClipboardList, founderOnly: true },
   { id: 'metrics', label: 'Metrics', icon: BarChart3, founderOnly: true },
   { id: 'team', label: 'Team chat', icon: MessageSquare },
@@ -91,7 +92,7 @@ const TAB_BY_ID: Record<Tab, { id: Tab; label: string; icon: typeof LayoutGrid; 
   Object.fromEntries(TABS.map((t) => [t.id, t])) as Record<Tab, (typeof TABS)[number]>;
 
 const NAV_GROUPS: { id: string; label: string; icon: typeof LayoutGrid; tabIds: Tab[] }[] = [
-  { id: 'sell', label: 'Sell', icon: TrendingUp, tabIds: ['dashboard', 'firms', 'pipeline', 'add', 'activity'] },
+  { id: 'sell', label: 'Sell', icon: TrendingUp, tabIds: ['dashboard', 'firms', 'email_fu', 'pipeline', 'add', 'activity'] },
   { id: 'me', label: 'My numbers', icon: Trophy, tabIds: ['comp', 'metrics'] },
   { id: 'learn', label: 'Learn', icon: BookOpen, tabIds: ['scripts', 'training', 'askai'] },
   { id: 'team', label: 'Team', icon: MessageSquare, tabIds: ['inbox', 'team', 'notes'] },
@@ -191,7 +192,13 @@ function PriorityBadge({ priority }: { priority: 'A' | 'B' | 'C' | null }) {
 }
 
 export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => void; isFounder?: boolean }) {
-  const [tab, setTab] = useState<Tab>('dashboard');
+  // Persist the active tab so returning from a native phone call (tap-to-call leaves the PWA,
+  // which may cold-reload on return) drops the rep back where they were, not on the home screen.
+  const [tab, setTabState] = useState<Tab>(() => {
+    try { const s = localStorage.getItem('crm_tab'); if (s && s !== 'add') return s as Tab; } catch { /* ignore */ }
+    return 'dashboard';
+  });
+  const setTab = (t: Tab) => { try { localStorage.setItem('crm_tab', t); } catch { /* ignore */ } setTabState(t); };
   const [openGroup, setOpenGroup] = useState<string | null>(null);
   // Team-chat unread indicator: compare the latest message time to the last one this
   // member has seen (persisted), so the Team button lights up on new posts.
@@ -480,6 +487,7 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
             {tab === 'dashboard' && <DashboardTab firms={firms} activity={activity} today={today} onLog={openFast} workerCount={workerCount} onChanged={load} onQuickEmail={quickEmail} onQuickLog={quickLog} onFounderEmailDone={founderEmailDone} claim={claim} isFounder={isFounder} />}
             {tab === 'pipeline' && isFounder && <PipelineTab firms={firms} onLog={openFast} workerCount={workerCount} onQuickEmail={quickEmail} onQuickLog={quickLog} claim={claim} />}
             {tab === 'firms' && <FirmsTab firms={firms} onLog={openFast} userId={userId} onQuickEmail={quickEmail} onQuickLog={quickLog} claim={claim} />}
+            {tab === 'email_fu' && isFounder && <FounderEmailQueueTab firms={firms} onFounderEmailDone={founderEmailDone} />}
             {tab === 'activity' && isFounder && <ActivityTab activity={activity} />}
             {tab === 'metrics' && isFounder && <MetricsTab firms={firms} activity={activity} />}
             {tab === 'team' && <TeamTab />}
@@ -886,8 +894,8 @@ function DashboardTab({ firms, activity, today, onLog, workerCount, onChanged, o
   const inbound = firms
     .filter((f) => f.source === 'pilot_form' && f.stage !== 'paid' && f.stage !== 'no')
     .sort((a, b) => (b.created_at ?? '').localeCompare(a.created_at ?? ''));
-  // Founder-only queue: firms the team flagged "Victoria to email f/u".
-  const founderQueue = isFounder ? firms.filter((f) => f.needs_founder_email) : [];
+  // Victoria's email follow-up queue lives in its own tab now (FounderEmailQueueTab).
+  const founderEmailCount = isFounder ? firms.filter((f) => f.needs_founder_email).length : 0;
 
   return (
     <div className="space-y-6">
@@ -901,31 +909,12 @@ function DashboardTab({ firms, activity, today, onLog, workerCount, onChanged, o
           <div className="space-y-3">{inbound.map((f) => <FirmCard key={f.id} firm={f} onLog={onLog} today={today} onQuickEmail={onQuickEmail} onQuickLog={onQuickLog} userId={claim?.userId} onClaim={claim?.onClaim} onRelease={claim?.onRelease} isFounder={claim?.isFounder} members={claim?.members} onAssign={claim?.onAssign} />)}</div>
         </section>
       )}
-      {isFounder && founderQueue.length > 0 && (
-        <section className="rounded-[18px] border-2 border-[#6D4AFF]/30 bg-[#F4F1FF] p-4">
-          <div className="mb-1 flex items-center gap-2">
-            <Mail className="h-4 w-4 text-[#5B35D5]" />
-            <span className="text-[15px] font-extrabold text-[#5B35D5]">Victoria to email — follow-ups</span>
-            <span className="rounded-full bg-[#6D4AFF] px-2 py-0.5 text-[11px] font-bold text-white">{founderQueue.length}</span>
-          </div>
-          <p className="mb-3 text-[12px] text-[#5B35D5]/80">Flagged by the team for a founder email. Tap the address to write it, then “Emailed ✓” to clear.</p>
-          <div className="space-y-2">
-            {founderQueue.map((f) => (
-              <div key={f.id} className="flex items-center gap-2 rounded-[12px] border border-[#E0D6FF] bg-white p-3">
-                <div className="min-w-0 flex-1">
-                  <div className="break-words text-[14px] font-bold text-[#1E1B4B]">{f.name}</div>
-                  {f.attorney_name && <div className="text-[11px] text-[#1E1B4B]/50">{f.attorney_name}</div>}
-                  {f.email
-                    ? <a href={`mailto:${f.email}`} className="break-all text-[12px] font-semibold text-[#6D4AFF] underline">{f.email}</a>
-                    : <span className="text-[12px] text-[#1E1B4B]/40">no email on file</span>}
-                </div>
-                {onFounderEmailDone && (
-                  <button type="button" onClick={() => onFounderEmailDone(f.id)} className="shrink-0 rounded-full bg-[#6D4AFF] px-3 py-2 text-[12px] font-bold text-white">Emailed ✓</button>
-                )}
-              </div>
-            ))}
-          </div>
-        </section>
+      {isFounder && founderEmailCount > 0 && (
+        <div className="flex items-center gap-2 rounded-[14px] border border-[#DCD3FF] bg-[#F4F1FF] px-4 py-3">
+          <Mail className="h-4 w-4 shrink-0 text-[#5B35D5]" />
+          <span className="text-[13px] font-semibold text-[#5B35D5]">{founderEmailCount} firm{founderEmailCount === 1 ? '' : 's'} flagged for a founder email</span>
+          <span className="ml-auto text-[12px] font-bold text-[#6D4AFF]">See “Victoria email f/u” tab →</span>
+        </div>
       )}
       {isFounder && (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
@@ -1589,23 +1578,75 @@ function PipelineTab({ firms, onLog, workerCount, onQuickEmail, onQuickLog, clai
 }
 
 // ── Firms ────────────────────────────────────────────────────────────────────
+// ── Victoria's email follow-up queue — its own tab (founder-only) ─────────────
+function FounderEmailQueueTab({ firms, onFounderEmailDone }: { firms: CrmFirm[]; onFounderEmailDone?: (id: string) => Promise<void> }) {
+  const queue = firms.filter((f) => f.needs_founder_email);
+  return (
+    <div className="space-y-4">
+      <div>
+        <div className="flex items-center gap-2">
+          <Mail className="h-4 w-4 text-[#5B35D5]" />
+          <h2 className="text-[15px] font-extrabold text-[#5B35D5]">Victoria — email follow-ups</h2>
+          {queue.length > 0 && <span className="rounded-full bg-[#6D4AFF] px-2 py-0.5 text-[11px] font-bold text-white">{queue.length}</span>}
+        </div>
+        <p className="mt-1 text-[12px] leading-relaxed text-[#1E1B4B]/55">Firms the team flagged with “Victoria to email f/u”. Tap the address to write the email, then “Emailed ✓” to clear it from the queue.</p>
+      </div>
+      {queue.length === 0 ? (
+        <p className="rounded-[12px] border border-[#E7E1FF] bg-white px-4 py-6 text-center text-[13px] text-[#1E1B4B]/45">Nothing to email right now — the queue is clear.</p>
+      ) : (
+        <div className="space-y-2">
+          {queue.map((f) => (
+            <div key={f.id} className="flex items-center gap-2 rounded-[12px] border border-[#E0D6FF] bg-white p-3">
+              <div className="min-w-0 flex-1">
+                <div className="break-words text-[14px] font-bold text-[#1E1B4B]">{f.name}</div>
+                {f.attorney_name && <div className="text-[11px] text-[#1E1B4B]/50">{f.attorney_name}</div>}
+                {f.email
+                  ? <a href={`mailto:${f.email}`} className="break-all text-[12px] font-semibold text-[#6D4AFF] underline">{f.email}</a>
+                  : <span className="text-[12px] text-[#1E1B4B]/40">no email on file</span>}
+              </div>
+              {onFounderEmailDone && (
+                <button type="button" onClick={() => onFounderEmailDone(f.id)} className="shrink-0 rounded-full bg-[#6D4AFF] px-3 py-2 text-[12px] font-bold text-white">Emailed ✓</button>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function FirmsTab({ firms, onLog, userId, onQuickEmail, onQuickLog, claim }: { firms: CrmFirm[]; onLog: (id: string) => void; userId: string | null; onQuickEmail?: (id: string) => Promise<void>; onQuickLog?: QuickLogFn; claim?: ClaimBundle }) {
-  const [view, setView] = useState<'open' | 'mine'>('open');
+  const [view, setView] = useState<'open' | 'mine'>(() => {
+    try { return (localStorage.getItem('crm_firms_view') as 'open' | 'mine') || 'open'; } catch { return 'open'; }
+  });
   const [tierFilter, setTierFilter] = useState<number | ''>('');
   const [priority, setPriority] = useState<'A' | 'B' | 'C' | ''>('');
+  const [search, setSearch] = useState(() => { try { return localStorage.getItem('crm_firms_search') || ''; } catch { return ''; } });
+  useEffect(() => { try { localStorage.setItem('crm_firms_view', view); } catch { /* ignore */ } }, [view]);
+  useEffect(() => { try { localStorage.setItem('crm_firms_search', search); } catch { /* ignore */ } }, [search]);
   const me = claim?.userId ?? userId;
 
+  const q = search.trim().toLowerCase();
+  const matchesSearch = (f: CrmFirm) =>
+    !q || (f.name ?? '').toLowerCase().includes(q) || (f.attorney_name ?? '').toLowerCase().includes(q);
+
   const openTotal = firms.filter((f) => !f.contacted_by).length;
-  const mine = firms.filter((f) => !!me && f.contacted_by === me);
+  const mine = firms.filter((f) => !!me && f.contacted_by === me).filter(matchesSearch);
   const open = firms.filter((f) =>
     !f.contacted_by &&
     (tierFilter === '' || f.tier === tierFilter) &&
     (!priority || f.priority === priority),
-  );
+  ).filter(matchesSearch);
   const list = view === 'open' ? open : mine;
 
   return (
     <div className="space-y-4 pb-24">
+      <input
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        placeholder="Search firm or attorney name…"
+        className="w-full rounded-[10px] border border-[#E7E1FF] bg-white px-3 py-2.5 text-[14px] outline-none focus:border-[#6D4AFF]"
+      />
       {view === 'open' && (
         <div className="flex flex-wrap gap-2">
           <select value={tierFilter === '' ? '' : String(tierFilter)} onChange={(e) => setTierFilter(e.target.value === '' ? '' : Number(e.target.value))} className={`${tap} rounded-[10px] border border-[#E7E1FF] bg-white px-3 text-[13px]`}>

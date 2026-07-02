@@ -158,7 +158,7 @@ export const CRM_SPECIALTIES: string[] = [
   'Information-gap surfacing — "additional information that may help" (never "weak" or "missing evidence").',
   'Document checklist — requested vs. received, at a glance.',
   'Time-sensitive date flags for attorney review (never determines the deadline).',
-  'Section 8B wage-exposure estimate (Practice & Firm, California only) — arithmetic from records, attorney work-product, never "damages."',
+  'Section 8B wage-exposure estimate (Firm & Surge, California only) — arithmetic from records, attorney work-product, never "damages."',
   'Firm dashboard — review-ready intakes; open and decide in minutes.',
   'Firm intake link — share one link with your clients; the organized intake lands in your dashboard.',
   'Worker control — the worker owns their records and decides what and who to share.',
