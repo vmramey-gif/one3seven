@@ -56,6 +56,7 @@ Deno.serve(async (req: Request) => {
   const name = (r.name as string) ?? '(no name)';
   const firm = (r.firm_name as string) ?? '(not given)';
   const email = (r.email as string) ?? '(no email)';
+  const phone = (r.phone as string) ?? '';
   const note = (r.note as string) ?? '';
   const when = (r.created_at as string) ?? new Date().toISOString();
 
@@ -67,6 +68,7 @@ Deno.serve(async (req: Request) => {
         <tr><td style="padding:4px 12px 4px 0;color:#6b7280">Name</td><td><strong>${esc(name)}</strong></td></tr>
         <tr><td style="padding:4px 12px 4px 0;color:#6b7280">Firm</td><td><strong>${esc(firm)}</strong></td></tr>
         <tr><td style="padding:4px 12px 4px 0;color:#6b7280">Email</td><td><a href="mailto:${esc(email)}">${esc(email)}</a></td></tr>
+        <tr><td style="padding:4px 12px 4px 0;color:#6b7280">Phone</td><td>${phone ? `<a href="tel:${esc(phone)}">${esc(phone)}</a>` : '<em>—</em>'}</td></tr>
         <tr><td style="padding:4px 12px 4px 0;color:#6b7280;vertical-align:top">Note</td><td>${esc(note) || '<em>—</em>'}</td></tr>
         <tr><td style="padding:4px 12px 4px 0;color:#6b7280">Submitted</td><td>${esc(when)}</td></tr>
       </table>
@@ -75,7 +77,7 @@ Deno.serve(async (req: Request) => {
       </p>
     </div>`;
 
-  const text = `New free-pilot request\n\nName: ${name}\nFirm: ${firm}\nEmail: ${email}\nNote: ${note || '—'}\nSubmitted: ${when}\n\nAlready in your /hq CRM as a priority-A card.`;
+  const text = `New free-pilot request\n\nName: ${name}\nFirm: ${firm}\nEmail: ${email}\nPhone: ${phone || '—'}\nNote: ${note || '—'}\nSubmitted: ${when}\n\nAlready in your /hq CRM as a priority-A card.`;
 
   const res = await fetch(RESEND_API_URL, {
     method: 'POST',

@@ -4,6 +4,7 @@ export type PilotInterestInput = {
   name: string;
   firmName: string;
   email: string;
+  phone?: string;
   note: string;
 };
 
@@ -22,6 +23,7 @@ export async function submitPilotInterest(input: PilotInterestInput): Promise<{ 
     name,
     email,
     firm_name: input.firmName.trim() || null,
+    phone: input.phone?.trim() || null,
     note: input.note.trim() || null,
     source: 'forFirms',
   });

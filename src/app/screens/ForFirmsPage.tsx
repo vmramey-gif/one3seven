@@ -16,6 +16,7 @@ export function ForFirmsPage({ onBack, onStartWorker }: ForFirmsPageProps) {
   const [name, setName] = useState('');
   const [firm, setFirm] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [note, setNote] = useState('');
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -28,7 +29,7 @@ export function ForFirmsPage({ onBack, onStartWorker }: ForFirmsPageProps) {
     setError('');
     setSubmitting(true);
     track('pilot_submit');
-    const res = await submitPilotInterest({ name, firmName: firm, email, note });
+    const res = await submitPilotInterest({ name, firmName: firm, email, phone, note });
     setSubmitting(false);
     if (res.error) { setError(res.error); return; }
     track('pilot_success');
@@ -247,6 +248,10 @@ export function ForFirmsPage({ onBack, onStartWorker }: ForFirmsPageProps) {
               <div>
                 <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-[#8E88B5]">Work email *</label>
                 <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className={inputCls} />
+              </div>
+              <div>
+                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-[#8E88B5]">Phone</label>
+                <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="(555) 555-5555" className={inputCls} />
               </div>
               <div>
                 <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-[#8E88B5]">Anything you'd like us to know?</label>

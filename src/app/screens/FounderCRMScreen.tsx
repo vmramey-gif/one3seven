@@ -692,9 +692,19 @@ function FirmCard({ firm, onLog, today, onQuickEmail, onQuickLog, userId, onClai
             <Phone className="h-4 w-4" />
           </a>
         )}
+        {firm.email && (
+          <a href={`mailto:${firm.email}`} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#EDE7FF] text-[#6D4AFF]" aria-label={`Email ${firm.name}`}>
+            <Mail className="h-4 w-4" />
+          </a>
+        )}
       </div>
       <div className="space-y-2 border-t border-[#F0EBFF] p-3">
           {firm.attorney_name && <div className="text-[12px] text-[#1E1B4B]/55">{firm.attorney_name}</div>}
+          {firm.email && (
+            <a href={`mailto:${firm.email}`} className="flex items-center gap-1.5 break-all text-[13px] font-semibold text-[#6D4AFF] underline underline-offset-2">
+              <Mail className="h-3.5 w-3.5 shrink-0" /> {firm.email}
+            </a>
+          )}
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[13px]">
             <span className="flex items-center gap-1.5"><Phone className="h-3.5 w-3.5 text-[#1E1B4B]/35" /><PhoneLink phone={firm.phone} /></span>
             {firm.next_followup && (
