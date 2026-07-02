@@ -234,18 +234,21 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
   const [fastFollowup, setFastFollowup] = useState('');
   const [saving, setSaving] = useState(false);
 
-  const load = async () => {
-    setLoading(true);
+  // spinner=true only on the very first load. Refetches (claim, log, realtime, onChanged) update
+  // firms in place WITHOUT toggling the full-page spinner — otherwise the whole tab tree unmounts
+  // and remounts on every claim, resetting the rep's filters and scroll position.
+  const load = async (spinner = false) => {
+    if (spinner) setLoading(true);
     const [f, a, wc] = await Promise.all([listFirms(), listActivity(200), getIntakesCount()]);
     if (f.error) setError(f.error);
     if (a.error) setError(a.error);
     setFirms(f.data);
     setActivity(a.data);
     setWorkerCount(wc);
-    setLoading(false);
+    if (spinner) setLoading(false);
   };
 
-  useEffect(() => { void load(); }, []);
+  useEffect(() => { void load(true); }, []);
 
   // Live firms: when any rep claims/releases/advances a firm, refresh so pools stay
   // in sync across the team (debounced to avoid thrash). This is what makes claiming
