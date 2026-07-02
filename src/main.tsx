@@ -54,23 +54,6 @@ const isForFirms =
   url.searchParams.has('for-firms') ||
   url.pathname === '/for-firms';
 
-// Worker home moved off "/" — anonymous workers start here; "/" is now firm-first.
-const isWorkers =
-  url.searchParams.has('workers') ||
-  url.pathname === '/workers';
-
-// Does a Supabase auth session already exist in this browser? (synchronous localStorage check).
-// Used so returning logged-in users still land in their app at "/", not the firm marketing page.
-function hasAuthSession(): boolean {
-  try {
-    for (let i = 0; i < localStorage.length; i++) {
-      const k = localStorage.key(i);
-      if (k && k.startsWith('sb-') && k.endsWith('-auth-token') && localStorage.getItem(k)) return true;
-    }
-  } catch { /* localStorage unavailable — treat as no session */ }
-  return false;
-}
-
 // Stripe billing return — ?billing=success|canceled|portal_return
 // Store in sessionStorage so App.tsx can surface a notification, then strip from URL.
 const billingResult = url.searchParams.get('billing');
@@ -93,11 +76,6 @@ if (prefillFirmCode?.trim()) {
     window.history.replaceState({}, '', url.pathname + (url.search || '') + (url.hash || ''));
   } catch { /* sessionStorage unavailable — no-op */ }
 }
-
-// Firm-first front door: bare "/" shows the For-Firms page ONLY for anonymous visitors with no
-// firm-code intake link. Firm-code links (?fc=) and returning logged-in users fall through to <App/>.
-const isRootFirmFront =
-  url.pathname === '/' && !prefillFirmCode?.trim() && !isWorkers && !hasAuthSession();
 
 if (url.pathname === '/terms') {
   createRoot(rootEl).render(<AppErrorBoundary><TermsPage /></AppErrorBoundary>);
@@ -131,12 +109,12 @@ if (url.pathname === '/terms') {
   createRoot(rootEl).render(
     <AppErrorBoundary><DemoApp /></AppErrorBoundary>
   );
-} else if (isForFirms || isRootFirmFront) {
+} else if (isForFirms) {
   createRoot(rootEl).render(
     <AppErrorBoundary>
       <ForFirmsPage
         onBack={() => { window.location.href = '/'; }}
-        onStartWorker={() => { window.location.href = '/workers'; }}
+        onStartWorker={() => { window.location.href = '/'; }}
       />
     </AppErrorBoundary>
   );

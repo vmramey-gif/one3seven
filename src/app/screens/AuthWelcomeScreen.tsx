@@ -46,7 +46,14 @@ export function AuthWelcomeScreen({
     <div className="min-h-screen bg-[#f6f2ff] px-5 py-4 text-[#1e1b4b] sm:px-6 sm:py-8">
       <div className="mx-auto flex min-h-[calc(100vh-2rem)] w-full max-w-[480px] flex-col sm:min-h-[calc(100vh-4rem)]">
         <header className="flex items-center justify-between">
-          <div className="text-[15px] font-semibold tracking-tight text-[#1e1b4b]"><WordMark /></div>
+          <button
+            type="button"
+            onClick={() => onNavigate('publicMarketing')}
+            className="text-[15px] font-semibold tracking-tight text-[#1e1b4b] transition hover:opacity-80"
+            aria-label="one3seven — home"
+          >
+            <WordMark />
+          </button>
           <button
             type="button"
             onClick={openSignIn}
@@ -138,6 +145,20 @@ export function AuthWelcomeScreen({
             </button>
           </section>
         </main>
+
+        {/* ── Why one3seven exists — founder origin (worker-facing) ── */}
+        <footer className="pb-6 pt-2">
+          <div className="mx-auto max-w-[420px] rounded-[22px] border border-[#e7e1ff] bg-white/70 px-5 py-6 text-center">
+            <div className="mb-2 text-[11px] font-bold uppercase tracking-[0.18em] text-[#5b35d5]">Why one3seven exists</div>
+            <p className="mx-auto text-[13px] leading-relaxed text-[#1e1b4b]/70 sm:text-[14px]">
+              one3seven was built by someone who went through her own legal situation — and had to write out her whole story from scratch every time she talked to a new attorney. Scattered records, retold from memory, over and over. There had to be a better way.
+            </p>
+            <p className="mt-4 font-medium leading-snug text-[#1e1b4b]" style={{ fontFamily: "'Fraunces', Georgia, serif", fontSize: 'clamp(18px, 4vw, 23px)' }}>
+              &ldquo;You should only have to tell your story once.&rdquo;
+            </p>
+            <p className="mt-2 text-[12px] font-semibold text-[#5b35d5]">&mdash; Victoria, founder</p>
+          </div>
+        </footer>
       </div>
     </div>
   );

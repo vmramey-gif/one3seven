@@ -908,10 +908,15 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
       {/* ── NAV ── */}
       <nav className="sticky top-0 z-50 border-b border-white/10 bg-[#14112E]/90 backdrop-blur-sm">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-5 sm:h-16 sm:px-8">
-          <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="flex items-center gap-2 transition hover:opacity-80"
+            aria-label="one3seven — home"
+          >
             <SeedMark size={24} />
             <div className="text-[17px] font-bold tracking-tight text-white"><WordMark /></div>
-          </div>
+          </button>
           <div className="hidden items-center gap-6 sm:flex">
             <button
               type="button"
@@ -934,6 +939,13 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
               className="text-sm font-medium text-white/60 transition hover:text-white"
             >
               For law firms
+            </button>
+            <button
+              type="button"
+              onClick={() => { track('nav_for_workers'); onWorkerStart(); }}
+              className="rounded-full border border-white/20 px-4 py-2 text-sm font-semibold text-white/80 transition hover:bg-white/5 hover:text-white"
+            >
+              For workers
             </button>
             {/* Discreet team gateway — /hq is auth-gated (CrmAccessGate). */}
             <a
@@ -963,7 +975,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
               <button type="button" onClick={onSignIn} className="flex items-center min-h-[48px] text-base font-medium text-white/60 text-left py-3">Sign in</button>
               <button type="button" onClick={onSignUpFree} className="flex items-center gap-1.5 min-h-[48px] text-base font-semibold text-[#C4B5FD] text-left py-3">Sign up for free <ArrowRight className="h-4 w-4" /></button>
               <button type="button" onClick={onForFirms} className="flex items-center gap-1.5 min-h-[48px] text-base font-medium text-white/60 text-left py-3">For law firms</button>
-              <button type="button" onClick={onWorkerStart} className="flex items-center gap-1.5 min-h-[48px] text-base font-semibold text-white/70 text-left py-3">Organize my intake <ArrowRight className="h-4 w-4" /></button>
+              <button type="button" onClick={onWorkerStart} className="flex items-center gap-1.5 min-h-[48px] text-base font-semibold text-white/70 text-left py-3">For workers <ArrowRight className="h-4 w-4" /></button>
               <a href="/hq" className="flex items-center min-h-[48px] text-base font-medium text-white/30 text-left py-3">HQ</a>
             </div>
           </div>
@@ -1029,41 +1041,48 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
                   </p>
                 </>
               ) : (
-                /* ── Journey 1: self-discovered worker ── */
+                /* ── Journey 1: default homepage — firm-geared front door ── */
                 <>
                   <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#C4B5FD]">
                     <span className="h-1.5 w-1.5 rounded-full bg-[#C4B5FD]" />
-                    Employment intake · California beta
+                    For California employment firms · Free pilot
                   </div>
 
                   <h1 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="mb-5 text-[34px] font-medium leading-[1.04] tracking-[-0.01em] text-white sm:text-[48px] lg:text-[56px]">
-                    Scattered records in.
+                    Open the file.
                     <br />
-                    <span className="text-[#C4B5FD]">A clear timeline out.</span>
+                    <span className="text-[#C4B5FD]">Decide in minutes.</span>
                   </h1>
 
                   <p className="mb-5 max-w-[480px] text-[16px] leading-relaxed text-[#C9C4E6] sm:text-[17px]">
-                    Organize your employment records into a clear, source-linked intake — and choose which firm to send it to. No waiting on a callback. You decide who sees it.
+                    Share one intake link with your clients. They self-serve through a guided intake, and a review-ready, source-linked record lands in your dashboard — so you decide fast instead of burning the first consult on triage.
                   </p>
 
                   <p className="mb-7 flex items-center gap-2 text-sm font-medium text-[#C9C4E6]">
                     <Shield className="h-4 w-4 flex-shrink-0 text-[#A78BFA]" />
-                    Your records stay private until you decide to share them.
+                    Organizes &amp; reflects — never concludes. The attorney evaluates everything.
                   </p>
 
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                     <button
                       type="button"
-                      onClick={() => { track('cta_worker_start'); onWorkerStart(); }}
+                      onClick={() => { track('cta_firm_pilot'); onForFirms(); }}
                       className="flex items-center justify-center gap-2 rounded-full bg-[#6D4AFF] px-7 py-3.5 text-[15px] font-semibold text-white shadow-[0_16px_48px_rgba(109,74,255,0.40)] transition hover:bg-[#5B35D5] hover:-translate-y-0.5 active:scale-[0.97]"
                     >
-                      Start organizing my records
+                      Start free pilot
                       <ArrowRight className="h-4 w-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { track('cta_worker_start'); onWorkerStart(); }}
+                      className="flex items-center justify-center gap-2 rounded-full border border-white/20 px-6 py-3.5 text-[15px] font-semibold text-white/80 transition hover:bg-white/5 active:scale-[0.97]"
+                    >
+                      I'm a worker →
                     </button>
                   </div>
 
                   <p className="mt-4 text-sm text-[#8E88B5]">
-                    Free to submit · Built for California employment matters · You control what's shared
+                    Free 7-day pilot · No credit card · Built for California employment matters
                   </p>
                 </>
               )}
@@ -1087,20 +1106,6 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
               </div>
             </motion.div>
           </div>
-        </div>
-      </section>
-
-      {/* ── FOUNDER ORIGIN (amber) ── */}
-      <section className="px-5 py-14 sm:px-8 sm:py-16" style={{ backgroundColor: '#F7ECD3' }}>
-        <div className="mx-auto max-w-[720px] text-center">
-          <div className="mb-3 text-xs font-bold uppercase tracking-[0.2em]" style={{ color: '#9A6B14' }}>Why one3seven exists</div>
-          <p className="mx-auto max-w-[600px] text-[15px] leading-relaxed sm:text-[16px]" style={{ color: '#4A3B1A' }}>
-            one3seven was built by someone who went through her own legal situation — and had to write out her whole story from scratch every time she talked to a new attorney. Scattered records, retold from memory, over and over. There had to be a better way.
-          </p>
-          <p className="mt-5 font-medium leading-snug" style={{ fontFamily: "'Fraunces', Georgia, serif", color: '#14112E', fontSize: 'clamp(20px, 4.5vw, 28px)' }}>
-            &ldquo;You should only have to tell your story once.&rdquo;
-          </p>
-          <p className="mt-3 text-[13px] font-semibold" style={{ color: '#9A6B14' }}>&mdash; Victoria, founder</p>
         </div>
       </section>
 
