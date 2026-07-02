@@ -16,7 +16,7 @@ import {
   listFirms, listActivity, addFirm, logActivity,
   listMessages, sendMessage, getCurrentMember, getLatestMessageAt, subscribeTeamMessages,
   listNotes, addNote, deleteNote, getIntakesCount, setFirmStage, setFirmMinutesSaved, getSiteAnalytics,
-  claimFirm, releaseFirm,
+  claimFirm, releaseFirm, assignFirm,
   listCrmMembers, listMyDirectMessages, sendDirectMessage, markThreadRead, getUnreadDmCount, subscribeDirectMessages, subscribeCrmFirms,
   type CrmFirm, type CrmActivityWithFirm, type NewFirmInput, type LogActivityInput, type CrmMessage, type CrmNote, type SiteAnalytics,
   type CrmMember, type CrmDirectMessage,
@@ -98,7 +98,14 @@ const NAV_GROUPS: { id: string; label: string; icon: typeof LayoutGrid; tabIds: 
   { id: 'founder', label: 'Founder', icon: ShieldCheck, tabIds: ['revenue', 'economics', 'growth', 'checklist', 'audit', 'links'] },
 ];
 
-type ClaimBundle = { userId: string | null; onClaim: (id: string) => Promise<void>; onRelease: (id: string) => Promise<void> };
+type ClaimBundle = {
+  userId: string | null;
+  onClaim: (id: string) => Promise<void>;
+  onRelease: (id: string) => Promise<void>;
+  isFounder?: boolean;
+  members?: CrmMember[];
+  onAssign?: (firmId: string, memberId: string | null, memberName: string | null) => Promise<void>;
+};
 
 const FAST_LOG_OUTCOMES = [
   'Demo booked', 'Left voicemail', 'No answer', 'Not interested', 'Follow up needed', 'Send something',
@@ -303,7 +310,18 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
     if (r.error) { setError(r.error); return; }
     await load();
   };
-  const claim: ClaimBundle = { userId, onClaim: claimFirmHandler, onRelease: releaseFirmHandler };
+  // Founder-only: reassign a firm's claim to any team member (or clear it).
+  const [crmMembers, setCrmMembers] = useState<CrmMember[]>([]);
+  useEffect(() => { void listCrmMembers().then((r) => { if (!r.error) setCrmMembers(r.data); }); }, []);
+  const assignFirmHandler = async (firmId: string, memberId: string | null, memberName: string | null) => {
+    const r = await assignFirm(firmId, memberId, memberName);
+    if (r.error) { setError(r.error); return; }
+    await load();
+  };
+  const claim: ClaimBundle = {
+    userId, onClaim: claimFirmHandler, onRelease: releaseFirmHandler,
+    isFounder, members: crmMembers, onAssign: assignFirmHandler,
+  };
 
   /** One-tap "I emailed this firm" — logs an email + claims credit, no form. */
   const quickEmail = async (firmId: string) => {
@@ -316,6 +334,26 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
       new_stage: f && f.stage === 'target' ? 'contacted' : '',
     });
     if (r.error) { setError(r.error); return; }
+    setLastFirmId(firmId);
+    await load();
+  };
+
+  /** One-tap logging — no form, no typing. Called / Victoria email f/u / Follow-up / Do-not-contact. */
+  const quickLog = async (firmId: string, kind: QuickLogKind) => {
+    const f = firmsById[firmId];
+    const bump: CrmStage | '' = f && f.stage === 'target' ? 'contacted' : '';
+    let r: { error?: string } | undefined;
+    if (kind === 'no_contact') {
+      r = await setFirmStage(firmId, 'no');
+    } else if (kind === 'called') {
+      r = await logActivity({ firm_id: firmId, activity_type: 'call', activity_date: today, outcome: 'Called', new_stage: bump });
+    } else if (kind === 'email_fu') {
+      r = await logActivity({ firm_id: firmId, activity_type: 'email', activity_date: today, outcome: 'Victoria to send email f/u', new_stage: bump, next_followup: today });
+    } else { // follow_up → remind in 3 days
+      const d = new Date(today + 'T00:00:00'); d.setDate(d.getDate() + 3);
+      r = await logActivity({ firm_id: firmId, activity_type: 'call', activity_date: today, outcome: 'Follow up needed', next_followup: d.toISOString().slice(0, 10) });
+    }
+    if (r?.error) { setError(r.error); return; }
     setLastFirmId(firmId);
     await load();
   };
@@ -430,9 +468,9 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
             {tab === 'dashboard' && (
               <SuitesHome greeting={crmGreeting(memberName)} isFounder={isFounder} showEconomics={showEconomics} activeTab={tab} onPick={setTab} />
             )}
-            {tab === 'dashboard' && <DashboardTab firms={firms} activity={activity} today={today} onLog={openFast} workerCount={workerCount} onChanged={load} onQuickEmail={quickEmail} claim={claim} isFounder={isFounder} />}
-            {tab === 'pipeline' && isFounder && <PipelineTab firms={firms} onLog={openFast} workerCount={workerCount} onQuickEmail={quickEmail} claim={claim} />}
-            {tab === 'firms' && <FirmsTab firms={firms} onLog={openFast} userId={userId} onQuickEmail={quickEmail} claim={claim} />}
+            {tab === 'dashboard' && <DashboardTab firms={firms} activity={activity} today={today} onLog={openFast} workerCount={workerCount} onChanged={load} onQuickEmail={quickEmail} onQuickLog={quickLog} claim={claim} isFounder={isFounder} />}
+            {tab === 'pipeline' && isFounder && <PipelineTab firms={firms} onLog={openFast} workerCount={workerCount} onQuickEmail={quickEmail} onQuickLog={quickLog} claim={claim} />}
+            {tab === 'firms' && <FirmsTab firms={firms} onLog={openFast} userId={userId} onQuickEmail={quickEmail} onQuickLog={quickLog} claim={claim} />}
             {tab === 'activity' && isFounder && <ActivityTab activity={activity} />}
             {tab === 'metrics' && isFounder && <MetricsTab firms={firms} activity={activity} />}
             {tab === 'team' && <TeamTab />}
@@ -570,10 +608,40 @@ function localAngle(firm: CrmFirm): string | null {
   return null;
 }
 
-function FirmCard({ firm, onLog, today, onQuickEmail, userId, onClaim, onRelease }: { firm: CrmFirm; onLog: (id: string) => void; today?: string; onQuickEmail?: (id: string) => Promise<void>; userId?: string | null; onClaim?: (id: string) => Promise<void>; onRelease?: (id: string) => Promise<void> }) {
-  const [open, setOpen] = useState(false);
-  const [busy, setBusy] = useState(false);
+type QuickLogKind = 'called' | 'email_fu' | 'follow_up' | 'no_contact';
+type QuickLogFn = (id: string, kind: QuickLogKind) => Promise<void>;
+
+// One-tap logging button — no typing, big touch target for mobile.
+function QuickActionButton(
+  { icon: Icon, label, tone, active, disabled, onClick }:
+  { icon: typeof Phone; label: string; tone: 'green' | 'purple' | 'gray'; active?: boolean; disabled?: boolean; onClick: () => void }
+) {
+  const tones = {
+    green: 'border-emerald-200 bg-emerald-50 text-emerald-700',
+    purple: 'border-[#E0D6FF] bg-[#F4F1FF] text-[#6D4AFF]',
+    gray: 'border-[#E7E1FF] bg-white text-[#1E1B4B]/55',
+  } as const;
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className={`flex min-h-[46px] items-center justify-center gap-1.5 rounded-[12px] border px-2 text-[12px] font-bold leading-tight disabled:opacity-50 ${tones[tone]}`}
+    >
+      <Icon className="h-4 w-4 shrink-0" /> <span>{active ? '…' : label}</span>
+    </button>
+  );
+}
+
+function FirmCard({ firm, onLog, today, onQuickEmail, onQuickLog, userId, onClaim, onRelease, isFounder, members, onAssign }: { firm: CrmFirm; onLog: (id: string) => void; today?: string; onQuickEmail?: (id: string) => Promise<void>; onQuickLog?: QuickLogFn; userId?: string | null; onClaim?: (id: string) => Promise<void>; onRelease?: (id: string) => Promise<void>; isFounder?: boolean; members?: CrmMember[]; onAssign?: (firmId: string, memberId: string | null, memberName: string | null) => Promise<void> }) {
   const [claiming, setClaiming] = useState(false);
+  const [pending, setPending] = useState<QuickLogKind | null>(null);
+  const [doneMsg, setDoneMsg] = useState('');
+  const runQuick = async (kind: QuickLogKind, label: string) => {
+    if (!onQuickLog) return;
+    setPending(kind);
+    try { await onQuickLog(firm.id, kind); setDoneMsg(label); } finally { setPending(null); }
+  };
   const due = today && firm.next_followup && firm.next_followup <= today;
   const mine = !!userId && firm.contacted_by === userId;
   const claimable = !firm.contacted_by && !!onClaim; // Open pool → whole row claims
@@ -587,24 +655,26 @@ function FirmCard({ firm, onLog, today, onQuickEmail, userId, onClaim, onRelease
           // Open pool: tapping the row claims the firm (chevron on the right opens the brief).
           <button type="button" disabled={claiming} onClick={doClaim} className="flex min-w-0 flex-1 items-center gap-2 text-left disabled:opacity-50" aria-label={`Claim ${firm.name}`}>
             <Hand className="h-4 w-4 shrink-0 text-[#6D4AFF]" />
-            <span className="truncate text-[14px] font-bold">{firm.name}</span>
+            <span className="break-words leading-snug text-[14px] font-bold">{firm.name}</span>
             <PriorityBadge priority={firm.priority} />
             <span className="shrink-0 rounded-full bg-[#EDE7FF] px-2 py-0.5 text-[10px] font-bold text-[#6D4AFF]">{claiming ? 'Claiming…' : 'Tap to claim'}</span>
           </button>
         ) : (
-          <button type="button" onClick={() => setOpen((o) => !o)} className="flex min-w-0 flex-1 items-center gap-2 text-left">
-            <ChevronRight className={`h-4 w-4 shrink-0 text-[#1E1B4B]/30 transition-transform ${open ? 'rotate-90' : ''}`} />
-            <span className="truncate text-[14px] font-bold">{firm.name}</span>
+          <div className="flex min-w-0 flex-1 items-center gap-2">
+            <span className="break-words leading-snug text-[14px] font-bold">{firm.name}</span>
             <PriorityBadge priority={firm.priority} />
             {due && <span className="shrink-0 rounded-full bg-red-100 px-1.5 py-0.5 text-[10px] font-bold text-red-600">due</span>}
-          </button>
+          </div>
+        )}
+        {firm.source === 'pilot_form' && (
+          <span className="shrink-0 rounded-full bg-[#F59E0B] px-2 py-0.5 text-[10px] font-extrabold text-white" title="Inbound pilot request from /for-firms">⚡ INBOUND</span>
         )}
         {firm.contacted_by && (
           <span
             className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold ${mine ? 'bg-emerald-100 text-emerald-700' : 'bg-[#EDE7FF] text-[#6D4AFF]'}`}
             title={`Claimed by ${firm.contacted_by_name ?? 'rep'}${claimedDate ? ' · ' + claimedDate : ''}`}
           >
-            {mine ? 'Yours' : (firm.contacted_by_name?.split(' ')[0] ?? 'Claimed')}
+            {mine ? 'You' : (firm.contacted_by_name ?? 'Claimed')}
           </span>
         )}
         <StageTag stage={firm.stage} />
@@ -613,14 +683,8 @@ function FirmCard({ firm, onLog, today, onQuickEmail, userId, onClaim, onRelease
             <Phone className="h-4 w-4" />
           </a>
         )}
-        {claimable && (
-          <button type="button" onClick={() => setOpen((o) => !o)} aria-label="Details" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[#1E1B4B]/40 hover:bg-[#F4F1FF]">
-            <ChevronRight className={`h-4 w-4 transition-transform ${open ? 'rotate-90' : ''}`} />
-          </button>
-        )}
       </div>
-      {open && (
-        <div className="space-y-2 border-t border-[#F0EBFF] p-3">
+      <div className="space-y-2 border-t border-[#F0EBFF] p-3">
           {firm.attorney_name && <div className="text-[12px] text-[#1E1B4B]/55">{firm.attorney_name}</div>}
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[13px]">
             <span className="flex items-center gap-1.5"><Phone className="h-3.5 w-3.5 text-[#1E1B4B]/35" /><PhoneLink phone={firm.phone} /></span>
@@ -706,23 +770,34 @@ function FirmCard({ firm, onLog, today, onQuickEmail, userId, onClaim, onRelease
               )}
             </div>
           )}
-          <div className="flex gap-2">
-            <button type="button" onClick={() => onLog(firm.id)} className={`flex ${tap} flex-1 items-center justify-center gap-2 rounded-[12px] bg-[#EDE7FF] font-semibold text-[#6D4AFF]`}>
-              <Phone className="h-4 w-4" /> Log call
-            </button>
-            {onQuickEmail && (
-              <button
-                type="button"
-                disabled={busy}
-                onClick={async () => { setBusy(true); try { await onQuickEmail(firm.id); } finally { setBusy(false); } }}
-                className={`flex ${tap} items-center justify-center gap-1.5 rounded-[12px] border border-[#E0D6FF] px-3 font-semibold text-[#6D4AFF] disabled:opacity-50`}
+          {isFounder && onAssign && members && members.length > 0 && (
+            <div className="flex items-center gap-2 rounded-[10px] bg-[#F7F3FF] px-2.5 py-2">
+              <span className="shrink-0 text-[11px] font-semibold text-[#6D4AFF]">Assign to</span>
+              <select
+                value={firm.contacted_by ?? ''}
+                onChange={(e) => {
+                  const m = members.find((x) => x.id === e.target.value);
+                  void onAssign(firm.id, m ? m.id : null, m ? m.name : null);
+                }}
+                className="min-w-0 flex-1 rounded-[8px] border border-[#E0D6FF] bg-white px-2 py-1.5 text-[12px] font-medium text-[#1E1B4B] outline-none focus:border-[#6D4AFF]"
               >
-                <Mail className="h-4 w-4" /> {busy ? '…' : 'Emailed'}
-              </button>
-            )}
-          </div>
+                <option value="">— Unclaimed —</option>
+                {members.map((m) => (
+                  <option key={m.id} value={m.id}>{m.name}{m.is_founder ? ' (founder)' : ''}</option>
+                ))}
+              </select>
+            </div>
+          )}
+          {onQuickLog && (
+            <div className="grid grid-cols-2 gap-2 pt-0.5">
+              <QuickActionButton icon={Phone} label="Called" tone="green" active={pending === 'called'} disabled={pending !== null} onClick={() => runQuick('called', 'Logged: Called')} />
+              <QuickActionButton icon={Mail} label="Victoria to email f/u" tone="purple" active={pending === 'email_fu'} disabled={pending !== null} onClick={() => runQuick('email_fu', 'Flagged for Victoria')} />
+              <QuickActionButton icon={Calendar} label="Follow up" tone="purple" active={pending === 'follow_up'} disabled={pending !== null} onClick={() => runQuick('follow_up', 'Follow-up set +3 days')} />
+              <QuickActionButton icon={X} label="Do not contact" tone="gray" active={pending === 'no_contact'} disabled={pending !== null} onClick={() => runQuick('no_contact', 'Marked do-not-contact')} />
+            </div>
+          )}
+          {doneMsg && <p className="text-center text-[11px] font-semibold text-emerald-600">✓ {doneMsg}</p>}
         </div>
-      )}
     </div>
   );
 }
@@ -773,7 +848,7 @@ function SuitesHome({ greeting, isFounder, showEconomics, activeTab, onPick }: {
 }
 
 // ── Dashboard ────────────────────────────────────────────────────────────────
-function DashboardTab({ firms, activity, today, onLog, workerCount, onChanged, onQuickEmail, claim, isFounder }: { firms: CrmFirm[]; activity: CrmActivityWithFirm[]; today: string; onLog: (id: string) => void; workerCount: number; onChanged: () => void; onQuickEmail?: (id: string) => Promise<void>; claim?: ClaimBundle; isFounder: boolean }) {
+function DashboardTab({ firms, activity, today, onLog, workerCount, onChanged, onQuickEmail, onQuickLog, claim, isFounder }: { firms: CrmFirm[]; activity: CrmActivityWithFirm[]; today: string; onLog: (id: string) => void; workerCount: number; onChanged: () => void; onQuickEmail?: (id: string) => Promise<void>; onQuickLog?: QuickLogFn; claim?: ClaimBundle; isFounder: boolean }) {
   // Reps see only their own numbers/activity; founders see team-wide.
   const me = claim?.userId ?? null;
   const myActivity = isFounder ? activity : activity.filter((a) => a.logged_by === me);
@@ -788,9 +863,23 @@ function DashboardTab({ firms, activity, today, onLog, workerCount, onChanged, o
     .filter((f) => f.next_followup && f.next_followup <= today && (isFounder || (!!me && f.contacted_by === me)))
     .sort((a, b) => (a.next_followup ?? '').localeCompare(b.next_followup ?? ''));
   const recent = activity.slice(0, 6);
+  // Inbound pilot requests (from /for-firms) get their own home — never buried in the cold list.
+  const inbound = firms
+    .filter((f) => f.source === 'pilot_form' && f.stage !== 'paid' && f.stage !== 'no')
+    .sort((a, b) => (b.created_at ?? '').localeCompare(a.created_at ?? ''));
 
   return (
     <div className="space-y-6">
+      {inbound.length > 0 && (
+        <section className="rounded-[18px] border-2 border-[#F59E0B]/45 bg-[#FFF9F0] p-4">
+          <div className="mb-1 flex items-center gap-2">
+            <span className="text-[15px] font-extrabold text-[#B45309]">🔥 New pilot requests</span>
+            <span className="rounded-full bg-[#F59E0B] px-2 py-0.5 text-[11px] font-bold text-white">{inbound.length}</span>
+          </div>
+          <p className="mb-3 text-[12px] text-[#B45309]/80">They raised their hand on /for-firms — claim and reach out fast. Inbound cools within hours.</p>
+          <div className="space-y-3">{inbound.map((f) => <FirmCard key={f.id} firm={f} onLog={onLog} today={today} onQuickEmail={onQuickEmail} onQuickLog={onQuickLog} userId={claim?.userId} onClaim={claim?.onClaim} onRelease={claim?.onRelease} isFounder={claim?.isFounder} members={claim?.members} onAssign={claim?.onAssign} />)}</div>
+        </section>
+      )}
       {isFounder && (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
           {stats.map((s) => (
@@ -811,7 +900,7 @@ function DashboardTab({ firms, activity, today, onLog, workerCount, onChanged, o
         {due.length === 0 ? (
           <p className="rounded-[12px] border border-[#E7E1FF] bg-white px-4 py-3 text-[13px] text-[#1E1B4B]/45">Nothing due. Nice.</p>
         ) : (
-          <div className="space-y-3">{due.map((f) => <FirmCard key={f.id} firm={f} onLog={onLog} today={today} onQuickEmail={onQuickEmail} userId={claim?.userId} onClaim={claim?.onClaim} onRelease={claim?.onRelease} />)}</div>
+          <div className="space-y-3">{due.map((f) => <FirmCard key={f.id} firm={f} onLog={onLog} today={today} onQuickEmail={onQuickEmail} onQuickLog={onQuickLog} userId={claim?.userId} onClaim={claim?.onClaim} onRelease={claim?.onRelease} isFounder={claim?.isFounder} members={claim?.members} onAssign={claim?.onAssign} />)}</div>
         )}
       </section>
 
@@ -872,7 +961,7 @@ function DemoPrepCard({ firms, today, onChanged }: { firms: CrmFirm[]; today: st
         <div key={f.id} className="rounded-[16px] border-2 border-amber-300 bg-amber-50 p-4">
           <div className="mb-1 flex items-start justify-between gap-2">
             <div className="min-w-0">
-              <div className="truncate text-[15px] font-bold text-[#1E1B4B]">{f.name}</div>
+              <div className="break-words leading-snug text-[15px] font-bold text-[#1E1B4B]">{f.name}</div>
               {f.attorney_name && <div className="text-[12px] text-[#1E1B4B]/55">{f.attorney_name}</div>}
             </div>
             <span className="shrink-0 rounded-full bg-amber-200 px-2 py-0.5 text-[11px] font-bold text-amber-800">Demo {daysUntil(f.next_followup)}</span>
@@ -1396,8 +1485,8 @@ function RevenueTab({ firms }: { firms: CrmFirm[] }) {
           <div className="space-y-2">
             {paid.map((f) => (
               <div key={f.id} className="flex items-center justify-between rounded-[12px] border border-[#E7E1FF] bg-white px-4 py-2.5">
-                <span className="truncate text-[13px] font-semibold">{f.name}</span>
-                <span className="text-[13px] text-[#1E1B4B]/70">{usd(Math.round(tierPrice(f.subscription_tier) * COMMISSION_RATE))}/mo</span>
+                <span className="break-words leading-snug text-[13px] font-semibold">{f.name}</span>
+                <span className="shrink-0 text-[13px] text-[#1E1B4B]/70">{usd(Math.round(tierPrice(f.subscription_tier) * COMMISSION_RATE))}/mo</span>
               </div>
             ))}
             <div className="flex items-center justify-between rounded-[12px] bg-[#EDE7FF] px-4 py-2.5">
@@ -1414,7 +1503,7 @@ function RevenueTab({ firms }: { firms: CrmFirm[] }) {
 }
 
 // ── Pipeline ─────────────────────────────────────────────────────────────────
-function PipelineTab({ firms, onLog, workerCount, onQuickEmail, claim }: { firms: CrmFirm[]; onLog: (id: string) => void; workerCount: number; onQuickEmail?: (id: string) => Promise<void>; claim?: ClaimBundle }) {
+function PipelineTab({ firms, onLog, workerCount, onQuickEmail, onQuickLog, claim }: { firms: CrmFirm[]; onLog: (id: string) => void; workerCount: number; onQuickEmail?: (id: string) => Promise<void>; onQuickLog?: QuickLogFn; claim?: ClaimBundle }) {
   const counts = CRM_STAGES.map((s) => ({ stage: s, n: firms.filter((f) => f.stage === s).length }));
   const priorityA = firms.filter((f) => f.priority === 'A');
   return (
@@ -1445,7 +1534,7 @@ function PipelineTab({ firms, onLog, workerCount, onQuickEmail, claim }: { firms
         {priorityA.length === 0 ? (
           <p className="rounded-[12px] border border-[#E7E1FF] bg-white px-4 py-3 text-[13px] text-[#1E1B4B]/45">No Priority A firms yet.</p>
         ) : (
-          <div className="space-y-3">{priorityA.map((f) => <FirmCard key={f.id} firm={f} onLog={onLog} onQuickEmail={onQuickEmail} userId={claim?.userId} onClaim={claim?.onClaim} onRelease={claim?.onRelease} />)}</div>
+          <div className="space-y-3">{priorityA.map((f) => <FirmCard key={f.id} firm={f} onLog={onLog} onQuickEmail={onQuickEmail} onQuickLog={onQuickLog} userId={claim?.userId} onClaim={claim?.onClaim} onRelease={claim?.onRelease} isFounder={claim?.isFounder} members={claim?.members} onAssign={claim?.onAssign} />)}</div>
         )}
       </section>
     </div>
@@ -1453,7 +1542,7 @@ function PipelineTab({ firms, onLog, workerCount, onQuickEmail, claim }: { firms
 }
 
 // ── Firms ────────────────────────────────────────────────────────────────────
-function FirmsTab({ firms, onLog, userId, onQuickEmail, claim }: { firms: CrmFirm[]; onLog: (id: string) => void; userId: string | null; onQuickEmail?: (id: string) => Promise<void>; claim?: ClaimBundle }) {
+function FirmsTab({ firms, onLog, userId, onQuickEmail, onQuickLog, claim }: { firms: CrmFirm[]; onLog: (id: string) => void; userId: string | null; onQuickEmail?: (id: string) => Promise<void>; onQuickLog?: QuickLogFn; claim?: ClaimBundle }) {
   const [view, setView] = useState<'open' | 'mine'>('open');
   const [tierFilter, setTierFilter] = useState<number | ''>('');
   const [priority, setPriority] = useState<'A' | 'B' | 'C' | ''>('');
@@ -1499,7 +1588,7 @@ function FirmsTab({ firms, onLog, userId, onQuickEmail, claim }: { firms: CrmFir
           {view === 'open' ? 'No open firms match this filter.' : 'You haven’t claimed any firms yet — claim one from Open.'}
         </p>
       ) : (
-        <div className="space-y-3">{list.map((f) => <FirmCard key={f.id} firm={f} onLog={onLog} today={todayISO()} onQuickEmail={onQuickEmail} userId={me} onClaim={claim?.onClaim} onRelease={claim?.onRelease} />)}</div>
+        <div className="space-y-3">{list.map((f) => <FirmCard key={f.id} firm={f} onLog={onLog} today={todayISO()} onQuickEmail={onQuickEmail} onQuickLog={onQuickLog} userId={me} onClaim={claim?.onClaim} onRelease={claim?.onRelease} isFounder={claim?.isFounder} members={claim?.members} onAssign={claim?.onAssign} />)}</div>
       )}
 
       {/* Bottom toggle — worker-dash style, scaled metrics. Open = shared pool; Mine = claimed. */}
@@ -1734,6 +1823,76 @@ function ScriptsTab() {
   );
 }
 
+// ── Emoji + GIF support for chat / inbox / notes ─────────────────────────────
+const QUICK_EMOJIS = [
+  '😀','😅','😂','🤣','😊','😍','😎','🤔','👍','👏','🙌','🙏','💪','🔥','⚡','✅',
+  '❌','🎉','🎯','🚀','💰','📈','📞','📧','📝','⭐','❤️','💜','🤝','👀','🥳','🤯',
+  '💯','✨','⏳','🔒','🆕','📣','💼','🏆','👋','😬','😭','🙈','☕','💡','📌','🫡',
+];
+
+// Matches a directly-embeddable image/GIF URL anywhere in the message body.
+const IMG_URL_RE = /(https?:\/\/[^\s]+?\.(?:gif|png|jpe?g|webp)(?:\?[^\s]*)?)/i;
+
+/** Renders message text, showing any GIF/image URL inline as an animated image. */
+function MessageBody({ text, className = '' }: { text: string; className?: string }) {
+  const textCls = `whitespace-pre-wrap break-words text-[13px] leading-relaxed ${className}`;
+  const match = text.match(IMG_URL_RE);
+  if (match) {
+    const url = match[1];
+    const rest = text.replace(url, '').trim();
+    return (
+      <div>
+        {rest && <div className={textCls}>{rest}</div>}
+        <img src={url} alt="shared gif" loading="lazy" className="mt-1 max-h-52 max-w-full rounded-[10px]" />
+      </div>
+    );
+  }
+  return <div className={textCls}>{text}</div>;
+}
+
+/** Emoji palette + paste-a-GIF-link control. Calls onInsert to append to the composer. */
+function EmojiGifBar({ onInsert }: { onInsert: (s: string) => void }) {
+  const [showEmoji, setShowEmoji] = useState(false);
+  const [showGif, setShowGif] = useState(false);
+  const [gifUrl, setGifUrl] = useState('');
+  const addGif = () => {
+    const u = gifUrl.trim();
+    if (!u) return;
+    onInsert((/\s$/.test(u) ? '' : ' ') + u);
+    setGifUrl(''); setShowGif(false);
+  };
+  return (
+    <div className="relative flex shrink-0 items-center gap-1">
+      <button type="button" aria-label="Add emoji"
+        onClick={() => { setShowEmoji((v) => !v); setShowGif(false); }}
+        className="flex h-9 w-9 items-center justify-center rounded-full text-lg hover:bg-[#F3EFFF]">😊</button>
+      <button type="button" aria-label="Add GIF"
+        onClick={() => { setShowGif((v) => !v); setShowEmoji(false); }}
+        className="flex h-9 items-center justify-center rounded-full px-2 text-[11px] font-bold text-[#6D4AFF] hover:bg-[#F3EFFF]">GIF</button>
+      {showEmoji && (
+        <div className="absolute bottom-11 left-0 z-20 grid w-[256px] grid-cols-8 gap-1 rounded-[12px] border border-[#E7E1FF] bg-white p-2 shadow-lg">
+          {QUICK_EMOJIS.map((e) => (
+            <button key={e} type="button" onClick={() => onInsert(e)}
+              className="flex h-7 w-7 items-center justify-center rounded text-lg hover:bg-[#F3EFFF]">{e}</button>
+          ))}
+        </div>
+      )}
+      {showGif && (
+        <div className="absolute bottom-11 left-0 z-20 w-[288px] rounded-[12px] border border-[#E7E1FF] bg-white p-3 shadow-lg">
+          <p className="mb-1.5 text-[11px] font-semibold text-[#1E1B4B]">Paste a GIF link</p>
+          <input value={gifUrl} onChange={(e) => setGifUrl(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addGif(); } }}
+            placeholder="https://…/something.gif"
+            className="w-full rounded-[8px] border border-[#E7E1FF] px-2 py-1.5 text-[12px] outline-none focus:border-[#6D4AFF]" />
+          <button type="button" onClick={addGif} disabled={!gifUrl.trim()}
+            className="mt-2 w-full rounded-full bg-[#6D4AFF] py-1.5 text-[12px] font-semibold text-white disabled:opacity-40">Add GIF</button>
+          <p className="mt-1.5 text-[10px] leading-snug text-[#1E1B4B]/45">On Giphy/Tenor: right-click a GIF → “Copy image address”, or use any link ending in .gif</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Team chat (founder + reps, one shared channel) ───────────────────────────
 function TeamTab() {
   const [messages, setMessages] = useState<CrmMessage[]>([]);
@@ -1780,7 +1939,7 @@ function TeamTab() {
               <div key={m.id} className={`flex ${mine ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-[82%] rounded-[14px] px-3.5 py-2 ${mine ? 'bg-[#6D4AFF] text-white' : 'bg-[#F3EFFF] text-[#1E1B4B]'}`}>
                   {!mine && <div className="mb-0.5 text-[11px] font-bold text-[#6D4AFF]">{m.sender_name || 'Member'}</div>}
-                  <div className="whitespace-pre-wrap text-[13px] leading-relaxed">{m.body}</div>
+                  <MessageBody text={m.body} />
                   <div className={`mt-0.5 text-[10px] ${mine ? 'text-white/60' : 'text-[#1E1B4B]/40'}`}>{new Date(m.created_at).toLocaleString()}</div>
                 </div>
               </div>
@@ -1790,7 +1949,8 @@ function TeamTab() {
         <div ref={bottomRef} />
       </div>
       {err && <p className="mt-2 text-[12px] text-red-600">{err}</p>}
-      <div className="mt-2 flex gap-2">
+      <div className="mt-2 flex items-end gap-2">
+        <EmojiGifBar onInsert={(s) => setBody((b) => b + s)} />
         <textarea
           value={body}
           onChange={(e) => setBody(e.target.value)}
@@ -1912,7 +2072,7 @@ function InboxTab({ onReadChange }: { onReadChange?: () => void }) {
           return (
             <div key={m.id} className={`flex ${mine ? 'justify-end' : 'justify-start'}`}>
               <div className={`max-w-[82%] rounded-[14px] px-3.5 py-2 ${mine ? 'bg-[#6D4AFF] text-white' : 'bg-[#F3EFFF] text-[#1E1B4B]'}`}>
-                <div className="whitespace-pre-wrap text-[13px] leading-relaxed">{m.body}</div>
+                <MessageBody text={m.body} />
                 <div className={`mt-0.5 text-[10px] ${mine ? 'text-white/60' : 'text-[#1E1B4B]/40'}`}>{new Date(m.created_at).toLocaleString()}</div>
               </div>
             </div>
@@ -1921,7 +2081,8 @@ function InboxTab({ onReadChange }: { onReadChange?: () => void }) {
         <div ref={bottomRef} />
       </div>
       {err && <p className="mt-2 text-[12px] text-red-600">{err}</p>}
-      <div className="mt-2 flex gap-2">
+      <div className="mt-2 flex items-end gap-2">
+        <EmojiGifBar onInsert={(s) => setBody((b) => b + s)} />
         <textarea
           value={body}
           onChange={(e) => setBody(e.target.value)}
@@ -1977,6 +2138,7 @@ function NotesTab({ isFounder }: { isFounder: boolean }) {
           rows={3}
           className="w-full rounded-[10px] border border-[#E7E1FF] px-3 py-2.5 text-sm outline-none focus:border-[#6D4AFF]"
         />
+        <div className="mt-1"><EmojiGifBar onInsert={(s) => setBody((b) => b + s)} /></div>
         {err && <p className="mt-2 text-[12px] text-red-600">{err}</p>}
         <button type="button" onClick={post} disabled={busy || !body.trim()} className={`mt-2 flex ${tap} w-full items-center justify-center gap-2 rounded-full bg-[#6D4AFF] font-semibold text-white disabled:opacity-40`}>
           <Plus className="h-4 w-4" /> {busy ? 'Posting…' : 'Add note'}
@@ -2002,7 +2164,7 @@ function NotesTab({ isFounder }: { isFounder: boolean }) {
                     )}
                   </div>
                 </div>
-                <p className="whitespace-pre-wrap text-[13px] leading-relaxed text-[#1E1B4B]/80">{n.body}</p>
+                <MessageBody text={n.body} className="text-[#1E1B4B]/80" />
               </div>
             );
           })}

@@ -467,6 +467,19 @@ export async function releaseFirm(firmId: string): Promise<{ error?: string }> {
   return {};
 }
 
+/**
+ * Founder-only: assign (or reassign) a firm's claim to a specific member — overrides any existing
+ * owner. Pass memberId = null to clear the claim. RLS lets founders update any crm_firms row.
+ */
+export async function assignFirm(firmId: string, memberId: string | null, memberName: string | null): Promise<{ error?: string }> {
+  const patch = memberId
+    ? { contacted_by: memberId, contacted_by_name: memberName, contacted_at: new Date().toISOString() }
+    : { contacted_by: null, contacted_by_name: null, contacted_at: null };
+  const { error } = await supabase.from('crm_firms').update(patch).eq('id', firmId);
+  if (error) return { error: error.message };
+  return {};
+}
+
 export async function updateFirm(id: string, patch: Partial<CrmFirm>): Promise<{ error?: string }> {
   const { error } = await supabase.from('crm_firms').update(patch).eq('id', id);
   if (error) return { error: error.message };
@@ -531,13 +544,10 @@ export async function logActivity(input: LogActivityInput): Promise<{ error?: st
     (firm.next_followup as string | null) ?? null
   );
 
-  // Claim model: the first rep to log a firm owns the credit. Don't overwrite once set.
+  // Claiming is intentional only — logging an activity never claims a firm.
+  // A rep claims via claimFirm(); a founder assigns via assignFirm(). Logging just advances
+  // stage + follow-up on whatever the firm already is.
   const firmUpdate: Record<string, unknown> = { stage: nextStage, next_followup: nextFollowup };
-  if (!firm.contacted_by && me.id) {
-    firmUpdate.contacted_by = me.id;
-    firmUpdate.contacted_by_name = me.name;
-    firmUpdate.contacted_at = new Date().toISOString();
-  }
 
   const { error: uErr } = await supabase
     .from('crm_firms')
