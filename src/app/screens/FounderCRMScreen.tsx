@@ -1621,6 +1621,7 @@ function FirmsTab({ firms, onLog, userId, onQuickEmail, onQuickLog, claim }: { f
   });
   const [tierFilter, setTierFilter] = useState<number | ''>('');
   const [priority, setPriority] = useState<'A' | 'B' | 'C' | ''>('');
+  const [emailFilter, setEmailFilter] = useState<'' | 'has' | 'none'>('');
   const [search, setSearch] = useState(() => { try { return localStorage.getItem('crm_firms_search') || ''; } catch { return ''; } });
   useEffect(() => { try { localStorage.setItem('crm_firms_view', view); } catch { /* ignore */ } }, [view]);
   useEffect(() => { try { localStorage.setItem('crm_firms_search', search); } catch { /* ignore */ } }, [search]);
@@ -1629,14 +1630,16 @@ function FirmsTab({ firms, onLog, userId, onQuickEmail, onQuickLog, claim }: { f
   const q = search.trim().toLowerCase();
   const matchesSearch = (f: CrmFirm) =>
     !q || (f.name ?? '').toLowerCase().includes(q) || (f.attorney_name ?? '').toLowerCase().includes(q);
+  const hasEmail = (f: CrmFirm) => !!(f.email && f.email.trim());
+  const matchesEmail = (f: CrmFirm) => emailFilter === '' || (emailFilter === 'has' ? hasEmail(f) : !hasEmail(f));
 
   const openTotal = firms.filter((f) => !f.contacted_by).length;
-  const mine = firms.filter((f) => !!me && f.contacted_by === me).filter(matchesSearch);
+  const mine = firms.filter((f) => !!me && f.contacted_by === me).filter(matchesSearch).filter(matchesEmail);
   const open = firms.filter((f) =>
     !f.contacted_by &&
     (tierFilter === '' || f.tier === tierFilter) &&
     (!priority || f.priority === priority),
-  ).filter(matchesSearch);
+  ).filter(matchesSearch).filter(matchesEmail);
   const list = view === 'open' ? open : mine;
 
   return (
@@ -1647,6 +1650,18 @@ function FirmsTab({ firms, onLog, userId, onQuickEmail, onQuickLog, claim }: { f
         placeholder="Search firm or attorney name…"
         className="w-full rounded-[10px] border border-[#E7E1FF] bg-white px-3 py-2.5 text-[14px] outline-none focus:border-[#6D4AFF]"
       />
+      <div className="flex flex-wrap items-center gap-1.5">
+        {([['', 'All'], ['has', '✉️ Has email'], ['none', 'Needs email']] as const).map(([key, label]) => (
+          <button
+            key={key || 'all'}
+            type="button"
+            onClick={() => setEmailFilter(key)}
+            className={`rounded-full px-3 py-1.5 text-[12px] font-semibold transition ${emailFilter === key ? 'bg-[#6D4AFF] text-white' : 'bg-[#F4F1FF] text-[#1E1B4B]/70 hover:bg-[#EDE7FF]'}`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
       {view === 'open' && (
         <div className="flex flex-wrap gap-2">
           <select value={tierFilter === '' ? '' : String(tierFilter)} onChange={(e) => setTierFilter(e.target.value === '' ? '' : Number(e.target.value))} className={`${tap} rounded-[10px] border border-[#E7E1FF] bg-white px-3 text-[13px]`}>
