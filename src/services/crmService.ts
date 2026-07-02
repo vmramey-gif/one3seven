@@ -34,6 +34,8 @@ export interface CrmFirm {
   contacted_at: string | null;
   /** Sales sequencing tier 1-4 (1 = tech-native, call first). Set by cela_tier_update.sql. */
   tier?: number | null;
+  /** Flagged for a founder ("Victoria to email f/u") — collects into the founder email queue. */
+  needs_founder_email?: boolean | null;
   created_at: string;
 }
 
@@ -476,6 +478,13 @@ export async function assignFirm(firmId: string, memberId: string | null, member
     ? { contacted_by: memberId, contacted_by_name: memberName, contacted_at: new Date().toISOString() }
     : { contacted_by: null, contacted_by_name: null, contacted_at: null };
   const { error } = await supabase.from('crm_firms').update(patch).eq('id', firmId);
+  if (error) return { error: error.message };
+  return {};
+}
+
+/** Set/clear the "founder should email this firm" flag (drives the founder email queue). */
+export async function flagFounderEmail(firmId: string, on: boolean): Promise<{ error?: string }> {
+  const { error } = await supabase.from('crm_firms').update({ needs_founder_email: on }).eq('id', firmId);
   if (error) return { error: error.message };
   return {};
 }

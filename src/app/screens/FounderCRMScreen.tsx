@@ -16,7 +16,7 @@ import {
   listFirms, listActivity, addFirm, logActivity,
   listMessages, sendMessage, getCurrentMember, getLatestMessageAt, subscribeTeamMessages,
   listNotes, addNote, deleteNote, getIntakesCount, setFirmStage, setFirmMinutesSaved, getSiteAnalytics,
-  claimFirm, releaseFirm, assignFirm,
+  claimFirm, releaseFirm, assignFirm, flagFounderEmail,
   listCrmMembers, listMyDirectMessages, sendDirectMessage, markThreadRead, getUnreadDmCount, subscribeDirectMessages, subscribeCrmFirms,
   type CrmFirm, type CrmActivityWithFirm, type NewFirmInput, type LogActivityInput, type CrmMessage, type CrmNote, type SiteAnalytics,
   type CrmMember, type CrmDirectMessage,
@@ -349,12 +349,21 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
       r = await logActivity({ firm_id: firmId, activity_type: 'call', activity_date: today, outcome: 'Called', new_stage: bump });
     } else if (kind === 'email_fu') {
       r = await logActivity({ firm_id: firmId, activity_type: 'email', activity_date: today, outcome: 'Victoria to send email f/u', new_stage: bump, next_followup: today });
+      void flagFounderEmail(firmId, true); // collect into the founder email queue (best-effort)
     } else { // follow_up → remind in 3 days
       const d = new Date(today + 'T00:00:00'); d.setDate(d.getDate() + 3);
       r = await logActivity({ firm_id: firmId, activity_type: 'call', activity_date: today, outcome: 'Follow up needed', next_followup: d.toISOString().slice(0, 10) });
     }
     if (r?.error) { setError(r.error); return; }
     setLastFirmId(firmId);
+    await load();
+  };
+
+  /** Founder clears a firm from the "Victoria to email" queue after emailing them. */
+  const founderEmailDone = async (firmId: string) => {
+    const r = await flagFounderEmail(firmId, false);
+    if (r.error) { setError(r.error); return; }
+    await logActivity({ firm_id: firmId, activity_type: 'email', activity_date: today, outcome: 'Emailed by Victoria' });
     await load();
   };
 
@@ -468,7 +477,7 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
             {tab === 'dashboard' && (
               <SuitesHome greeting={crmGreeting(memberName)} isFounder={isFounder} showEconomics={showEconomics} activeTab={tab} onPick={setTab} />
             )}
-            {tab === 'dashboard' && <DashboardTab firms={firms} activity={activity} today={today} onLog={openFast} workerCount={workerCount} onChanged={load} onQuickEmail={quickEmail} onQuickLog={quickLog} claim={claim} isFounder={isFounder} />}
+            {tab === 'dashboard' && <DashboardTab firms={firms} activity={activity} today={today} onLog={openFast} workerCount={workerCount} onChanged={load} onQuickEmail={quickEmail} onQuickLog={quickLog} onFounderEmailDone={founderEmailDone} claim={claim} isFounder={isFounder} />}
             {tab === 'pipeline' && isFounder && <PipelineTab firms={firms} onLog={openFast} workerCount={workerCount} onQuickEmail={quickEmail} onQuickLog={quickLog} claim={claim} />}
             {tab === 'firms' && <FirmsTab firms={firms} onLog={openFast} userId={userId} onQuickEmail={quickEmail} onQuickLog={quickLog} claim={claim} />}
             {tab === 'activity' && isFounder && <ActivityTab activity={activity} />}
@@ -848,7 +857,7 @@ function SuitesHome({ greeting, isFounder, showEconomics, activeTab, onPick }: {
 }
 
 // ── Dashboard ────────────────────────────────────────────────────────────────
-function DashboardTab({ firms, activity, today, onLog, workerCount, onChanged, onQuickEmail, onQuickLog, claim, isFounder }: { firms: CrmFirm[]; activity: CrmActivityWithFirm[]; today: string; onLog: (id: string) => void; workerCount: number; onChanged: () => void; onQuickEmail?: (id: string) => Promise<void>; onQuickLog?: QuickLogFn; claim?: ClaimBundle; isFounder: boolean }) {
+function DashboardTab({ firms, activity, today, onLog, workerCount, onChanged, onQuickEmail, onQuickLog, onFounderEmailDone, claim, isFounder }: { firms: CrmFirm[]; activity: CrmActivityWithFirm[]; today: string; onLog: (id: string) => void; workerCount: number; onChanged: () => void; onQuickEmail?: (id: string) => Promise<void>; onQuickLog?: QuickLogFn; onFounderEmailDone?: (id: string) => Promise<void>; claim?: ClaimBundle; isFounder: boolean }) {
   // Reps see only their own numbers/activity; founders see team-wide.
   const me = claim?.userId ?? null;
   const myActivity = isFounder ? activity : activity.filter((a) => a.logged_by === me);
@@ -867,6 +876,8 @@ function DashboardTab({ firms, activity, today, onLog, workerCount, onChanged, o
   const inbound = firms
     .filter((f) => f.source === 'pilot_form' && f.stage !== 'paid' && f.stage !== 'no')
     .sort((a, b) => (b.created_at ?? '').localeCompare(a.created_at ?? ''));
+  // Founder-only queue: firms the team flagged "Victoria to email f/u".
+  const founderQueue = isFounder ? firms.filter((f) => f.needs_founder_email) : [];
 
   return (
     <div className="space-y-6">
@@ -878,6 +889,32 @@ function DashboardTab({ firms, activity, today, onLog, workerCount, onChanged, o
           </div>
           <p className="mb-3 text-[12px] text-[#B45309]/80">They raised their hand on /for-firms — claim and reach out fast. Inbound cools within hours.</p>
           <div className="space-y-3">{inbound.map((f) => <FirmCard key={f.id} firm={f} onLog={onLog} today={today} onQuickEmail={onQuickEmail} onQuickLog={onQuickLog} userId={claim?.userId} onClaim={claim?.onClaim} onRelease={claim?.onRelease} isFounder={claim?.isFounder} members={claim?.members} onAssign={claim?.onAssign} />)}</div>
+        </section>
+      )}
+      {isFounder && founderQueue.length > 0 && (
+        <section className="rounded-[18px] border-2 border-[#6D4AFF]/30 bg-[#F4F1FF] p-4">
+          <div className="mb-1 flex items-center gap-2">
+            <Mail className="h-4 w-4 text-[#5B35D5]" />
+            <span className="text-[15px] font-extrabold text-[#5B35D5]">Victoria to email — follow-ups</span>
+            <span className="rounded-full bg-[#6D4AFF] px-2 py-0.5 text-[11px] font-bold text-white">{founderQueue.length}</span>
+          </div>
+          <p className="mb-3 text-[12px] text-[#5B35D5]/80">Flagged by the team for a founder email. Tap the address to write it, then “Emailed ✓” to clear.</p>
+          <div className="space-y-2">
+            {founderQueue.map((f) => (
+              <div key={f.id} className="flex items-center gap-2 rounded-[12px] border border-[#E0D6FF] bg-white p-3">
+                <div className="min-w-0 flex-1">
+                  <div className="break-words text-[14px] font-bold text-[#1E1B4B]">{f.name}</div>
+                  {f.attorney_name && <div className="text-[11px] text-[#1E1B4B]/50">{f.attorney_name}</div>}
+                  {f.email
+                    ? <a href={`mailto:${f.email}`} className="break-all text-[12px] font-semibold text-[#6D4AFF] underline">{f.email}</a>
+                    : <span className="text-[12px] text-[#1E1B4B]/40">no email on file</span>}
+                </div>
+                {onFounderEmailDone && (
+                  <button type="button" onClick={() => onFounderEmailDone(f.id)} className="shrink-0 rounded-full bg-[#6D4AFF] px-3 py-2 text-[12px] font-bold text-white">Emailed ✓</button>
+                )}
+              </div>
+            ))}
+          </div>
         </section>
       )}
       {isFounder && (
