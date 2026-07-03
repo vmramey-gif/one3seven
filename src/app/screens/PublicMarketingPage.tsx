@@ -5,6 +5,7 @@ import { motion, useReducedMotion } from 'motion/react';
 import { ArrowRight, CheckCircle2, Shield, Clock, FileText, Users, Zap, ChevronRight, FolderOpen, CalendarClock, Lock, MessageSquare, CalendarDays, Handshake } from 'lucide-react';
 import { track } from '../../lib/analytics';
 import { HeroAnimation } from '../components/HeroAnimation';
+import { useLang, LangToggle } from '../../i18n/i18n';
 
 interface PublicMarketingPageProps {
   onWorkerStart: () => void;
@@ -899,6 +900,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showBetaModal, setShowBetaModal] = useState(false);
   const reducedMotion = useReducedMotion() ?? false;
+  const { t } = useLang();
 
   const openBetaModal = () => setShowBetaModal(true);
 
@@ -918,19 +920,20 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
             <div className="text-[17px] font-bold tracking-tight text-white"><WordMark /></div>
           </button>
           <div className="hidden items-center gap-6 sm:flex">
+            <LangToggle tone="dark" />
             <button
               type="button"
               onClick={onSignIn}
               className="text-sm font-medium text-white/60 transition hover:text-white"
             >
-              Sign in
+              {t('nav.signin')}
             </button>
             <button
               type="button"
               onClick={onSignUpFree}
               className="flex items-center gap-1.5 rounded-full bg-[#5B21B6] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(91,33,182,0.22)] transition hover:bg-[#4C1D96] hover:-translate-y-px active:scale-[0.97]"
             >
-              Sign up for free
+              {t('nav.signup')}
               <ArrowRight className="h-3.5 w-3.5" />
             </button>
             <button
@@ -938,14 +941,14 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
               onClick={() => { track('nav_for_firms'); onForFirms(); }}
               className="text-sm font-medium text-white/60 transition hover:text-white"
             >
-              For law firms
+              {t('nav.firms')}
             </button>
             <button
               type="button"
               onClick={() => { track('nav_for_workers'); onWorkerStart(); }}
               className="rounded-full border border-white/20 px-4 py-2 text-sm font-semibold text-white/80 transition hover:bg-white/5 hover:text-white"
             >
-              For workers
+              {t('nav.workers')}
             </button>
             {/* Discreet team gateway — /hq is auth-gated (CrmAccessGate). */}
             <a
@@ -972,10 +975,11 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
         {mobileMenuOpen && (
           <div className="border-t border-white/10 bg-[#14112E] px-5 py-4 sm:hidden">
             <div className="flex flex-col">
-              <button type="button" onClick={onSignIn} className="flex items-center min-h-[48px] text-base font-medium text-white/60 text-left py-3">Sign in</button>
-              <button type="button" onClick={onSignUpFree} className="flex items-center gap-1.5 min-h-[48px] text-base font-semibold text-[#C4B5FD] text-left py-3">Sign up for free <ArrowRight className="h-4 w-4" /></button>
-              <button type="button" onClick={onForFirms} className="flex items-center gap-1.5 min-h-[48px] text-base font-medium text-white/60 text-left py-3">For law firms</button>
-              <button type="button" onClick={onWorkerStart} className="flex items-center gap-1.5 min-h-[48px] text-base font-semibold text-white/70 text-left py-3">For workers <ArrowRight className="h-4 w-4" /></button>
+              <div className="py-2"><LangToggle tone="dark" /></div>
+              <button type="button" onClick={onSignIn} className="flex items-center min-h-[48px] text-base font-medium text-white/60 text-left py-3">{t('nav.signin')}</button>
+              <button type="button" onClick={onSignUpFree} className="flex items-center gap-1.5 min-h-[48px] text-base font-semibold text-[#C4B5FD] text-left py-3">{t('nav.signup')} <ArrowRight className="h-4 w-4" /></button>
+              <button type="button" onClick={onForFirms} className="flex items-center gap-1.5 min-h-[48px] text-base font-medium text-white/60 text-left py-3">{t('nav.firms')}</button>
+              <button type="button" onClick={onWorkerStart} className="flex items-center gap-1.5 min-h-[48px] text-base font-semibold text-white/70 text-left py-3">{t('nav.workers')} <ArrowRight className="h-4 w-4" /></button>
               <a href="/hq" className="flex items-center min-h-[48px] text-base font-medium text-white/30 text-left py-3">HQ</a>
             </div>
           </div>
@@ -1045,22 +1049,22 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
                 <>
                   <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#C4B5FD]">
                     <span className="h-1.5 w-1.5 rounded-full bg-[#C4B5FD]" />
-                    For California employment firms · Free pilot
+                    {t('home.badge')}
                   </div>
 
                   <h1 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="mb-5 text-[34px] font-medium leading-[1.04] tracking-[-0.01em] text-white sm:text-[48px] lg:text-[56px]">
-                    Open the file.
+                    {t('home.h1_1')}
                     <br />
-                    <span className="text-[#C4B5FD]">Decide in minutes.</span>
+                    <span className="text-[#C4B5FD]">{t('home.h1_2')}</span>
                   </h1>
 
                   <p className="mb-5 max-w-[480px] text-[16px] leading-relaxed text-[#C9C4E6] sm:text-[17px]">
-                    Share one intake link with your clients. They self-serve through a guided intake, and a review-ready, source-linked record lands in your dashboard — so you decide fast instead of burning the first consult on triage.
+                    {t('home.sub')}
                   </p>
 
                   <p className="mb-7 flex items-center gap-2 text-sm font-medium text-[#C9C4E6]">
                     <Shield className="h-4 w-4 flex-shrink-0 text-[#A78BFA]" />
-                    Organizes &amp; reflects — never concludes. The attorney evaluates everything.
+                    {t('home.trust')}
                   </p>
 
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -1069,7 +1073,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
                       onClick={() => { track('cta_firm_pilot'); onForFirms(); }}
                       className="flex items-center justify-center gap-2 rounded-full bg-[#6D4AFF] px-7 py-3.5 text-[15px] font-semibold text-white shadow-[0_16px_48px_rgba(109,74,255,0.40)] transition hover:bg-[#5B35D5] hover:-translate-y-0.5 active:scale-[0.97]"
                     >
-                      Start free pilot
+                      {t('home.cta_pilot')}
                       <ArrowRight className="h-4 w-4" />
                     </button>
                     <button
@@ -1077,12 +1081,12 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
                       onClick={() => { track('cta_worker_start'); onWorkerStart(); }}
                       className="flex items-center justify-center gap-2 rounded-full border border-white/20 px-6 py-3.5 text-[15px] font-semibold text-white/80 transition hover:bg-white/5 active:scale-[0.97]"
                     >
-                      I'm a worker →
+                      {t('home.cta_worker')}
                     </button>
                   </div>
 
                   <p className="mt-4 text-sm text-[#8E88B5]">
-                    Free 7-day pilot · No credit card · Built for California employment matters
+                    {t('home.hero_foot')}
                   </p>
                 </>
               )}

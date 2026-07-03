@@ -27,6 +27,26 @@ export const STRINGS: Dict = {
   'aw.quote':        { en: '“You should only have to tell your story once.”',
                        es: '“Solo deberías tener que contar tu historia una vez.”' },
   'aw.founder':      { en: '— Victoria, founder',            es: '— Victoria, fundadora' },
+
+  // Homepage nav (PublicMarketingPage)
+  'nav.signin':      { en: 'Sign in',                             es: 'Iniciar sesión' },
+  'nav.signup':      { en: 'Sign up for free',                    es: 'Regístrate gratis' },
+  'nav.firms':       { en: 'For law firms',                      es: 'Para bufetes' },
+  'nav.workers':     { en: 'For workers',                        es: 'Para trabajadores' },
+  // Homepage hero (default / firm-geared front door)
+  'home.badge':      { en: 'For California employment firms · Free pilot',
+                       es: 'Para bufetes de derecho laboral de California · Prueba gratis' },
+  'home.h1_1':       { en: 'Open the file.',                     es: 'Abre el expediente.' },
+  'home.h1_2':       { en: 'Decide in minutes.',                 es: 'Decide en minutos.' },
+  'home.sub':        { en: 'Share one intake link with your clients. They self-serve through a guided intake, and a review-ready, source-linked record lands in your dashboard — so you decide fast instead of burning the first consult on triage.',
+                       es: 'Comparte un enlace de admisión con tus clientes. Ellos completan una admisión guiada por su cuenta, y un expediente listo para revisar, con enlaces a la fuente, llega a tu panel — para que decidas rápido en vez de gastar la primera consulta organizando.' },
+  // LEGAL-REVIEW: compliance line — have a bilingual read before real reliance.
+  'home.trust':      { en: 'Organizes & reflects — never concludes. The attorney evaluates everything.',
+                       es: 'Organiza y refleja — nunca concluye. El abogado evalúa todo.' },
+  'home.cta_pilot':  { en: 'Start free pilot',                   es: 'Comienza la prueba gratis' },
+  'home.cta_worker': { en: "I'm a worker →",                     es: 'Soy trabajador →' },
+  'home.hero_foot':  { en: 'Free 7-day pilot · No credit card · Built for California employment matters',
+                       es: 'Prueba gratis de 7 días · Sin tarjeta de crédito · Hecho para asuntos laborales de California' },
 };
 
 type Ctx = { lang: Lang; setLang: (l: Lang) => void; t: (key: string) => string };
