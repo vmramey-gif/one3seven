@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { WordMark } from '../components/WordMark';
 import { ArrowRight } from 'lucide-react';
 import { Screen } from '../App';
+import { useLang, LangToggle } from '../../i18n/i18n';
 
 interface AuthWelcomeScreenProps {
   onNavigate: (screen: Screen) => void;
@@ -20,6 +21,7 @@ export function AuthWelcomeScreen({
   onOpenCreateAccount,
 }: AuthWelcomeScreenProps) {
   const [isOrganizingStack, setIsOrganizingStack] = useState(false);
+  const { t } = useLang();
   const openSignIn = () => (onOpenSignIn ? onOpenSignIn() : onNavigate('signIn'));
   const openCreateAccount = () => (onOpenCreateAccount ? onOpenCreateAccount() : onNavigate('createAccount'));
   const openFirmSignIn = () => (onFirmSignIn ? onFirmSignIn() : onNavigate('signIn'));
@@ -48,7 +50,7 @@ export function AuthWelcomeScreen({
       <div className="pointer-events-none absolute -left-32 -top-32 h-[500px] w-[500px] rounded-full bg-[#6D4AFF]/20 blur-3xl" />
       <div className="pointer-events-none absolute -right-40 top-40 h-[440px] w-[440px] rounded-full bg-[#5B21B6]/15 blur-3xl" />
       <div className="relative mx-auto flex min-h-[calc(100vh-2rem)] w-full max-w-[480px] flex-col sm:min-h-[calc(100vh-4rem)]">
-        <header className="flex items-center justify-between">
+        <header className="flex items-center justify-between gap-2">
           <button
             type="button"
             onClick={() => onNavigate('publicMarketing')}
@@ -57,13 +59,16 @@ export function AuthWelcomeScreen({
           >
             <WordMark />
           </button>
-          <button
-            type="button"
-            onClick={openSignIn}
-            className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/10"
-          >
-            Sign in
-          </button>
+          <div className="flex items-center gap-2">
+            <LangToggle tone="dark" />
+            <button
+              type="button"
+              onClick={openSignIn}
+              className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/10"
+            >
+              {t('aw.signin')}
+            </button>
+          </div>
         </header>
 
         <main className="flex flex-1 flex-col justify-center py-5 sm:py-10">
@@ -112,16 +117,15 @@ export function AuthWelcomeScreen({
           <section className="text-center">
             <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#C4B5FD]">
               <span className="h-1.5 w-1.5 rounded-full bg-[#C4B5FD]" />
-              For workers · California
+              {t('aw.badge')}
             </div>
             <h1 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="text-[31px] font-medium leading-[1.05] tracking-[-0.01em] text-white sm:text-[40px]">
-              Your records are everywhere.
+              {t('aw.h1_line1')}
               <br />
-              <span className="text-[#C4B5FD]">Your story doesn't have to be.</span>
+              <span className="text-[#C4B5FD]">{t('aw.h1_line2')}</span>
             </h1>
             <p className="mx-auto mt-4 max-w-[390px] text-[14px] leading-relaxed text-[#C9C4E6] sm:mt-5 sm:text-[15px]">
-              Organize documents, conversations, timelines, and records in one place before speaking
-              with an attorney.
+              {t('aw.sub')}
             </p>
 
             <div className="mt-6 space-y-3 sm:mt-8">
@@ -131,7 +135,7 @@ export function AuthWelcomeScreen({
                 disabled={isOrganizingStack}
                 className="flex w-full items-center justify-center gap-2 rounded-full bg-[#6D4AFF] px-6 py-3.5 text-base font-semibold text-white shadow-[0_16px_48px_rgba(109,74,255,0.40)] transition hover:-translate-y-0.5 hover:bg-[#5B35D5] disabled:translate-y-0 disabled:opacity-80 sm:py-4"
               >
-                {isOrganizingStack ? 'Organizing...' : 'Start Organizing'}
+                {isOrganizingStack ? t('aw.organizing') : t('aw.start')}
                 <ArrowRight className="h-5 w-5" />
               </button>
               <button
@@ -139,7 +143,7 @@ export function AuthWelcomeScreen({
                 onClick={openSignIn}
                 className="text-sm font-medium text-[#C4B5FD] transition hover:text-white"
               >
-                Sign in
+                {t('aw.signin')}
               </button>
             </div>
 
@@ -148,7 +152,7 @@ export function AuthWelcomeScreen({
               onClick={openFirmSignIn}
               className="mt-3 text-xs font-medium text-white/50 transition hover:text-white sm:mt-5"
             >
-              Participating firm?
+              {t('aw.firm')}
             </button>
           </section>
         </main>
@@ -156,14 +160,14 @@ export function AuthWelcomeScreen({
         {/* ── Why one3seven exists — founder origin (worker-facing) ── */}
         <footer className="pb-6 pt-2">
           <div className="mx-auto max-w-[420px] rounded-[22px] border border-white/10 bg-white/[0.04] px-5 py-6 text-center">
-            <div className="mb-2 text-[11px] font-bold uppercase tracking-[0.18em] text-[#C4B5FD]">Why one3seven exists</div>
+            <div className="mb-2 text-[11px] font-bold uppercase tracking-[0.18em] text-[#C4B5FD]">{t('aw.why')}</div>
             <p className="mx-auto text-[13px] leading-relaxed text-[#C9C4E6] sm:text-[14px]">
-              one3seven was built by someone who went through her own legal situation — and had to write out her whole story from scratch every time she talked to a new attorney. Scattered records, retold from memory, over and over. There had to be a better way.
+              {t('aw.why_body')}
             </p>
             <p className="mt-4 font-medium leading-snug text-white" style={{ fontFamily: "'Fraunces', Georgia, serif", fontSize: 'clamp(18px, 4vw, 23px)' }}>
-              &ldquo;You should only have to tell your story once.&rdquo;
+              {t('aw.quote')}
             </p>
-            <p className="mt-2 text-[12px] font-semibold text-[#C4B5FD]">&mdash; Victoria, founder</p>
+            <p className="mt-2 text-[12px] font-semibold text-[#C4B5FD]">{t('aw.founder')}</p>
           </div>
         </footer>
       </div>

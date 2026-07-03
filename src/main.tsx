@@ -15,6 +15,7 @@ import { CrmAccessGate } from './app/components/CrmAccessGate.tsx';
 import { TermsPage } from './app/screens/TermsPage.tsx';
 import { PrivacyPage } from './app/screens/PrivacyPage.tsx';
 import { ForFirmsPage } from './app/screens/ForFirmsPage.tsx';
+import { LanguageProvider } from './i18n/i18n.tsx';
 import { OFFLINE_DEV_GALLERY_ONLY } from './lib/supabaseAvailability.ts';
 import { isSupabaseConfigured } from './lib/supabaseClient';
 import { pageview, startHeartbeat } from './lib/analytics';
@@ -124,6 +125,6 @@ if (url.pathname === '/terms') {
   );
 } else {
   createRoot(rootEl).render(
-    <AppErrorBoundary><App /></AppErrorBoundary>
+    <AppErrorBoundary><LanguageProvider><App /></LanguageProvider></AppErrorBoundary>
   );
 }
