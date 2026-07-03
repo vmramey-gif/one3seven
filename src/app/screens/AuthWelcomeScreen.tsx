@@ -43,13 +43,16 @@ export function AuthWelcomeScreen({
   ];
 
   return (
-    <div className="min-h-screen bg-[#f6f2ff] px-5 py-4 text-[#1e1b4b] sm:px-6 sm:py-8">
-      <div className="mx-auto flex min-h-[calc(100vh-2rem)] w-full max-w-[480px] flex-col sm:min-h-[calc(100vh-4rem)]">
+    <div className="relative min-h-screen overflow-hidden bg-[#14112E] px-5 py-4 text-[#E8E5F5] antialiased sm:px-6 sm:py-8">
+      {/* Ambient glow to match the homepage hero */}
+      <div className="pointer-events-none absolute -left-32 -top-32 h-[500px] w-[500px] rounded-full bg-[#6D4AFF]/20 blur-3xl" />
+      <div className="pointer-events-none absolute -right-40 top-40 h-[440px] w-[440px] rounded-full bg-[#5B21B6]/15 blur-3xl" />
+      <div className="relative mx-auto flex min-h-[calc(100vh-2rem)] w-full max-w-[480px] flex-col sm:min-h-[calc(100vh-4rem)]">
         <header className="flex items-center justify-between">
           <button
             type="button"
             onClick={() => onNavigate('publicMarketing')}
-            className="text-[15px] font-semibold tracking-tight text-[#1e1b4b] transition hover:opacity-80"
+            className="text-[17px] font-bold tracking-tight text-white transition hover:opacity-80"
             aria-label="one3seven — home"
           >
             <WordMark />
@@ -57,14 +60,14 @@ export function AuthWelcomeScreen({
           <button
             type="button"
             onClick={openSignIn}
-            className="rounded-full border border-[#ded6ff] bg-white/80 px-4 py-2 text-sm font-medium text-[#5b35d5] shadow-sm transition hover:bg-white"
+            className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/10"
           >
             Sign in
           </button>
         </header>
 
         <main className="flex flex-1 flex-col justify-center py-5 sm:py-10">
-          <div className="mb-5 rounded-[28px] border border-[#e7e1ff] bg-white/82 p-3 shadow-[0_28px_90px_rgba(31,27,75,0.12)] sm:mb-10 sm:rounded-[34px] sm:p-5">
+          <div className="mb-5 rounded-[28px] border border-white/10 bg-white/[0.04] p-3 shadow-[0_28px_90px_rgba(0,0,0,0.35)] sm:mb-10 sm:rounded-[34px] sm:p-5">
             <div
               className={`relative mx-auto h-[168px] max-w-[300px] transition-transform duration-[1400ms] ease-[cubic-bezier(0.22,1,0.36,1)] sm:h-[248px] sm:max-w-[360px] ${
                 isOrganizingStack ? '-translate-y-4 scale-[0.94]' : ''
@@ -107,22 +110,26 @@ export function AuthWelcomeScreen({
           </div>
 
           <section className="text-center">
-            <h1 className="text-[31px] font-semibold leading-[1.03] tracking-tight text-[#1e1b4b] sm:text-[38px]">
+            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#C4B5FD]">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#C4B5FD]" />
+              For workers · California
+            </div>
+            <h1 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="text-[31px] font-medium leading-[1.05] tracking-[-0.01em] text-white sm:text-[40px]">
               Your records are everywhere.
               <br />
-              Your story doesn't have to be.
+              <span className="text-[#C4B5FD]">Your story doesn't have to be.</span>
             </h1>
-            <p className="mx-auto mt-3 max-w-[390px] text-[14px] leading-relaxed text-[#1e1b4b]/68 sm:mt-5 sm:text-[15px]">
+            <p className="mx-auto mt-4 max-w-[390px] text-[14px] leading-relaxed text-[#C9C4E6] sm:mt-5 sm:text-[15px]">
               Organize documents, conversations, timelines, and records in one place before speaking
               with an attorney.
             </p>
 
-            <div className="mt-5 space-y-2.5 sm:mt-8 sm:space-y-3">
+            <div className="mt-6 space-y-3 sm:mt-8">
               <button
                 type="button"
                 onClick={startOrganizing}
                 disabled={isOrganizingStack}
-                className="flex w-full items-center justify-center gap-2 rounded-full bg-[#6d4aff] px-6 py-3.5 text-base font-semibold text-white shadow-[0_18px_48px_rgba(109,74,255,0.28)] transition hover:-translate-y-0.5 hover:bg-[#5b35d5] disabled:translate-y-0 disabled:opacity-80 sm:py-4"
+                className="flex w-full items-center justify-center gap-2 rounded-full bg-[#6D4AFF] px-6 py-3.5 text-base font-semibold text-white shadow-[0_16px_48px_rgba(109,74,255,0.40)] transition hover:-translate-y-0.5 hover:bg-[#5B35D5] disabled:translate-y-0 disabled:opacity-80 sm:py-4"
               >
                 {isOrganizingStack ? 'Organizing...' : 'Start Organizing'}
                 <ArrowRight className="h-5 w-5" />
@@ -130,7 +137,7 @@ export function AuthWelcomeScreen({
               <button
                 type="button"
                 onClick={openSignIn}
-                className="text-sm font-medium text-[#5b35d5] transition hover:text-[#4322b8]"
+                className="text-sm font-medium text-[#C4B5FD] transition hover:text-white"
               >
                 Sign in
               </button>
@@ -139,7 +146,7 @@ export function AuthWelcomeScreen({
             <button
               type="button"
               onClick={openFirmSignIn}
-              className="mt-3 text-xs font-medium text-[#1e1b4b]/55 transition hover:text-[#1e1b4b] sm:mt-5"
+              className="mt-3 text-xs font-medium text-white/50 transition hover:text-white sm:mt-5"
             >
               Participating firm?
             </button>
@@ -148,15 +155,15 @@ export function AuthWelcomeScreen({
 
         {/* ── Why one3seven exists — founder origin (worker-facing) ── */}
         <footer className="pb-6 pt-2">
-          <div className="mx-auto max-w-[420px] rounded-[22px] border border-[#e7e1ff] bg-white/70 px-5 py-6 text-center">
-            <div className="mb-2 text-[11px] font-bold uppercase tracking-[0.18em] text-[#5b35d5]">Why one3seven exists</div>
-            <p className="mx-auto text-[13px] leading-relaxed text-[#1e1b4b]/70 sm:text-[14px]">
+          <div className="mx-auto max-w-[420px] rounded-[22px] border border-white/10 bg-white/[0.04] px-5 py-6 text-center">
+            <div className="mb-2 text-[11px] font-bold uppercase tracking-[0.18em] text-[#C4B5FD]">Why one3seven exists</div>
+            <p className="mx-auto text-[13px] leading-relaxed text-[#C9C4E6] sm:text-[14px]">
               one3seven was built by someone who went through her own legal situation — and had to write out her whole story from scratch every time she talked to a new attorney. Scattered records, retold from memory, over and over. There had to be a better way.
             </p>
-            <p className="mt-4 font-medium leading-snug text-[#1e1b4b]" style={{ fontFamily: "'Fraunces', Georgia, serif", fontSize: 'clamp(18px, 4vw, 23px)' }}>
+            <p className="mt-4 font-medium leading-snug text-white" style={{ fontFamily: "'Fraunces', Georgia, serif", fontSize: 'clamp(18px, 4vw, 23px)' }}>
               &ldquo;You should only have to tell your story once.&rdquo;
             </p>
-            <p className="mt-2 text-[12px] font-semibold text-[#5b35d5]">&mdash; Victoria, founder</p>
+            <p className="mt-2 text-[12px] font-semibold text-[#C4B5FD]">&mdash; Victoria, founder</p>
           </div>
         </footer>
       </div>
