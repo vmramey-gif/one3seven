@@ -11,6 +11,8 @@ export type FirmTimelineEventCardProps = {
   relatedDocs: number;
   relatedDocLabels: string[];
   important?: boolean;
+  /** When false, a connecting timeline rail is drawn from this node down to the next event. */
+  isLast?: boolean;
 };
 
 export function FirmTimelineEventCard({
@@ -21,6 +23,7 @@ export function FirmTimelineEventCard({
   relatedDocs,
   relatedDocLabels,
   important = false,
+  isLast = false,
 }: FirmTimelineEventCardProps) {
   const [open, setOpen] = useState(false);
   const labels = relatedDocLabels.slice(0, 6);
@@ -64,8 +67,14 @@ export function FirmTimelineEventCard({
   return (
     <div className="relative flex gap-4">
       <div className="relative flex-shrink-0 pt-1">
+        {!isLast ? (
+          <div
+            className="absolute left-1/2 top-[2.75rem] -bottom-6 w-[2px] -translate-x-1/2 rounded-full bg-gradient-to-b from-[#D9CEFF] to-[#EFEAFF]"
+            aria-hidden="true"
+          />
+        ) : null}
         <div
-          className={`w-9 h-9 rounded-full border-2 flex items-center justify-center ${
+          className={`relative w-9 h-9 rounded-full border-2 flex items-center justify-center ${
             important
               ? 'border-[#6D4AFF] bg-[#F1ECFF]'
               : 'border-[#DCD3FF] bg-white'
@@ -84,11 +93,12 @@ export function FirmTimelineEventCard({
             {displayCategory}
           </span>
           {confidenceLabel ? (
-            <span className={`rounded-md px-2 py-0.5 text-[10px] font-medium ${
+            <span className={`inline-flex items-center gap-1.5 rounded-md px-2 py-0.5 text-[10px] font-semibold ${
               confidenceLabel === 'Record-grounded'
                 ? 'bg-emerald-50 text-emerald-700 border border-emerald-100'
                 : 'bg-amber-50 text-amber-700 border border-amber-100'
             }`}>
+              <span className={`h-1.5 w-1.5 rounded-full ${confidenceLabel === 'Record-grounded' ? 'bg-emerald-500' : 'bg-amber-500'}`} />
               {confidenceLabel}
             </span>
           ) : null}

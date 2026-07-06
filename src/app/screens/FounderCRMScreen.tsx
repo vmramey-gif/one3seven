@@ -1090,7 +1090,7 @@ function CompTab({ firms }: { firms: CrmFirm[] }) {
   const bonus = firstThreeBonus(paidCount);
 
   const [firmCount, setFirmCount] = useState(3);
-  const [tier, setTier] = useState<'solo' | 'practice' | 'firm'>('practice');
+  const [tier, setTier] = useState<'practice' | 'firm' | 'surge'>('practice');
   const [months, setMonths] = useState(12);
   const calc = commissionProjection({ firmCount, tier, months });
 
@@ -1157,7 +1157,7 @@ function CompTab({ firms }: { firms: CrmFirm[] }) {
           <div>
             <div className="mb-1 text-[12px] font-semibold text-[#1E1B4B]/70">Tier</div>
             <div className="flex gap-2">
-              {(['solo', 'practice', 'firm'] as const).map((t) => (
+              {(['practice', 'firm', 'surge'] as const).map((t) => (
                 <button key={t} type="button" onClick={() => setTier(t)} className={`flex-1 rounded-[10px] border px-2 py-2 text-[12px] font-semibold capitalize transition ${tier === t ? 'border-[#6D4AFF] bg-[#6D4AFF] text-white' : 'border-[#E7E1FF] text-[#1E1B4B]/60 hover:border-[#B8A8FF]'}`}>
                   {t} ${TIER_PRICES[t]}
                 </button>
@@ -1197,7 +1197,7 @@ function CompanyEconomicsTab({ firms }: { firms: CrmFirm[] }) {
   const paidCount = firms.filter((f) => f.stage === 'paid').length;
 
   const [firmCount, setFirmCount] = useState(Math.max(3, paidCount));
-  const [tier, setTier] = useState<'solo' | 'practice' | 'firm'>('practice');
+  const [tier, setTier] = useState<'practice' | 'firm' | 'surge'>('practice');
   const [months, setMonths] = useState(12);
   const [a, setA] = useState({ ...ECON_DEFAULTS });
   const setNum = (k: keyof typeof a) => (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -1233,7 +1233,7 @@ function CompanyEconomicsTab({ firms }: { firms: CrmFirm[] }) {
           <div>
             <div className="mb-1 text-[12px] font-semibold text-[#1E1B4B]/70">Tier</div>
             <div className="flex gap-2">
-              {(['solo', 'practice', 'firm'] as const).map((t) => (
+              {(['practice', 'firm', 'surge'] as const).map((t) => (
                 <button key={t} type="button" onClick={() => setTier(t)} className={`flex-1 rounded-[10px] border px-2 py-2 text-[12px] font-semibold capitalize transition ${tier === t ? 'border-[#6D4AFF] bg-[#6D4AFF] text-white' : 'border-[#E7E1FF] text-[#1E1B4B]/60 hover:border-[#B8A8FF]'}`}>{t} ${TIER_PRICES[t]}</button>
               ))}
             </div>

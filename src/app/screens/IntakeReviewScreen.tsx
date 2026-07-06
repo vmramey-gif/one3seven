@@ -1180,7 +1180,7 @@ export function IntakeReviewScreen({
                   transition={{ delay: 0.03 }}
                   className="rounded-[20px] border border-[#ECE7F5] bg-white/95 p-5 shadow-[0_14px_38px_rgba(31,27,75,0.08)]"
                 >
-                  <p className="text-xs uppercase tracking-[0.2em] text-[#5B21B6] mb-4">Processing Summary</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#5B21B6] mb-4">Processing Summary</p>
 
                   {/* Process signals */}
                   <div className="flex flex-wrap gap-2">
@@ -1591,7 +1591,7 @@ export function IntakeReviewScreen({
               animate={{ opacity: 1, y: 0 }}
               className={FIRM_REVIEW_PROMINENT_CARD}
             >
-              <p className="text-xs uppercase tracking-[0.24em] text-[#5B21B6]">Chronology</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#5B21B6]">Chronology</p>
               <h2 className="mt-3 text-2xl font-semibold text-[#14112E]">
                 {timelineForDisplay.length} event{timelineForDisplay.length === 1 ? '' : 's'} from {reconstructedRecordCount} record{reconstructedRecordCount === 1 ? '' : 's'}
               </h2>
@@ -1705,6 +1705,7 @@ export function IntakeReviewScreen({
                       relatedDocs={event.relatedDocs}
                       relatedDocLabels={event.directFileLabels ?? (useConnectedFirmLayout ? relatedDocLabelsForCategory(event.category) : [])}
                       important={index === 0 || event.relatedDocs >= 2}
+                      isLast={index === timelineForDisplay.length - 1}
                     />
                   ))
                 )}
@@ -1882,7 +1883,7 @@ export function IntakeReviewScreen({
                   )}
 
                   <div className="flex items-center gap-2 mb-4">
-                    <p className="text-xs uppercase tracking-[0.2em] text-[#5B21B6]">Extracted from documents</p>
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#5B21B6]">Extracted from documents</p>
                     <span className="text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-full px-2 py-0.5">
                       From document content
                     </span>
@@ -2055,7 +2056,7 @@ export function IntakeReviewScreen({
                   className="rounded-[24px] border border-[#ECE7F5] bg-white p-5 shadow-[0_14px_38px_rgba(31,27,75,0.08)]"
                 >
                   <div className="flex items-center justify-between mb-3">
-                    <p className="text-xs uppercase tracking-[0.2em] text-[#5B21B6]">Document Checklist</p>
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#5B21B6]">Document Checklist</p>
                     {fulfilled.length > 0 && (
                       <span className="text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-full px-2 py-0.5">
                         {fulfilled.length}/{requested.length} received
@@ -2556,6 +2557,7 @@ export function IntakeReviewScreen({
                       relatedDocs={event.relatedDocs}
                       relatedDocLabels={event.directFileLabels ?? (useConnectedFirmLayout ? relatedDocLabelsForCategory(event.category) : [])}
                       important={index === 0 || event.relatedDocs >= 2}
+                      isLast={index === timelineForDisplay.length - 1}
                     />
                   ))
                 )}
