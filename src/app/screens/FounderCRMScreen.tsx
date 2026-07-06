@@ -372,6 +372,18 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
     await load();
   };
 
+  /** "Not interested" — park the firm as nurture and auto-resurface it in the queue in 3 months. */
+  const markNotInterested = async (firmId: string) => {
+    const d = new Date(today + 'T00:00:00'); d.setMonth(d.getMonth() + 3);
+    const r = await logActivity({
+      firm_id: firmId, activity_type: 'call', activity_date: today,
+      outcome: 'Not interested — recheck in 3 months', new_stage: 'nurture',
+      next_followup: d.toISOString().slice(0, 10),
+    });
+    if (r?.error) { setError(r.error); return; }
+    setLastFirmId(firmId); await load();
+  };
+
   /** Founder clears a firm from the "Victoria to email" queue after emailing them. */
   const founderEmailDone = async (firmId: string) => {
     const r = await flagFounderEmail(firmId, false);
@@ -501,7 +513,7 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
             )}
             {tab === 'dashboard' && <DashboardTab firms={firms} activity={activity} today={today} onLog={openFast} workerCount={workerCount} onChanged={load} onQuickEmail={quickEmail} onQuickLog={quickLog} onFounderEmailDone={founderEmailDone} claim={claim} isFounder={isFounder} />}
             {tab === 'pipeline' && isFounder && <PipelineTab firms={firms} onLog={openFast} workerCount={workerCount} onQuickEmail={quickEmail} onQuickLog={quickLog} claim={claim} />}
-            {tab === 'firms' && <FirmsTab firms={firms} onLog={openFast} userId={userId} onQuickEmail={quickEmail} onQuickLog={quickLog} claim={claim} />}
+            {tab === 'firms' && <FirmsTab firms={firms} onLog={openFast} userId={userId} onNoContact={(id) => quickLog(id, 'no_contact')} onNotInterested={markNotInterested} claim={claim} />}
             {tab === 'email_fu' && isFounder && <FounderEmailQueueTab firms={firms} onFounderEmailDone={founderEmailDone} />}
             {tab === 'activity' && isFounder && <ActivityTab activity={activity} />}
             {tab === 'metrics' && isFounder && <MetricsTab firms={firms} activity={activity} />}
@@ -1685,14 +1697,17 @@ function FounderEmailQueueTab({ firms, onFounderEmailDone }: { firms: CrmFirm[];
 }
 
 /** One dense CDK-style firm row in the table. Click a cell action; whole row opens the log. */
-function FirmRow({ firm, me, today, onLog, onClaim }: {
+function FirmRow({ firm, me, today, onLog, onClaim, onNoContact, onNotInterested }: {
   firm: CrmFirm;
   me: string | null;
   today: string;
   onLog: (id: string) => void;
   onClaim?: (id: string) => Promise<void>;
+  onNoContact?: (id: string) => Promise<void> | void;
+  onNotInterested?: (id: string) => Promise<void> | void;
 }) {
   const [claiming, setClaiming] = useState(false);
+  const [menu, setMenu] = useState(false);
   const mine = !!me && firm.contacted_by === me;
   const due = !!firm.next_followup && firm.next_followup <= today;
   const owner = firm.contacted_by_name ? firm.contacted_by_name.split(' ')[0] : null;
@@ -1700,34 +1715,49 @@ function FirmRow({ firm, me, today, onLog, onClaim }: {
     <tr className="border-b border-[#F2EEFC] align-middle hover:bg-[#FAF8FF]">
       <td className="px-3 py-2">
         <div className="flex items-center gap-1.5">
-          <button type="button" onClick={() => onLog(firm.id)} className="max-w-[180px] truncate text-left text-[13px] font-semibold text-[#1E1B4B] hover:text-[#6D4AFF]" title={firm.name}>{firm.name}</button>
+          <button type="button" onClick={() => onLog(firm.id)} className="min-w-0 flex-1 truncate text-left text-[13px] font-semibold text-[#1E1B4B] hover:text-[#6D4AFF]" title={firm.name}>{firm.name}</button>
           {firm.source === 'pilot_form' && <span className="shrink-0 rounded bg-[#F59E0B] px-1 py-0.5 text-[9px] font-extrabold text-white" title="Inbound pilot request">⚡</span>}
           <PriorityBadge priority={firm.priority} />
         </div>
       </td>
-      <td className="px-3 py-2 text-[12px] text-[#1E1B4B]/65"><span className="block max-w-[130px] truncate" title={firm.attorney_name ?? ''}>{firm.attorney_name || '—'}</span></td>
-      <td className="px-2 py-2 text-center text-[12px] font-semibold text-[#1E1B4B]/70">{firm.tier ?? '—'}</td>
+      <td className="hidden px-3 py-2 text-[12px] text-[#1E1B4B]/65 md:table-cell"><span className="block max-w-[130px] truncate" title={firm.attorney_name ?? ''}>{firm.attorney_name || '—'}</span></td>
+      <td className="hidden px-2 py-2 text-center text-[12px] font-semibold text-[#1E1B4B]/70 sm:table-cell">{firm.tier ?? '—'}</td>
       <td className="px-2 py-2"><StageTag stage={firm.stage} /></td>
-      <td className={`px-2 py-2 text-[12px] ${due ? 'font-bold text-red-600' : 'text-[#1E1B4B]/55'}`}>{firm.next_followup || '—'}</td>
-      <td className="px-2 py-2 text-[12px]">
-        {owner ? (
-          <span className={mine ? 'font-semibold text-emerald-600' : 'text-[#1E1B4B]/60'}>{mine ? 'You' : owner}</span>
-        ) : onClaim ? (
-          <button type="button" disabled={claiming} onClick={async () => { setClaiming(true); try { await onClaim(firm.id); } finally { setClaiming(false); } }} className="rounded-full bg-[#EDE7FF] px-2 py-0.5 text-[10px] font-bold text-[#6D4AFF] disabled:opacity-50">{claiming ? '…' : 'Claim'}</button>
-        ) : <span className="text-[#1E1B4B]/30">—</span>}
+      <td className={`hidden px-2 py-2 text-[12px] sm:table-cell ${due ? 'font-bold text-red-600' : 'text-[#1E1B4B]/55'}`}>{firm.next_followup || '—'}</td>
+      <td className="hidden px-2 py-2 text-[12px] md:table-cell">
+        {owner ? <span className={mine ? 'font-semibold text-emerald-600' : 'text-[#1E1B4B]/60'}>{mine ? 'You' : owner}</span> : <span className="text-[#1E1B4B]/30">—</span>}
       </td>
-      <td className="px-3 py-2">
-        <div className="flex items-center justify-end gap-1.5">
+      <td className="relative px-2 py-2">
+        <div className="flex items-center justify-end gap-1">
+          {!owner && onClaim && (
+            <button type="button" disabled={claiming} onClick={async () => { setClaiming(true); try { await onClaim(firm.id); } finally { setClaiming(false); } }} className="rounded-full bg-[#EDE7FF] px-2 py-1 text-[10px] font-bold text-[#6D4AFF] disabled:opacity-50">{claiming ? '…' : 'Claim'}</button>
+          )}
           {firm.phone && <a href={`tel:${digitsOf(firm.phone)}`} className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-50 text-emerald-600" aria-label={`Call ${firm.name}`}><Phone className="h-3.5 w-3.5" /></a>}
           {firm.email && <a href={`mailto:${firm.email}`} className="flex h-7 w-7 items-center justify-center rounded-full bg-[#EDE7FF] text-[#6D4AFF]" aria-label={`Email ${firm.name}`}><Mail className="h-3.5 w-3.5" /></a>}
           <button type="button" onClick={() => onLog(firm.id)} className="rounded-full bg-[#6D4AFF] px-3 py-1 text-[11px] font-bold text-white hover:bg-[#5B35D5]">Log</button>
+          {(onNoContact || onNotInterested) && (
+            <button type="button" onClick={() => setMenu((v) => !v)} aria-label="More actions" className="flex h-7 w-7 items-center justify-center rounded-full text-[16px] font-bold leading-none text-[#1E1B4B]/50 hover:bg-[#EDE7FF]">⋯</button>
+          )}
         </div>
+        {menu && (
+          <>
+            <button type="button" aria-hidden className="fixed inset-0 z-10 cursor-default bg-transparent" onClick={() => setMenu(false)} />
+            <div className="absolute right-2 top-10 z-20 w-48 overflow-hidden rounded-[10px] border border-[#E7E1FF] bg-white shadow-xl">
+              {onNotInterested && (
+                <button type="button" onClick={() => { setMenu(false); void onNotInterested(firm.id); }} className="block w-full px-3 py-2.5 text-left text-[12px] font-semibold text-[#1E1B4B] hover:bg-[#F7F3FF]">Not interested<span className="block text-[10px] font-normal text-[#1E1B4B]/45">parks it — back in the queue in 3 months</span></button>
+              )}
+              {onNoContact && (
+                <button type="button" onClick={() => { setMenu(false); void onNoContact(firm.id); }} className="block w-full border-t border-[#F0EBFF] px-3 py-2.5 text-left text-[12px] font-semibold text-red-600 hover:bg-red-50">Do not contact<span className="block text-[10px] font-normal text-red-400">removes from the queue for good</span></button>
+              )}
+            </div>
+          </>
+        )}
       </td>
     </tr>
   );
 }
 
-function FirmsTab({ firms, onLog, userId, claim }: { firms: CrmFirm[]; onLog: (id: string) => void; userId: string | null; onQuickEmail?: (id: string) => Promise<void>; onQuickLog?: QuickLogFn; claim?: ClaimBundle }) {
+function FirmsTab({ firms, onLog, userId, onNoContact, onNotInterested, claim }: { firms: CrmFirm[]; onLog: (id: string) => void; userId: string | null; onNoContact?: (id: string) => Promise<void> | void; onNotInterested?: (id: string) => Promise<void> | void; claim?: ClaimBundle }) {
   const [view, setView] = useState<'open' | 'mine'>(() => {
     try { return (localStorage.getItem('crm_firms_view') as 'open' | 'mine') || 'open'; } catch { return 'open'; }
   });
@@ -1817,21 +1847,21 @@ function FirmsTab({ firms, onLog, userId, claim }: { firms: CrmFirm[]; onLog: (i
       {list.length === 0 ? (
         <p className="rounded-[12px] border border-[#E7E1FF] bg-white px-4 py-6 text-center text-[13px] text-[#1E1B4B]/45">No firms match these filters.</p>
       ) : (
-        <div className="overflow-x-auto rounded-[12px] border border-[#E7E1FF] bg-white">
-          <table className="w-full min-w-[680px]">
+        <div className="rounded-[12px] border border-[#E7E1FF] bg-white">
+          <table className="w-full">
             <thead>
               <tr className="border-b border-[#EFEAFF] text-left text-[10px] uppercase tracking-wide text-[#1E1B4B]/40">
                 <th className="px-3 py-2 font-semibold">Firm</th>
-                <th className="px-3 py-2 font-semibold">Attorney</th>
-                <th className="px-2 py-2 text-center font-semibold">Tier</th>
+                <th className="hidden px-3 py-2 font-semibold md:table-cell">Attorney</th>
+                <th className="hidden px-2 py-2 text-center font-semibold sm:table-cell">Tier</th>
                 <th className="px-2 py-2 font-semibold">Stage</th>
-                <th className="px-2 py-2 font-semibold">Next</th>
-                <th className="px-2 py-2 font-semibold">Owner</th>
+                <th className="hidden px-2 py-2 font-semibold sm:table-cell">Next</th>
+                <th className="hidden px-2 py-2 font-semibold md:table-cell">Owner</th>
                 <th className="px-3 py-2 text-right font-semibold">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {list.map((f) => <FirmRow key={f.id} firm={f} me={me} today={today} onLog={onLog} onClaim={claim?.onClaim} />)}
+              {list.map((f) => <FirmRow key={f.id} firm={f} me={me} today={today} onLog={onLog} onClaim={claim?.onClaim} onNoContact={onNoContact} onNotInterested={onNotInterested} />)}
             </tbody>
           </table>
         </div>
