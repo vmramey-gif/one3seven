@@ -108,8 +108,11 @@ type ClaimBundle = {
   onAssign?: (firmId: string, memberId: string | null, memberName: string | null) => Promise<void>;
 };
 
-const FAST_LOG_OUTCOMES = [
-  'Demo booked', 'Left voicemail', 'No answer', 'Not interested', 'Follow up needed', 'Send something',
+// Multi-select outcome chips for the log modal — tap any that apply, then Submit.
+const LOG_CHIPS = [
+  'Called', 'No answer', 'Left voicemail', 'Spoke with them', 'Gatekeeper',
+  'Not interested', 'Callback scheduled', 'Demo booked', 'Pilot started',
+  'Do not contact', 'Victoria to email f/u',
 ];
 
 const todayISO = () => new Date().toISOString().slice(0, 10);
@@ -229,7 +232,7 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
 
   // Fast-log sheet
   const [fastFirmId, setFastFirmId] = useState<string | null>(null);
-  const [fastOutcome, setFastOutcome] = useState('');
+  const [fastChips, setFastChips] = useState<string[]>([]);
   const [fastNotes, setFastNotes] = useState('');
   const [fastFollowup, setFastFollowup] = useState('');
   const [saving, setSaving] = useState(false);
@@ -302,7 +305,7 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
 
   const openFast = (firmId: string) => {
     setFastFirmId(firmId);
-    setFastOutcome('');
+    setFastChips([]);
     setFastNotes('');
     setFastFollowup('');
     setError('');
@@ -378,14 +381,23 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
   };
 
   const saveFast = async () => {
-    if (!fastFirmId || !fastOutcome) return;
+    if (!fastFirmId || fastChips.length === 0) return;
     setSaving(true);
+    const f = firmsById[fastFirmId];
+    // Derive the resulting stage from the selected chips (most decisive wins).
+    let newStage: CrmStage | '' = '';
+    if (fastChips.includes('Do not contact') || fastChips.includes('Not interested')) newStage = 'no';
+    else if (fastChips.includes('Pilot started')) newStage = 'pilot';
+    else if (fastChips.includes('Demo booked')) newStage = 'demo_booked';
+    else if (f && f.stage === 'target') newStage = 'contacted';
+    const type: 'call' | 'email' | 'demo' = fastChips.includes('Demo booked') ? 'demo' : 'call';
     const r = await logActivity({
-      firm_id: fastFirmId, activity_type: 'call', activity_date: today,
-      outcome: fastOutcome, notes: fastNotes, next_followup: fastFollowup,
+      firm_id: fastFirmId, activity_type: type, activity_date: today,
+      outcome: fastChips.join(', '), notes: fastNotes, next_followup: fastFollowup, new_stage: newStage,
     });
     setSaving(false);
     if (r.error) { setError(r.error); return; }
+    if (fastChips.includes('Victoria to email f/u')) void flagFounderEmail(fastFirmId, true);
     setLastFirmId(fastFirmId);
     closeFast();
     void load();
@@ -515,10 +527,10 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
 
       {/* Fast-log sheet (3 taps: firm -> outcome -> save) */}
       {fastFirmId && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={closeFast}>
-          <div className="w-full max-w-md rounded-t-[20px] bg-white p-5 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={closeFast}>
+          <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-[20px] bg-white p-5 shadow-2xl" onClick={(e) => e.stopPropagation()}>
             <div className="mb-3 flex items-center justify-between">
-              <div className="text-[15px] font-bold">Log call · {firmsById[fastFirmId]?.name}</div>
+              <div className="text-[15px] font-bold">Log · {firmsById[fastFirmId]?.name}</div>
               <button type="button" onClick={closeFast} className={`flex ${tap} w-11 items-center justify-center rounded-full hover:bg-slate-100`}><X className="h-4 w-4" /></button>
             </div>
             {firmsById[fastFirmId]?.phone && (
@@ -526,24 +538,27 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
                 <Phone className="h-4 w-4" /> Call {firmsById[fastFirmId]?.phone}
               </a>
             )}
-            <div className="mb-2 text-[12px] font-semibold uppercase tracking-wide text-[#1E1B4B]/45">Outcome</div>
-            <div className="mb-3 grid grid-cols-2 gap-2">
-              {FAST_LOG_OUTCOMES.map((o) => (
-                <button
-                  key={o}
-                  type="button"
-                  onClick={() => setFastOutcome(o)}
-                  className={`${tap} rounded-[12px] border px-3 text-[13px] font-semibold transition ${fastOutcome === o ? 'border-[#6D4AFF] bg-[#6D4AFF] text-white' : 'border-[#E7E1FF] bg-white text-[#1E1B4B]/70'}`}
-                >
-                  {o}
-                </button>
-              ))}
+            <div className="mb-2 text-[12px] font-semibold uppercase tracking-wide text-[#1E1B4B]/45">Outcome — tap all that apply</div>
+            <div className="mb-3 flex flex-wrap gap-2">
+              {LOG_CHIPS.map((o) => {
+                const on = fastChips.includes(o);
+                return (
+                  <button
+                    key={o}
+                    type="button"
+                    onClick={() => setFastChips((prev) => on ? prev.filter((x) => x !== o) : [...prev, o])}
+                    className={`rounded-full border px-3 py-1.5 text-[12px] font-semibold transition ${on ? 'border-[#6D4AFF] bg-[#6D4AFF] text-white' : 'border-[#E7E1FF] bg-white text-[#1E1B4B]/70 hover:border-[#B8A8FF]'}`}
+                  >
+                    {on ? '✓ ' : ''}{o}
+                  </button>
+                );
+              })}
             </div>
             <textarea
               value={fastNotes}
               onChange={(e) => setFastNotes(e.target.value)}
-              placeholder="Notes (optional)"
-              className="mb-2 min-h-[64px] w-full rounded-[12px] border border-[#E7E1FF] px-3 py-2.5 text-sm outline-none focus:border-[#6D4AFF]"
+              placeholder="Your notes (e.g. “asked for Bob, callback Fri”)"
+              className="mb-2 min-h-[72px] w-full rounded-[12px] border border-[#E7E1FF] px-3 py-2.5 text-sm outline-none focus:border-[#6D4AFF]"
             />
             <label className="mb-1 block text-[12px] font-semibold text-[#1E1B4B]/45">Next follow-up (optional)</label>
             <input
@@ -555,10 +570,10 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
             <button
               type="button"
               onClick={saveFast}
-              disabled={!fastOutcome || saving}
+              disabled={fastChips.length === 0 || saving}
               className={`flex ${tap} w-full items-center justify-center gap-2 rounded-full bg-[#6D4AFF] font-semibold text-white disabled:opacity-40`}
             >
-              {saving ? 'Saving…' : 'Save'}
+              {saving ? 'Saving…' : `Submit${fastChips.length ? ` (${fastChips.length})` : ''}`}
             </button>
           </div>
         </div>
@@ -878,6 +893,55 @@ function SuitesHome({ greeting, isFounder, showEconomics, activeTab, onPick }: {
 }
 
 // ── Dashboard ────────────────────────────────────────────────────────────────
+/** Founder-only per-rep oversight: who's working today, at a glance. */
+function RepScoreboard({ firms, activity, members, today }: { firms: CrmFirm[]; activity: CrmActivityWithFirm[]; members: CrmMember[]; today: string }) {
+  const monday = startOfWeekISO();
+  const reps = members.filter((m) => !m.is_founder);
+  if (reps.length === 0) return null;
+  const rows = reps.map((m) => {
+    const mine = activity.filter((a) => a.logged_by === m.id);
+    return {
+      m,
+      callsToday: mine.filter((a) => a.activity_type === 'call' && a.activity_date === today).length,
+      emailsToday: mine.filter((a) => a.activity_type === 'email' && a.activity_date === today).length,
+      demosWeek: mine.filter((a) => a.activity_type === 'demo' && a.activity_date >= monday).length,
+      pilots: firms.filter((f) => f.contacted_by === m.id && (f.stage === 'pilot' || f.stage === 'paid')).length,
+      lastActive: mine.reduce((max, a) => (a.created_at > max ? a.created_at : max), ''),
+    };
+  }).sort((a, b) => (b.callsToday + b.emailsToday) - (a.callsToday + a.emailsToday));
+  return (
+    <section>
+      <h2 className="mb-2 text-[14px] font-bold">Team — who's working</h2>
+      <div className="overflow-x-auto rounded-[12px] border border-[#E7E1FF] bg-white">
+        <table className="w-full min-w-[460px] text-[13px]">
+          <thead>
+            <tr className="border-b border-[#EFEAFF] text-left text-[10px] uppercase tracking-wide text-[#1E1B4B]/40">
+              <th className="px-3 py-2 font-semibold">Rep</th>
+              <th className="px-2 py-2 text-center font-semibold">Calls today</th>
+              <th className="px-2 py-2 text-center font-semibold">Emails today</th>
+              <th className="px-2 py-2 text-center font-semibold">Demos/wk</th>
+              <th className="px-2 py-2 text-center font-semibold">Pilots</th>
+              <th className="px-3 py-2 font-semibold">Last active</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map(({ m, callsToday, emailsToday, demosWeek, pilots, lastActive }) => (
+              <tr key={m.id} className="border-b border-[#F2EEFC] hover:bg-[#FAF8FF]">
+                <td className="px-3 py-2 font-semibold text-[#1E1B4B]">{m.name}</td>
+                <td className={`px-2 py-2 text-center font-bold ${callsToday > 0 ? 'text-[#6D4AFF]' : 'text-[#1E1B4B]/30'}`}>{callsToday}</td>
+                <td className={`px-2 py-2 text-center ${emailsToday > 0 ? 'font-semibold text-[#1E1B4B]/70' : 'text-[#1E1B4B]/30'}`}>{emailsToday}</td>
+                <td className="px-2 py-2 text-center text-[#1E1B4B]/70">{demosWeek}</td>
+                <td className={`px-2 py-2 text-center ${pilots > 0 ? 'font-bold text-emerald-600' : 'text-[#1E1B4B]/30'}`}>{pilots}</td>
+                <td className="px-3 py-2 text-[12px] text-[#1E1B4B]/50">{lastActive ? new Date(lastActive).toLocaleDateString() : 'never'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
 function DashboardTab({ firms, activity, today, onLog, workerCount, onChanged, onQuickEmail, onQuickLog, onFounderEmailDone, claim, isFounder }: { firms: CrmFirm[]; activity: CrmActivityWithFirm[]; today: string; onLog: (id: string) => void; workerCount: number; onChanged: () => void; onQuickEmail?: (id: string) => Promise<void>; onQuickLog?: QuickLogFn; onFounderEmailDone?: (id: string) => Promise<void>; claim?: ClaimBundle; isFounder: boolean }) {
   // Reps see only their own numbers/activity; founders see team-wide.
   const me = claim?.userId ?? null;
@@ -931,6 +995,8 @@ function DashboardTab({ firms, activity, today, onLog, workerCount, onChanged, o
       )}
 
       {isFounder && <StageStrip firms={firms} />}
+
+      {isFounder && claim?.members && <RepScoreboard firms={firms} activity={activity} members={claim.members} today={today} />}
 
       {isFounder && <DemoPrepCard firms={firms} today={today} onChanged={onChanged} />}
 
@@ -1618,89 +1684,163 @@ function FounderEmailQueueTab({ firms, onFounderEmailDone }: { firms: CrmFirm[];
   );
 }
 
-function FirmsTab({ firms, onLog, userId, onQuickEmail, onQuickLog, claim }: { firms: CrmFirm[]; onLog: (id: string) => void; userId: string | null; onQuickEmail?: (id: string) => Promise<void>; onQuickLog?: QuickLogFn; claim?: ClaimBundle }) {
+/** One dense CDK-style firm row in the table. Click a cell action; whole row opens the log. */
+function FirmRow({ firm, me, today, onLog, onClaim }: {
+  firm: CrmFirm;
+  me: string | null;
+  today: string;
+  onLog: (id: string) => void;
+  onClaim?: (id: string) => Promise<void>;
+}) {
+  const [claiming, setClaiming] = useState(false);
+  const mine = !!me && firm.contacted_by === me;
+  const due = !!firm.next_followup && firm.next_followup <= today;
+  const owner = firm.contacted_by_name ? firm.contacted_by_name.split(' ')[0] : null;
+  return (
+    <tr className="border-b border-[#F2EEFC] align-middle hover:bg-[#FAF8FF]">
+      <td className="px-3 py-2">
+        <div className="flex items-center gap-1.5">
+          <button type="button" onClick={() => onLog(firm.id)} className="max-w-[180px] truncate text-left text-[13px] font-semibold text-[#1E1B4B] hover:text-[#6D4AFF]" title={firm.name}>{firm.name}</button>
+          {firm.source === 'pilot_form' && <span className="shrink-0 rounded bg-[#F59E0B] px-1 py-0.5 text-[9px] font-extrabold text-white" title="Inbound pilot request">⚡</span>}
+          <PriorityBadge priority={firm.priority} />
+        </div>
+      </td>
+      <td className="px-3 py-2 text-[12px] text-[#1E1B4B]/65"><span className="block max-w-[130px] truncate" title={firm.attorney_name ?? ''}>{firm.attorney_name || '—'}</span></td>
+      <td className="px-2 py-2 text-center text-[12px] font-semibold text-[#1E1B4B]/70">{firm.tier ?? '—'}</td>
+      <td className="px-2 py-2"><StageTag stage={firm.stage} /></td>
+      <td className={`px-2 py-2 text-[12px] ${due ? 'font-bold text-red-600' : 'text-[#1E1B4B]/55'}`}>{firm.next_followup || '—'}</td>
+      <td className="px-2 py-2 text-[12px]">
+        {owner ? (
+          <span className={mine ? 'font-semibold text-emerald-600' : 'text-[#1E1B4B]/60'}>{mine ? 'You' : owner}</span>
+        ) : onClaim ? (
+          <button type="button" disabled={claiming} onClick={async () => { setClaiming(true); try { await onClaim(firm.id); } finally { setClaiming(false); } }} className="rounded-full bg-[#EDE7FF] px-2 py-0.5 text-[10px] font-bold text-[#6D4AFF] disabled:opacity-50">{claiming ? '…' : 'Claim'}</button>
+        ) : <span className="text-[#1E1B4B]/30">—</span>}
+      </td>
+      <td className="px-3 py-2">
+        <div className="flex items-center justify-end gap-1.5">
+          {firm.phone && <a href={`tel:${digitsOf(firm.phone)}`} className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-50 text-emerald-600" aria-label={`Call ${firm.name}`}><Phone className="h-3.5 w-3.5" /></a>}
+          {firm.email && <a href={`mailto:${firm.email}`} className="flex h-7 w-7 items-center justify-center rounded-full bg-[#EDE7FF] text-[#6D4AFF]" aria-label={`Email ${firm.name}`}><Mail className="h-3.5 w-3.5" /></a>}
+          <button type="button" onClick={() => onLog(firm.id)} className="rounded-full bg-[#6D4AFF] px-3 py-1 text-[11px] font-bold text-white hover:bg-[#5B35D5]">Log</button>
+        </div>
+      </td>
+    </tr>
+  );
+}
+
+function FirmsTab({ firms, onLog, userId, claim }: { firms: CrmFirm[]; onLog: (id: string) => void; userId: string | null; onQuickEmail?: (id: string) => Promise<void>; onQuickLog?: QuickLogFn; claim?: ClaimBundle }) {
   const [view, setView] = useState<'open' | 'mine'>(() => {
     try { return (localStorage.getItem('crm_firms_view') as 'open' | 'mine') || 'open'; } catch { return 'open'; }
   });
   const [tierFilter, setTierFilter] = useState<number | ''>('');
   const [priority, setPriority] = useState<'A' | 'B' | 'C' | ''>('');
   const [emailFilter, setEmailFilter] = useState<'' | 'has' | 'none'>('');
+  const [contacted, setContacted] = useState<'' | 'yes' | 'no'>('');
+  const [stageFilter, setStageFilter] = useState<CrmStage | ''>('');
+  const [timing, setTiming] = useState<'' | 'due' | 'cold' | 'recent'>('');
   const [search, setSearch] = useState(() => { try { return localStorage.getItem('crm_firms_search') || ''; } catch { return ''; } });
   useEffect(() => { try { localStorage.setItem('crm_firms_view', view); } catch { /* ignore */ } }, [view]);
   useEffect(() => { try { localStorage.setItem('crm_firms_search', search); } catch { /* ignore */ } }, [search]);
   const me = claim?.userId ?? userId;
+  const today = todayISO();
 
   const q = search.trim().toLowerCase();
-  const matchesSearch = (f: CrmFirm) =>
-    !q || (f.name ?? '').toLowerCase().includes(q) || (f.attorney_name ?? '').toLowerCase().includes(q);
   const hasEmail = (f: CrmFirm) => !!(f.email && f.email.trim());
-  const matchesEmail = (f: CrmFirm) => emailFilter === '' || (emailFilter === 'has' ? hasEmail(f) : !hasEmail(f));
+  const isContacted = (f: CrmFirm) => f.stage !== 'target';
+  const daysSince = (iso?: string | null) => (iso ? Math.floor((Date.now() - new Date(iso).getTime()) / 86400000) : Infinity);
+  const passes = (f: CrmFirm) =>
+    (!q || (f.name ?? '').toLowerCase().includes(q) || (f.attorney_name ?? '').toLowerCase().includes(q)) &&
+    (emailFilter === '' || (emailFilter === 'has' ? hasEmail(f) : !hasEmail(f))) &&
+    (contacted === '' || (contacted === 'yes' ? isContacted(f) : !isContacted(f))) &&
+    (tierFilter === '' || f.tier === tierFilter) &&
+    (!priority || f.priority === priority) &&
+    (!stageFilter || f.stage === stageFilter) &&
+    (timing === '' ||
+      (timing === 'due' ? !!f.next_followup && f.next_followup <= today :
+       timing === 'cold' ? isContacted(f) && !f.next_followup :
+       daysSince(f.contacted_at) <= 7));
 
   const openTotal = firms.filter((f) => !f.contacted_by).length;
-  const mine = firms.filter((f) => !!me && f.contacted_by === me).filter(matchesSearch).filter(matchesEmail);
-  const open = firms.filter((f) =>
-    !f.contacted_by &&
-    (tierFilter === '' || f.tier === tierFilter) &&
-    (!priority || f.priority === priority),
-  ).filter(matchesSearch).filter(matchesEmail);
-  const list = view === 'open' ? open : mine;
+  const mineTotal = firms.filter((f) => !!me && f.contacted_by === me).length;
+  const base = view === 'open' ? firms.filter((f) => !f.contacted_by) : firms.filter((f) => !!me && f.contacted_by === me);
+  const list = base.filter(passes);
+
+  const selCls = `${tap} rounded-[8px] border border-[#E7E1FF] bg-white px-2 text-[12px]`;
 
   return (
-    <div className="space-y-4 pb-24">
+    <div className="space-y-3 pb-24">
       <input
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        placeholder="Search firm or attorney name…"
+        placeholder="Search firm or attorney…"
         className="w-full rounded-[10px] border border-[#E7E1FF] bg-white px-3 py-2.5 text-[14px] outline-none focus:border-[#6D4AFF]"
       />
+
+      {/* Filter bar — CDK-style: slice by contacted / tier / priority / stage / timing / email */}
       <div className="flex flex-wrap items-center gap-1.5">
-        {([['', 'All'], ['has', '✉️ Has email'], ['none', 'Needs email']] as const).map(([key, label]) => (
-          <button
-            key={key || 'all'}
-            type="button"
-            onClick={() => setEmailFilter(key)}
-            className={`rounded-full px-3 py-1.5 text-[12px] font-semibold transition ${emailFilter === key ? 'bg-[#6D4AFF] text-white' : 'bg-[#F4F1FF] text-[#1E1B4B]/70 hover:bg-[#EDE7FF]'}`}
-          >
-            {label}
-          </button>
-        ))}
+        <select value={contacted} onChange={(e) => setContacted(e.target.value as '' | 'yes' | 'no')} className={selCls}>
+          <option value="">All</option>
+          <option value="no">Not contacted</option>
+          <option value="yes">Contacted</option>
+        </select>
+        <select value={tierFilter === '' ? '' : String(tierFilter)} onChange={(e) => setTierFilter(e.target.value === '' ? '' : Number(e.target.value))} className={selCls}>
+          <option value="">All tiers</option>
+          <option value="1">Tier 1</option><option value="2">Tier 2</option><option value="3">Tier 3</option><option value="4">Tier 4</option>
+        </select>
+        <select value={priority} onChange={(e) => setPriority(e.target.value as 'A' | 'B' | 'C' | '')} className={selCls}>
+          <option value="">All priority</option>
+          <option value="A">A · targets</option><option value="B">B · warm</option><option value="C">C · pipeline</option>
+        </select>
+        <select value={stageFilter} onChange={(e) => setStageFilter(e.target.value as CrmStage | '')} className={selCls}>
+          <option value="">All stages</option>
+          {CRM_STAGES.map((s) => <option key={s} value={s}>{CRM_STAGE_LABELS[s]}</option>)}
+        </select>
+        <select value={timing} onChange={(e) => setTiming(e.target.value as '' | 'due' | 'cold' | 'recent')} className={selCls}>
+          <option value="">Any timing</option>
+          <option value="due">Due today</option>
+          <option value="cold">Going cold</option>
+          <option value="recent">Recently worked</option>
+        </select>
+        <select value={emailFilter} onChange={(e) => setEmailFilter(e.target.value as '' | 'has' | 'none')} className={selCls}>
+          <option value="">Any email</option>
+          <option value="has">Has email</option>
+          <option value="none">Needs email</option>
+        </select>
       </div>
-      {view === 'open' && (
-        <div className="flex flex-wrap gap-2">
-          <select value={tierFilter === '' ? '' : String(tierFilter)} onChange={(e) => setTierFilter(e.target.value === '' ? '' : Number(e.target.value))} className={`${tap} rounded-[10px] border border-[#E7E1FF] bg-white px-3 text-[13px]`}>
-            <option value="">All tiers</option>
-            <option value="1">Tier 1 · Tech-native</option>
-            <option value="2">Tier 2 · Growth</option>
-            <option value="3">Tier 3 · Modern boutique</option>
-            <option value="4">Tier 4 · Traditional</option>
-          </select>
-          <select value={priority} onChange={(e) => setPriority(e.target.value as 'A' | 'B' | 'C' | '')} className={`${tap} rounded-[10px] border border-[#E7E1FF] bg-white px-3 text-[13px]`}>
-            <option value="">All firms</option>
-            <option value="A">Priority targets</option>
-            <option value="B">Warm region</option>
-            <option value="C">Pipeline</option>
-          </select>
+
+      <div className="flex items-center justify-between text-[12px] text-[#1E1B4B]/50">
+        <span>{list.length} firm{list.length === 1 ? '' : 's'}</span>
+        {(contacted || tierFilter !== '' || priority || stageFilter || timing || emailFilter || q) && (
+          <button type="button" onClick={() => { setContacted(''); setTierFilter(''); setPriority(''); setStageFilter(''); setTiming(''); setEmailFilter(''); setSearch(''); }} className="font-semibold text-[#6D4AFF] hover:underline">Clear filters</button>
+        )}
+      </div>
+
+      {list.length === 0 ? (
+        <p className="rounded-[12px] border border-[#E7E1FF] bg-white px-4 py-6 text-center text-[13px] text-[#1E1B4B]/45">No firms match these filters.</p>
+      ) : (
+        <div className="overflow-x-auto rounded-[12px] border border-[#E7E1FF] bg-white">
+          <table className="w-full min-w-[680px]">
+            <thead>
+              <tr className="border-b border-[#EFEAFF] text-left text-[10px] uppercase tracking-wide text-[#1E1B4B]/40">
+                <th className="px-3 py-2 font-semibold">Firm</th>
+                <th className="px-3 py-2 font-semibold">Attorney</th>
+                <th className="px-2 py-2 text-center font-semibold">Tier</th>
+                <th className="px-2 py-2 font-semibold">Stage</th>
+                <th className="px-2 py-2 font-semibold">Next</th>
+                <th className="px-2 py-2 font-semibold">Owner</th>
+                <th className="px-3 py-2 text-right font-semibold">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {list.map((f) => <FirmRow key={f.id} firm={f} me={me} today={today} onLog={onLog} onClaim={claim?.onClaim} />)}
+            </tbody>
+          </table>
         </div>
       )}
 
-      <p className="text-[12px] leading-relaxed text-[#1E1B4B]/50">
-        {view === 'open'
-          ? 'Tap Claim on a firm and it becomes yours — it leaves everyone else’s list until you release it. Log the call whenever.'
-          : 'Firms you’ve claimed. Log calls anytime; release one to return it to the pool.'}
-      </p>
-
-      {list.length === 0 ? (
-        <p className="rounded-[12px] border border-[#E7E1FF] bg-white px-4 py-6 text-center text-[13px] text-[#1E1B4B]/45">
-          {view === 'open' ? 'No open firms match this filter.' : 'You haven’t claimed any firms yet — claim one from Open.'}
-        </p>
-      ) : (
-        <div className="space-y-3">{list.map((f) => <FirmCard key={f.id} firm={f} onLog={onLog} today={todayISO()} onQuickEmail={onQuickEmail} onQuickLog={onQuickLog} userId={me} onClaim={claim?.onClaim} onRelease={claim?.onRelease} isFounder={claim?.isFounder} members={claim?.members} onAssign={claim?.onAssign} />)}</div>
-      )}
-
-      {/* Bottom toggle — worker-dash style, scaled metrics. Open = shared pool; Mine = claimed. */}
+      {/* Bottom toggle — Open = shared pool; Mine = claimed. */}
       <div className="fixed inset-x-0 bottom-0 z-30 border-t border-[#E7E1FF] bg-white/95 px-4 py-2.5 backdrop-blur">
         <div className="mx-auto flex max-w-3xl gap-2">
-          {([['open', 'Open', openTotal], ['mine', 'Mine', mine.length]] as const).map(([key, label, n]) => (
+          {([['open', 'Open', openTotal], ['mine', 'Mine', mineTotal]] as const).map(([key, label, n]) => (
             <button
               key={key}
               type="button"
