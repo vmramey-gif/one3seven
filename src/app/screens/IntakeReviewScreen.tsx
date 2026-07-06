@@ -1063,7 +1063,7 @@ export function IntakeReviewScreen({
 
       {/* Content */}
       <div className="px-6 py-8">
-        <div className="mx-auto flex max-w-5xl flex-col gap-5">
+        <div className="mx-auto flex max-w-5xl flex-col gap-6">
 
             {/* Case Readiness Snapshot — attorney orientation card */}
             {useConnectedFirmLayout && firmLiveView ? (() => {
@@ -1182,8 +1182,8 @@ export function IntakeReviewScreen({
                 >
                   <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#5B21B6] mb-4">Processing Summary</p>
 
-                  {/* Process signals */}
-                  <div className="flex flex-wrap gap-2">
+                  {/* Worker narrative — status chip */}
+                  <div className="mb-3 flex flex-wrap gap-2">
                     <span
                       className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium ${
                         hasStory
@@ -1191,32 +1191,34 @@ export function IntakeReviewScreen({
                           : 'border-[#ECE7F5] bg-[#FAF9F6] text-[#14112E]/52'
                       }`}
                     >
-                      {hasStory ? (
-                        <CheckCircle2 className="w-3 h-3" />
-                      ) : (
-                        <Clock className="w-3 h-3" />
-                      )}
+                      {hasStory ? <CheckCircle2 className="w-3 h-3" /> : <Clock className="w-3 h-3" />}
                       Worker narrative {hasStory ? 'provided' : 'not provided'}
                     </span>
-                    {recordCount > 0 ? (
-                      <span className="inline-flex items-center gap-1.5 rounded-full border border-[#ECE7F5] bg-[#FAF9F6] px-3 py-1.5 text-xs font-medium text-[#14112E]/72">
-                        <FileText className="w-3 h-3 text-[#5B21B6]" />
-                        {recordCount} document{recordCount !== 1 ? 's' : ''} organized
-                      </span>
-                    ) : null}
-                    {eventCount > 0 ? (
-                      <span className="inline-flex items-center gap-1.5 rounded-full border border-[#ECE7F5] bg-[#FAF9F6] px-3 py-1.5 text-xs font-medium text-[#14112E]/72">
-                        <Calendar className="w-3 h-3 text-[#5B21B6]" />
-                        {eventCount} timeline event{eventCount !== 1 ? 's' : ''} extracted
-                      </span>
-                    ) : null}
-                    {gapCount > 0 ? (
-                      <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs font-medium text-amber-800">
-                        <AlertCircle className="w-3 h-3" />
-                        {gapCount} clarification{gapCount !== 1 ? 's' : ''} surfaced
-                      </span>
-                    ) : null}
                   </div>
+
+                  {/* Headline stats — the numbers land the moment the packet opens */}
+                  {(recordCount > 0 || eventCount > 0 || gapCount > 0) ? (
+                    <div className="flex flex-wrap gap-2.5">
+                      {recordCount > 0 ? (
+                        <div className="min-w-[104px] flex-1 rounded-[14px] border border-[#ECE7F5] bg-[#FAF9F6] p-3 text-center">
+                          <div className="text-[26px] font-black leading-none text-[#5B21B6]">{recordCount}</div>
+                          <div className="mt-1 text-[11px] font-semibold text-[#14112E]/55">Documents organized</div>
+                        </div>
+                      ) : null}
+                      {eventCount > 0 ? (
+                        <div className="min-w-[104px] flex-1 rounded-[14px] border border-[#ECE7F5] bg-[#FAF9F6] p-3 text-center">
+                          <div className="text-[26px] font-black leading-none text-[#5B21B6]">{eventCount}</div>
+                          <div className="mt-1 text-[11px] font-semibold text-[#14112E]/55">Timeline events</div>
+                        </div>
+                      ) : null}
+                      {gapCount > 0 ? (
+                        <div className="min-w-[104px] flex-1 rounded-[14px] border border-amber-200 bg-amber-50 p-3 text-center">
+                          <div className="text-[26px] font-black leading-none text-amber-600">{gapCount}</div>
+                          <div className="mt-1 text-[11px] font-semibold text-amber-700/80">Clarifications surfaced</div>
+                        </div>
+                      ) : null}
+                    </div>
+                  ) : null}
 
                   {/* Worker context signals — employment status, arbitration, prior filing */}
                   {followUp && (followUp.employmentStatus || followUp.arbitrationAgreement || followUp.priorAgencyFiling) ? (
