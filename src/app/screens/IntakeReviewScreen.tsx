@@ -2853,7 +2853,7 @@ export function IntakeReviewScreen({
                       See pricing
                     </button>
                   </div>
-                  <p className="text-[10px] text-white/28 mt-4">No card required · Solo from $149/mo after trial</p>
+                  <p className="text-[10px] text-white/28 mt-4">No card required · Practice from $249/mo after trial</p>
                 </div>
               </motion.div>
             )}
