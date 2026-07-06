@@ -1715,7 +1715,7 @@ function FirmRow({ firm, me, today, onLog, onClaim, onNoContact, onNotInterested
     <tr className="border-b border-[#F2EEFC] align-middle hover:bg-[#FAF8FF]">
       <td className="px-3 py-2">
         <div className="flex items-center gap-1.5">
-          <button type="button" onClick={() => onLog(firm.id)} className="min-w-0 flex-1 truncate text-left text-[13px] font-semibold text-[#1E1B4B] hover:text-[#6D4AFF]" title={firm.name}>{firm.name}</button>
+          <button type="button" onClick={() => onLog(firm.id)} className="max-w-[200px] truncate text-left text-[13px] font-semibold text-[#1E1B4B] hover:text-[#6D4AFF]" title={firm.name}>{firm.name}</button>
           {firm.source === 'pilot_form' && <span className="shrink-0 rounded bg-[#F59E0B] px-1 py-0.5 text-[9px] font-extrabold text-white" title="Inbound pilot request">⚡</span>}
           <PriorityBadge priority={firm.priority} />
         </div>
