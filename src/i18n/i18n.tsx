@@ -47,6 +47,15 @@ export const STRINGS: Dict = {
   'home.cta_worker': { en: "I'm a worker →",                     es: 'Soy trabajador →' },
   'home.hero_foot':  { en: 'Free 7-day pilot · No credit card · Built for California employment matters',
                        es: 'Prueba gratis de 7 días · Sin tarjeta de crédito · Hecho para asuntos laborales de California' },
+
+  // Account approval hold screen
+  'pending.badge':   { en: 'Application received',              es: 'Solicitud recibida' },
+  'pending.title':   { en: "You're on the list.",              es: 'Estás en la lista.' },
+  'pending.body':    { en: 'Thank you for signing up. Your account will be confirmed within 1–2 business days, and we’ll email you the moment it’s ready.',
+                       es: 'Gracias por registrarte. Tu cuenta será confirmada en 1 a 2 días hábiles, y te enviaremos un correo en cuanto esté lista.' },
+  'pending.sub':     { en: 'We’re welcoming new members in small groups during our California beta.',
+                       es: 'Estamos dando la bienvenida a nuevos miembros en grupos pequeños durante nuestra beta de California.' },
+  'pending.signout': { en: 'Sign out',                          es: 'Cerrar sesión' },
 };
 
 type Ctx = { lang: Lang; setLang: (l: Lang) => void; t: (key: string) => string };

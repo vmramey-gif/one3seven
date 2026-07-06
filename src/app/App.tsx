@@ -4,6 +4,7 @@ import { pageviewPath } from '../lib/analytics';
 import { GalleryScreen } from './screens/GalleryScreen';
 import { DevNavMapScreen } from './screens/DevNavMapScreen';
 import { AuthWelcomeScreen } from './screens/AuthWelcomeScreen';
+import { PendingApprovalScreen } from './screens/PendingApprovalScreen';
 import { PublicMarketingPage } from './screens/PublicMarketingPage';
 import { ForFirmsPage } from './screens/ForFirmsPage';
 import { SignInScreen } from './screens/SignInScreen';
@@ -3909,6 +3910,21 @@ export default function App() {
         </div>
       </div>
     );
+  }
+
+  // ── Beta access gate ──────────────────────────────────────────────────────
+  // A signed-up worker/firm is held on the approval screen until an operator sets
+  // profiles.approved = true. Founders and reps bypass. Auth/marketing screens stay reachable
+  // (so people can still sign up + we capture the lead); the gate only blocks entry into the
+  // product itself. Approve an account: update public.profiles set approved = true where email = '…'.
+  const accountGated =
+    !!profile &&
+    profile.approved !== true &&
+    profile.is_founder !== true &&
+    profile.crm_role !== 'rep' &&
+    !AUTH_FLOW_SCREENS.includes(currentScreen);
+  if (accountGated) {
+    return <PendingApprovalScreen onSignOut={() => void handleSignOut()} />;
   }
 
   return (

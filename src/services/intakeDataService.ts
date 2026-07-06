@@ -111,6 +111,10 @@ export type ProfileRow = {
   role: 'worker' | 'firm' | null;
   /** Founder-only internal tooling (CRM) access. Set operator-side; never via the app. */
   is_founder?: boolean | null;
+  /** Sales-rep CRM access marker. */
+  crm_role?: string | null;
+  /** Access gate: false until an operator approves the account (worker/firm hold during beta). */
+  approved?: boolean | null;
   created_at: string;
   // Worker contact details (persisted in DB — see migration 20260609_worker_contact_details)
   middle_initial?: string | null;
