@@ -17,7 +17,7 @@ export const CRM_WEEKLY_TARGETS = {
 // ── Positioning north star — the frame every call, email, and demo runs on. ──
 // Sell the OUTCOME (an organized file), never the mechanism (AI). Partner, not product.
 export const CRM_POSITIONING_NORTH_STAR =
-  'one3seven is your intake partner, shaped around your firm. Invisible AI, visible benefit — the firm never sees the technology, just gets organized intake, and keeps every ounce of control.';
+  'one3seven is your intake organization partner, shaped around your firm. No chatbot required — the firm opens an organized, source-linked intake file and keeps every ounce of control.';
 
 export const CRM_PARTNERSHIP: { line: string; why: string }[] = [
   {
@@ -25,15 +25,15 @@ export const CRM_PARTNERSHIP: { line: string; why: string }[] = [
     why: 'Firms don’t want to bend to software. Position one3seven as molding to THEM — their practice areas, matter types, intake link, workflow. Partner, not vendor.',
   },
   {
-    line: '“You’ll never open an AI. You’ll open a file — timeline built, records categorized, every fact linked to its source — before your first call.”',
-    why: 'Invisible AI, visible benefit. The AI is the plumbing, not the faucet: no prompts, no chatbot, no black box. Sell the organized file; the word “AI” recedes.',
+    line: '“You don’t have to prompt a chatbot. You open a file — timeline built, records categorized, every fact linked to its source — before your first call.”',
+    why: 'Visible benefit, no chatbot. The AI is the plumbing, not the faucet: no prompts, no black box. Sell the organized file; the word “AI” recedes.',
   },
   {
     line: '“AI is coming to your practice whether you invite it or not. This is the version where you get the upside — organized intake, faster decisions — without the risk. It never drafts, advises, or concludes.”',
     why: 'Attorneys fear AI (UPL, malpractice, embarrassment). Give them the safe side of an inevitable shift — upside, no downside.',
   },
   {
-    line: '“It organizes and reflects — it never concludes. Every fact links to a source document. You verify, you decide, you represent. The AI never touches judgment — that’s still, only, and always yours.”',
+    line: '“It organizes and reflects — it never concludes. Every fact links to a source document. You verify, you decide. The AI never touches legal judgment — that stays with your team.”',
     why: 'The single most reassuring sentence to a nervous attorney. Your compliance line and your best sales line are the same sentence — lead with it.',
   },
   {
@@ -53,7 +53,7 @@ export const CRM_CALL_SCRIPT: { step: string; text: string }[] = [
   },
   {
     step: 'How it works (invisible AI, one line)',
-    text: '“You never open an AI. The worker uploads their pay stubs, HR complaints, write-ups; you open a file — timeline built, records categorized, every fact linked to its source. It organizes and reflects — it never concludes. You evaluate, you decide.”',
+    text: '“You don’t prompt a chatbot. The worker uploads their pay stubs, HR complaints, write-ups; you open a file — timeline built, records categorized, every fact linked to its source. It organizes and reflects — it never concludes. You evaluate, you decide.”',
   },
   {
     step: 'The ask (a look, not a sale)',
@@ -107,7 +107,7 @@ Hi [First name],
 
 Plaintiff employment clients often arrive with records scattered across pay stubs, texts, HR emails, and memory — and someone has to spend unbilled time assembling it before the matter can even be reviewed.
 
-one3seven becomes your intake partner, shaped around your firm: a worker uploads their scattered records, and you open a clean, source-linked file — a clear timeline, categorized records, every fact traceable to the original document. You never open an AI; you just get the organized intake.
+one3seven becomes your intake organization partner, shaped around your firm: a worker uploads their scattered records, and you open a clean, source-linked file — a clear timeline, categorized records, every fact traceable to the original document. You don't prompt a chatbot; you just get the organized intake.
 
 It organizes and reflects. It does not draw legal conclusions. You evaluate everything.
 

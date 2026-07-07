@@ -1058,6 +1058,10 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
                     <span className="text-[#C4B5FD]">{t('home.h1_2')}</span>
                   </h1>
 
+                  <p className="mb-5 max-w-[520px] text-[15px] font-medium leading-relaxed text-[#A78BFA]">
+                    {t('home.partner')}
+                  </p>
+
                   <p className="mb-5 max-w-[480px] text-[16px] leading-relaxed text-[#C9C4E6] sm:text-[17px]">
                     {t('home.sub')}
                   </p>
@@ -1281,7 +1285,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
                   claim — see reference_anthropic_trademark) + our own organize-not-conclude line. */}
               <div className="mb-4 rounded-[14px] border border-white/10 bg-white/5 px-4 py-3.5">
                 <p className="text-[13px] font-medium leading-relaxed text-white">
-                  Built on the same AI platform California adopted statewide for its agencies.
+                  Built on Anthropic's Claude.
                 </p>
                 <p className="mt-1.5 text-[13px] leading-relaxed text-[#C9C4E6]">
                   one3seven only organizes and reflects — it never concludes.
@@ -1394,7 +1398,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
             </div>
           </div>
           <div className="mt-8 border-t border-white/8 pt-8 text-[11px] text-white/28">
-            © {new Date().getFullYear()} one3seven. one3seven is not a law firm and does not provide legal advice. Use of this platform does not create an attorney-client relationship. All AI-organized intake content requires independent verification by a licensed attorney before use. Submission of an intake does not require any firm to review, accept, or represent the worker. An attorney-client relationship is created only through a separate written agreement between the worker and a law firm.
+            © {new Date().getFullYear()} one3seven. one3seven is not a law firm and does not provide legal advice. one3seven is not a lawyer referral service and does not recommend, rank, or select attorneys for workers. Use of this platform does not create an attorney-client relationship. All AI-organized intake content requires independent verification by a licensed attorney before use. Submission of an intake does not require any firm to review, accept, or represent the worker. An attorney-client relationship is created only through a separate written agreement between the worker and a law firm.
           </div>
         </div>
       </footer>

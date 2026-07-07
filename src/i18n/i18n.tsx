@@ -43,6 +43,8 @@ export const STRINGS: Dict = {
   // LEGAL-REVIEW: compliance line — have a bilingual read before real reliance.
   'home.trust':      { en: 'Organizes & reflects — never concludes. The attorney evaluates everything.',
                        es: 'Organiza y refleja — nunca concluye. El abogado evalúa todo.' },
+  'home.partner':    { en: 'Your intake organization partner, shaped around your firm — no chatbot required, just the organized file.',
+                       es: 'Tu socio de organización de admisiones, adaptado a tu firma — sin chatbot, solo el expediente organizado.' },
   'home.cta_pilot':  { en: 'Start free pilot',                   es: 'Comienza la prueba gratis' },
   'home.cta_worker': { en: "I'm a worker →",                     es: 'Soy trabajador →' },
   'home.hero_foot':  { en: 'Free 7-day pilot · No credit card · Built for California employment matters',

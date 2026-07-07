@@ -61,19 +61,22 @@ export function ForFirmsPage({ onBack, onStartWorker }: ForFirmsPageProps) {
             For law firms
           </div>
           <h1 style={SERIF} className="mb-5 text-[32px] font-medium leading-[1.05] tracking-[-0.01em] text-white sm:text-[46px]">
-            Open the file. Decide in minutes.
+            Your intake organization partner — shaped around your firm.
           </h1>
-          <p className="mx-auto mb-8 max-w-[620px] text-[16px] leading-relaxed text-[#C9C4E6] sm:text-[17px]">
-            Share one intake link with your clients. They self-serve through a guided intake, and you
-            get a review-ready, source-linked record in your dashboard — so you decide in minutes
-            instead of burning hours on triage.
+          <p className="mx-auto mb-5 max-w-[620px] text-[16px] leading-relaxed text-[#C9C4E6] sm:text-[17px]">
+            A worker uploads scattered employment records. Your firm opens a clean, source-linked intake
+            file — with the worker's story, timeline, documents, and key dates organized from the records
+            provided, before your first call.
+          </p>
+          <p className="mx-auto mb-8 max-w-[560px] text-[14px] font-medium leading-relaxed text-[#A78BFA]">
+            For intake review, you don't have to prompt a chatbot. You open the organized file.
           </p>
           <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
             <a
               href="#pilot-interest"
               className="inline-flex items-center justify-center gap-2 rounded-full bg-[#6D4AFF] px-7 py-3.5 text-[15px] font-semibold text-white shadow-[0_16px_48px_rgba(109,74,255,0.40)] transition hover:-translate-y-0.5 hover:bg-[#5B35D5]"
             >
-              Start free pilot
+              Request a 7-day pilot
               <ArrowRight className="h-4 w-4" />
             </a>
             <a
@@ -84,8 +87,9 @@ export function ForFirmsPage({ onBack, onStartWorker }: ForFirmsPageProps) {
               See a sample intake packet
             </a>
           </div>
-          <p className="mx-auto mt-5 max-w-[560px] text-[12px] leading-relaxed text-[#9A93C2]">
-            Only organizes and reflects — never concludes. Every surfaced fact traces to the worker's story or a source document.
+          <p className="mx-auto mt-5 max-w-[600px] text-[12px] leading-relaxed text-[#9A93C2]">
+            No prompts required. No legal conclusions. No case scoring. one3seven organizes and reflects —
+            it does not advise. Key extracted facts link back to source records, so your firm can verify and decide.
           </p>
         </div>
       </section>
@@ -191,7 +195,7 @@ export function ForFirmsPage({ onBack, onStartWorker }: ForFirmsPageProps) {
           <div className="space-y-4">
             {[
               ['Firm data isolation', 'Each firm sees only its own intakes. Row-level database policies enforce separation between firms, and isolation has been independently verified.'],
-              ['AI foundation', 'Built on the same AI platform California adopted statewide for its agencies.'],
+              ['AI foundation', 'Built on Anthropic\'s Claude.'],
               ['AI training', 'Uploaded documents are used to organize your intake. They are not used to train AI models.'],
               ['Built for auditability', 'Every surfaced fact links back to the worker’s input or a source document — review never depends on trusting a black-box summary.'],
               ['Attorney-decided', 'one3seven organizes records and surfaces information from documents. It does not provide legal advice, predictions, or conclusions. Source documents remain available for direct attorney review.'],
@@ -212,11 +216,18 @@ export function ForFirmsPage({ onBack, onStartWorker }: ForFirmsPageProps) {
       <section id="pilot-interest" className="px-5 py-16 sm:px-8 sm:py-20">
         <div className="mx-auto max-w-[520px]">
           <div className="mb-6 text-center">
-            <h2 style={SERIF} className="text-[26px] font-medium tracking-[-0.01em] text-white sm:text-[32px]">Be one of the first 100 founder firms</h2>
-            <p className="mt-2 text-[14px] leading-relaxed text-[#C9C4E6]">
-              Founder pricing locked for life, priority support, and a direct line to the founders. Free
-              7-day pilot — no credit card. See a sample intake packet today, decide within the week. Tell us
-              about your firm and we'll set up your intake link.
+            <h2 style={SERIF} className="text-[26px] font-medium tracking-[-0.01em] text-white sm:text-[32px]">Founding firms — shaped around your practice</h2>
+            <p className="mt-3 text-[14px] leading-relaxed text-[#C9C4E6]">
+              We are opening a limited founding cohort of 50 California employment firms and shaping the
+              intake experience around real plaintiff-side workflows: your matter types, your review process,
+              your documents, and the way your team evaluates new matters.
+            </p>
+            <p className="mt-3 text-[14px] leading-relaxed text-[#C9C4E6]">
+              Founding firms receive hands-on onboarding, direct founder access, and founder pricing locked
+              for life during the founding program.
+            </p>
+            <p className="mt-3 text-[13px] leading-relaxed text-[#9A93C2]">
+              Your firm stays in control. Attorney judgment stays with your team. one3seven only organizes the intake file.
             </p>
           </div>
 
@@ -277,9 +288,9 @@ export function ForFirmsPage({ onBack, onStartWorker }: ForFirmsPageProps) {
             Contact: <a href="mailto:info@one3seven.com" className="font-semibold text-[#A78BFA] hover:underline">info@one3seven.com</a>
           </p>
           <p className="max-w-[640px] text-[11px] leading-relaxed text-[#8E88B5]">
-            one3seven is not a law firm and does not provide legal advice. Not a lawyer referral service. It
-            organizes records and surfaces information for review preparation. Attorneys independently evaluate
-            all information.
+            one3seven is not a law firm and does not provide legal advice. one3seven is not a lawyer referral
+            service and does not recommend, rank, or select attorneys for workers. It organizes records and
+            surfaces information for review preparation. Attorneys independently evaluate all information.
           </p>
         </div>
       </footer>
