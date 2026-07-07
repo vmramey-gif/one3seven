@@ -27,7 +27,7 @@ import {
   companyEconomics, ECON_DEFAULTS, type EconomicsInput,
 } from '../../services/crmAnalytics';
 import { CRM_STAGES, CRM_STAGE_LABELS, type CrmStage } from '../../services/crmStageLogic';
-import { CRM_WEEKLY_TARGETS, CRM_CALL_SCRIPT, CRM_OBJECTIONS, CRM_COLD_EMAIL, CRM_CREDIBILITY, CRM_COMPETITORS, CRM_WHY_AI_LOVE_HATE, CRM_SPECIALTIES } from '../constants/crmReference';
+import { CRM_WEEKLY_TARGETS, CRM_CALL_SCRIPT, CRM_OBJECTIONS, CRM_COLD_EMAIL, CRM_CREDIBILITY, CRM_COMPETITORS, CRM_WHY_AI_LOVE_HATE, CRM_SPECIALTIES, CRM_PARTNERSHIP, CRM_POSITIONING_NORTH_STAR } from '../constants/crmReference';
 import { FIRE_DEMO_TRAINING, PI_RULES, CRM_COMMISSIONS, CRM_SUBSCRIPTION_TIERS, LAUNCH_CHECKLIST } from '../constants/crmTraining';
 import { AUDIT_SITE_CHECKS, AUDIT_MANUAL_GROUPS } from '../constants/crmAudit';
 import { crmFirmIntel } from '../constants/crmFirmIntel';
@@ -2031,6 +2031,20 @@ function MetricsTab({ firms, activity }: { firms: CrmFirm[]; activity: CrmActivi
 function ScriptsTab() {
   return (
     <div className="space-y-3">
+      {/* Positioning north star — the frame every call/email/demo runs on. */}
+      <div className="rounded-[14px] border-2 border-[#DCD3FF] bg-[#F7F3FF] p-4">
+        <div className="mb-2 text-[11px] font-bold uppercase tracking-wide text-[#6D4AFF]">How we position (read first)</div>
+        <p className="mb-3 text-[14px] font-semibold leading-relaxed text-[#1E1B4B]">{CRM_POSITIONING_NORTH_STAR}</p>
+        <div className="space-y-2.5">
+          {CRM_PARTNERSHIP.map((p) => (
+            <div key={p.line} className="rounded-[10px] border border-[#E7E1FF] bg-white p-2.5">
+              <p className="text-[13px] font-medium leading-snug text-[#1E1B4B]">{p.line}</p>
+              <p className="mt-1 text-[11px] leading-relaxed text-[#1E1B4B]/50">{p.why}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
       <Collapsible title="Call script" defaultOpen>
         <div className="space-y-3">
           {CRM_CALL_SCRIPT.map((s) => (

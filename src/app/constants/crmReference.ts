@@ -14,18 +14,46 @@ export const CRM_WEEKLY_TARGETS = {
   pilots: 1,
 } as const;
 
+// ── Positioning north star — the frame every call, email, and demo runs on. ──
+// Sell the OUTCOME (an organized file), never the mechanism (AI). Partner, not product.
+export const CRM_POSITIONING_NORTH_STAR =
+  'one3seven is your intake partner, shaped around your firm. Invisible AI, visible benefit — the firm never sees the technology, just gets organized intake, and keeps every ounce of control.';
+
+export const CRM_PARTNERSHIP: { line: string; why: string }[] = [
+  {
+    line: '“We want to be your intake partner — shaped around your firm.”',
+    why: 'Firms don’t want to bend to software. Position one3seven as molding to THEM — their practice areas, matter types, intake link, workflow. Partner, not vendor.',
+  },
+  {
+    line: '“You’ll never open an AI. You’ll open a file — timeline built, records categorized, every fact linked to its source — before your first call.”',
+    why: 'Invisible AI, visible benefit. The AI is the plumbing, not the faucet: no prompts, no chatbot, no black box. Sell the organized file; the word “AI” recedes.',
+  },
+  {
+    line: '“AI is coming to your practice whether you invite it or not. This is the version where you get the upside — organized intake, faster decisions — without the risk. It never drafts, advises, or concludes.”',
+    why: 'Attorneys fear AI (UPL, malpractice, embarrassment). Give them the safe side of an inevitable shift — upside, no downside.',
+  },
+  {
+    line: '“It organizes and reflects — it never concludes. Every fact links to a source document. You verify, you decide, you represent. The AI never touches judgment — that’s still, only, and always yours.”',
+    why: 'The single most reassuring sentence to a nervous attorney. Your compliance line and your best sales line are the same sentence — lead with it.',
+  },
+  {
+    line: '“The 7-day pilot isn’t a test drive — it’s us shaping the intake around how your firm actually works.”',
+    why: 'Reframe the pilot as co-building, not a trial. Dedicated onboarding on Surge. The pilot IS the partnership.',
+  },
+];
+
 export const CRM_CALL_SCRIPT: { step: string; text: string }[] = [
   {
     step: 'Opener (permission-based)',
     text: '“Hi [Attorney], this is [Rep] with one3seven — I know I’m an interruption. Can I have 30 seconds, and you can tell me whether it’s worth continuing?”',
   },
   {
-    step: 'Reason for the call (the problem)',
-    text: '“We work with California employment firms who lose unbilled hours assembling a worker’s scattered records before they can even evaluate the matter. one3seven hands you an organized, source-linked intake before the first call.”',
+    step: 'Reason for the call (the problem + the partnership)',
+    text: '“We work with California employment firms who lose unbilled hours assembling a worker’s scattered records before they can even evaluate the matter. We become your intake partner — shaped around your firm — so an organized, source-linked file is waiting before your first call.”',
   },
   {
-    step: 'How it works (one line)',
-    text: '“The worker uploads their pay stubs, HR complaints, write-ups — one3seven organizes them into a timeline and a categorized packet. It organizes; it never gives legal advice or decides the matter. You evaluate.”',
+    step: 'How it works (invisible AI, one line)',
+    text: '“You never open an AI. The worker uploads their pay stubs, HR complaints, write-ups; you open a file — timeline built, records categorized, every fact linked to its source. It organizes and reflects — it never concludes. You evaluate, you decide.”',
   },
   {
     step: 'The ask (a look, not a sale)',
@@ -79,7 +107,7 @@ Hi [First name],
 
 Plaintiff employment clients often arrive with records scattered across pay stubs, texts, HR emails, and memory — and someone has to spend unbilled time assembling it before the matter can even be reviewed.
 
-one3seven organizes a worker's employment records into a structured, source-linked intake packet: a clear timeline, categorized records, and surfaced dates where each fact traces back to the original document.
+one3seven becomes your intake partner, shaped around your firm: a worker uploads their scattered records, and you open a clean, source-linked file — a clear timeline, categorized records, every fact traceable to the original document. You never open an AI; you just get the organized intake.
 
 It organizes and reflects. It does not draw legal conclusions. You evaluate everything.
 

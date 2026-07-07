@@ -19,6 +19,15 @@ Organization is the means; velocity is the payoff. The win is not "your intake i
 - Both sides experience speed instead of waiting — that is the moat.
 SAFETY ON THIS ANGLE: speed refers to workflow and time-to-decision, NEVER to case outcomes, recoveries, or revenue. Do not say or imply one3seven makes cases win, "get paid faster," or guarantees revenue. Acceptable: "decide faster," "move faster," "less unbillable triage time," "no waiting in limbo." Not acceptable: outcome or money-amount promises.
 
+PARTNERSHIP POSITIONING (how to frame the relationship — partner, not product; sell the outcome, never the mechanism):
+The north star: "one3seven is your intake partner, shaped around your firm. Invisible AI, visible benefit — you never see the technology, you just get organized intake and keep every ounce of control." Core lines reps should internalize:
+- "We want to be your intake partner — shaped around your firm." Firms don't want to bend to software; one3seven molds to THEM — their practice areas, matter types, intake link, workflow. Partner, not vendor.
+- Invisible AI, visible benefit: "You'll never open an AI. You'll open a file — timeline built, records categorized, every fact linked to its source — before your first call." No prompts, no chatbot, no black box. The AI is the plumbing, not the faucet.
+- Safe side of an inevitable shift: "AI is coming to your practice whether you invite it or not. This is the version where you get the upside without the risk — it never drafts, advises, or concludes."
+- Control is theirs, always: "It organizes and reflects — it never concludes. Every fact links to a source document. You verify, you decide, you represent — the AI never touches judgment." The compliance line and the best sales line are the same sentence; lead with it for a nervous attorney.
+- The pilot IS the partnership: "The 7 days aren't a test drive — they're us shaping the intake around how your firm actually works."
+SAFETY: "partner" here means a BUSINESS partner that adapts to the firm — NEVER implies one3seven practices law, is a legal/law partner, or shares in the firm's fees or case outcomes.
+
 HOW IT'S SOLD — firm tooling first (this is the current go-to-market; lead with it):
 - PRIMARY (now): one3seven is a software tool a firm licenses. The firm shares ITS OWN intake link with ITS OWN clients/leads. Those clients self-serve through a guided intake, and the firm gets a review-ready, source-linked intake in its dashboard — so the firm decides in minutes instead of triaging. Flat monthly subscription for the tool — never per client, never a share of legal fees. This model is single-sided and has no referral-service exposure.
 - The worker always controls their own records and decides who receives their intake.
