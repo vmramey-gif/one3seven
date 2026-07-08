@@ -8,6 +8,24 @@ Legend: ✅ shipped to prod · ⏳ built, pending deploy/config · ⚠️ risk /
 
 ---
 
+## 2026-07-08 — Code health audit fixes + copy round 4
+
+### 🔧 Code health (audit-driven bug fixes)
+- ✅ **Surge MRR 12× overstatement fixed** — Surge is billed annually ($1,490/yr) but CRM revenue math treated it as monthly. Added `TIER_BILLING` map; `tierPrice()` now returns monthly-equivalent (Surge → $124/mo) for MRR/commission while `TIER_PRICES` stays the display sticker. Test that baked in the bug corrected (`crmAnalytics.test.ts`). Any `surge`-tagged firm no longer inflates forecasts ~12×.
+- ✅ **Document-request action gate** — removed a dead always-false condition in `workerDocumentRequestNeedsAction` that could suppress the "needs action" prompt.
+- ✅ **Demo data correctness** (`DemoApp.tsx`) — invalid matter-tag IDs (`wage_theft`/`overtime` → `wage_hour`); added 3 required `intelligence` fields (`confirmedEmployer`, `allFlags`, `wageFacts`).
+- ✅ **File hydration** — `listUploadedFiles` now SELECTs `file_type`, so files rehydrated after reload keep their MIME type.
+- ✅ **Per-route page titles** (`main.tsx`) — `/for-firms`, `/terms`, `/privacy` + internal routes get distinct titles (SEO + tab clarity).
+- ✅ Removed broken no-op dead code (`intakePacketScan.ts`). Build ✅, tests ✅ 20/20, tsc errors 52 → 44 (remainder are runtime-correct type-noise).
+
+### ✍️ Copy round 4 (`ForFirmsPage`, `PublicMarketingPage`)
+- ✅ **Dropped "independently verified"** security claim — no defensible replacement without a real audit/pen test; now the plain true statement ("Row-level database policies enforce separation between firms").
+- ✅ **Scoped Anthropic line** — "Powered by Anthropic's Claude **for record organization**" (both pages), scoping Claude to organizing, not the whole product.
+- ✅ **Capacity-honest cohort** — dropped hard "50 firms" (a sole-engineer support-capacity promise, not a marketing number) → "a small founding cohort … onboarded a few at a time, hands-on."
+- ✅ **Pilot clock decoupled from calendar** — hero CTA "Request a pilot" (no day-count); pilot "begins with your first real intake and runs 30 days from there." Solves the low-ask vs. enough-volume tension in one framing.
+
+---
+
 ## 2026-07-06 — Firm-first relaunch, CRM v2, pricing, access gate
 
 ### 🏠 Homepage & marketing

@@ -39,6 +39,8 @@ that instinct is in constant conflict with the verb test. When in doubt, weaker 
 | "California-approved AI" · "the AI platform California adopted statewide" · any gov-endorsement vibe | Implies government endorsement | "Built on Anthropic's Claude" (factual, lower on page, never in hero) |
 | "partner / certified / endorsed by Anthropic" · Anthropic logos | Trademark / false-affiliation | "Built on / powered by Anthropic's Claude" only |
 | Fabricated metrics ("15 minutes", "6 schemas", "100% traceable") · fake scarcity counters | False advertising | only defensible, real numbers ("0 legal conclusions", "source documents preserved") |
+| "independently verified" · "audited" · "penetration tested" · "SOC 2" (as a security claim) | Unverifiable without an actual audit/pen test on file | state the plain mechanism only: "Row-level database policies enforce separation between firms." Add a verification claim ONLY once a real audit exists to point to |
+| A public cohort size ("50 firms", "first 100") pitched as a marketing number | It's really a **support-capacity promise** — one3seven is sole-engineer-supported; an unsupportable number is a false commitment | pick a number you can actually onboard hands-on in the window, or say none ("a small founding cohort … a few at a time"); make the horizon explicit |
 
 ---
 
