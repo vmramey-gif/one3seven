@@ -1422,9 +1422,11 @@ function GrowthTab() {
           <Stat label="Landing page visits" value={data.landing_visits.toLocaleString()} />
           <Stat label="For-firms visits" value={data.for_firms_visits.toLocaleString()} />
           <Stat label="Demo visits" value={data.demo_visits.toLocaleString()} />
-          <Stat label="Total sessions" value={data.total_sessions.toLocaleString()} />
+          <Stat label="Total sessions (public)" value={data.total_sessions.toLocaleString()} />
           <Stat label="Avg time on site" value={fmtDuration(data.avg_session_seconds)} />
           <Stat label="Avg time in demos" value={fmtDuration(data.demo_avg_session_seconds)} />
+          <Stat label="HQ sessions (internal)" value={(data.internal_sessions ?? 0).toLocaleString()} />
+          <Stat label="HQ visits (internal)" value={(data.internal_visits ?? 0).toLocaleString()} />
         </div>
       </section>
 

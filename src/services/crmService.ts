@@ -385,6 +385,9 @@ export interface SiteAnalytics {
   total_sessions: number;
   avg_session_seconds: number;
   demo_avg_session_seconds: number;
+  /** Founder/rep activity on /hq + /company-demo, excluded from the public numbers above. */
+  internal_sessions: number;
+  internal_visits: number;
   pilot_submits: number;
   pilot_success: number;
   signups_count: number;
