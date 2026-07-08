@@ -1285,7 +1285,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
                   claim — see reference_anthropic_trademark) + our own organize-not-conclude line. */}
               <div className="mb-4 rounded-[14px] border border-white/10 bg-white/5 px-4 py-3.5">
                 <p className="text-[13px] font-medium leading-relaxed text-white">
-                  Built on Anthropic's Claude.
+                  Powered by Anthropic's Claude for record organization.
                 </p>
                 <p className="mt-1.5 text-[13px] leading-relaxed text-[#C9C4E6]">
                   one3seven only organizes and reflects — it never concludes.

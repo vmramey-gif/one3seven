@@ -76,7 +76,7 @@ export function ForFirmsPage({ onBack, onStartWorker }: ForFirmsPageProps) {
               href="#pilot-interest"
               className="inline-flex items-center justify-center gap-2 rounded-full bg-[#6D4AFF] px-7 py-3.5 text-[15px] font-semibold text-white shadow-[0_16px_48px_rgba(109,74,255,0.40)] transition hover:-translate-y-0.5 hover:bg-[#5B35D5]"
             >
-              Request a 7-day pilot
+              Request a pilot
               <ArrowRight className="h-4 w-4" />
             </a>
             <a
@@ -194,8 +194,8 @@ export function ForFirmsPage({ onBack, onStartWorker }: ForFirmsPageProps) {
           </div>
           <div className="space-y-4">
             {[
-              ['Firm data isolation', 'Each firm sees only its own intakes. Row-level database policies enforce separation between firms, and isolation has been independently verified.'],
-              ['AI foundation', 'Built on Anthropic\'s Claude.'],
+              ['Firm data isolation', 'Each firm sees only its own intakes. Row-level database policies enforce separation between firms.'],
+              ['AI foundation', 'Powered by Anthropic\'s Claude for record organization.'],
               ['AI training', 'Uploaded documents are used to organize your intake. They are not used to train AI models.'],
               ['Built for auditability', 'Every surfaced fact links back to the worker’s input or a source document — review never depends on trusting a black-box summary.'],
               ['Attorney-decided', 'one3seven organizes records and surfaces information from documents. It does not provide legal advice, predictions, or conclusions. Source documents remain available for direct attorney review.'],
@@ -218,13 +218,14 @@ export function ForFirmsPage({ onBack, onStartWorker }: ForFirmsPageProps) {
           <div className="mb-6 text-center">
             <h2 style={SERIF} className="text-[26px] font-medium tracking-[-0.01em] text-white sm:text-[32px]">Founding firms — shaped around your practice</h2>
             <p className="mt-3 text-[14px] leading-relaxed text-[#C9C4E6]">
-              We are opening a limited founding cohort of 50 California employment firms and shaping the
-              intake experience around real plaintiff-side workflows: your matter types, your review process,
-              your documents, and the way your team evaluates new matters.
+              We are opening a small founding cohort of California employment firms — onboarded a few at a
+              time, hands-on — and shaping the intake experience around real plaintiff-side workflows: your
+              matter types, your review process, your documents, and the way your team evaluates new matters.
             </p>
             <p className="mt-3 text-[14px] leading-relaxed text-[#C9C4E6]">
               Founding firms receive hands-on onboarding, direct founder access, and founder pricing locked
-              for life during the founding program.
+              for life during the founding program. Your pilot begins with your first real intake and runs
+              30 days from there — enough time to evaluate it on real matters, not a rushed week.
             </p>
             <p className="mt-3 text-[13px] leading-relaxed text-[#9A93C2]">
               Your firm stays in control. Attorney judgment stays with your team. one3seven only organizes the intake file.
