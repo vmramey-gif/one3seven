@@ -31,13 +31,19 @@ function sessionId(): string {
 export function track(event: string, props?: Record<string, unknown>): void {
   try {
     if (typeof window === 'undefined' || dntEnabled() || !isSupabaseConfigured()) return;
-    void supabase.from('web_events').insert({
-      event,
-      path: window.location.pathname,
-      referrer: document.referrer || null,
-      session_id: sessionId(),
-      props: props ?? null,
-    });
+    // supabase-js queries are lazy — the request only fires when the builder is
+    // awaited or .then()'d. A bare `void insert(...)` NEVER sends. Attach a
+    // no-op .then() so the insert actually executes (and never rejects loudly).
+    supabase
+      .from('web_events')
+      .insert({
+        event,
+        path: window.location.pathname,
+        referrer: document.referrer || null,
+        session_id: sessionId(),
+        props: props ?? null,
+      })
+      .then(undefined, () => { /* analytics never breaks the app */ });
   } catch {
     /* analytics never breaks the app */
   }
@@ -54,13 +60,16 @@ export function pageview(): void {
 export function pageviewPath(path: string): void {
   try {
     if (typeof window === 'undefined' || dntEnabled() || !isSupabaseConfigured()) return;
-    void supabase.from('web_events').insert({
-      event: 'pageview',
-      path,
-      referrer: document.referrer || null,
-      session_id: sessionId(),
-      props: null,
-    });
+    supabase
+      .from('web_events')
+      .insert({
+        event: 'pageview',
+        path,
+        referrer: document.referrer || null,
+        session_id: sessionId(),
+        props: null,
+      })
+      .then(undefined, () => { /* analytics never breaks the app */ });
   } catch {
     /* analytics never breaks the app */
   }
