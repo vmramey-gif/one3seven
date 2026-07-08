@@ -232,9 +232,6 @@ function buildThemes(
   anchors: ParsedDate[]
 ): string[] {
   const t: string[] = [];
-  const count = (cat: IntakeTopLevelCategory) => byTop[cat].length;
-  if (count('Incident & Workplace Evidence') + /\b(complaint|grievance)\b/i.test('') ? 0 : 0)
-    void 0;
   if (
     byTop['Incident & Workplace Evidence'].length > 0 ||
     byTop['Employment Records'].some((f) => /\bcomplaint|grievance|investigation\b/i.test(f.fileName))

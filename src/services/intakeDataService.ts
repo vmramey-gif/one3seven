@@ -1155,7 +1155,7 @@ export async function uploadIntakeFile(
 export async function listUploadedFiles(intakeId: string) {
   const { data, error } = await supabase
     .from('uploaded_files')
-    .select('id, file_name, file_path, category, file_size, created_at')
+    .select('id, file_name, file_type, file_path, category, file_size, created_at')
     .eq('intake_id', intakeId)
     .order('created_at', { ascending: true });
   if (error) {

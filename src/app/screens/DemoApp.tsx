@@ -32,7 +32,7 @@ const DEMO_FIRM_LIVE_VIEW: FirmLiveIntakeView = {
     reimbursed: null,
     workedRemotely: 'no',
   },
-  employmentMatterTags: ['wage_theft', 'overtime', 'wrongful_termination', 'retaliation'],
+  employmentMatterTags: ['wage_hour', 'wrongful_termination', 'retaliation'],
   events: [
     {
       id: 'demo-ev-1',
@@ -117,6 +117,7 @@ const DEMO_FIRM_LIVE_VIEW: FirmLiveIntakeView = {
   documentRequest: null,
   documentResponse: null,
   intelligence: {
+    confirmedEmployer: 'Pacific Ridge Distribution LLC',
     confirmedComplaintTopic: 'Unpaid overtime and missed meal-break compensation',
     confirmedComplaintDate: 'November 26, 2025',
     confirmedHrResponseSummary: 'HR acknowledged receipt same day; written warning issued 11 days later',
@@ -171,6 +172,10 @@ const DEMO_FIRM_LIVE_VIEW: FirmLiveIntakeView = {
       'Pay records show overtime hours without a matching overtime rate. Do you have additional paystubs or wage statements for those periods?',
       'No coworker statement is in the records. Is there anyone who saw what happened who could share what they observed?',
     ],
+    // Not surfaced in the demo review UI; empty keeps the sample honest (no
+    // fabricated raw flag tokens or wage-exposure figures).
+    allFlags: [],
+    wageFacts: [],
   },
 };
 

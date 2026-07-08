@@ -78,6 +78,23 @@ if (prefillFirmCode?.trim()) {
   } catch { /* sessionStorage unavailable — no-op */ }
 }
 
+// Per-route document title. index.html ships the default homepage title;
+// non-home routes inherit it unless we set one here (helps SEO on public
+// routes and disambiguates browser tabs on internal ones).
+const routeTitle =
+  url.pathname === '/terms' ? 'Terms of Service — one3seven'
+  : url.pathname === '/privacy' ? 'Privacy Policy — one3seven'
+  : url.pathname === '/company-demo/debrief' ? 'Demo Debrief — one3seven'
+  : url.pathname === '/company-demo' ? 'Company Demo Guide — one3seven'
+  : isHQ ? 'Founder HQ — one3seven'
+  : isFireDemo ? 'Fire Demo — one3seven'
+  : isTxDemo ? 'Texas Demo — one3seven'
+  : isWorkerDemo ? 'Worker Demo — one3seven'
+  : isDemo ? 'Sample Intake Demo — one3seven'
+  : isForFirms ? 'one3seven for Firms — Organized Employment Intake'
+  : null;
+if (routeTitle) document.title = routeTitle;
+
 if (url.pathname === '/terms') {
   createRoot(rootEl).render(<AppErrorBoundary><TermsPage /></AppErrorBoundary>);
 } else if (url.pathname === '/privacy') {

@@ -3,8 +3,17 @@
  */
 import type { CrmFirm } from './crmService';
 
+/** Sticker price per tier. Practice/Firm are billed monthly; Surge is billed
+ *  annually ($1,490/yr). Use this for DISPLAY; use tierPrice() for MRR math. */
 export const TIER_PRICES = { practice: 249, firm: 549, surge: 1490 } as const;
 export type SubscriptionTier = 'practice' | 'firm' | 'surge';
+
+/** Billing cadence per tier. MRR math divides annual tiers by 12. */
+export const TIER_BILLING: Record<SubscriptionTier, 'monthly' | 'annual'> = {
+  practice: 'monthly',
+  firm: 'monthly',
+  surge: 'annual',
+};
 
 export const PHASE1_PAYING_TARGET = 3;
 export const PIPELINE_CONVERSION_RATE = 0.3;
@@ -24,11 +33,12 @@ export function avgMinutesSaved(firms: { est_minutes_saved?: number | null }[]):
   return { avg: Math.round(vals.reduce((s, v) => s + v, 0) / vals.length), n: vals.length };
 }
 
-/** Monthly price for a tier; null/unknown defaults to Practice ($249). */
+/** Monthly-recurring-revenue contribution for a tier (annual tiers ÷ 12, rounded).
+ *  null/unknown defaults to Practice ($249/mo). For the sticker price use TIER_PRICES. */
 export function tierPrice(tier: string | null | undefined): number {
-  if (tier === 'firm') return TIER_PRICES.firm;
-  if (tier === 'surge') return TIER_PRICES.surge;
-  return TIER_PRICES.practice;
+  const t: SubscriptionTier = tier === 'firm' || tier === 'surge' ? tier : 'practice';
+  const sticker = TIER_PRICES[t];
+  return TIER_BILLING[t] === 'annual' ? Math.round(sticker / 12) : sticker;
 }
 
 export interface RevenueSummary {
@@ -46,7 +56,7 @@ export function computeRevenue(firms: CrmFirm[]): RevenueSummary {
   const tiers: SubscriptionTier[] = ['practice', 'firm', 'surge'];
   const perTier = tiers.map((tier) => {
     const count = paid.filter((f) => (f.subscription_tier ?? 'practice') === tier).length;
-    return { tier, count, mrr: count * TIER_PRICES[tier] };
+    return { tier, count, mrr: count * tierPrice(tier) };
   });
   const currentMrr = paid.reduce((sum, f) => sum + tierPrice(f.subscription_tier), 0);
   const candidates = firms.filter(
@@ -127,7 +137,7 @@ export interface CommissionResult {
 export function commissionProjection({ firmCount, tier, months }: CommissionScenario): CommissionResult {
   const firms = Math.max(0, Math.floor(firmCount));
   const m = Math.max(0, Math.floor(months));
-  const mrr = firms * TIER_PRICES[tier];
+  const mrr = firms * tierPrice(tier);
   const monthlyCommission = Math.round(mrr * COMMISSION_RATE);
   const totalCommission = monthlyCommission * m;
   const bonus = firstThreeBonus(firms).earned;
@@ -172,7 +182,7 @@ export interface EconomicsResult {
 export function companyEconomics(i: EconomicsInput): EconomicsResult {
   const firms = Math.max(0, Math.floor(i.firmCount));
   const m = Math.max(0, Math.floor(i.months));
-  const mrr = firms * TIER_PRICES[i.tier];
+  const mrr = firms * tierPrice(i.tier);
   const grossTotal = mrr * m;
   const charges = firms * m; // one subscription charge per firm per month
   const commission = grossTotal * (i.commissionPct / 100);

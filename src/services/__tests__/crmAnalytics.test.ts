@@ -28,7 +28,7 @@ describe('tierPrice', () => {
   it('prices each tier; null/unknown = Practice', () => {
     expect(tierPrice('practice')).toBe(249);
     expect(tierPrice('firm')).toBe(549);
-    expect(tierPrice('surge')).toBe(1490);
+    expect(tierPrice('surge')).toBe(124); // $1,490/yr billed annually → monthly-equivalent MRR
     expect(tierPrice(null)).toBe(249);
     expect(tierPrice('mystery')).toBe(249);
   });
@@ -37,9 +37,9 @@ describe('tierPrice', () => {
 describe('computeRevenue', () => {
   it('sums MRR by tier, commission, and pipeline forecast', () => {
     const firms = [
-      firm('paid', 'firm'),       // 549
-      firm('paid', 'surge'),      // 1490
-      firm('paid', null),         // null -> practice 249
+      firm('paid', 'firm'),       // 549/mo
+      firm('paid', 'surge'),      // $1,490/yr billed annually -> 124/mo MRR
+      firm('paid', null),         // null -> practice 249/mo
       firm('pilot'),
       firm('demo_booked'),
       firm('demo_done'),
@@ -47,11 +47,11 @@ describe('computeRevenue', () => {
     ];
     const r = computeRevenue(firms);
     expect(r.paidCount).toBe(3);
-    expect(r.currentMrr).toBe(549 + 1490 + 249); // 2288
-    expect(r.commissionMonthly).toBe(Math.round(2288 * 0.2)); // 458
+    expect(r.currentMrr).toBe(549 + 124 + 249); // 922 — Surge annual normalized to monthly
+    expect(r.commissionMonthly).toBe(Math.round(922 * 0.2)); // 184
     expect(r.perTier.find((t) => t.tier === 'practice')).toEqual({ tier: 'practice', count: 1, mrr: 249 });
     expect(r.perTier.find((t) => t.tier === 'firm')).toEqual({ tier: 'firm', count: 1, mrr: 549 });
-    expect(r.perTier.find((t) => t.tier === 'surge')).toEqual({ tier: 'surge', count: 1, mrr: 1490 });
+    expect(r.perTier.find((t) => t.tier === 'surge')).toEqual({ tier: 'surge', count: 1, mrr: 124 });
     expect(r.candidateCount).toBe(3); // pilot + demo_booked + demo_done
     expect(r.projectedMrr).toBe(Math.round(3 * 0.3 * 249)); // 224
   });
