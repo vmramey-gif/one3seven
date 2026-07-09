@@ -96,11 +96,11 @@ function NavBar({ step, phase, onBack, onSignUp }: { step: number; phase: Phase;
       <div className="mx-auto flex h-14 max-w-2xl items-center justify-between px-5">
         <div className="flex items-center gap-3">
           {inIntake && step > 1 && (
-            <button type="button" onClick={onBack} className="flex items-center gap-1 rounded-lg px-2 py-1.5 text-sm text-[#14112E]/55 transition hover:bg-[#F5F1FB] hover:text-[#14112E]">
+            <button type="button" onClick={onBack} className="flex items-center gap-1 rounded-lg px-2 py-1.5 text-sm text-[#1B2623]/55 transition hover:bg-[#F2F4EC] hover:text-[#1B2623]">
               <ArrowLeft className="h-3.5 w-3.5" /> Back
             </button>
           )}
-          <span className="text-[15px] font-bold tracking-tight text-[#14112E]">
+          <span className="text-[15px] font-bold tracking-tight text-[#1B2623]">
             one<span className="font-black text-[#42574E]">3</span>seven
           </span>
         </div>
@@ -112,7 +112,7 @@ function NavBar({ step, phase, onBack, onSignUp }: { step: number; phase: Phase;
               ))}
             </div>
           )}
-          <button type="button" onClick={onSignUp} className="rounded-full border border-[#42574E]/30 px-4 py-1.5 text-xs font-semibold text-[#42574E] transition hover:bg-[#F5F1FB]">
+          <button type="button" onClick={onSignUp} className="rounded-full border border-[#42574E]/30 px-4 py-1.5 text-xs font-semibold text-[#42574E] transition hover:bg-[#F2F4EC]">
             Sign up free
           </button>
         </div>
@@ -127,7 +127,7 @@ function NextButton({ onClick, label = 'Continue', disabled = false }: { onClick
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={`flex items-center gap-2 rounded-full px-7 py-3.5 text-[15px] font-semibold text-white shadow-[0_12px_32px_rgba(109,74,255,0.25)] transition ${disabled ? 'cursor-not-allowed bg-[#42574E]/30' : 'bg-[#42574E] hover:bg-[#4C1D96] hover:-translate-y-0.5'}`}
+      className={`flex items-center gap-2 rounded-full px-7 py-3.5 text-[15px] font-semibold text-white shadow-[0_12px_32px_rgba(109,74,255,0.25)] transition ${disabled ? 'cursor-not-allowed bg-[#42574E]/30' : 'bg-[#42574E] hover:bg-[#42574E] hover:-translate-y-0.5'}`}
     >
       {label} <ArrowRight className="h-4 w-4" />
     </button>
@@ -138,7 +138,7 @@ function StepLabel({ step, total, title }: { step: number; total: number; title:
   return (
     <div className="mb-6">
       <div className="mb-1 text-xs font-bold uppercase tracking-[0.2em] text-[#42574E]">Step {step} of {total}</div>
-      <h2 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="text-[24px] font-medium leading-tight tracking-[-0.01em] text-[#14112E] sm:text-[27px]">{title}</h2>
+      <h2 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="text-[24px] font-medium leading-tight tracking-[-0.01em] text-[#1B2623] sm:text-[27px]">{title}</h2>
     </div>
   );
 }
@@ -180,17 +180,17 @@ function Step1Story({ onNext }: { onNext: () => void }) {
   return (
     <motion.div key="step1" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }} className="mx-auto max-w-2xl px-5 py-10">
       <StepLabel step={1} total={3} title="Tell us what happened" />
-      <p className="mb-6 text-[14px] leading-relaxed text-[#14112E]/55">
+      <p className="mb-6 text-[14px] leading-relaxed text-[#1B2623]/55">
         Use your own words. There are no wrong answers. You can add records in the next step.
       </p>
 
-      <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-[#ECE7F5] bg-white px-3 py-1.5 text-xs font-semibold text-[#42574E]">
+      <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-[#E4E5DE] bg-white px-3 py-1.5 text-xs font-semibold text-[#42574E]">
         <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" />
         <Mic className="h-3.5 w-3.5" />
         {done ? 'Story captured' : 'Marcus is speaking…'}
       </div>
 
-      <div className="mb-6 min-h-[140px] w-full rounded-[18px] border border-[#ECE7F5] bg-[#FAF9F6] p-5 text-[14px] leading-relaxed text-[#14112E]">
+      <div className="mb-6 min-h-[140px] w-full rounded-[18px] border border-[#E4E5DE] bg-[#FAF9F6] p-5 text-[14px] leading-relaxed text-[#1B2623]">
         {displayed}
         {!done && <span className="ml-0.5 inline-block h-[1em] w-0.5 animate-pulse bg-[#42574E] align-middle" />}
       </div>
@@ -238,12 +238,12 @@ function Step2Records({ onNext }: { onNext: () => void }) {
   return (
     <motion.div key="step2" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }} className="mx-auto max-w-2xl px-5 py-10">
       <StepLabel step={2} total={3} title="Add records" />
-      <p className="mb-5 text-[14px] leading-relaxed text-[#14112E]/55">
+      <p className="mb-5 text-[14px] leading-relaxed text-[#1B2623]/55">
         Upload anything relevant — pay stubs, emails, write-ups, HR complaints, screenshots. No legal knowledge needed.
       </p>
 
       {/* Suggested file types tip */}
-      <div className="mb-5 rounded-[14px] border border-[#ECE7F5] bg-white p-4">
+      <div className="mb-5 rounded-[14px] border border-[#E4E5DE] bg-white p-4">
         <div className="mb-2.5 text-[11px] font-bold uppercase tracking-wider text-[#42574E]">What to upload — common examples</div>
         <div className="grid grid-cols-2 gap-x-4 gap-y-1.5">
           {[
@@ -260,18 +260,18 @@ function Step2Records({ onNext }: { onNext: () => void }) {
           ].map(([label, dot]) => (
             <div key={label} className="flex items-start gap-1.5">
               <span className={`mt-[3px] h-1.5 w-1.5 shrink-0 rounded-full ${dot}`} />
-              <span className="text-[12px] leading-snug text-[#14112E]/65">{label}</span>
+              <span className="text-[12px] leading-snug text-[#1B2623]/65">{label}</span>
             </div>
           ))}
         </div>
-        <p className="mt-3 text-[11px] text-[#14112E]/35">Not sure what to include? Upload anything and one3seven will organize it.</p>
+        <p className="mt-3 text-[11px] text-[#1B2623]/35">Not sure what to include? Upload anything and one3seven will organize it.</p>
       </div>
 
       {/* Drop zone */}
-      <div className="mb-5 flex flex-col items-center justify-center gap-2 rounded-[18px] border-2 border-dashed border-[#ECE7F5] bg-[#FAF9F6] py-7">
+      <div className="mb-5 flex flex-col items-center justify-center gap-2 rounded-[18px] border-2 border-dashed border-[#E4E5DE] bg-[#FAF9F6] py-7">
         <Upload className="h-7 w-7 text-[#42574E]/40" />
         <span className="text-[13px] font-semibold text-[#42574E]">Drop files here, or click to browse</span>
-        <span className="text-[11px] text-[#14112E]/35">PDF · Images · Word · Any format</span>
+        <span className="text-[11px] text-[#1B2623]/35">PDF · Images · Word · Any format</span>
       </div>
 
       <div className="mb-4 space-y-1.5">
@@ -287,15 +287,15 @@ function Step2Records({ onNext }: { onNext: () => void }) {
                     <doc.icon className={`h-3.5 w-3.5 shrink-0 ${doc.color}`} />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2">
-                        <span className="text-[12px] font-semibold text-[#14112E] truncate">{doc.label}</span>
-                        <span className="shrink-0 text-[10px] text-[#14112E]/40">{doc.size}</span>
+                        <span className="text-[12px] font-semibold text-[#1B2623] truncate">{doc.label}</span>
+                        <span className="shrink-0 text-[10px] text-[#1B2623]/40">{doc.size}</span>
                       </div>
                       {!complete && (
                         <div className="mt-1 h-1 w-full overflow-hidden rounded-full bg-white/60">
                           <div className={`h-full rounded-full transition-all ${doc.color.replace('text-', 'bg-')}`} style={{ width: `${pct}%` }} />
                         </div>
                       )}
-                      {complete && <div className="mt-0.5 text-[10px] text-[#14112E]/40">{doc.cat}</div>}
+                      {complete && <div className="mt-0.5 text-[10px] text-[#1B2623]/40">{doc.cat}</div>}
                     </div>
                     {complete && <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-500" />}
                   </div>
@@ -368,17 +368,17 @@ function Step3Details({ onSubmit }: { onSubmit: () => void }) {
   return (
     <motion.div key="step3" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }} className="mx-auto max-w-2xl px-5 py-10">
       <StepLabel step={3} total={3} title="Helpful details if you know them" />
-      <p className="mb-2 text-[14px] leading-relaxed text-[#14112E]/55">
+      <p className="mb-2 text-[14px] leading-relaxed text-[#1B2623]/55">
         These optional details help one3seven connect your story to the records you upload.
       </p>
 
       {/* Completeness bar — sticky so it's always readable */}
-      <div className="sticky top-14 z-10 mb-6 rounded-[14px] border border-[#ECE7F5] bg-white/95 backdrop-blur-sm p-4 shadow-sm">
+      <div className="sticky top-14 z-10 mb-6 rounded-[14px] border border-[#E4E5DE] bg-white/95 backdrop-blur-sm p-4 shadow-sm">
         <div className="mb-2 flex items-center justify-between">
-          <span className="text-[12px] font-bold text-[#14112E]">Intake Completeness</span>
+          <span className="text-[12px] font-bold text-[#1B2623]">Intake Completeness</span>
           <span className="text-[12px] font-bold text-[#42574E]">{showAnswer.filter(Boolean).length} of {OPTIONAL_FIELDS.length}</span>
         </div>
-        <div className="h-2 overflow-hidden rounded-full bg-[#ECE7F5]">
+        <div className="h-2 overflow-hidden rounded-full bg-[#E4E5DE]">
           <motion.div className="h-full rounded-full bg-[#42574E]" animate={{ width: `${pct}%` }} transition={{ duration: 0.4, ease: 'easeOut' }} />
         </div>
       </div>
@@ -399,10 +399,10 @@ function Step3Details({ onSubmit }: { onSubmit: () => void }) {
                     transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
                     className="mb-1.5 flex items-start gap-2"
                   >
-                    <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[#ECE7F5] bg-[#F5F1FB] mt-0.5">
+                    <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[#E4E5DE] bg-[#F2F4EC] mt-0.5">
                       <span className="text-[8px] font-black text-[#42574E]">137</span>
                     </div>
-                    <div className="max-w-[78%] rounded-[14px] rounded-tl-[4px] border border-[#ECE7F5] bg-white px-4 py-2.5 text-[13px] font-medium text-[#14112E]">
+                    <div className="max-w-[78%] rounded-[14px] rounded-tl-[4px] border border-[#E4E5DE] bg-white px-4 py-2.5 text-[13px] font-medium text-[#1B2623]">
                       {f.label}
                     </div>
                   </motion.div>
@@ -443,7 +443,7 @@ function Step3Details({ onSubmit }: { onSubmit: () => void }) {
                     transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
                     className="mb-0.5 flex justify-end"
                   >
-                    <div className="max-w-[78%] rounded-[14px] rounded-tr-[4px] bg-[#14112E] px-4 py-2.5 text-[13px] font-medium text-white/90">
+                    <div className="max-w-[78%] rounded-[14px] rounded-tr-[4px] bg-[#1B2623] px-4 py-2.5 text-[13px] font-medium text-white/90">
                       {f.answer}
                     </div>
                   </motion.div>
@@ -486,13 +486,13 @@ function PostProcessing({ onNext }: { onNext: () => void }) {
 
   return (
     <motion.div key="processing" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }} className="mx-auto max-w-2xl px-5 py-12">
-      <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-[#ECE7F5] bg-[#F5F1FB] px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[#42574E]">
+      <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-[#E4E5DE] bg-[#F2F4EC] px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[#42574E]">
         What one3seven builds from this
       </div>
-      <h2 className="mb-8 text-[24px] font-bold leading-tight tracking-tight text-[#14112E]">Organizing your intake</h2>
+      <h2 className="mb-8 text-[24px] font-bold leading-tight tracking-tight text-[#1B2623]">Organizing your intake</h2>
 
       <div className="grid gap-6 sm:grid-cols-2">
-        <div className="flex flex-col items-center justify-center rounded-[20px] border border-[#ECE7F5] bg-[#FAF9F6] py-8">
+        <div className="flex flex-col items-center justify-center rounded-[20px] border border-[#E4E5DE] bg-[#FAF9F6] py-8">
           <OneThreeSevenLoader size="lg" />
         </div>
 
@@ -505,17 +505,17 @@ function PostProcessing({ onNext }: { onNext: () => void }) {
                 <AnimatePresence mode="wait">
                   {done
                     ? <motion.div key="done" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 400, damping: 20 }}><CheckCircle2 className={`h-4 w-4 shrink-0 ${active ? 'text-[#42574E]' : 'text-emerald-500'}`} /></motion.div>
-                    : <div key="empty" className="h-4 w-4 shrink-0 rounded-full border-2 border-[#ECE7F5]" />
+                    : <div key="empty" className="h-4 w-4 shrink-0 rounded-full border-2 border-[#E4E5DE]" />
                   }
                 </AnimatePresence>
-                <span className={`text-[13px] transition-colors ${done ? (active ? 'font-semibold text-[#42574E]' : 'font-medium text-[#14112E]') : 'text-[#14112E]/30'}`}>{s}</span>
+                <span className={`text-[13px] transition-colors ${done ? (active ? 'font-semibold text-[#42574E]' : 'font-medium text-[#1B2623]') : 'text-[#1B2623]/30'}`}>{s}</span>
               </motion.div>
             );
           })}
         </div>
       </div>
 
-      <p className="mt-8 text-center text-[11px] text-[#14112E]/35">
+      <p className="mt-8 text-center text-[11px] text-[#1B2623]/35">
         one3seven organizes records for attorney review. It does not provide legal advice or determine legal outcomes.
       </p>
     </motion.div>
@@ -535,16 +535,16 @@ function PostSummary({ onNext }: { onNext: () => void }) {
 
   return (
     <motion.div key="postsummary" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }} className="mx-auto max-w-2xl px-5 py-12">
-      <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-[#ECE7F5] bg-[#F5F1FB] px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[#42574E]">
+      <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-[#E4E5DE] bg-[#F2F4EC] px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[#42574E]">
         What one3seven builds from this
       </div>
       <div className="mb-2 mt-3 flex items-center gap-3">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-100">
           <CheckCircle2 className="h-5 w-5 text-emerald-600" />
         </div>
-        <h2 className="text-[24px] font-bold leading-tight tracking-tight text-[#14112E]">Review packet ready</h2>
+        <h2 className="text-[24px] font-bold leading-tight tracking-tight text-[#1B2623]">Review packet ready</h2>
       </div>
-      <p className="mb-7 text-[14px] leading-relaxed text-[#14112E]/55">
+      <p className="mb-7 text-[14px] leading-relaxed text-[#1B2623]/55">
         Marcus's story and records have been organized into a structured intake for attorney review.
       </p>
 
@@ -557,12 +557,12 @@ function PostSummary({ onNext }: { onNext: () => void }) {
         ))}
       </div>
 
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.9 }} className="mb-7 rounded-[16px] border border-[#ECE7F5] bg-white p-4">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.9 }} className="mb-7 rounded-[16px] border border-[#E4E5DE] bg-white p-4">
         <div className="flex items-center gap-2">
           <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
-          <span className="text-[13px] font-semibold text-[#14112E]">Review Packet Generated</span>
+          <span className="text-[13px] font-semibold text-[#1B2623]">Review Packet Generated</span>
         </div>
-        <p className="mt-1.5 pl-6 text-[12px] leading-relaxed text-[#14112E]/55">
+        <p className="mt-1.5 pl-6 text-[12px] leading-relaxed text-[#1B2623]/55">
           Story, timeline, document checklist, and employer response summary — structured for attorney review.
         </p>
       </motion.div>
@@ -597,24 +597,24 @@ function PostDashboard({ onNext }: { onNext: () => void }) {
 
   return (
     <motion.div key="dashboard" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }} className="mx-auto max-w-2xl px-5 py-10">
-      <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-[#ECE7F5] bg-[#F5F1FB] px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[#42574E]">
+      <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-[#E4E5DE] bg-[#F2F4EC] px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[#42574E]">
         What one3seven builds from this
       </div>
 
       <div className="mb-5 mt-3 flex items-start justify-between gap-4">
         <div>
-          <h2 className="text-[20px] font-bold leading-tight tracking-tight text-[#14112E]">Marcus Rivera</h2>
-          <div className="mt-0.5 text-[13px] text-[#14112E]/50">Pacific Ridge Distribution LLC</div>
-          <div className="mt-0.5 text-[12px] text-[#14112E]/40">March 2022 – January 2026</div>
+          <h2 className="text-[20px] font-bold leading-tight tracking-tight text-[#1B2623]">Marcus Rivera</h2>
+          <div className="mt-0.5 text-[13px] text-[#1B2623]/50">Pacific Ridge Distribution LLC</div>
+          <div className="mt-0.5 text-[12px] text-[#1B2623]/40">March 2022 – January 2026</div>
         </div>
         <div className="shrink-0 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-[10px] font-bold text-emerald-700">Organized</div>
       </div>
 
       {/* View toggle */}
-      <div className="mb-5 flex rounded-[12px] border border-[#ECE7F5] bg-white p-1">
+      <div className="mb-5 flex rounded-[12px] border border-[#E4E5DE] bg-white p-1">
         {([['firm', 'What Firms See'], ['full', 'Full Review']] as const).map(([key, label]) => (
           <button key={key} type="button" onClick={() => setView(key)}
-            className={`flex-1 rounded-[9px] py-2 text-[13px] font-semibold transition ${view === key ? 'bg-[#42574E] text-white shadow-sm' : 'text-[#14112E]/55 hover:text-[#14112E]'}`}>
+            className={`flex-1 rounded-[9px] py-2 text-[13px] font-semibold transition ${view === key ? 'bg-[#42574E] text-white shadow-sm' : 'text-[#1B2623]/55 hover:text-[#1B2623]'}`}>
             {label}
           </button>
         ))}
@@ -623,36 +623,36 @@ function PostDashboard({ onNext }: { onNext: () => void }) {
       {/* Status grid */}
       <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
         {STATUS.map(s => (
-          <div key={s} className="flex items-center gap-2 rounded-[12px] border border-[#ECE7F5] bg-white px-3 py-2.5">
+          <div key={s} className="flex items-center gap-2 rounded-[12px] border border-[#E4E5DE] bg-white px-3 py-2.5">
             <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-500" />
-            <span className="text-[11px] font-semibold text-[#14112E]">{s}</span>
+            <span className="text-[11px] font-semibold text-[#1B2623]">{s}</span>
           </div>
         ))}
       </div>
 
       {/* Organized summary */}
-      <div className="mb-4 rounded-[16px] border border-[#ECE7F5] bg-[#F5F1FB] p-5">
+      <div className="mb-4 rounded-[16px] border border-[#E4E5DE] bg-[#F2F4EC] p-5">
         <div className="mb-2 text-[10px] font-bold uppercase tracking-wider text-[#42574E]">Organized Summary</div>
-        <p className="text-[13px] leading-relaxed text-[#14112E]/80">{ORGANIZED_SUMMARY}</p>
+        <p className="text-[13px] leading-relaxed text-[#1B2623]/80">{ORGANIZED_SUMMARY}</p>
       </div>
 
       {/* Possible review areas */}
-      <div className="mb-4 rounded-[16px] border border-[#ECE7F5] bg-white p-5">
-        <div className="mb-2 text-[10px] font-bold uppercase tracking-wider text-[#14112E]/40">Possible Review Areas</div>
+      <div className="mb-4 rounded-[16px] border border-[#E4E5DE] bg-white p-5">
+        <div className="mb-2 text-[10px] font-bold uppercase tracking-wider text-[#1B2623]/40">Possible Review Areas</div>
         <div className="mb-4 flex flex-wrap gap-2">
           {CONCERNS.map(c => (
-            <span key={c} className="rounded-full border border-[#ECE7F5] bg-[#F5F1FB] px-3 py-1.5 text-[12px] font-semibold text-[#42574E]">{c}</span>
+            <span key={c} className="rounded-full border border-[#E4E5DE] bg-[#F2F4EC] px-3 py-1.5 text-[12px] font-semibold text-[#42574E]">{c}</span>
           ))}
         </div>
         {!concernsConfirmed ? (
           <div>
-            <p className="mb-3 text-[13px] font-medium text-[#14112E]">Does this sound accurate?</p>
+            <p className="mb-3 text-[13px] font-medium text-[#1B2623]">Does this sound accurate?</p>
             <div className="flex gap-2">
               <button type="button" onClick={() => setConcernsConfirmed(true)}
-                className="flex items-center gap-1.5 rounded-full bg-[#42574E] px-5 py-2 text-[13px] font-semibold text-white transition hover:bg-[#4C1D96]">
+                className="flex items-center gap-1.5 rounded-full bg-[#42574E] px-5 py-2 text-[13px] font-semibold text-white transition hover:bg-[#42574E]">
                 <CheckCircle2 className="h-3.5 w-3.5" /> Yes, that's accurate
               </button>
-              <button type="button" className="rounded-full border border-[#ECE7F5] px-5 py-2 text-[13px] font-semibold text-[#14112E]/55 transition hover:bg-[#F5F1FB]">
+              <button type="button" className="rounded-full border border-[#E4E5DE] px-5 py-2 text-[13px] font-semibold text-[#1B2623]/55 transition hover:bg-[#F2F4EC]">
                 Not exactly
               </button>
             </div>
@@ -670,28 +670,28 @@ function PostDashboard({ onNext }: { onNext: () => void }) {
         {view === 'full' && (
           <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.3 }}>
             {/* Timeline */}
-            <div className="mb-4 rounded-[16px] border border-[#ECE7F5] bg-white overflow-hidden">
+            <div className="mb-4 rounded-[16px] border border-[#E4E5DE] bg-white overflow-hidden">
               <button type="button" onClick={() => setTimelineOpen(o => !o)} className="flex w-full items-center justify-between px-5 py-4">
-                <span className="text-[13px] font-bold text-[#14112E]">Timeline Preview</span>
-                {timelineOpen ? <ChevronUp className="h-4 w-4 text-[#14112E]/40" /> : <ChevronDown className="h-4 w-4 text-[#14112E]/40" />}
+                <span className="text-[13px] font-bold text-[#1B2623]">Timeline Preview</span>
+                {timelineOpen ? <ChevronUp className="h-4 w-4 text-[#1B2623]/40" /> : <ChevronDown className="h-4 w-4 text-[#1B2623]/40" />}
               </button>
               <AnimatePresence>
                 {timelineOpen && (
                   <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }} className="overflow-hidden">
-                    <div className="border-t border-[#ECE7F5] px-5 pb-4 pt-3 space-y-1">
+                    <div className="border-t border-[#E4E5DE] px-5 pb-4 pt-3 space-y-1">
                       {TIMELINE.map((e, i) => (
                         <div key={e.date} className="flex gap-3">
                           <div className="flex flex-col items-center pt-1.5">
                             <div className={`h-2 w-2 rounded-full shrink-0 ${e.dot}`} />
-                            {i < TIMELINE.length - 1 && <div className="w-px flex-1 bg-[#ECE7F5] mt-1" style={{ minHeight: 20 }} />}
+                            {i < TIMELINE.length - 1 && <div className="w-px flex-1 bg-[#E4E5DE] mt-1" style={{ minHeight: 20 }} />}
                           </div>
                           <div className="pb-3 min-w-0">
                             <div className="flex flex-wrap items-center gap-1.5 mb-0.5">
-                              <span className="text-[10px] font-bold text-[#14112E]/40">{e.date}</span>
-                              {e.tag && <span className={`rounded-full px-1.5 py-0.5 text-[9px] font-bold ${e.gap ? 'bg-red-100 text-red-600' : 'bg-[#F5F1FB] text-[#42574E]'}`}>{e.tag}</span>}
+                              <span className="text-[10px] font-bold text-[#1B2623]/40">{e.date}</span>
+                              {e.tag && <span className={`rounded-full px-1.5 py-0.5 text-[9px] font-bold ${e.gap ? 'bg-red-100 text-red-600' : 'bg-[#F2F4EC] text-[#42574E]'}`}>{e.tag}</span>}
                             </div>
-                            <div className="text-[12px] font-semibold text-[#14112E]">{e.label}</div>
-                            <div className="text-[11px] leading-relaxed text-[#14112E]/50 mt-0.5">{e.detail}</div>
+                            <div className="text-[12px] font-semibold text-[#1B2623]">{e.label}</div>
+                            <div className="text-[11px] leading-relaxed text-[#1B2623]/50 mt-0.5">{e.detail}</div>
                           </div>
                         </div>
                       ))}
@@ -702,15 +702,15 @@ function PostDashboard({ onNext }: { onNext: () => void }) {
             </div>
 
             {/* Doc categories */}
-            <div className="mb-4 rounded-[16px] border border-[#ECE7F5] bg-white overflow-hidden">
+            <div className="mb-4 rounded-[16px] border border-[#E4E5DE] bg-white overflow-hidden">
               <button type="button" onClick={() => setDocsOpen(o => !o)} className="flex w-full items-center justify-between px-5 py-4">
-                <span className="text-[13px] font-bold text-[#14112E]">Document Categories</span>
-                {docsOpen ? <ChevronUp className="h-4 w-4 text-[#14112E]/40" /> : <ChevronDown className="h-4 w-4 text-[#14112E]/40" />}
+                <span className="text-[13px] font-bold text-[#1B2623]">Document Categories</span>
+                {docsOpen ? <ChevronUp className="h-4 w-4 text-[#1B2623]/40" /> : <ChevronDown className="h-4 w-4 text-[#1B2623]/40" />}
               </button>
               <AnimatePresence>
                 {docsOpen && (
                   <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }} className="overflow-hidden">
-                    <div className="border-t border-[#ECE7F5] px-5 pb-4 pt-3 grid grid-cols-2 gap-2">
+                    <div className="border-t border-[#E4E5DE] px-5 pb-4 pt-3 grid grid-cols-2 gap-2">
                       {DOC_CATEGORIES.map(c => (
                         <div key={c.label} className={`rounded-[12px] border ${c.border} ${c.bg} px-3 py-2.5`}>
                           <div className={`text-[15px] font-black leading-none ${c.color}`}>{c.count}</div>
@@ -757,12 +757,12 @@ function PostControl({ onSignUp }: { onSignUp: () => void }) {
 
   return (
     <motion.div key="control" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }} className="mx-auto max-w-2xl px-5 py-10">
-      <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-[#ECE7F5] bg-[#F5F1FB] px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[#42574E]">
+      <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-[#E4E5DE] bg-[#F2F4EC] px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[#42574E]">
         What one3seven builds from this
       </div>
 
       {/* Privacy banner */}
-      <div className="mb-6 mt-3 rounded-[18px] border border-[#ECE7F5] bg-[#14112E] p-6">
+      <div className="mb-6 mt-3 rounded-[18px] border border-[#E4E5DE] bg-[#1B2623] p-6">
         <div className="mb-3 flex items-center gap-3">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#42574E]/20">
             <Lock className="h-4 w-4 text-[#7C8B6F]" />
@@ -784,18 +784,18 @@ function PostControl({ onSignUp }: { onSignUp: () => void }) {
         </div>
       </div>
 
-      <h2 className="mb-2 text-[20px] font-bold leading-tight tracking-tight text-[#14112E]">What Marcus can do next</h2>
-      <p className="mb-5 text-[14px] leading-relaxed text-[#14112E]/55">His intake is organized. He decides what happens to it.</p>
+      <h2 className="mb-2 text-[20px] font-bold leading-tight tracking-tight text-[#1B2623]">What Marcus can do next</h2>
+      <p className="mb-5 text-[14px] leading-relaxed text-[#1B2623]/55">His intake is organized. He decides what happens to it.</p>
 
       <div className="mb-6 space-y-3">
         {actions.map(a => (
-          <div key={a.label} className={`flex items-center gap-4 rounded-[16px] border p-5 ${a.primary ? 'border-[#ECE7F5] bg-[#F5F1FB]' : 'border-[#ECE7F5] bg-white'}`}>
-            <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${a.primary ? 'bg-[#42574E]' : 'bg-[#ECE7F5]'}`}>
+          <div key={a.label} className={`flex items-center gap-4 rounded-[16px] border p-5 ${a.primary ? 'border-[#E4E5DE] bg-[#F2F4EC]' : 'border-[#E4E5DE] bg-white'}`}>
+            <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${a.primary ? 'bg-[#42574E]' : 'bg-[#E4E5DE]'}`}>
               <a.icon className={`h-4 w-4 ${a.primary ? 'text-white' : 'text-[#42574E]'}`} />
             </div>
             <div>
-              <div className="text-[14px] font-bold text-[#14112E]">{a.label}</div>
-              <div className="text-[12px] leading-relaxed text-[#14112E]/50">{a.sub}</div>
+              <div className="text-[14px] font-bold text-[#1B2623]">{a.label}</div>
+              <div className="text-[12px] leading-relaxed text-[#1B2623]/50">{a.sub}</div>
             </div>
           </div>
         ))}
@@ -820,21 +820,21 @@ function PostControl({ onSignUp }: { onSignUp: () => void }) {
         </div>
       </div>
 
-      <p className="mb-6 text-[11px] leading-relaxed text-[#14112E]/35">
+      <p className="mb-6 text-[11px] leading-relaxed text-[#1B2623]/35">
         one3seven surfaces dates and timing for attorney review. It does not determine applicable deadlines or filing requirements.
       </p>
 
       <div className="flex flex-col gap-3 sm:flex-row">
         <button type="button" onClick={onSignUp}
-          className="flex items-center justify-center gap-2 rounded-full bg-[#42574E] px-7 py-3.5 text-[15px] font-semibold text-white shadow-[0_12px_32px_rgba(109,74,255,0.25)] transition hover:bg-[#4C1D96] hover:-translate-y-0.5">
+          className="flex items-center justify-center gap-2 rounded-full bg-[#42574E] px-7 py-3.5 text-[15px] font-semibold text-white shadow-[0_12px_32px_rgba(109,74,255,0.25)] transition hover:bg-[#42574E] hover:-translate-y-0.5">
           Request beta access <ArrowRight className="h-4 w-4" />
         </button>
         <button type="button" onClick={() => { window.location.href = '/'; }}
-          className="flex items-center justify-center gap-2 rounded-full border border-[#ECE7F5] bg-white px-7 py-3.5 text-[15px] font-semibold text-[#14112E] transition hover:bg-[#F5F1FB]">
+          className="flex items-center justify-center gap-2 rounded-full border border-[#E4E5DE] bg-white px-7 py-3.5 text-[15px] font-semibold text-[#1B2623] transition hover:bg-[#F2F4EC]">
           Back to home
         </button>
       </div>
-      <p className="mt-3 text-xs text-[#14112E]/35">Free to submit · No account required to start · Records stay private until you approve sharing</p>
+      <p className="mt-3 text-xs text-[#1B2623]/35">Free to submit · No account required to start · Records stay private until you approve sharing</p>
     </motion.div>
   );
 }
@@ -861,7 +861,7 @@ export function WorkerDemoPage() {
   const handleSignUp = () => { window.location.href = '/'; };
 
   return (
-    <div className="min-h-screen bg-[#FAF9F6] text-[#14112E] antialiased">
+    <div className="min-h-screen bg-[#FAF9F6] text-[#1B2623] antialiased">
       <NavBar step={intakeStep} phase={phase} onBack={goBack} onSignUp={handleSignUp} />
       <AnimatePresence mode="wait">
         {phase === 'intake' && intakeStep === 1 && <Step1Story key="s1" onNext={goNext} />}

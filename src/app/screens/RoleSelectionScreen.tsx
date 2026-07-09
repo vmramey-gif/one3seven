@@ -59,13 +59,13 @@ export function RoleSelectionScreen({ onNavigate, onSelectRole, onCommitRole, al
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#FAF9F6] px-6 text-[#14112E]">
+    <div className="flex min-h-screen items-center justify-center bg-[#FAF9F6] px-6 text-[#1B2623]">
       <div className="w-full max-w-[520px]">
         <div className="mb-6">
           <button
             type="button"
             onClick={() => onNavigate('authWelcome')}
-            className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs uppercase tracking-wide text-[#14112E]/60 hover:bg-[#F5F1FB] hover:text-[#14112E]"
+            className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs uppercase tracking-wide text-[#1B2623]/60 hover:bg-[#F2F4EC] hover:text-[#1B2623]"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             Back
@@ -79,11 +79,11 @@ export function RoleSelectionScreen({ onNavigate, onSelectRole, onCommitRole, al
           {/* Header */}
           <div className="mb-12 text-center">
             <SeedMark size={36} className="mx-auto mb-3" />
-            <h1 className="mb-2 text-xl font-semibold text-[#14112E]"><WordMark /></h1>
-            <h2 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="mb-3 text-2xl font-medium tracking-[-0.01em] text-[#14112E]">
+            <h1 className="mb-2 text-xl font-semibold text-[#1B2623]"><WordMark /></h1>
+            <h2 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="mb-3 text-2xl font-medium tracking-[-0.01em] text-[#1B2623]">
               How will you use <WordMark />?
             </h2>
-            <p className="text-sm text-[#14112E]/64">
+            <p className="text-sm text-[#1B2623]/64">
               Choose the workspace for this account.
             </p>
             {error ? <p className="text-sm text-red-600 mt-3">{error}</p> : null}
@@ -98,20 +98,20 @@ export function RoleSelectionScreen({ onNavigate, onSelectRole, onCommitRole, al
               transition={{ delay: 0.1 }}
               onClick={() => void handleRoleSelection('worker')}
               disabled={busy}
-              className="group w-full rounded-[28px] border border-[#ECE7F5] bg-white/95 p-8 text-left shadow-[0_18px_56px_rgba(31,27,75,0.09)] transition-all hover:-translate-y-0.5 hover:border-[#C9B8F0] hover:shadow-[0_24px_68px_rgba(31,27,75,0.13)]"
+              className="group w-full rounded-[28px] border border-[#E4E5DE] bg-white/95 p-8 text-left shadow-[0_18px_56px_rgba(31,27,75,0.09)] transition-all hover:-translate-y-0.5 hover:border-[#7C8B6F] hover:shadow-[0_24px_68px_rgba(31,27,75,0.13)]"
             >
               <div className="flex items-start gap-4">
-                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-[#F5F1FB] transition-colors group-hover:bg-[#42574E]">
+                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-[#F2F4EC] transition-colors group-hover:bg-[#42574E]">
                   <FileText className="h-6 w-6 text-[#42574E] transition-colors group-hover:text-white" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="mb-2 text-lg font-semibold text-[#14112E]">
+                  <h3 className="mb-2 text-lg font-semibold text-[#1B2623]">
                     Organize My Records
                   </h3>
-                  <p className="mb-4 text-sm leading-relaxed text-[#14112E]/64">
+                  <p className="mb-4 text-sm leading-relaxed text-[#1B2623]/64">
                     For individuals organizing records, timelines, and supporting materials across intake types.
                   </p>
-                  <div className="flex items-center gap-2 text-sm font-medium text-[#4C1D96]">
+                  <div className="flex items-center gap-2 text-sm font-medium text-[#42574E]">
                     Open your workspace
                     <ArrowRight className="w-4 h-4" />
                   </div>
@@ -127,20 +127,20 @@ export function RoleSelectionScreen({ onNavigate, onSelectRole, onCommitRole, al
                 transition={{ delay: 0.2 }}
                 onClick={() => void handleRoleSelection('firm')}
                 disabled={busy}
-                className="group w-full rounded-[28px] border border-[#ECE7F5] bg-white/95 p-8 text-left shadow-[0_18px_56px_rgba(31,27,75,0.09)] transition-all hover:-translate-y-0.5 hover:border-[#C9B8F0] hover:shadow-[0_24px_68px_rgba(31,27,75,0.13)]"
+                className="group w-full rounded-[28px] border border-[#E4E5DE] bg-white/95 p-8 text-left shadow-[0_18px_56px_rgba(31,27,75,0.09)] transition-all hover:-translate-y-0.5 hover:border-[#7C8B6F] hover:shadow-[0_24px_68px_rgba(31,27,75,0.13)]"
               >
                 <div className="flex items-start gap-4">
-                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-[#F5F1FB] transition-colors group-hover:bg-[#42574E]">
+                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-[#F2F4EC] transition-colors group-hover:bg-[#42574E]">
                     <Briefcase className="h-6 w-6 text-[#42574E] transition-colors group-hover:text-white" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="mb-2 text-lg font-semibold text-[#14112E]">
+                    <h3 className="mb-2 text-lg font-semibold text-[#1B2623]">
                       Attorney / Participating Firm
                     </h3>
-                    <p className="mb-4 text-sm leading-relaxed text-[#14112E]/64">
+                    <p className="mb-4 text-sm leading-relaxed text-[#1B2623]/64">
                       For participating firms reviewing organized intake submissions and workflow-ready matter packets.
                     </p>
-                    <div className="flex items-center gap-2 text-sm font-medium text-[#4C1D96]">
+                    <div className="flex items-center gap-2 text-sm font-medium text-[#42574E]">
                       Continue to firm dashboard
                       <ArrowRight className="w-4 h-4" />
                     </div>
@@ -152,7 +152,7 @@ export function RoleSelectionScreen({ onNavigate, onSelectRole, onCommitRole, al
 
           {/* Footer Note */}
           <div className="text-center space-y-4">
-            <p className="text-xs leading-relaxed text-[#14112E]/52">
+            <p className="text-xs leading-relaxed text-[#1B2623]/52">
               Choose carefully. This determines the dashboard and workflow for this account.
             </p>
             <One3SevenDisclaimer variant="compact" />

@@ -825,7 +825,7 @@ export function UploadScreen({
               </div>
               <button
                 onClick={handleDismissSave}
-                className="text-[#8B86A0] hover:text-violet-700 transition-colors"
+                className="text-[#7C857F] hover:text-violet-700 transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -839,7 +839,7 @@ export function UploadScreen({
         <button
           type="button"
           onClick={() => onNavigate('landing')}
-          className="flex items-center gap-1.5 text-[11px] uppercase tracking-wide text-[#8B86A0] hover:text-violet-700 transition-colors duration-200 font-normal"
+          className="flex items-center gap-1.5 text-[11px] uppercase tracking-wide text-[#7C857F] hover:text-violet-700 transition-colors duration-200 font-normal"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           Back to your dashboard
@@ -881,7 +881,7 @@ export function UploadScreen({
               <h1 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="text-xl font-medium text-[#15112f] tracking-tight">
                 {WORKER_DOC_REQUEST_PANEL_COPY.uploadSectionTitle}
               </h1>
-              <p className="text-sm text-[#6B6685] mt-1 leading-relaxed">
+              <p className="text-sm text-[#6A6D66] mt-1 leading-relaxed">
                 {WORKER_DOC_REQUEST_PANEL_COPY.uploadSectionHint}
               </p>
             </div>
@@ -893,24 +893,24 @@ export function UploadScreen({
               <h1 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="text-xl font-medium text-[#15112f] tracking-tight">
                 {STORY_FIRST_UPLOAD_HEADING}
               </h1>
-              <p className="text-sm text-[#6B6685] mt-1 leading-relaxed">{STORY_FIRST_UPLOAD_INTRO}</p>
+              <p className="text-sm text-[#6A6D66] mt-1 leading-relaxed">{STORY_FIRST_UPLOAD_INTRO}</p>
               <p className="text-[11px] text-[#475569] mt-2 leading-relaxed">
                 {STORY_FIRST_UPLOAD_EXAMPLES.slice(0, 4).join(' · ')}
                 {STORY_FIRST_UPLOAD_EXAMPLES.length > 4 ? ' · …' : ''}
               </p>
-              <details className="mt-3 rounded-[12px] border border-[#ECE7F5] bg-[#FAF9F6]/80 px-3 py-2">
-                <summary className="cursor-pointer text-[12px] font-medium text-[#3A3552]">
+              <details className="mt-3 rounded-[12px] border border-[#E4E5DE] bg-[#FAF9F6]/80 px-3 py-2">
+                <summary className="cursor-pointer text-[12px] font-medium text-[#384039]">
                   {WORKER_UPLOAD_SOURCING_GUIDANCE.heading}
                 </summary>
-                <p className="mt-2 text-[11px] text-[#6B6685] leading-relaxed">
+                <p className="mt-2 text-[11px] text-[#6A6D66] leading-relaxed">
                   {WORKER_UPLOAD_SOURCING_GUIDANCE.intro}
                 </p>
-                <ul className="mt-1 list-inside list-disc text-[11px] text-[#6B6685] space-y-1">
+                <ul className="mt-1 list-inside list-disc text-[11px] text-[#6A6D66] space-y-1">
                   {WORKER_UPLOAD_SOURCING_GUIDANCE.items.map((item) => (
                     <li key={item}>{item}</li>
                   ))}
                 </ul>
-                <p className="mt-2 text-[11px] text-[#8B86A0] leading-relaxed">
+                <p className="mt-2 text-[11px] text-[#7C857F] leading-relaxed">
                   {WORKER_UPLOAD_SOURCING_GUIDANCE.pdfNote}
                 </p>
               </details>
@@ -969,7 +969,7 @@ export function UploadScreen({
                   <div className="inline-block mt-2 px-5 py-2 rounded-lg text-sm font-medium border border-violet-100 bg-white text-[#312e81] hover:border-violet-200 hover:bg-violet-50 transition-colors">
                     Browse files
                   </div>
-                  <div className="mt-6 text-xs text-[#8B86A0]">
+                  <div className="mt-6 text-xs text-[#7C857F]">
                     PDF files only
                   </div>
                 </>
@@ -987,7 +987,7 @@ export function UploadScreen({
                     </div>
 
                     {detectedCategoryLabels.length > 0 ? (
-                      <p className="text-xs text-[#6B6685] text-center max-w-sm">
+                      <p className="text-xs text-[#6A6D66] text-center max-w-sm">
                         one3seven identified {detectedCategoryLabels.length}{' '}
                         {detectedCategoryLabels.length === 1 ? 'type' : 'types'} from your files (for example:{' '}
                         {detectedCategoryLabels.slice(0, 2).join(', ')}
@@ -996,7 +996,7 @@ export function UploadScreen({
                     ) : null}
                   </motion.div>
 
-                  <div className="text-sm text-[#6B6685]">
+                  <div className="text-sm text-[#6A6D66]">
                     Drop more files or click to add
                   </div>
                 </div>
@@ -1004,7 +1004,7 @@ export function UploadScreen({
             </motion.div>
 
             <div className="mt-3 flex flex-col items-center gap-2">
-              <p className="text-[11px] text-[#8B86A0] text-center leading-relaxed max-w-md">
+              <p className="text-[11px] text-[#7C857F] text-center leading-relaxed max-w-md">
                 Upload PDF documents — paystubs, letters, and records as PDF files work best right now. We&apos;re working on photo support.
               </p>
             </div>
@@ -1029,13 +1029,13 @@ export function UploadScreen({
                     {isUploading ? 'Uploading documents…' : 'Ready to upload'}
                   </span>
                 </div>
-                <div className="text-xs text-[#6B6685] mb-3">
+                <div className="text-xs text-[#6A6D66] mb-3">
                   {pendingUploadFiles.length}{' '}
                   {pendingUploadFiles.length === 1 ? 'file' : 'files'} selected in this action
                 </div>
                 <ul className="space-y-1.5">
                   {pendingUploadFiles.map((file) => (
-                    <li key={`pending-${file.name}-${file.size}-${file.lastModified}`} className="text-xs text-[#3A3552] truncate">
+                    <li key={`pending-${file.name}-${file.size}-${file.lastModified}`} className="text-xs text-[#384039] truncate">
                       {file.name}
                     </li>
                   ))}
@@ -1051,7 +1051,7 @@ export function UploadScreen({
               animate={{ opacity: 1, y: 0 }}
               className="mb-4 rounded-xl border border-violet-100 bg-white px-3 py-2.5 shadow-sm"
             >
-              <p className="text-xs text-[#6B6685] leading-relaxed">
+              <p className="text-xs text-[#6A6D66] leading-relaxed">
                 Record types are identified automatically from file names and content — no sorting required on your end.
                 {detectedCategoryLabels.length > 0 ? (
                   <>
@@ -1070,13 +1070,13 @@ export function UploadScreen({
               animate={{ opacity: 1, y: 0 }}
               className="mb-4"
             >
-              <p className="text-xs text-[#6B6685] mb-3 leading-relaxed">
+              <p className="text-xs text-[#6A6D66] mb-3 leading-relaxed">
                 Clear file names help one3seven organize your intake more accurately and help firms review your
                 records faster.
               </p>
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-semibold text-[#15112f]">Files on this intake</h3>
-                <div className="text-xs text-[#6B6685]">
+                <div className="text-xs text-[#6A6D66]">
                   {uploadedFiles.length} {uploadedFiles.length === 1 ? 'file' : 'files'} saved
                 </div>
               </div>
@@ -1126,7 +1126,7 @@ export function UploadScreen({
                         e.stopPropagation();
                         startRename(index, file.name);
                       }}
-                      className="text-[#A8A3BC] hover:text-violet-700 transition-colors"
+                      className="text-[#9AA39B] hover:text-violet-700 transition-colors"
                       title="Rename"
                     >
                       <Edit3 className="w-4 h-4" />
@@ -1137,7 +1137,7 @@ export function UploadScreen({
                         e.stopPropagation();
                         void removeFile(index);
                       }}
-                      className="text-[#A8A3BC] hover:text-violet-700 transition-colors"
+                      className="text-[#9AA39B] hover:text-violet-700 transition-colors"
                       title="Delete"
                     >
                       <X className="w-4 h-4" />
@@ -1179,7 +1179,7 @@ export function UploadScreen({
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     onClick={() => setShowAllFiles(!showAllFiles)}
-                    className="w-full text-sm text-[#6B6685] hover:text-violet-700 py-2 rounded-lg hover:bg-violet-50 transition-colors"
+                    className="w-full text-sm text-[#6A6D66] hover:text-violet-700 py-2 rounded-lg hover:bg-violet-50 transition-colors"
                   >
                     {showAllFiles ? (
                       'Show Less ∧'
@@ -1201,18 +1201,18 @@ export function UploadScreen({
                     <button
                       type="button"
                       onClick={() => setShowStoryPreview(false)}
-                      className="text-xs text-[#6B6685] hover:text-violet-700"
+                      className="text-xs text-[#6A6D66] hover:text-violet-700"
                     >
                       {WORKER_UPLOAD_COPY.hideStory}
                     </button>
                   </div>
-                  <p className="text-sm text-[#6B6685] leading-relaxed whitespace-pre-wrap">
+                  <p className="text-sm text-[#6A6D66] leading-relaxed whitespace-pre-wrap">
                     {workerStoryPreview}
                   </p>
                 </>
               ) : (
                 <div className="flex items-center justify-between gap-3">
-                  <p className="text-sm text-[#6B6685]">{WORKER_UPLOAD_COPY.storyProvided}</p>
+                  <p className="text-sm text-[#6A6D66]">{WORKER_UPLOAD_COPY.storyProvided}</p>
                   <button
                     type="button"
                     onClick={() => setShowStoryPreview(true)}
@@ -1239,9 +1239,9 @@ export function UploadScreen({
                 <p className="text-sm font-medium text-[#15112f]">{STORY_FIRST_FOLLOWUP_HEADING}</p>
               </div>
               {showFollowUpDetails ? (
-                <ChevronUp className="h-4 w-4 shrink-0 text-[#8B86A0]" />
+                <ChevronUp className="h-4 w-4 shrink-0 text-[#7C857F]" />
               ) : (
-                <ChevronDown className="h-4 w-4 shrink-0 text-[#8B86A0]" />
+                <ChevronDown className="h-4 w-4 shrink-0 text-[#7C857F]" />
               )}
             </button>
 
@@ -1252,7 +1252,7 @@ export function UploadScreen({
                   <div className="flex items-center justify-between gap-3">
                     <div>
                       <p className="text-sm font-semibold text-[#15112f]">Intake Completeness</p>
-                      <p className="mt-0.5 text-xs leading-relaxed text-[#6B6685]">
+                      <p className="mt-0.5 text-xs leading-relaxed text-[#6A6D66]">
                         These optional details help one3seven connect your story to the records you upload.
                       </p>
                     </div>
@@ -1278,14 +1278,14 @@ export function UploadScreen({
                   <label className="text-sm font-semibold text-[#15112f]" htmlFor="followup-employment-name">
                     Full Name Used During Employment
                   </label>
-                  <p className="mt-1 text-xs leading-relaxed text-[#8B86A0]">
+                  <p className="mt-1 text-xs leading-relaxed text-[#7C857F]">
                     The name that appears on your pay stubs, workplace emails, or employment documents.
                   </p>
                   <input
                     id="followup-employment-name"
                     value={followUp.employmentName ?? ''}
                     onChange={(e) => updateFollowUp({ employmentName: e.target.value })}
-                    className="mt-2.5 w-full rounded-[10px] border border-violet-200 bg-white px-3 py-2.5 text-sm text-[#15112f] placeholder:text-[#A8A3BC] focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-100"
+                    className="mt-2.5 w-full rounded-[10px] border border-violet-200 bg-white px-3 py-2.5 text-sm text-[#15112f] placeholder:text-[#9AA39B] focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-100"
                     placeholder="Name shown on employment records"
                   />
                 </div>
@@ -1299,7 +1299,7 @@ export function UploadScreen({
                     id="followup-employer"
                     value={followUp.employer ?? ''}
                     onChange={(e) => updateFollowUp({ employer: e.target.value })}
-                    className="mt-2.5 w-full rounded-[10px] border border-violet-200 bg-white px-3 py-2.5 text-sm text-[#15112f] placeholder:text-[#A8A3BC] focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-100"
+                    className="mt-2.5 w-full rounded-[10px] border border-violet-200 bg-white px-3 py-2.5 text-sm text-[#15112f] placeholder:text-[#9AA39B] focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-100"
                     placeholder="Company or organization name"
                   />
                 </div>
@@ -1313,7 +1313,7 @@ export function UploadScreen({
                     id="followup-dates"
                     value={followUp.employmentDates ?? ''}
                     onChange={(e) => updateFollowUp({ employmentDates: e.target.value })}
-                    className="mt-2.5 w-full rounded-[10px] border border-violet-200 bg-white px-3 py-2.5 text-sm text-[#15112f] placeholder:text-[#A8A3BC] focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-100"
+                    className="mt-2.5 w-full rounded-[10px] border border-violet-200 bg-white px-3 py-2.5 text-sm text-[#15112f] placeholder:text-[#9AA39B] focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-100"
                     placeholder="e.g. March 2021 – January 2024"
                   />
                 </div>
@@ -1323,14 +1323,14 @@ export function UploadScreen({
                   <label className="text-sm font-semibold text-[#15112f]" htmlFor="followup-people">
                     Are there key people involved?
                   </label>
-                  <p className="mt-1 text-xs leading-relaxed text-[#8B86A0]">
+                  <p className="mt-1 text-xs leading-relaxed text-[#7C857F]">
                     Supervisors, HR contacts, coworkers — anyone relevant to what happened.
                   </p>
                   <input
                     id="followup-people"
                     value={followUp.keyPeople ?? ''}
                     onChange={(e) => updateFollowUp({ keyPeople: e.target.value })}
-                    className="mt-2.5 w-full rounded-[10px] border border-violet-200 bg-white px-3 py-2.5 text-sm text-[#15112f] placeholder:text-[#A8A3BC] focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-100"
+                    className="mt-2.5 w-full rounded-[10px] border border-violet-200 bg-white px-3 py-2.5 text-sm text-[#15112f] placeholder:text-[#9AA39B] focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-100"
                     placeholder="Manager, HR contact, coworkers, etc."
                   />
                 </div>
@@ -1347,7 +1347,7 @@ export function UploadScreen({
                         className={`rounded-full px-3 py-1.5 text-xs font-medium border transition-colors ${
                           followUp.workedRemotely === opt.value
                             ? 'border-violet-700 bg-violet-700 text-white'
-                            : 'border-violet-100 bg-white text-[#3A3552] hover:border-violet-200 hover:bg-violet-50'
+                            : 'border-violet-100 bg-white text-[#384039] hover:border-violet-200 hover:bg-violet-50'
                         }`}
                       >
                         {opt.label}
@@ -1366,7 +1366,7 @@ export function UploadScreen({
                     value={followUp.remoteExpenses ?? ''}
                     onChange={(e) => updateFollowUp({ remoteExpenses: e.target.value })}
                     rows={2}
-                    className="mt-2.5 w-full rounded-[10px] border border-violet-200 bg-white px-3 py-2.5 text-sm text-[#15112f] placeholder:text-[#A8A3BC] focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-100 resize-none"
+                    className="mt-2.5 w-full rounded-[10px] border border-violet-200 bg-white px-3 py-2.5 text-sm text-[#15112f] placeholder:text-[#9AA39B] focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-100 resize-none"
                     placeholder="Briefly describe what you paid for out of pocket, if anything"
                   />
                 </div>
@@ -1383,7 +1383,7 @@ export function UploadScreen({
                         className={`rounded-full px-3 py-1.5 text-xs font-medium border transition-colors ${
                           followUp.reimbursed === opt.value
                             ? 'border-violet-700 bg-violet-700 text-white'
-                            : 'border-violet-100 bg-white text-[#3A3552] hover:border-violet-200 hover:bg-violet-50'
+                            : 'border-violet-100 bg-white text-[#384039] hover:border-violet-200 hover:bg-violet-50'
                         }`}
                       >
                         {opt.label}
@@ -1402,7 +1402,7 @@ export function UploadScreen({
                     value={followUp.complainedOrReported ?? ''}
                     onChange={(e) => updateFollowUp({ complainedOrReported: e.target.value })}
                     rows={2}
-                    className="mt-2.5 w-full rounded-[10px] border border-violet-200 bg-white px-3 py-2.5 text-sm text-[#15112f] placeholder:text-[#A8A3BC] focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-100 resize-none"
+                    className="mt-2.5 w-full rounded-[10px] border border-violet-200 bg-white px-3 py-2.5 text-sm text-[#15112f] placeholder:text-[#9AA39B] focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-100 resize-none"
                     placeholder="What you reported and when, if you remember"
                   />
                 </div>
@@ -1417,7 +1417,7 @@ export function UploadScreen({
                     value={followUp.changedAfterward ?? ''}
                     onChange={(e) => updateFollowUp({ changedAfterward: e.target.value })}
                     rows={2}
-                    className="mt-2.5 w-full rounded-[10px] border border-violet-200 bg-white px-3 py-2.5 text-sm text-[#15112f] placeholder:text-[#A8A3BC] focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-100 resize-none"
+                    className="mt-2.5 w-full rounded-[10px] border border-violet-200 bg-white px-3 py-2.5 text-sm text-[#15112f] placeholder:text-[#9AA39B] focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-100 resize-none"
                     placeholder="Schedule, pay, treatment, discipline, termination, etc."
                   />
                 </div>
@@ -1432,7 +1432,7 @@ export function UploadScreen({
                       <label className="text-sm font-semibold text-[#15112f]" htmlFor="followup-work-state">
                         In what state did you primarily work?
                       </label>
-                      <p className="mt-1 text-xs leading-relaxed text-[#8B86A0]">
+                      <p className="mt-1 text-xs leading-relaxed text-[#7C857F]">
                         The state where you did the work — this can differ from where you live.
                       </p>
                       <select
@@ -1460,7 +1460,7 @@ export function UploadScreen({
                             className={`rounded-full px-3 py-1.5 text-xs font-medium border transition-colors ${
                               followUp.employmentStatus === opt.value
                                 ? 'border-violet-700 bg-violet-700 text-white'
-                                : 'border-violet-100 bg-white text-[#3A3552] hover:border-violet-200 hover:bg-violet-50'
+                                : 'border-violet-100 bg-white text-[#384039] hover:border-violet-200 hover:bg-violet-50'
                             }`}
                           >
                             {opt.label}
@@ -1472,7 +1472,7 @@ export function UploadScreen({
                     {/* Card: Arbitration */}
                     <div className="rounded-[14px] border border-violet-100 bg-white px-4 py-3.5 shadow-sm">
                       <p className="text-sm font-semibold text-[#15112f] mb-1">Do you recall signing an arbitration agreement?</p>
-                      <p className="text-xs text-[#8B86A0] mb-2.5 leading-relaxed">This may have been part of your offer letter or onboarding paperwork.</p>
+                      <p className="text-xs text-[#7C857F] mb-2.5 leading-relaxed">This may have been part of your offer letter or onboarding paperwork.</p>
                       <div className="flex flex-wrap gap-2">
                         {ARBITRATION_OPTIONS.map((opt) => (
                           <button
@@ -1482,7 +1482,7 @@ export function UploadScreen({
                             className={`rounded-full px-3 py-1.5 text-xs font-medium border transition-colors ${
                               followUp.arbitrationAgreement === opt.value
                                 ? 'border-violet-700 bg-violet-700 text-white'
-                                : 'border-violet-100 bg-white text-[#3A3552] hover:border-violet-200 hover:bg-violet-50'
+                                : 'border-violet-100 bg-white text-[#384039] hover:border-violet-200 hover:bg-violet-50'
                             }`}
                           >
                             {opt.label}
@@ -1494,7 +1494,7 @@ export function UploadScreen({
                     {/* Card: Agency filing */}
                     <div className="rounded-[14px] border border-violet-100 bg-white px-4 py-3.5 shadow-sm">
                       <p className="text-sm font-semibold text-[#15112f] mb-1">Have you filed a complaint with any agency?</p>
-                      <p className="text-xs text-[#8B86A0] mb-2.5 leading-relaxed">For example: EEOC, California Civil Rights Department (CRD / former DFEH), DLSE, or the Labor Commissioner.</p>
+                      <p className="text-xs text-[#7C857F] mb-2.5 leading-relaxed">For example: EEOC, California Civil Rights Department (CRD / former DFEH), DLSE, or the Labor Commissioner.</p>
                       <div className="flex flex-wrap gap-2 mb-2">
                         {AGENCY_FILING_OPTIONS.map((opt) => (
                           <button
@@ -1504,7 +1504,7 @@ export function UploadScreen({
                             className={`rounded-full px-3 py-1.5 text-xs font-medium border transition-colors ${
                               followUp.priorAgencyFiling === opt.value
                                 ? 'border-violet-700 bg-violet-700 text-white'
-                                : 'border-violet-100 bg-white text-[#3A3552] hover:border-violet-200 hover:bg-violet-50'
+                                : 'border-violet-100 bg-white text-[#384039] hover:border-violet-200 hover:bg-violet-50'
                             }`}
                           >
                             {opt.label}
@@ -1515,7 +1515,7 @@ export function UploadScreen({
                         <input
                           value={followUp.priorAgencyFilingDetails ?? ''}
                           onChange={(e) => updateFollowUp({ priorAgencyFilingDetails: e.target.value })}
-                          className="mt-1 w-full rounded-[10px] border border-violet-200 bg-white px-3 py-2.5 text-sm text-[#15112f] placeholder:text-[#A8A3BC] focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-100"
+                          className="mt-1 w-full rounded-[10px] border border-violet-200 bg-white px-3 py-2.5 text-sm text-[#15112f] placeholder:text-[#9AA39B] focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-100"
                           placeholder="Which agency, if you remember"
                         />
                       ) : null}
@@ -1529,11 +1529,11 @@ export function UploadScreen({
           {!intakeHasGeneratedSummary && onPrelinkFirmCode ? (
             <div className="mb-8 rounded-[14px] border border-violet-100 bg-white p-4 shadow-sm">
               <p className="text-sm font-semibold text-[#15112f] mb-1">Link Firm Code</p>
-              <p className="text-xs text-[#6B6685] mb-3 leading-relaxed">
+              <p className="text-xs text-[#6A6D66] mb-3 leading-relaxed">
                 Optional: connect your law firm before organizing. This does not send your intake yet.
               </p>
               {activeIntakeLinkedFirmName ? (
-                <p className="text-xs text-[#3A3552] mb-3">
+                <p className="text-xs text-[#384039] mb-3">
                   Linked firm: <span className="font-semibold">{activeIntakeLinkedFirmName}</span>
                 </p>
               ) : null}
@@ -1543,7 +1543,7 @@ export function UploadScreen({
                   onChange={(e) => setPrelinkCodeDraft(e.target.value)}
                   placeholder="Enter Firm Code"
                   disabled={prelinkBusy}
-                  className="flex-1 px-4 py-3 rounded-[14px] border border-violet-200 bg-white text-sm text-[#15112f] placeholder:text-[#8B86A0] focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-100"
+                  className="flex-1 px-4 py-3 rounded-[14px] border border-violet-200 bg-white text-sm text-[#15112f] placeholder:text-[#7C857F] focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-100"
                 />
                 <button
                   type="button"
@@ -1563,9 +1563,9 @@ export function UploadScreen({
 
           {docRequestFocusMode && onOpenIntakeSummary ? (
             <details className="mb-4 border-b border-violet-100 group">
-              <summary className="cursor-pointer list-none py-2.5 text-sm font-medium text-[#6B6685] marker:content-none flex items-center justify-between gap-2">
+              <summary className="cursor-pointer list-none py-2.5 text-sm font-medium text-[#6A6D66] marker:content-none flex items-center justify-between gap-2">
                 <span>{WORKER_DOC_REQUEST_PANEL_COPY.summaryCollapsedTitle}</span>
-                <ChevronDown className="h-4 w-4 text-[#8B86A0] group-open:rotate-180 transition-transform" />
+                <ChevronDown className="h-4 w-4 text-[#7C857F] group-open:rotate-180 transition-transform" />
               </summary>
               <div className="pb-3">
                 <p className="text-xs text-[#475569] leading-relaxed mb-2">
@@ -1695,7 +1695,7 @@ export function UploadScreen({
               onClick={(e) => e.stopPropagation()}
             >
               <h2 className="text-lg font-semibold text-[#15112f] mb-2">Are you working with a law firm?</h2>
-              <p className="text-sm text-[#6B6685] leading-relaxed mb-4">
+              <p className="text-sm text-[#6A6D66] leading-relaxed mb-4">
                 If your law firm gave you a one3seven Firm Code, you can enter it now so your organized intake routes directly to their dashboard after processing.
               </p>
               <p className="text-xs text-[#475569] mb-4">
@@ -1736,7 +1736,7 @@ export function UploadScreen({
                       setFirmCodeDraft('');
                     }}
                     disabled={firmGateBusy}
-                    className="mb-3 text-xs text-[#8B86A0] hover:text-[#14112E]"
+                    className="mb-3 text-xs text-[#7C857F] hover:text-[#1B2623]"
                   >
                     ← Back
                   </button>
@@ -1745,7 +1745,7 @@ export function UploadScreen({
                       value={firmCodeDraft}
                       onChange={(e) => setFirmCodeDraft(e.target.value)}
                       placeholder="Enter Firm Code"
-                      className="w-full px-4 py-3 rounded-[14px] border border-violet-200 bg-violet-50/50 text-sm text-[#15112f] placeholder:text-[#8B86A0] focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-100"
+                      className="w-full px-4 py-3 rounded-[14px] border border-violet-200 bg-violet-50/50 text-sm text-[#15112f] placeholder:text-[#7C857F] focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-100"
                       disabled={firmGateBusy}
                     />
                     <button
@@ -1758,7 +1758,7 @@ export function UploadScreen({
                     </button>
                   </div>
                   {linkedFirmPreview ? (
-                    <p className="text-sm text-[#14112E] mb-3">
+                    <p className="text-sm text-[#1B2623] mb-3">
                       Connected to <span className="font-semibold">{linkedFirmPreview.firm_name}</span>. Your organized intake will be routed only to this firm.
                     </p>
                   ) : null}
@@ -1786,7 +1786,7 @@ export function UploadScreen({
                       setFirmGateStep('intro');
                     }
                   }}
-                  className="w-full py-2 text-sm text-[#8B86A0]"
+                  className="w-full py-2 text-sm text-[#7C857F]"
                 >
                   Cancel
                 </button>

@@ -889,7 +889,7 @@ export function GuidedIntakeScreen({
                         <button
                           type="button"
                           onClick={handleStoryStepNext}
-                          className="ml-auto rounded-full border border-[#CFC3FF] bg-white px-4 py-2 text-xs font-semibold text-[#1E1B4B] hover:bg-[#F8F4FF]"
+                          className="ml-auto rounded-full border border-[#CFC3FF] bg-white px-4 py-2 text-xs font-semibold text-[#1B2623] hover:bg-[#F8F4FF]"
                         >
                           Review story
                         </button>

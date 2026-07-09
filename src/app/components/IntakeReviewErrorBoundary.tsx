@@ -48,8 +48,8 @@ export class IntakeReviewErrorBoundary extends Component<Props, State> {
       return (
         <div className="min-h-screen bg-[#F2F4EC] flex flex-col items-center justify-center px-6 text-center">
           <div className="max-w-sm w-full">
-            <p className="text-lg font-semibold text-[#1E1B4B] mb-1">one3seven</p>
-            <p className="text-sm text-[#1E1B4B]/60 mb-8">
+            <p className="text-lg font-semibold text-[#1B2623] mb-1">one3seven</p>
+            <p className="text-sm text-[#1B2623]/60 mb-8">
               This intake couldn't be loaded. Your dashboard is unaffected.
             </p>
             <button
@@ -58,7 +58,7 @@ export class IntakeReviewErrorBoundary extends Component<Props, State> {
             >
               Back to Dashboard
             </button>
-            <p className="mt-5 text-xs text-[#1E1B4B]/40">
+            <p className="mt-5 text-xs text-[#1B2623]/40">
               If this keeps happening on the same intake, contact{' '}
               <a href="mailto:info@one3seven.com?subject=Intake%20review%20issue" className="font-semibold text-[#42574E] hover:underline">info@one3seven.com</a>.
             </p>

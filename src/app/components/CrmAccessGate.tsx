@@ -34,7 +34,7 @@ export function CrmAccessGate({ children }: { children: ReactNode }) {
 
   if (access === 'loading') {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#14112E] text-white/70">
+      <div className="flex min-h-screen items-center justify-center bg-[#1B2623] text-white/70">
         <p className="text-sm">Checking access…</p>
       </div>
     );
@@ -42,7 +42,7 @@ export function CrmAccessGate({ children }: { children: ReactNode }) {
 
   if (access === 'denied') {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-[#14112E] px-6 text-center">
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-[#1B2623] px-6 text-center">
         <p style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="text-2xl font-medium text-white">
           Internal access only
         </p>

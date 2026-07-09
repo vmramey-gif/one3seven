@@ -245,22 +245,22 @@ export function FirmSettingsScreen({
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF9F6] text-[#14112E]">
-      <nav className="sticky top-0 z-50 border-b border-[#ECE7F5] bg-white/90 backdrop-blur">
+    <div className="min-h-screen bg-[#FAF9F6] text-[#1B2623]">
+      <nav className="sticky top-0 z-50 border-b border-[#E4E5DE] bg-white/90 backdrop-blur">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-5">
           <div className="flex items-center gap-4 flex-wrap w-full justify-between">
             <div className="flex items-center gap-4 min-w-0">
               {!setupRequired ? (
                 <button
                   onClick={() => onNavigate('firmDashboard')}
-                  className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#14112E]/65 transition-colors hover:bg-[#F5F1FB] hover:text-[#14112E]"
+                  className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#1B2623]/65 transition-colors hover:bg-[#F2F4EC] hover:text-[#1B2623]"
                 >
                   <ArrowLeft className="w-4 h-4" />
                   Back to Dashboard
                 </button>
               ) : null}
-              {!setupRequired ? <div className="hidden h-6 w-px bg-[#ECE7F5] sm:block" /> : null}
-              <h1 className="truncate text-lg font-semibold text-[#14112E]">
+              {!setupRequired ? <div className="hidden h-6 w-px bg-[#E4E5DE] sm:block" /> : null}
+              <h1 className="truncate text-lg font-semibold text-[#1B2623]">
                 {setupRequired ? 'Firm profile setup' : 'Settings & Preferences'}
               </h1>
             </div>
@@ -288,48 +288,48 @@ export function FirmSettingsScreen({
           <motion.section
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="rounded-[32px] border border-[#ECE7F5] bg-white/95 p-8 shadow-[0_28px_90px_rgba(31,27,75,0.12)]"
+            className="rounded-[32px] border border-[#E4E5DE] bg-white/95 p-8 shadow-[0_28px_90px_rgba(31,27,75,0.12)]"
           >
-            <h2 className="mb-4 text-lg font-semibold text-[#14112E]">Firm profile</h2>
+            <h2 className="mb-4 text-lg font-semibold text-[#1B2623]">Firm profile</h2>
             {setupRequired ? (
-              <p className="mb-4 text-sm leading-relaxed text-[#14112E]/64">
+              <p className="mb-4 text-sm leading-relaxed text-[#1B2623]/64">
                 Enter your firm name and save to finish setup. Your firm code is assigned when you save and appears on
                 the dashboard afterward.
               </p>
             ) : null}
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <label className="mb-1 block text-xs text-[#14112E]/52">Firm name</label>
+                <label className="mb-1 block text-xs text-[#1B2623]/52">Firm name</label>
                 <input
                   value={firmName}
                   onChange={(e) => setFirmName(e.target.value)}
                   placeholder="Your law firm or practice name"
-                  className="w-full rounded-2xl border border-[#ECE7F5] bg-[#FAF9F6] px-4 py-3 text-sm text-[#14112E] placeholder:text-[#14112E]/38 focus:border-[#42574E] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#42574E]/10"
+                  className="w-full rounded-2xl border border-[#E4E5DE] bg-[#FAF9F6] px-4 py-3 text-sm text-[#1B2623] placeholder:text-[#1B2623]/38 focus:border-[#42574E] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#42574E]/10"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-xs text-[#14112E]/52">Firm code</label>
+                <label className="mb-1 block text-xs text-[#1B2623]/52">Firm code</label>
                 {profileComplete && firmCodeDisplay.trim() ? (
                   <>
                     <input
                       value={firmCodeDisplay}
                       readOnly
-                      className="w-full rounded-2xl border border-[#ECE7F5] bg-[#FAF9F6] px-4 py-3 font-mono text-sm text-[#14112E]"
+                      className="w-full rounded-2xl border border-[#E4E5DE] bg-[#FAF9F6] px-4 py-3 font-mono text-sm text-[#1B2623]"
                     />
-                    <p className="mt-2 text-xs text-[#14112E]/52">
+                    <p className="mt-2 text-xs text-[#1B2623]/52">
                       Share this code with workers so their organized intake routes directly to your dashboard.
                     </p>
                     {/* Intake link — shareable URL that pre-fills this firm code for any worker */}
-                    <div className="mt-3 rounded-2xl border border-[#ECE7F5] bg-[#F5F1FB] px-4 py-3">
-                      <p className="mb-1 text-xs font-semibold text-[#14112E]">Your intake link</p>
-                      <p className="mb-2 text-xs text-[#14112E]/55 leading-relaxed">
+                    <div className="mt-3 rounded-2xl border border-[#E4E5DE] bg-[#F2F4EC] px-4 py-3">
+                      <p className="mb-1 text-xs font-semibold text-[#1B2623]">Your intake link</p>
+                      <p className="mb-2 text-xs text-[#1B2623]/55 leading-relaxed">
                         Send this link to anyone. They go through the guided intake flow and their organized case routes directly to your dashboard — no code needed.
                       </p>
                       <div className="flex items-center gap-2">
                         <input
                           value={`${window.location.origin}/?fc=${firmCodeDisplay}`}
                           readOnly
-                          className="min-w-0 flex-1 rounded-xl border border-[#ECE7F5] bg-white px-3 py-2 font-mono text-xs text-[#14112E]/70 select-all"
+                          className="min-w-0 flex-1 rounded-xl border border-[#E4E5DE] bg-white px-3 py-2 font-mono text-xs text-[#1B2623]/70 select-all"
                           onFocus={(e) => e.target.select()}
                         />
                         <button
@@ -342,7 +342,7 @@ export function FirmSettingsScreen({
                               window.setTimeout(() => setIntakeLinkCopied(false), 2200);
                             });
                           }}
-                          className="flex shrink-0 items-center gap-1.5 rounded-xl bg-[#42574E] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[#4C1D96]"
+                          className="flex shrink-0 items-center gap-1.5 rounded-xl bg-[#42574E] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[#42574E]"
                         >
                           <Link2 className="w-3.5 h-3.5" />
                           {intakeLinkCopied ? 'Copied!' : 'Copy link'}
@@ -351,25 +351,25 @@ export function FirmSettingsScreen({
                     </div>
                   </>
                 ) : (
-                  <p className="rounded-2xl border border-dashed border-[#ECE7F5] bg-[#FAF9F6] px-4 py-3 text-sm text-[#14112E]/64">
+                  <p className="rounded-2xl border border-dashed border-[#E4E5DE] bg-[#FAF9F6] px-4 py-3 text-sm text-[#1B2623]/64">
                     Assigned when you save your firm profile.
                   </p>
                 )}
               </div>
             </div>
 
-            <div className="mt-5 rounded-2xl border border-[#ECE7F5] bg-[#FAF9F6] p-5">
-              <p className="mb-1 text-sm font-semibold text-[#14112E]">Attorney credentials</p>
-              <p className="mb-4 text-xs text-[#14112E]/58 leading-relaxed">
+            <div className="mt-5 rounded-2xl border border-[#E4E5DE] bg-[#FAF9F6] p-5">
+              <p className="mb-1 text-sm font-semibold text-[#1B2623]">Attorney credentials</p>
+              <p className="mb-4 text-xs text-[#1B2623]/58 leading-relaxed">
                 Your bar number and state are shown to workers when they review access requests. Workers can use this to verify your licensure through their state bar directory. These credentials are attorney-provided — one3seven does not independently verify bar status.
               </p>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="mb-1 block text-xs text-[#14112E]/52">State bar</label>
+                  <label className="mb-1 block text-xs text-[#1B2623]/52">State bar</label>
                   <select
                     value={barState}
                     onChange={(e) => setBarState(e.target.value)}
-                    className="w-full rounded-2xl border border-[#ECE7F5] bg-white px-4 py-3 text-sm text-[#14112E] focus:border-[#42574E] focus:outline-none focus:ring-4 focus:ring-[#42574E]/10"
+                    className="w-full rounded-2xl border border-[#E4E5DE] bg-white px-4 py-3 text-sm text-[#1B2623] focus:border-[#42574E] focus:outline-none focus:ring-4 focus:ring-[#42574E]/10"
                   >
                     <option value="">Select a state</option>
                     {Object.entries(STATE_LABELS).map(([abbr, label]) => (
@@ -378,38 +378,38 @@ export function FirmSettingsScreen({
                   </select>
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs text-[#14112E]/52">Bar number</label>
+                  <label className="mb-1 block text-xs text-[#1B2623]/52">Bar number</label>
                   <input
                     value={barNumber}
                     onChange={(e) => setBarNumber(e.target.value)}
                     placeholder="e.g. 123456"
-                    className="w-full rounded-2xl border border-[#ECE7F5] bg-[#FAF9F6] px-4 py-3 font-mono text-sm text-[#14112E] placeholder:text-[#14112E]/38 focus:border-[#42574E] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#42574E]/10"
+                    className="w-full rounded-2xl border border-[#E4E5DE] bg-[#FAF9F6] px-4 py-3 font-mono text-sm text-[#1B2623] placeholder:text-[#1B2623]/38 focus:border-[#42574E] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#42574E]/10"
                   />
                 </div>
               </div>
             </div>
 
             {firmProfile?.contact_email ? (
-              <div className="mt-4 rounded-2xl border border-[#ECE7F5] bg-[#FAF9F6] px-4 py-3">
-                <p className="mb-1 text-xs text-[#14112E]/52">Firm account email</p>
-                <p className="text-sm font-medium text-[#14112E]">{firmProfile.contact_email}</p>
+              <div className="mt-4 rounded-2xl border border-[#E4E5DE] bg-[#FAF9F6] px-4 py-3">
+                <p className="mb-1 text-xs text-[#1B2623]/52">Firm account email</p>
+                <p className="text-sm font-medium text-[#1B2623]">{firmProfile.contact_email}</p>
               </div>
             ) : null}
 
-            <div className="mt-4 text-sm text-[#14112E]/64">
+            <div className="mt-4 text-sm text-[#1B2623]/64">
               <p>
                 Current plan: <span className="font-medium">{sub.planId}</span> - Subscription status:{' '}
                 <span className="font-medium">{sub.subscriptionStatus}</span>
               </p>
-              <p className="mt-2 text-xs text-[#14112E]/52">
+              <p className="mt-2 text-xs text-[#1B2623]/52">
                 Beta Pilot is free while trialing. Solo, Practice, Firm, and Enterprise plans will connect through Stripe before paid launch.
               </p>
             </div>
 
             <div className="mt-5 grid gap-3 sm:grid-cols-3">
-              <div className="rounded-2xl border border-[#ECE7F5] bg-[#FAF9F6] px-4 py-3">
-                <p className="text-xs text-[#14112E]/52">Direct firm-code routing</p>
-                <p className="text-sm font-semibold text-[#14112E]">Active</p>
+              <div className="rounded-2xl border border-[#E4E5DE] bg-[#FAF9F6] px-4 py-3">
+                <p className="text-xs text-[#1B2623]/52">Direct firm-code routing</p>
+                <p className="text-sm font-semibold text-[#1B2623]">Active</p>
               </div>
               <button
                 type="button"
@@ -417,17 +417,17 @@ export function FirmSettingsScreen({
                 className={`rounded-2xl border px-4 py-3 text-left transition-colors ${
                   acceptingCases
                     ? 'border-emerald-200 bg-emerald-50'
-                    : 'border-[#ECE7F5] bg-[#FAF9F6]'
+                    : 'border-[#E4E5DE] bg-[#FAF9F6]'
                 }`}
               >
-                <p className="text-xs text-[#14112E]/52">Network intake status</p>
-                <p className={`text-sm font-semibold ${acceptingCases ? 'text-emerald-700' : 'text-[#14112E]/50'}`}>
+                <p className="text-xs text-[#1B2623]/52">Network intake status</p>
+                <p className={`text-sm font-semibold ${acceptingCases ? 'text-emerald-700' : 'text-[#1B2623]/50'}`}>
                   {acceptingCases ? 'Accepting new intakes' : 'Not accepting'}
                 </p>
               </button>
-              <div className="rounded-2xl border border-[#ECE7F5] bg-[#FAF9F6] px-4 py-3">
-                <p className="text-xs text-[#14112E]/52">Saved filters</p>
-                <p className="text-sm font-semibold text-[#14112E]">
+              <div className="rounded-2xl border border-[#E4E5DE] bg-[#FAF9F6] px-4 py-3">
+                <p className="text-xs text-[#1B2623]/52">Saved filters</p>
+                <p className="text-sm font-semibold text-[#1B2623]">
                   {selectedGeographies.length} region{selectedGeographies.length === 1 ? '' : 's'} -{' '}
                   {selectedCategories.length} focus area{selectedCategories.length === 1 ? '' : 's'}
                 </p>
@@ -438,18 +438,18 @@ export function FirmSettingsScreen({
           <motion.section
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="rounded-[32px] border border-[#ECE7F5] bg-white/95 p-8 shadow-[0_28px_90px_rgba(31,27,75,0.12)]"
+            className="rounded-[32px] border border-[#E4E5DE] bg-white/95 p-8 shadow-[0_28px_90px_rgba(31,27,75,0.12)]"
           >
             <div className="mb-6 flex items-start justify-between gap-4 flex-wrap">
               <div>
-                <h2 className="text-lg font-semibold text-[#14112E]">Billing &amp; subscription</h2>
-                <p className="mt-1 text-sm text-[#14112E]/55">
+                <h2 className="text-lg font-semibold text-[#1B2623]">Billing &amp; subscription</h2>
+                <p className="mt-1 text-sm text-[#1B2623]/55">
                   Current plan:{' '}
                   <span className={`font-semibold ${sub.isPaid ? 'text-emerald-600' : 'text-[#42574E]'}`}>
                     {sub.label}
                   </span>
                   {' · '}
-                  <span className="text-[#14112E]/50">{sub.subscriptionStatus}</span>
+                  <span className="text-[#1B2623]/50">{sub.subscriptionStatus}</span>
                 </p>
               </div>
               {sub.isPaid && (
@@ -457,7 +457,7 @@ export function FirmSettingsScreen({
                   type="button"
                   onClick={() => void handleManageBilling()}
                   disabled={billingLoading === 'portal'}
-                  className="shrink-0 rounded-xl border border-[#ECE7F5] bg-white px-4 py-2 text-xs font-semibold text-[#42574E] transition hover:bg-[#F5F1FB] disabled:opacity-60"
+                  className="shrink-0 rounded-xl border border-[#E4E5DE] bg-white px-4 py-2 text-xs font-semibold text-[#42574E] transition hover:bg-[#F2F4EC] disabled:opacity-60"
                 >
                   {billingLoading === 'portal' ? 'Opening…' : 'Manage billing →'}
                 </button>
@@ -483,10 +483,10 @@ export function FirmSettingsScreen({
                     key={plan.id}
                     className={`relative flex flex-col rounded-[22px] border p-5 transition ${
                       isPopular
-                        ? 'border-[#42574E] bg-[#F5F1FB] shadow-[0_8px_32px_rgba(109,74,255,0.14)]'
+                        ? 'border-[#42574E] bg-[#F2F4EC] shadow-[0_8px_32px_rgba(109,74,255,0.14)]'
                         : isCurrent
                         ? 'border-emerald-300 bg-emerald-50/60'
-                        : 'border-[#ECE7F5] bg-white'
+                        : 'border-[#E4E5DE] bg-white'
                     }`}
                   >
                     {isPopular && (
@@ -501,29 +501,29 @@ export function FirmSettingsScreen({
                     )}
 
                     <div className="mb-3">
-                      <p className="text-[13px] font-bold text-[#14112E]">{plan.label}</p>
+                      <p className="text-[13px] font-bold text-[#1B2623]">{plan.label}</p>
                       <div className="mt-1 flex items-end gap-1">
-                        <span className="text-[28px] font-black leading-none tracking-tight text-[#14112E]">
+                        <span className="text-[28px] font-black leading-none tracking-tight text-[#1B2623]">
                           ${plan.price}
                         </span>
-                        <span className="mb-1 text-xs text-[#14112E]/45">/mo</span>
+                        <span className="mb-1 text-xs text-[#1B2623]/45">/mo</span>
                       </div>
                     </div>
 
                     <ul className="mb-5 flex-1 space-y-1.5">
-                      <li className="flex items-center gap-1.5 text-xs text-[#14112E]/65">
+                      <li className="flex items-center gap-1.5 text-xs text-[#1B2623]/65">
                         <span className="text-[#42574E]">✓</span>
                         {plan.intakesPerMonth ? `Up to ${plan.intakesPerMonth} intakes/mo` : 'Unlimited intakes'}
                       </li>
-                      <li className="flex items-center gap-1.5 text-xs text-[#14112E]/65">
+                      <li className="flex items-center gap-1.5 text-xs text-[#1B2623]/65">
                         <span className="text-[#42574E]">✓</span>
                         {plan.seats ? `${plan.seats} seat${plan.seats > 1 ? 's' : ''}` : 'Unlimited seats'}
                       </li>
-                      <li className="flex items-center gap-1.5 text-xs text-[#14112E]/65">
+                      <li className="flex items-center gap-1.5 text-xs text-[#1B2623]/65">
                         <span className="text-[#42574E]">✓</span>
                         Intake organization + review packet
                       </li>
-                      <li className="flex items-center gap-1.5 text-xs text-[#14112E]/65">
+                      <li className="flex items-center gap-1.5 text-xs text-[#1B2623]/65">
                         <span className="text-[#42574E]">✓</span>
                         Beta pilot pricing
                       </li>
@@ -540,14 +540,14 @@ export function FirmSettingsScreen({
                         disabled={!!billingLoading}
                         className={`rounded-xl py-2.5 text-xs font-semibold transition disabled:opacity-60 ${
                           isPopular
-                            ? 'bg-[#42574E] text-white hover:bg-[#4C1D96]'
-                            : 'border border-[#ECE7F5] bg-white text-[#42574E] hover:bg-[#F5F1FB]'
+                            ? 'bg-[#42574E] text-white hover:bg-[#42574E]'
+                            : 'border border-[#E4E5DE] bg-white text-[#42574E] hover:bg-[#F2F4EC]'
                         }`}
                       >
                         {loading ? 'Opening Stripe…' : 'Start free trial →'}
                       </button>
                     ) : (
-                      <div className="rounded-xl border border-dashed border-[#ECE7F5] py-2.5 text-center text-xs text-[#14112E]/40">
+                      <div className="rounded-xl border border-dashed border-[#E4E5DE] py-2.5 text-center text-xs text-[#1B2623]/40">
                         {!plan.priceId ? 'Coming soon' : 'Select above'}
                       </div>
                     )}
@@ -557,20 +557,20 @@ export function FirmSettingsScreen({
             </div>
 
             {/* Enterprise */}
-            <div className="mt-4 flex items-center justify-between rounded-[18px] border border-dashed border-[#ECE7F5] bg-[#FAF9F6] px-5 py-4">
+            <div className="mt-4 flex items-center justify-between rounded-[18px] border border-dashed border-[#E4E5DE] bg-[#FAF9F6] px-5 py-4">
               <div>
-                <p className="text-[13px] font-bold text-[#14112E]">Enterprise</p>
-                <p className="text-xs text-[#14112E]/50">Unlimited intakes · Unlimited seats · Custom onboarding</p>
+                <p className="text-[13px] font-bold text-[#1B2623]">Enterprise</p>
+                <p className="text-xs text-[#1B2623]/50">Unlimited intakes · Unlimited seats · Custom onboarding</p>
               </div>
               <a
                 href="mailto:info@one3seven.com?subject=Enterprise%20inquiry"
-                className="rounded-xl border border-[#ECE7F5] bg-white px-4 py-2 text-xs font-semibold text-[#42574E] transition hover:bg-[#F5F1FB]"
+                className="rounded-xl border border-[#E4E5DE] bg-white px-4 py-2 text-xs font-semibold text-[#42574E] transition hover:bg-[#F2F4EC]"
               >
                 Contact us →
               </a>
             </div>
 
-            <p className="mt-4 text-center text-[11px] text-[#14112E]/35">
+            <p className="mt-4 text-center text-[11px] text-[#1B2623]/35">
               All plans include a 7-day free trial · Cancel anytime · Billed monthly via Stripe
             </p>
           </motion.section>
@@ -578,13 +578,13 @@ export function FirmSettingsScreen({
           <motion.section
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="rounded-[32px] border border-[#ECE7F5] bg-white/95 p-8 shadow-[0_28px_90px_rgba(31,27,75,0.12)]"
+            className="rounded-[32px] border border-[#E4E5DE] bg-white/95 p-8 shadow-[0_28px_90px_rgba(31,27,75,0.12)]"
           >
-            <h2 className="mb-2 text-lg font-semibold text-[#14112E]">Team & permissions</h2>
-            <p className="mb-4 text-sm text-[#14112E]/64">
+            <h2 className="mb-2 text-lg font-semibold text-[#1B2623]">Team & permissions</h2>
+            <p className="mb-4 text-sm text-[#1B2623]/64">
               Team access is planned for paid firm workspaces. This beta account currently belongs to the signed-in firm user.
             </p>
-            <p className="rounded-2xl border border-dashed border-[#ECE7F5] bg-[#FAF9F6] px-4 py-3 text-xs text-[#14112E]/52">
+            <p className="rounded-2xl border border-dashed border-[#E4E5DE] bg-[#FAF9F6] px-4 py-3 text-xs text-[#1B2623]/52">
               Team member and permission controls are unavailable during the closed beta.
             </p>
           </motion.section>
@@ -592,13 +592,13 @@ export function FirmSettingsScreen({
           <motion.section
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="rounded-[32px] border border-[#ECE7F5] bg-white/95 p-8 shadow-[0_28px_90px_rgba(31,27,75,0.12)]"
+            className="rounded-[32px] border border-[#E4E5DE] bg-white/95 p-8 shadow-[0_28px_90px_rgba(31,27,75,0.12)]"
           >
-            <h2 className="mb-2 text-lg font-semibold text-[#14112E]">Account security</h2>
-            <p className="mb-3 text-sm text-[#14112E]/64">
+            <h2 className="mb-2 text-lg font-semibold text-[#1B2623]">Account security</h2>
+            <p className="mb-3 text-sm text-[#1B2623]/64">
               Password, sessions, and account access are handled through Supabase Auth while firm workspace security is expanded.
             </p>
-            <p className="rounded-2xl border border-dashed border-[#ECE7F5] bg-[#FAF9F6] px-4 py-3 text-xs text-[#14112E]/52">
+            <p className="rounded-2xl border border-dashed border-[#E4E5DE] bg-[#FAF9F6] px-4 py-3 text-xs text-[#1B2623]/52">
               Additional security checklist controls are unavailable during the closed beta.
             </p>
           </motion.section>
@@ -607,13 +607,13 @@ export function FirmSettingsScreen({
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="rounded-[32px] border border-[#ECE7F5] bg-white/95 p-8 shadow-[0_28px_90px_rgba(31,27,75,0.12)]"
+            className="rounded-[32px] border border-[#E4E5DE] bg-white/95 p-8 shadow-[0_28px_90px_rgba(31,27,75,0.12)]"
           >
             <div className="mb-4 flex items-center gap-3">
               <Filter className="h-5 w-5 text-[#42574E]" />
-              <h2 className="text-lg font-semibold text-[#14112E]">Intake Routing Preferences</h2>
+              <h2 className="text-lg font-semibold text-[#1B2623]">Intake Routing Preferences</h2>
             </div>
-            <p className="mb-6 text-sm leading-relaxed text-[#14112E]/64">
+            <p className="mb-6 text-sm leading-relaxed text-[#1B2623]/64">
               These settings save geography and practice-area context to your firm profile. People can still route directly to your dashboard with your firm code.
             </p>
 
@@ -621,7 +621,7 @@ export function FirmSettingsScreen({
               <div>
                 <div className="mb-3 flex items-center gap-2">
                   <MapPin className="h-4 w-4 text-[#42574E]" />
-                  <div className="text-sm font-medium text-[#14112E]">Geography Preferences</div>
+                  <div className="text-sm font-medium text-[#1B2623]">Geography Preferences</div>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {GEOGRAPHIES.map((geo) => (
@@ -633,7 +633,7 @@ export function FirmSettingsScreen({
               </div>
 
               <div>
-                <div className="mb-3 text-sm font-medium text-[#14112E]">
+                <div className="mb-3 text-sm font-medium text-[#1B2623]">
                   Intake practice areas (California beta)
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -650,12 +650,12 @@ export function FirmSettingsScreen({
               </div>
 
               <div>
-                <div className="mb-3 text-sm font-medium text-[#14112E]">Complete Packet Signals</div>
+                <div className="mb-3 text-sm font-medium text-[#1B2623]">Complete Packet Signals</div>
                 <div className="grid gap-2 sm:grid-cols-2">
                   {REQUIRED_PACKET_SIGNALS.map((signal) => (
-                    <div key={signal} className="rounded-2xl border border-[#ECE7F5] bg-[#FAF9F6] px-4 py-3">
-                      <p className="text-sm font-medium text-[#14112E]">{signal}</p>
-                      <p className="mt-1 text-xs text-[#14112E]/52">Review-preparation signal, not a legal requirement.</p>
+                    <div key={signal} className="rounded-2xl border border-[#E4E5DE] bg-[#FAF9F6] px-4 py-3">
+                      <p className="text-sm font-medium text-[#1B2623]">{signal}</p>
+                      <p className="mt-1 text-xs text-[#1B2623]/52">Review-preparation signal, not a legal requirement.</p>
                     </div>
                   ))}
                 </div>
@@ -668,19 +668,19 @@ export function FirmSettingsScreen({
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="rounded-[32px] border border-[#ECE7F5] bg-[#FAF9F6] p-8 shadow-[0_18px_56px_rgba(31,27,75,0.09)]"
+            className="rounded-[32px] border border-[#E4E5DE] bg-[#FAF9F6] p-8 shadow-[0_18px_56px_rgba(31,27,75,0.09)]"
           >
             <div className="flex items-start gap-3">
               <Info className="mt-0.5 h-5 w-5 flex-shrink-0 text-[#42574E]" />
               <div>
-                <h3 className="mb-2 text-sm font-semibold text-[#14112E]">About intake workflow signals</h3>
-                <p className="mb-3 text-xs leading-relaxed text-[#14112E]/64">
+                <h3 className="mb-2 text-sm font-semibold text-[#1B2623]">About intake workflow signals</h3>
+                <p className="mb-3 text-xs leading-relaxed text-[#1B2623]/64">
                   Status labels inside your dashboard describe operational routing and review preparation only. They are not legal conclusions, outcomes, or rankings from one3seven.
                 </p>
-                <p className="text-xs leading-relaxed text-[#14112E]/64">
+                <p className="text-xs leading-relaxed text-[#1B2623]/64">
                   When a preview is not advanced by a firm, it usually reflects capacity, focus areas, or internal intake preferences - not a reflection on the worker's records.
                 </p>
-                <p className="mt-3 text-xs leading-relaxed text-[#14112E]/64">
+                <p className="mt-3 text-xs leading-relaxed text-[#1B2623]/64">
                   Participating firms choose their own next steps. {ONE3SEVEN_NOTICES.positioning}
                 </p>
               </div>
@@ -692,7 +692,7 @@ export function FirmSettingsScreen({
               {settingsError ? (
                 <p className="text-sm text-red-600">{settingsError}</p>
               ) : (
-                <p className="text-sm text-[#14112E]/52">
+                <p className="text-sm text-[#1B2623]/52">
                   Firm name, geography, and intake focus areas save to your firm profile.
                 </p>
               )}
@@ -702,12 +702,12 @@ export function FirmSettingsScreen({
                     type="button"
                     onClick={() => void handleRunDbDiagnostics()}
                     disabled={diagBusy || isSaving}
-                    className="w-fit text-xs text-[#14112E]/60 underline underline-offset-2 hover:text-[#14112E] disabled:opacity-50"
+                    className="w-fit text-xs text-[#1B2623]/60 underline underline-offset-2 hover:text-[#1B2623] disabled:opacity-50"
                   >
                     {diagBusy ? 'Running DB diagnostics…' : 'Run DB diagnostics (temp)'}
                   </button>
                   {diagSummary ? (
-                    <p className="break-words font-mono text-xs text-[#14112E]/60">{diagSummary}</p>
+                    <p className="break-words font-mono text-xs text-[#1B2623]/60">{diagSummary}</p>
                   ) : null}
                 </div>
               ) : null}
@@ -715,7 +715,7 @@ export function FirmSettingsScreen({
             <button
               onClick={handleSaveSettings}
               disabled={isSaving}
-              className="flex shrink-0 items-center justify-center gap-2 rounded-full bg-[#42574E] px-8 py-3 font-medium text-white shadow-[0_18px_48px_rgba(109,74,255,0.26)] transition hover:-translate-y-0.5 hover:bg-[#4C1D96] disabled:translate-y-0 disabled:opacity-60"
+              className="flex shrink-0 items-center justify-center gap-2 rounded-full bg-[#42574E] px-8 py-3 font-medium text-white shadow-[0_18px_48px_rgba(109,74,255,0.26)] transition hover:-translate-y-0.5 hover:bg-[#42574E] disabled:translate-y-0 disabled:opacity-60"
             >
               <Save className="w-4 h-4" />
               {isSaving ? 'Saving...' : 'Save firm profile'}
@@ -735,7 +735,7 @@ function PillButton({ selected, onClick, children }: { selected: boolean; onClic
       className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
         selected
           ? 'bg-[#42574E] text-white shadow-[0_10px_24px_rgba(109,74,255,0.18)]'
-          : 'border border-[#ECE7F5] bg-white text-[#14112E]/70 hover:border-[#C9B8F0] hover:bg-[#F5F1FB] hover:text-[#14112E]'
+          : 'border border-[#E4E5DE] bg-white text-[#1B2623]/70 hover:border-[#7C8B6F] hover:bg-[#F2F4EC] hover:text-[#1B2623]'
       }`}
     >
       {children}

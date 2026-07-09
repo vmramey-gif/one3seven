@@ -135,11 +135,11 @@ export function OneThreeSevenLoader({ size = 'lg' }: { size?: 'lg' | 'sm' }) {
 
   if (size === 'sm') {
     return (
-      <span className="inline-flex items-center gap-2 text-sm text-[#1E1B4B]/60" role="status" aria-label="Organizing records">
+      <span className="inline-flex items-center gap-2 text-sm text-[#1B2623]/60" role="status" aria-label="Organizing records">
         <span className="text-[15px] leading-none" aria-hidden="true">
-          <span className="font-normal text-[#1E1B4B]/70">1</span>
+          <span className="font-normal text-[#1B2623]/70">1</span>
           <span className="font-black text-[#42574E]">3</span>
-          <span className="font-normal text-[#1E1B4B]/70">7</span>
+          <span className="font-normal text-[#1B2623]/70">7</span>
         </span>
         Organizing records...
       </span>
@@ -153,7 +153,7 @@ export function OneThreeSevenLoader({ size = 'lg' }: { size?: 'lg' | 'sm' }) {
       </div>
 
       <p
-        className="text-sm font-medium text-[#1E1B4B]/60 transition-opacity duration-300"
+        className="text-sm font-medium text-[#1B2623]/60 transition-opacity duration-300"
         style={{ opacity: msgVis ? 1 : 0, minHeight: '1.25rem' }}
       >
         {MESSAGES[msgIdx]}

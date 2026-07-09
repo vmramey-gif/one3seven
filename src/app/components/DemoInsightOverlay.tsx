@@ -142,7 +142,7 @@ export function DemoInsightProvider({ children, onSignUp }: ProviderProps) {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.18 }}
               onClick={dismiss}
-              className="fixed inset-0 z-[1100] bg-[#1E1B4B]/70 backdrop-blur-sm"
+              className="fixed inset-0 z-[1100] bg-[#1B2623]/70 backdrop-blur-sm"
             />
 
             {/* Panel */}
@@ -159,13 +159,13 @@ export function DemoInsightProvider({ children, onSignUp }: ProviderProps) {
                 onClick={(e) => e.stopPropagation()}
               >
                 {/* Glow bar at top */}
-                <div className="h-1 w-full bg-gradient-to-r from-[#42574E] via-[#9C72FF] to-[#7C8B6F]" />
+                <div className="h-1 w-full bg-gradient-to-r from-[#42574E] via-[#42574E] to-[#7C8B6F]" />
 
                 <div className="p-7">
                   {/* Dismiss */}
                   <button
                     onClick={dismiss}
-                    className="absolute top-5 right-5 rounded-full p-1.5 text-[#1E1B4B]/35 hover:bg-[#F7F3FF] hover:text-[#1E1B4B] transition-colors"
+                    className="absolute top-5 right-5 rounded-full p-1.5 text-[#1B2623]/35 hover:bg-[#F7F9F5] hover:text-[#1B2623] transition-colors"
                     aria-label="Close"
                   >
                     <X className="w-4 h-4" />
@@ -176,7 +176,7 @@ export function DemoInsightProvider({ children, onSignUp }: ProviderProps) {
                     <div
                       className="inline-block rounded-2xl px-4 py-3"
                       style={{
-                        background: 'linear-gradient(135deg, #F0EBFF 0%, #E8E0FF 100%)',
+                        background: 'linear-gradient(135deg, #F2F4EC 0%, #E7EDE8 100%)',
                         border: '1.5px solid #CBD6CF',
                       }}
                     >
@@ -186,19 +186,19 @@ export function DemoInsightProvider({ children, onSignUp }: ProviderProps) {
                       >
                         {insight.stat}
                       </p>
-                      <p className="text-[11px] font-medium text-[#1E1B4B]/55 mt-1 max-w-[220px] leading-snug">
+                      <p className="text-[11px] font-medium text-[#1B2623]/55 mt-1 max-w-[220px] leading-snug">
                         {insight.statLabel}
                       </p>
                     </div>
                   </div>
 
                   {/* Title */}
-                  <h3 className="text-[17px] font-800 text-[#1E1B4B] mb-2.5 leading-snug" style={{ fontWeight: 800 }}>
+                  <h3 className="text-[17px] font-800 text-[#1B2623] mb-2.5 leading-snug" style={{ fontWeight: 800 }}>
                     {insight.title}
                   </h3>
 
                   {/* Body */}
-                  <p className="text-[13.5px] text-[#1E1B4B]/65 leading-relaxed mb-6">
+                  <p className="text-[13.5px] text-[#1B2623]/65 leading-relaxed mb-6">
                     {insight.body}
                   </p>
 
@@ -206,7 +206,7 @@ export function DemoInsightProvider({ children, onSignUp }: ProviderProps) {
                   <div className="flex gap-2.5">
                     <button
                       onClick={dismiss}
-                      className="flex-1 rounded-full border border-[#CBD6CF] bg-white py-2.5 text-sm font-semibold text-[#1E1B4B]/70 hover:border-[#B8A8FF] hover:bg-[#F7F3FF] transition-colors"
+                      className="flex-1 rounded-full border border-[#CBD6CF] bg-white py-2.5 text-sm font-semibold text-[#1B2623]/70 hover:border-[#7C8B6F] hover:bg-[#F7F9F5] transition-colors"
                     >
                       Got it
                     </button>
@@ -252,9 +252,9 @@ export function DemoInsightBadge({ id, compact = false }: BadgeProps) {
       title="Why does this exist?"
       className={`
         relative inline-flex items-center justify-center rounded-full
-        bg-[#F0EBFF] border border-[#CBD6CF] text-[#42574E]
+        bg-[#F2F4EC] border border-[#CBD6CF] text-[#42574E]
         font-bold leading-none select-none
-        hover:bg-[#E8E0FF] hover:border-[#7C8B6F] transition-colors
+        hover:bg-[#E7EDE8] hover:border-[#7C8B6F] transition-colors
         ${compact ? 'w-4 h-4 text-[9px]' : 'w-5 h-5 text-[10px]'}
       `}
       style={{ flexShrink: 0 }}

@@ -69,7 +69,7 @@ export function StatutoryRef({ refText, children }: { refText: string; children:
           className="absolute bottom-full left-0 z-50 mb-1 w-64 rounded-lg border px-3 py-2 text-xs leading-relaxed shadow-lg"
           style={{
             background: 'var(--o3s-surface, #fff)',
-            color: 'var(--o3s-text, #1e1b4b)',
+            color: 'var(--o3s-text, #1B2623)',
             borderColor: 'var(--o3s-border, #d3ded6)',
           }}
         >

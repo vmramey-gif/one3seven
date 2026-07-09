@@ -532,7 +532,7 @@ export function LandingScreen({
               <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#42574E]">
                 Status Journey
               </p>
-              <h2 className="mt-2 break-words text-lg font-semibold text-[#1E1B4B]">
+              <h2 className="mt-2 break-words text-lg font-semibold text-[#1B2623]">
                 {selectedStatusJourney.title}
               </h2>
               <p className="mt-1 break-words text-xs text-[#64748B]">
@@ -540,12 +540,12 @@ export function LandingScreen({
               </p>
             </div>
             {statusJourneyOptions.length > 1 ? (
-              <label className="flex w-full max-w-md flex-col gap-1 text-left text-xs font-medium text-[#1E1B4B]/70">
+              <label className="flex w-full max-w-md flex-col gap-1 text-left text-xs font-medium text-[#1B2623]/70">
                 Choose intake
                 <select
                   value={selectedStatusJourney.intakeId}
                   onChange={(event) => setSelectedStatusIntakeId(event.target.value)}
-                  className="w-full max-w-full rounded-2xl border border-[#CBD6CF] bg-[#FBFAFF] px-3 py-2 text-sm font-medium text-[#1E1B4B] shadow-sm outline-none transition focus:border-[#42574E] focus:ring-2 focus:ring-[#CBD6CF]"
+                  className="w-full max-w-full rounded-2xl border border-[#CBD6CF] bg-[#FBFAFF] px-3 py-2 text-sm font-medium text-[#1B2623] shadow-sm outline-none transition focus:border-[#42574E] focus:ring-2 focus:ring-[#CBD6CF]"
                 >
                   {statusJourneyOptions.map((option) => (
                     <option key={option.intakeId} value={option.intakeId}>
@@ -661,7 +661,7 @@ export function LandingScreen({
         <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#42574E]">
           Summary
         </h2>
-        <p className="text-xs leading-relaxed text-[#1E1B4B]/64">
+        <p className="text-xs leading-relaxed text-[#1B2623]/64">
           Completed organized summaries are available here for review.
         </p>
       </div>
@@ -683,14 +683,14 @@ export function LandingScreen({
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 text-[#42574E]">
                       <FileText className="h-4 w-4" strokeWidth={1.8} aria-hidden />
-                      <p className="text-sm font-semibold text-[#1E1B4B]">
+                      <p className="text-sm font-semibold text-[#1B2623]">
                         Employment Intake Summary
                       </p>
                     </div>
-                    <p className="mt-1 text-[11px] text-[#1E1B4B]/50">
+                    <p className="mt-1 text-[11px] text-[#1B2623]/50">
                       Reference: {card.intakeNumber}
                     </p>
-                    <p className="mt-1 text-xs text-[#1E1B4B]/64">
+                    <p className="mt-1 text-xs text-[#1B2623]/64">
                       {statusLabel}
                       {lastActivity ? ` - ${lastActivity}` : null}
                     </p>
@@ -717,7 +717,7 @@ export function LandingScreen({
           })}
         </div>
       ) : (
-        <p className="rounded-[18px] border border-[#D3DED6] bg-white/90 px-4 py-8 text-center text-sm leading-relaxed text-[#1E1B4B]/64">
+        <p className="rounded-[18px] border border-[#D3DED6] bg-white/90 px-4 py-8 text-center text-sm leading-relaxed text-[#1B2623]/64">
           No completed summaries yet. Organize an intake first, then its Employment Intake Summary will appear here.
         </p>
       )}
@@ -725,7 +725,7 @@ export function LandingScreen({
   );
 
   return (
-    <div className={`min-h-screen bg-[#F2F4EC] text-[#1E1B4B]${showWorkerHub ? ' pb-24 sm:pb-0' : ''}`}>
+    <div className={`min-h-screen bg-[#F2F4EC] text-[#1B2623]${showWorkerHub ? ' pb-24 sm:pb-0' : ''}`}>
       {/* Top Navigation */}
       {!shellMode ? (
       <nav className={`sticky top-0 z-50 border-b backdrop-blur-md ${
@@ -738,7 +738,7 @@ export function LandingScreen({
             <button
               type="button"
               onClick={() => (showWorkerHub && onGoWorkerDashboard ? onGoWorkerDashboard() : onNavigate('landing'))}
-              className={`${showWorkerHub ? 'text-base' : 'text-lg'} font-medium text-[#1E1B4B] hover:opacity-80 transition-opacity text-left tracking-tight`}
+              className={`${showWorkerHub ? 'text-base' : 'text-lg'} font-medium text-[#1B2623] hover:opacity-80 transition-opacity text-left tracking-tight`}
             >
               <WordMark />
             </button>
@@ -750,7 +750,7 @@ export function LandingScreen({
                 <button
                   type="button"
                   onClick={onOpenSettings}
-                  className="rounded-lg px-3 py-2 text-sm text-[#1E1B4B]/65 hover:bg-[#F7F3FF] hover:text-[#1E1B4B]"
+                  className="rounded-lg px-3 py-2 text-sm text-[#1B2623]/65 hover:bg-[#F7F9F5] hover:text-[#1B2623]"
                 >
                   Settings
                 </button>
@@ -758,7 +758,7 @@ export function LandingScreen({
                 <button
                   type="button"
                   onClick={onOpenSettings}
-                  className="rounded-lg px-3 py-2 text-sm text-[#1E1B4B]/65 hover:bg-[#F7F3FF] hover:text-[#1E1B4B]"
+                  className="rounded-lg px-3 py-2 text-sm text-[#1B2623]/65 hover:bg-[#F7F9F5] hover:text-[#1B2623]"
                 >
                   Settings
                 </button>
@@ -784,7 +784,7 @@ export function LandingScreen({
               <section id="worker-mobile-records" className="px-4 pt-5 pb-4">
                 {openIntakeFeedback ? (
                   <p
-                    className="mb-3 rounded-lg border border-[#D3DED6] bg-white px-3 py-1.5 text-xs leading-relaxed text-[#1E1B4B]/70"
+                    className="mb-3 rounded-lg border border-[#D3DED6] bg-white px-3 py-1.5 text-xs leading-relaxed text-[#1B2623]/70"
                     role="status"
                     aria-live="polite"
                   >
@@ -808,14 +808,14 @@ export function LandingScreen({
                 ) : null}
                 <div className="mb-4">
                   <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#42574E]">Intakes</h2>
-                  <p className="text-xs leading-relaxed text-[#1E1B4B]/64">
+                  <p className="text-xs leading-relaxed text-[#1B2623]/64">
                     All saved and created intakes remain available here. Tap + to start a new intake.
                   </p>
                 </div>
                 {sortedIntakeCards.length > 0 ? (
                   renderCompactIntakeList()
                 ) : (
-                  <p className="py-6 text-center text-sm leading-relaxed text-[#1E1B4B]/64">
+                  <p className="py-6 text-center text-sm leading-relaxed text-[#1B2623]/64">
                     No saved intakes yet. Tap + to start a new intake.
                   </p>
                 )}
@@ -836,7 +836,7 @@ export function LandingScreen({
         >
           {openIntakeFeedback ? (
             <p
-              className="mb-3 rounded-lg border border-[#D3DED6] bg-white px-3 py-1.5 text-xs leading-relaxed text-[#1E1B4B]/70"
+              className="mb-3 rounded-lg border border-[#D3DED6] bg-white px-3 py-1.5 text-xs leading-relaxed text-[#1B2623]/70"
               role="status"
               aria-live="polite"
             >
@@ -887,7 +887,7 @@ export function LandingScreen({
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#42574E]">
               Intakes
             </p>
-            <p className="mt-1 text-xs leading-relaxed text-[#1E1B4B]/64">
+            <p className="mt-1 text-xs leading-relaxed text-[#1B2623]/64">
               All saved intakes remain available here. Tap + to start a new intake.
             </p>
           </div>
@@ -943,7 +943,7 @@ export function LandingScreen({
                             Category: {displayCaseCategoryLabel(card.caseCategory)}
                           </p>
                         ) : null}
-                        <p className="mt-0.5 text-[11px] text-[#1E1B4B]/62">
+                        <p className="mt-0.5 text-[11px] text-[#1B2623]/62">
                           {formatWorkerWorkflowStatusForDisplay(card.workflowStatus, card.submissionChannel)}
                           {lastActivity ? ` · ${lastActivity}` : null}
                         </p>
@@ -1005,7 +1005,7 @@ export function LandingScreen({
             </div>
             )
           ) : (
-            <p className="py-6 text-center text-sm leading-relaxed text-[#1E1B4B]/64">
+            <p className="py-6 text-center text-sm leading-relaxed text-[#1B2623]/64">
               No saved intakes yet. Tap + to start a new intake.
             </p>
           )}
@@ -1336,16 +1336,16 @@ export function LandingScreen({
       >
         {workerDashboardCompact ? (
           <details className="group overflow-hidden rounded-2xl border border-[#D3DED6] bg-white/86 shadow-[0_12px_32px_rgba(31,27,75,0.07)]">
-            <summary className="flex cursor-pointer list-none items-center justify-between gap-2 px-4 py-3 text-sm font-medium text-[#1E1B4B] hover:bg-[#F7F3FF]">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-2 px-4 py-3 text-sm font-medium text-[#1B2623] hover:bg-[#F7F9F5]">
               About one3seven
               <span className="text-[11px] font-normal text-[#64748B] group-open:hidden">Show</span>
               <span className="hidden text-[11px] font-normal text-[#64748B] group-open:inline">Hide</span>
             </summary>
             <div className="space-y-3 border-t border-[#D3DED6] px-4 pb-4 pt-3">
-              <p className="text-xs leading-relaxed text-[#1E1B4B]/64">
+              <p className="text-xs leading-relaxed text-[#1B2623]/64">
                 Organize your records into a calm, reviewable summary—ready when you choose to share with a firm.
               </p>
-              <ul className="list-disc space-y-1.5 pl-4 text-xs text-[#1E1B4B]/64">
+              <ul className="list-disc space-y-1.5 pl-4 text-xs text-[#1B2623]/64">
                 <li>Track intake status and firm activity in one place</li>
                 <li>Review timelines and summaries inside each intake</li>
                 <li>Prepare cleaner materials for legal conversations</li>
@@ -1376,24 +1376,24 @@ export function LandingScreen({
             </ul>
           </div>
 
-          <div className="rounded-[16px] border border-[#D3DED6] bg-white p-7 text-[#1E1B4B] shadow-[0_14px_38px_rgba(31,27,75,0.08)]">
+          <div className="rounded-[16px] border border-[#D3DED6] bg-white p-7 text-[#1B2623] shadow-[0_14px_38px_rgba(31,27,75,0.08)]">
             <h3 className="mb-5 text-base font-semibold">For Participating Firms</h3>
             <ul className="space-y-4">
               <li className="flex items-start gap-3">
                 <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#42574E]" />
-                <span className="text-sm leading-relaxed text-[#1E1B4B]/64">Receive more organized intake submissions</span>
+                <span className="text-sm leading-relaxed text-[#1B2623]/64">Receive more organized intake submissions</span>
               </li>
               <li className="flex items-start gap-3">
                 <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#42574E]" />
-                <span className="text-sm leading-relaxed text-[#1E1B4B]/64">Reduce manual document sorting</span>
+                <span className="text-sm leading-relaxed text-[#1B2623]/64">Reduce manual document sorting</span>
               </li>
               <li className="flex items-start gap-3">
                 <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#42574E]" />
-                <span className="text-sm leading-relaxed text-[#1E1B4B]/64">Review structured timelines and categorized records</span>
+                <span className="text-sm leading-relaxed text-[#1B2623]/64">Review structured timelines and categorized records</span>
               </li>
               <li className="flex items-start gap-3">
                 <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#42574E]" />
-                <span className="text-sm leading-relaxed text-[#1E1B4B]/64">Improve intake workflow efficiency</span>
+                <span className="text-sm leading-relaxed text-[#1B2623]/64">Improve intake workflow efficiency</span>
               </li>
             </ul>
           </div>
@@ -1416,12 +1416,12 @@ export function LandingScreen({
         }`}
       >
         <div className="text-center">
-          <div className="mb-2 text-lg font-semibold text-[#1E1B4B]"><WordMark /></div>
+          <div className="mb-2 text-lg font-semibold text-[#1B2623]"><WordMark /></div>
           <p className="mb-8 text-sm leading-relaxed text-[#475569]">
             A workflow organization platform for intake preparation.
           </p>
           <p className="mx-auto mb-6 max-w-lg text-xs leading-relaxed text-[#64748B]">{ONE3SEVEN_NOTICES.positioning}</p>
-          <div className="flex flex-wrap justify-center gap-8 text-sm text-[#1E1B4B]/64">
+          <div className="flex flex-wrap justify-center gap-8 text-sm text-[#1B2623]/64">
             <a
               href="https://one3seven.com/privacy"
               target="_blank"
@@ -1482,7 +1482,7 @@ export function LandingScreen({
               <div className="space-y-3">
                 <button
                   type="button"
-                  className="w-full border border-[#42574E] text-[#42574E] bg-white py-3.5 rounded-[14px] text-sm font-medium hover:bg-[#F7F3FF]"
+                  className="w-full border border-[#42574E] text-[#42574E] bg-white py-3.5 rounded-[14px] text-sm font-medium hover:bg-[#F7F9F5]"
                   onClick={() => handleLawFirmChoice('enter_firm_code')}
                 >
                   Share with a firm

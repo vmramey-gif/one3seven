@@ -67,23 +67,23 @@ export function FirmDirectedIntakeScreen({ firmName, onSubmit }: FirmDirectedInt
   return (
     <div className="min-h-screen bg-[#FAF9F6]">
       {/* Header */}
-      <nav className="sticky top-0 z-50 border-b border-[#ECE7F5] bg-white/90 backdrop-blur-md px-6 py-4">
-        <span className="text-base font-semibold text-[#14112E]"><WordMark /></span>
+      <nav className="sticky top-0 z-50 border-b border-[#E4E5DE] bg-white/90 backdrop-blur-md px-6 py-4">
+        <span className="text-base font-semibold text-[#1B2623]"><WordMark /></span>
       </nav>
 
       <div className="mx-auto max-w-[520px] px-6 py-10">
         {/* Firm badge */}
-        <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#ECE7F5] bg-white px-4 py-1.5 text-xs font-semibold text-[#42574E]">
+        <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#E4E5DE] bg-white px-4 py-1.5 text-xs font-semibold text-[#42574E]">
           <span className="h-1.5 w-1.5 rounded-full bg-[#42574E] animate-pulse" />
           Submitted to {firmName}
         </div>
 
         {step === 'form' && (
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
-            <h1 className="mb-2 text-2xl font-bold text-[#14112E] leading-tight">
+            <h1 className="mb-2 text-2xl font-bold text-[#1B2623] leading-tight">
               Tell us about your situation.
             </h1>
-            <p className="mb-8 text-sm text-[#14112E]/60 leading-relaxed">
+            <p className="mb-8 text-sm text-[#1B2623]/60 leading-relaxed">
               {firmName} asked you to submit your records here. This takes about 10 minutes.
               Your documents will be organized and sent directly to the firm.
             </p>
@@ -92,7 +92,7 @@ export function FirmDirectedIntakeScreen({ firmName, onSubmit }: FirmDirectedInt
               {/* Name row */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-[#14112E]/50">
+                  <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-[#1B2623]/50">
                     First name <span className="text-red-400">*</span>
                   </label>
                   <input
@@ -100,11 +100,11 @@ export function FirmDirectedIntakeScreen({ firmName, onSubmit }: FirmDirectedInt
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
                     placeholder="First"
-                    className="w-full rounded-xl border border-[#ECE7F5] bg-white px-4 py-3 text-sm text-[#14112E] placeholder-[#14112E]/30 focus:border-[#42574E] focus:outline-none focus:ring-2 focus:ring-[#42574E]/20"
+                    className="w-full rounded-xl border border-[#E4E5DE] bg-white px-4 py-3 text-sm text-[#1B2623] placeholder-[#1B2623]/30 focus:border-[#42574E] focus:outline-none focus:ring-2 focus:ring-[#42574E]/20"
                   />
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-[#14112E]/50">
+                  <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-[#1B2623]/50">
                     Last name <span className="text-red-400">*</span>
                   </label>
                   <input
@@ -112,14 +112,14 @@ export function FirmDirectedIntakeScreen({ firmName, onSubmit }: FirmDirectedInt
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
                     placeholder="Last"
-                    className="w-full rounded-xl border border-[#ECE7F5] bg-white px-4 py-3 text-sm text-[#14112E] placeholder-[#14112E]/30 focus:border-[#42574E] focus:outline-none focus:ring-2 focus:ring-[#42574E]/20"
+                    className="w-full rounded-xl border border-[#E4E5DE] bg-white px-4 py-3 text-sm text-[#1B2623] placeholder-[#1B2623]/30 focus:border-[#42574E] focus:outline-none focus:ring-2 focus:ring-[#42574E]/20"
                   />
                 </div>
               </div>
 
               {/* Phone */}
               <div>
-                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-[#14112E]/50">
+                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-[#1B2623]/50">
                   Phone number
                 </label>
                 <input
@@ -127,13 +127,13 @@ export function FirmDirectedIntakeScreen({ firmName, onSubmit }: FirmDirectedInt
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="(555) 000-0000"
-                  className="w-full rounded-xl border border-[#ECE7F5] bg-white px-4 py-3 text-sm text-[#14112E] placeholder-[#14112E]/30 focus:border-[#42574E] focus:outline-none focus:ring-2 focus:ring-[#42574E]/20"
+                  className="w-full rounded-xl border border-[#E4E5DE] bg-white px-4 py-3 text-sm text-[#1B2623] placeholder-[#1B2623]/30 focus:border-[#42574E] focus:outline-none focus:ring-2 focus:ring-[#42574E]/20"
                 />
               </div>
 
               {/* Employer */}
               <div>
-                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-[#14112E]/50">
+                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-[#1B2623]/50">
                   Employer name <span className="text-red-400">*</span>
                 </label>
                 <input
@@ -141,13 +141,13 @@ export function FirmDirectedIntakeScreen({ firmName, onSubmit }: FirmDirectedInt
                   value={employer}
                   onChange={(e) => setEmployer(e.target.value)}
                   placeholder="Who did you work for?"
-                  className="w-full rounded-xl border border-[#ECE7F5] bg-white px-4 py-3 text-sm text-[#14112E] placeholder-[#14112E]/30 focus:border-[#42574E] focus:outline-none focus:ring-2 focus:ring-[#42574E]/20"
+                  className="w-full rounded-xl border border-[#E4E5DE] bg-white px-4 py-3 text-sm text-[#1B2623] placeholder-[#1B2623]/30 focus:border-[#42574E] focus:outline-none focus:ring-2 focus:ring-[#42574E]/20"
                 />
               </div>
 
               {/* Story */}
               <div>
-                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-[#14112E]/50">
+                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-[#1B2623]/50">
                   What happened? <span className="text-red-400">*</span>
                 </label>
                 <textarea
@@ -155,7 +155,7 @@ export function FirmDirectedIntakeScreen({ firmName, onSubmit }: FirmDirectedInt
                   onChange={(e) => setStory(e.target.value)}
                   placeholder="Describe your situation in your own words. Include dates, key events, and anything you think matters."
                   rows={5}
-                  className="w-full rounded-xl border border-[#ECE7F5] bg-white px-4 py-3 text-sm text-[#14112E] placeholder-[#14112E]/30 focus:border-[#42574E] focus:outline-none focus:ring-2 focus:ring-[#42574E]/20 resize-none"
+                  className="w-full rounded-xl border border-[#E4E5DE] bg-white px-4 py-3 text-sm text-[#1B2623] placeholder-[#1B2623]/30 focus:border-[#42574E] focus:outline-none focus:ring-2 focus:ring-[#42574E]/20 resize-none"
                 />
               </div>
 
@@ -166,13 +166,13 @@ export function FirmDirectedIntakeScreen({ firmName, onSubmit }: FirmDirectedInt
               <button
                 type="button"
                 onClick={handleFormContinue}
-                className="flex w-full items-center justify-center gap-2 rounded-full bg-[#42574E] px-6 py-4 text-[15px] font-semibold text-white shadow-[0_8px_32px_rgba(109,74,255,0.28)] transition hover:bg-[#4C1D96] hover:-translate-y-0.5"
+                className="flex w-full items-center justify-center gap-2 rounded-full bg-[#42574E] px-6 py-4 text-[15px] font-semibold text-white shadow-[0_8px_32px_rgba(109,74,255,0.28)] transition hover:bg-[#42574E] hover:-translate-y-0.5"
               >
                 Continue
                 <ArrowRight className="h-4 w-4" />
               </button>
 
-              <p className="text-center text-xs text-[#14112E]/40">
+              <p className="text-center text-xs text-[#1B2623]/40">
                 You'll upload your documents in the next step.
               </p>
             </div>
@@ -181,17 +181,17 @@ export function FirmDirectedIntakeScreen({ firmName, onSubmit }: FirmDirectedInt
 
         {step === 'email' && (
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
-            <h1 className="mb-2 text-2xl font-bold text-[#14112E] leading-tight">
+            <h1 className="mb-2 text-2xl font-bold text-[#1B2623] leading-tight">
               Where should {firmName} send updates?
             </h1>
-            <p className="mb-8 text-sm text-[#14112E]/60 leading-relaxed">
+            <p className="mb-8 text-sm text-[#1B2623]/60 leading-relaxed">
               We'll send you a secure link to submit your documents and track your intake status.
               No password needed.
             </p>
 
             <form onSubmit={(e) => void handleEmailSubmit(e)} className="space-y-4">
               <div>
-                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-[#14112E]/50">
+                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-[#1B2623]/50">
                   Your email address
                 </label>
                 <input
@@ -200,7 +200,7 @@ export function FirmDirectedIntakeScreen({ firmName, onSubmit }: FirmDirectedInt
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
                   autoFocus
-                  className="w-full rounded-xl border border-[#ECE7F5] bg-white px-4 py-3 text-sm text-[#14112E] placeholder-[#14112E]/30 focus:border-[#42574E] focus:outline-none focus:ring-2 focus:ring-[#42574E]/20"
+                  className="w-full rounded-xl border border-[#E4E5DE] bg-white px-4 py-3 text-sm text-[#1B2623] placeholder-[#1B2623]/30 focus:border-[#42574E] focus:outline-none focus:ring-2 focus:ring-[#42574E]/20"
                 />
               </div>
 
@@ -211,7 +211,7 @@ export function FirmDirectedIntakeScreen({ firmName, onSubmit }: FirmDirectedInt
               <button
                 type="submit"
                 disabled={busy}
-                className="flex w-full items-center justify-center gap-2 rounded-full bg-[#42574E] px-6 py-4 text-[15px] font-semibold text-white shadow-[0_8px_32px_rgba(109,74,255,0.28)] transition hover:bg-[#4C1D96] disabled:opacity-60"
+                className="flex w-full items-center justify-center gap-2 rounded-full bg-[#42574E] px-6 py-4 text-[15px] font-semibold text-white shadow-[0_8px_32px_rgba(109,74,255,0.28)] transition hover:bg-[#42574E] disabled:opacity-60"
               >
                 {busy ? 'Sending…' : 'Send my secure link'}
                 {!busy && <ArrowRight className="h-4 w-4" />}
@@ -220,7 +220,7 @@ export function FirmDirectedIntakeScreen({ firmName, onSubmit }: FirmDirectedInt
               <button
                 type="button"
                 onClick={() => { setError(''); setStep('form'); }}
-                className="w-full text-center text-sm text-[#14112E]/50 hover:text-[#14112E] transition"
+                className="w-full text-center text-sm text-[#1B2623]/50 hover:text-[#1B2623] transition"
               >
                 ← Back
               </button>
@@ -235,14 +235,14 @@ export function FirmDirectedIntakeScreen({ firmName, onSubmit }: FirmDirectedInt
                 <CheckCircle2 className="h-8 w-8 text-emerald-600" />
               </div>
             </div>
-            <h1 className="mb-3 text-2xl font-bold text-[#14112E]">Check your email.</h1>
-            <p className="mb-2 text-sm text-[#14112E]/60 leading-relaxed">
-              We sent a secure link to <span className="font-semibold text-[#14112E]">{email}</span>.
+            <h1 className="mb-3 text-2xl font-bold text-[#1B2623]">Check your email.</h1>
+            <p className="mb-2 text-sm text-[#1B2623]/60 leading-relaxed">
+              We sent a secure link to <span className="font-semibold text-[#1B2623]">{email}</span>.
             </p>
-            <p className="text-sm text-[#14112E]/60 leading-relaxed">
+            <p className="text-sm text-[#1B2623]/60 leading-relaxed">
               Click that link to upload your documents and submit your records to {firmName}.
             </p>
-            <p className="mt-6 text-xs text-[#14112E]/40">
+            <p className="mt-6 text-xs text-[#1B2623]/40">
               Didn't get it? Check your spam folder or{' '}
               <button
                 type="button"

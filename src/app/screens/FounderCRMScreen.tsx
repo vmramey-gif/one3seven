@@ -135,7 +135,7 @@ const tap = 'min-h-[44px]'; // mobile touch-target floor
 const digitsOf = (p: string) => p.replace(/[^\d+]/g, '');
 
 function PhoneLink({ phone, className = '' }: { phone: string | null; className?: string }) {
-  if (!phone || !phone.trim()) return <span className="text-[#1E1B4B]/30">—</span>;
+  if (!phone || !phone.trim()) return <span className="text-[#1B2623]/30">—</span>;
   return (
     <a href={`tel:${digitsOf(phone)}`} className={`text-[#42574E] underline-offset-2 hover:underline ${className}`}>
       {phone}
@@ -146,7 +146,7 @@ function PhoneLink({ phone, className = '' }: { phone: string | null; className?
 function StageTag({ stage }: { stage: CrmStage }) {
   const hot = stage === 'pilot' || stage === 'paid' || stage === 'demo_booked' || stage === 'demo_done';
   return (
-    <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${hot ? 'bg-[#EDE7FF] text-[#42574E]' : 'bg-slate-100 text-slate-600'}`}>
+    <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${hot ? 'bg-[#F2F4EC] text-[#42574E]' : 'bg-slate-100 text-slate-600'}`}>
       {CRM_STAGE_LABELS[stage]}
     </span>
   );
@@ -161,19 +161,19 @@ function StageStrip({ firms }: { firms: CrmFirm[] }) {
   const n = (s: CrmStage) => firms.filter((f) => f.stage === s).length;
   return (
     <section>
-      <h2 className="mb-2 text-[13px] font-bold text-[#1E1B4B]">Pipeline by stage</h2>
+      <h2 className="mb-2 text-[13px] font-bold text-[#1B2623]">Pipeline by stage</h2>
       <div className="flex flex-wrap items-stretch gap-1.5">
         {PIPELINE_STAGES.map((s) => (
           <div key={s} className="min-w-[62px] flex-1 rounded-[10px] border border-[#D3DED6] bg-white px-2 py-1.5 text-center">
             <div className="text-[18px] font-black leading-none text-[#42574E]">{n(s)}</div>
-            <div className="mt-0.5 text-[9px] font-semibold uppercase tracking-wide text-[#1E1B4B]/50">{CRM_STAGE_LABELS[s]}</div>
+            <div className="mt-0.5 text-[9px] font-semibold uppercase tracking-wide text-[#1B2623]/50">{CRM_STAGE_LABELS[s]}</div>
           </div>
         ))}
         <div className="w-px self-stretch bg-[#D3DED6]" />
         {SIDE_STAGES.map((s) => (
-          <div key={s} className="min-w-[58px] rounded-[10px] border border-[#F0ECFA] bg-[#FAF9FE] px-2 py-1.5 text-center">
-            <div className="text-[18px] font-black leading-none text-[#1E1B4B]/40">{n(s)}</div>
-            <div className="mt-0.5 text-[9px] font-semibold uppercase tracking-wide text-[#1E1B4B]/40">{CRM_STAGE_LABELS[s]}</div>
+          <div key={s} className="min-w-[58px] rounded-[10px] border border-[#F0ECFA] bg-[#FBFBFA] px-2 py-1.5 text-center">
+            <div className="text-[18px] font-black leading-none text-[#1B2623]/40">{n(s)}</div>
+            <div className="mt-0.5 text-[9px] font-semibold uppercase tracking-wide text-[#1B2623]/40">{CRM_STAGE_LABELS[s]}</div>
           </div>
         ))}
       </div>
@@ -416,11 +416,11 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
   };
 
   return (
-    <div className="min-h-screen bg-[#F2F4EC] text-[#1E1B4B] antialiased">
+    <div className="min-h-screen bg-[#F2F4EC] text-[#1B2623] antialiased">
       {/* Header */}
       <header className="sticky top-0 z-30 border-b border-[#D3DED6] bg-white/95 backdrop-blur-sm">
         <div className="mx-auto flex max-w-3xl items-center justify-between px-4 py-3">
-          <button type="button" onClick={onExit} className={`flex items-center gap-1.5 ${tap} px-1 text-sm font-medium text-[#1E1B4B]/60 hover:text-[#1E1B4B]`}>
+          <button type="button" onClick={onExit} className={`flex items-center gap-1.5 ${tap} px-1 text-sm font-medium text-[#1B2623]/60 hover:text-[#1B2623]`}>
             <ArrowLeft className="h-4 w-4" /> Exit
           </button>
           <div className="flex items-center gap-2">
@@ -433,7 +433,7 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
               {realtimeLive ? 'Live' : 'Polling'}
             </span>
           </div>
-          <span className="rounded-full bg-[#EDE7FF] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[#42574E]">{roleLabel}</span>
+          <span className="rounded-full bg-[#F2F4EC] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[#42574E]">{roleLabel}</span>
         </div>
         {/* Categorized dropdown nav — wraps, never scrolls sideways. */}
         <div className="relative mx-auto max-w-3xl px-3 pb-2">
@@ -451,7 +451,7 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
                   <button
                     type="button"
                     onClick={() => setOpenGroup(open ? null : group.id)}
-                    className={`relative flex ${tap} items-center gap-1.5 rounded-[10px] px-3 text-[13px] font-semibold transition ${activeHere ? 'bg-[#42574E] text-white' : 'bg-[#F2EEFF] text-[#1E1B4B]/70 hover:bg-[#EDE7FF]'}`}
+                    className={`relative flex ${tap} items-center gap-1.5 rounded-[10px] px-3 text-[13px] font-semibold transition ${activeHere ? 'bg-[#42574E] text-white' : 'bg-[#F2EEFF] text-[#1B2623]/70 hover:bg-[#F2F4EC]'}`}
                   >
                     <group.icon className="h-3.5 w-3.5" />
                     {activeHere && activeItem ? activeItem.label : group.label}
@@ -467,7 +467,7 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
                           key={t.id}
                           type="button"
                           onClick={() => { setTab(t.id); setOpenGroup(null); }}
-                          className={`flex ${tap} w-full items-center gap-2 rounded-[8px] px-3 text-left text-[13px] font-medium transition ${tab === t.id ? 'bg-[#EDE7FF] text-[#42574E]' : 'text-[#1E1B4B]/70 hover:bg-[#F4F1FF]'}`}
+                          className={`flex ${tap} w-full items-center gap-2 rounded-[8px] px-3 text-left text-[13px] font-medium transition ${tab === t.id ? 'bg-[#F2F4EC] text-[#42574E]' : 'text-[#1B2623]/70 hover:bg-[#F4F1FF]'}`}
                         >
                           <t.icon className="h-3.5 w-3.5 shrink-0" /> {t.label}
                           {t.id === 'team' && unreadTeam && (
@@ -505,7 +505,7 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
           <div className="mb-4 rounded-[12px] border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>
         )}
         {loading ? (
-          <div className="py-20 text-center text-sm text-[#1E1B4B]/40">Loading…</div>
+          <div className="py-20 text-center text-sm text-[#1B2623]/40">Loading…</div>
         ) : (
           <>
             {tab === 'dashboard' && (
@@ -550,7 +550,7 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
                 <Phone className="h-4 w-4" /> Call {firmsById[fastFirmId]?.phone}
               </a>
             )}
-            <div className="mb-2 text-[12px] font-semibold uppercase tracking-wide text-[#1E1B4B]/45">Outcome — tap all that apply</div>
+            <div className="mb-2 text-[12px] font-semibold uppercase tracking-wide text-[#1B2623]/45">Outcome — tap all that apply</div>
             <div className="mb-3 flex flex-wrap gap-2">
               {LOG_CHIPS.map((o) => {
                 const on = fastChips.includes(o);
@@ -559,7 +559,7 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
                     key={o}
                     type="button"
                     onClick={() => setFastChips((prev) => on ? prev.filter((x) => x !== o) : [...prev, o])}
-                    className={`rounded-full border px-3 py-1.5 text-[12px] font-semibold transition ${on ? 'border-[#42574E] bg-[#42574E] text-white' : 'border-[#D3DED6] bg-white text-[#1E1B4B]/70 hover:border-[#B8A8FF]'}`}
+                    className={`rounded-full border px-3 py-1.5 text-[12px] font-semibold transition ${on ? 'border-[#42574E] bg-[#42574E] text-white' : 'border-[#D3DED6] bg-white text-[#1B2623]/70 hover:border-[#7C8B6F]'}`}
                   >
                     {on ? '✓ ' : ''}{o}
                   </button>
@@ -572,7 +572,7 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
               placeholder="Your notes (e.g. “asked for Bob, callback Fri”)"
               className="mb-2 min-h-[72px] w-full rounded-[12px] border border-[#D3DED6] px-3 py-2.5 text-sm outline-none focus:border-[#42574E]"
             />
-            <label className="mb-1 block text-[12px] font-semibold text-[#1E1B4B]/45">Next follow-up (optional)</label>
+            <label className="mb-1 block text-[12px] font-semibold text-[#1B2623]/45">Next follow-up (optional)</label>
             <input
               type="date"
               value={fastFollowup}
@@ -601,10 +601,10 @@ function Collapsible({ title, defaultOpen = false, children }: { title: string; 
   return (
     <div className="overflow-hidden rounded-[12px] border border-[#D3DED6] bg-white">
       <button type="button" onClick={() => setOpen((o) => !o)} className={`flex ${tap} w-full items-center justify-between px-4 text-left`}>
-        <span className="text-[13px] font-bold text-[#1E1B4B]">{title}</span>
-        <ChevronRight className={`h-4 w-4 shrink-0 text-[#1E1B4B]/35 transition-transform ${open ? 'rotate-90' : ''}`} />
+        <span className="text-[13px] font-bold text-[#1B2623]">{title}</span>
+        <ChevronRight className={`h-4 w-4 shrink-0 text-[#1B2623]/35 transition-transform ${open ? 'rotate-90' : ''}`} />
       </button>
-      {open && <div className="border-t border-[#F0EBFF] p-4">{children}</div>}
+      {open && <div className="border-t border-[#F2F4EC] p-4">{children}</div>}
     </div>
   );
 }
@@ -666,7 +666,7 @@ function QuickActionButton(
   const tones = {
     green: 'border-emerald-200 bg-emerald-50 text-emerald-700',
     purple: 'border-[#E0D6FF] bg-[#F4F1FF] text-[#42574E]',
-    gray: 'border-[#D3DED6] bg-white text-[#1E1B4B]/55',
+    gray: 'border-[#D3DED6] bg-white text-[#1B2623]/55',
   } as const;
   return (
     <button
@@ -704,7 +704,7 @@ function FirmCard({ firm, onLog, today, onQuickEmail, onQuickLog, userId, onClai
             <Hand className="h-4 w-4 shrink-0 text-[#42574E]" />
             <span className="break-words leading-snug text-[14px] font-bold">{firm.name}</span>
             <PriorityBadge priority={firm.priority} />
-            <span className="shrink-0 rounded-full bg-[#EDE7FF] px-2 py-0.5 text-[10px] font-bold text-[#42574E]">{claiming ? 'Claiming…' : 'Tap to claim'}</span>
+            <span className="shrink-0 rounded-full bg-[#F2F4EC] px-2 py-0.5 text-[10px] font-bold text-[#42574E]">{claiming ? 'Claiming…' : 'Tap to claim'}</span>
           </button>
         ) : (
           <div className="flex min-w-0 flex-1 items-center gap-2">
@@ -718,7 +718,7 @@ function FirmCard({ firm, onLog, today, onQuickEmail, onQuickLog, userId, onClai
         )}
         {firm.contacted_by && (
           <span
-            className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold ${mine ? 'bg-emerald-100 text-emerald-700' : 'bg-[#EDE7FF] text-[#42574E]'}`}
+            className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold ${mine ? 'bg-emerald-100 text-emerald-700' : 'bg-[#F2F4EC] text-[#42574E]'}`}
             title={`Claimed by ${firm.contacted_by_name ?? 'rep'}${claimedDate ? ' · ' + claimedDate : ''}`}
           >
             {mine ? 'You' : (firm.contacted_by_name ?? 'Claimed')}
@@ -731,37 +731,37 @@ function FirmCard({ firm, onLog, today, onQuickEmail, onQuickLog, userId, onClai
           </a>
         )}
         {firm.email && (
-          <a href={`mailto:${firm.email}`} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#EDE7FF] text-[#42574E]" aria-label={`Email ${firm.name}`}>
+          <a href={`mailto:${firm.email}`} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#F2F4EC] text-[#42574E]" aria-label={`Email ${firm.name}`}>
             <Mail className="h-4 w-4" />
           </a>
         )}
       </div>
-      <div className="space-y-2 border-t border-[#F0EBFF] p-3">
-          {firm.attorney_name && <div className="text-[12px] text-[#1E1B4B]/55">{firm.attorney_name}</div>}
+      <div className="space-y-2 border-t border-[#F2F4EC] p-3">
+          {firm.attorney_name && <div className="text-[12px] text-[#1B2623]/55">{firm.attorney_name}</div>}
           {firm.email && (
             <a href={`mailto:${firm.email}`} className="flex items-center gap-1.5 break-all text-[13px] font-semibold text-[#42574E] underline underline-offset-2">
               <Mail className="h-3.5 w-3.5 shrink-0" /> {firm.email}
             </a>
           )}
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[13px]">
-            <span className="flex items-center gap-1.5"><Phone className="h-3.5 w-3.5 text-[#1E1B4B]/35" /><PhoneLink phone={firm.phone} /></span>
+            <span className="flex items-center gap-1.5"><Phone className="h-3.5 w-3.5 text-[#1B2623]/35" /><PhoneLink phone={firm.phone} /></span>
             {firm.next_followup && (
-              <span className={`flex items-center gap-1.5 ${due ? 'font-semibold text-red-600' : 'text-[#1E1B4B]/50'}`}>
+              <span className={`flex items-center gap-1.5 ${due ? 'font-semibold text-red-600' : 'text-[#1B2623]/50'}`}>
                 <Calendar className="h-3.5 w-3.5" /> {firm.next_followup}
               </span>
             )}
-            {firm.region && <span className="text-[#1E1B4B]/45">{firm.region}</span>}
+            {firm.region && <span className="text-[#1B2623]/45">{firm.region}</span>}
           </div>
-          {firm.notes && <p className="text-[12px] leading-relaxed text-[#1E1B4B]/60">{firm.notes}</p>}
+          {firm.notes && <p className="text-[12px] leading-relaxed text-[#1B2623]/60">{firm.notes}</p>}
 
           {/* Call strip — quick-glance intel for use during the call */}
           {intel && (
-            <div className="rounded-[12px] border border-[#CBD6CF] bg-[#F7F3FF] p-3">
+            <div className="rounded-[12px] border border-[#CBD6CF] bg-[#F7F9F5] p-3">
               {intel.fireCaseSignal && (
                 <span className="mb-1.5 inline-flex items-center gap-1 rounded-full bg-orange-100 px-2 py-0.5 text-[10px] font-bold text-orange-700">🔥 Fire case signal</span>
               )}
-              <p className="text-[12px] font-semibold text-[#1E1B4B]">{intel.headlineWin}</p>
-              <p className="mt-1.5 text-[12px] leading-relaxed text-[#1E1B4B]/75"><span className="font-bold text-[#42574E]">Opener: </span>{intel.opener}</p>
+              <p className="text-[12px] font-semibold text-[#1B2623]">{intel.headlineWin}</p>
+              <p className="mt-1.5 text-[12px] leading-relaxed text-[#1B2623]/75"><span className="font-bold text-[#42574E]">Opener: </span>{intel.opener}</p>
             </div>
           )}
 
@@ -769,7 +769,7 @@ function FirmCard({ firm, onLog, today, onQuickEmail, onQuickLog, userId, onClai
           {!intel && (() => {
             const play = firm.tier ? TIER_PLAYS[firm.tier] : null;
             return (
-              <div className="rounded-[12px] border border-[#CBD6CF] bg-[#F7F3FF] p-3">
+              <div className="rounded-[12px] border border-[#CBD6CF] bg-[#F7F9F5] p-3">
                 <div className="flex items-center justify-between gap-2">
                   <p className="text-[11px] font-bold uppercase tracking-wide text-[#42574E]">Call brief</p>
                   {play && (
@@ -778,19 +778,19 @@ function FirmCard({ firm, onLog, today, onQuickEmail, onQuickLog, userId, onClai
                 </div>
                 {play ? (
                   <>
-                    <p className="mt-2 text-[12px] leading-relaxed text-[#1E1B4B]/80"><span className="font-bold text-[#42574E]">Angle: </span>{play.angle}</p>
-                    <p className="mt-1.5 text-[12px] leading-relaxed text-[#1E1B4B]/65"><span className="font-bold text-[#1E1B4B]/75">If they push back: </span>{play.objection}</p>
+                    <p className="mt-2 text-[12px] leading-relaxed text-[#1B2623]/80"><span className="font-bold text-[#42574E]">Angle: </span>{play.angle}</p>
+                    <p className="mt-1.5 text-[12px] leading-relaxed text-[#1B2623]/65"><span className="font-bold text-[#1B2623]/75">If they push back: </span>{play.objection}</p>
                   </>
                 ) : (
                   <>
-                    <p className="mt-1 text-[12px] leading-relaxed text-[#1E1B4B]/80">{practiceFit(firm.focus_areas)}</p>
-                    <p className="mt-2 text-[12px] leading-relaxed text-[#1E1B4B]/75"><span className="font-bold text-[#42574E]">Opener: </span>{suggestedOpener(firm)}</p>
+                    <p className="mt-1 text-[12px] leading-relaxed text-[#1B2623]/80">{practiceFit(firm.focus_areas)}</p>
+                    <p className="mt-2 text-[12px] leading-relaxed text-[#1B2623]/75"><span className="font-bold text-[#42574E]">Opener: </span>{suggestedOpener(firm)}</p>
                   </>
                 )}
                 {localAngle(firm) && (
-                  <p className="mt-1.5 text-[12px] font-medium text-[#1E1B4B]/70">{localAngle(firm)}</p>
+                  <p className="mt-1.5 text-[12px] font-medium text-[#1B2623]/70">{localAngle(firm)}</p>
                 )}
-                {firm.notes && <p className="mt-1 text-[11px] text-[#1E1B4B]/45">{firm.notes}</p>}
+                {firm.notes && <p className="mt-1 text-[11px] text-[#1B2623]/45">{firm.notes}</p>}
               </div>
             );
           })()}
@@ -800,18 +800,18 @@ function FirmCard({ firm, onLog, today, onQuickEmail, onQuickLog, userId, onClai
             <Collapsible title="Full brief">
               <ul className="mb-2 space-y-1">
                 {intel.topWins.map((w) => (
-                  <li key={w} className="flex gap-2 text-[12px] leading-relaxed text-[#1E1B4B]/70">
+                  <li key={w} className="flex gap-2 text-[12px] leading-relaxed text-[#1B2623]/70">
                     <span className="mt-[6px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#8B6DFF]" /><span>{w}</span>
                   </li>
                 ))}
               </ul>
-              <p className="text-[12px] leading-relaxed text-[#1E1B4B]/60">{intel.awardsRecognition}</p>
-              <p className="mt-1.5 text-[12px] leading-relaxed text-[#1E1B4B]/60">{intel.intakeNotes}</p>
+              <p className="text-[12px] leading-relaxed text-[#1B2623]/60">{intel.awardsRecognition}</p>
+              <p className="mt-1.5 text-[12px] leading-relaxed text-[#1B2623]/60">{intel.intakeNotes}</p>
             </Collapsible>
           )}
 
           {firm.contacted_by && (
-            <div className="flex items-center justify-between gap-2 text-[11px] text-[#1E1B4B]/50">
+            <div className="flex items-center justify-between gap-2 text-[11px] text-[#1B2623]/50">
               <span className="inline-flex items-center gap-1">
                 <Lock className="h-3 w-3" />
                 Claimed by {mine ? 'you' : (firm.contacted_by_name ?? 'a rep')}{claimedDate ? ` on ${claimedDate}` : ''}
@@ -820,7 +820,7 @@ function FirmCard({ firm, onLog, today, onQuickEmail, onQuickLog, userId, onClai
                 <button
                   type="button"
                   onClick={() => onRelease(firm.id)}
-                  className="font-semibold text-[#1E1B4B]/45 underline-offset-2 hover:text-red-600 hover:underline"
+                  className="font-semibold text-[#1B2623]/45 underline-offset-2 hover:text-red-600 hover:underline"
                 >
                   Release
                 </button>
@@ -828,7 +828,7 @@ function FirmCard({ firm, onLog, today, onQuickEmail, onQuickLog, userId, onClai
             </div>
           )}
           {isFounder && onAssign && members && members.length > 0 && (
-            <div className="flex items-center gap-2 rounded-[10px] bg-[#F7F3FF] px-2.5 py-2">
+            <div className="flex items-center gap-2 rounded-[10px] bg-[#F7F9F5] px-2.5 py-2">
               <span className="shrink-0 text-[11px] font-semibold text-[#42574E]">Assign to</span>
               <select
                 value={firm.contacted_by ?? ''}
@@ -836,7 +836,7 @@ function FirmCard({ firm, onLog, today, onQuickEmail, onQuickLog, userId, onClai
                   const m = members.find((x) => x.id === e.target.value);
                   void onAssign(firm.id, m ? m.id : null, m ? m.name : null);
                 }}
-                className="min-w-0 flex-1 rounded-[8px] border border-[#E0D6FF] bg-white px-2 py-1.5 text-[12px] font-medium text-[#1E1B4B] outline-none focus:border-[#42574E]"
+                className="min-w-0 flex-1 rounded-[8px] border border-[#E0D6FF] bg-white px-2 py-1.5 text-[12px] font-medium text-[#1B2623] outline-none focus:border-[#42574E]"
               >
                 <option value="">— Unclaimed —</option>
                 {members.map((m) => (
@@ -874,16 +874,16 @@ function SuitesHome({ greeting, isFounder, showEconomics, activeTab, onPick }: {
 
   return (
     <div className="mb-7">
-      <h1 className="font-display text-[clamp(1.5rem,5vw,2rem)] font-medium leading-[1.12] tracking-[-0.02em] text-transparent bg-[linear-gradient(110deg,#1E1B4B_0%,#374A42_42%,#1E1B4B_78%)] bg-[length:220%_100%] bg-clip-text">
+      <h1 className="font-display text-[clamp(1.5rem,5vw,2rem)] font-medium leading-[1.12] tracking-[-0.02em] text-transparent bg-[linear-gradient(110deg,#1B2623_0%,#374A42_42%,#1B2623_78%)] bg-[length:220%_100%] bg-clip-text">
         {greeting}
       </h1>
-      <p className="mt-1 text-[13px] text-[#1E1B4B]/50">Your sales suite — jump back in.</p>
+      <p className="mt-1 text-[13px] text-[#1B2623]/50">Your sales suite — jump back in.</p>
       <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
         {groups.map((g) => (
           <div key={g.id} className="rounded-[18px] border border-[#D3DED6] bg-white p-4 shadow-[0_10px_30px_rgba(31,27,75,0.05)]">
             <div className="mb-3 flex items-center gap-2">
-              <span className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-[#EDE7FF] text-[#42574E]"><g.icon className="h-4 w-4" /></span>
-              <span className="text-[14px] font-bold text-[#1E1B4B]">{g.label}</span>
+              <span className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-[#F2F4EC] text-[#42574E]"><g.icon className="h-4 w-4" /></span>
+              <span className="text-[14px] font-bold text-[#1B2623]">{g.label}</span>
             </div>
             <div className="flex flex-wrap gap-1.5">
               {g.items.map((t) => (
@@ -891,7 +891,7 @@ function SuitesHome({ greeting, isFounder, showEconomics, activeTab, onPick }: {
                   key={t.id}
                   type="button"
                   onClick={() => onPick(t.id)}
-                  className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[12px] font-semibold transition ${activeTab === t.id ? 'bg-[#42574E] text-white' : 'bg-[#F4F1FF] text-[#1E1B4B]/70 hover:bg-[#EDE7FF]'}`}
+                  className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[12px] font-semibold transition ${activeTab === t.id ? 'bg-[#42574E] text-white' : 'bg-[#F4F1FF] text-[#1B2623]/70 hover:bg-[#F2F4EC]'}`}
                 >
                   <t.icon className="h-3.5 w-3.5" /> {t.label}
                 </button>
@@ -927,7 +927,7 @@ function RepScoreboard({ firms, activity, members, today }: { firms: CrmFirm[]; 
       <div className="overflow-x-auto rounded-[12px] border border-[#D3DED6] bg-white">
         <table className="w-full min-w-[460px] text-[13px]">
           <thead>
-            <tr className="border-b border-[#EFEAFF] text-left text-[10px] uppercase tracking-wide text-[#1E1B4B]/40">
+            <tr className="border-b border-[#F2F4EC] text-left text-[10px] uppercase tracking-wide text-[#1B2623]/40">
               <th className="px-3 py-2 font-semibold">Rep</th>
               <th className="px-2 py-2 text-center font-semibold">Calls today</th>
               <th className="px-2 py-2 text-center font-semibold">Emails today</th>
@@ -939,12 +939,12 @@ function RepScoreboard({ firms, activity, members, today }: { firms: CrmFirm[]; 
           <tbody>
             {rows.map(({ m, callsToday, emailsToday, demosWeek, pilots, lastActive }) => (
               <tr key={m.id} className="border-b border-[#F2EEFC] hover:bg-[#FAF8FF]">
-                <td className="px-3 py-2 font-semibold text-[#1E1B4B]">{m.name}</td>
-                <td className={`px-2 py-2 text-center font-bold ${callsToday > 0 ? 'text-[#42574E]' : 'text-[#1E1B4B]/30'}`}>{callsToday}</td>
-                <td className={`px-2 py-2 text-center ${emailsToday > 0 ? 'font-semibold text-[#1E1B4B]/70' : 'text-[#1E1B4B]/30'}`}>{emailsToday}</td>
-                <td className="px-2 py-2 text-center text-[#1E1B4B]/70">{demosWeek}</td>
-                <td className={`px-2 py-2 text-center ${pilots > 0 ? 'font-bold text-emerald-600' : 'text-[#1E1B4B]/30'}`}>{pilots}</td>
-                <td className="px-3 py-2 text-[12px] text-[#1E1B4B]/50">{lastActive ? new Date(lastActive).toLocaleDateString() : 'never'}</td>
+                <td className="px-3 py-2 font-semibold text-[#1B2623]">{m.name}</td>
+                <td className={`px-2 py-2 text-center font-bold ${callsToday > 0 ? 'text-[#42574E]' : 'text-[#1B2623]/30'}`}>{callsToday}</td>
+                <td className={`px-2 py-2 text-center ${emailsToday > 0 ? 'font-semibold text-[#1B2623]/70' : 'text-[#1B2623]/30'}`}>{emailsToday}</td>
+                <td className="px-2 py-2 text-center text-[#1B2623]/70">{demosWeek}</td>
+                <td className={`px-2 py-2 text-center ${pilots > 0 ? 'font-bold text-emerald-600' : 'text-[#1B2623]/30'}`}>{pilots}</td>
+                <td className="px-3 py-2 text-[12px] text-[#1B2623]/50">{lastActive ? new Date(lastActive).toLocaleDateString() : 'never'}</td>
               </tr>
             ))}
           </tbody>
@@ -1000,7 +1000,7 @@ function DashboardTab({ firms, activity, today, onLog, workerCount, onChanged, o
           {stats.map((s) => (
             <div key={s.label} className="rounded-[14px] border border-[#D3DED6] bg-white p-4">
               <div className="text-[26px] font-black leading-none text-[#42574E]">{s.value}</div>
-              <div className="mt-1 text-[11px] font-semibold text-[#1E1B4B]/55">{s.label}</div>
+              <div className="mt-1 text-[11px] font-semibold text-[#1B2623]/55">{s.label}</div>
             </div>
           ))}
         </div>
@@ -1015,7 +1015,7 @@ function DashboardTab({ firms, activity, today, onLog, workerCount, onChanged, o
       <section>
         <h2 className="mb-2 text-[14px] font-bold">Follow-ups due today</h2>
         {due.length === 0 ? (
-          <p className="rounded-[12px] border border-[#D3DED6] bg-white px-4 py-3 text-[13px] text-[#1E1B4B]/45">Nothing due. Nice.</p>
+          <p className="rounded-[12px] border border-[#D3DED6] bg-white px-4 py-3 text-[13px] text-[#1B2623]/45">Nothing due. Nice.</p>
         ) : (
           <div className="space-y-3">{due.map((f) => <FirmCard key={f.id} firm={f} onLog={onLog} today={today} onQuickEmail={onQuickEmail} onQuickLog={onQuickLog} userId={claim?.userId} onClaim={claim?.onClaim} onRelease={claim?.onRelease} isFounder={claim?.isFounder} members={claim?.members} onAssign={claim?.onAssign} />)}</div>
         )}
@@ -1028,7 +1028,7 @@ function DashboardTab({ firms, activity, today, onLog, workerCount, onChanged, o
         <section>
           <h2 className="mb-2 text-[14px] font-bold">Recent activity</h2>
           {recent.length === 0 ? (
-            <p className="rounded-[12px] border border-[#D3DED6] bg-white px-4 py-3 text-[13px] text-[#1E1B4B]/45">No activity logged yet.</p>
+            <p className="rounded-[12px] border border-[#D3DED6] bg-white px-4 py-3 text-[13px] text-[#1B2623]/45">No activity logged yet.</p>
           ) : (
             <div className="space-y-2">{recent.map((a) => <ActivityRow key={a.id} a={a} />)}</div>
           )}
@@ -1078,24 +1078,24 @@ function DemoPrepCard({ firms, today, onChanged }: { firms: CrmFirm[]; today: st
         <div key={f.id} className="rounded-[16px] border-2 border-amber-300 bg-amber-50 p-4">
           <div className="mb-1 flex items-start justify-between gap-2">
             <div className="min-w-0">
-              <div className="break-words leading-snug text-[15px] font-bold text-[#1E1B4B]">{f.name}</div>
-              {f.attorney_name && <div className="text-[12px] text-[#1E1B4B]/55">{f.attorney_name}</div>}
+              <div className="break-words leading-snug text-[15px] font-bold text-[#1B2623]">{f.name}</div>
+              {f.attorney_name && <div className="text-[12px] text-[#1B2623]/55">{f.attorney_name}</div>}
             </div>
             <span className="shrink-0 rounded-full bg-amber-200 px-2 py-0.5 text-[11px] font-bold text-amber-800">Demo {daysUntil(f.next_followup)}</span>
           </div>
           <div className="mb-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[13px]">
-            {f.phone && <span className="flex items-center gap-1.5"><Phone className="h-3.5 w-3.5 text-[#1E1B4B]/40" /><PhoneLink phone={f.phone} /></span>}
-            {f.region && <span className="text-[#1E1B4B]/55">{f.region}</span>}
+            {f.phone && <span className="flex items-center gap-1.5"><Phone className="h-3.5 w-3.5 text-[#1B2623]/40" /><PhoneLink phone={f.phone} /></span>}
+            {f.region && <span className="text-[#1B2623]/55">{f.region}</span>}
           </div>
-          {f.focus_areas && <p className="mb-2 text-[12px] leading-relaxed text-[#1E1B4B]/60">Focus: {f.focus_areas}</p>}
+          {f.focus_areas && <p className="mb-2 text-[12px] leading-relaxed text-[#1B2623]/60">Focus: {f.focus_areas}</p>}
           {intel && (
             <div className="mb-2 rounded-[10px] border border-amber-300/60 bg-white/70 p-2.5">
-              <p className="text-[12px] font-semibold text-[#1E1B4B]">{intel.headlineWin}</p>
-              <p className="mt-1 text-[12px] leading-relaxed text-[#1E1B4B]/75"><span className="font-bold text-[#42574E]">Opener: </span>{intel.opener}</p>
+              <p className="text-[12px] font-semibold text-[#1B2623]">{intel.headlineWin}</p>
+              <p className="mt-1 text-[12px] leading-relaxed text-[#1B2623]/75"><span className="font-bold text-[#42574E]">Opener: </span>{intel.opener}</p>
             </div>
           )}
           <div className="mb-1 text-[11px] font-bold uppercase tracking-wide text-amber-800/70">Lead with these</div>
-          <ol className="mb-2 list-decimal space-y-1 pl-5 text-[13px] text-[#1E1B4B]/80">
+          <ol className="mb-2 list-decimal space-y-1 pl-5 text-[13px] text-[#1B2623]/80">
             {discoveryQuestions(f.focus_areas).map((q) => <li key={q}>{q}</li>)}
           </ol>
           {fireAngle(f.region) && (
@@ -1127,7 +1127,7 @@ function DailyTargetsScoreboard({ activity, today }: { activity: CrmActivityWith
   const colorMap = {
     green: { text: 'text-emerald-600', bar: 'bg-emerald-500' },
     amber: { text: 'text-amber-600', bar: 'bg-amber-500' },
-    gray: { text: 'text-[#1E1B4B]/35', bar: 'bg-[#1E1B4B]/25' },
+    gray: { text: 'text-[#1B2623]/35', bar: 'bg-[#1B2623]/25' },
   };
   return (
     <section>
@@ -1139,9 +1139,9 @@ function DailyTargetsScoreboard({ activity, today }: { activity: CrmActivityWith
           return (
             <div key={c.label} className="rounded-[14px] border border-[#D3DED6] bg-white p-3">
               <div className={`text-[26px] font-black leading-none ${color.text}`}>{c.count}</div>
-              <div className="mt-1 text-[10px] font-semibold leading-tight text-[#1E1B4B]/55">{c.label}</div>
-              <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[#F0EBFF]"><div className={`h-full rounded-full ${color.bar}`} style={{ width: `${pct}%` }} /></div>
-              <div className="mt-1 text-[10px] text-[#1E1B4B]/40">target: {c.target}</div>
+              <div className="mt-1 text-[10px] font-semibold leading-tight text-[#1B2623]/55">{c.label}</div>
+              <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[#F2F4EC]"><div className={`h-full rounded-full ${color.bar}`} style={{ width: `${pct}%` }} /></div>
+              <div className="mt-1 text-[10px] text-[#1B2623]/40">target: {c.target}</div>
             </div>
           );
         })}
@@ -1155,8 +1155,8 @@ function DailyTargetsScoreboard({ activity, today }: { activity: CrmActivityWith
 function CompStat({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
   return (
     <div>
-      <div className="text-[11px] font-semibold text-[#1E1B4B]/55">{label}</div>
-      <div className={`text-[18px] font-black ${highlight ? 'text-[#42574E]' : 'text-[#1E1B4B]'}`}>{value}</div>
+      <div className="text-[11px] font-semibold text-[#1B2623]/55">{label}</div>
+      <div className={`text-[18px] font-black ${highlight ? 'text-[#42574E]' : 'text-[#1B2623]'}`}>{value}</div>
     </div>
   );
 }
@@ -1177,7 +1177,7 @@ function CompTab({ firms }: { firms: CrmFirm[] }) {
       {/* Bonus tracker — the "bonus earned" signal */}
       <section>
         <h2 className="mb-2 text-[14px] font-bold">First 3 paying firms — launch bonus</h2>
-        <div className="rounded-[16px] border border-[#CBD6CF] bg-[#F7F3FF] p-4">
+        <div className="rounded-[16px] border border-[#CBD6CF] bg-[#F7F9F5] p-4">
           {bonus.earned > 0 ? (
             <div className="mb-3 rounded-[12px] bg-[#42574E] px-4 py-3 text-white">
               <div className="text-[11px] font-bold uppercase tracking-wide text-white/70">Bonus earned</div>
@@ -1185,24 +1185,24 @@ function CompTab({ firms }: { firms: CrmFirm[] }) {
               <div className="text-[12px] text-white/80">{paidCount} of {BONUS_LADDER.length} paying firms · pay within 1–2 business days of the cleared invoice</div>
             </div>
           ) : (
-            <p className="mb-3 text-[13px] text-[#1E1B4B]/55">No paying firms yet. The first conversion earns {usd(BONUS_LADDER[0])}.</p>
+            <p className="mb-3 text-[13px] text-[#1B2623]/55">No paying firms yet. The first conversion earns {usd(BONUS_LADDER[0])}.</p>
           )}
           <div className="grid grid-cols-3 gap-2">
             {bonus.steps.map((s) => (
               <div key={s.n} className={`rounded-[10px] border px-2 py-2.5 text-center ${s.hit ? 'border-[#42574E] bg-white' : 'border-[#D3DED6] bg-white/60'}`}>
-                <div className={`text-[15px] font-black ${s.hit ? 'text-[#42574E]' : 'text-[#1E1B4B]/30'}`}>{usd(s.amount)}</div>
-                <div className="text-[10px] font-semibold text-[#1E1B4B]/55">Firm {s.n}{s.hit ? ' ✓' : ''}</div>
+                <div className={`text-[15px] font-black ${s.hit ? 'text-[#42574E]' : 'text-[#1B2623]/30'}`}>{usd(s.amount)}</div>
+                <div className="text-[10px] font-semibold text-[#1B2623]/55">Firm {s.n}{s.hit ? ' ✓' : ''}</div>
               </div>
             ))}
           </div>
           {!bonus.complete && bonus.nextAmount != null && (
-            <p className="mt-3 text-[12px] text-[#1E1B4B]/55">Next conversion: <b className="text-[#42574E]">{usd(bonus.nextAmount)}</b></p>
+            <p className="mt-3 text-[12px] text-[#1B2623]/55">Next conversion: <b className="text-[#42574E]">{usd(bonus.nextAmount)}</b></p>
           )}
-          <p className="mt-3 text-[12px] text-[#1E1B4B]/45">
+          <p className="mt-3 text-[12px] text-[#1B2623]/45">
             + {usd(SPRINT_BONUS)} sprint bonus if all 3 land in the sprint window — plus {Math.round(COMMISSION_RATE * 100)}% recurring on every firm, every month.
           </p>
         </div>
-        <p className="mt-2 text-[11px] leading-relaxed text-[#1E1B4B]/45">
+        <p className="mt-2 text-[11px] leading-relaxed text-[#1B2623]/45">
           A firm counts when it's marked <b>Paid</b> — set that the moment Stripe confirms the first cleared invoice. 30-day clawback: if a firm cancels within 30 days, its bonus reverses.
         </p>
       </section>
@@ -1213,7 +1213,7 @@ function CompTab({ firms }: { firms: CrmFirm[] }) {
         <div className="space-y-4 rounded-[16px] border border-[#D3DED6] bg-white p-4">
           <div>
             <div className="mb-1 flex items-center justify-between">
-              <label className="text-[12px] font-semibold text-[#1E1B4B]/70">Paying firms</label>
+              <label className="text-[12px] font-semibold text-[#1B2623]/70">Paying firms</label>
               <input
                 type="number"
                 min={0}
@@ -1226,33 +1226,33 @@ function CompTab({ firms }: { firms: CrmFirm[] }) {
             <input type="range" min={0} max={500} value={firmCount} onChange={(e) => setFirmCount(+e.target.value)} className="w-full accent-[#42574E]" />
             <div className="mt-1.5 flex gap-1.5">
               {[10, 50, 100, 250, 500].map((n) => (
-                <button key={n} type="button" onClick={() => setFirmCount(n)} className={`flex-1 rounded-[8px] border px-1 py-1 text-[11px] font-semibold transition ${firmCount === n ? 'border-[#42574E] bg-[#42574E] text-white' : 'border-[#D3DED6] text-[#1E1B4B]/55 hover:border-[#B8A8FF]'}`}>
+                <button key={n} type="button" onClick={() => setFirmCount(n)} className={`flex-1 rounded-[8px] border px-1 py-1 text-[11px] font-semibold transition ${firmCount === n ? 'border-[#42574E] bg-[#42574E] text-white' : 'border-[#D3DED6] text-[#1B2623]/55 hover:border-[#7C8B6F]'}`}>
                   {n}
                 </button>
               ))}
             </div>
           </div>
           <div>
-            <div className="mb-1 text-[12px] font-semibold text-[#1E1B4B]/70">Tier</div>
+            <div className="mb-1 text-[12px] font-semibold text-[#1B2623]/70">Tier</div>
             <div className="flex gap-2">
               {(['practice', 'firm', 'surge'] as const).map((t) => (
-                <button key={t} type="button" onClick={() => setTier(t)} className={`flex-1 rounded-[10px] border px-2 py-2 text-[12px] font-semibold capitalize transition ${tier === t ? 'border-[#42574E] bg-[#42574E] text-white' : 'border-[#D3DED6] text-[#1E1B4B]/60 hover:border-[#B8A8FF]'}`}>
+                <button key={t} type="button" onClick={() => setTier(t)} className={`flex-1 rounded-[10px] border px-2 py-2 text-[12px] font-semibold capitalize transition ${tier === t ? 'border-[#42574E] bg-[#42574E] text-white' : 'border-[#D3DED6] text-[#1B2623]/60 hover:border-[#7C8B6F]'}`}>
                   {t} ${TIER_PRICES[t]}
                 </button>
               ))}
             </div>
           </div>
           <div>
-            <div className="mb-1 text-[12px] font-semibold text-[#1E1B4B]/70">Months retained</div>
+            <div className="mb-1 text-[12px] font-semibold text-[#1B2623]/70">Months retained</div>
             <div className="flex gap-2">
               {[1, 3, 6, 12].map((m) => (
-                <button key={m} type="button" onClick={() => setMonths(m)} className={`flex-1 rounded-[10px] border px-2 py-2 text-[12px] font-semibold transition ${months === m ? 'border-[#42574E] bg-[#42574E] text-white' : 'border-[#D3DED6] text-[#1E1B4B]/60 hover:border-[#B8A8FF]'}`}>
+                <button key={m} type="button" onClick={() => setMonths(m)} className={`flex-1 rounded-[10px] border px-2 py-2 text-[12px] font-semibold transition ${months === m ? 'border-[#42574E] bg-[#42574E] text-white' : 'border-[#D3DED6] text-[#1B2623]/60 hover:border-[#7C8B6F]'}`}>
                   {m} mo
                 </button>
               ))}
             </div>
           </div>
-          <div className="rounded-[12px] bg-[#F7F3FF] p-4">
+          <div className="rounded-[12px] bg-[#F7F9F5] p-4">
             <div className="grid grid-cols-2 gap-3">
               <CompStat label="Monthly commission" value={`${usd(calc.monthlyCommission)}/mo`} />
               <CompStat label={`Commission over ${months} mo`} value={usd(calc.totalCommission)} />
@@ -1260,7 +1260,7 @@ function CompTab({ firms }: { firms: CrmFirm[] }) {
               <CompStat label="Total potential" value={usd(calc.total)} highlight />
             </div>
           </div>
-          <p className="text-[11px] leading-relaxed text-[#1E1B4B]/45">
+          <p className="text-[11px] leading-relaxed text-[#1B2623]/45">
             Illustration only — assumes all firms on the {tier} tier, retained {months} month{months === 1 ? '' : 's'}. The {Math.round(COMMISSION_RATE * 100)}% commission keeps paying every month a firm stays.
           </p>
         </div>
@@ -1290,45 +1290,45 @@ function CompanyEconomicsTab({ firms }: { firms: CrmFirm[] }) {
     <div className="space-y-5">
       <section>
         <h2 className="mb-2 text-[14px] font-bold">Company economics — net after overhead</h2>
-        <p className="mb-3 text-[11px] leading-relaxed text-[#1E1B4B]/45">
+        <p className="mb-3 text-[11px] leading-relaxed text-[#1B2623]/45">
           The mirror of the rep calculator, from one3seven's side. Restricted view. AI and infra are estimates — tune them as real usage comes in.
         </p>
         <div className="space-y-4 rounded-[16px] border border-[#D3DED6] bg-white p-4">
           {/* Firm count */}
           <div>
             <div className="mb-1 flex items-center justify-between">
-              <label className="text-[12px] font-semibold text-[#1E1B4B]/70">Paying firms</label>
+              <label className="text-[12px] font-semibold text-[#1B2623]/70">Paying firms</label>
               <input type="number" min={0} max={500} value={firmCount} onChange={(e) => setFirmCount(Math.max(0, Math.min(500, Math.floor(+e.target.value) || 0)))} className={numCls} />
             </div>
             <input type="range" min={0} max={500} value={firmCount} onChange={(e) => setFirmCount(+e.target.value)} className="w-full accent-[#42574E]" />
             <div className="mt-1.5 flex gap-1.5">
               {[10, 50, 100, 250, 500].map((n) => (
-                <button key={n} type="button" onClick={() => setFirmCount(n)} className={`flex-1 rounded-[8px] border px-1 py-1 text-[11px] font-semibold transition ${firmCount === n ? 'border-[#42574E] bg-[#42574E] text-white' : 'border-[#D3DED6] text-[#1E1B4B]/55 hover:border-[#B8A8FF]'}`}>{n}</button>
+                <button key={n} type="button" onClick={() => setFirmCount(n)} className={`flex-1 rounded-[8px] border px-1 py-1 text-[11px] font-semibold transition ${firmCount === n ? 'border-[#42574E] bg-[#42574E] text-white' : 'border-[#D3DED6] text-[#1B2623]/55 hover:border-[#7C8B6F]'}`}>{n}</button>
               ))}
             </div>
           </div>
           {/* Tier */}
           <div>
-            <div className="mb-1 text-[12px] font-semibold text-[#1E1B4B]/70">Tier</div>
+            <div className="mb-1 text-[12px] font-semibold text-[#1B2623]/70">Tier</div>
             <div className="flex gap-2">
               {(['practice', 'firm', 'surge'] as const).map((t) => (
-                <button key={t} type="button" onClick={() => setTier(t)} className={`flex-1 rounded-[10px] border px-2 py-2 text-[12px] font-semibold capitalize transition ${tier === t ? 'border-[#42574E] bg-[#42574E] text-white' : 'border-[#D3DED6] text-[#1E1B4B]/60 hover:border-[#B8A8FF]'}`}>{t} ${TIER_PRICES[t]}</button>
+                <button key={t} type="button" onClick={() => setTier(t)} className={`flex-1 rounded-[10px] border px-2 py-2 text-[12px] font-semibold capitalize transition ${tier === t ? 'border-[#42574E] bg-[#42574E] text-white' : 'border-[#D3DED6] text-[#1B2623]/60 hover:border-[#7C8B6F]'}`}>{t} ${TIER_PRICES[t]}</button>
               ))}
             </div>
           </div>
           {/* Months */}
           <div>
-            <div className="mb-1 text-[12px] font-semibold text-[#1E1B4B]/70">Months retained</div>
+            <div className="mb-1 text-[12px] font-semibold text-[#1B2623]/70">Months retained</div>
             <div className="flex gap-2">
               {[1, 3, 6, 12].map((m) => (
-                <button key={m} type="button" onClick={() => setMonths(m)} className={`flex-1 rounded-[10px] border px-2 py-2 text-[12px] font-semibold transition ${months === m ? 'border-[#42574E] bg-[#42574E] text-white' : 'border-[#D3DED6] text-[#1E1B4B]/60 hover:border-[#B8A8FF]'}`}>{m} mo</button>
+                <button key={m} type="button" onClick={() => setMonths(m)} className={`flex-1 rounded-[10px] border px-2 py-2 text-[12px] font-semibold transition ${months === m ? 'border-[#42574E] bg-[#42574E] text-white' : 'border-[#D3DED6] text-[#1B2623]/60 hover:border-[#7C8B6F]'}`}>{m} mo</button>
               ))}
             </div>
           </div>
 
           {/* Editable assumptions */}
           <div className="rounded-[12px] border border-[#D3DED6] bg-[#FBFAFF] p-3">
-            <div className="mb-2 text-[11px] font-bold uppercase tracking-wide text-[#1E1B4B]/55">Overhead assumptions</div>
+            <div className="mb-2 text-[11px] font-bold uppercase tracking-wide text-[#1B2623]/55">Overhead assumptions</div>
             <div className="space-y-2">
               {([
                 ['commissionPct', 'Sales commission %'],
@@ -1338,7 +1338,7 @@ function CompanyEconomicsTab({ firms }: { firms: CrmFirm[] }) {
                 ['fixedInfraMonthly', 'Fixed infra $/mo'],
               ] as const).map(([k, label]) => (
                 <div key={k} className="flex items-center justify-between">
-                  <label className="text-[12px] text-[#1E1B4B]/65">{label}</label>
+                  <label className="text-[12px] text-[#1B2623]/65">{label}</label>
                   <input type="number" min={0} step="any" value={a[k]} onChange={setNum(k)} className={numCls} />
                 </div>
               ))}
@@ -1346,7 +1346,7 @@ function CompanyEconomicsTab({ firms }: { firms: CrmFirm[] }) {
           </div>
 
           {/* Results */}
-          <div className="rounded-[12px] bg-[#F7F3FF] p-4">
+          <div className="rounded-[12px] bg-[#F7F9F5] p-4">
             <div className="grid grid-cols-2 gap-3">
               <CompStat label="Gross revenue" value={usd(r.grossTotal)} />
               <CompStat label="− Commission" value={usd(r.commission)} />
@@ -1358,7 +1358,7 @@ function CompanyEconomicsTab({ firms }: { firms: CrmFirm[] }) {
               <CompStat label={`Net over ${months} mo · ${r.marginPct}% margin`} value={usd(r.netTotal)} highlight />
             </div>
           </div>
-          <p className="text-[11px] leading-relaxed text-[#1E1B4B]/45">
+          <p className="text-[11px] leading-relaxed text-[#1B2623]/45">
             Illustration only — assumes all firms on the {tier} tier, retained {months} month{months === 1 ? '' : 's'}. Margin improves with scale as fixed infra amortizes. Excludes founder time, counsel, and E&O.
           </p>
         </div>
@@ -1393,9 +1393,9 @@ function GrowthTab() {
   };
   const fmtDate = (iso: string) => { try { return new Date(iso).toLocaleDateString(); } catch { return iso; } };
 
-  if (loading) return <p className="text-[13px] text-[#1E1B4B]/45">Loading analytics…</p>;
+  if (loading) return <p className="text-[13px] text-[#1B2623]/45">Loading analytics…</p>;
   if (err) return <p className="rounded-[12px] border border-red-200 bg-red-50 px-4 py-3 text-[13px] text-red-700">{err}</p>;
-  if (!data) return <p className="text-[13px] text-[#1E1B4B]/45">No data yet.</p>;
+  if (!data) return <p className="text-[13px] text-[#1B2623]/45">No data yet.</p>;
 
   const daily = data.daily ?? [];
   const tiers = data.tier_breakdown ?? [];
@@ -1404,7 +1404,7 @@ function GrowthTab() {
   const Stat = ({ label, value }: { label: string; value: string | number }) => (
     <div className="rounded-[12px] border border-[#D3DED6] bg-white p-4">
       <div className="text-[24px] font-black leading-none text-[#42574E]">{value}</div>
-      <div className="mt-1 text-[11px] font-semibold text-[#1E1B4B]/55">{label}</div>
+      <div className="mt-1 text-[11px] font-semibold text-[#1B2623]/55">{label}</div>
     </div>
   );
 
@@ -1413,11 +1413,11 @@ function GrowthTab() {
       <section>
         <div className="mb-2 flex items-center justify-between">
           <h2 className="text-[14px] font-bold">Traffic</h2>
-          <button type="button" onClick={() => void load()} className="flex items-center gap-1.5 rounded-full border border-[#D3DED6] px-3 py-1.5 text-[11px] font-semibold text-[#42574E] transition hover:border-[#B8A8FF] hover:bg-[#F5F1FB]">
+          <button type="button" onClick={() => void load()} className="flex items-center gap-1.5 rounded-full border border-[#D3DED6] px-3 py-1.5 text-[11px] font-semibold text-[#42574E] transition hover:border-[#7C8B6F] hover:bg-[#F2F4EC]">
             <RefreshCw className="h-3 w-3" /> Refresh
           </button>
         </div>
-        {refreshedAt && <p className="mb-2 text-[11px] text-[#1E1B4B]/40">Live · as of {refreshedAt.toLocaleTimeString()}</p>}
+        {refreshedAt && <p className="mb-2 text-[11px] text-[#1B2623]/40">Live · as of {refreshedAt.toLocaleTimeString()}</p>}
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           <Stat label="Landing page visits" value={data.landing_visits.toLocaleString()} />
           <Stat label="For-firms visits" value={data.for_firms_visits.toLocaleString()} />
@@ -1448,17 +1448,17 @@ function GrowthTab() {
               const max = Math.max(1, ...daily.map((d) => d.visits));
               return daily.map((d) => (
                 <div key={d.day} className="flex items-center gap-2">
-                  <span className="w-14 shrink-0 text-[11px] text-[#1E1B4B]/55">{d.day}</span>
+                  <span className="w-14 shrink-0 text-[11px] text-[#1B2623]/55">{d.day}</span>
                   <div className="h-4 flex-1 overflow-hidden rounded bg-[#F3EFFF]">
                     <div className="h-full rounded bg-[#42574E]" style={{ width: `${Math.round((d.visits / max) * 100)}%` }} />
                   </div>
-                  <span className="w-10 shrink-0 text-right text-[11px] font-semibold text-[#1E1B4B]">{d.visits}</span>
+                  <span className="w-10 shrink-0 text-right text-[11px] font-semibold text-[#1B2623]">{d.visits}</span>
                   <span className="w-16 shrink-0 text-right text-[11px] text-[#42574E]">{d.signups} new</span>
                 </div>
               ));
             })()}
           </div>
-          <p className="mt-1.5 text-[11px] text-[#1E1B4B]/45">Bar = page visits · right = new signups</p>
+          <p className="mt-1.5 text-[11px] text-[#1B2623]/45">Bar = page visits · right = new signups</p>
         </section>
       )}
 
@@ -1467,7 +1467,7 @@ function GrowthTab() {
           <h2 className="mb-2 text-[14px] font-bold">Tier breakdown</h2>
           <div className="flex flex-wrap gap-2">
             {tiers.map((t) => (
-              <span key={t.tier} className="rounded-full border border-[#D3DED6] bg-white px-3 py-1.5 text-[12px] text-[#1E1B4B]">
+              <span key={t.tier} className="rounded-full border border-[#D3DED6] bg-white px-3 py-1.5 text-[12px] text-[#1B2623]">
                 <b className="capitalize text-[#42574E]">{t.tier}</b> · {t.count}
               </span>
             ))}
@@ -1478,25 +1478,25 @@ function GrowthTab() {
       <section>
         <h2 className="mb-2 text-[14px] font-bold">Signups ({signups.length})</h2>
         {signups.length === 0 ? (
-          <p className="rounded-[12px] border border-[#D3DED6] bg-white px-4 py-3 text-[13px] text-[#1E1B4B]/45">No accounts yet.</p>
+          <p className="rounded-[12px] border border-[#D3DED6] bg-white px-4 py-3 text-[13px] text-[#1B2623]/45">No accounts yet.</p>
         ) : (
           <div className="space-y-2">
             {signups.map((s, i) => (
               <div key={s.email + i} className="flex items-center gap-3 rounded-[12px] border border-[#D3DED6] bg-white p-3">
                 <div className="min-w-0 flex-1">
-                  <div className="truncate text-[13px] font-semibold text-[#1E1B4B]">{s.name}</div>
-                  <div className="truncate text-[11px] text-[#1E1B4B]/50">{s.email} · {fmtDate(s.created_at)}</div>
+                  <div className="truncate text-[13px] font-semibold text-[#1B2623]">{s.name}</div>
+                  <div className="truncate text-[11px] text-[#1B2623]/50">{s.email} · {fmtDate(s.created_at)}</div>
                 </div>
                 {s.tier ? (
                   <span className="shrink-0 rounded-full bg-[#F3EFFF] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-[#42574E]">{s.tier}{s.sub_status && s.sub_status !== 'active' ? ` · ${s.sub_status}` : ''}</span>
                 ) : (
-                  <span className="shrink-0 rounded-full border border-[#D3DED6] px-2.5 py-1 text-[10px] font-semibold text-[#1E1B4B]/45">worker</span>
+                  <span className="shrink-0 rounded-full border border-[#D3DED6] px-2.5 py-1 text-[10px] font-semibold text-[#1B2623]/45">worker</span>
                 )}
               </div>
             ))}
           </div>
         )}
-        <p className="mt-3 text-[11px] leading-relaxed text-[#1E1B4B]/45">
+        <p className="mt-3 text-[11px] leading-relaxed text-[#1B2623]/45">
           Time-on-site is measured from new sessions going forward (heartbeat-based). Tier shows for firm accounts with a subscription; workers have no tier.
         </p>
       </section>
@@ -1518,7 +1518,7 @@ function LinksTab() {
     <div className="space-y-5">
       <section>
         <h2 className="mb-1 text-[14px] font-bold">All one3seven links</h2>
-        <p className="mb-3 text-[11px] leading-relaxed text-[#1E1B4B]/45">
+        <p className="mb-3 text-[11px] leading-relaxed text-[#1B2623]/45">
           Every page off <b>www.one3seven.com</b>. Tap to open, or copy to share. Internal links require sign-in.
         </p>
         <div className="space-y-4">
@@ -1531,14 +1531,14 @@ function LinksTab() {
                   return (
                     <div key={it.path} className="flex items-center gap-2 rounded-[12px] border border-[#D3DED6] bg-white p-3">
                       <div className="min-w-0 flex-1">
-                        <div className="text-[13px] font-semibold text-[#1E1B4B]">{it.label}</div>
-                        <div className="truncate text-[11px] text-[#1E1B4B]/50">{it.desc}</div>
+                        <div className="text-[13px] font-semibold text-[#1B2623]">{it.label}</div>
+                        <div className="truncate text-[11px] text-[#1B2623]/50">{it.desc}</div>
                         <div className="truncate text-[11px] font-medium text-[#42574E]">{url}</div>
                       </div>
-                      <button type="button" onClick={() => copy(url)} aria-label="Copy link" className="rounded-lg border border-[#D3DED6] p-2 text-[#1E1B4B]/55 transition hover:border-[#B8A8FF] hover:bg-[#F7F3FF]">
+                      <button type="button" onClick={() => copy(url)} aria-label="Copy link" className="rounded-lg border border-[#D3DED6] p-2 text-[#1B2623]/55 transition hover:border-[#7C8B6F] hover:bg-[#F7F9F5]">
                         {copied === url ? <Check className="h-4 w-4 text-emerald-600" /> : <Copy className="h-4 w-4" />}
                       </button>
-                      <a href={url} target="_blank" rel="noreferrer" aria-label="Open link" className="rounded-lg border border-[#D3DED6] p-2 text-[#1E1B4B]/55 transition hover:border-[#B8A8FF] hover:bg-[#F7F3FF]">
+                      <a href={url} target="_blank" rel="noreferrer" aria-label="Open link" className="rounded-lg border border-[#D3DED6] p-2 text-[#1B2623]/55 transition hover:border-[#7C8B6F] hover:bg-[#F7F9F5]">
                         <ExternalLink className="h-4 w-4" />
                       </a>
                     </div>
@@ -1548,7 +1548,7 @@ function LinksTab() {
             </div>
           ))}
         </div>
-        <p className="mt-4 text-[11px] leading-relaxed text-[#1E1B4B]/45">
+        <p className="mt-4 text-[11px] leading-relaxed text-[#1B2623]/45">
           Tip: <b>/for-firms</b> is the page to send prospects — it opens straight to the pitch and pilot request.
         </p>
       </section>
@@ -1565,26 +1565,26 @@ function RevenueTab({ firms }: { firms: CrmFirm[] }) {
     <div className="space-y-5">
       <section>
         <h2 className="mb-2 text-[14px] font-bold">Current MRR (actual)</h2>
-        <div className="rounded-[16px] border border-[#CBD6CF] bg-[#F7F3FF] p-4">
-          <div className="text-[32px] font-black leading-none text-[#42574E]">{usd(r.currentMrr)}<span className="text-[14px] font-semibold text-[#1E1B4B]/40">/mo</span></div>
-          <div className="mt-1 text-[12px] text-[#1E1B4B]/55">{r.paidCount} paying firm{r.paidCount === 1 ? '' : 's'}</div>
+        <div className="rounded-[16px] border border-[#CBD6CF] bg-[#F7F9F5] p-4">
+          <div className="text-[32px] font-black leading-none text-[#42574E]">{usd(r.currentMrr)}<span className="text-[14px] font-semibold text-[#1B2623]/40">/mo</span></div>
+          <div className="mt-1 text-[12px] text-[#1B2623]/55">{r.paidCount} paying firm{r.paidCount === 1 ? '' : 's'}</div>
           <div className="mt-3 grid grid-cols-3 gap-2">
             {r.perTier.map((t) => (
               <div key={t.tier} className="rounded-[10px] border border-[#D3DED6] bg-white px-2 py-2 text-center">
-                <div className="text-[15px] font-black text-[#1E1B4B]">{t.count}</div>
-                <div className="text-[10px] font-semibold capitalize text-[#1E1B4B]/55">{t.tier} · ${TIER_PRICES[t.tier]}</div>
+                <div className="text-[15px] font-black text-[#1B2623]">{t.count}</div>
+                <div className="text-[10px] font-semibold capitalize text-[#1B2623]/55">{t.tier} · ${TIER_PRICES[t.tier]}</div>
               </div>
             ))}
           </div>
-          {r.currentMrr === 0 && <p className="mt-3 text-[12px] text-[#1E1B4B]/45">No firms on paid plans yet — $0 until conversions begin (Stripe billing not live yet).</p>}
+          {r.currentMrr === 0 && <p className="mt-3 text-[12px] text-[#1B2623]/45">No firms on paid plans yet — $0 until conversions begin (Stripe billing not live yet).</p>}
         </div>
       </section>
 
       <section>
         <h2 className="mb-2 text-[14px] font-bold">Pipeline forecast</h2>
         <div className="rounded-[16px] border border-[#D3DED6] bg-white p-4">
-          <div className="text-[26px] font-black leading-none text-[#1E1B4B]">{usd(r.projectedMrr)}<span className="text-[13px] font-semibold text-[#1E1B4B]/40">/mo</span></div>
-          <div className="mt-1 text-[12px] text-[#1E1B4B]/55">projected — 30% conversion estimate on {r.candidateCount} pipeline firm{r.candidateCount === 1 ? '' : 's'} at Practice tier</div>
+          <div className="text-[26px] font-black leading-none text-[#1B2623]">{usd(r.projectedMrr)}<span className="text-[13px] font-semibold text-[#1B2623]/40">/mo</span></div>
+          <div className="mt-1 text-[12px] text-[#1B2623]/55">projected — 30% conversion estimate on {r.candidateCount} pipeline firm{r.candidateCount === 1 ? '' : 's'} at Practice tier</div>
         </div>
       </section>
 
@@ -1592,23 +1592,23 @@ function RevenueTab({ firms }: { firms: CrmFirm[] }) {
         <h2 className="mb-2 text-[14px] font-bold">Phase 1 target: {PHASE1_PAYING_TARGET} paying firms</h2>
         <div className="rounded-[16px] border border-[#D3DED6] bg-white p-4">
           <div className="mb-2 flex items-center justify-between text-[13px] font-semibold"><span>{r.paidCount} of {PHASE1_PAYING_TARGET}</span><span className="text-[#42574E]">{progressPct}%</span></div>
-          <div className="h-2.5 overflow-hidden rounded-full bg-[#F0EBFF]"><div className="h-full rounded-full bg-[#42574E]" style={{ width: `${progressPct}%` }} /></div>
+          <div className="h-2.5 overflow-hidden rounded-full bg-[#F2F4EC]"><div className="h-full rounded-full bg-[#42574E]" style={{ width: `${progressPct}%` }} /></div>
         </div>
       </section>
 
       <section>
         <h2 className="mb-2 text-[14px] font-bold">Commission liability ({Math.round(COMMISSION_RATE * 100)}% recurring)</h2>
         {paid.length === 0 ? (
-          <p className="rounded-[12px] border border-[#D3DED6] bg-white px-4 py-3 text-[13px] text-[#1E1B4B]/45">No paying firms yet — $0 commission liability.</p>
+          <p className="rounded-[12px] border border-[#D3DED6] bg-white px-4 py-3 text-[13px] text-[#1B2623]/45">No paying firms yet — $0 commission liability.</p>
         ) : (
           <div className="space-y-2">
             {paid.map((f) => (
               <div key={f.id} className="flex items-center justify-between rounded-[12px] border border-[#D3DED6] bg-white px-4 py-2.5">
                 <span className="break-words leading-snug text-[13px] font-semibold">{f.name}</span>
-                <span className="shrink-0 text-[13px] text-[#1E1B4B]/70">{usd(Math.round(tierPrice(f.subscription_tier) * COMMISSION_RATE))}/mo</span>
+                <span className="shrink-0 text-[13px] text-[#1B2623]/70">{usd(Math.round(tierPrice(f.subscription_tier) * COMMISSION_RATE))}/mo</span>
               </div>
             ))}
-            <div className="flex items-center justify-between rounded-[12px] bg-[#EDE7FF] px-4 py-2.5">
+            <div className="flex items-center justify-between rounded-[12px] bg-[#F2F4EC] px-4 py-2.5">
               <span className="text-[13px] font-bold text-[#42574E]">Total monthly commission</span>
               <span className="text-[13px] font-bold text-[#42574E]">{usd(r.commissionMonthly)}/mo</span>
             </div>
@@ -1616,7 +1616,7 @@ function RevenueTab({ firms }: { firms: CrmFirm[] }) {
         )}
       </section>
 
-      <p className="text-[11px] leading-relaxed text-[#1E1B4B]/40">Figures derive from the CRM pipeline only (no Stripe integration). Forecast is an estimate, not booked revenue.</p>
+      <p className="text-[11px] leading-relaxed text-[#1B2623]/40">Figures derive from the CRM pipeline only (no Stripe integration). Forecast is an estimate, not booked revenue.</p>
     </div>
   );
 }
@@ -1630,11 +1630,11 @@ function PipelineTab({ firms, onLog, workerCount, onQuickEmail, onQuickLog, clai
       <div className="grid grid-cols-2 gap-3">
         <div className="rounded-[14px] border border-[#D3DED6] bg-white p-4">
           <div className="text-[26px] font-black leading-none text-[#42574E]">{firms.length}</div>
-          <div className="mt-1 text-[11px] font-semibold text-[#1E1B4B]/55">Firms in pipeline</div>
+          <div className="mt-1 text-[11px] font-semibold text-[#1B2623]/55">Firms in pipeline</div>
         </div>
         <div className="rounded-[14px] border border-[#D3DED6] bg-white p-4">
           <div className="text-[26px] font-black leading-none text-[#42574E]">{workerCount}</div>
-          <div className="mt-1 text-[11px] font-semibold text-[#1E1B4B]/55">Workers organized</div>
+          <div className="mt-1 text-[11px] font-semibold text-[#1B2623]/55">Workers organized</div>
         </div>
       </div>
       <section>
@@ -1643,7 +1643,7 @@ function PipelineTab({ firms, onLog, workerCount, onQuickEmail, onQuickLog, clai
           {counts.map((c) => (
             <div key={c.stage} className="rounded-[12px] border border-[#D3DED6] bg-white p-3 text-center">
               <div className="text-[20px] font-black text-[#42574E]">{c.n}</div>
-              <div className="mt-0.5 text-[10px] font-semibold text-[#1E1B4B]/55">{CRM_STAGE_LABELS[c.stage]}</div>
+              <div className="mt-0.5 text-[10px] font-semibold text-[#1B2623]/55">{CRM_STAGE_LABELS[c.stage]}</div>
             </div>
           ))}
         </div>
@@ -1651,7 +1651,7 @@ function PipelineTab({ firms, onLog, workerCount, onQuickEmail, onQuickLog, clai
       <section>
         <h2 className="mb-2 text-[14px] font-bold">Priority A firms</h2>
         {priorityA.length === 0 ? (
-          <p className="rounded-[12px] border border-[#D3DED6] bg-white px-4 py-3 text-[13px] text-[#1E1B4B]/45">No Priority A firms yet.</p>
+          <p className="rounded-[12px] border border-[#D3DED6] bg-white px-4 py-3 text-[13px] text-[#1B2623]/45">No Priority A firms yet.</p>
         ) : (
           <div className="space-y-3">{priorityA.map((f) => <FirmCard key={f.id} firm={f} onLog={onLog} onQuickEmail={onQuickEmail} onQuickLog={onQuickLog} userId={claim?.userId} onClaim={claim?.onClaim} onRelease={claim?.onRelease} isFounder={claim?.isFounder} members={claim?.members} onAssign={claim?.onAssign} />)}</div>
         )}
@@ -1672,20 +1672,20 @@ function FounderEmailQueueTab({ firms, onFounderEmailDone }: { firms: CrmFirm[];
           <h2 className="text-[15px] font-extrabold text-[#374A42]">Victoria — email follow-ups</h2>
           {queue.length > 0 && <span className="rounded-full bg-[#42574E] px-2 py-0.5 text-[11px] font-bold text-white">{queue.length}</span>}
         </div>
-        <p className="mt-1 text-[12px] leading-relaxed text-[#1E1B4B]/55">Firms the team flagged with “Victoria to email f/u”. Tap the address to write the email, then “Emailed ✓” to clear it from the queue.</p>
+        <p className="mt-1 text-[12px] leading-relaxed text-[#1B2623]/55">Firms the team flagged with “Victoria to email f/u”. Tap the address to write the email, then “Emailed ✓” to clear it from the queue.</p>
       </div>
       {queue.length === 0 ? (
-        <p className="rounded-[12px] border border-[#D3DED6] bg-white px-4 py-6 text-center text-[13px] text-[#1E1B4B]/45">Nothing to email right now — the queue is clear.</p>
+        <p className="rounded-[12px] border border-[#D3DED6] bg-white px-4 py-6 text-center text-[13px] text-[#1B2623]/45">Nothing to email right now — the queue is clear.</p>
       ) : (
         <div className="space-y-2">
           {queue.map((f) => (
             <div key={f.id} className="flex items-center gap-2 rounded-[12px] border border-[#E0D6FF] bg-white p-3">
               <div className="min-w-0 flex-1">
-                <div className="break-words text-[14px] font-bold text-[#1E1B4B]">{f.name}</div>
-                {f.attorney_name && <div className="text-[11px] text-[#1E1B4B]/50">{f.attorney_name}</div>}
+                <div className="break-words text-[14px] font-bold text-[#1B2623]">{f.name}</div>
+                {f.attorney_name && <div className="text-[11px] text-[#1B2623]/50">{f.attorney_name}</div>}
                 {f.email
                   ? <a href={`mailto:${f.email}`} className="break-all text-[12px] font-semibold text-[#42574E] underline">{f.email}</a>
-                  : <span className="text-[12px] text-[#1E1B4B]/40">no email on file</span>}
+                  : <span className="text-[12px] text-[#1B2623]/40">no email on file</span>}
               </div>
               {onFounderEmailDone && (
                 <button type="button" onClick={() => onFounderEmailDone(f.id)} className="shrink-0 rounded-full bg-[#42574E] px-3 py-2 text-[12px] font-bold text-white">Emailed ✓</button>
@@ -1717,28 +1717,28 @@ function FirmRow({ firm, me, today, onLog, onClaim, onNoContact, onNotInterested
     <tr className="border-b border-[#F2EEFC] align-middle hover:bg-[#FAF8FF]">
       <td className="px-3 py-2">
         <div className="flex items-center gap-1.5">
-          <button type="button" onClick={() => onLog(firm.id)} className="max-w-[200px] truncate text-left text-[13px] font-semibold text-[#1E1B4B] hover:text-[#42574E]" title={firm.name}>{firm.name}</button>
+          <button type="button" onClick={() => onLog(firm.id)} className="max-w-[200px] truncate text-left text-[13px] font-semibold text-[#1B2623] hover:text-[#42574E]" title={firm.name}>{firm.name}</button>
           {firm.source === 'pilot_form' && <span className="shrink-0 rounded bg-[#F59E0B] px-1 py-0.5 text-[9px] font-extrabold text-white" title="Inbound pilot request">⚡</span>}
           <PriorityBadge priority={firm.priority} />
         </div>
       </td>
-      <td className="hidden px-3 py-2 text-[12px] text-[#1E1B4B]/65 md:table-cell"><span className="block max-w-[130px] truncate" title={firm.attorney_name ?? ''}>{firm.attorney_name || '—'}</span></td>
-      <td className="hidden px-2 py-2 text-center text-[12px] font-semibold text-[#1E1B4B]/70 sm:table-cell">{firm.tier ?? '—'}</td>
+      <td className="hidden px-3 py-2 text-[12px] text-[#1B2623]/65 md:table-cell"><span className="block max-w-[130px] truncate" title={firm.attorney_name ?? ''}>{firm.attorney_name || '—'}</span></td>
+      <td className="hidden px-2 py-2 text-center text-[12px] font-semibold text-[#1B2623]/70 sm:table-cell">{firm.tier ?? '—'}</td>
       <td className="px-2 py-2"><StageTag stage={firm.stage} /></td>
-      <td className={`hidden px-2 py-2 text-[12px] sm:table-cell ${due ? 'font-bold text-red-600' : 'text-[#1E1B4B]/55'}`}>{firm.next_followup || '—'}</td>
+      <td className={`hidden px-2 py-2 text-[12px] sm:table-cell ${due ? 'font-bold text-red-600' : 'text-[#1B2623]/55'}`}>{firm.next_followup || '—'}</td>
       <td className="hidden px-2 py-2 text-[12px] md:table-cell">
-        {owner ? <span className={mine ? 'font-semibold text-emerald-600' : 'text-[#1E1B4B]/60'}>{mine ? 'You' : owner}</span> : <span className="text-[#1E1B4B]/30">—</span>}
+        {owner ? <span className={mine ? 'font-semibold text-emerald-600' : 'text-[#1B2623]/60'}>{mine ? 'You' : owner}</span> : <span className="text-[#1B2623]/30">—</span>}
       </td>
       <td className="relative px-2 py-2">
         <div className="flex items-center justify-end gap-1">
           {!owner && onClaim && (
-            <button type="button" disabled={claiming} onClick={async () => { setClaiming(true); try { await onClaim(firm.id); } finally { setClaiming(false); } }} className="rounded-full bg-[#EDE7FF] px-2 py-1 text-[10px] font-bold text-[#42574E] disabled:opacity-50">{claiming ? '…' : 'Claim'}</button>
+            <button type="button" disabled={claiming} onClick={async () => { setClaiming(true); try { await onClaim(firm.id); } finally { setClaiming(false); } }} className="rounded-full bg-[#F2F4EC] px-2 py-1 text-[10px] font-bold text-[#42574E] disabled:opacity-50">{claiming ? '…' : 'Claim'}</button>
           )}
           {firm.phone && <a href={`tel:${digitsOf(firm.phone)}`} className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-50 text-emerald-600" aria-label={`Call ${firm.name}`}><Phone className="h-3.5 w-3.5" /></a>}
-          {firm.email && <a href={`mailto:${firm.email}`} className="flex h-7 w-7 items-center justify-center rounded-full bg-[#EDE7FF] text-[#42574E]" aria-label={`Email ${firm.name}`}><Mail className="h-3.5 w-3.5" /></a>}
+          {firm.email && <a href={`mailto:${firm.email}`} className="flex h-7 w-7 items-center justify-center rounded-full bg-[#F2F4EC] text-[#42574E]" aria-label={`Email ${firm.name}`}><Mail className="h-3.5 w-3.5" /></a>}
           <button type="button" onClick={() => onLog(firm.id)} className="rounded-full bg-[#42574E] px-3 py-1 text-[11px] font-bold text-white hover:bg-[#374A42]">Log</button>
           {(onNoContact || onNotInterested) && (
-            <button type="button" onClick={() => setMenu((v) => !v)} aria-label="More actions" className="flex h-7 w-7 items-center justify-center rounded-full text-[16px] font-bold leading-none text-[#1E1B4B]/50 hover:bg-[#EDE7FF]">⋯</button>
+            <button type="button" onClick={() => setMenu((v) => !v)} aria-label="More actions" className="flex h-7 w-7 items-center justify-center rounded-full text-[16px] font-bold leading-none text-[#1B2623]/50 hover:bg-[#F2F4EC]">⋯</button>
           )}
         </div>
         {menu && (
@@ -1746,10 +1746,10 @@ function FirmRow({ firm, me, today, onLog, onClaim, onNoContact, onNotInterested
             <button type="button" aria-hidden className="fixed inset-0 z-10 cursor-default bg-transparent" onClick={() => setMenu(false)} />
             <div className="absolute right-2 top-10 z-20 w-48 overflow-hidden rounded-[10px] border border-[#D3DED6] bg-white shadow-xl">
               {onNotInterested && (
-                <button type="button" onClick={() => { setMenu(false); void onNotInterested(firm.id); }} className="block w-full px-3 py-2.5 text-left text-[12px] font-semibold text-[#1E1B4B] hover:bg-[#F7F3FF]">Not interested<span className="block text-[10px] font-normal text-[#1E1B4B]/45">parks it — back in the queue in 3 months</span></button>
+                <button type="button" onClick={() => { setMenu(false); void onNotInterested(firm.id); }} className="block w-full px-3 py-2.5 text-left text-[12px] font-semibold text-[#1B2623] hover:bg-[#F7F9F5]">Not interested<span className="block text-[10px] font-normal text-[#1B2623]/45">parks it — back in the queue in 3 months</span></button>
               )}
               {onNoContact && (
-                <button type="button" onClick={() => { setMenu(false); void onNoContact(firm.id); }} className="block w-full border-t border-[#F0EBFF] px-3 py-2.5 text-left text-[12px] font-semibold text-red-600 hover:bg-red-50">Do not contact<span className="block text-[10px] font-normal text-red-400">removes from the queue for good</span></button>
+                <button type="button" onClick={() => { setMenu(false); void onNoContact(firm.id); }} className="block w-full border-t border-[#F2F4EC] px-3 py-2.5 text-left text-[12px] font-semibold text-red-600 hover:bg-red-50">Do not contact<span className="block text-[10px] font-normal text-red-400">removes from the queue for good</span></button>
               )}
             </div>
           </>
@@ -1839,7 +1839,7 @@ function FirmsTab({ firms, onLog, userId, onNoContact, onNotInterested, claim }:
         </select>
       </div>
 
-      <div className="flex items-center justify-between text-[12px] text-[#1E1B4B]/50">
+      <div className="flex items-center justify-between text-[12px] text-[#1B2623]/50">
         <span>{list.length} firm{list.length === 1 ? '' : 's'}</span>
         {(contacted || tierFilter !== '' || priority || stageFilter || timing || emailFilter || q) && (
           <button type="button" onClick={() => { setContacted(''); setTierFilter(''); setPriority(''); setStageFilter(''); setTiming(''); setEmailFilter(''); setSearch(''); }} className="font-semibold text-[#42574E] hover:underline">Clear filters</button>
@@ -1847,12 +1847,12 @@ function FirmsTab({ firms, onLog, userId, onNoContact, onNotInterested, claim }:
       </div>
 
       {list.length === 0 ? (
-        <p className="rounded-[12px] border border-[#D3DED6] bg-white px-4 py-6 text-center text-[13px] text-[#1E1B4B]/45">No firms match these filters.</p>
+        <p className="rounded-[12px] border border-[#D3DED6] bg-white px-4 py-6 text-center text-[13px] text-[#1B2623]/45">No firms match these filters.</p>
       ) : (
         <div className="rounded-[12px] border border-[#D3DED6] bg-white">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-[#EFEAFF] text-left text-[10px] uppercase tracking-wide text-[#1E1B4B]/40">
+              <tr className="border-b border-[#F2F4EC] text-left text-[10px] uppercase tracking-wide text-[#1B2623]/40">
                 <th className="px-3 py-2 font-semibold">Firm</th>
                 <th className="hidden px-3 py-2 font-semibold md:table-cell">Attorney</th>
                 <th className="hidden px-2 py-2 text-center font-semibold sm:table-cell">Tier</th>
@@ -1877,10 +1877,10 @@ function FirmsTab({ firms, onLog, userId, onNoContact, onNotInterested, claim }:
               key={key}
               type="button"
               onClick={() => setView(key)}
-              className={`flex flex-1 flex-col items-center rounded-[14px] border px-3 py-2 transition ${view === key ? 'border-[#42574E] bg-[#42574E] text-white' : 'border-[#D3DED6] bg-white text-[#1E1B4B] hover:border-[#B8A8FF]'}`}
+              className={`flex flex-1 flex-col items-center rounded-[14px] border px-3 py-2 transition ${view === key ? 'border-[#42574E] bg-[#42574E] text-white' : 'border-[#D3DED6] bg-white text-[#1B2623] hover:border-[#7C8B6F]'}`}
             >
               <span className="text-[22px] font-black leading-none">{n}</span>
-              <span className={`mt-0.5 text-[11px] font-bold uppercase tracking-wide ${view === key ? 'text-white/80' : 'text-[#1E1B4B]/50'}`}>{label}</span>
+              <span className={`mt-0.5 text-[11px] font-bold uppercase tracking-wide ${view === key ? 'text-white/80' : 'text-[#1B2623]/50'}`}>{label}</span>
             </button>
           ))}
         </div>
@@ -1891,7 +1891,7 @@ function FirmsTab({ firms, onLog, userId, onNoContact, onNotInterested, claim }:
 
 // ── Activity ─────────────────────────────────────────────────────────────────
 function ActivityRow({ a }: { a: CrmActivityWithFirm }) {
-  const typeColor = a.activity_type === 'demo' ? 'bg-emerald-100 text-emerald-700' : a.activity_type === 'email' ? 'bg-blue-100 text-blue-700' : 'bg-[#EDE7FF] text-[#42574E]';
+  const typeColor = a.activity_type === 'demo' ? 'bg-emerald-100 text-emerald-700' : a.activity_type === 'email' ? 'bg-blue-100 text-blue-700' : 'bg-[#F2F4EC] text-[#42574E]';
   return (
     <div className="rounded-[12px] border border-[#D3DED6] bg-white p-3.5">
       <div className="mb-1 flex items-center justify-between gap-2">
@@ -1899,17 +1899,17 @@ function ActivityRow({ a }: { a: CrmActivityWithFirm }) {
           <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${typeColor}`}>{a.activity_type ?? '—'}</span>
           <span className="text-[13px] font-semibold">{a.firm_name ?? 'Unknown firm'}</span>
         </div>
-        <span className="text-[11px] text-[#1E1B4B]/40">{a.activity_date}</span>
+        <span className="text-[11px] text-[#1B2623]/40">{a.activity_date}</span>
       </div>
-      {a.outcome && <div className="text-[13px] text-[#1E1B4B]/70">{a.outcome}</div>}
+      {a.outcome && <div className="text-[13px] text-[#1B2623]/70">{a.outcome}</div>}
       {a.objection && <div className="mt-0.5 text-[12px] text-amber-700">Objection: {a.objection}</div>}
-      {a.notes && <p className="mt-1 line-clamp-2 text-[12px] leading-relaxed text-[#1E1B4B]/50">{a.notes}</p>}
+      {a.notes && <p className="mt-1 line-clamp-2 text-[12px] leading-relaxed text-[#1B2623]/50">{a.notes}</p>}
     </div>
   );
 }
 
 function ActivityTab({ activity }: { activity: CrmActivityWithFirm[] }) {
-  if (activity.length === 0) return <p className="rounded-[12px] border border-[#D3DED6] bg-white px-4 py-3 text-[13px] text-[#1E1B4B]/45">No activity logged yet.</p>;
+  if (activity.length === 0) return <p className="rounded-[12px] border border-[#D3DED6] bg-white px-4 py-3 text-[13px] text-[#1B2623]/45">No activity logged yet.</p>;
   return <div className="space-y-2">{activity.map((a) => <ActivityRow key={a.id} a={a} />)}</div>;
 }
 
@@ -1927,10 +1927,10 @@ function Bar({ label, value, target }: { label: string; value: number; target: n
   return (
     <div>
       <div className="mb-1 flex items-center justify-between text-[13px]">
-        <span className="font-semibold text-[#1E1B4B]/70">{label}</span>
+        <span className="font-semibold text-[#1B2623]/70">{label}</span>
         <span className="font-bold text-[#42574E]">{value} / {target}</span>
       </div>
-      <div className="h-2.5 overflow-hidden rounded-full bg-[#EDE7FF]">
+      <div className="h-2.5 overflow-hidden rounded-full bg-[#F2F4EC]">
         <div className="h-full rounded-full bg-[#42574E]" style={{ width: `${pct}%` }} />
       </div>
     </div>
@@ -1971,13 +1971,13 @@ function MetricsTab({ firms, activity }: { firms: CrmFirm[]; activity: CrmActivi
         <h2 className="mb-2 text-[14px] font-bold">Firms contacted — credit by rep</h2>
         <div className="rounded-[14px] border border-[#D3DED6] bg-white p-4">
           {creditByRep.length === 0 ? (
-            <p className="text-[13px] text-[#1E1B4B]/45">No firms contacted yet. Logging a firm credits the rep who logged it first.</p>
+            <p className="text-[13px] text-[#1B2623]/45">No firms contacted yet. Logging a firm credits the rep who logged it first.</p>
           ) : (
             <div className="space-y-2">
               {creditByRep.map(([name, n]) => (
                 <div key={name} className="flex items-center justify-between text-[13px]">
-                  <span className="font-semibold text-[#1E1B4B]">{name}</span>
-                  <span className="rounded-full bg-[#EDE7FF] px-2.5 py-0.5 text-[12px] font-bold text-[#42574E]">{n} firm{n === 1 ? '' : 's'}</span>
+                  <span className="font-semibold text-[#1B2623]">{name}</span>
+                  <span className="rounded-full bg-[#F2F4EC] px-2.5 py-0.5 text-[12px] font-bold text-[#42574E]">{n} firm{n === 1 ? '' : 's'}</span>
                 </div>
               ))}
             </div>
@@ -1986,14 +1986,14 @@ function MetricsTab({ firms, activity }: { firms: CrmFirm[]; activity: CrmActivi
       </section>
       <section>
         <h2 className="mb-2 text-[14px] font-bold">Time saved (the value claim)</h2>
-        <div className="rounded-[14px] border border-[#CBD6CF] bg-[#F7F3FF] p-4">
+        <div className="rounded-[14px] border border-[#CBD6CF] bg-[#F7F9F5] p-4">
           {mins.n > 0 ? (
             <>
               <div className="text-[28px] font-black leading-none text-[#42574E]">{mins.avg} min</div>
-              <div className="mt-1 text-[12px] text-[#1E1B4B]/60">avg attorney time saved per intake — firm estimate · n={mins.n} firm{mins.n === 1 ? '' : 's'}</div>
+              <div className="mt-1 text-[12px] text-[#1B2623]/60">avg attorney time saved per intake — firm estimate · n={mins.n} firm{mins.n === 1 ? '' : 's'}</div>
             </>
           ) : (
-            <div className="text-[12px] leading-relaxed text-[#1E1B4B]/55">No estimates yet. On a demo, ask the firm how long assembling a worker's records takes them today, and log it in the "minutes saved" field — that's the number you quote on every call.</div>
+            <div className="text-[12px] leading-relaxed text-[#1B2623]/55">No estimates yet. On a demo, ask the firm how long assembling a worker's records takes them today, and log it in the "minutes saved" field — that's the number you quote on every call.</div>
           )}
         </div>
       </section>
@@ -2008,16 +2008,16 @@ function MetricsTab({ firms, activity }: { firms: CrmFirm[]; activity: CrmActivi
       <section>
         <h2 className="mb-2 text-[14px] font-bold">Top objections</h2>
         {objectionCounts.length === 0 ? (
-          <p className="rounded-[12px] border border-[#D3DED6] bg-white px-4 py-3 text-[13px] text-[#1E1B4B]/45">No objections logged yet.</p>
+          <p className="rounded-[12px] border border-[#D3DED6] bg-white px-4 py-3 text-[13px] text-[#1B2623]/45">No objections logged yet.</p>
         ) : (
           <div className="space-y-2">
             {objectionCounts.map(([obj, n]) => (
               <div key={obj} className="rounded-[12px] border border-[#D3DED6] bg-white p-3">
                 <div className="mb-1 flex items-center justify-between text-[13px]">
-                  <span className="text-[#1E1B4B]/70">{obj}</span>
+                  <span className="text-[#1B2623]/70">{obj}</span>
                   <span className="font-bold text-[#42574E]">{n}</span>
                 </div>
-                <div className="h-2 overflow-hidden rounded-full bg-[#EDE7FF]">
+                <div className="h-2 overflow-hidden rounded-full bg-[#F2F4EC]">
                   <div className="h-full rounded-full bg-[#8B6DFF]" style={{ width: `${Math.round((n / maxObj) * 100)}%` }} />
                 </div>
               </div>
@@ -2034,14 +2034,14 @@ function ScriptsTab() {
   return (
     <div className="space-y-3">
       {/* Positioning north star — the frame every call/email/demo runs on. */}
-      <div className="rounded-[14px] border-2 border-[#CBD6CF] bg-[#F7F3FF] p-4">
+      <div className="rounded-[14px] border-2 border-[#CBD6CF] bg-[#F7F9F5] p-4">
         <div className="mb-2 text-[11px] font-bold uppercase tracking-wide text-[#42574E]">How we position (read first)</div>
-        <p className="mb-3 text-[14px] font-semibold leading-relaxed text-[#1E1B4B]">{CRM_POSITIONING_NORTH_STAR}</p>
+        <p className="mb-3 text-[14px] font-semibold leading-relaxed text-[#1B2623]">{CRM_POSITIONING_NORTH_STAR}</p>
         <div className="space-y-2.5">
           {CRM_PARTNERSHIP.map((p) => (
             <div key={p.line} className="rounded-[10px] border border-[#D3DED6] bg-white p-2.5">
-              <p className="text-[13px] font-medium leading-snug text-[#1E1B4B]">{p.line}</p>
-              <p className="mt-1 text-[11px] leading-relaxed text-[#1E1B4B]/50">{p.why}</p>
+              <p className="text-[13px] font-medium leading-snug text-[#1B2623]">{p.line}</p>
+              <p className="mt-1 text-[11px] leading-relaxed text-[#1B2623]/50">{p.why}</p>
             </div>
           ))}
         </div>
@@ -2052,7 +2052,7 @@ function ScriptsTab() {
           {CRM_CALL_SCRIPT.map((s) => (
             <div key={s.step}>
               <div className="mb-1 text-[11px] font-bold uppercase tracking-wide text-[#42574E]">{s.step}</div>
-              <p className="text-[14px] leading-relaxed text-[#1E1B4B]/75">{s.text}</p>
+              <p className="text-[14px] leading-relaxed text-[#1B2623]/75">{s.text}</p>
             </div>
           ))}
         </div>
@@ -2061,25 +2061,25 @@ function ScriptsTab() {
         <div className="space-y-3">
           {CRM_OBJECTIONS.map((o) => (
             <div key={o.objection}>
-              <div className="mb-1 text-[13px] font-bold text-[#1E1B4B]">{o.objection}</div>
-              <p className="text-[13px] leading-relaxed text-[#1E1B4B]/65">{o.response}</p>
+              <div className="mb-1 text-[13px] font-bold text-[#1B2623]">{o.objection}</div>
+              <p className="text-[13px] leading-relaxed text-[#1B2623]/65">{o.response}</p>
             </div>
           ))}
         </div>
       </Collapsible>
       <Collapsible title="Cold email sequence (free pilot · 3-touch)">
-        <pre className="whitespace-pre-wrap text-[13px] leading-relaxed text-[#1E1B4B]/75">{CRM_COLD_EMAIL}</pre>
+        <pre className="whitespace-pre-wrap text-[13px] leading-relaxed text-[#1B2623]/75">{CRM_COLD_EMAIL}</pre>
       </Collapsible>
       <Collapsible title="Competitors — what to say (only if they bring it up)">
         <div className="space-y-3">
           {CRM_COMPETITORS.map((c) => (
             <div key={c.name}>
-              <div className="mb-1 text-[13px] font-bold text-[#1E1B4B]">{c.name}</div>
+              <div className="mb-1 text-[13px] font-bold text-[#1B2623]">{c.name}</div>
               <div className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-[#42574E]">{c.when}</div>
-              <p className="text-[13px] leading-relaxed text-[#1E1B4B]/65">{c.say}</p>
+              <p className="text-[13px] leading-relaxed text-[#1B2623]/65">{c.say}</p>
             </div>
           ))}
-          <p className="rounded-[10px] bg-[#FAFAFF] px-3 py-2 text-[12px] leading-relaxed text-[#1E1B4B]/55">
+          <p className="rounded-[10px] bg-[#FAFAFF] px-3 py-2 text-[12px] leading-relaxed text-[#1B2623]/55">
             Rule: only raise a competitor if the prospect does. State facts, never trash-talk, then pivot to our lane.
           </p>
         </div>
@@ -2087,7 +2087,7 @@ function ScriptsTab() {
       <Collapsible title="Credibility line (California · Anthropic)">
         <ul className="space-y-2">
           {CRM_CREDIBILITY.map((c) => (
-            <li key={c} className="flex gap-2 text-[13px] leading-relaxed text-[#1E1B4B]/70">
+            <li key={c} className="flex gap-2 text-[13px] leading-relaxed text-[#1B2623]/70">
               <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#42574E]" /><span>{c}</span>
             </li>
           ))}
@@ -2096,7 +2096,7 @@ function ScriptsTab() {
       <Collapsible title="Why attorneys love / hate legal AI">
         <ul className="space-y-2">
           {CRM_WHY_AI_LOVE_HATE.map((c) => (
-            <li key={c} className="flex gap-2 text-[13px] leading-relaxed text-[#1E1B4B]/70">
+            <li key={c} className="flex gap-2 text-[13px] leading-relaxed text-[#1B2623]/70">
               <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#42574E]" /><span>{c}</span>
             </li>
           ))}
@@ -2105,7 +2105,7 @@ function ScriptsTab() {
       <Collapsible title="What we offer — specialties & specifics">
         <ul className="space-y-2">
           {CRM_SPECIALTIES.map((c) => (
-            <li key={c} className="flex gap-2 text-[13px] leading-relaxed text-[#1E1B4B]/70">
+            <li key={c} className="flex gap-2 text-[13px] leading-relaxed text-[#1B2623]/70">
               <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#8B6DFF]" /><span>{c}</span>
             </li>
           ))}
@@ -2171,14 +2171,14 @@ function EmojiGifBar({ onInsert }: { onInsert: (s: string) => void }) {
       )}
       {showGif && (
         <div className="absolute bottom-11 left-0 z-20 w-[288px] rounded-[12px] border border-[#D3DED6] bg-white p-3 shadow-lg">
-          <p className="mb-1.5 text-[11px] font-semibold text-[#1E1B4B]">Paste a GIF link</p>
+          <p className="mb-1.5 text-[11px] font-semibold text-[#1B2623]">Paste a GIF link</p>
           <input value={gifUrl} onChange={(e) => setGifUrl(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addGif(); } }}
             placeholder="https://…/something.gif"
             className="w-full rounded-[8px] border border-[#D3DED6] px-2 py-1.5 text-[12px] outline-none focus:border-[#42574E]" />
           <button type="button" onClick={addGif} disabled={!gifUrl.trim()}
             className="mt-2 w-full rounded-full bg-[#42574E] py-1.5 text-[12px] font-semibold text-white disabled:opacity-40">Add GIF</button>
-          <p className="mt-1.5 text-[10px] leading-snug text-[#1E1B4B]/45">On Giphy/Tenor: right-click a GIF → “Copy image address”, or use any link ending in .gif</p>
+          <p className="mt-1.5 text-[10px] leading-snug text-[#1B2623]/45">On Giphy/Tenor: right-click a GIF → “Copy image address”, or use any link ending in .gif</p>
         </div>
       )}
     </div>
@@ -2218,21 +2218,21 @@ function TeamTab() {
 
   return (
     <div className="flex flex-col" style={{ minHeight: '62vh' }}>
-      <p className="mb-3 text-[12px] leading-relaxed text-[#1E1B4B]/55">
+      <p className="mb-3 text-[12px] leading-relaxed text-[#1B2623]/55">
         Team chat — the founder and all sales reps share this channel. Everyone here sees these messages.
       </p>
       <div className="flex-1 space-y-2 overflow-y-auto rounded-[12px] border border-[#D3DED6] bg-white p-3">
         {messages.length === 0 ? (
-          <p className="py-12 text-center text-[13px] text-[#1E1B4B]/40">No messages yet. Say hi 👋</p>
+          <p className="py-12 text-center text-[13px] text-[#1B2623]/40">No messages yet. Say hi 👋</p>
         ) : (
           messages.map((m) => {
             const mine = !!me.id && m.sender_id === me.id;
             return (
               <div key={m.id} className={`flex ${mine ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[82%] rounded-[14px] px-3.5 py-2 ${mine ? 'bg-[#42574E] text-white' : 'bg-[#F3EFFF] text-[#1E1B4B]'}`}>
+                <div className={`max-w-[82%] rounded-[14px] px-3.5 py-2 ${mine ? 'bg-[#42574E] text-white' : 'bg-[#F3EFFF] text-[#1B2623]'}`}>
                   {!mine && <div className="mb-0.5 text-[11px] font-bold text-[#42574E]">{m.sender_name || 'Member'}</div>}
                   <MessageBody text={m.body} />
-                  <div className={`mt-0.5 text-[10px] ${mine ? 'text-white/60' : 'text-[#1E1B4B]/40'}`}>{new Date(m.created_at).toLocaleString()}</div>
+                  <div className={`mt-0.5 text-[10px] ${mine ? 'text-white/60' : 'text-[#1B2623]/40'}`}>{new Date(m.created_at).toLocaleString()}</div>
                 </div>
               </div>
             );
@@ -2329,18 +2329,18 @@ function InboxTab({ onReadChange }: { onReadChange?: () => void }) {
     });
     return (
       <div>
-        <p className="mb-3 text-[12px] leading-relaxed text-[#1E1B4B]/55">Inbox — private 1:1 messages with a teammate. Only you two see these.</p>
+        <p className="mb-3 text-[12px] leading-relaxed text-[#1B2623]/55">Inbox — private 1:1 messages with a teammate. Only you two see these.</p>
         <div className="space-y-2">
           {sorted.length === 0 ? (
-            <p className="py-12 text-center text-[13px] text-[#1E1B4B]/40">No teammates to message yet.</p>
+            <p className="py-12 text-center text-[13px] text-[#1B2623]/40">No teammates to message yet.</p>
           ) : sorted.map((m) => {
             const last = lastMsg(m.id); const unread = unreadFrom(m.id);
             return (
               <button key={m.id} type="button" onClick={() => openThread(m)} className={`flex ${tap} w-full items-center gap-3 rounded-[12px] border border-[#D3DED6] bg-white px-3 text-left`}>
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#EDE7FF] text-[13px] font-bold text-[#42574E]">{m.name.slice(0, 1).toUpperCase()}</div>
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#F2F4EC] text-[13px] font-bold text-[#42574E]">{m.name.slice(0, 1).toUpperCase()}</div>
                 <div className="min-w-0 flex-1">
                   <span className="truncate text-[14px] font-semibold">{m.name}{m.is_founder && <span className="ml-1 text-[10px] font-bold text-[#42574E]">· Founder</span>}</span>
-                  <p className="truncate text-[12px] text-[#1E1B4B]/50">{last ? (last.sender_id === me.id ? 'You: ' : '') + last.body : 'Start a conversation'}</p>
+                  <p className="truncate text-[12px] text-[#1B2623]/50">{last ? (last.sender_id === me.id ? 'You: ' : '') + last.body : 'Start a conversation'}</p>
                 </div>
                 {unread > 0 && <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-[11px] font-bold text-white">{unread}</span>}
               </button>
@@ -2358,14 +2358,14 @@ function InboxTab({ onReadChange }: { onReadChange?: () => void }) {
       <div className="mb-2 text-[14px] font-bold">{selected.name}{selected.is_founder && <span className="ml-1 text-[11px] font-semibold text-[#42574E]">· Founder</span>}</div>
       <div className="flex-1 space-y-2 overflow-y-auto rounded-[12px] border border-[#D3DED6] bg-white p-3">
         {thread.length === 0 ? (
-          <p className="py-12 text-center text-[13px] text-[#1E1B4B]/40">No messages yet. Say hi 👋</p>
+          <p className="py-12 text-center text-[13px] text-[#1B2623]/40">No messages yet. Say hi 👋</p>
         ) : thread.map((m) => {
           const mine = m.sender_id === me.id;
           return (
             <div key={m.id} className={`flex ${mine ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-[82%] rounded-[14px] px-3.5 py-2 ${mine ? 'bg-[#42574E] text-white' : 'bg-[#F3EFFF] text-[#1E1B4B]'}`}>
+              <div className={`max-w-[82%] rounded-[14px] px-3.5 py-2 ${mine ? 'bg-[#42574E] text-white' : 'bg-[#F3EFFF] text-[#1B2623]'}`}>
                 <MessageBody text={m.body} />
-                <div className={`mt-0.5 text-[10px] ${mine ? 'text-white/60' : 'text-[#1E1B4B]/40'}`}>{new Date(m.created_at).toLocaleString()}</div>
+                <div className={`mt-0.5 text-[10px] ${mine ? 'text-white/60' : 'text-[#1B2623]/40'}`}>{new Date(m.created_at).toLocaleString()}</div>
               </div>
             </div>
           );
@@ -2419,7 +2419,7 @@ function NotesTab({ isFounder }: { isFounder: boolean }) {
 
   return (
     <div className="space-y-4">
-      <p className="text-[12px] leading-relaxed text-[#1E1B4B]/55">
+      <p className="text-[12px] leading-relaxed text-[#1B2623]/55">
         Shared team notes — tips, reminders, what’s working. Everyone on the team sees these.
       </p>
       <div className="rounded-[12px] border border-[#D3DED6] bg-white p-3">
@@ -2438,7 +2438,7 @@ function NotesTab({ isFounder }: { isFounder: boolean }) {
       </div>
 
       {notes.length === 0 ? (
-        <p className="rounded-[12px] border border-[#D3DED6] bg-white px-4 py-3 text-[13px] text-[#1E1B4B]/45">No notes yet. Add the first one.</p>
+        <p className="rounded-[12px] border border-[#D3DED6] bg-white px-4 py-3 text-[13px] text-[#1B2623]/45">No notes yet. Add the first one.</p>
       ) : (
         <div className="space-y-2">
           {notes.map((n) => {
@@ -2448,15 +2448,15 @@ function NotesTab({ isFounder }: { isFounder: boolean }) {
                 <div className="mb-1 flex items-center justify-between gap-2">
                   <span className="text-[12px] font-bold text-[#42574E]">{n.author_name || 'Member'}</span>
                   <div className="flex items-center gap-2">
-                    <span className="text-[11px] text-[#1E1B4B]/40">{new Date(n.created_at).toLocaleString()}</span>
+                    <span className="text-[11px] text-[#1B2623]/40">{new Date(n.created_at).toLocaleString()}</span>
                     {canDelete && (
-                      <button type="button" onClick={() => remove(n.id)} className="flex h-7 w-7 items-center justify-center rounded-full text-[#1E1B4B]/35 hover:bg-red-50 hover:text-red-500" aria-label="Delete note">
+                      <button type="button" onClick={() => remove(n.id)} className="flex h-7 w-7 items-center justify-center rounded-full text-[#1B2623]/35 hover:bg-red-50 hover:text-red-500" aria-label="Delete note">
                         <Trash2 className="h-3.5 w-3.5" />
                       </button>
                     )}
                   </div>
                 </div>
-                <MessageBody text={n.body} className="text-[#1E1B4B]/80" />
+                <MessageBody text={n.body} className="text-[#1B2623]/80" />
               </div>
             );
           })}
@@ -2494,7 +2494,7 @@ function AskAITab() {
   return (
     <div className="flex flex-col" style={{ minHeight: '64vh' }}>
       <div className="mb-2 flex items-center justify-between gap-3">
-        <p className="text-[12px] leading-relaxed text-[#1E1B4B]/55">Internal sales assistant — product, pitch, objections. Not legal advice.</p>
+        <p className="text-[12px] leading-relaxed text-[#1B2623]/55">Internal sales assistant — product, pitch, objections. Not legal advice.</p>
         {messages.length > 0 && (
           <button type="button" onClick={() => setMessages([])} className="shrink-0 text-[12px] font-semibold text-[#42574E] hover:underline">Clear conversation</button>
         )}
@@ -2503,9 +2503,9 @@ function AskAITab() {
       <div className="flex-1 space-y-2 overflow-y-auto rounded-[12px] border border-[#D3DED6] bg-white p-3">
         {messages.length === 0 ? (
           <div className="space-y-2 py-6">
-            <p className="px-1 text-[13px] font-semibold text-[#1E1B4B]/70">Ask anything about selling one3seven:</p>
+            <p className="px-1 text-[13px] font-semibold text-[#1B2623]/70">Ask anything about selling one3seven:</p>
             {STARTER_QUESTIONS.map((q) => (
-              <button key={q} type="button" onClick={() => send(q)} className="block w-full rounded-[12px] border border-[#D3DED6] bg-[#FAFAFF] px-3 py-2.5 text-left text-[13px] text-[#1E1B4B] transition hover:border-[#C9BEF5]">
+              <button key={q} type="button" onClick={() => send(q)} className="block w-full rounded-[12px] border border-[#D3DED6] bg-[#FAFAFF] px-3 py-2.5 text-left text-[13px] text-[#1B2623] transition hover:border-[#C9BEF5]">
                 {q}
               </button>
             ))}
@@ -2513,7 +2513,7 @@ function AskAITab() {
         ) : (
           messages.map((m, i) => (
             <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-[85%] whitespace-pre-wrap rounded-[14px] px-3.5 py-2 text-[13px] leading-relaxed ${m.role === 'user' ? 'bg-[#42574E] text-white' : 'bg-[#F3EFFF] text-[#1E1B4B]'}`}>
+              <div className={`max-w-[85%] whitespace-pre-wrap rounded-[14px] px-3.5 py-2 text-[13px] leading-relaxed ${m.role === 'user' ? 'bg-[#42574E] text-white' : 'bg-[#F3EFFF] text-[#1B2623]'}`}>
                 {m.content}
               </div>
             </div>
@@ -2551,11 +2551,11 @@ function AskAITab() {
 type AuditState = 'pass' | 'fail' | 'warn' | 'checking' | null;
 
 function AuditPill({ state }: { state: AuditState }) {
-  if (state === 'checking') return <span className="text-[11px] font-bold text-[#1E1B4B]/40">checking…</span>;
+  if (state === 'checking') return <span className="text-[11px] font-bold text-[#1B2623]/40">checking…</span>;
   if (state === 'pass') return <span className="flex items-center gap-1 text-[12px] font-bold text-emerald-600"><CheckCircle2 className="h-4 w-4" /> Pass</span>;
   if (state === 'fail') return <span className="flex items-center gap-1 text-[12px] font-bold text-red-600"><X className="h-4 w-4" /> Fail</span>;
   if (state === 'warn') return <span className="flex items-center gap-1 text-[12px] font-bold text-amber-600"><AlertTriangle className="h-4 w-4" /> Warn</span>;
-  return <span className="text-[11px] text-[#1E1B4B]/30">—</span>;
+  return <span className="text-[11px] text-[#1B2623]/30">—</span>;
 }
 
 function AuditTab() {
@@ -2627,15 +2627,15 @@ function AuditTab() {
       <button type="button" onClick={runAudit} disabled={running} className="flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full bg-[#42574E] font-semibold text-white transition hover:bg-[#374A42] disabled:opacity-50">
         <RefreshCw className={`h-4 w-4 ${running ? 'animate-spin' : ''}`} /> {running ? 'Running audit…' : 'Run audit'}
       </button>
-      <p className="text-[12px] leading-relaxed text-[#1E1B4B]/55">
+      <p className="text-[12px] leading-relaxed text-[#1B2623]/55">
         Morning routine: run this first. If anything automated is red, fix it before any outreach goes out. Then rotate through a few manual checks.
       </p>
 
       <Collapsible title="Website checks (automated)" defaultOpen>
         <div className="space-y-1.5">
           {AUDIT_SITE_CHECKS.map((c) => (
-            <div key={c.id} className="flex items-center justify-between rounded-[10px] border border-[#F0EBFF] px-3 py-2">
-              <span className="text-[13px] text-[#1E1B4B]">{c.label} <span className="text-[#1E1B4B]/35">{c.path}</span></span>
+            <div key={c.id} className="flex items-center justify-between rounded-[10px] border border-[#F2F4EC] px-3 py-2">
+              <span className="text-[13px] text-[#1B2623]">{c.label} <span className="text-[#1B2623]/35">{c.path}</span></span>
               <AuditPill state={site[c.id] ?? null} />
             </div>
           ))}
@@ -2644,12 +2644,12 @@ function AuditTab() {
 
       <Collapsible title="CRM checks (automated)" defaultOpen>
         {crm.length === 0 ? (
-          <p className="text-[12px] text-[#1E1B4B]/40">Run the audit to populate.</p>
+          <p className="text-[12px] text-[#1B2623]/40">Run the audit to populate.</p>
         ) : (
           <div className="space-y-1.5">
             {crm.map((c) => (
-              <div key={c.id} className="flex items-center justify-between rounded-[10px] border border-[#F0EBFF] px-3 py-2">
-                <span className="text-[13px] text-[#1E1B4B]">{c.label} <span className="text-[#1E1B4B]/35">{c.detail}</span></span>
+              <div key={c.id} className="flex items-center justify-between rounded-[10px] border border-[#F2F4EC] px-3 py-2">
+                <span className="text-[13px] text-[#1B2623]">{c.label} <span className="text-[#1B2623]/35">{c.detail}</span></span>
                 <AuditPill state={c.state} />
               </div>
             ))}
@@ -2661,8 +2661,8 @@ function AuditTab() {
         <Collapsible key={g.group} title={`${g.group} (manual)`}>
           <div className="space-y-2">
             {g.items.map((item) => (
-              <div key={item.id} className="rounded-[10px] border border-[#F0EBFF] px-3 py-2.5">
-                <div className="mb-1.5 text-[13px] text-[#1E1B4B]">{item.label}</div>
+              <div key={item.id} className="rounded-[10px] border border-[#F2F4EC] px-3 py-2.5">
+                <div className="mb-1.5 text-[13px] text-[#1B2623]">{item.label}</div>
                 <div className="flex gap-1.5">
                   {(['pass', 'warn', 'fail'] as const).map((s) => {
                     const active = manual[item.id] === s;
@@ -2691,13 +2691,13 @@ function AuditTab() {
 
       <Collapsible title="Audit history (last 7 runs)">
         {history.length === 0 ? (
-          <p className="text-[12px] text-[#1E1B4B]/40">No runs yet. Hit “Run audit” to start your history.</p>
+          <p className="text-[12px] text-[#1B2623]/40">No runs yet. Hit “Run audit” to start your history.</p>
         ) : (
           <div className="space-y-1.5">
             {history.map((h, i) => (
-              <div key={i} className="flex flex-wrap items-center justify-between gap-2 rounded-[10px] border border-[#F0EBFF] px-3 py-2 text-[12px]">
-                <span className="text-[#1E1B4B]/55">{h.ts}</span>
-                <span className="text-[#1E1B4B]/75">Site {h.site} · CRM {h.crm} · Manual {h.manual}</span>
+              <div key={i} className="flex flex-wrap items-center justify-between gap-2 rounded-[10px] border border-[#F2F4EC] px-3 py-2 text-[12px]">
+                <span className="text-[#1B2623]/55">{h.ts}</span>
+                <span className="text-[#1B2623]/75">Site {h.site} · CRM {h.crm} · Manual {h.manual}</span>
               </div>
             ))}
           </div>
@@ -2731,17 +2731,17 @@ function ChecklistTab() {
           <span>Launch checklist</span>
           <span className="text-[#42574E]">{completed} of {allItems.length} done</span>
         </div>
-        <div className="h-2.5 overflow-hidden rounded-full bg-[#EDE7FF]">
+        <div className="h-2.5 overflow-hidden rounded-full bg-[#F2F4EC]">
           <div className="h-full rounded-full bg-[#42574E] transition-all duration-500" style={{ width: `${pct}%` }} />
         </div>
-        <p className="mt-2 text-[12px] leading-relaxed text-[#1E1B4B]/55">
+        <p className="mt-2 text-[12px] leading-relaxed text-[#1B2623]/55">
           Plain-English steps from “built” to “charging customers.” Tap to check off — saved on this device.
         </p>
       </div>
 
       {LAUNCH_CHECKLIST.map((group) => (
         <section key={group.group}>
-          <h3 className="mb-2 text-[13px] font-bold text-[#1E1B4B]">{group.group}</h3>
+          <h3 className="mb-2 text-[13px] font-bold text-[#1B2623]">{group.group}</h3>
           <div className="space-y-2">
             {group.items.map((item) => {
               const checked = !!done[item.id];
@@ -2756,8 +2756,8 @@ function ChecklistTab() {
                     {checked && <Check className="h-3.5 w-3.5" />}
                   </span>
                   <span className="min-w-0">
-                    <span className={`block text-[13px] font-semibold ${checked ? 'text-emerald-800 line-through' : 'text-[#1E1B4B]'}`}>{item.label}</span>
-                    <span className="mt-0.5 block text-[12px] leading-relaxed text-[#1E1B4B]/55">{item.why}</span>
+                    <span className={`block text-[13px] font-semibold ${checked ? 'text-emerald-800 line-through' : 'text-[#1B2623]'}`}>{item.label}</span>
+                    <span className="mt-0.5 block text-[12px] leading-relaxed text-[#1B2623]/55">{item.why}</span>
                   </span>
                 </button>
               );
@@ -2774,23 +2774,23 @@ function TrainingTab() {
   return (
     <div className="space-y-3">
       <Collapsible title="🔥 Fire demo — how to run it" defaultOpen>
-        <p className="mb-3 text-[13px] leading-relaxed text-[#1E1B4B]/65">{FIRE_DEMO_TRAINING.intro}</p>
+        <p className="mb-3 text-[13px] leading-relaxed text-[#1B2623]/65">{FIRE_DEMO_TRAINING.intro}</p>
         <a href={`https://${FIRE_DEMO_TRAINING.link}`} target="_blank" rel="noreferrer" className="mb-3 inline-block text-[13px] font-semibold text-[#42574E] hover:underline">
           {FIRE_DEMO_TRAINING.link} ↗
         </a>
         <div className="mb-4 rounded-[12px] border-2 border-[#42574E]/40 bg-[#F3EFFF] p-4">
           <div className="mb-1 text-[11px] font-bold uppercase tracking-wide text-[#42574E]">Employment focus — read this first</div>
-          <p className="text-[13px] leading-relaxed text-[#1E1B4B]/80">{FIRE_DEMO_TRAINING.employmentFocus}</p>
+          <p className="text-[13px] leading-relaxed text-[#1B2623]/80">{FIRE_DEMO_TRAINING.employmentFocus}</p>
         </div>
         <div className="space-y-2.5">
           {FIRE_DEMO_TRAINING.steps.map((s) => (
             <div key={s.title} className="rounded-[12px] border border-[#D3DED6] bg-white p-3.5">
-              <div className="mb-0.5 text-[13px] font-bold text-[#1E1B4B]">{s.title}</div>
-              <p className="text-[13px] leading-relaxed text-[#1E1B4B]/65">{s.text}</p>
+              <div className="mb-0.5 text-[13px] font-bold text-[#1B2623]">{s.title}</div>
+              <p className="text-[13px] leading-relaxed text-[#1B2623]/65">{s.text}</p>
             </div>
           ))}
         </div>
-        <p className="mt-3 rounded-[10px] bg-[#EDE7FF] px-3 py-2 text-[12px] font-semibold text-[#42574E]">{FIRE_DEMO_TRAINING.theAsk}</p>
+        <p className="mt-3 rounded-[10px] bg-[#F2F4EC] px-3 py-2 text-[12px] font-semibold text-[#42574E]">{FIRE_DEMO_TRAINING.theAsk}</p>
       </Collapsible>
 
       <Collapsible title="⚠️ PI & scope rules — do not break these">
@@ -2809,8 +2809,8 @@ function TrainingTab() {
           {CRM_SUBSCRIPTION_TIERS.map((t) => (
             <div key={t.tier} className="flex items-center justify-between gap-3 rounded-[10px] border border-[#D3DED6] bg-white px-3 py-2.5">
               <div>
-                <div className="text-[13px] font-bold text-[#1E1B4B]">{t.tier}</div>
-                <div className="text-[11px] text-[#1E1B4B]/55">{t.detail}</div>
+                <div className="text-[13px] font-bold text-[#1B2623]">{t.tier}</div>
+                <div className="text-[11px] text-[#1B2623]/55">{t.detail}</div>
               </div>
               <div className="shrink-0 text-[13px] font-bold text-[#42574E]">{t.price}</div>
             </div>
@@ -2819,14 +2819,14 @@ function TrainingTab() {
       </Collapsible>
 
       <Collapsible title={CRM_COMMISSIONS.headline}>
-        <p className="mb-3 text-[13px] leading-relaxed text-[#1E1B4B]/65">{CRM_COMMISSIONS.intro}</p>
+        <p className="mb-3 text-[13px] leading-relaxed text-[#1B2623]/65">{CRM_COMMISSIONS.intro}</p>
 
         <div className="mb-1.5 text-[11px] font-bold uppercase tracking-wide text-[#42574E]">Your commission by tier (20%)</div>
         <div className="mb-4 overflow-hidden rounded-[12px] border border-[#D3DED6]">
           {CRM_COMMISSIONS.perTier.map((r, i) => (
-            <div key={r.tier} className={`flex items-center justify-between gap-2 px-3 py-2.5 text-[13px] ${i > 0 ? 'border-t border-[#F0EBFF]' : ''}`}>
-              <span className="font-bold text-[#1E1B4B]">{r.tier} <span className="font-normal text-[#1E1B4B]/45">{r.price}</span></span>
-              <span className="text-right"><span className="font-bold text-[#42574E]">{r.perMo}</span> <span className="text-[#1E1B4B]/45">· {r.perYr}</span></span>
+            <div key={r.tier} className={`flex items-center justify-between gap-2 px-3 py-2.5 text-[13px] ${i > 0 ? 'border-t border-[#F2F4EC]' : ''}`}>
+              <span className="font-bold text-[#1B2623]">{r.tier} <span className="font-normal text-[#1B2623]/45">{r.price}</span></span>
+              <span className="text-right"><span className="font-bold text-[#42574E]">{r.perMo}</span> <span className="text-[#1B2623]/45">· {r.perYr}</span></span>
             </div>
           ))}
         </div>
@@ -2834,31 +2834,31 @@ function TrainingTab() {
         <div className="mb-1.5 text-[11px] font-bold uppercase tracking-wide text-[#42574E]">How it compounds as you build your book</div>
         <div className="mb-4 overflow-hidden rounded-[12px] border border-[#D3DED6]">
           {CRM_COMMISSIONS.compounding.map((r, i) => (
-            <div key={r.firms} className={`px-3 py-2.5 ${i > 0 ? 'border-t border-[#F0EBFF]' : ''}`}>
+            <div key={r.firms} className={`px-3 py-2.5 ${i > 0 ? 'border-t border-[#F2F4EC]' : ''}`}>
               <div className="flex items-center justify-between text-[13px]">
-                <span className="font-bold text-[#1E1B4B]">{r.firms}</span>
-                <span><span className="font-bold text-[#42574E]">{r.mo}/mo</span> <span className="text-[#1E1B4B]/45">· {r.yr}/yr</span></span>
+                <span className="font-bold text-[#1B2623]">{r.firms}</span>
+                <span><span className="font-bold text-[#42574E]">{r.mo}/mo</span> <span className="text-[#1B2623]/45">· {r.yr}/yr</span></span>
               </div>
-              <div className="text-[11px] text-[#1E1B4B]/50">{r.mix}</div>
+              <div className="text-[11px] text-[#1B2623]/50">{r.mix}</div>
             </div>
           ))}
         </div>
 
         <ul className="mb-3 space-y-1.5">
           {CRM_COMMISSIONS.terms.map((l) => (
-            <li key={l} className="flex gap-2 text-[13px] leading-relaxed text-[#1E1B4B]/75"><span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#8B6DFF]" /><span>{l}</span></li>
+            <li key={l} className="flex gap-2 text-[13px] leading-relaxed text-[#1B2623]/75"><span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#8B6DFF]" /><span>{l}</span></li>
           ))}
         </ul>
 
         <div className="mb-3 rounded-[10px] border border-[#D3DED6] bg-[#FAFAFF] p-3">
-          <div className="mb-1 text-[11px] font-bold uppercase tracking-wide text-[#1E1B4B]/45">Not offered at this stage</div>
-          <div className="text-[12px] text-[#1E1B4B]/60">{CRM_COMMISSIONS.notOffered.join(' · ')}</div>
+          <div className="mb-1 text-[11px] font-bold uppercase tracking-wide text-[#1B2623]/45">Not offered at this stage</div>
+          <div className="text-[12px] text-[#1B2623]/60">{CRM_COMMISSIONS.notOffered.join(' · ')}</div>
         </div>
 
         <p className="rounded-[10px] border border-amber-300 bg-amber-50 px-3 py-2 text-[12px] font-semibold text-amber-800">{CRM_COMMISSIONS.note}</p>
       </Collapsible>
 
-      <div className="rounded-[12px] border border-[#D3DED6] bg-white p-3.5 text-[13px] leading-relaxed text-[#1E1B4B]/70">
+      <div className="rounded-[12px] border border-[#D3DED6] bg-white p-3.5 text-[13px] leading-relaxed text-[#1B2623]/70">
         To contact one3seven, email <a href="mailto:info@one3seven.com" className="font-semibold text-[#42574E] hover:underline">info@one3seven.com</a>.
       </div>
     </div>
@@ -2872,7 +2872,7 @@ function AddLogTab({ firms, lastFirmId, onSaved, setError }: { firms: CrmFirm[];
     <div className="space-y-4">
       <div className="flex rounded-[12px] border border-[#D3DED6] bg-white p-1">
         {(['firm', 'log'] as const).map((m) => (
-          <button key={m} type="button" onClick={() => setMode(m)} className={`flex-1 ${tap} rounded-[9px] text-[13px] font-semibold ${mode === m ? 'bg-[#42574E] text-white' : 'text-[#1E1B4B]/55'}`}>
+          <button key={m} type="button" onClick={() => setMode(m)} className={`flex-1 ${tap} rounded-[9px] text-[13px] font-semibold ${mode === m ? 'bg-[#42574E] text-white' : 'text-[#1B2623]/55'}`}>
             {m === 'firm' ? 'Add firm' : 'Log activity'}
           </button>
         ))}
@@ -2917,7 +2917,7 @@ function AddFirmForm({ onSaved, setError }: { onSaved: (firmId?: string) => void
       </div>
       <input className={inputCls} placeholder="Focus areas" value={f.focus_areas ?? ''} onChange={(e) => set({ focus_areas: e.target.value })} />
       <input className={inputCls} placeholder="Source" value={f.source ?? ''} onChange={(e) => set({ source: e.target.value })} />
-      <label className="block text-[12px] font-semibold text-[#1E1B4B]/45">Next follow-up</label>
+      <label className="block text-[12px] font-semibold text-[#1B2623]/45">Next follow-up</label>
       <input className={inputCls} type="date" value={f.next_followup ?? ''} onChange={(e) => set({ next_followup: e.target.value })} />
       <textarea className="min-h-[64px] w-full rounded-[12px] border border-[#D3DED6] px-3 py-2.5 text-sm outline-none focus:border-[#42574E]" placeholder="Notes" value={f.notes ?? ''} onChange={(e) => set({ notes: e.target.value })} />
       <button type="button" onClick={submit} disabled={saving} className={`flex ${tap} w-full items-center justify-center rounded-full bg-[#42574E] font-semibold text-white disabled:opacity-40`}>{saving ? 'Saving…' : 'Add firm'}</button>
@@ -2949,7 +2949,7 @@ function FullLogForm({ firms, lastFirmId, onSaved, setError }: { firms: CrmFirm[
   return (
     <div className="space-y-2.5 rounded-[14px] border border-[#D3DED6] bg-white p-4">
       {ok && <div className="flex items-center gap-2 rounded-[10px] bg-emerald-50 px-3 py-2 text-[13px] font-semibold text-emerald-700"><CheckCircle2 className="h-4 w-4" /> Activity logged</div>}
-      <label className="block text-[12px] font-semibold text-[#1E1B4B]/45">Firm</label>
+      <label className="block text-[12px] font-semibold text-[#1B2623]/45">Firm</label>
       <select className={inputCls} value={l.firm_id} onChange={(e) => set({ firm_id: e.target.value })}>
         <option value="">Select firm…</option>
         {firms.map((f) => <option key={f.id} value={f.id}>{f.name}</option>)}
@@ -2973,7 +2973,7 @@ function FullLogForm({ firms, lastFirmId, onSaved, setError }: { firms: CrmFirm[
         </select>
       </div>
       <input className={inputCls} type="number" min="0" placeholder="Minutes saved per intake (firm's estimate)" value={minutesSaved} onChange={(e) => setMinutesSaved(e.target.value)} />
-      <label className="block text-[12px] font-semibold text-[#1E1B4B]/45">Next follow-up</label>
+      <label className="block text-[12px] font-semibold text-[#1B2623]/45">Next follow-up</label>
       <input className={inputCls} type="date" value={l.next_followup ?? ''} onChange={(e) => set({ next_followup: e.target.value })} />
       <textarea className="min-h-[64px] w-full rounded-[12px] border border-[#D3DED6] px-3 py-2.5 text-sm outline-none focus:border-[#42574E]" placeholder="Notes" value={l.notes ?? ''} onChange={(e) => set({ notes: e.target.value })} />
       <button type="button" onClick={submit} disabled={saving} className={`flex ${tap} w-full items-center justify-center rounded-full bg-[#42574E] font-semibold text-white disabled:opacity-40`}>{saving ? 'Saving…' : 'Log activity'}</button>

@@ -248,7 +248,7 @@ export function WorkerStatusJourneyCard({
         <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#64748B]">
           Current status
         </p>
-        <p className="mt-2 text-base font-medium leading-snug text-[#1E1B4B]">{currentLabel}</p>
+        <p className="mt-2 text-base font-medium leading-snug text-[#1B2623]">{currentLabel}</p>
         <div className="mt-4 flex items-center gap-1.5" aria-hidden>
           {previewSteps.map((_, index) => {
             const state = stepState(index, activeIndex, futureOnlyFrom);
@@ -291,7 +291,7 @@ export function WorkerStatusJourneyCard({
     >
       <div className={`${showSubtitle ? 'border-b border-[#F1EBFF] pb-4 mb-5' : 'mb-4'}`}>
         <h2
-          className={`font-semibold text-[#1E1B4B] tracking-tight ${
+          className={`font-semibold text-[#1B2623] tracking-tight ${
             isRail ? 'text-lg' : 'text-sm'
           }`}
         >
@@ -345,9 +345,9 @@ export function WorkerStatusJourneyCard({
                   <p
                     className={`${labelSize} leading-snug ${
                       isCompleted
-                        ? 'font-medium text-[#1E1B4B]'
+                        ? 'font-medium text-[#1B2623]'
                         : isCurrent
-                          ? 'font-semibold text-[#1E1B4B]'
+                          ? 'font-semibold text-[#1B2623]'
                           : 'font-normal text-[#64748B]'
                     }`}
                   >

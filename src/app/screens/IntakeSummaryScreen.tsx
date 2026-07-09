@@ -236,7 +236,7 @@ function TruncatedNameButton({ fullName, display }: { fullName: string; display:
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="text-sm font-medium text-[#14112E] hover:text-[#3A3552] underline decoration-[#D6CEE8] underline-offset-2"
+        className="text-sm font-medium text-[#1B2623] hover:text-[#384039] underline decoration-[#CBD6CF] underline-offset-2"
         title="View full file name"
       >
         {display}
@@ -251,15 +251,15 @@ function TruncatedNameButton({ fullName, display }: { fullName: string; display:
           <motion.div
             initial={{ scale: 0.98, y: 8 }}
             animate={{ scale: 1, y: 0 }}
-            className="w-full max-w-sm rounded-[14px] border border-[#ECE7F5] bg-white p-5 shadow-xl"
+            className="w-full max-w-sm rounded-[14px] border border-[#E4E5DE] bg-white p-5 shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <p className="text-xs font-semibold text-[#8B86A0] uppercase tracking-wide mb-2">Full file name</p>
-            <p className="text-sm text-[#14112E] break-all leading-relaxed">{fullName}</p>
+            <p className="text-xs font-semibold text-[#7C857F] uppercase tracking-wide mb-2">Full file name</p>
+            <p className="text-sm text-[#1B2623] break-all leading-relaxed">{fullName}</p>
             <button
               type="button"
               onClick={() => setOpen(false)}
-              className="mt-4 w-full text-sm font-medium py-2.5 rounded-[12px] bg-[#42574E] text-white hover:bg-[#4C1D96]"
+              className="mt-4 w-full text-sm font-medium py-2.5 rounded-[12px] bg-[#42574E] text-white hover:bg-[#42574E]"
             >
               Close
             </button>
@@ -1146,10 +1146,10 @@ export function IntakeSummaryScreen({
           </div>
 
           <div className="mb-4 rounded-[18px] border border-[#CBD6CF] bg-white/90 p-3 shadow-[0_14px_36px_rgba(91,53,213,0.08)]">
-            <p className="mb-3 text-sm leading-relaxed text-[#1E1B4B]/72">
+            <p className="mb-3 text-sm leading-relaxed text-[#1B2623]/72">
               This is the organized summary one3seven created from your story and records.
             </p>
-            <div className="grid grid-cols-2 gap-2 rounded-[14px] bg-[#F7F3FF] p-1">
+            <div className="grid grid-cols-2 gap-2 rounded-[14px] bg-[#F7F9F5] p-1">
               <button
                 type="button"
                 onClick={() => setFullReviewMode(false)}
@@ -1186,7 +1186,7 @@ export function IntakeSummaryScreen({
               <div className="mt-2 space-y-2">
                 {organizedSummaryParagraphs.length > 0 ? (
                   organizedSummaryParagraphs.map((paragraph, index) => (
-                    <p key={`organized-summary-${index}`} className="text-sm leading-relaxed text-[#1E1B4B]">
+                    <p key={`organized-summary-${index}`} className="text-sm leading-relaxed text-[#1B2623]">
                       {paragraph}
                     </p>
                   ))
@@ -1212,12 +1212,12 @@ export function IntakeSummaryScreen({
                     className={`rounded-[14px] border px-3 py-3 ${
                       item.complete
                         ? 'border-[#CBD6CF] bg-[#F8F4FF]'
-                        : 'border-[#ECE7F5] bg-[#FAF9F6]'
+                        : 'border-[#E4E5DE] bg-[#FAF9F6]'
                     }`}
                   >
                     <div className="flex items-start gap-2">
                       <CheckCircle2
-                        className={`mt-0.5 h-4 w-4 shrink-0 ${item.complete ? 'text-[#42574E]' : 'text-[#A8A3BC]'}`}
+                        className={`mt-0.5 h-4 w-4 shrink-0 ${item.complete ? 'text-[#42574E]' : 'text-[#9AA39B]'}`}
                         aria-hidden
                       />
                       <div>
@@ -1271,26 +1271,26 @@ export function IntakeSummaryScreen({
           </section>
 
           {employmentMatterTags.length > 0 ? (
-            <section className="mb-4 rounded-[14px] border border-[#F1ECF8] bg-white px-4 py-3.5 shadow-sm">
+            <section className="mb-4 rounded-[14px] border border-[#F2F4EC] bg-white px-4 py-3.5 shadow-sm">
               {concernsAcknowledged === null ? (
                 <>
-                  <h2 className="text-sm font-semibold text-[#14112E] mb-1">Based on what you described, we identified potential concerns related to:</h2>
+                  <h2 className="text-sm font-semibold text-[#1B2623] mb-1">Based on what you described, we identified potential concerns related to:</h2>
                   <div className="mb-3">
                     <EmploymentMatterChipList tags={employmentMatterTags} />
                   </div>
-                  <p className="text-xs text-[#8B86A0] mb-3">Does this sound right?</p>
+                  <p className="text-xs text-[#7C857F] mb-3">Does this sound right?</p>
                   <div className="flex gap-2">
                     <button
                       type="button"
                       onClick={() => setConcernsAcknowledged(true)}
-                      className="rounded-full border border-[#42574E] px-3 py-1 text-xs font-medium text-[#42574E] hover:bg-[#F7F3FF]"
+                      className="rounded-full border border-[#42574E] px-3 py-1 text-xs font-medium text-[#42574E] hover:bg-[#F7F9F5]"
                     >
                       Yes, that's right
                     </button>
                     <button
                       type="button"
                       onClick={() => setConcernsAcknowledged(false)}
-                      className="rounded-full border border-[#ECE7F5] px-3 py-1 text-xs font-medium text-[#6B6685] hover:bg-[#F5F1FB]"
+                      className="rounded-full border border-[#E4E5DE] px-3 py-1 text-xs font-medium text-[#6A6D66] hover:bg-[#F2F4EC]"
                     >
                       Not exactly
                     </button>
@@ -1298,14 +1298,14 @@ export function IntakeSummaryScreen({
                 </>
               ) : concernsAcknowledged ? (
                 <>
-                  <h2 className="text-sm font-semibold text-[#14112E] mb-2">Identified concerns</h2>
+                  <h2 className="text-sm font-semibold text-[#1B2623] mb-2">Identified concerns</h2>
                   <EmploymentMatterChipList tags={employmentMatterTags} />
                 </>
               ) : (
                 <>
-                  <h2 className="text-sm font-semibold text-[#14112E] mb-1">Potential concerns (to review)</h2>
+                  <h2 className="text-sm font-semibold text-[#1B2623] mb-1">Potential concerns (to review)</h2>
                   <EmploymentMatterChipList tags={employmentMatterTags} />
-                  <p className="mt-2 text-xs text-[#8B86A0] leading-relaxed">You can add more detail to your story or upload additional records — one3seven will update your organized file.</p>
+                  <p className="mt-2 text-xs text-[#7C857F] leading-relaxed">You can add more detail to your story or upload additional records — one3seven will update your organized file.</p>
                 </>
               )}
             </section>
@@ -1327,22 +1327,22 @@ export function IntakeSummaryScreen({
                     key={req.routeId}
                     className="rounded-[14px] border border-amber-200 bg-amber-50/90 p-4 shadow-sm"
                   >
-                    <h2 className="text-base font-semibold text-[#14112E]">Firm access request</h2>
-                    <p className="mt-1 text-sm font-medium text-[#14112E]">{req.firmName || 'Participating firm'}</p>
+                    <h2 className="text-base font-semibold text-[#1B2623]">Firm access request</h2>
+                    <p className="mt-1 text-sm font-medium text-[#1B2623]">{req.firmName || 'Participating firm'}</p>
                     <p className="mt-1 text-xs font-medium text-amber-950">
                       Full access requested — awaiting your approval
                     </p>
                     {req.barNumber || req.barState ? (
                       <div className="mt-2 rounded-[10px] border border-amber-100 bg-white/70 px-3 py-2">
-                        <p className="text-xs font-medium text-[#3A3552] mb-1">Attorney-provided credentials</p>
+                        <p className="text-xs font-medium text-[#384039] mb-1">Attorney-provided credentials</p>
                         {req.barState ? (
-                          <p className="text-xs text-[#6B6685]">
-                            State: <span className="font-medium text-[#14112E]">{barStateLabel}</span>
+                          <p className="text-xs text-[#6A6D66]">
+                            State: <span className="font-medium text-[#1B2623]">{barStateLabel}</span>
                           </p>
                         ) : null}
                         {req.barNumber ? (
-                          <p className="text-xs text-[#6B6685] mt-0.5">
-                            Bar number: <span className="font-mono font-medium text-[#14112E]">{req.barNumber}</span>
+                          <p className="text-xs text-[#6A6D66] mt-0.5">
+                            Bar number: <span className="font-mono font-medium text-[#1B2623]">{req.barNumber}</span>
                           </p>
                         ) : null}
                         {barSearchUrl ? (
@@ -1350,17 +1350,17 @@ export function IntakeSummaryScreen({
                             href={barSearchUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="mt-1.5 inline-flex items-center gap-1 text-xs font-medium text-[#374A42] underline underline-offset-2 hover:text-[#1E1B4B]"
+                            className="mt-1.5 inline-flex items-center gap-1 text-xs font-medium text-[#374A42] underline underline-offset-2 hover:text-[#1B2623]"
                           >
                             Search {barStateLabel} State Bar directory ↗
                           </a>
                         ) : null}
-                        <p className="mt-1.5 text-[10px] text-[#8B86A0] leading-relaxed">
+                        <p className="mt-1.5 text-[10px] text-[#7C857F] leading-relaxed">
                           Credentials are attorney-provided. one3seven does not independently verify bar status.
                         </p>
                       </div>
                     ) : null}
-                    <p className="mt-2 text-xs text-[#6B6685] leading-relaxed">
+                    <p className="mt-2 text-xs text-[#6A6D66] leading-relaxed">
                       {PARTICIPATING_NETWORK_COPY.firmsDoNotSee} Approve only when you are ready for this firm to
                       open your full organized packet and connected records.
                     </p>
@@ -1376,7 +1376,7 @@ export function IntakeSummaryScreen({
                       type="button"
                       disabled={Boolean(accessApprovalBusyRouteId)}
                       onClick={() => void handleApproveAccess(req.routeId)}
-                      className="mt-4 w-full min-h-[44px] touch-manipulation text-sm font-medium bg-[#42574E] text-white px-4 py-3 rounded-[12px] hover:bg-[#4C1D96] disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="mt-4 w-full min-h-[44px] touch-manipulation text-sm font-medium bg-[#42574E] text-white px-4 py-3 rounded-[12px] hover:bg-[#42574E] disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {busy ? (
                         <span className="inline-flex items-center justify-center gap-2">
@@ -1391,13 +1391,13 @@ export function IntakeSummaryScreen({
                 );
               })}
               {accessApprovalMessage ? (
-                <p className="text-sm text-[#14112E] bg-emerald-50 border border-emerald-100 rounded-[14px] px-4 py-3">
+                <p className="text-sm text-[#1B2623] bg-emerald-50 border border-emerald-100 rounded-[14px] px-4 py-3">
                   {accessApprovalMessage}
                 </p>
               ) : null}
             </section>
           ) : accessApprovalMessage ? (
-            <p className="mb-4 text-sm text-[#14112E] bg-emerald-50 border border-emerald-100 rounded-[14px] px-4 py-3">
+            <p className="mb-4 text-sm text-[#1B2623] bg-emerald-50 border border-emerald-100 rounded-[14px] px-4 py-3">
               {accessApprovalMessage}
             </p>
           ) : null}
@@ -1426,11 +1426,11 @@ export function IntakeSummaryScreen({
                 titleClassName={expandableTitleClass}
               >
                 {guidedSelectionsDisplay ? (
-                  <pre className="text-xs text-[#3A3552] mb-2 whitespace-pre-wrap font-sans leading-relaxed">
+                  <pre className="text-xs text-[#384039] mb-2 whitespace-pre-wrap font-sans leading-relaxed">
                     {guidedSelectionsDisplay}
                   </pre>
                 ) : null}
-                <p className="text-sm text-[#3A3552] leading-relaxed whitespace-pre-wrap">{workerStoryDisplay}</p>
+                <p className="text-sm text-[#384039] leading-relaxed whitespace-pre-wrap">{workerStoryDisplay}</p>
               </WorkerExpandableSection>
             </div>
           ) : null}
@@ -1453,19 +1453,19 @@ export function IntakeSummaryScreen({
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.08 + index * 0.03 }}
-                    className="rounded-[12px] border border-[#ECE7F5] bg-white p-3 transition-colors hover:border-[#C9B8F0]"
+                    className="rounded-[12px] border border-[#E4E5DE] bg-white p-3 transition-colors hover:border-[#7C8B6F]"
                   >
-                    <category.icon className="mb-2 h-4 w-4 text-[#3A3552]" />
-                    <div className="mb-1 text-sm font-medium text-[#14112E]">{category.name}</div>
-                    <div className="text-xs text-[#3A3552]">
+                    <category.icon className="mb-2 h-4 w-4 text-[#384039]" />
+                    <div className="mb-1 text-sm font-medium text-[#1B2623]">{category.name}</div>
+                    <div className="text-xs text-[#384039]">
                       {category.count} {category.count === 1 ? 'record' : 'records'}
                     </div>
                   </motion.div>
                 ))}
               </div>
             ) : (
-              <div className="rounded-[12px] border border-[#ECE7F5] bg-[#FAF9F6] p-4 text-center">
-                <p className="text-sm text-[#3A3552]">No uploaded records are available for this intake yet.</p>
+              <div className="rounded-[12px] border border-[#E4E5DE] bg-[#FAF9F6] p-4 text-center">
+                <p className="text-sm text-[#384039]">No uploaded records are available for this intake yet.</p>
               </div>
             )}
           </WorkerExpandableSection>
@@ -1520,15 +1520,15 @@ export function IntakeSummaryScreen({
 
         {preferLiveDataOnly && onSaveWorkerIntakeNotes ? (
           <section id="worker-intake-notes-section" className="px-6 pb-6">
-            <div className="rounded-[12px] border border-[#ECE7F5] bg-white p-4 shadow-sm">
-              <h2 className="text-base font-semibold text-[#14112E] mb-1">Intake notes</h2>
+            <div className="rounded-[12px] border border-[#E4E5DE] bg-white p-4 shadow-sm">
+              <h2 className="text-base font-semibold text-[#1B2623] mb-1">Intake notes</h2>
               <p className="text-xs text-[#475569] mb-2 leading-relaxed">
                 Optional notes you add after organization—separate from your guided story.
               </p>
               {!intakeNotesOpen ? (
                 <>
                   {savedAdditionalNotesDisplay ? (
-                    <p className="text-sm text-[#3A3552] mb-4 leading-relaxed whitespace-pre-wrap">
+                    <p className="text-sm text-[#384039] mb-4 leading-relaxed whitespace-pre-wrap">
                       {savedAdditionalNotesDisplay}
                     </p>
                   ) : null}
@@ -1539,14 +1539,14 @@ export function IntakeSummaryScreen({
                       setIntakeNotesOpen(true);
                       setIntakeNoteMessage(null);
                     }}
-                    className="text-sm font-medium px-4 py-2.5 rounded-[12px] bg-[#42574E] text-white hover:bg-[#4C1D96]"
+                    className="text-sm font-medium px-4 py-2.5 rounded-[12px] bg-[#42574E] text-white hover:bg-[#42574E]"
                   >
                     {savedAdditionalNotesRaw ? 'Edit Notes' : 'Add Notes'}
                   </button>
                 </>
               ) : (
                 <>
-                  <p className="text-sm font-medium text-[#14112E] mb-1">Additional intake notes</p>
+                  <p className="text-sm font-medium text-[#1B2623] mb-1">Additional intake notes</p>
                   <p className="text-xs text-[#475569] mb-4 leading-relaxed">
                     Optional context for your firm—separate from your guided story.
                   </p>
@@ -1555,7 +1555,7 @@ export function IntakeSummaryScreen({
                     onChange={(e) => setIntakeNoteDraft(e.target.value)}
                     placeholder="Share context that helps explain your situation…"
                     rows={5}
-                    className="w-full px-4 py-3 bg-[#FAF9F6] border border-[#ECE7F5] rounded-[14px] text-sm text-[#14112E] placeholder:text-[#A8A3BC] mb-3"
+                    className="w-full px-4 py-3 bg-[#FAF9F6] border border-[#E4E5DE] rounded-[14px] text-sm text-[#1B2623] placeholder:text-[#9AA39B] mb-3"
                   />
                   {intakeNoteMessage ? (
                     <p
@@ -1571,8 +1571,8 @@ export function IntakeSummaryScreen({
                       onClick={() => void handleSaveIntakeNotes()}
                       className={`text-sm font-medium px-4 py-2.5 rounded-[12px] ${
                         intakeNoteSaving || intakeNoteDraft === savedAdditionalNotesRaw
-                          ? 'bg-[#ECE7F5] text-[#8B86A0] cursor-not-allowed'
-                          : 'bg-[#42574E] text-white hover:bg-[#4C1D96]'
+                          ? 'bg-[#E4E5DE] text-[#7C857F] cursor-not-allowed'
+                          : 'bg-[#42574E] text-white hover:bg-[#42574E]'
                       }`}
                     >
                       {intakeNoteSaving ? 'Saving…' : 'Save notes'}
@@ -1584,7 +1584,7 @@ export function IntakeSummaryScreen({
                         setIntakeNoteMessage(null);
                         setIntakeNoteDraft(savedAdditionalNotesRaw);
                       }}
-                      className="text-sm font-medium px-4 py-2.5 rounded-[12px] border border-[#ECE7F5] text-[#3A3552] hover:bg-[#F5F1FB]"
+                      className="text-sm font-medium px-4 py-2.5 rounded-[12px] border border-[#E4E5DE] text-[#384039] hover:bg-[#F2F4EC]"
                     >
                       Close
                     </button>
@@ -1632,9 +1632,9 @@ export function IntakeSummaryScreen({
               titleClassName={expandableTitleClass}
             >
               {liveMissing && liveMissing.length > 0 ? (
-                <div className="mb-4 rounded-[12px] border border-[#ECE7F5] bg-[#FAF9F6]/80 p-3">
-                  <div className="text-sm font-medium text-[#14112E] mb-1.5">Records that may still help</div>
-                  <ul className="list-disc pl-5 text-sm text-[#3A3552] space-y-1">
+                <div className="mb-4 rounded-[12px] border border-[#E4E5DE] bg-[#FAF9F6]/80 p-3">
+                  <div className="text-sm font-medium text-[#1B2623] mb-1.5">Records that may still help</div>
+                  <ul className="list-disc pl-5 text-sm text-[#384039] space-y-1">
                     {liveMissing.slice(0, 5).map((x, i) => (
                       <li key={`m-${i}`}>{softenWorkerReviewLine(x)}</li>
                     ))}
@@ -1643,8 +1643,8 @@ export function IntakeSummaryScreen({
               ) : null}
               {readinessPresentation.supplementalBrief.length > 0 ? (
                 <div className="mb-3">
-                  <div className="text-sm font-medium text-[#14112E] mb-1.5">Notes for review</div>
-                  <ul className="list-disc pl-5 text-sm text-[#3A3552] space-y-1">
+                  <div className="text-sm font-medium text-[#1B2623] mb-1.5">Notes for review</div>
+                  <ul className="list-disc pl-5 text-sm text-[#384039] space-y-1">
                     {readinessPresentation.supplementalBrief.map((x, i) => (
                       <li key={`rb-${i}`}>{softenWorkerReviewLine(x)}</li>
                     ))}
@@ -1690,7 +1690,7 @@ export function IntakeSummaryScreen({
                   return (
                     <li
                       key={key}
-                      className="rounded-[14px] border border-[#ECE7F5] bg-white p-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
+                      className="rounded-[14px] border border-[#E4E5DE] bg-white p-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
                     >
                       <div className="min-w-0 flex-1">
                         {isEditing && onUploadedFileLabelChange ? (
@@ -1700,7 +1700,7 @@ export function IntakeSummaryScreen({
                               maxLength={14}
                               value={editingFileLabel}
                               onChange={(e) => setEditingFileLabel(e.target.value.slice(0, 14))}
-                              className="flex-1 min-w-[8rem] px-3 py-2 text-sm border border-[#ECE7F5] rounded-lg bg-[#FAF9F6]"
+                              className="flex-1 min-w-[8rem] px-3 py-2 text-sm border border-[#E4E5DE] rounded-lg bg-[#FAF9F6]"
                               aria-label="File label"
                             />
                             <button
@@ -1716,7 +1716,7 @@ export function IntakeSummaryScreen({
                             <button
                               type="button"
                               onClick={() => setEditingFileKey(null)}
-                              className="text-xs font-medium px-3 py-2 rounded-lg border border-[#ECE7F5] text-[#3A3552]"
+                              className="text-xs font-medium px-3 py-2 rounded-lg border border-[#E4E5DE] text-[#384039]"
                             >
                               Cancel
                             </button>
@@ -1724,7 +1724,7 @@ export function IntakeSummaryScreen({
                         ) : (
                           <TruncatedNameButton fullName={file.name} display={display} />
                         )}
-                        <p className="text-[11px] text-[#8B86A0] mt-1">
+                        <p className="text-[11px] text-[#7C857F] mt-1">
                           {resolveAttorneyFacingUploadCategory(
                             file.name,
                             uploadedFilePersistMeta[resolvedIndex]?.category
@@ -1740,7 +1740,7 @@ export function IntakeSummaryScreen({
                                 setEditingFileKey(key);
                                 setEditingFileLabel(display);
                               }}
-                              className="text-xs font-medium px-3 py-2 rounded-lg border border-[#ECE7F5] text-[#14112E] hover:bg-[#F5F1FB]"
+                              className="text-xs font-medium px-3 py-2 rounded-lg border border-[#E4E5DE] text-[#1B2623] hover:bg-[#F2F4EC]"
                             >
                               Rename
                             </button>
@@ -1764,7 +1764,7 @@ export function IntakeSummaryScreen({
                 <button
                   type="button"
                   onClick={() => setShowAllUploadedFiles((v) => !v)}
-                  className="mt-3 text-sm font-medium text-[#6B6685] hover:text-[#14112E]"
+                  className="mt-3 text-sm font-medium text-[#6A6D66] hover:text-[#1B2623]"
                 >
                   {showAllUploadedFiles
                     ? WORKER_INTAKE_ACTIONS.showLess
@@ -1791,7 +1791,7 @@ export function IntakeSummaryScreen({
             >
             <div className="space-y-4">
               <IntakePacketPreview model={packetPreviewModel} darkPresentation={sx.packetPreviewDark} />
-              <p className={`text-xs text-center leading-relaxed px-2 ${shellMode ? 'text-[var(--o3s-subtle)] sm:text-[#6B6685]' : 'text-[#6B6685]'}`}>
+              <p className={`text-xs text-center leading-relaxed px-2 ${shellMode ? 'text-[var(--o3s-subtle)] sm:text-[#6A6D66]' : 'text-[#6A6D66]'}`}>
                 Download a clean packet organized by story, timeline, review areas, and supporting records.
               </p>
             </div>
@@ -1881,7 +1881,7 @@ export function IntakeSummaryScreen({
                 Add More Documents
               </button>
               {preferLiveDataOnly ? (
-                <div className="rounded-[14px] border border-[#ECE7F5] bg-[#FAF9F6] px-4 py-3 text-sm text-[#6B6685]">
+                <div className="rounded-[14px] border border-[#E4E5DE] bg-[#FAF9F6] px-4 py-3 text-sm text-[#6A6D66]">
                   Email delivery is unavailable during the closed beta.
                 </div>
               ) : (
@@ -1918,13 +1918,13 @@ export function IntakeSummaryScreen({
                 </p>
               ) : !PARTICIPATING_ROUTING_LIVE ? (
                 <div
-                  className="flex w-full items-center justify-center gap-2 rounded-[14px] border border-[#ECE7F5] bg-[#FAF9F6] px-4 py-3 text-sm font-medium text-[#A8A3BC] cursor-not-allowed select-none"
+                  className="flex w-full items-center justify-center gap-2 rounded-[14px] border border-[#E4E5DE] bg-[#FAF9F6] px-4 py-3 text-sm font-medium text-[#9AA39B] cursor-not-allowed select-none"
                   title="Sending your organized intake to participating firms is coming soon. For now, download or print your packet to bring to any attorney consultation."
                   aria-disabled="true"
                 >
                   <Share2 className="w-5 h-5" />
                   Send to participating firms
-                  <span className="ml-1 rounded-full bg-[#ECE7F5] px-2 py-0.5 text-[11px] font-semibold text-[#8B86A0]">Coming soon</span>
+                  <span className="ml-1 rounded-full bg-[#E4E5DE] px-2 py-0.5 text-[11px] font-semibold text-[#7C857F]">Coming soon</span>
                 </div>
               ) : canShareSummary ? (
                 <button
@@ -1955,14 +1955,14 @@ export function IntakeSummaryScreen({
           <section id="worker-doc-request-section" className="px-6 pb-10">
             {workflowDocRequestCompleted ? (
               <div className="rounded-[14px] border border-emerald-200 bg-emerald-50 p-5">
-                <h2 className="text-lg font-semibold text-[#14112E] mb-2">Updated materials sent for firm review</h2>
-                <p className="text-sm text-[#3A3552] mb-4 leading-relaxed">
+                <h2 className="text-lg font-semibold text-[#1B2623] mb-2">Updated materials sent for firm review</h2>
+                <p className="text-sm text-[#384039] mb-4 leading-relaxed">
                   Your firm can refresh their dashboard to review the new files and your response below.
                 </p>
                 {firmDocRequest && firmDocRequest.categories.length > 0 ? (
                   <div className="mb-4">
-                    <p className="text-xs font-medium text-[#6B6685] mb-1">Originally requested</p>
-                    <ul className="list-disc pl-5 text-sm text-[#14112E] space-y-1">
+                    <p className="text-xs font-medium text-[#6A6D66] mb-1">Originally requested</p>
+                    <ul className="list-disc pl-5 text-sm text-[#1B2623] space-y-1">
                       {firmDocRequest.categories.map((c) => (
                         <li key={c}>{polishHumanReadableDisplayText(c) || c}</li>
                       ))}
@@ -1971,8 +1971,8 @@ export function IntakeSummaryScreen({
                 ) : null}
                 {workerDocResponse && workerDocResponse.fulfilled.length > 0 ? (
                   <div className="mb-4">
-                    <p className="text-xs font-medium text-[#6B6685] mb-1">You indicated these were fulfilled</p>
-                    <ul className="list-disc pl-5 text-sm text-[#14112E] space-y-1">
+                    <p className="text-xs font-medium text-[#6A6D66] mb-1">You indicated these were fulfilled</p>
+                    <ul className="list-disc pl-5 text-sm text-[#1B2623] space-y-1">
                       {workerDocResponse.fulfilled.map((c) => (
                         <li key={c}>{polishHumanReadableDisplayText(c) || c}</li>
                       ))}
@@ -1980,19 +1980,19 @@ export function IntakeSummaryScreen({
                   </div>
                 ) : null}
                 {workerDocResponse?.note ? (
-                  <p className="text-sm text-[#3A3552] mb-4 whitespace-pre-wrap">
+                  <p className="text-sm text-[#384039] mb-4 whitespace-pre-wrap">
                     <span className="font-medium">Your note to the firm:</span>{' '}
                     {polishHumanReadableDisplayText(workerDocResponse.note)}
                   </p>
                 ) : null}
-                <p className="text-xs text-[#6B6685] mb-4 leading-relaxed border-t border-emerald-200/80 pt-3">
+                <p className="text-xs text-[#6A6D66] mb-4 leading-relaxed border-t border-emerald-200/80 pt-3">
                   Your firm sees this update when they refresh their intake review. Automatic in-app firm alerts for
                   new uploads are not enabled in this beta yet.
                 </p>
                 <button
                   type="button"
                   onClick={() => onNavigate('upload')}
-                  className="text-sm text-[#6B6685] hover:text-[#14112E] underline underline-offset-2"
+                  className="text-sm text-[#6A6D66] hover:text-[#1B2623] underline underline-offset-2"
                 >
                   Add more documents
                 </button>
@@ -2002,20 +2002,20 @@ export function IntakeSummaryScreen({
                 {showDocRequestConfirmation ? (
                   <p className="text-xs font-semibold uppercase tracking-wide text-amber-900 mb-2">Action required</p>
                 ) : null}
-                <h2 className="text-lg font-semibold text-[#14112E] mb-2">
+                <h2 className="text-lg font-semibold text-[#1B2623] mb-2">
                   {firmDocRequest?.firmName
                     ? `${firmDocRequest.firmName} requested additional documents`
                     : 'Additional documents requested'}
                 </h2>
-                <p className="text-xs text-[#6B6685] mb-4 leading-relaxed">
+                <p className="text-xs text-[#6A6D66] mb-4 leading-relaxed">
                   {showDocRequestConfirmation
                     ? 'Step 1: Upload the records below and run organize. Step 2: Scroll to confirm which categories you are sending back to your firm.'
                     : 'Your firm asked for these records before continuing review.'}
                 </p>
                 {firmDocRequest && firmDocRequest.categories.length > 0 ? (
                   <div className="mb-4">
-                    <p className="text-xs font-medium text-[#6B6685] mb-1">Requested categories</p>
-                    <ul className="list-disc pl-5 text-sm text-[#14112E] space-y-1">
+                    <p className="text-xs font-medium text-[#6A6D66] mb-1">Requested categories</p>
+                    <ul className="list-disc pl-5 text-sm text-[#1B2623] space-y-1">
                       {firmDocRequest.categories.map((c) => (
                         <li key={c}>{polishHumanReadableDisplayText(c) || c}</li>
                       ))}
@@ -2023,7 +2023,7 @@ export function IntakeSummaryScreen({
                   </div>
                 ) : null}
                 {firmDocRequest?.note ? (
-                  <p className="text-sm text-[#3A3552] mb-4 whitespace-pre-wrap">
+                  <p className="text-sm text-[#384039] mb-4 whitespace-pre-wrap">
                     <span className="font-medium">Firm note:</span> {polishHumanReadableDisplayText(firmDocRequest.note)}
                   </p>
                 ) : null}
@@ -2031,25 +2031,25 @@ export function IntakeSummaryScreen({
                 firmDocRequest &&
                 firmDocRequest.categories.length === 0 &&
                 !firmDocRequest.note ? (
-                  <p className="text-sm text-[#6B6685] mb-4">
+                  <p className="text-sm text-[#6A6D66] mb-4">
                     Request details are not loaded yet. Leave and reopen this summary if the list is empty.
                   </p>
                 ) : null}
                 <button
                   type="button"
                   onClick={() => onNavigate('upload')}
-                  className="text-sm font-medium bg-[#42574E] text-white px-4 py-2.5 rounded-[12px] hover:bg-[#4C1D96] mb-4"
+                  className="text-sm font-medium bg-[#42574E] text-white px-4 py-2.5 rounded-[12px] hover:bg-[#42574E] mb-4"
                 >
                   Upload requested documents
                 </button>
                 {showDocRequestConfirmation ? (
                   <div id="worker-doc-request-confirm" className="pt-4 border-t border-amber-200/80">
-                    <h3 className="text-base font-semibold text-[#14112E] mb-2">Step 2 — Confirm your response</h3>
-                    <p className="text-xs text-[#6B6685] mb-3 leading-relaxed">
+                    <h3 className="text-base font-semibold text-[#1B2623] mb-2">Step 2 — Confirm your response</h3>
+                    <p className="text-xs text-[#6A6D66] mb-3 leading-relaxed">
                       Check which requested categories your new uploads satisfy, then send your response. This saves
                       your answer on the intake summary for firm review.
                     </p>
-                    <p className="text-xs text-[#6B6685] mb-3 leading-relaxed bg-white/60 border border-amber-200/60 rounded-lg px-3 py-2">
+                    <p className="text-xs text-[#6A6D66] mb-3 leading-relaxed bg-white/60 border border-amber-200/60 rounded-lg px-3 py-2">
                       Firm in-app alerts for submitted documents are not enabled in this beta yet. Your firm will see
                       this response when they open or refresh your intake on their dashboard.
                     </p>
@@ -2064,7 +2064,7 @@ export function IntakeSummaryScreen({
                           className={`flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm cursor-pointer border ${
                             fulfilledDraft.includes('Other')
                               ? 'bg-[#42574E] text-white border-[#42574E]'
-                              : 'bg-white text-[#14112E] border-[#ECE7F5]'
+                              : 'bg-white text-[#1B2623] border-[#E4E5DE]'
                           }`}
                         >
                           <input
@@ -2088,7 +2088,7 @@ export function IntakeSummaryScreen({
                           className={`flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm cursor-pointer border ${
                             fulfilledDraft.includes(category)
                               ? 'bg-[#42574E] text-white border-[#42574E]'
-                              : 'bg-white text-[#14112E] border-[#ECE7F5]'
+                              : 'bg-white text-[#1B2623] border-[#E4E5DE]'
                           }`}
                         >
                           <input
@@ -2117,8 +2117,8 @@ export function IntakeSummaryScreen({
                         {docDraftSaveError}
                       </p>
                     ) : null}
-                    {docDraftSaving ? <p className="text-xs text-[#8B86A0] mb-2">Saving…</p> : null}
-                    <label className="text-xs font-medium text-[#3A3552] mb-1 block">Optional note to firm</label>
+                    {docDraftSaving ? <p className="text-xs text-[#7C857F] mb-2">Saving…</p> : null}
+                    <label className="text-xs font-medium text-[#384039] mb-1 block">Optional note to firm</label>
                     <textarea
                       value={noteToFirmDraft}
                       onChange={(e) => {
@@ -2127,7 +2127,7 @@ export function IntakeSummaryScreen({
                         if (docConfirmError) setDocConfirmError(null);
                         persistDocumentResponseNoteDraft(fulfilledDraft, nextNote);
                       }}
-                      className="w-full mb-3 px-3 py-2 border border-[#ECE7F5] rounded-lg text-sm h-20 resize-none"
+                      className="w-full mb-3 px-3 py-2 border border-[#E4E5DE] rounded-lg text-sm h-20 resize-none"
                       placeholder="Brief context for your firm (optional)."
                       disabled={docConfirmBusy}
                     />
@@ -2156,14 +2156,14 @@ export function IntakeSummaryScreen({
                           setNoteToFirmDraft('');
                         })()
                       }
-                      className="text-sm font-medium bg-[#42574E] text-white px-4 py-2.5 rounded-[12px] hover:bg-[#4C1D96] disabled:opacity-50"
+                      className="text-sm font-medium bg-[#42574E] text-white px-4 py-2.5 rounded-[12px] hover:bg-[#42574E] disabled:opacity-50"
                     >
                       {docConfirmBusy ? 'Saving…' : 'Confirm response to firm'}
                     </button>
                   </div>
                 ) : workflowDocRequestPending && Boolean(onConfirmDocumentRequestResponse) && !hasFirmDocRequestDetails ? (
                   <div id="worker-doc-request-confirm" className="pt-4 border-t border-amber-200/80">
-                    <p className="text-xs text-[#6B6685] leading-relaxed">
+                    <p className="text-xs text-[#6A6D66] leading-relaxed">
                       After you upload and organize, return here to confirm your response. If requested categories do
                       not appear, refresh this summary or open upload from your notification again.
                     </p>
@@ -2180,17 +2180,17 @@ export function IntakeSummaryScreen({
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.9, duration: 0.5 }}
-              className="bg-white rounded-[16px] p-6 border border-[#ECE7F5]"
+              className="bg-white rounded-[16px] p-6 border border-[#E4E5DE]"
             >
-              <p className="text-sm text-[#3A3552] leading-relaxed mb-4">
+              <p className="text-sm text-[#384039] leading-relaxed mb-4">
                 {PARTICIPATING_NETWORK_COPY.shareModalBody} Participating firms may review a preview, request
                 expanded access, ask for additional records, or take no further action - your intake stays active in
                 the network either way.
               </p>
-              <p className="text-sm text-[#3A3552] leading-relaxed mb-4">
+              <p className="text-sm text-[#384039] leading-relaxed mb-4">
                 A firm&apos;s next step does not change what one3seven organizes for you. {ONE3SEVEN_NOTICES.positioning}
               </p>
-              <p className="text-sm text-[#6B6685] leading-relaxed">
+              <p className="text-sm text-[#6A6D66] leading-relaxed">
                 You may continue uploading documents, updating timelines, saving summaries, or sharing organized records elsewhere.
               </p>
             </motion.div>
@@ -2199,10 +2199,10 @@ export function IntakeSummaryScreen({
 
         {/* Footer Disclaimer */}
         <footer className={sx.footer}>
-          <div className="bg-[#FAF9F6] rounded-[16px] p-6 border border-[#ECE7F5]">
-            <h3 className="text-sm font-semibold text-[#14112E] mb-4">About one3seven</h3>
-            <p className="text-xs text-[#6B6685] leading-relaxed mb-3">{ONE3SEVEN_NOTICES.positioning}</p>
-            <p className="text-xs text-[#6B6685] leading-relaxed">
+          <div className="bg-[#FAF9F6] rounded-[16px] p-6 border border-[#E4E5DE]">
+            <h3 className="text-sm font-semibold text-[#1B2623] mb-4">About one3seven</h3>
+            <p className="text-xs text-[#6A6D66] leading-relaxed mb-3">{ONE3SEVEN_NOTICES.positioning}</p>
+            <p className="text-xs text-[#6A6D66] leading-relaxed">
               Intake summaries, timeline snapshots, category tags, and readiness notes are organizational aids for review preparation only.
             </p>
           </div>
@@ -2216,7 +2216,7 @@ export function IntakeSummaryScreen({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-[#14112E]/50 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center"
+            className="fixed inset-0 bg-[#1B2623]/50 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center"
             onClick={() => !isSending && setShowEmailModal(false)}
           >
             <motion.div
@@ -2230,10 +2230,10 @@ export function IntakeSummaryScreen({
               <div className="p-6">
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-xl font-semibold text-[#14112E]">Save Email Note</h3>
+                  <h3 className="text-xl font-semibold text-[#1B2623]">Save Email Note</h3>
                   <button
                     onClick={() => !isSending && setShowEmailModal(false)}
-                    className="text-[#A8A3BC] hover:text-[#6B6685] transition-colors"
+                    className="text-[#9AA39B] hover:text-[#6A6D66] transition-colors"
                     disabled={isSending}
                   >
                     <X className="w-5 h-5" />
@@ -2242,25 +2242,25 @@ export function IntakeSummaryScreen({
 
                 {/* Email Address */}
                 <div className="mb-5">
-                  <label className="text-sm font-medium text-[#14112E] mb-2 block">Email Address</label>
+                  <label className="text-sm font-medium text-[#1B2623] mb-2 block">Email Address</label>
                   <input
                     type="email"
                     value={emailAddress}
                     onChange={(e) => setEmailAddress(e.target.value)}
                     placeholder="your@email.com"
-                    className="w-full px-4 py-3 bg-[#FAF9F6] border border-[#ECE7F5] rounded-[14px] text-sm text-[#14112E] placeholder:text-[#A8A3BC] focus:outline-none focus:ring-2 focus:ring-[#42574E] focus:border-transparent"
+                    className="w-full px-4 py-3 bg-[#FAF9F6] border border-[#E4E5DE] rounded-[14px] text-sm text-[#1B2623] placeholder:text-[#9AA39B] focus:outline-none focus:ring-2 focus:ring-[#42574E] focus:border-transparent"
                     disabled={isSending}
                   />
                 </div>
 
                 {/* Optional Note */}
                 <div className="mb-6">
-                  <label className="text-sm font-medium text-[#14112E] mb-2 block">Optional Note</label>
+                  <label className="text-sm font-medium text-[#1B2623] mb-2 block">Optional Note</label>
                   <textarea
                     value={emailNote}
                     onChange={(e) => setEmailNote(e.target.value)}
                     placeholder="Add a note to yourself (optional)"
-                    className="w-full h-24 px-4 py-3 bg-[#FAF9F6] border border-[#ECE7F5] rounded-[14px] text-sm text-[#14112E] placeholder:text-[#A8A3BC] focus:outline-none focus:ring-2 focus:ring-[#42574E] focus:border-transparent resize-none"
+                    className="w-full h-24 px-4 py-3 bg-[#FAF9F6] border border-[#E4E5DE] rounded-[14px] text-sm text-[#1B2623] placeholder:text-[#9AA39B] focus:outline-none focus:ring-2 focus:ring-[#42574E] focus:border-transparent resize-none"
                     disabled={isSending}
                   />
                 </div>
@@ -2272,8 +2272,8 @@ export function IntakeSummaryScreen({
                     disabled={!emailAddress.trim() || isSending}
                     className={`w-full py-4 px-6 rounded-[14px] transition-all font-medium flex items-center justify-center gap-2 ${
                       !emailAddress.trim() || isSending
-                        ? 'bg-[#ECE7F5] text-[#A8A3BC] cursor-not-allowed'
-                        : 'bg-[#42574E] text-white hover:bg-[#4C1D96] shadow-sm hover:shadow-md'
+                        ? 'bg-[#E4E5DE] text-[#9AA39B] cursor-not-allowed'
+                        : 'bg-[#42574E] text-white hover:bg-[#42574E] shadow-sm hover:shadow-md'
                     }`}
                   >
                     {isSending ? (
@@ -2293,8 +2293,8 @@ export function IntakeSummaryScreen({
                     disabled={isSending}
                     className={`w-full py-4 px-6 rounded-[14px] transition-colors font-medium ${
                       isSending
-                        ? 'bg-[#F1ECFE] text-[#A8A3BC] cursor-not-allowed'
-                        : 'bg-[#F1ECFE] text-[#14112E] hover:bg-[#ECE7F5]'
+                        ? 'bg-[#F2F4EC] text-[#9AA39B] cursor-not-allowed'
+                        : 'bg-[#F2F4EC] text-[#1B2623] hover:bg-[#E4E5DE]'
                     }`}
                   >
                     Cancel
@@ -2313,7 +2313,7 @@ export function IntakeSummaryScreen({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-[#14112E]/50 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center"
+            className="fixed inset-0 bg-[#1B2623]/50 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center"
             onClick={() => !isSharing && setShowShareModal(false)}
           >
             <motion.div
@@ -2326,11 +2326,11 @@ export function IntakeSummaryScreen({
             >
               <div className="p-6">
                 <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-xl font-semibold text-[#14112E]">Send organized intake</h3>
+                  <h3 className="text-xl font-semibold text-[#1B2623]">Send organized intake</h3>
                   <button
                     type="button"
                     onClick={() => !isSharing && setShowShareModal(false)}
-                    className="text-[#A8A3BC] hover:text-[#6B6685] transition-colors"
+                    className="text-[#9AA39B] hover:text-[#6A6D66] transition-colors"
                     disabled={isSharing}
                   >
                     <X className="w-5 h-5" />
@@ -2341,7 +2341,7 @@ export function IntakeSummaryScreen({
                   <>
                     {hasLinkedFirm ? (
                       <>
-                        <p className="text-sm text-[#3A3552] leading-relaxed mb-4">
+                        <p className="text-sm text-[#384039] leading-relaxed mb-4">
                           {FIRM_ROUTING_COPY.sendOrganizedIntro}
                         </p>
                         <p className="text-xs text-[#475569] leading-relaxed mb-6">
@@ -2350,11 +2350,11 @@ export function IntakeSummaryScreen({
                       </>
                     ) : (
                       <>
-                        <p className="text-sm text-[#3A3552] leading-relaxed mb-3">
+                        <p className="text-sm text-[#384039] leading-relaxed mb-3">
                           Choose how to share your organized intake. You do not need a firm code to use the
                           participating review network.
                         </p>
-                        <p className="text-xs text-[#6B6685] leading-relaxed mb-3">
+                        <p className="text-xs text-[#6A6D66] leading-relaxed mb-3">
                           {PARTICIPATING_NETWORK_COPY.shareModalBody}
                         </p>
                         <p className="text-xs text-[#475569] leading-relaxed mb-6">
@@ -2367,7 +2367,7 @@ export function IntakeSummaryScreen({
                   <>
                     <button
                       type="button"
-                      className="text-xs text-[#6B6685] mb-4 hover:text-[#14112E]"
+                      className="text-xs text-[#6A6D66] mb-4 hover:text-[#1B2623]"
                       disabled={isSharing}
                       onClick={() => {
                         setShareApiError('');
@@ -2376,12 +2376,12 @@ export function IntakeSummaryScreen({
                     >
                       ← Back
                     </button>
-                    <p className="text-sm text-[#6B6685] mb-3">{FIRM_ROUTING_COPY.firmCodeFieldHelp}</p>
+                    <p className="text-sm text-[#6A6D66] mb-3">{FIRM_ROUTING_COPY.firmCodeFieldHelp}</p>
                     <input
                       value={firmCodeInput}
                       onChange={(e) => setFirmCodeInput(e.target.value)}
                       placeholder="e.g. ABC12XYZ"
-                      className="w-full px-4 py-3 bg-[#FAF9F6] border border-[#ECE7F5] rounded-[14px] text-sm mb-3"
+                      className="w-full px-4 py-3 bg-[#FAF9F6] border border-[#E4E5DE] rounded-[14px] text-sm mb-3"
                       disabled={isSharing}
                     />
                   </>
@@ -2401,8 +2401,8 @@ export function IntakeSummaryScreen({
                           disabled={isSharing}
                           className={`w-full py-4 px-6 rounded-[14px] transition-all font-medium flex items-center justify-center gap-2 ${
                             isSharing
-                              ? 'bg-[#A8A3BC] text-white cursor-not-allowed'
-                              : 'bg-[#42574E] text-white hover:bg-[#4C1D96] shadow-sm hover:shadow-md'
+                              ? 'bg-[#9AA39B] text-white cursor-not-allowed'
+                              : 'bg-[#42574E] text-white hover:bg-[#42574E] shadow-sm hover:shadow-md'
                           }`}
                         >
                           {isSharing ? (
@@ -2426,10 +2426,10 @@ export function IntakeSummaryScreen({
                             setRoutingSubpanel('firm_code');
                           }}
                           disabled={isSharing}
-                          className={`w-full py-4 px-6 rounded-[14px] border text-[#14112E] font-medium transition-colors flex items-center justify-center gap-2 ${
+                          className={`w-full py-4 px-6 rounded-[14px] border text-[#1B2623] font-medium transition-colors flex items-center justify-center gap-2 ${
                             isSharing
-                              ? 'border-[#ECE7F5] text-[#A8A3BC] cursor-not-allowed'
-                              : 'border-[#D6CEE8] hover:bg-[#F5F1FB]'
+                              ? 'border-[#E4E5DE] text-[#9AA39B] cursor-not-allowed'
+                              : 'border-[#CBD6CF] hover:bg-[#F2F4EC]'
                           }`}
                         >
                           Enter Firm Code
@@ -2442,8 +2442,8 @@ export function IntakeSummaryScreen({
                           disabled={isSharing}
                           className={`w-full py-4 px-6 rounded-[14px] transition-all font-medium flex items-center justify-center gap-2 ${
                             isSharing
-                              ? 'bg-[#A8A3BC] text-white cursor-not-allowed'
-                              : 'bg-[#42574E] text-white hover:bg-[#4C1D96] shadow-sm hover:shadow-md'
+                              ? 'bg-[#9AA39B] text-white cursor-not-allowed'
+                              : 'bg-[#42574E] text-white hover:bg-[#42574E] shadow-sm hover:shadow-md'
                           }`}
                         >
                           {isSharing ? (
@@ -2465,8 +2465,8 @@ export function IntakeSummaryScreen({
                           disabled={isSharing}
                           className={`w-full py-4 px-6 rounded-[14px] transition-all font-medium flex items-center justify-center gap-2 ${
                             isSharing
-                              ? 'bg-[#A8A3BC] text-white cursor-not-allowed'
-                              : 'bg-[#42574E] text-white hover:bg-[#4C1D96] shadow-sm hover:shadow-md'
+                              ? 'bg-[#9AA39B] text-white cursor-not-allowed'
+                              : 'bg-[#42574E] text-white hover:bg-[#42574E] shadow-sm hover:shadow-md'
                           }`}
                         >
                           {isSharing ? (
@@ -2504,8 +2504,8 @@ export function IntakeSummaryScreen({
                     disabled={isSharing}
                     className={`w-full py-4 px-6 rounded-[14px] transition-colors font-medium ${
                       isSharing
-                        ? 'bg-[#F1ECFE] text-[#A8A3BC] cursor-not-allowed'
-                        : 'bg-[#F1ECFE] text-[#14112E] hover:bg-[#ECE7F5]'
+                        ? 'bg-[#F2F4EC] text-[#9AA39B] cursor-not-allowed'
+                        : 'bg-[#F2F4EC] text-[#1B2623] hover:bg-[#E4E5DE]'
                     }`}
                   >
                     Cancel

@@ -82,12 +82,12 @@ export function TimelineDetailScreen({
   return (
     <div className="min-h-screen bg-white">
       {/* Top Navigation */}
-      <nav className="sticky top-0 bg-white/80 backdrop-blur-md border-b border-[#F1ECF8] z-50">
+      <nav className="sticky top-0 bg-white/80 backdrop-blur-md border-b border-[#F2F4EC] z-50">
         <div className="px-6 py-7 flex items-center justify-between gap-3">
           <button
             type="button"
             onClick={() => onNavigate(backScreen)}
-            className="text-xl font-semibold text-[#14112E] hover:opacity-70 transition-opacity duration-200"
+            className="text-xl font-semibold text-[#1B2623] hover:opacity-70 transition-opacity duration-200"
           >
             one3seven
           </button>
@@ -100,7 +100,7 @@ export function TimelineDetailScreen({
         <button
           type="button"
           onClick={() => onNavigate(backScreen)}
-          className="flex items-center gap-1.5 text-xs uppercase tracking-wide text-[#8B86A0] hover:text-[#3A3552] transition-colors duration-200 font-normal"
+          className="flex items-center gap-1.5 text-xs uppercase tracking-wide text-[#7C857F] hover:text-[#384039] transition-colors duration-200 font-normal"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           Back
@@ -114,18 +114,18 @@ export function TimelineDetailScreen({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, ease: 'easeOut' }}
         >
-          <h1 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="text-[32px] leading-[1.2] font-medium text-[#14112E] mb-4 tracking-[-0.01em]">
+          <h1 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="text-[32px] leading-[1.2] font-medium text-[#1B2623] mb-4 tracking-[-0.01em]">
             Clarify This Event
           </h1>
-          <p className="text-base text-[#6B6685] mb-10 leading-relaxed">
+          <p className="text-base text-[#6A6D66] mb-10 leading-relaxed">
             Add any details that may help organize this timeline entry more clearly.
           </p>
 
           {/* Timeline Summary Card */}
-          <div className="mb-8 bg-[#FAF9F6] rounded-[14px] p-6 border border-[#ECE7F5] relative">
+          <div className="mb-8 bg-[#FAF9F6] rounded-[14px] p-6 border border-[#E4E5DE] relative">
             {isUpdatingSummary && (
               <div className="absolute inset-0 bg-[#FAF9F6]/90 rounded-[14px] flex items-center justify-center z-10">
-                <div className="flex items-center gap-2 text-[#3A3552]">
+                <div className="flex items-center gap-2 text-[#384039]">
                   <Loader2 className="w-4 h-4 animate-spin" />
                   <span className="text-xs">Updating timeline note...</span>
                 </div>
@@ -134,12 +134,12 @@ export function TimelineDetailScreen({
 
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
-                <Info className="w-4 h-4 text-[#6B6685]" />
-                <label className="text-sm font-semibold text-[#14112E]">Timeline Note</label>
+                <Info className="w-4 h-4 text-[#6A6D66]" />
+                <label className="text-sm font-semibold text-[#1B2623]">Timeline Note</label>
               </div>
               <button
                 onClick={() => setIsEditingSummary(!isEditingSummary)}
-                className="flex items-center gap-1.5 text-xs text-[#6B6685] hover:text-[#14112E] transition-colors"
+                className="flex items-center gap-1.5 text-xs text-[#6A6D66] hover:text-[#1B2623] transition-colors"
               >
                 <Edit3 className="w-3.5 h-3.5" />
                 Edit timeline note
@@ -150,20 +150,20 @@ export function TimelineDetailScreen({
                 <textarea
                   value={timelineSummary}
                   onChange={(e) => setTimelineSummary(e.target.value)}
-                  className="w-full h-24 px-3 py-3 bg-white border border-[#D6CEE8] rounded-lg text-xs text-[#3A3552] placeholder:text-[#A8A3BC] focus:outline-none focus:ring-2 focus:ring-[#42574E] focus:border-transparent resize-none"
+                  className="w-full h-24 px-3 py-3 bg-white border border-[#CBD6CF] rounded-lg text-xs text-[#384039] placeholder:text-[#9AA39B] focus:outline-none focus:ring-2 focus:ring-[#42574E] focus:border-transparent resize-none"
                 />
-                <p className="text-xs text-[#8B86A0] mt-2 leading-relaxed">
+                <p className="text-xs text-[#7C857F] mt-2 leading-relaxed">
                   You can adjust this summary if you want the timeline entry to describe the record more clearly.
                 </p>
               </>
             ) : (
-              <p className="text-xs text-[#3A3552] leading-relaxed">{timelineSummary}</p>
+              <p className="text-xs text-[#384039] leading-relaxed">{timelineSummary}</p>
             )}
           </div>
 
           {/* Related Uploaded Documents */}
           <div className="mb-8">
-            <label className="text-sm font-semibold text-[#14112E] mb-3 block">
+            <label className="text-sm font-semibold text-[#1B2623] mb-3 block">
               Related Uploaded Documents
             </label>
             <div className="space-y-2">
@@ -172,16 +172,16 @@ export function TimelineDetailScreen({
                 return (
                   <button
                     key={index}
-                    className="w-full bg-[#FAF9F6] rounded-[14px] p-4 border border-[#ECE7F5] hover:border-[#C9B8F0] hover:bg-[#F1ECFE] transition-all flex items-center gap-3 text-left"
+                    className="w-full bg-[#FAF9F6] rounded-[14px] p-4 border border-[#E4E5DE] hover:border-[#7C8B6F] hover:bg-[#F2F4EC] transition-all flex items-center gap-3 text-left"
                   >
-                    <FileText className="w-4 h-4 text-[#6B6685] flex-shrink-0" />
+                    <FileText className="w-4 h-4 text-[#6A6D66] flex-shrink-0" />
                     <div className="flex-1 min-w-0">
-                      <div className="text-sm text-[#14112E] truncate">{fileName}</div>
+                      <div className="text-sm text-[#1B2623] truncate">{fileName}</div>
                     </div>
-                    <div className="inline-block bg-[#ECE7F5] px-2 py-1 rounded text-xs text-[#3A3552] flex-shrink-0">
+                    <div className="inline-block bg-[#E4E5DE] px-2 py-1 rounded text-xs text-[#384039] flex-shrink-0">
                       {timelineItem.category}
                     </div>
-                    <div className="text-xs text-[#6B6685] flex-shrink-0">Open</div>
+                    <div className="text-xs text-[#6A6D66] flex-shrink-0">Open</div>
                   </button>
                 );
               })}
@@ -191,18 +191,18 @@ export function TimelineDetailScreen({
 
           {/* Worker-added context */}
           <div className="mb-12">
-            <label className="text-sm font-semibold text-[#14112E] mb-3 block">Added context</label>
+            <label className="text-sm font-semibold text-[#1B2623] mb-3 block">Added context</label>
             <textarea
               value={context}
               onChange={(e) => setContext(e.target.value)}
               placeholder="Add factual details that help interpret this timeline entry. This saves with your intake."
-              className="w-full h-32 px-4 py-3 bg-[#FAF9F6] border border-[#ECE7F5] rounded-[14px] text-sm text-[#14112E] placeholder:text-[#A8A3BC] focus:outline-none focus:ring-2 focus:ring-[#42574E] focus:border-transparent resize-none leading-relaxed"
+              className="w-full h-32 px-4 py-3 bg-[#FAF9F6] border border-[#E4E5DE] rounded-[14px] text-sm text-[#1B2623] placeholder:text-[#9AA39B] focus:outline-none focus:ring-2 focus:ring-[#42574E] focus:border-transparent resize-none leading-relaxed"
             />
             {context.trim().length > 0 && (
               <motion.div
                 initial={{ opacity: 0, y: -5 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mt-3 flex items-start gap-2 text-xs text-[#6B6685]"
+                className="mt-3 flex items-start gap-2 text-xs text-[#6A6D66]"
               >
                 <Info className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
                 <span className="leading-relaxed">
@@ -237,13 +237,13 @@ export function TimelineDetailScreen({
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                className="mb-6 bg-[#FAF9F6] rounded-[14px] p-5 border border-[#ECE7F5]"
+                className="mb-6 bg-[#FAF9F6] rounded-[14px] p-5 border border-[#E4E5DE]"
               >
                 <div className="flex items-center gap-3 mb-3">
-                  <Loader2 className="w-5 h-5 text-[#6B6685] animate-spin flex-shrink-0" />
-                  <span className="text-sm text-[#3A3552] font-medium">Updating organized timeline</span>
+                  <Loader2 className="w-5 h-5 text-[#6A6D66] animate-spin flex-shrink-0" />
+                  <span className="text-sm text-[#384039] font-medium">Updating organized timeline</span>
                 </div>
-                <div className="text-xs text-[#6B6685] leading-relaxed">
+                <div className="text-xs text-[#6A6D66] leading-relaxed">
                   Organizing related records and updating the timeline...
                 </div>
               </motion.div>
@@ -257,8 +257,8 @@ export function TimelineDetailScreen({
               disabled={isSaving}
               className={`w-full py-4 px-6 rounded-[14px] transition-all shadow-sm font-medium flex items-center justify-center gap-2 ${
                 isSaving
-                  ? 'bg-[#A8A3BC] text-white cursor-not-allowed'
-                  : 'bg-[#42574E] text-white hover:bg-[#4C1D96] hover:shadow-md'
+                  ? 'bg-[#9AA39B] text-white cursor-not-allowed'
+                  : 'bg-[#42574E] text-white hover:bg-[#42574E] hover:shadow-md'
               }`}
             >
               {isSaving ? (
@@ -278,8 +278,8 @@ export function TimelineDetailScreen({
               disabled={isSaving}
               className={`w-full py-4 px-6 rounded-[14px] transition-colors font-medium ${
                 isSaving
-                  ? 'bg-[#F1ECFE] text-[#A8A3BC] cursor-not-allowed'
-                  : 'bg-[#F1ECFE] text-[#14112E] hover:bg-[#ECE7F5]'
+                  ? 'bg-[#F2F4EC] text-[#9AA39B] cursor-not-allowed'
+                  : 'bg-[#F2F4EC] text-[#1B2623] hover:bg-[#E4E5DE]'
               }`}
             >
               Cancel

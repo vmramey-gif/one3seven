@@ -69,18 +69,18 @@ export function FirmTimelineEventCard({
       <div className="relative flex-shrink-0 pt-1">
         {!isLast ? (
           <div
-            className="absolute left-1/2 top-[2.75rem] -bottom-6 w-[2px] -translate-x-1/2 rounded-full bg-gradient-to-b from-[#D9CEFF] to-[#EFEAFF]"
+            className="absolute left-1/2 top-[2.75rem] -bottom-6 w-[2px] -translate-x-1/2 rounded-full bg-gradient-to-b from-[#CBD6CF] to-[#F2F4EC]"
             aria-hidden="true"
           />
         ) : null}
         <div
           className={`relative w-9 h-9 rounded-full border-2 flex items-center justify-center ${
             important
-              ? 'border-[#42574E] bg-[#F1ECFF]'
+              ? 'border-[#42574E] bg-[#F2F4EC]'
               : 'border-[#CBD6CF] bg-white'
           }`}
         >
-          <div className={`h-2 w-2 rounded-full ${important ? 'bg-[#42574E]' : 'bg-[#B8A8FF]'}`} />
+          <div className={`h-2 w-2 rounded-full ${important ? 'bg-[#42574E]' : 'bg-[#7C8B6F]'}`} />
         </div>
       </div>
       <div className="min-w-0 flex-1 rounded-2xl border border-[#D3DED6] bg-white/95 p-5 shadow-[0_16px_46px_rgba(31,27,75,0.09)]">
@@ -89,7 +89,7 @@ export function FirmTimelineEventCard({
             {displayDate}
             {dateIsInferred ? <span className="ml-1 text-[10px] font-normal normal-case tracking-normal text-[#42574E]/55">(year from filename)</span> : null}
           </span>
-          <span className="rounded-md border border-[#D3DED6] bg-[#F7F3FF] px-2 py-0.5 text-[11px] text-[#1E1B4B]/62">
+          <span className="rounded-md border border-[#D3DED6] bg-[#F7F9F5] px-2 py-0.5 text-[11px] text-[#1B2623]/62">
             {displayCategory}
           </span>
           {confidenceLabel ? (
@@ -102,42 +102,42 @@ export function FirmTimelineEventCard({
               {confidenceLabel}
             </span>
           ) : null}
-          <span className="ml-auto flex items-center gap-1 text-[11px] text-[#1E1B4B]/50">
+          <span className="ml-auto flex items-center gap-1 text-[11px] text-[#1B2623]/50">
             <FileText className="w-3 h-3" />
             {relatedDocs} supporting {relatedDocs === 1 ? 'record' : 'records'}
           </span>
         </div>
-        <h3 className="mb-2 text-lg font-semibold text-[#1E1B4B] break-words overflow-hidden">{displayTitle}</h3>
-        <p className={`text-sm text-[#1E1B4B]/68 leading-relaxed whitespace-pre-wrap break-words ${!open && hasLongSummary ? 'line-clamp-3' : ''}`}>{displaySummary}</p>
+        <h3 className="mb-2 text-lg font-semibold text-[#1B2623] break-words overflow-hidden">{displayTitle}</h3>
+        <p className={`text-sm text-[#1B2623]/68 leading-relaxed whitespace-pre-wrap break-words ${!open && hasLongSummary ? 'line-clamp-3' : ''}`}>{displaySummary}</p>
         {canExpand ? (
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
-            className="mt-2 text-xs font-medium text-[#374A42] hover:text-[#1E1B4B]"
+            className="mt-2 text-xs font-medium text-[#374A42] hover:text-[#1B2623]"
           >
             {open ? FIRM_INTAKE_ACTIONS.showLess : FIRM_INTAKE_ACTIONS.showMore}
           </button>
         ) : null}
         {hasSupportingRecords && open ? (
           <div className="pt-3 mt-3 border-t border-[#D3DED6]">
-            <div className="text-[11px] text-[#1E1B4B]/50 mb-2">Supporting Records</div>
+            <div className="text-[11px] text-[#1B2623]/50 mb-2">Supporting Records</div>
             <div className="flex flex-wrap gap-1.5">
               {labels.map((label) => (
                 <span
                   key={label}
-                  className="max-w-[200px] truncate px-2 py-1 bg-[#F7F3FF] text-[11px] text-[#1E1B4B]/68 rounded border border-[#D3DED6]"
+                  className="max-w-[200px] truncate px-2 py-1 bg-[#F7F9F5] text-[11px] text-[#1B2623]/68 rounded border border-[#D3DED6]"
                   title={label.replace(/_/g, ' ').replace(/\.[^.]+$/, '')}
                 >
                   {label.replace(/_/g, ' ').replace(/\.[^.]+$/, '')}
                 </span>
               ))}
               {relatedDocLabels.length === 0 ? (
-                <span className="max-w-full break-words px-2 py-1 bg-[#F7F3FF] text-[11px] text-[#1E1B4B]/68 rounded border border-[#D3DED6]">
+                <span className="max-w-full break-words px-2 py-1 bg-[#F7F9F5] text-[11px] text-[#1B2623]/68 rounded border border-[#D3DED6]">
                   {relatedDocs} record{relatedDocs === 1 ? '' : 's'} in this category
                 </span>
               ) : null}
               {relatedDocLabels.length > 6 ? (
-                <span className="max-w-full break-words px-2 py-1 text-[11px] text-[#1E1B4B]/45">
+                <span className="max-w-full break-words px-2 py-1 text-[11px] text-[#1B2623]/45">
                   +{relatedDocLabels.length - 6} more
                 </span>
               ) : null}

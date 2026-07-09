@@ -38,7 +38,7 @@ export function WageExposureReviewSection({
   return (
     <section
       className="rounded-2xl border p-5"
-      style={{ borderColor: 'var(--o3s-border, #d3ded6)', background: 'var(--o3s-surface, #fff)', color: 'var(--o3s-text, #1e1b4b)' }}
+      style={{ borderColor: 'var(--o3s-border, #d3ded6)', background: 'var(--o3s-surface, #fff)', color: 'var(--o3s-text, #1B2623)' }}
     >
       <div className="mb-3 flex items-center gap-2">
         <h3 className="text-base font-semibold">Wage exposure estimate</h3>

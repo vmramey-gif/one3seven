@@ -125,7 +125,7 @@ export function CitationPanel({
       className="fixed right-0 top-0 z-50 flex h-full w-full max-w-md flex-col border-l shadow-2xl"
       style={{
         background: 'var(--o3s-surface, #ffffff)',
-        color: 'var(--o3s-text, #1e1b4b)',
+        color: 'var(--o3s-text, #1B2623)',
         borderColor: 'var(--o3s-border, #d3ded6)',
       }}
       aria-label="Source citation"
@@ -149,7 +149,7 @@ export function CitationPanel({
         </div>
         <p
           className="mt-2 rounded-md px-2 py-1.5 text-xs leading-relaxed"
-          style={{ background: 'var(--o3s-primary-soft, #f3efff)', color: 'var(--o3s-text, #1e1b4b)' }}
+          style={{ background: 'var(--o3s-primary-soft, #f3efff)', color: 'var(--o3s-text, #1B2623)' }}
         >
           “{citation.sourceText}”
         </p>

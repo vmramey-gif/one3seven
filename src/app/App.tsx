@@ -3905,7 +3905,7 @@ export default function App() {
     return (
       <div className="min-h-screen bg-[#f8f6ff] flex items-center justify-center px-6">
         <div className="text-center">
-          <p className="text-lg font-semibold text-[#1E1B4B]"><WordMark /></p>
+          <p className="text-lg font-semibold text-[#1B2623]"><WordMark /></p>
           <p className="mt-2 text-sm text-[#66708f]">Restoring your secure session…</p>
         </div>
       </div>
@@ -4028,7 +4028,7 @@ export default function App() {
           {currentScreen === 'firmDirectedIntake' && !firmDirectedContext && (
             <motion.div key="firmDirectedIntakeLoading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               className="flex min-h-screen items-center justify-center bg-[#F2F4EC]">
-              <span className="text-sm text-[#1E1B4B]/40">Loading…</span>
+              <span className="text-sm text-[#1B2623]/40">Loading…</span>
             </motion.div>
           )}
           {currentScreen === 'firmDirectedIntake' && firmDirectedContext && (

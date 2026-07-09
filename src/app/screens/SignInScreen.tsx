@@ -38,12 +38,12 @@ export function SignInScreen({ onNavigate, onSignIn, onGoogleAuth }: SignInScree
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF9F6] text-[#14112E]">
+    <div className="min-h-screen bg-[#FAF9F6] text-[#1B2623]">
       {/* Back Navigation */}
       <div className="px-6 pt-6">
         <button
           onClick={() => onNavigate('authWelcome')}
-          className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-normal uppercase tracking-wide text-[#14112E]/60 transition-colors duration-200 hover:bg-[#F5F1FB] hover:text-[#14112E]"
+          className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-normal uppercase tracking-wide text-[#1B2623]/60 transition-colors duration-200 hover:bg-[#F2F4EC] hover:text-[#1B2623]"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           Back
@@ -57,13 +57,13 @@ export function SignInScreen({ onNavigate, onSignIn, onGoogleAuth }: SignInScree
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="rounded-[32px] border border-[#ECE7F5] bg-white/95 p-6 shadow-[0_28px_90px_rgba(31,27,75,0.12)] sm:p-8"
+            className="rounded-[32px] border border-[#E4E5DE] bg-white/95 p-6 shadow-[0_28px_90px_rgba(31,27,75,0.12)] sm:p-8"
           >
             {/* Logo */}
             <div className="mb-8 text-center">
               <SeedMark size={36} className="mx-auto mb-3" />
-              <h1 className="mb-2 text-xl font-semibold text-[#14112E]"><WordMark /></h1>
-              <p className="text-sm text-[#14112E]/64">Sign in to continue</p>
+              <h1 className="mb-2 text-xl font-semibold text-[#1B2623]"><WordMark /></h1>
+              <p className="text-sm text-[#1B2623]/64">Sign in to continue</p>
             </div>
 
             {apiError && (
@@ -79,30 +79,30 @@ export function SignInScreen({ onNavigate, onSignIn, onGoogleAuth }: SignInScree
             {/* Sign In Form */}
             <form onSubmit={handleSubmit} className="mb-6 space-y-4">
               <div>
-                <label className="mb-2 block text-sm font-medium text-[#14112E]">Email</label>
+                <label className="mb-2 block text-sm font-medium text-[#1B2623]">Email</label>
                 <div className="relative">
-                  <Mail className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#14112E]/38" />
+                  <Mail className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#1B2623]/38" />
                   <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="your@email.com"
-                    className="w-full rounded-2xl border border-[#ECE7F5] bg-[#FAF9F6] py-4 pl-12 pr-4 text-sm text-[#14112E] placeholder:text-[#14112E]/38 focus:border-[#42574E] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#42574E]/10"
+                    className="w-full rounded-2xl border border-[#E4E5DE] bg-[#FAF9F6] py-4 pl-12 pr-4 text-sm text-[#1B2623] placeholder:text-[#1B2623]/38 focus:border-[#42574E] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#42574E]/10"
                     required
                   />
                 </div>
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-[#14112E]">Password</label>
+                <label className="mb-2 block text-sm font-medium text-[#1B2623]">Password</label>
                 <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#14112E]/38" />
+                  <Lock className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#1B2623]/38" />
                   <input
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full rounded-2xl border border-[#ECE7F5] bg-[#FAF9F6] py-4 pl-12 pr-4 text-sm text-[#14112E] placeholder:text-[#14112E]/38 focus:border-[#42574E] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#42574E]/10"
+                    className="w-full rounded-2xl border border-[#E4E5DE] bg-[#FAF9F6] py-4 pl-12 pr-4 text-sm text-[#1B2623] placeholder:text-[#1B2623]/38 focus:border-[#42574E] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#42574E]/10"
                     required
                   />
                 </div>
@@ -111,7 +111,7 @@ export function SignInScreen({ onNavigate, onSignIn, onGoogleAuth }: SignInScree
               <button
                 type="submit"
                 disabled={submitting}
-                className="flex w-full items-center justify-center gap-2 rounded-full bg-[#42574E] px-6 py-4 font-medium text-white shadow-[0_18px_48px_rgba(109,74,255,0.26)] transition hover:-translate-y-0.5 hover:bg-[#4C1D96] disabled:translate-y-0 disabled:opacity-60"
+                className="flex w-full items-center justify-center gap-2 rounded-full bg-[#42574E] px-6 py-4 font-medium text-white shadow-[0_18px_48px_rgba(109,74,255,0.26)] transition hover:-translate-y-0.5 hover:bg-[#42574E] disabled:translate-y-0 disabled:opacity-60"
               >
                 Continue
                 <ArrowRight className="w-5 h-5" />
@@ -127,7 +127,7 @@ export function SignInScreen({ onNavigate, onSignIn, onGoogleAuth }: SignInScree
                     'Password reset will connect through Supabase Auth when email templates are configured.'
                   )
                 }
-                className="text-sm text-[#14112E]/64 transition-colors hover:text-[#14112E]"
+                className="text-sm text-[#1B2623]/64 transition-colors hover:text-[#1B2623]"
               >
                 Forgot password?
               </button>
@@ -136,10 +136,10 @@ export function SignInScreen({ onNavigate, onSignIn, onGoogleAuth }: SignInScree
             {/* Divider */}
             <div className="relative mb-6">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-[#ECE7F5]"></div>
+                <div className="w-full border-t border-[#E4E5DE]"></div>
               </div>
               <div className="relative flex justify-center text-xs">
-                <span className="bg-white px-3 uppercase tracking-wide text-[#14112E]/52">Or</span>
+                <span className="bg-white px-3 uppercase tracking-wide text-[#1B2623]/52">Or</span>
               </div>
             </div>
 
@@ -148,7 +148,7 @@ export function SignInScreen({ onNavigate, onSignIn, onGoogleAuth }: SignInScree
               <button
                 type="button"
                 onClick={() => void onGoogleAuth()}
-                className="w-full rounded-full border border-[#ECE7F5] bg-white px-6 py-4 text-sm font-medium text-[#14112E] shadow-[0_12px_32px_rgba(31,27,75,0.08)] transition-colors hover:bg-[#F5F1FB]"
+                className="w-full rounded-full border border-[#E4E5DE] bg-white px-6 py-4 text-sm font-medium text-[#1B2623] shadow-[0_12px_32px_rgba(31,27,75,0.08)] transition-colors hover:bg-[#F2F4EC]"
               >
                 Continue with Google
               </button>
@@ -156,11 +156,11 @@ export function SignInScreen({ onNavigate, onSignIn, onGoogleAuth }: SignInScree
 
             {/* Create Account — open to workers */}
             <div className="mt-8 text-center">
-              <span className="text-sm text-[#14112E]/64">New here? </span>
+              <span className="text-sm text-[#1B2623]/64">New here? </span>
               <button
                 type="button"
                 onClick={() => onNavigate('createAccount')}
-                className="text-sm font-medium text-[#42574E] transition-colors hover:text-[#4C1D96]"
+                className="text-sm font-medium text-[#42574E] transition-colors hover:text-[#42574E]"
               >
                 Create an account
               </button>

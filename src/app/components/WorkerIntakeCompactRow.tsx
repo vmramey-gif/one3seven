@@ -41,19 +41,19 @@ export function WorkerIntakeCompactRow({
         type={onOpenWorkspace ? 'button' : undefined}
         onClick={onOpenWorkspace}
         className={`flex w-full items-start justify-between gap-3 rounded-[14px] px-1 py-1.5 text-left ${
-          onOpenWorkspace ? 'cursor-pointer hover:bg-[#F7F3FF] focus:outline-none focus:ring-2 focus:ring-[#CBD6CF]' : ''
+          onOpenWorkspace ? 'cursor-pointer hover:bg-[#F7F9F5] focus:outline-none focus:ring-2 focus:ring-[#CBD6CF]' : ''
         }`}
       >
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-medium tracking-tight text-[#1E1B4B]">
+          <p className="truncate text-sm font-medium tracking-tight text-[#1B2623]">
             Employment Records Intake
           </p>
-          <p className="mt-0.5 truncate text-[10px] text-[#1E1B4B]/48">Reference: {intakeNumber}</p>
+          <p className="mt-0.5 truncate text-[10px] text-[#1B2623]/48">Reference: {intakeNumber}</p>
           {statusLabel ? (
-            <p className="mt-0.5 truncate text-xs text-[#1E1B4B]/64">{statusLabel}</p>
+            <p className="mt-0.5 truncate text-xs text-[#1B2623]/64">{statusLabel}</p>
           ) : null}
           {lastActivity ? (
-            <p className="mt-0.5 text-[10px] text-[#1E1B4B]/48">{lastActivity}</p>
+            <p className="mt-0.5 text-[10px] text-[#1B2623]/48">{lastActivity}</p>
           ) : null}
         </div>
       </HeaderElement>

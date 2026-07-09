@@ -192,13 +192,13 @@ export function DemoApp() {
   return (
     <div className="relative">
       {/* Slim fixed banner — brand + CTA only, stays out of the way */}
-      <div className="fixed bottom-0 left-0 right-0 z-[999] bg-[#14112E]/95 backdrop-blur text-white px-4 py-2.5 flex items-center justify-between gap-3 border-t border-white/10">
+      <div className="fixed bottom-0 left-0 right-0 z-[999] bg-[#1B2623]/95 backdrop-blur text-white px-4 py-2.5 flex items-center justify-between gap-3 border-t border-white/10">
         <p className="text-xs text-white/50 truncate">
           one3seven · Sample intake preview
         </p>
         <button
           onClick={handleSignUp}
-          className="shrink-0 rounded-full bg-[#42574E] px-4 py-1.5 text-xs font-semibold text-white hover:bg-[#4C1D96] transition-colors"
+          className="shrink-0 rounded-full bg-[#42574E] px-4 py-1.5 text-xs font-semibold text-white hover:bg-[#42574E] transition-colors"
         >
           Get your firm intake link →
         </button>

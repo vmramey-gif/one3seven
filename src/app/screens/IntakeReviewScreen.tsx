@@ -115,18 +115,18 @@ interface DocumentCategory {
   documents: FirmDocumentEntry[];
 }
 
-const FIRM_REVIEW_PAGE = 'min-h-screen bg-[#FAF9F6] text-[#14112E]';
-const FIRM_REVIEW_NAV = 'sticky top-0 z-50 border-b border-[#ECE7F5] bg-white/90 backdrop-blur';
+const FIRM_REVIEW_PAGE = 'min-h-screen bg-[#FAF9F6] text-[#1B2623]';
+const FIRM_REVIEW_NAV = 'sticky top-0 z-50 border-b border-[#E4E5DE] bg-white/90 backdrop-blur';
 const FIRM_REVIEW_PROMINENT_CARD =
-  'rounded-[28px] border border-[#ECE7F5] bg-white/95 p-6 shadow-[0_28px_90px_rgba(31,27,75,0.12)] sm:p-8';
+  'rounded-[28px] border border-[#E4E5DE] bg-white/95 p-6 shadow-[0_28px_90px_rgba(31,27,75,0.12)] sm:p-8';
 const FIRM_REVIEW_CARD =
-  'rounded-[24px] border border-[#ECE7F5] bg-white/92 p-5 shadow-[0_18px_56px_rgba(31,27,75,0.09)]';
+  'rounded-[24px] border border-[#E4E5DE] bg-white/92 p-5 shadow-[0_18px_56px_rgba(31,27,75,0.09)]';
 const FIRM_REVIEW_QUIET_CARD =
-  'rounded-[20px] border border-[#ECE7F5] bg-white/70 p-4 shadow-[0_10px_30px_rgba(31,27,75,0.05)]';
+  'rounded-[20px] border border-[#E4E5DE] bg-white/70 p-4 shadow-[0_10px_30px_rgba(31,27,75,0.05)]';
 const FIRM_REVIEW_PRIMARY_BUTTON =
-  'bg-[#42574E] text-white shadow-[0_14px_34px_rgba(109,74,255,0.24)] hover:bg-[#4C1D96]';
+  'bg-[#42574E] text-white shadow-[0_14px_34px_rgba(109,74,255,0.24)] hover:bg-[#42574E]';
 const FIRM_REVIEW_SECONDARY_BUTTON =
-  'border border-[#ECE7F5] bg-white text-[#14112E] shadow-sm hover:border-[#C9B8F0] hover:bg-[#F5F1FB]';
+  'border border-[#E4E5DE] bg-white text-[#1B2623] shadow-sm hover:border-[#7C8B6F] hover:bg-[#F2F4EC]';
 
 function firmDocumentEntryKey(entry: FirmDocumentEntry): string {
   return entry.uploadedFileId ?? entry.label;
@@ -575,14 +575,14 @@ export function IntakeReviewScreen({
               <button
                 type="button"
                 onClick={() => onNavigate('firmDashboard')}
-                className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#14112E]/65 transition-colors hover:bg-[#F5F1FB] hover:text-[#14112E]"
+                className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#1B2623]/65 transition-colors hover:bg-[#F2F4EC] hover:text-[#1B2623]"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Back to Dashboard
               </button>
               <div className="min-w-0 flex-1">
-                <h1 className="text-lg font-semibold text-[#14112E]">Intake Review</h1>
-                <p className="text-xs text-[#14112E]/52">{intakeReviewReferenceLabel}</p>
+                <h1 className="text-lg font-semibold text-[#1B2623]">Intake Review</h1>
+                <p className="text-xs text-[#1B2623]/52">{intakeReviewReferenceLabel}</p>
               </div>
             </div>
           </div>
@@ -603,21 +603,21 @@ export function IntakeReviewScreen({
               <button
                 type="button"
                 onClick={() => onNavigate('firmDashboard')}
-                className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#14112E]/65 transition-colors hover:bg-[#F5F1FB] hover:text-[#14112E]"
+                className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#1B2623]/65 transition-colors hover:bg-[#F2F4EC] hover:text-[#1B2623]"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Back to Dashboard
               </button>
               <div className="min-w-0 flex-1">
-                <h1 className="text-lg font-semibold text-[#14112E]">Intake Review</h1>
-                <p className="text-xs text-[#14112E]/52">{intakeReviewReferenceLabel}</p>
+                <h1 className="text-lg font-semibold text-[#1B2623]">Intake Review</h1>
+                <p className="text-xs text-[#1B2623]/52">{intakeReviewReferenceLabel}</p>
               </div>
             </div>
           </div>
         </nav>
         <div className="max-w-lg mx-auto px-6 py-16 text-center">
-          <p className="text-sm text-[#14112E] mb-2">This intake preview could not be loaded.</p>
-          <p className="text-xs text-[#6B6685] leading-relaxed mb-6">
+          <p className="text-sm text-[#1B2623] mb-2">This intake preview could not be loaded.</p>
+          <p className="text-xs text-[#6A6D66] leading-relaxed mb-6">
             Return to your dashboard and open the intake again. If the issue continues, confirm your session is still active.
           </p>
           <button
@@ -898,12 +898,12 @@ export function IntakeReviewScreen({
     <div className={FIRM_REVIEW_PAGE}>
       {/* Top Navigation — slim bar in demo mode, full chrome otherwise */}
       {demoMode ? (
-        <nav className="sticky top-0 z-50 border-b border-[#ECE7F5] bg-white/95 backdrop-blur">
+        <nav className="sticky top-0 z-50 border-b border-[#E4E5DE] bg-white/95 backdrop-blur">
           <div className="flex items-center justify-between px-5 py-2.5">
             <div className="flex items-center gap-2.5">
-              <span className="text-sm font-semibold text-[#14112E]"><WordMark /></span>
-              <span className="hidden sm:inline text-[#ECE7F5]">·</span>
-              <span className="hidden sm:inline text-xs text-[#14112E]/50">Firm intake review</span>
+              <span className="text-sm font-semibold text-[#1B2623]"><WordMark /></span>
+              <span className="hidden sm:inline text-[#E4E5DE]">·</span>
+              <span className="hidden sm:inline text-xs text-[#1B2623]/50">Firm intake review</span>
             </div>
             <div className="flex items-center gap-2.5">
               {/* Desktop quick actions — always accessible without scrolling */}
@@ -918,12 +918,12 @@ export function IntakeReviewScreen({
               )}
               <button
                 onClick={handleDownloadSummary}
-                className="hidden lg:flex items-center gap-1.5 rounded-full bg-[#42574E] px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-[#4C1D96] transition-colors"
+                className="hidden lg:flex items-center gap-1.5 rounded-full bg-[#42574E] px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-[#42574E] transition-colors"
               >
                 <Download className="w-3.5 h-3.5" />
                 Download
               </button>
-              <span className="rounded-full border border-[#ECE7F5] bg-[#F5F1FB] px-3 py-1 text-[11px] font-medium text-[#42574E]">
+              <span className="rounded-full border border-[#E4E5DE] bg-[#F2F4EC] px-3 py-1 text-[11px] font-medium text-[#42574E]">
                 Sample intake
               </span>
             </div>
@@ -936,15 +936,15 @@ export function IntakeReviewScreen({
               <button
                 type="button"
                 onClick={() => onNavigate('firmDashboard')}
-                className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#14112E]/65 transition-colors hover:bg-[#F5F1FB] hover:text-[#14112E]"
+                className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#1B2623]/65 transition-colors hover:bg-[#F2F4EC] hover:text-[#1B2623]"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Back to Review Queue
               </button>
-              <div className="hidden h-6 w-px bg-[#ECE7F5] sm:block" />
+              <div className="hidden h-6 w-px bg-[#E4E5DE] sm:block" />
               <div className="min-w-0 flex-1">
-                <h1 className="text-lg font-semibold text-[#14112E]">Intake Review</h1>
-                <p className="text-xs text-[#14112E]/52">{intakeReviewReferenceLabel}</p>
+                <h1 className="text-lg font-semibold text-[#1B2623]">Intake Review</h1>
+                <p className="text-xs text-[#1B2623]/52">{intakeReviewReferenceLabel}</p>
               </div>
               <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto sm:justify-end">
                 {/* Desktop quick actions */}
@@ -959,7 +959,7 @@ export function IntakeReviewScreen({
                 )}
                 <button
                   onClick={handleDownloadSummary}
-                  className="hidden lg:flex items-center gap-1.5 rounded-full bg-[#42574E] px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-[#4C1D96] transition-colors"
+                  className="hidden lg:flex items-center gap-1.5 rounded-full bg-[#42574E] px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-[#42574E] transition-colors"
                 >
                   <Download className="w-3.5 h-3.5" />
                   Download
@@ -969,7 +969,7 @@ export function IntakeReviewScreen({
                   <button
                     type="button"
                     onClick={onOpenFirmSettings}
-                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#14112E]/65 hover:bg-[#F5F1FB] hover:text-[#14112E]"
+                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#1B2623]/65 hover:bg-[#F2F4EC] hover:text-[#1B2623]"
                   >
                     <Settings className="w-4 h-4" />
                     Settings
@@ -979,7 +979,7 @@ export function IntakeReviewScreen({
                   <button
                     type="button"
                     onClick={onFirmSignOut}
-                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#14112E]/52 hover:bg-[#F5F1FB] hover:text-[#14112E]"
+                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#1B2623]/52 hover:bg-[#F2F4EC] hover:text-[#1B2623]"
                   >
                     <LogOut className="w-4 h-4" />
                     Sign out
@@ -993,10 +993,10 @@ export function IntakeReviewScreen({
 
       {firmLiveView && !demoMode ? (
         <div
-          className="border-b border-[#ECE7F5] bg-white/82"
+          className="border-b border-[#E4E5DE] bg-white/82"
         >
           <div
-            className="flex flex-wrap items-center gap-3 px-6 py-3 text-sm text-[#14112E]/65"
+            className="flex flex-wrap items-center gap-3 px-6 py-3 text-sm text-[#1B2623]/65"
           >
             <span>
               <strong>Access:</strong>{' '}
@@ -1048,7 +1048,7 @@ export function IntakeReviewScreen({
 
       {/* Demo orientation strip — sets context before the attorney reads a single word */}
       {demoMode && (
-        <div className="bg-[#14112E] px-5 py-4 border-b border-[#221B47]">
+        <div className="bg-[#1B2623] px-5 py-4 border-b border-[#2C3A34]">
           <p className="text-sm text-white/90 leading-relaxed max-w-2xl">
             Marcus Rivera submitted 11 documents last night.{' '}
             <span className="text-[#7C8B6F]">
@@ -1131,9 +1131,9 @@ export function IntakeReviewScreen({
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="rounded-[20px] border border-[#ECE7F5] bg-[#14112E] p-5 shadow-[0_14px_38px_rgba(31,27,75,0.18)]"
+                  className="rounded-[20px] border border-[#E4E5DE] bg-[#1B2623] p-5 shadow-[0_14px_38px_rgba(31,27,75,0.18)]"
                 >
-                  <p className="text-xs uppercase tracking-[0.2em] text-[#C9B8F0] mb-3">Intake Snapshot</p>
+                  <p className="text-xs uppercase tracking-[0.2em] text-[#7C8B6F] mb-3">Intake Snapshot</p>
                   <div className="flex flex-wrap gap-x-8 gap-y-3">
                     {snapshotItems.map(item => (
                       <div key={item.label}>
@@ -1178,7 +1178,7 @@ export function IntakeReviewScreen({
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.03 }}
-                  className="rounded-[20px] border border-[#ECE7F5] bg-white/95 p-5 shadow-[0_14px_38px_rgba(31,27,75,0.08)]"
+                  className="rounded-[20px] border border-[#E4E5DE] bg-white/95 p-5 shadow-[0_14px_38px_rgba(31,27,75,0.08)]"
                 >
                   <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#42574E] mb-4">Processing Summary</p>
 
@@ -1188,7 +1188,7 @@ export function IntakeReviewScreen({
                       className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium ${
                         hasStory
                           ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
-                          : 'border-[#ECE7F5] bg-[#FAF9F6] text-[#14112E]/52'
+                          : 'border-[#E4E5DE] bg-[#FAF9F6] text-[#1B2623]/52'
                       }`}
                     >
                       {hasStory ? <CheckCircle2 className="w-3 h-3" /> : <Clock className="w-3 h-3" />}
@@ -1200,15 +1200,15 @@ export function IntakeReviewScreen({
                   {(recordCount > 0 || eventCount > 0 || gapCount > 0) ? (
                     <div className="flex flex-wrap gap-2.5">
                       {recordCount > 0 ? (
-                        <div className="min-w-[104px] flex-1 rounded-[14px] border border-[#ECE7F5] bg-[#FAF9F6] p-3 text-center">
+                        <div className="min-w-[104px] flex-1 rounded-[14px] border border-[#E4E5DE] bg-[#FAF9F6] p-3 text-center">
                           <div className="text-[26px] font-black leading-none text-[#42574E]">{recordCount}</div>
-                          <div className="mt-1 text-[11px] font-semibold text-[#14112E]/55">Documents organized</div>
+                          <div className="mt-1 text-[11px] font-semibold text-[#1B2623]/55">Documents organized</div>
                         </div>
                       ) : null}
                       {eventCount > 0 ? (
-                        <div className="min-w-[104px] flex-1 rounded-[14px] border border-[#ECE7F5] bg-[#FAF9F6] p-3 text-center">
+                        <div className="min-w-[104px] flex-1 rounded-[14px] border border-[#E4E5DE] bg-[#FAF9F6] p-3 text-center">
                           <div className="text-[26px] font-black leading-none text-[#42574E]">{eventCount}</div>
-                          <div className="mt-1 text-[11px] font-semibold text-[#14112E]/55">Timeline events</div>
+                          <div className="mt-1 text-[11px] font-semibold text-[#1B2623]/55">Timeline events</div>
                         </div>
                       ) : null}
                       {gapCount > 0 ? (
@@ -1222,10 +1222,10 @@ export function IntakeReviewScreen({
 
                   {/* Worker context signals — employment status, arbitration, prior filing */}
                   {followUp && (followUp.employmentStatus || followUp.arbitrationAgreement || followUp.priorAgencyFiling) ? (
-                    <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-[#ECE7F5]">
+                    <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-[#E4E5DE]">
                       {followUp.employmentStatus ? (
-                        <span className="inline-flex items-center rounded-full border border-[#ECE7F5] bg-[#F5F1FB] px-3 py-1.5 text-xs text-[#14112E]/72">
-                          <span className="font-medium text-[#14112E]/45 mr-1.5">Employment:</span>
+                        <span className="inline-flex items-center rounded-full border border-[#E4E5DE] bg-[#F2F4EC] px-3 py-1.5 text-xs text-[#1B2623]/72">
+                          <span className="font-medium text-[#1B2623]/45 mr-1.5">Employment:</span>
                           {followUp.employmentStatus === 'still_employed'
                             ? 'Still employed'
                             : followUp.employmentStatus === 'employment_ended'
@@ -1234,8 +1234,8 @@ export function IntakeReviewScreen({
                         </span>
                       ) : null}
                       {followUp.arbitrationAgreement ? (
-                        <span className="inline-flex items-center rounded-full border border-[#ECE7F5] bg-[#F5F1FB] px-3 py-1.5 text-xs text-[#14112E]/72">
-                          <span className="font-medium text-[#14112E]/45 mr-1.5">Arbitration:</span>
+                        <span className="inline-flex items-center rounded-full border border-[#E4E5DE] bg-[#F2F4EC] px-3 py-1.5 text-xs text-[#1B2623]/72">
+                          <span className="font-medium text-[#1B2623]/45 mr-1.5">Arbitration:</span>
                           {followUp.arbitrationAgreement === 'yes'
                             ? 'Agreement on file'
                             : followUp.arbitrationAgreement === 'no'
@@ -1244,8 +1244,8 @@ export function IntakeReviewScreen({
                         </span>
                       ) : null}
                       {followUp.priorAgencyFiling ? (
-                        <span className="inline-flex items-center rounded-full border border-[#ECE7F5] bg-[#F5F1FB] px-3 py-1.5 text-xs text-[#14112E]/72">
-                          <span className="font-medium text-[#14112E]/45 mr-1.5">Prior filing:</span>
+                        <span className="inline-flex items-center rounded-full border border-[#E4E5DE] bg-[#F2F4EC] px-3 py-1.5 text-xs text-[#1B2623]/72">
+                          <span className="font-medium text-[#1B2623]/45 mr-1.5">Prior filing:</span>
                           {followUp.priorAgencyFiling === 'yes'
                             ? 'Yes'
                             : followUp.priorAgencyFiling === 'no'
@@ -1258,11 +1258,11 @@ export function IntakeReviewScreen({
 
                   {/* Matter signals from timeline categories or matter tags */}
                   {tags.length > 0 ? (
-                    <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-[#ECE7F5]">
+                    <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-[#E4E5DE]">
                       {tags.map((tag) => (
                         <span
                           key={tag}
-                          className="rounded-full border border-[#ECE7F5] bg-[#F5F1FB] px-3 py-1 text-xs text-[#4C1D96]"
+                          className="rounded-full border border-[#E4E5DE] bg-[#F2F4EC] px-3 py-1 text-xs text-[#42574E]"
                         >
                           {tag}
                         </span>
@@ -1280,7 +1280,7 @@ export function IntakeReviewScreen({
               transition={{ delay: 0.04 }}
               className={FIRM_REVIEW_PROMINENT_CARD}
             >
-              <h3 className="text-sm font-semibold text-[#14112E] mb-3">Firm Actions</h3>
+              <h3 className="text-sm font-semibold text-[#1B2623] mb-3">Firm Actions</h3>
               <div className="space-y-2">
                 <button
                   onClick={handleDownloadSummary}
@@ -1314,7 +1314,7 @@ export function IntakeReviewScreen({
                     {onDeclineIntake ? (
                       <button
                         onClick={() => setShowDeclineConfirm(true)}
-                        className="flex-1 flex items-center justify-center gap-2 rounded-full border border-[#ECE7F5] bg-white px-4 py-2.5 text-sm font-medium text-[#6B6685] transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-700"
+                        className="flex-1 flex items-center justify-center gap-2 rounded-full border border-[#E4E5DE] bg-white px-4 py-2.5 text-sm font-medium text-[#6A6D66] transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-700"
                       >
                         Not Pursuing
                       </button>
@@ -1326,7 +1326,7 @@ export function IntakeReviewScreen({
                     Added for follow-up
                   </div>
                 ) : isFirmDeclined ? (
-                  <div className="w-full flex items-center gap-2 rounded-full border border-[#ECE7F5] bg-[#FAF9F6] px-4 py-2.5 text-sm font-medium text-[#8B86A0]">
+                  <div className="w-full flex items-center gap-2 rounded-full border border-[#E4E5DE] bg-[#FAF9F6] px-4 py-2.5 text-sm font-medium text-[#7C857F]">
                     Marked as not pursuing
                   </div>
                 ) : null}
@@ -1350,9 +1350,9 @@ export function IntakeReviewScreen({
                   meta="Personal narrative shared for organization"
                   preview={firmWorkerStoryDisplay.slice(0, 140)}
                   forceOpen
-                  className="border-[#ECE7F5] bg-white/95 shadow-[0_28px_90px_rgba(31,27,75,0.12)]"
+                  className="border-[#E4E5DE] bg-white/95 shadow-[0_28px_90px_rgba(31,27,75,0.12)]"
                 >
-                  <p className="text-xs text-[#8B86A0] mb-3 leading-relaxed">
+                  <p className="text-xs text-[#7C857F] mb-3 leading-relaxed">
                     Shared in the worker&apos;s own words for record organization. Not verified fact or legal analysis.
                   </p>
                   <FirmCollapsibleText text={firmWorkerStoryDisplay} preserveWhitespace />
@@ -1366,12 +1366,12 @@ export function IntakeReviewScreen({
                 transition={{ delay: 0.075 }}
                 className={FIRM_REVIEW_PROMINENT_CARD}
               >
-              <h2 className="text-base font-semibold text-[#14112E] mb-4">Worker Context</h2>
+              <h2 className="text-base font-semibold text-[#1B2623] mb-4">Worker Context</h2>
                 <>
                   <div className="relative">
                     {!isContextExpanded && (
                       <>
-                        <p className="text-sm text-[#14112E]/70 leading-relaxed">
+                        <p className="text-sm text-[#1B2623]/70 leading-relaxed">
                           I worked as a delivery driver and frequently worked over 40 hours per week without proper overtime pay.
                         </p>
                         <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white/95 to-transparent pointer-events-none"></div>
@@ -1382,7 +1382,7 @@ export function IntakeReviewScreen({
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ duration: 0.3 }}
-                        className="text-sm text-[#14112E]/70 leading-relaxed"
+                        className="text-sm text-[#1B2623]/70 leading-relaxed"
                       >
                         I worked as a delivery driver and frequently worked over 40 hours per week without proper overtime pay. I also had concerns about meal periods being shortened or skipped during busy shifts. There were multiple occasions where I had to work through lunch breaks to meet delivery quotas, and my manager would often ask me to clock out early even though I was still working. I tried to document as much as I could through my own records and communications with coworkers.
                       </motion.p>
@@ -1390,7 +1390,7 @@ export function IntakeReviewScreen({
                   </div>
                   <button
                     onClick={() => setIsContextExpanded(!isContextExpanded)}
-                    className="mt-5 text-xs font-medium text-[#4C1D96] transition-colors hover:text-[#14112E]"
+                    className="mt-5 text-xs font-medium text-[#42574E] transition-colors hover:text-[#1B2623]"
                   >
                     {isContextExpanded ? 'Show Less' : 'View Full Context'}
                   </button>
@@ -1404,7 +1404,7 @@ export function IntakeReviewScreen({
               transition={{ delay: 0.05 }}
               className={FIRM_REVIEW_PROMINENT_CARD}
             >
-              <h2 className="text-sm font-semibold text-[#14112E] mb-2">Intake Overview</h2>
+              <h2 className="text-sm font-semibold text-[#1B2623] mb-2">Intake Overview</h2>
               {useConnectedFirmLayout && firmLiveView ? (
                 <div className="space-y-3">
                   {firmOverviewFields
@@ -1414,17 +1414,17 @@ export function IntakeReviewScreen({
                     })
                     .map((field) => (
                       <div key={field.label} className="flex flex-col gap-0.5">
-                        <span className="text-[10px] uppercase tracking-wider text-[#14112E]/42">{field.label}</span>
-                        <span className="text-sm text-[#14112E]/80 leading-snug">{field.value}</span>
+                        <span className="text-[10px] uppercase tracking-wider text-[#1B2623]/42">{field.label}</span>
+                        <span className="text-sm text-[#1B2623]/80 leading-snug">{field.value}</span>
                       </div>
                     ))}
                 </div>
               ) : (
                 <div className="flex flex-wrap gap-2">
-                  <span className="px-3 py-1.5 bg-white text-[#14112E] rounded-lg text-sm border border-[#ECE7F5]">
+                  <span className="px-3 py-1.5 bg-white text-[#1B2623] rounded-lg text-sm border border-[#E4E5DE]">
                     Overtime concerns
                   </span>
-                  <span className="px-3 py-1.5 bg-white text-[#14112E] rounded-lg text-sm border border-[#ECE7F5]">
+                  <span className="px-3 py-1.5 bg-white text-[#1B2623] rounded-lg text-sm border border-[#E4E5DE]">
                     Meal & rest period concerns
                   </span>
                 </div>
@@ -1435,15 +1435,15 @@ export function IntakeReviewScreen({
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="hidden bg-white border border-[#ECE7F5] rounded-[14px] p-5"
+              className="hidden bg-white border border-[#E4E5DE] rounded-[14px] p-5"
             >
-              <h2 className="text-sm font-semibold text-[#14112E] mb-4">{FIRM_REVIEW_SECTION.intakeOverview}</h2>
+              <h2 className="text-sm font-semibold text-[#1B2623] mb-4">{FIRM_REVIEW_SECTION.intakeOverview}</h2>
               {useConnectedFirmLayout && firmLiveView && firmOverviewFields.length > 0 ? (
                 <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
                   {firmOverviewFields.map((field) => (
                     <div key={field.label}>
-                      <dt className="text-xs text-[#8B86A0] mb-1">{field.label}</dt>
-                      <dd className="text-sm text-[#14112E] leading-snug whitespace-pre-wrap">
+                      <dt className="text-xs text-[#7C857F] mb-1">{field.label}</dt>
+                      <dd className="text-sm text-[#1B2623] leading-snug whitespace-pre-wrap">
                         {polishHumanReadableDisplayText(field.value) || field.value}
                       </dd>
                     </div>
@@ -1454,9 +1454,9 @@ export function IntakeReviewScreen({
                   {useConnectedFirmLayout && firmLiveView ? (
                     <>
                       <div>
-                        <div className="text-xs text-[#8B86A0] mb-1.5">Intake reference</div>
+                        <div className="text-xs text-[#7C857F] mb-1.5">Intake reference</div>
                         <span
-                          className={`text-sm text-[#3A3552] ${isSampleFirmIntakeIdentifier ? 'font-medium' : 'font-mono'}`}
+                          className={`text-sm text-[#384039] ${isSampleFirmIntakeIdentifier ? 'font-medium' : 'font-mono'}`}
                         >
                           {isSampleFirmIntakeIdentifier
                             ? SAMPLE_INTAKE_PREVIEW_DISPLAY_LABEL
@@ -1464,12 +1464,12 @@ export function IntakeReviewScreen({
                         </span>
                       </div>
                       <div>
-                        <div className="text-xs text-[#8B86A0] mb-1.5">Records in preview</div>
-                        <span className="text-sm text-[#3A3552]">{firmLiveView.files.length}</span>
+                        <div className="text-xs text-[#7C857F] mb-1.5">Records in preview</div>
+                        <span className="text-sm text-[#384039]">{firmLiveView.files.length}</span>
                       </div>
                       <div>
-                        <div className="text-xs text-[#8B86A0] mb-1.5">Access level</div>
-                        <span className="text-sm text-[#3A3552]">
+                        <div className="text-xs text-[#7C857F] mb-1.5">Access level</div>
+                        <span className="text-sm text-[#384039]">
                           {firmLiveView.previewOnly ? 'Limited preview' : 'Full materials'}
                         </span>
                       </div>
@@ -1477,21 +1477,21 @@ export function IntakeReviewScreen({
                   ) : (
                     <>
                       <div>
-                        <div className="text-xs text-[#8B86A0] mb-1.5">Location</div>
+                        <div className="text-xs text-[#7C857F] mb-1.5">Location</div>
                         <div className="flex items-center gap-2">
-                          <MapPin className="w-4 h-4 text-[#A8A3BC]" />
-                          <span className="text-sm text-[#3A3552]">Los Angeles, CA</span>
+                          <MapPin className="w-4 h-4 text-[#9AA39B]" />
+                          <span className="text-sm text-[#384039]">Los Angeles, CA</span>
                         </div>
                       </div>
                       <div>
-                        <div className="text-xs text-[#8B86A0] mb-1.5">Employer State</div>
-                        <span className="text-sm text-[#3A3552]">California</span>
+                        <div className="text-xs text-[#7C857F] mb-1.5">Employer State</div>
+                        <span className="text-sm text-[#384039]">California</span>
                       </div>
                       <div>
-                        <div className="text-xs text-[#8B86A0] mb-1.5">Upload Date</div>
+                        <div className="text-xs text-[#7C857F] mb-1.5">Upload Date</div>
                         <div className="flex items-center gap-2">
-                          <Calendar className="w-4 h-4 text-[#A8A3BC]" />
-                          <span className="text-sm text-[#3A3552]">May 10, 2026</span>
+                          <Calendar className="w-4 h-4 text-[#9AA39B]" />
+                          <span className="text-sm text-[#384039]">May 10, 2026</span>
                         </div>
                       </div>
                     </>
@@ -1500,13 +1500,13 @@ export function IntakeReviewScreen({
               )}
 
               {documentCategoriesForDisplay.length > 0 ? (
-                <div className="mt-5 pt-5 border-t border-[#F1ECF8]">
-                  <div className="text-xs text-[#8B86A0] mb-2">Record categories on file</div>
+                <div className="mt-5 pt-5 border-t border-[#F2F4EC]">
+                  <div className="text-xs text-[#7C857F] mb-2">Record categories on file</div>
                   <div className="flex flex-wrap gap-2">
                     {documentCategoriesForDisplay.map((cat) => (
                       <span
                         key={cat.name}
-                        className="px-3 py-1.5 bg-[#FAF9F6] rounded-lg text-xs text-[#3A3552] border border-[#ECE7F5]"
+                        className="px-3 py-1.5 bg-[#FAF9F6] rounded-lg text-xs text-[#384039] border border-[#E4E5DE]"
                       >
                         {cat.name} ({cat.count})
                       </span>
@@ -1528,7 +1528,7 @@ export function IntakeReviewScreen({
                     : 'Organized overview from uploaded records.'
                 }
               >
-                <div className="text-sm text-[#3A3552] leading-relaxed space-y-2">
+                <div className="text-sm text-[#384039] leading-relaxed space-y-2">
                   {useConnectedFirmLayout && firmLiveView ? (
                     <FirmCollapsibleText
                       text={
@@ -1561,7 +1561,7 @@ export function IntakeReviewScreen({
                     : 'Employment timeline organized from records.'
                 }
               >
-                <div className="text-sm text-[#3A3552] leading-relaxed space-y-2">
+                <div className="text-sm text-[#384039] leading-relaxed space-y-2">
                   {useConnectedFirmLayout && firmLiveView ? (
                     <FirmCollapsibleText
                       text={
@@ -1594,15 +1594,15 @@ export function IntakeReviewScreen({
               className={FIRM_REVIEW_PROMINENT_CARD}
             >
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#42574E]">Chronology</p>
-              <h2 className="mt-3 text-2xl font-semibold text-[#14112E]">
+              <h2 className="mt-3 text-2xl font-semibold text-[#1B2623]">
                 {timelineForDisplay.length} event{timelineForDisplay.length === 1 ? '' : 's'} from {reconstructedRecordCount} record{reconstructedRecordCount === 1 ? '' : 's'}
               </h2>
               {confirmationDisplayCount > 0 ? (
-                <p className="mt-2 text-sm leading-relaxed text-[#14112E]/68">
+                <p className="mt-2 text-sm leading-relaxed text-[#1B2623]/68">
                   {confirmationDisplayCount} item{confirmationDisplayCount === 1 ? '' : 's'} may benefit from confirmation.
                 </p>
               ) : null}
-              <p className="mt-2 text-sm leading-relaxed text-[#14112E]/55">
+              <p className="mt-2 text-sm leading-relaxed text-[#1B2623]/55">
                 Each event shows its source document. Dates requiring confirmation are identified.
               </p>
 
@@ -1613,7 +1613,7 @@ export function IntakeReviewScreen({
                     className={`rounded-full border px-3 py-1.5 text-xs ${
                       index === 0
                         ? 'border-violet-700 bg-violet-700 text-white'
-                        : 'border-violet-100 bg-violet-50 text-[#6B6685]'
+                        : 'border-violet-100 bg-violet-50 text-[#6A6D66]'
                     }`}
                   >
                     {step}
@@ -1623,7 +1623,7 @@ export function IntakeReviewScreen({
 
               <div className="mt-9 space-y-4 sm:hidden">
                 {timelineForDisplay.length === 0 ? (
-                  <p className="text-sm text-[#14112E]/62 py-2 leading-relaxed">
+                  <p className="text-sm text-[#1B2623]/62 py-2 leading-relaxed">
                     {preferConnectedLiveIntake
                       ? liveTimelineEmptyMessage
                       : 'No timeline events are available in this preview yet.'}
@@ -1635,51 +1635,51 @@ export function IntakeReviewScreen({
                     return (
                       <article
                         key={`mobile-${event.date}-${event.event}-${index}`}
-                        className="rounded-2xl border border-[#ECE7F5] bg-white p-4 shadow-[0_12px_34px_rgba(31,27,75,0.08)]"
+                        className="rounded-2xl border border-[#E4E5DE] bg-white p-4 shadow-[0_12px_34px_rgba(31,27,75,0.08)]"
                       >
                         <div className="flex items-start gap-3">
-                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#F5F1FB] text-xs font-semibold text-[#42574E]">
+                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#F2F4EC] text-xs font-semibold text-[#42574E]">
                             {index + 1}
                           </div>
                           <div className="min-w-0 flex-1 overflow-hidden">
                             <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#42574E] whitespace-nowrap overflow-hidden text-ellipsis">
                               {event.date}
                             </p>
-                            <h3 className="mt-1 text-base font-semibold leading-snug text-[#14112E] break-words">
+                            <h3 className="mt-1 text-base font-semibold leading-snug text-[#1B2623] break-words">
                               {event.event}
                             </h3>
                             {event.category ? (
-                              <p className="mt-1 text-xs text-[#14112E]/48 break-words">{event.category}</p>
+                              <p className="mt-1 text-xs text-[#1B2623]/48 break-words">{event.category}</p>
                             ) : null}
                           </div>
                         </div>
 
                         {event.summary ? (
-                          <p className="mt-4 text-sm leading-relaxed text-[#14112E]/68 break-words overflow-hidden">{event.summary}</p>
+                          <p className="mt-4 text-sm leading-relaxed text-[#1B2623]/68 break-words overflow-hidden">{event.summary}</p>
                         ) : null}
 
                         {mobileRelatedDocLabels.length > 0 ? (
-                          <div className="mt-4 rounded-xl border border-[#ECE7F5] bg-[#FAF9F6] px-3 py-2">
-                            <p className="text-xs font-medium text-[#14112E]/58">Supporting records</p>
+                          <div className="mt-4 rounded-xl border border-[#E4E5DE] bg-[#FAF9F6] px-3 py-2">
+                            <p className="text-xs font-medium text-[#1B2623]/58">Supporting records</p>
                             <div className="mt-2 flex flex-wrap gap-2">
                               {mobileRelatedDocLabels.slice(0, 3).map((label) => (
                                 <span
                                   key={`${event.date}-${event.event}-${label}`}
-                                  className="rounded-full border border-[#ECE7F5] bg-white px-2.5 py-1 text-xs text-[#14112E]/68 max-w-[180px] truncate"
+                                  className="rounded-full border border-[#E4E5DE] bg-white px-2.5 py-1 text-xs text-[#1B2623]/68 max-w-[180px] truncate"
                                   title={label.replace(/_/g, ' ').replace(/\.[^.]+$/, '')}
                                 >
                                   {label.replace(/_/g, ' ').replace(/\.[^.]+$/, '')}
                                 </span>
                               ))}
                               {mobileRelatedDocLabels.length > 3 ? (
-                                <span className="rounded-full border border-[#ECE7F5] bg-white px-2.5 py-1 text-xs text-[#14112E]/52">
+                                <span className="rounded-full border border-[#E4E5DE] bg-white px-2.5 py-1 text-xs text-[#1B2623]/52">
                                   +{mobileRelatedDocLabels.length - 3} more
                                 </span>
                               ) : null}
                             </div>
                           </div>
                         ) : event.relatedDocs > 0 ? (
-                          <p className="mt-4 text-xs text-[#14112E]/52">
+                          <p className="mt-4 text-xs text-[#1B2623]/52">
                             {event.relatedDocs} supporting record{event.relatedDocs === 1 ? '' : 's'}
                           </p>
                         ) : null}
@@ -1691,7 +1691,7 @@ export function IntakeReviewScreen({
 
               <div className="mt-9 hidden space-y-6 sm:block">
                 {timelineForDisplay.length === 0 ? (
-                  <p className="text-sm text-[#6B6685] py-2 leading-relaxed">
+                  <p className="text-sm text-[#6A6D66] py-2 leading-relaxed">
                     {preferConnectedLiveIntake
                       ? liveTimelineEmptyMessage
                       : 'No timeline events are available in this preview yet.'}
@@ -1719,7 +1719,7 @@ export function IntakeReviewScreen({
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.05 }}
-                className="hidden rounded-xl border border-[#B08D57]/25 bg-[#14112E] p-5"
+                className="hidden rounded-xl border border-[#B08D57]/25 bg-[#1B2623] p-5"
               >
                 <h3 className="text-sm font-semibold text-[#E8E6E3] mb-3">May Benefit From Review</h3>
                 <div className="space-y-2">
@@ -1737,9 +1737,9 @@ export function IntakeReviewScreen({
               meta={`${documentCategoriesForDisplay.length} categories`}
               preview="Records organized below the chronology."
               defaultOpen
-              className="border-[#ECE7F5] bg-white/95 shadow-[0_28px_90px_rgba(31,27,75,0.12)]"
+              className="border-[#E4E5DE] bg-white/95 shadow-[0_28px_90px_rgba(31,27,75,0.12)]"
             >
-              <p className="text-xs text-[#14112E]/62 mb-4 leading-relaxed">
+              <p className="text-xs text-[#1B2623]/62 mb-4 leading-relaxed">
                 Documents support timeline events. The chronology remains the primary review surface.
               </p>
               {firmFileOpenError ? (
@@ -1749,27 +1749,27 @@ export function IntakeReviewScreen({
               ) : null}
               <div id="firm-uploaded-files-section" className="space-y-2">
                 {documentCategoriesForDisplay.length === 0 ? (
-                  <p className="text-sm text-[#14112E]/62 py-2 leading-relaxed">
+                  <p className="text-sm text-[#1B2623]/62 py-2 leading-relaxed">
                     {preferConnectedLiveIntake ? liveDocumentsEmptyMessage : 'No documents listed in this preview yet.'}
                   </p>
                 ) : (
                   documentCategoriesForDisplay.map((category) => (
-                  <div key={category.name} className="overflow-hidden rounded-2xl border border-[#ECE7F5] bg-[#FAF9F6]">
+                  <div key={category.name} className="overflow-hidden rounded-2xl border border-[#E4E5DE] bg-[#FAF9F6]">
                     <button
                       onClick={() => setExpandedCategory(expandedCategory === category.name ? null : category.name)}
-                      className="w-full flex items-center justify-between p-4 transition-colors hover:bg-[#F5F1FB]"
+                      className="w-full flex items-center justify-between p-4 transition-colors hover:bg-[#F2F4EC]"
                     >
                       <div className="flex items-center gap-3">
                         <FileText className="w-4 h-4 text-[#42574E]" />
                         <div className="text-left">
-                          <div className="text-sm font-medium text-[#14112E]">{category.name}</div>
-                          <div className="text-xs text-[#14112E]/52">{category.count} documents</div>
+                          <div className="text-sm font-medium text-[#1B2623]">{category.name}</div>
+                          <div className="text-xs text-[#1B2623]/52">{category.count} documents</div>
                         </div>
                       </div>
                       {expandedCategory === category.name ? (
-                        <ChevronDown className="w-5 h-5 text-[#A8A3BC]" />
+                        <ChevronDown className="w-5 h-5 text-[#9AA39B]" />
                       ) : (
-                        <ChevronRight className="w-5 h-5 text-[#A8A3BC]" />
+                        <ChevronRight className="w-5 h-5 text-[#9AA39B]" />
                       )}
                     </button>
 
@@ -1778,26 +1778,26 @@ export function IntakeReviewScreen({
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: 'auto' }}
                         exit={{ opacity: 0, height: 0 }}
-                        className="border-t border-[#ECE7F5] bg-[#FAF9F6]"
+                        className="border-t border-[#E4E5DE] bg-[#FAF9F6]"
                       >
                         <div className="p-4 space-y-2">
                           {category.documents.map((doc) => (
                             <div
                               key={firmDocumentEntryKey(doc)}
-                              className="flex items-center justify-between rounded-xl border border-[#ECE7F5] bg-white p-2 transition-colors hover:border-[#C9B8F0]"
+                              className="flex items-center justify-between rounded-xl border border-[#E4E5DE] bg-white p-2 transition-colors hover:border-[#7C8B6F]"
                             >
-                              <span className="text-sm text-[#14112E]/72">{doc.label}</span>
+                              <span className="text-sm text-[#1B2623]/72">{doc.label}</span>
                               {canOpenFirmFile(doc) ? (
                                 <button
                                   type="button"
                                   disabled={firmFileOpeningKey === firmDocumentEntryKey(doc)}
                                   onClick={() => void handleFirmViewFile(doc)}
-                                  className="text-xs font-medium text-[#4C1D96] transition-colors hover:text-[#14112E] disabled:opacity-50"
+                                  className="text-xs font-medium text-[#42574E] transition-colors hover:text-[#1B2623] disabled:opacity-50"
                                 >
                                   {firmFileOpeningKey === firmDocumentEntryKey(doc) ? 'Opening…' : 'View'}
                                 </button>
                               ) : (
-                                <span className="text-xs text-[#A8A3BC]">
+                                <span className="text-xs text-[#9AA39B]">
                                   {firmRouteStatus === 'full_access' ? 'Unavailable' : 'Preview only'}
                                 </span>
                               )}
@@ -1864,7 +1864,7 @@ export function IntakeReviewScreen({
                 <motion.section
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="rounded-[24px] border border-[#ECE7F5] bg-white p-5 shadow-[0_14px_38px_rgba(31,27,75,0.08)]"
+                  className="rounded-[24px] border border-[#E4E5DE] bg-white p-5 shadow-[0_14px_38px_rgba(31,27,75,0.08)]"
                 >
                   {showSolBanner && solDaysElapsed !== null && (
                     <div className="flex items-start gap-3 rounded-xl px-4 py-3 mb-4 border bg-amber-50 border-amber-300">
@@ -1895,8 +1895,8 @@ export function IntakeReviewScreen({
                     <div className="space-y-3 mb-4">
                       {confirmedFacts.map((f) => (
                         <div key={f.label} className="flex flex-col gap-0.5">
-                          <span className="text-[10px] uppercase tracking-wider text-[#14112E]/40">{f.label}</span>
-                          <span className="text-sm text-[#14112E]/82 leading-snug">{f.value}</span>
+                          <span className="text-[10px] uppercase tracking-wider text-[#1B2623]/40">{f.label}</span>
+                          <span className="text-sm text-[#1B2623]/82 leading-snug">{f.value}</span>
                         </div>
                       ))}
                     </div>
@@ -1904,7 +1904,7 @@ export function IntakeReviewScreen({
 
                   {intelTimingIntervals.length > 0 && (
                     <>
-                      <p className="text-[10px] uppercase tracking-wider text-[#14112E]/40 mb-3">Event timing</p>
+                      <p className="text-[10px] uppercase tracking-wider text-[#1B2623]/40 mb-3">Event timing</p>
                       <div className="grid grid-cols-2 gap-2 mb-4">
                         {intelTimingIntervals.map((t) => {
                           const isShort = t.days <= 30;
@@ -1917,7 +1917,7 @@ export function IntakeReviewScreen({
                                   ? 'bg-red-50 border-red-200'
                                   : isMid
                                   ? 'bg-amber-50 border-amber-200'
-                                  : 'bg-[#F5F1FB] border-[#ECE7F5]'
+                                  : 'bg-[#F2F4EC] border-[#E4E5DE]'
                               }`}
                             >
                               <span className={`text-2xl font-900 leading-none tracking-tight ${
@@ -1928,7 +1928,7 @@ export function IntakeReviewScreen({
                               <span className={`text-[10px] font-semibold uppercase tracking-wide ${
                                 isShort ? 'text-red-500' : isMid ? 'text-amber-600' : 'text-[#42574E]'
                               }`}>{t.label}</span>
-                              <span className="text-[10px] text-[#14112E]/55 leading-snug">
+                              <span className="text-[10px] text-[#1B2623]/55 leading-snug">
                                 {t.description.replace(t.label + ': ', '')}
                               </span>
                             </div>
@@ -1940,7 +1940,7 @@ export function IntakeReviewScreen({
 
                   {intelKeyQuotes.length > 0 && (
                     <>
-                      <p className="text-[10px] uppercase tracking-wider text-[#14112E]/40 mb-2">Key document language</p>
+                      <p className="text-[10px] uppercase tracking-wider text-[#1B2623]/40 mb-2">Key document language</p>
                       <div className="space-y-3">
                         {intelKeyQuotes.slice(0, 4).map((q) => {
                           // Extraction quality is internal metadata; the firm-facing label uses
@@ -1959,7 +1959,7 @@ export function IntakeReviewScreen({
                               ? 'bg-rose-50 text-rose-600 border-rose-100'
                               : 'bg-amber-50 text-amber-700 border-amber-100';
                           return (
-                            <div key={q.file_name} className="rounded-lg bg-[#F5F1FB] border border-[#ECE7F5] px-3 py-2">
+                            <div key={q.file_name} className="rounded-lg bg-[#F2F4EC] border border-[#E4E5DE] px-3 py-2">
                               <div className="mb-1 flex items-center justify-between gap-2">
                                 <p className="text-[10px] text-[#42574E]">{q.category.replace(/_/g, ' ')} — {q.file_name.replace(/_/g, ' ').replace(/\.[^.]+$/, '')}</p>
                                 {conf && (
@@ -1968,7 +1968,7 @@ export function IntakeReviewScreen({
                                   </span>
                                 )}
                               </div>
-                              <p className="text-xs text-[#14112E]/75 italic leading-relaxed">"{q.quote}"</p>
+                              <p className="text-xs text-[#1B2623]/75 italic leading-relaxed">"{q.quote}"</p>
                             </div>
                           );
                         })}
@@ -1984,7 +1984,7 @@ export function IntakeReviewScreen({
                         </span>
                       )}
                       {intel.finalPayPresent && (
-                        <span className="text-[11px] bg-[#F5F1FB] text-[#42574E] border border-[#ECE7F5] rounded-full px-2.5 py-1">
+                        <span className="text-[11px] bg-[#F2F4EC] text-[#42574E] border border-[#E4E5DE] rounded-full px-2.5 py-1">
                           Final pay document present
                         </span>
                       )}
@@ -2008,12 +2008,12 @@ export function IntakeReviewScreen({
                   transition={{ delay: 0.05 }}
                   className="rounded-[24px] border border-amber-200 bg-amber-50/85 p-5 shadow-[0_14px_38px_rgba(120,53,15,0.08)]"
                 >
-                  <h3 className="text-sm font-semibold text-[#14112E] mb-3">
+                  <h3 className="text-sm font-semibold text-[#1B2623] mb-3">
                     {intelligenceItems.length > 0 ? 'Items Requiring Confirmation' : 'Clarifications Needed'}
                   </h3>
                   <div className="space-y-2">
                     {items.map((line, index) => (
-                      <p key={`${line}-${index}`} className="text-sm leading-relaxed text-[#14112E]/70">
+                      <p key={`${line}-${index}`} className="text-sm leading-relaxed text-[#1B2623]/70">
                         · {line}
                       </p>
                     ))}
@@ -2032,13 +2032,13 @@ export function IntakeReviewScreen({
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.05 }}
-                  className="rounded-[24px] border border-[#ECE7F5] bg-[#F5F1FB] p-5 shadow-[0_14px_38px_rgba(31,27,75,0.08)]"
+                  className="rounded-[24px] border border-[#E4E5DE] bg-[#F2F4EC] p-5 shadow-[0_14px_38px_rgba(31,27,75,0.08)]"
                 >
-                  <h3 className="text-sm font-semibold text-[#14112E] mb-1">Questions that may help complete the intake</h3>
-                  <p className="text-[11px] text-[#14112E]/45 mb-3">Suggested follow-ups drawn from gaps in the uploaded records. Not legal advice.</p>
+                  <h3 className="text-sm font-semibold text-[#1B2623] mb-1">Questions that may help complete the intake</h3>
+                  <p className="text-[11px] text-[#1B2623]/45 mb-3">Suggested follow-ups drawn from gaps in the uploaded records. Not legal advice.</p>
                   <div className="space-y-2">
                     {clarifications.map((line, index) => (
-                      <p key={`${line}-${index}`} className="text-sm leading-relaxed text-[#14112E]/70">
+                      <p key={`${line}-${index}`} className="text-sm leading-relaxed text-[#1B2623]/70">
                         · {line}
                       </p>
                     ))}
@@ -2055,7 +2055,7 @@ export function IntakeReviewScreen({
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="rounded-[24px] border border-[#ECE7F5] bg-white p-5 shadow-[0_14px_38px_rgba(31,27,75,0.08)]"
+                  className="rounded-[24px] border border-[#E4E5DE] bg-white p-5 shadow-[0_14px_38px_rgba(31,27,75,0.08)]"
                 >
                   <div className="flex items-center justify-between mb-3">
                     <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#42574E]">Document Checklist</p>
@@ -2076,7 +2076,7 @@ export function IntakeReviewScreen({
                             {isReceived ? '✓' : '○'}
                           </span>
                           <div className="flex-1 min-w-0">
-                            <p className="text-xs font-medium text-[#14112E] leading-snug">
+                            <p className="text-xs font-medium text-[#1B2623] leading-snug">
                               {polishHumanReadableDisplayText(c) || c}
                             </p>
                           </div>
@@ -2090,7 +2090,7 @@ export function IntakeReviewScreen({
                     })}
                   </div>
                   {firmLiveView.documentRequest!.note ? (
-                    <p className="text-xs text-[#14112E]/55 leading-relaxed border-t border-[#ECE7F5] pt-3">
+                    <p className="text-xs text-[#1B2623]/55 leading-relaxed border-t border-[#E4E5DE] pt-3">
                       {polishHumanReadableDisplayText(sanitizeFirmFacingText(firmLiveView.documentRequest!.note))}
                     </p>
                   ) : null}
@@ -2112,11 +2112,11 @@ export function IntakeReviewScreen({
                 animate={{ opacity: 1, y: 0 }}
                 className="bg-emerald-50 border border-emerald-200 rounded-[14px] p-4"
               >
-                <h3 className="text-sm font-semibold text-[#14112E] mb-2">Response to document request</h3>
+                <h3 className="text-sm font-semibold text-[#1B2623] mb-2">Response to document request</h3>
                 {firmLiveView.documentResponse.fulfilled.length > 0 ? (
                   <>
-                    <p className="text-xs font-medium text-[#3A3552] mb-1">Fulfilled categories</p>
-                    <ul className="list-disc pl-4 text-xs text-[#14112E] space-y-1 mb-2">
+                    <p className="text-xs font-medium text-[#384039] mb-1">Fulfilled categories</p>
+                    <ul className="list-disc pl-4 text-xs text-[#1B2623] space-y-1 mb-2">
                       {firmLiveView.documentResponse.fulfilled.map((c) => (
                         <li key={c}>{polishHumanReadableDisplayText(c) || c}</li>
                       ))}
@@ -2124,7 +2124,7 @@ export function IntakeReviewScreen({
                   </>
                 ) : null}
                 {firmLiveView.documentResponse.note ? (
-                  <p className="text-xs text-[#3A3552] whitespace-pre-wrap">
+                  <p className="text-xs text-[#384039] whitespace-pre-wrap">
                     <span className="font-medium">Their note:</span>{' '}
                     {polishHumanReadableDisplayText(sanitizeFirmFacingText(firmLiveView.documentResponse.note))}
                   </p>
@@ -2136,10 +2136,10 @@ export function IntakeReviewScreen({
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="rounded-[16px] border border-[#ECE7F5]/60 bg-[#FAF9F6] px-5 py-4"
+              className="rounded-[16px] border border-[#E4E5DE]/60 bg-[#FAF9F6] px-5 py-4"
             >
-              <p className="text-[11px] leading-relaxed text-[#14112E]/52">
-                <span className="font-medium text-[#14112E]/70">How this intake was organized:</span> one3seven organizes file names, extracted dates, worker-provided context, and document categories into a review structure. Automated organization may require confirmation against the original source records. one3seven does not provide legal conclusions, case scoring, or outcome predictions. Source documents are available for direct review.
+              <p className="text-[11px] leading-relaxed text-[#1B2623]/52">
+                <span className="font-medium text-[#1B2623]/70">How this intake was organized:</span> one3seven organizes file names, extracted dates, worker-provided context, and document categories into a review structure. Automated organization may require confirmation against the original source records. one3seven does not provide legal conclusions, case scoring, or outcome predictions. Source documents are available for direct review.
               </p>
             </motion.div>
 
@@ -2148,7 +2148,7 @@ export function IntakeReviewScreen({
                 animate={{ opacity: 1, y: 0 }}
                 className={FIRM_REVIEW_QUIET_CARD}
               >
-                <h3 className="text-sm font-semibold text-[#14112E]/78 mb-3">Review Status</h3>
+                <h3 className="text-sm font-semibold text-[#1B2623]/78 mb-3">Review Status</h3>
                 <div className="space-y-3">
                   {firmReviewSteps.map((step, index) => {
                     const isDone = index < activeFirmStepIndex;
@@ -2159,13 +2159,13 @@ export function IntakeReviewScreen({
                           className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold border ${
                             isDone || isActive
                               ? 'bg-[#42574E] text-white border-[#42574E]'
-                              : 'bg-white text-[#14112E]/34 border-[#ECE7F5]'
+                              : 'bg-white text-[#1B2623]/34 border-[#E4E5DE]'
                           }`}
                         >
                           {isDone ? <CheckCircle2 className="w-4 h-4" /> : index + 1}
                         </div>
                         <div>
-                          <span className={`text-sm ${isActive ? 'text-[#14112E] font-medium' : 'text-[#14112E]/58'}`}>
+                          <span className={`text-sm ${isActive ? 'text-[#1B2623] font-medium' : 'text-[#1B2623]/58'}`}>
                             {step.label}
                           </span>
                           {isActive ? (
@@ -2181,25 +2181,25 @@ export function IntakeReviewScreen({
                   })}
                 </div>
                 {usesPersistedWorkflowStatus ? (
-                  <p className="mt-3 text-xs text-[#8B86A0] leading-relaxed">
+                  <p className="mt-3 text-xs text-[#7C857F] leading-relaxed">
                     {isSampleFirmIntakePreview
                       ? 'Sample intake for orientation — status is illustrative only.'
                       : 'Reflects the live intake record. Updates when the worker responds or access changes.'}
                   </p>
                 ) : canEditLocalWorkflow ? (
                   <>
-                    <p className="mt-3 text-xs text-[#8B86A0] mb-3 leading-relaxed">
+                    <p className="mt-3 text-xs text-[#7C857F] mb-3 leading-relaxed">
                       Demo workspace only — changes here are not saved to live intakes.
                     </p>
                     <button
                       onClick={() => setShowStatusModal(true)}
-                      className="w-full rounded-[12px] border border-[#ECE7F5] px-4 py-2.5 text-sm text-[#14112E]/70 transition-colors hover:bg-[#F5F1FB] min-h-[44px] touch-manipulation"
+                      className="w-full rounded-[12px] border border-[#E4E5DE] px-4 py-2.5 text-sm text-[#1B2623]/70 transition-colors hover:bg-[#F2F4EC] min-h-[44px] touch-manipulation"
                     >
                       Update demo workspace status
                     </button>
                   </>
                 ) : (
-                  <p className="mt-3 text-xs text-[#8B86A0] leading-relaxed">
+                  <p className="mt-3 text-xs text-[#7C857F] leading-relaxed">
                     Connect a live intake from your firm dashboard to view persisted workflow status.
                   </p>
                 )}
@@ -2211,7 +2211,7 @@ export function IntakeReviewScreen({
                 animate={{ opacity: 1, y: 0 }}
                 className="hidden"
               >
-                <h3 className="text-sm font-semibold text-[#14112E]/78 mb-2">Employment Matter</h3>
+                <h3 className="text-sm font-semibold text-[#1B2623]/78 mb-2">Employment Matter</h3>
                 <EmploymentMatterChipList tags={firmLiveView.employmentMatterTags} />
               </motion.div>
             ) : null}
@@ -2220,15 +2220,15 @@ export function IntakeReviewScreen({
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="hidden bg-white border border-[#ECE7F5] rounded-[14px] p-5"
+              className="hidden bg-white border border-[#E4E5DE] rounded-[14px] p-5"
             >
-              <h2 className="text-sm font-semibold text-[#14112E] mb-4">{FIRM_REVIEW_SECTION.intakeOverview}</h2>
+              <h2 className="text-sm font-semibold text-[#1B2623] mb-4">{FIRM_REVIEW_SECTION.intakeOverview}</h2>
               {useConnectedFirmLayout && firmLiveView && firmOverviewFields.length > 0 ? (
                 <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
                   {firmOverviewFields.map((field) => (
                     <div key={field.label}>
-                      <dt className="text-xs text-[#8B86A0] mb-1">{field.label}</dt>
-                      <dd className="text-sm text-[#14112E] leading-snug whitespace-pre-wrap">
+                      <dt className="text-xs text-[#7C857F] mb-1">{field.label}</dt>
+                      <dd className="text-sm text-[#1B2623] leading-snug whitespace-pre-wrap">
                         {polishHumanReadableDisplayText(field.value) || field.value}
                       </dd>
                     </div>
@@ -2239,9 +2239,9 @@ export function IntakeReviewScreen({
                   {useConnectedFirmLayout && firmLiveView ? (
                     <>
                       <div>
-                        <div className="text-xs text-[#8B86A0] mb-1.5">Intake reference</div>
+                        <div className="text-xs text-[#7C857F] mb-1.5">Intake reference</div>
                         <span
-                          className={`text-sm text-[#3A3552] ${isSampleFirmIntakeIdentifier ? 'font-medium' : 'font-mono'}`}
+                          className={`text-sm text-[#384039] ${isSampleFirmIntakeIdentifier ? 'font-medium' : 'font-mono'}`}
                         >
                           {isSampleFirmIntakeIdentifier
                             ? SAMPLE_INTAKE_PREVIEW_DISPLAY_LABEL
@@ -2249,12 +2249,12 @@ export function IntakeReviewScreen({
                         </span>
                       </div>
                       <div>
-                        <div className="text-xs text-[#8B86A0] mb-1.5">Records in preview</div>
-                        <span className="text-sm text-[#3A3552]">{firmLiveView.files.length}</span>
+                        <div className="text-xs text-[#7C857F] mb-1.5">Records in preview</div>
+                        <span className="text-sm text-[#384039]">{firmLiveView.files.length}</span>
                       </div>
                       <div>
-                        <div className="text-xs text-[#8B86A0] mb-1.5">Access level</div>
-                        <span className="text-sm text-[#3A3552]">
+                        <div className="text-xs text-[#7C857F] mb-1.5">Access level</div>
+                        <span className="text-sm text-[#384039]">
                           {firmLiveView.previewOnly ? 'Limited preview' : 'Full materials'}
                         </span>
                       </div>
@@ -2262,21 +2262,21 @@ export function IntakeReviewScreen({
                   ) : (
                     <>
                       <div>
-                        <div className="text-xs text-[#8B86A0] mb-1.5">Location</div>
+                        <div className="text-xs text-[#7C857F] mb-1.5">Location</div>
                         <div className="flex items-center gap-2">
-                          <MapPin className="w-4 h-4 text-[#A8A3BC]" />
-                          <span className="text-sm text-[#3A3552]">Los Angeles, CA</span>
+                          <MapPin className="w-4 h-4 text-[#9AA39B]" />
+                          <span className="text-sm text-[#384039]">Los Angeles, CA</span>
                         </div>
                       </div>
                       <div>
-                        <div className="text-xs text-[#8B86A0] mb-1.5">Employer State</div>
-                        <span className="text-sm text-[#3A3552]">California</span>
+                        <div className="text-xs text-[#7C857F] mb-1.5">Employer State</div>
+                        <span className="text-sm text-[#384039]">California</span>
                       </div>
                       <div>
-                        <div className="text-xs text-[#8B86A0] mb-1.5">Upload Date</div>
+                        <div className="text-xs text-[#7C857F] mb-1.5">Upload Date</div>
                         <div className="flex items-center gap-2">
-                          <Calendar className="w-4 h-4 text-[#A8A3BC]" />
-                          <span className="text-sm text-[#3A3552]">May 10, 2026</span>
+                          <Calendar className="w-4 h-4 text-[#9AA39B]" />
+                          <span className="text-sm text-[#384039]">May 10, 2026</span>
                         </div>
                       </div>
                     </>
@@ -2285,13 +2285,13 @@ export function IntakeReviewScreen({
               )}
 
               {documentCategoriesForDisplay.length > 0 ? (
-                <div className="mt-5 pt-5 border-t border-[#F1ECF8]">
-                  <div className="text-xs text-[#8B86A0] mb-2">Record categories on file</div>
+                <div className="mt-5 pt-5 border-t border-[#F2F4EC]">
+                  <div className="text-xs text-[#7C857F] mb-2">Record categories on file</div>
                   <div className="flex flex-wrap gap-2">
                     {documentCategoriesForDisplay.map((cat) => (
                       <span
                         key={cat.name}
-                        className="px-3 py-1.5 bg-[#FAF9F6] rounded-lg text-xs text-[#3A3552] border border-[#ECE7F5]"
+                        className="px-3 py-1.5 bg-[#FAF9F6] rounded-lg text-xs text-[#384039] border border-[#E4E5DE]"
                       >
                         {cat.name} ({cat.count})
                       </span>
@@ -2305,20 +2305,20 @@ export function IntakeReviewScreen({
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.05 }}
-              className="hidden rounded-[14px] border border-[#ECE7F5] bg-[#FAF9F6]/80 p-4"
+              className="hidden rounded-[14px] border border-[#E4E5DE] bg-[#FAF9F6]/80 p-4"
             >
-              <h2 className="text-sm font-semibold text-[#14112E] mb-2">Intake summary</h2>
+              <h2 className="text-sm font-semibold text-[#1B2623] mb-2">Intake summary</h2>
               {useConnectedFirmLayout ? (
-                <p className="text-sm leading-relaxed text-[#6B6685]">
+                <p className="text-sm leading-relaxed text-[#6A6D66]">
                   {polishFirmFacingProse(firmLiveView?.overview || '') ||
                     'Overview will appear after the intake record set is organized.'}
                 </p>
               ) : (
                 <div className="flex flex-wrap gap-2">
-                  <span className="px-3 py-1.5 bg-white text-[#14112E] rounded-lg text-sm border border-[#ECE7F5]">
+                  <span className="px-3 py-1.5 bg-white text-[#1B2623] rounded-lg text-sm border border-[#E4E5DE]">
                     Overtime concerns
                   </span>
-                  <span className="px-3 py-1.5 bg-white text-[#14112E] rounded-lg text-sm border border-[#ECE7F5]">
+                  <span className="px-3 py-1.5 bg-white text-[#1B2623] rounded-lg text-sm border border-[#E4E5DE]">
                     Meal & rest period concerns
                   </span>
                 </div>
@@ -2337,7 +2337,7 @@ export function IntakeReviewScreen({
                     : 'Organized overview from uploaded records.'
                 }
               >
-                <div className="text-sm text-[#3A3552] leading-relaxed space-y-2">
+                <div className="text-sm text-[#384039] leading-relaxed space-y-2">
                   {useConnectedFirmLayout && firmLiveView ? (
                     <FirmCollapsibleText
                       text={
@@ -2370,7 +2370,7 @@ export function IntakeReviewScreen({
                     : 'Employment timeline organized from records.'
                 }
               >
-                <div className="text-sm text-[#3A3552] leading-relaxed space-y-2">
+                <div className="text-sm text-[#384039] leading-relaxed space-y-2">
                   {useConnectedFirmLayout && firmLiveView ? (
                     <FirmCollapsibleText
                       text={
@@ -2418,8 +2418,8 @@ export function IntakeReviewScreen({
                     <div className="space-y-4">
                       {firmRecordGroups.map((group) => (
                         <div key={group.label}>
-                          <div className="text-xs font-semibold text-[#14112E] mb-2">{group.label}</div>
-                          <ul className="text-sm text-[#3A3552] leading-relaxed space-y-1 list-none pl-0">
+                          <div className="text-xs font-semibold text-[#1B2623] mb-2">{group.label}</div>
+                          <ul className="text-sm text-[#384039] leading-relaxed space-y-1 list-none pl-0">
                             {group.categories.map((c) => (
                               <li key={`${group.label}-${c.name}`}>
                                 • {c.name} ({c.count} {c.count === 1 ? 'record' : 'records'})
@@ -2430,7 +2430,7 @@ export function IntakeReviewScreen({
                       ))}
                     </div>
                   ) : useConnectedFirmLayout ? (
-                    <ul className="text-sm text-[#3A3552] leading-relaxed space-y-1 list-none pl-0">
+                    <ul className="text-sm text-[#384039] leading-relaxed space-y-1 list-none pl-0">
                       {documentCategoriesForDisplay.map((c) => (
                         <li key={c.name}>
                           • {c.name} ({c.count} {c.count === 1 ? 'document' : 'documents'})
@@ -2438,7 +2438,7 @@ export function IntakeReviewScreen({
                       ))}
                     </ul>
                   ) : (
-                    <div className="text-sm text-[#3A3552] leading-relaxed space-y-1">
+                    <div className="text-sm text-[#384039] leading-relaxed space-y-1">
                       <p>• Pay Records (5 documents) support payroll activity and compensation patterns</p>
                       <p>• Time Records (4 documents) provide timekeeping and hours-worked documentation</p>
                       <p>• Workplace Communications (3 documents) offer context on scheduling and operational matters</p>
@@ -2458,7 +2458,7 @@ export function IntakeReviewScreen({
                 }
               >
                 {useConnectedFirmLayout && firmLiveView ? (
-                  <div className="text-sm text-[#3A3552] leading-relaxed space-y-3">
+                  <div className="text-sm text-[#384039] leading-relaxed space-y-3">
                     {firmReadinessPresentation.topics.length > 0 ? (
                       <ul className="list-disc pl-5 space-y-1">
                         {firmReadinessPresentation.topics.map((topic, i) => (
@@ -2472,11 +2472,11 @@ export function IntakeReviewScreen({
                         ))}
                       </ul>
                     ) : (
-                      <p className="text-[#6B6685]">No topic references were noted for this intake yet.</p>
+                      <p className="text-[#6A6D66]">No topic references were noted for this intake yet.</p>
                     )}
                   </div>
                 ) : (
-                  <div className="text-sm text-[#3A3552] leading-relaxed space-y-2">
+                  <div className="text-sm text-[#384039] leading-relaxed space-y-2">
                     <p>
                       Payroll records were grouped by pay period for clarity. Communication files were organized by topic and date range.
                     </p>
@@ -2495,7 +2495,7 @@ export function IntakeReviewScreen({
                 }
               >
                 {useConnectedFirmLayout && firmLiveView ? (
-                  <div className="text-sm text-[#3A3552] leading-relaxed space-y-3">
+                  <div className="text-sm text-[#384039] leading-relaxed space-y-3">
                     {firmLiveView.missing?.length ? (
                       <ul className="list-disc pl-5 space-y-1">
                         {firmLiveView.missing.map((r, i) => (
@@ -2509,14 +2509,14 @@ export function IntakeReviewScreen({
                         ))}
                       </ul>
                     ) : (
-                      <p className="text-[#6B6685]">
+                      <p className="text-[#6A6D66]">
                         No additional context notes were recorded. The worker may be asked to provide supporting records if helpful.
                       </p>
                     )}
                   </div>
                 ) : (
-                  <div className="text-sm text-[#3A3552] leading-relaxed space-y-2">
-                    <p className="text-[#6B6685] text-xs italic">
+                  <div className="text-sm text-[#384039] leading-relaxed space-y-2">
+                    <p className="text-[#6A6D66] text-xs italic">
                       Additional context may help clarify timeline continuity. Employment agreement documentation or manager communications could strengthen the chronological narrative.
                     </p>
                   </div>
@@ -2543,7 +2543,7 @@ export function IntakeReviewScreen({
             >
               <div className="space-y-4">
                 {timelineForDisplay.length === 0 ? (
-                  <p className="text-sm text-[#6B6685] py-2 leading-relaxed">
+                  <p className="text-sm text-[#6A6D66] py-2 leading-relaxed">
                     {preferConnectedLiveIntake
                       ? liveTimelineEmptyMessage
                       : 'No timeline events are available in this preview yet.'}
@@ -2573,7 +2573,7 @@ export function IntakeReviewScreen({
               meta={`${documentCategoriesForDisplay.length} categories`}
               preview="Records organized below the chronology."
             >
-              <p className="text-xs text-[#6B6685] mb-4 leading-relaxed">
+              <p className="text-xs text-[#6A6D66] mb-4 leading-relaxed">
                 Documents support timeline events. The chronology remains the primary review surface.
               </p>
               {firmFileOpenError ? (
@@ -2583,27 +2583,27 @@ export function IntakeReviewScreen({
               ) : null}
               <div className="space-y-2">
                 {documentCategoriesForDisplay.length === 0 ? (
-                  <p className="text-sm text-[#6B6685] py-2 leading-relaxed">
+                  <p className="text-sm text-[#6A6D66] py-2 leading-relaxed">
                     {preferConnectedLiveIntake ? liveDocumentsEmptyMessage : 'No documents listed in this preview yet.'}
                   </p>
                 ) : (
                   documentCategoriesForDisplay.map((category) => (
-                  <div key={category.name} className="bg-[#FAF9F6] border border-[#ECE7F5] rounded-xl overflow-hidden">
+                  <div key={category.name} className="bg-[#FAF9F6] border border-[#E4E5DE] rounded-xl overflow-hidden">
                     <button
                       onClick={() => setExpandedCategory(expandedCategory === category.name ? null : category.name)}
-                      className="w-full flex items-center justify-between p-4 hover:bg-[#F1ECFE] transition-colors"
+                      className="w-full flex items-center justify-between p-4 hover:bg-[#F2F4EC] transition-colors"
                     >
                       <div className="flex items-center gap-3">
-                        <FileText className="w-4 h-4 text-[#A8A3BC]" />
+                        <FileText className="w-4 h-4 text-[#9AA39B]" />
                         <div className="text-left">
-                          <div className="text-sm font-medium text-[#14112E]">{category.name}</div>
-                          <div className="text-xs text-[#8B86A0]">{category.count} documents</div>
+                          <div className="text-sm font-medium text-[#1B2623]">{category.name}</div>
+                          <div className="text-xs text-[#7C857F]">{category.count} documents</div>
                         </div>
                       </div>
                       {expandedCategory === category.name ? (
-                        <ChevronDown className="w-5 h-5 text-[#A8A3BC]" />
+                        <ChevronDown className="w-5 h-5 text-[#9AA39B]" />
                       ) : (
-                        <ChevronRight className="w-5 h-5 text-[#A8A3BC]" />
+                        <ChevronRight className="w-5 h-5 text-[#9AA39B]" />
                       )}
                     </button>
 
@@ -2612,26 +2612,26 @@ export function IntakeReviewScreen({
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: 'auto' }}
                         exit={{ opacity: 0, height: 0 }}
-                        className="border-t border-[#ECE7F5] bg-[#FAF9F6]"
+                        className="border-t border-[#E4E5DE] bg-[#FAF9F6]"
                       >
                         <div className="p-4 space-y-2">
                           {category.documents.map((doc) => (
                             <div
                               key={firmDocumentEntryKey(doc)}
-                              className="flex items-center justify-between p-2 bg-white rounded-lg border border-[#ECE7F5] hover:border-[#C9B8F0] transition-colors"
+                              className="flex items-center justify-between p-2 bg-white rounded-lg border border-[#E4E5DE] hover:border-[#7C8B6F] transition-colors"
                             >
-                              <span className="text-sm text-[#3A3552]">{doc.label}</span>
+                              <span className="text-sm text-[#384039]">{doc.label}</span>
                               {canOpenFirmFile(doc) ? (
                                 <button
                                   type="button"
                                   disabled={firmFileOpeningKey === firmDocumentEntryKey(doc)}
                                   onClick={() => void handleFirmViewFile(doc)}
-                                  className="text-xs text-[#6B6685] hover:text-[#14112E] transition-colors disabled:opacity-50"
+                                  className="text-xs text-[#6A6D66] hover:text-[#1B2623] transition-colors disabled:opacity-50"
                                 >
                                   {firmFileOpeningKey === firmDocumentEntryKey(doc) ? 'Opening…' : 'View'}
                                 </button>
                               ) : (
-                                <span className="text-xs text-[#A8A3BC]">
+                                <span className="text-xs text-[#9AA39B]">
                                   {firmRouteStatus === 'full_access' ? 'Unavailable' : 'Preview only'}
                                 </span>
                               )}
@@ -2651,11 +2651,11 @@ export function IntakeReviewScreen({
               meta="Team-only notes"
               tone="quiet"
               preview="Internal notes for your review team."
-              className="hidden border-[#ECE7F5] bg-white/70 shadow-[0_10px_30px_rgba(31,27,75,0.05)]"
+              className="hidden border-[#E4E5DE] bg-white/70 shadow-[0_10px_30px_rgba(31,27,75,0.05)]"
             >
               {preferConnectedLiveIntake ? (
-                <div className="rounded-2xl border border-[#ECE7F5] bg-[#FAF9F6] p-6">
-                  <p className="text-sm text-[#14112E]/64 leading-relaxed mb-3">
+                <div className="rounded-2xl border border-[#E4E5DE] bg-[#FAF9F6] p-6">
+                  <p className="text-sm text-[#1B2623]/64 leading-relaxed mb-3">
                     Internal team notes are not saved to live intakes during closed beta. Notes you add here would not
                     persist for your firm or sync across reviewers.
                   </p>
@@ -2664,12 +2664,12 @@ export function IntakeReviewScreen({
                     readOnly
                     disabled
                     placeholder="Internal notes unavailable during closed beta"
-                    className="w-full h-32 px-3 py-2 bg-[#FAF9F6] border border-[#ECE7F5] rounded-lg text-sm text-[#14112E]/45 placeholder:text-[#14112E]/35 resize-none mb-3 cursor-not-allowed"
+                    className="w-full h-32 px-3 py-2 bg-[#FAF9F6] border border-[#E4E5DE] rounded-lg text-sm text-[#1B2623]/45 placeholder:text-[#1B2623]/35 resize-none mb-3 cursor-not-allowed"
                   />
                   <button
                     type="button"
                     disabled
-                    className="w-full rounded-full border border-[#ECE7F5] bg-[#FAF9F6] px-4 py-2.5 text-sm font-medium text-[#14112E]/38 cursor-not-allowed"
+                    className="w-full rounded-full border border-[#E4E5DE] bg-[#FAF9F6] px-4 py-2.5 text-sm font-medium text-[#1B2623]/38 cursor-not-allowed"
                   >
                     Notes unavailable during closed beta
                   </button>
@@ -2679,39 +2679,39 @@ export function IntakeReviewScreen({
                   {savedNotes.length > 0 ? (
                     <div className="space-y-3 mb-6">
                       {savedNotes.map((note) => (
-                        <div key={note.id} className="rounded-2xl border border-[#ECE7F5] bg-white p-5">
+                        <div key={note.id} className="rounded-2xl border border-[#E4E5DE] bg-white p-5">
                           <div className="flex items-center gap-3 mb-3">
                             <div className="w-8 h-8 bg-[#42574E] text-white rounded-full flex items-center justify-center text-xs font-medium">
                               {note.reviewer || '?'}
                             </div>
                             <div className="flex-1">
-                              <div className="text-xs text-[#8B86A0]">{note.timestamp}</div>
+                              <div className="text-xs text-[#7C857F]">{note.timestamp}</div>
                             </div>
                           </div>
-                          <p className="text-sm text-[#14112E]/68 leading-relaxed">{note.content}</p>
+                          <p className="text-sm text-[#1B2623]/68 leading-relaxed">{note.content}</p>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <div className="rounded-2xl border border-[#ECE7F5] bg-[#FAF9F6] p-8 mb-6 text-center">
-                      <p className="text-sm text-[#14112E]/52">No internal reviewer notes yet.</p>
+                    <div className="rounded-2xl border border-[#E4E5DE] bg-[#FAF9F6] p-8 mb-6 text-center">
+                      <p className="text-sm text-[#1B2623]/52">No internal reviewer notes yet.</p>
                     </div>
                   )}
 
-                  <div className="rounded-2xl border border-[#ECE7F5] bg-white p-6">
+                  <div className="rounded-2xl border border-[#E4E5DE] bg-white p-6">
                     <textarea
                       value={internalNotes}
                       onChange={(e) => setInternalNotes(e.target.value)}
                       placeholder="Add internal notes for your team..."
-                      className="w-full h-32 px-3 py-2 bg-[#FAF9F6] border border-[#ECE7F5] rounded-lg text-sm text-[#14112E] placeholder:text-[#14112E]/38 focus:outline-none focus:ring-2 focus:ring-[#42574E]/20 focus:border-[#42574E] resize-none mb-3"
+                      className="w-full h-32 px-3 py-2 bg-[#FAF9F6] border border-[#E4E5DE] rounded-lg text-sm text-[#1B2623] placeholder:text-[#1B2623]/38 focus:outline-none focus:ring-2 focus:ring-[#42574E]/20 focus:border-[#42574E] resize-none mb-3"
                     />
                     <button
                       onClick={handleSaveNotes}
                       disabled={!internalNotes.trim()}
                       className={`w-full py-2.5 px-4 rounded-lg transition-colors text-sm font-medium ${
                         internalNotes.trim()
-                          ? 'bg-[#42574E] text-white hover:bg-[#4C1D96]'
-                          : 'bg-[#FAF9F6] text-[#14112E]/35 cursor-not-allowed'
+                          ? 'bg-[#42574E] text-white hover:bg-[#42574E]'
+                          : 'bg-[#FAF9F6] text-[#1B2623]/35 cursor-not-allowed'
                       }`}
                     >
                       Save Note
@@ -2725,13 +2725,13 @@ export function IntakeReviewScreen({
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="hidden bg-white border border-[#ECE7F5] rounded-[14px] p-5"
+              className="hidden bg-white border border-[#E4E5DE] rounded-[14px] p-5"
             >
-              <h3 className="text-sm font-semibold text-[#14112E] mb-3">Firm actions</h3>
+              <h3 className="text-sm font-semibold text-[#1B2623] mb-3">Firm actions</h3>
               <div className="space-y-2">
                 <button
                   onClick={handleDownloadSummary}
-                  className="w-full flex items-center gap-2 px-4 py-2.5 bg-[#42574E] text-white rounded-lg hover:bg-[#4C1D96] transition-colors text-sm font-medium"
+                  className="w-full flex items-center gap-2 px-4 py-2.5 bg-[#42574E] text-white rounded-lg hover:bg-[#42574E] transition-colors text-sm font-medium"
                 >
                   <Download className="w-4 h-4" />
                   Download Intake Summary
@@ -2751,7 +2751,7 @@ export function IntakeReviewScreen({
                     {onAcceptIntake ? (
                       <button
                         onClick={() => void handleAcceptIntake()}
-                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-[#42574E] text-white rounded-lg hover:bg-[#4C1D96] transition-colors text-sm font-medium"
+                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-[#42574E] text-white rounded-lg hover:bg-[#42574E] transition-colors text-sm font-medium"
                       >
                         <CheckCircle2 className="w-4 h-4" />
                         Accept
@@ -2760,7 +2760,7 @@ export function IntakeReviewScreen({
                     {onDeclineIntake ? (
                       <button
                         onClick={() => setShowDeclineConfirm(true)}
-                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 border border-[#ECE7F5] bg-white text-[#6B6685] rounded-lg hover:border-red-200 hover:bg-red-50 hover:text-red-700 transition-colors text-sm font-medium"
+                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 border border-[#E4E5DE] bg-white text-[#6A6D66] rounded-lg hover:border-red-200 hover:bg-red-50 hover:text-red-700 transition-colors text-sm font-medium"
                       >
                         Not Pursuing
                       </button>
@@ -2772,7 +2772,7 @@ export function IntakeReviewScreen({
                     Added for follow-up
                   </div>
                 ) : isFirmDeclined ? (
-                  <div className="w-full flex items-center gap-2 px-4 py-2.5 bg-[#FAF9F6] text-[#8B86A0] rounded-lg border border-[#ECE7F5] text-sm font-medium">
+                  <div className="w-full flex items-center gap-2 px-4 py-2.5 bg-[#FAF9F6] text-[#7C857F] rounded-lg border border-[#E4E5DE] text-sm font-medium">
                     Marked as not pursuing
                   </div>
                 ) : null}
@@ -2780,7 +2780,7 @@ export function IntakeReviewScreen({
                   <button
                     type="button"
                     onClick={openFirmDocRequestModal}
-                    className="w-full flex items-center gap-2 px-4 py-2.5 bg-white text-[#14112E] rounded-lg border border-[#ECE7F5] hover:bg-[#F5F1FB] transition-colors text-sm font-medium"
+                    className="w-full flex items-center gap-2 px-4 py-2.5 bg-white text-[#1B2623] rounded-lg border border-[#E4E5DE] hover:bg-[#F2F4EC] transition-colors text-sm font-medium"
                   >
                     Request Additional Documents
                   </button>
@@ -2795,10 +2795,10 @@ export function IntakeReviewScreen({
               className="hidden"
             >
               <div className="flex items-start gap-3">
-                <AlertCircle className="w-4 h-4 text-[#8B86A0] flex-shrink-0 mt-0.5" />
+                <AlertCircle className="w-4 h-4 text-[#7C857F] flex-shrink-0 mt-0.5" />
                 <div>
-                  <h3 className="text-sm font-medium text-[#14112E]/70 mb-1">Workflow Observation</h3>
-                  <p className="text-xs text-[#14112E]/55 leading-relaxed">
+                  <h3 className="text-sm font-medium text-[#1B2623]/70 mb-1">Workflow Observation</h3>
+                  <p className="text-xs text-[#1B2623]/55 leading-relaxed">
                     Some timeline events reference additional documentation that may improve organization clarity.
                   </p>
                 </div>
@@ -2809,9 +2809,9 @@ export function IntakeReviewScreen({
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
-              className="border-t border-[#ECE7F5] px-2 py-4"
+              className="border-t border-[#E4E5DE] px-2 py-4"
             >
-              <p className="text-xs text-[#14112E]/55 leading-relaxed">
+              <p className="text-xs text-[#1B2623]/55 leading-relaxed">
                 {ONE3SEVEN_NOTICES.positioning}
                 <br />
                 <br />
@@ -2826,7 +2826,7 @@ export function IntakeReviewScreen({
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
                 className="rounded-[28px] overflow-hidden shadow-[0_28px_80px_rgba(109,74,255,0.18)]"
-                style={{ background: 'linear-gradient(145deg, #14112E 0%, #221B47 55%, #4C1D96 100%)' }}
+                style={{ background: 'linear-gradient(145deg, #1B2623 0%, #2C3A34 55%, #42574E 100%)' }}
               >
                 <div className="px-7 py-8">
                   <p className="text-[10px] font-700 uppercase tracking-[0.2em] text-[#7C8B6F] mb-3" style={{ fontWeight: 700 }}>
@@ -2877,10 +2877,10 @@ export function IntakeReviewScreen({
               exit={{ opacity: 0, scale: 0.96, y: 10 }}
               className="fixed inset-x-4 bottom-6 z-[200] mx-auto max-w-sm rounded-3xl bg-white p-6 shadow-2xl sm:inset-auto sm:left-1/2 sm:-translate-x-1/2 sm:top-1/2 sm:-translate-y-1/2"
             >
-              <h3 className="text-base font-semibold text-[#14112E] mb-2">
+              <h3 className="text-base font-semibold text-[#1B2623] mb-2">
                 Mark as not pursuing?
               </h3>
-              <p className="text-sm text-[#14112E]/65 leading-relaxed mb-6">
+              <p className="text-sm text-[#1B2623]/65 leading-relaxed mb-6">
                 This intake will stay in your review queue for reference. The worker won't be notified — this is an internal status only.
               </p>
               <div className="flex gap-3">
@@ -2888,7 +2888,7 @@ export function IntakeReviewScreen({
                   type="button"
                   onClick={() => setShowDeclineConfirm(false)}
                   disabled={declineSubmitting}
-                  className="flex-1 rounded-full border border-[#ECE7F5] py-3 text-sm font-medium text-[#6B6685] transition-colors hover:bg-[#F5F1FB] disabled:opacity-50"
+                  className="flex-1 rounded-full border border-[#E4E5DE] py-3 text-sm font-medium text-[#6A6D66] transition-colors hover:bg-[#F2F4EC] disabled:opacity-50"
                 >
                   Cancel
                 </button>
@@ -2896,7 +2896,7 @@ export function IntakeReviewScreen({
                   type="button"
                   onClick={() => void handleDeclineIntake()}
                   disabled={declineSubmitting}
-                  className="flex-1 rounded-full bg-[#42574E] py-3 text-sm font-medium text-white transition-colors hover:bg-[#4C1D96] disabled:opacity-50"
+                  className="flex-1 rounded-full bg-[#42574E] py-3 text-sm font-medium text-white transition-colors hover:bg-[#42574E] disabled:opacity-50"
                 >
                   {declineSubmitting ? 'Saving…' : 'Confirm'}
                 </button>
@@ -2927,7 +2927,7 @@ export function IntakeReviewScreen({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-[#14112E]/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-[#1B2623]/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
             onClick={() => setShowStatusModal(false)}
           >
             <motion.div
@@ -2937,8 +2937,8 @@ export function IntakeReviewScreen({
               onClick={(e) => e.stopPropagation()}
               className="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl"
             >
-              <h3 className="text-lg font-semibold text-[#14112E] mb-2">Update demo workspace status</h3>
-              <p className="text-xs text-[#8B86A0] mb-4 leading-relaxed">
+              <h3 className="text-lg font-semibold text-[#1B2623] mb-2">Update demo workspace status</h3>
+              <p className="text-xs text-[#7C857F] mb-4 leading-relaxed">
                 For local demo layouts only. Live intakes use persisted workflow status from the database.
               </p>
               <div className="space-y-2 mb-6">
@@ -2959,7 +2959,7 @@ export function IntakeReviewScreen({
                     className={`w-full px-4 py-3 rounded-lg text-sm font-medium text-left transition-colors ${
                       workflowStatus === status
                         ? 'bg-[#42574E] text-white'
-                        : 'bg-[#FAF9F6] text-[#3A3552] hover:bg-[#F1ECFE]'
+                        : 'bg-[#FAF9F6] text-[#384039] hover:bg-[#F2F4EC]'
                     }`}
                   >
                     {getStatusLabel(status)}
@@ -2968,7 +2968,7 @@ export function IntakeReviewScreen({
               </div>
               <button
                 onClick={() => setShowStatusModal(false)}
-                className="w-full bg-[#F1ECFE] text-[#14112E] py-2.5 px-4 rounded-lg hover:bg-[#ECE7F5] transition-colors text-sm font-medium"
+                className="w-full bg-[#F2F4EC] text-[#1B2623] py-2.5 px-4 rounded-lg hover:bg-[#E4E5DE] transition-colors text-sm font-medium"
               >
                 Cancel
               </button>
@@ -2984,7 +2984,7 @@ export function IntakeReviewScreen({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-[#14112E]/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-[#1B2623]/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
             onClick={closeFirmDocRequestModal}
           >
             <motion.div
@@ -2994,8 +2994,8 @@ export function IntakeReviewScreen({
               onClick={(e) => e.stopPropagation()}
               className="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl"
             >
-              <h3 className="text-lg font-semibold text-[#14112E] mb-2">Request additional documents</h3>
-              <p className="text-sm text-[#6B6685] mb-4">
+              <h3 className="text-lg font-semibold text-[#1B2623] mb-2">Request additional documents</h3>
+              <p className="text-sm text-[#6A6D66] mb-4">
                 Select the records your firm needs before continuing review.
               </p>
               {docReqError ? (
@@ -3010,7 +3010,7 @@ export function IntakeReviewScreen({
                     className={`flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-sm cursor-pointer border transition-colors ${
                       docReqCategories.includes(category)
                         ? 'bg-[#42574E] text-white border-[#42574E]'
-                        : 'bg-[#FAF9F6] text-[#3A3552] border-[#ECE7F5] hover:bg-[#F1ECFE]'
+                        : 'bg-[#FAF9F6] text-[#384039] border-[#E4E5DE] hover:bg-[#F2F4EC]'
                     }`}
                   >
                     <input
@@ -3022,25 +3022,25 @@ export function IntakeReviewScreen({
                     />
                     <span
                       className={`w-4 h-4 rounded border-2 flex-shrink-0 flex items-center justify-center ${
-                        docReqCategories.includes(category) ? 'border-white bg-white' : 'border-[#D6CEE8] bg-white'
+                        docReqCategories.includes(category) ? 'border-white bg-white' : 'border-[#CBD6CF] bg-white'
                       }`}
                     >
                       {docReqCategories.includes(category) ? (
-                        <CheckCircle2 className="w-3 h-3 text-[#14112E]" />
+                        <CheckCircle2 className="w-3 h-3 text-[#1B2623]" />
                       ) : null}
                     </span>
                     {polishHumanReadableDisplayText(category) || category}
                   </label>
                 ))}
               </div>
-              <label className="text-sm font-medium text-[#14112E] mb-1 block">Optional note</label>
+              <label className="text-sm font-medium text-[#1B2623] mb-1 block">Optional note</label>
               <textarea
                 value={docReqNote}
                 onChange={(e) => {
                   setDocReqNote(e.target.value);
                   if (docReqError) setDocReqError(null);
                 }}
-                className="w-full mb-4 px-3 py-2 border border-[#ECE7F5] rounded-lg text-sm h-24 resize-none"
+                className="w-full mb-4 px-3 py-2 border border-[#E4E5DE] rounded-lg text-sm h-24 resize-none"
                 placeholder="Add context for the record owner (optional)."
                 disabled={docReqSubmitting}
               />
@@ -3062,7 +3062,7 @@ export function IntakeReviewScreen({
                   type="button"
                   onClick={closeFirmDocRequestModal}
                   disabled={docReqSubmitting}
-                  className="flex-1 bg-[#F1ECFE] text-[#14112E] py-2.5 rounded-lg text-sm font-medium"
+                  className="flex-1 bg-[#F2F4EC] text-[#1B2623] py-2.5 rounded-lg text-sm font-medium"
                 >
                   Cancel
                 </button>

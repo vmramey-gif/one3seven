@@ -103,11 +103,11 @@ export function TexasCriminalDemoPage() {
   const cats = Array.from(new Set(DOCS.map((d) => d.cat)));
 
   return (
-    <div className="min-h-screen bg-[#FAF9FE] text-[#14112E]">
+    <div className="min-h-screen bg-[#FBFBFA] text-[#1B2623]">
       <nav className="sticky top-0 z-40 border-b border-violet-100/80 bg-white/92 px-5 py-3 backdrop-blur-sm">
         <div className="mx-auto flex max-w-2xl items-center justify-between">
           <span className="text-[15px] font-bold tracking-tight">one<span className="font-black text-[#42574E]">3</span>seven</span>
-          <span className="rounded-full bg-[#EDE7FF] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-[#42574E]">TX criminal · demo</span>
+          <span className="rounded-full bg-[#F2F4EC] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-[#42574E]">TX criminal · demo</span>
         </div>
       </nav>
 
@@ -120,15 +120,15 @@ export function TexasCriminalDemoPage() {
               <h1 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="text-2xl font-medium leading-snug">
                 This is {CLIENT}.
               </h1>
-              <p className="mx-auto mt-3 max-w-md text-[15px] leading-relaxed text-[#14112E]/70">
+              <p className="mx-auto mt-3 max-w-md text-[15px] leading-relaxed text-[#1B2623]/70">
                 Days after an arrest in Harris County, his life is a stack of paperwork he doesn't understand —
                 a citation, bond documents, a court date he's afraid to miss. Here's how one3seven helps him walk
-                into a defense attorney's office <span className="font-semibold text-[#14112E]">organized</span> instead of overwhelmed.
+                into a defense attorney's office <span className="font-semibold text-[#1B2623]">organized</span> instead of overwhelmed.
               </p>
-              <button onClick={() => setPhase('intake')} className="mt-7 inline-flex min-h-[48px] items-center gap-2 rounded-full bg-[#42574E] px-6 text-sm font-semibold text-white hover:bg-[#4C1D96]">
+              <button onClick={() => setPhase('intake')} className="mt-7 inline-flex min-h-[48px] items-center gap-2 rounded-full bg-[#42574E] px-6 text-sm font-semibold text-white hover:bg-[#42574E]">
                 See the intake <ArrowRight className="h-4 w-4" />
               </button>
-              <p className="mt-5 text-[11px] text-[#14112E]/40">Sample data for demonstration. one3seven is not a law firm and does not provide legal advice.</p>
+              <p className="mt-5 text-[11px] text-[#1B2623]/40">Sample data for demonstration. one3seven is not a law firm and does not provide legal advice.</p>
             </motion.div>
           )}
 
@@ -136,7 +136,7 @@ export function TexasCriminalDemoPage() {
           {phase === 'intake' && (
             <motion.div key="intake" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-6">
               <Section title="His story, in his own words">
-                <p className="rounded-[14px] border border-violet-100 bg-white p-4 text-[14px] leading-relaxed text-[#14112E]/80">{STORY_TEXT}</p>
+                <p className="rounded-[14px] border border-violet-100 bg-white p-4 text-[14px] leading-relaxed text-[#1B2623]/80">{STORY_TEXT}</p>
               </Section>
 
               <Section title="What he has">
@@ -146,7 +146,7 @@ export function TexasCriminalDemoPage() {
                       <d.icon className="h-4 w-4 shrink-0 text-[#42574E]" />
                       <div className="min-w-0">
                         <p className="truncate text-[13px] font-semibold">{d.label}</p>
-                        <p className="text-[11px] text-[#14112E]/45">{d.cat} · {d.size}{d.recovered ? ` · ${d.recovered}` : ''}</p>
+                        <p className="text-[11px] text-[#1B2623]/45">{d.cat} · {d.size}{d.recovered ? ` · ${d.recovered}` : ''}</p>
                       </div>
                     </div>
                   ))}
@@ -157,16 +157,16 @@ export function TexasCriminalDemoPage() {
                 <div className="overflow-hidden rounded-[14px] border border-violet-100 bg-white">
                   {KEY_FACTS.map((f, i) => (
                     <div key={f.label} className={`flex flex-col gap-0.5 px-4 py-2.5 ${i ? 'border-t border-violet-50' : ''}`}>
-                      <span className="text-[11px] font-medium text-[#14112E]/45">{f.label}</span>
-                      <span className="text-[13px] text-[#14112E]/85">{f.answer}</span>
+                      <span className="text-[11px] font-medium text-[#1B2623]/45">{f.label}</span>
+                      <span className="text-[13px] text-[#1B2623]/85">{f.answer}</span>
                     </div>
                   ))}
                 </div>
               </Section>
 
               <div className="flex items-center justify-between">
-                <button onClick={() => setPhase('intro')} className="inline-flex items-center gap-1 text-sm font-medium text-[#14112E]/55 hover:text-[#14112E]"><ArrowLeft className="h-4 w-4" /> Back</button>
-                <button onClick={() => setPhase('processing')} className="inline-flex min-h-[48px] items-center gap-2 rounded-full bg-[#42574E] px-6 text-sm font-semibold text-white hover:bg-[#4C1D96]">
+                <button onClick={() => setPhase('intro')} className="inline-flex items-center gap-1 text-sm font-medium text-[#1B2623]/55 hover:text-[#1B2623]"><ArrowLeft className="h-4 w-4" /> Back</button>
+                <button onClick={() => setPhase('processing')} className="inline-flex min-h-[48px] items-center gap-2 rounded-full bg-[#42574E] px-6 text-sm font-semibold text-white hover:bg-[#42574E]">
                   Organize this <ArrowRight className="h-4 w-4" />
                 </button>
               </div>
@@ -180,8 +180,8 @@ export function TexasCriminalDemoPage() {
               <p className="mt-6 text-[15px] font-semibold">Organizing the file…</p>
               <div className="mx-auto mt-5 max-w-xs space-y-2 text-left">
                 {PROCESSING_STEPS.map((s, i) => (
-                  <div key={s} className={`flex items-center gap-2 text-[13px] transition ${i < procStep ? 'text-[#14112E]' : 'text-[#14112E]/30'}`}>
-                    {i < procStep ? <CheckCircle2 className="h-4 w-4 text-emerald-500" /> : <div className="h-4 w-4 rounded-full border border-[#14112E]/20" />}
+                  <div key={s} className={`flex items-center gap-2 text-[13px] transition ${i < procStep ? 'text-[#1B2623]' : 'text-[#1B2623]/30'}`}>
+                    {i < procStep ? <CheckCircle2 className="h-4 w-4 text-emerald-500" /> : <div className="h-4 w-4 rounded-full border border-[#1B2623]/20" />}
                     {s}
                   </div>
                 ))}
@@ -195,10 +195,10 @@ export function TexasCriminalDemoPage() {
               <div className="rounded-[16px] border border-violet-100 bg-white p-5">
                 <p className="text-[11px] font-bold uppercase tracking-wide text-[#42574E]">What the attorney receives</p>
                 <h2 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="mt-1 text-xl font-medium">{CLIENT}</h2>
-                <p className="text-[12px] text-[#14112E]/50">{MATTER}</p>
-                <p className="mt-3 text-[13px] leading-relaxed text-[#14112E]/75">{ORGANIZED_SUMMARY}</p>
+                <p className="text-[12px] text-[#1B2623]/50">{MATTER}</p>
+                <p className="mt-3 text-[13px] leading-relaxed text-[#1B2623]/75">{ORGANIZED_SUMMARY}</p>
                 <div className="mt-3 flex flex-wrap gap-1.5">
-                  {AREAS.map((a) => <span key={a} className="rounded-full bg-[#F3EEFF] px-2.5 py-1 text-[11px] font-semibold text-[#42574E]">{a}</span>)}
+                  {AREAS.map((a) => <span key={a} className="rounded-full bg-[#F2F4EC] px-2.5 py-1 text-[11px] font-semibold text-[#42574E]">{a}</span>)}
                 </div>
               </div>
 
@@ -210,10 +210,10 @@ export function TexasCriminalDemoPage() {
                       <div className="min-w-0">
                         <div className="flex flex-wrap items-center gap-2">
                           <span className="text-[13px] font-bold">{t.label}</span>
-                          <span className="text-[11px] text-[#14112E]/45">{t.date}</span>
-                          {t.tag && <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${t.gap ? 'bg-amber-50 text-amber-700' : 'bg-[#F3EEFF] text-[#42574E]'}`}>{t.tag}</span>}
+                          <span className="text-[11px] text-[#1B2623]/45">{t.date}</span>
+                          {t.tag && <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${t.gap ? 'bg-amber-50 text-amber-700' : 'bg-[#F2F4EC] text-[#42574E]'}`}>{t.tag}</span>}
                         </div>
-                        <p className="mt-0.5 text-[12px] leading-relaxed text-[#14112E]/65">{t.detail}</p>
+                        <p className="mt-0.5 text-[12px] leading-relaxed text-[#1B2623]/65">{t.detail}</p>
                       </div>
                     </div>
                   ))}
@@ -224,7 +224,7 @@ export function TexasCriminalDemoPage() {
                 <div className="space-y-3">
                   {cats.map((c) => (
                     <div key={c}>
-                      <p className="mb-1 text-[11px] font-bold uppercase tracking-wide text-[#14112E]/45">{c}</p>
+                      <p className="mb-1 text-[11px] font-bold uppercase tracking-wide text-[#1B2623]/45">{c}</p>
                       <div className="flex flex-wrap gap-1.5">
                         {DOCS.filter((d) => d.cat === c).map((d) => (
                           <span key={d.label} className="inline-flex items-center gap-1.5 rounded-full border border-violet-100 bg-white px-2.5 py-1 text-[11px] font-medium">
@@ -240,7 +240,7 @@ export function TexasCriminalDemoPage() {
               <Section title="Additional information that may help">
                 <ul className="space-y-2">
                   {SUGGESTIONS.map((s) => (
-                    <li key={s} className="flex gap-2 rounded-[12px] border border-amber-100 bg-amber-50/50 p-3 text-[12px] leading-relaxed text-[#14112E]/75">
+                    <li key={s} className="flex gap-2 rounded-[12px] border border-amber-100 bg-amber-50/50 p-3 text-[12px] leading-relaxed text-[#1B2623]/75">
                       <Search className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-600" /> {s}
                     </li>
                   ))}
@@ -250,16 +250,16 @@ export function TexasCriminalDemoPage() {
               {/* The discipline line — non-negotiable in a criminal context */}
               <div className="rounded-[16px] border border-[#42574E]/20 bg-[#F2F4EC] p-5">
                 <div className="flex items-center gap-2"><Shield className="h-4 w-4 text-[#42574E]" /><p className="text-[13px] font-bold text-[#42574E]">one3seven organizes and reflects.</p></div>
-                <p className="mt-2 text-[12px] leading-relaxed text-[#14112E]/70">
+                <p className="mt-2 text-[12px] leading-relaxed text-[#1B2623]/70">
                   It does not assess guilt or innocence, weigh the evidence, or suggest a defense strategy. It organizes the
                   record so the attorney opens a structured file — every decision stays with the attorney.
                 </p>
-                <p className="mt-2 flex items-center gap-1.5 text-[11px] text-[#14112E]/45"><Lock className="h-3 w-3" /> Sample data. Not a law firm. Not legal advice.</p>
+                <p className="mt-2 flex items-center gap-1.5 text-[11px] text-[#1B2623]/45"><Lock className="h-3 w-3" /> Sample data. Not a law firm. Not legal advice.</p>
               </div>
 
               <div className="flex items-center justify-between pt-1">
-                <button onClick={() => setPhase('intro')} className="inline-flex items-center gap-1 text-sm font-medium text-[#14112E]/55 hover:text-[#14112E]"><ArrowLeft className="h-4 w-4" /> Start over</button>
-                <span className="text-[12px] font-medium text-[#14112E]/45">Scattered paperwork in → a clear file out.</span>
+                <button onClick={() => setPhase('intro')} className="inline-flex items-center gap-1 text-sm font-medium text-[#1B2623]/55 hover:text-[#1B2623]"><ArrowLeft className="h-4 w-4" /> Start over</button>
+                <span className="text-[12px] font-medium text-[#1B2623]/45">Scattered paperwork in → a clear file out.</span>
               </div>
             </motion.div>
           )}
@@ -272,7 +272,7 @@ export function TexasCriminalDemoPage() {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section>
-      <h3 className="mb-2 text-[13px] font-bold uppercase tracking-wide text-[#14112E]/55">{title}</h3>
+      <h3 className="mb-2 text-[13px] font-bold uppercase tracking-wide text-[#1B2623]/55">{title}</h3>
       {children}
     </section>
   );
