@@ -31,7 +31,7 @@ const HOW_IT_WORKS = [
   {
     step: '02',
     title: 'AI organizes and structures the record',
-    body: 'The engine extracts a timeline, categorizes documents, sequences events chronologically, and flags dates that may require timely attorney review.',
+    body: 'The engine organizes uploaded records into a chronological timeline, groups related documents, and surfaces information found in those records — flagging dates that may warrant timely attorney review.',
     color: 'bg-[#6D4AFF]/[0.08] border-[#6D4AFF]/25',
     accent: 'text-[#C4B5FD]',
     tag: 'one3seven',
@@ -50,7 +50,7 @@ const FIRM_FEATURES = [
   { icon: Clock, label: 'Event timing cards', desc: 'Displays the dates and elapsed time between events in the timeline.', tip: 'Dates and events are pulled from uploaded records and worker-provided context.' },
   { icon: Shield, label: 'Time-sensitive date flag', desc: 'Surfaces dates that may affect agency or court filing periods for attorney review.' },
   { icon: FileText, label: 'Document checklist', desc: 'Requested vs. received — at a glance, no manual cross-referencing.' },
-  { icon: Zap, label: 'Source-linked information extraction', desc: 'Key language, dates, and employer responses linked to the uploaded source records.', tip: 'Records are structured for attorney review. one3seven does not make legal conclusions.' },
+  { icon: Zap, label: 'Source-linked information', desc: 'Key language, dates, and employer responses linked to the uploaded source records.', tip: 'Records are structured for attorney review. one3seven does not make legal conclusions.' },
   { icon: CheckCircle2, label: 'Intake link sharing', desc: 'One URL you share — workers go through guided intake and land in your dashboard.' },
 ];
 
@@ -1126,7 +1126,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
               Employment matters rarely arrive organized
             </h2>
             <p className="text-[15px] leading-relaxed text-[#C9C4E6] sm:text-[16px]">
-              Workers show up with documents scattered across phones, emails, and folders — no order, no timeline, no clear story. Attorneys spend the first consultation assembling the record instead of evaluating the matter. When intake is disorganized, important information gets missed, decisions get delayed, and time-sensitive issues can slip through.
+              Workers show up with documents scattered across phones, emails, and folders — no order, no timeline, no clear story. Too often, attorneys spend the first consultation organizing records instead of evaluating them. When intake is disorganized, important information gets missed, decisions get delayed, and time-sensitive issues can slip through.
             </p>
           </div>
 
@@ -1145,7 +1145,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
               },
               {
                 Icon: CalendarClock,
-                title: 'Filing periods vary',
+                title: 'Important dates can be easy to miss',
                 body: 'Employment matters may involve different filing periods depending on the events, allegations, and jurisdiction. Critical dates can be difficult to identify when the record is incomplete.',
               },
             ].map((c) => (
@@ -1230,7 +1230,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
                 <span className="text-[#C4B5FD]">You control what's shared.</span>
               </h2>
               <p className="mb-8 text-[15px] leading-relaxed text-white/60">
-                Upload your documents. The AI does the rest. You see your own timeline, your status, and you decide when — and with whom — to share your intake.
+                Upload your documents. one3seven organizes them into a structured intake. You see your own timeline, your status, and you decide when — and with whom — to share your intake.
               </p>
               <button
                 type="button"
