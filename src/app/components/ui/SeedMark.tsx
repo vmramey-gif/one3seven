@@ -5,8 +5,8 @@
  */
 
 const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
-const BRAND: [number, number, number] = [91, 33, 182]; // #42574E
-const LAV: [number, number, number] = [181, 168, 232];
+const BRAND: [number, number, number] = [66, 87, 78]; // #42574E sage — deep, center
+const LAV: [number, number, number] = [150, 171, 156]; // #96AB9C light sage — edge
 
 const hex = (a: number[]) => '#' + a.map((v) => Math.round(v).toString(16).padStart(2, '0')).join('');
 const lerp = (a: number[], b: number[], t: number): number[] => a.map((v, i) => v + (b[i] - v) * t);

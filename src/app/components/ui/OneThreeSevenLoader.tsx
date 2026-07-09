@@ -19,9 +19,9 @@ const SPIRAL_TURNS = 0.32; // a soft inward arc, not a spin
 const FORM_MS = 2400; // scatter → formed (seeds accelerate inward)
 const STAGGER = 0.55; // staggered arrival gathered into a collective rush
 
-// Scattered lavender → organized brand purple (#42574E = 91,33,182).
-const LAV: [number, number, number] = [198, 190, 232];
-const BRAND: [number, number, number] = [91, 33, 182];
+// Scattered light sage → organized deep sage (#42574E = 66,87,78).
+const LAV: [number, number, number] = [190, 204, 193];
+const BRAND: [number, number, number] = [66, 87, 78];
 
 interface Seed {
   tAngle: number; // target angle (phyllotaxis)
