@@ -15,6 +15,7 @@ import { CrmAccessGate } from './app/components/CrmAccessGate.tsx';
 import { TermsPage } from './app/screens/TermsPage.tsx';
 import { PrivacyPage } from './app/screens/PrivacyPage.tsx';
 import { ForFirmsPage } from './app/screens/ForFirmsPage.tsx';
+import { BrandPreviewPage } from './app/screens/BrandPreviewPage.tsx';
 import { LanguageProvider } from './i18n/i18n.tsx';
 import { OFFLINE_DEV_GALLERY_ONLY } from './lib/supabaseAvailability.ts';
 import { isSupabaseConfigured } from './lib/supabaseClient';
@@ -55,6 +56,10 @@ const isForFirms =
   url.searchParams.has('for-firms') ||
   url.pathname === '/for-firms';
 
+const isBrand =
+  url.searchParams.has('brand') ||
+  url.pathname === '/brand';
+
 // Stripe billing return — ?billing=success|canceled|portal_return
 // Store in sessionStorage so App.tsx can surface a notification, then strip from URL.
 const billingResult = url.searchParams.get('billing');
@@ -92,6 +97,7 @@ const routeTitle =
   : isWorkerDemo ? 'Worker Demo — one3seven'
   : isDemo ? 'Sample Intake Demo — one3seven'
   : isForFirms ? 'one3seven for Firms — Organized Employment Intake'
+  : isBrand ? 'one3seven — Brand Preview'
   : null;
 if (routeTitle) document.title = routeTitle;
 
@@ -126,6 +132,10 @@ if (url.pathname === '/terms') {
 } else if (isDemo) {
   createRoot(rootEl).render(
     <AppErrorBoundary><DemoApp /></AppErrorBoundary>
+  );
+} else if (isBrand) {
+  createRoot(rootEl).render(
+    <AppErrorBoundary><BrandPreviewPage /></AppErrorBoundary>
   );
 } else if (isForFirms) {
   createRoot(rootEl).render(
