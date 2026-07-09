@@ -35,6 +35,32 @@ import { STARTER_QUESTIONS, askAssistant, type ChatMessage } from '../../service
 
 type Tab = 'dashboard' | 'pipeline' | 'firms' | 'activity' | 'metrics' | 'revenue' | 'comp' | 'economics' | 'growth' | 'team' | 'inbox' | 'notes' | 'scripts' | 'training' | 'askai' | 'checklist' | 'audit' | 'links' | 'email_fu' | 'add';
 
+// Pre-filled outreach email. Opens the founder's default mail app (Outlook) composing
+// FROM victoria@ — so it lands in Sent and replies thread back — with the firm's own
+// personalized hook (from notes) already drafted. Founder reviews and sends.
+// Verb-test clean: organizes & reflects, never concludes; free pilot; honest opt-out.
+function outreachMailto(firm: { email: string | null; name: string; attorney_name: string | null; notes: string | null }): string {
+  const first = (firm.attorney_name ?? '').trim().split(/\s+/)[0] || 'there';
+  const hook = (firm.notes ?? '').trim();
+  const subject = `Organized employment intakes for ${firm.name}`;
+  const body = [
+    `Hi ${first},`,
+    '',
+    hook || 'I work with California plaintiff-side employment firms.',
+    '',
+    'I built one3seven for firms like yours: a worker uploads their scattered records, and you open a clean, source-linked intake — a dated timeline, grouped documents, every fact traceable to its source — before your first call. It organizes and reflects; it never draws legal conclusions. You evaluate everything.',
+    '',
+    "We're opening a small founding cohort with a free pilot. Could I send you a real sample intake to look at?",
+    '',
+    'Best,',
+    'Victoria Ramey',
+    'one3seven · https://www.one3seven.com/for-firms',
+    '',
+    'Not the right fit? Reply "no thanks" and I won\'t follow up.',
+  ].join('\n');
+  return `mailto:${firm.email ?? ''}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
 // Every URL off www.one3seven.com, grouped — the founder "links in one place" directory.
 const SITE_BASE = 'https://www.one3seven.com';
 const SITE_LINK_GROUPS: { group: string; items: { path: string; label: string; desc: string }[] }[] = [
@@ -731,7 +757,7 @@ function FirmCard({ firm, onLog, today, onQuickEmail, onQuickLog, userId, onClai
           </a>
         )}
         {firm.email && (
-          <a href={`mailto:${firm.email}`} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#F2F4EC] text-[#42574E]" aria-label={`Email ${firm.name}`}>
+          <a href={outreachMailto(firm)} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#F2F4EC] text-[#42574E]" aria-label={`Email ${firm.name}`}>
             <Mail className="h-4 w-4" />
           </a>
         )}
@@ -739,7 +765,7 @@ function FirmCard({ firm, onLog, today, onQuickEmail, onQuickLog, userId, onClai
       <div className="space-y-2 border-t border-[#F2F4EC] p-3">
           {firm.attorney_name && <div className="text-[12px] text-[#1B2623]/55">{firm.attorney_name}</div>}
           {firm.email && (
-            <a href={`mailto:${firm.email}`} className="flex items-center gap-1.5 break-all text-[13px] font-semibold text-[#42574E] underline underline-offset-2">
+            <a href={outreachMailto(firm)} className="flex items-center gap-1.5 break-all text-[13px] font-semibold text-[#42574E] underline underline-offset-2">
               <Mail className="h-3.5 w-3.5 shrink-0" /> {firm.email}
             </a>
           )}
@@ -1684,7 +1710,7 @@ function FounderEmailQueueTab({ firms, onFounderEmailDone }: { firms: CrmFirm[];
                 <div className="break-words text-[14px] font-bold text-[#1B2623]">{f.name}</div>
                 {f.attorney_name && <div className="text-[11px] text-[#1B2623]/50">{f.attorney_name}</div>}
                 {f.email
-                  ? <a href={`mailto:${f.email}`} className="break-all text-[12px] font-semibold text-[#42574E] underline">{f.email}</a>
+                  ? <a href={outreachMailto(f)} className="break-all text-[12px] font-semibold text-[#42574E] underline">{f.email}</a>
                   : <span className="text-[12px] text-[#1B2623]/40">no email on file</span>}
               </div>
               {onFounderEmailDone && (
@@ -1735,7 +1761,7 @@ function FirmRow({ firm, me, today, onLog, onClaim, onNoContact, onNotInterested
             <button type="button" disabled={claiming} onClick={async () => { setClaiming(true); try { await onClaim(firm.id); } finally { setClaiming(false); } }} className="rounded-full bg-[#F2F4EC] px-2 py-1 text-[10px] font-bold text-[#42574E] disabled:opacity-50">{claiming ? '…' : 'Claim'}</button>
           )}
           {firm.phone && <a href={`tel:${digitsOf(firm.phone)}`} className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-50 text-emerald-600" aria-label={`Call ${firm.name}`}><Phone className="h-3.5 w-3.5" /></a>}
-          {firm.email && <a href={`mailto:${firm.email}`} className="flex h-7 w-7 items-center justify-center rounded-full bg-[#F2F4EC] text-[#42574E]" aria-label={`Email ${firm.name}`}><Mail className="h-3.5 w-3.5" /></a>}
+          {firm.email && <a href={outreachMailto(firm)} className="flex h-7 w-7 items-center justify-center rounded-full bg-[#F2F4EC] text-[#42574E]" aria-label={`Email ${firm.name}`}><Mail className="h-3.5 w-3.5" /></a>}
           <button type="button" onClick={() => onLog(firm.id)} className="rounded-full bg-[#42574E] px-3 py-1 text-[11px] font-bold text-white hover:bg-[#374A42]">Log</button>
           {(onNoContact || onNotInterested) && (
             <button type="button" onClick={() => setMenu((v) => !v)} aria-label="More actions" className="flex h-7 w-7 items-center justify-center rounded-full text-[16px] font-bold leading-none text-[#1B2623]/50 hover:bg-[#F2F4EC]">⋯</button>
