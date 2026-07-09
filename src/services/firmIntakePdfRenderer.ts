@@ -4,7 +4,7 @@
  * It performs no content selection, no language generation, and no interpretation;
  * every string handed to it has already passed the dictionary/guardrail layer.
  *
- * Brand color: #5B21B6 ("bold confidence").
+ * Brand color: #42574E (sage — 2026-07-08 brand). Violet is reserved for AI UI only.
  */
 
 import { PDFDocument, StandardFonts, rgb, PDFName, PDFArray, type PDFFont, type PDFPage, type RGB } from 'pdf-lib';
@@ -19,11 +19,11 @@ import type { DamagesReport } from './damagesCalculator';
 export type PdfSourceDoc = { docId: string; fileName: string; mime: string; bytes: Uint8Array };
 
 // ── Brand + palette ──────────────────────────────────────────────────────────
-const BRAND = rgb(0x5b / 255, 0x21 / 255, 0xb6 / 255); // #5B21B6
-const BRAND_SOFT = rgb(0xf3 / 255, 0xef / 255, 0xff / 255); // tint fill
-const BRAND_LINE = rgb(0xe5 / 255, 0xde / 255, 0xf8 / 255); // hairline
-const INK = rgb(0.07, 0.08, 0.12);
-const SOFT = rgb(0.22, 0.25, 0.37);
+const BRAND = rgb(0x42 / 255, 0x57 / 255, 0x4e / 255); // #42574E sage
+const BRAND_SOFT = rgb(0xe7 / 255, 0xed / 255, 0xe8 / 255); // #E7EDE8 sage tint fill
+const BRAND_LINE = rgb(0xd3 / 255, 0xde / 255, 0xd6 / 255); // #D3DED6 sage hairline
+const INK = rgb(0.10, 0.13, 0.11); // green-ink
+const SOFT = rgb(0.24, 0.28, 0.26); // sage-gray
 const MUTED = rgb(0.45, 0.47, 0.55);
 const WHITE = rgb(1, 1, 1);
 const AMBER_FILL = rgb(1.0, 0.97, 0.9);
@@ -466,8 +466,8 @@ function drawCover(c: Cursor, cover: CoverData, bandTitle: string, subtitle: str
   // brand band
   c.page.drawRectangle({ x: 0, y: PAGE_H - 170, width: PAGE_W, height: 170, color: BRAND });
   c.page.drawText('one3seven', { x: MARGIN, y: PAGE_H - 86, size: 26, font: c.bold, color: WHITE });
-  c.page.drawText(bandTitle, { x: MARGIN, y: PAGE_H - 116, size: 12, font: c.bold, color: rgb(0.86, 0.82, 0.98) });
-  c.page.drawText(subtitle, { x: MARGIN, y: PAGE_H - 138, size: 10.5, font: c.font, color: rgb(0.82, 0.78, 0.96) });
+  c.page.drawText(bandTitle, { x: MARGIN, y: PAGE_H - 116, size: 12, font: c.bold, color: rgb(0.87, 0.91, 0.87) });
+  c.page.drawText(subtitle, { x: MARGIN, y: PAGE_H - 138, size: 10.5, font: c.font, color: rgb(0.80, 0.86, 0.81) });
 
   c.y = PAGE_H - 230;
 
