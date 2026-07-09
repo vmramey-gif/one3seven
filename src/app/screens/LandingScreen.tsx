@@ -480,7 +480,7 @@ export function LandingScreen({
         meta={noFirmConnected ? 'No firm connected — tap to add a firm code' : peek}
         defaultOpen={noFirmConnected}
         size={size}
-        className={workerDashboardCompact ? 'bg-white/80' : 'bg-[#F8F6FF]'}
+        className={workerDashboardCompact ? 'bg-white/80' : 'bg-[#F1F3EF]'}
       >
         {isParticipatingSubmissionChannel(opts.channel) ? (
           <ParticipatingNetworkStatusSection
@@ -545,7 +545,7 @@ export function LandingScreen({
                 <select
                   value={selectedStatusJourney.intakeId}
                   onChange={(event) => setSelectedStatusIntakeId(event.target.value)}
-                  className="w-full max-w-full rounded-2xl border border-[#CBD6CF] bg-[#FBFAFF] px-3 py-2 text-sm font-medium text-[#1B2623] shadow-sm outline-none transition focus:border-[#42574E] focus:ring-2 focus:ring-[#CBD6CF]"
+                  className="w-full max-w-full rounded-2xl border border-[#CBD6CF] bg-[#FBFBFA] px-3 py-2 text-sm font-medium text-[#1B2623] shadow-sm outline-none transition focus:border-[#42574E] focus:ring-2 focus:ring-[#CBD6CF]"
                 >
                   {statusJourneyOptions.map((option) => (
                     <option key={option.intakeId} value={option.intakeId}>
@@ -707,7 +707,7 @@ export function LandingScreen({
                       }
                     }}
                     disabled={!onOpenWorkerSummaryForIntake && activeIntakeHub?.intakeId !== card.intakeId}
-                    className="w-full rounded-[14px] border border-[#42574E] bg-[#42574E] px-4 py-2 text-sm font-bold text-white shadow-[0_12px_28px_rgba(109,74,255,0.18)] transition-colors hover:bg-[#374A42] disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+                    className="w-full rounded-[14px] border border-[#42574E] bg-[#42574E] px-4 py-2 text-sm font-bold text-white shadow-[0_12px_28px_rgba(66,87,78,0.18)] transition-colors hover:bg-[#374A42] disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
                   >
                     View Summary
                   </button>
@@ -915,7 +915,7 @@ export function LandingScreen({
                     }}
                     className={`relative rounded-[12px] border bg-white p-3 shadow-sm ${
                       actionNeeded
-                        ? 'border-[#BFAEFF] bg-[#FBFAFF] shadow-[0_18px_42px_rgba(109,74,255,0.14)] ring-1 ring-[#CBD6CF]'
+                        ? 'border-[#95AB9B] bg-[#FBFBFA] shadow-[0_18px_42px_rgba(66,87,78,0.14)] ring-1 ring-[#CBD6CF]'
                         : isActive
                           ? 'border-slate-300 ring-1 ring-slate-200/80'
                           : 'border-slate-200'
@@ -923,7 +923,7 @@ export function LandingScreen({
                   >
                     {actionNeeded ? (
                       <span
-                        className="absolute right-3 top-3 h-2 w-2 rounded-full bg-[#42574E] shadow-[0_0_0_4px_rgba(109,74,255,0.14)]"
+                        className="absolute right-3 top-3 h-2 w-2 rounded-full bg-[#42574E] shadow-[0_0_0_4px_rgba(66,87,78,0.14)]"
                         aria-hidden
                       />
                     ) : null}

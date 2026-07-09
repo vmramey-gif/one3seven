@@ -33,7 +33,7 @@ function TimelineCard({ t }: { t: (k: string) => string }) {
     <div className="rounded-2xl border border-[#E4E5DE] bg-[#FBFBFA] p-6 shadow-[0_1px_2px_rgba(27,38,35,0.04)]">
       <div className="mb-4 flex items-center justify-between">
         <span style={MONO} className="text-[10.5px] uppercase tracking-[0.1em] text-[#7c857f]">{t('tl.header')}</span>
-        <span style={MONO} className="rounded-full border border-[#DDD0F2] bg-[#EFE9FA] px-2.5 py-1 text-[10px] text-[#5B21B6]">{t('tl.ai')}</span>
+        <span style={MONO} className="rounded-full border border-[#C6D0C8] bg-[#E7EDE8] px-2.5 py-1 text-[10px] text-[#5B21B6]">{t('tl.ai')}</span>
       </div>
       <div>
         {events.map((e, i) => (
@@ -100,7 +100,7 @@ export function SageMarketingPage({ onWorkerStart, onSignIn, onForFirms, firmDir
             )}
           </div>
           <div className="mt-6 flex items-center gap-2 text-[12.5px] text-[#5b5e59]">
-            <span className="h-[7px] w-[7px] rounded-full bg-[#5B21B6] shadow-[0_0_0_4px_rgba(91,33,182,0.16)]" />
+            <span className="h-[7px] w-[7px] rounded-full bg-[#5B21B6] shadow-[0_0_0_4px_rgba(66,87,78,0.16)]" />
             {t('home.ai_line')}
           </div>
         </div>
@@ -140,7 +140,7 @@ export function SageMarketingPage({ onWorkerStart, onSignIn, onForFirms, firmDir
           </h2>
           <p className="mt-4 max-w-[46ch] text-[15px] leading-[1.6] text-[#40433f]">{t('trust.body')}</p>
           <div className="mt-5 inline-flex items-center gap-2 text-[12.5px] text-[#5b5e59]">
-            <span className="h-[7px] w-[7px] rounded-full bg-[#5B21B6] shadow-[0_0_0_4px_rgba(91,33,182,0.16)]" />
+            <span className="h-[7px] w-[7px] rounded-full bg-[#5B21B6] shadow-[0_0_0_4px_rgba(66,87,78,0.16)]" />
             {t('trust.claude')}
           </div>
         </div>

@@ -25,15 +25,15 @@ export function WorkerIntakeCompactRow({
     <div
       className={`relative rounded-[18px] border bg-white/95 p-3 shadow-[0_14px_34px_rgba(67,56,202,0.07)] transition-colors ${
         actionNeeded
-          ? 'border-[#BFAEFF] bg-[#FBFAFF] shadow-[0_18px_42px_rgba(109,74,255,0.14)] ring-1 ring-[#CBD6CF]'
+          ? 'border-[#95AB9B] bg-[#FBFBFA] shadow-[0_18px_42px_rgba(66,87,78,0.14)] ring-1 ring-[#CBD6CF]'
           : highlighted
-          ? 'border-[#CFC3FF] bg-[#FBFAFF] ring-1 ring-[#CBD6CF]'
+          ? 'border-[#C6D0C8] bg-[#FBFBFA] ring-1 ring-[#CBD6CF]'
           : 'border-[#D3DED6]'
       }`}
     >
       {actionNeeded ? (
         <span
-          className="absolute right-3 top-3 h-2 w-2 rounded-full bg-[#42574E] shadow-[0_0_0_4px_rgba(109,74,255,0.14)]"
+          className="absolute right-3 top-3 h-2 w-2 rounded-full bg-[#42574E] shadow-[0_0_0_4px_rgba(66,87,78,0.14)]"
           aria-hidden
         />
       ) : null}
@@ -58,7 +58,7 @@ export function WorkerIntakeCompactRow({
         </div>
       </HeaderElement>
       {children ? (
-        <div className="mt-3 space-y-2 border-t border-[#EEE9FF] pt-3">{children}</div>
+        <div className="mt-3 space-y-2 border-t border-[#E7EDE8] pt-3">{children}</div>
       ) : null}
     </div>
   );

@@ -164,9 +164,9 @@ export function ProcessingScreen({
   }, [phase, quickMode]);
 
   return (
-    <div className="min-h-screen bg-[#f8f6ff]">
+    <div className="min-h-screen bg-[#F1F3EF]">
       {/* Top Navigation */}
-      <nav className="sticky top-0 bg-[#f8f6ff]/80 backdrop-blur-md border-b border-[#e5def8] z-50">
+      <nav className="sticky top-0 bg-[#F1F3EF]/80 backdrop-blur-md border-b border-[#D3DED6] z-50">
         <div className="px-6 py-7 flex items-center justify-between gap-3">
           <button
             type="button"
@@ -181,7 +181,7 @@ export function ProcessingScreen({
               <button
                 type="button"
                 onClick={onOpenWorkerSettings}
-                className="text-sm text-[#39415f] hover:text-[#111b3d] px-3 py-2 rounded-lg hover:bg-[#eee9ff]"
+                className="text-sm text-[#40433F] hover:text-[#1B2623] px-3 py-2 rounded-lg hover:bg-[#E7EDE8]"
               >
                 Settings
               </button>
@@ -190,7 +190,7 @@ export function ProcessingScreen({
               <button
                 type="button"
                 onClick={onWorkerSignOut}
-                className="text-sm text-[#39415f] hover:text-[#111b3d] px-3 py-2 rounded-lg hover:bg-[#eee9ff]"
+                className="text-sm text-[#40433F] hover:text-[#1B2623] px-3 py-2 rounded-lg hover:bg-[#E7EDE8]"
               >
                 Sign out
               </button>
@@ -204,7 +204,7 @@ export function ProcessingScreen({
         <button
           type="button"
           onClick={() => onNavigate('upload')}
-          className="flex items-center gap-1.5 text-xs uppercase tracking-wide font-normal self-start text-[#66708f] hover:text-[#39415f] transition-colors duration-200"
+          className="flex items-center gap-1.5 text-xs uppercase tracking-wide font-normal self-start text-[#6A6D66] hover:text-[#40433F] transition-colors duration-200"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           Back to upload
@@ -212,12 +212,12 @@ export function ProcessingScreen({
         <button
           type="button"
           onClick={() => onNavigate('landing')}
-          className="text-xs self-start text-[#66708f] hover:text-[#111b3d]"
+          className="text-xs self-start text-[#6A6D66] hover:text-[#1B2623]"
         >
           Your dashboard
         </button>
         {phase === 'finalizing' ? (
-          <p className="text-xs text-[#66708f] self-start">
+          <p className="text-xs text-[#6A6D66] self-start">
             {finalizeTimedOut
               ? 'Taking longer than expected — you can leave; your intake will keep updating.'
               : quickMode
@@ -235,16 +235,16 @@ export function ProcessingScreen({
             transition={{ duration: 0.5 }}
             className="text-center"
           >
-            <h1 className="text-[28px] leading-[1.2] font-semibold text-[#111b3d] mb-4 tracking-tight">
+            <h1 className="text-[28px] leading-[1.2] font-semibold text-[#1B2623] mb-4 tracking-tight">
               Organizing Your Intake
             </h1>
-            <p className="text-base text-[#39415f] mb-10 leading-relaxed">
+            <p className="text-base text-[#40433F] mb-10 leading-relaxed">
               Your records, file names, and any context you added are being organized into a clear timeline and intake
               summary structure.
             </p>
 
             {/* Animated workflow visualization */}
-            <div className="relative bg-gradient-to-br from-[#f8f6ff] to-[#eee9ff] rounded-[18px] p-10 mb-8 border border-[#e5def8]">
+            <div className="relative bg-gradient-to-br from-[#F1F3EF] to-[#E7EDE8] rounded-[18px] p-10 mb-8 border border-[#D3DED6]">
               <div className="flex justify-center gap-6 items-center mb-8">
                 <motion.div
                   animate={{ scale: [1, 1.1, 1], opacity: [0.5, 1, 0.5] }}
@@ -279,32 +279,32 @@ export function ProcessingScreen({
                     {index <= currentStep ? (
                       <CheckCircle2 className="w-4 h-4 text-[#42574e]" />
                     ) : (
-                      <div className="w-4 h-4 border-2 border-[#d5c9f3] rounded-full" />
+                      <div className="w-4 h-4 border-2 border-[#CBD6CF] rounded-full" />
                     )}
-                    <span className={index <= currentStep ? 'text-[#111b3d]' : 'text-[#66708f]'}>{step}</span>
+                    <span className={index <= currentStep ? 'text-[#1B2623]' : 'text-[#6A6D66]'}>{step}</span>
                   </motion.div>
                 ))}
               </div>
 
               {phase === 'finalizing' ? (
-                <div className="mt-8 pt-6 border-t border-[#e5def8] flex flex-col items-center gap-3">
+                <div className="mt-8 pt-6 border-t border-[#D3DED6] flex flex-col items-center gap-3">
                   <Loader2 className="w-8 h-8 text-[#42574e] animate-spin" aria-hidden />
-                  <p className="text-sm font-medium text-[#111b3d]">
+                  <p className="text-sm font-medium text-[#1B2623]">
                     {quickMode ? 'Sending updated files to the firm…' : 'Finalizing organization...'}
                   </p>
-                  <p className="text-xs text-[#66708f] leading-relaxed">
+                  <p className="text-xs text-[#6A6D66] leading-relaxed">
                     {quickMode ? 'Usually under a few seconds.' : 'This can take a few more seconds.'}
                   </p>
                 </div>
               ) : null}
 
               {phase === 'complete' ? (
-                <div className="mt-8 pt-6 border-t border-[#e5def8] flex flex-col items-center gap-3">
+                <div className="mt-8 pt-6 border-t border-[#D3DED6] flex flex-col items-center gap-3">
                   <CheckCircle2 className="w-10 h-10 text-[#42574e]" aria-hidden />
-                  <p className="text-sm font-medium text-[#111b3d]">
+                  <p className="text-sm font-medium text-[#1B2623]">
                     {quickMode ? 'Intake updated' : 'Intake summary updated'}
                   </p>
-                  <p className="text-xs text-[#66708f] leading-relaxed">
+                  <p className="text-xs text-[#6A6D66] leading-relaxed">
                     {destinationAfterComplete === 'landing'
                       ? 'Returning to your dashboard…'
                       : 'Opening your summary…'}
@@ -313,7 +313,7 @@ export function ProcessingScreen({
               ) : null}
             </div>
 
-            <p className="text-xs text-[#66708f] leading-relaxed">{ONE3SEVEN_NOTICES.positioning}</p>
+            <p className="text-xs text-[#6A6D66] leading-relaxed">{ONE3SEVEN_NOTICES.positioning}</p>
           </motion.div>
         </div>
       </div>

@@ -1196,14 +1196,14 @@ export function IntakeSummaryScreen({
                   </p>
                 )}
                 {organizedSummaryParagraphs.length > 0 ? (
-                  <p className="rounded-[14px] border border-[#EEE9FF] bg-[#FBFAFF] px-3 py-2 text-sm leading-relaxed text-[#475569]">
+                  <p className="rounded-[14px] border border-[#E7EDE8] bg-[#FBFBFA] px-3 py-2 text-sm leading-relaxed text-[#475569]">
                     {maturityMessage[intakeMaturityState]}
                   </p>
                 ) : null}
               </div>
             </div>
 
-            <div className="border-t border-[#EEE9FF] pt-4">
+            <div className="border-t border-[#E7EDE8] pt-4">
               <h2 className="text-sm font-semibold text-[#0B1033]">What one3seven Organized</h2>
               <div className="mt-3 grid gap-2 sm:grid-cols-2">
                 {confidenceItems.map((item) => (
@@ -1231,7 +1231,7 @@ export function IntakeSummaryScreen({
             </div>
 
             {(showEmploymentHandoff || showInjuryHandoff) ? (
-              <div className="border-t border-[#EEE9FF] pt-4">
+              <div className="border-t border-[#E7EDE8] pt-4">
                 <h2 className="text-sm font-semibold text-[#0B1033]">{WORKER_RECORD_HANDOFF.heading}</h2>
                 <p className="mt-2 text-sm leading-relaxed text-[#475569]">{WORKER_RECORD_HANDOFF.intro}</p>
                 <ul className="mt-2 space-y-1 text-sm leading-relaxed text-[#475569]">
@@ -1244,14 +1244,14 @@ export function IntakeSummaryScreen({
               </div>
             ) : null}
 
-            <div className="mt-4 grid gap-3 border-t border-[#EEE9FF] pt-4 lg:grid-cols-2">
-              <div className="rounded-[14px] border border-[#EEE9FF] bg-[#FBFAFF] px-3 py-3">
+            <div className="mt-4 grid gap-3 border-t border-[#E7EDE8] pt-4 lg:grid-cols-2">
+              <div className="rounded-[14px] border border-[#E7EDE8] bg-[#FBFBFA] px-3 py-3">
                 <h2 className="text-sm font-semibold text-[#0B1033]">Additional Information May Help</h2>
                 {missingInformationItems.length > 0 ? (
                   <ul className="mt-2 space-y-1.5 text-sm leading-relaxed text-[#475569]">
                     {missingInformationItems.map((item, index) => (
                       <li key={`missing-confidence-${index}`} className="flex gap-2">
-                        <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#8B6DFF]" />
+                        <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#5E7268]" />
                         <span className="break-words overflow-hidden min-w-0">{item}</span>
                       </li>
                     ))}
@@ -1853,11 +1853,11 @@ export function IntakeSummaryScreen({
                     <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
                 <div className="text-sm font-medium">{PARTICIPATING_NETWORK_COPY.postSendTitle}</div>
                   </div>
-                  <div className="text-xs text-[#F4F1FF] pl-8 leading-relaxed">
+                  <div className="text-xs text-[#E7EDE8] pl-8 leading-relaxed">
                     {PARTICIPATING_NETWORK_COPY.firmsSeeNow} {PARTICIPATING_NETWORK_COPY.firmsDoNotSee} You can
                     track status on your dashboard and approve expanded access if a firm asks.
                   </div>
-                  <div className="text-xs text-[#C9C2DC] pl-8 mt-2 leading-relaxed">
+                  <div className="text-xs text-[#95AB9B] pl-8 mt-2 leading-relaxed">
                     We&apos;ll email you when a firm responds. Most participating firms respond within 1–2 business days.
                   </div>
                 </motion.div>

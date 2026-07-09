@@ -46,7 +46,7 @@ export function CrmAccessGate({ children }: { children: ReactNode }) {
         <p style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="text-2xl font-medium text-white">
           Internal access only
         </p>
-        <p className="max-w-sm text-sm text-[#C9C4E6]">
+        <p className="max-w-sm text-sm text-[#95AB9B]">
           This page is for the one3seven team. Sign in at one3sevenHQ, then return here.
         </p>
         <a

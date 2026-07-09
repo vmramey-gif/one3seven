@@ -18,7 +18,7 @@ function ComingSoonControl({ label }: { label: string }) {
     <button
       type="button"
       disabled
-      className="w-full cursor-not-allowed rounded-2xl border border-[#CBD6CF] bg-[#F8F6FF] px-4 py-2 text-sm text-[#1B2623]/42"
+      className="w-full cursor-not-allowed rounded-2xl border border-[#CBD6CF] bg-[#F1F3EF] px-4 py-2 text-sm text-[#1B2623]/42"
     >
       {label} — Coming soon
     </button>
@@ -69,13 +69,13 @@ export function WorkerSettingsScreen({ onNavigate, userEmail, profileId, onSignO
               <input
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                className="w-full rounded-2xl border border-[#CBD6CF] bg-[#F8F6FF] px-4 py-3 text-sm text-[#1B2623] placeholder:text-[#1B2623]/38 focus:border-[#42574E] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#42574E]/10"
+                className="w-full rounded-2xl border border-[#CBD6CF] bg-[#F1F3EF] px-4 py-3 text-sm text-[#1B2623] placeholder:text-[#1B2623]/38 focus:border-[#42574E] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#42574E]/10"
                 placeholder="Your name"
               />
               <label className="mb-2 mt-5 flex items-center gap-2 text-sm font-medium text-[#1B2623]">
                 <Mail className="h-4 w-4 text-[#42574E]" /> Email
               </label>
-              <input value={userEmail ?? ''} disabled className="w-full rounded-2xl border border-[#CBD6CF] bg-[#F8F6FF] px-4 py-3 text-sm text-[#1B2623]/52" />
+              <input value={userEmail ?? ''} disabled className="w-full rounded-2xl border border-[#CBD6CF] bg-[#F1F3EF] px-4 py-3 text-sm text-[#1B2623]/52" />
               <p className="mt-2 text-xs text-[#1B2623]/52">Email is managed through Supabase Auth.</p>
             </div>
 
@@ -152,7 +152,7 @@ export function WorkerSettingsScreen({ onNavigate, userEmail, profileId, onSignO
             <button
               type="button"
               onClick={() => void handleSave()}
-              className="w-full rounded-full bg-[#42574E] py-4 font-medium text-white shadow-[0_18px_48px_rgba(109,74,255,0.26)] transition hover:-translate-y-0.5 hover:bg-[#374A42]"
+              className="w-full rounded-full bg-[#42574E] py-4 font-medium text-white shadow-[0_18px_48px_rgba(66,87,78,0.26)] transition hover:-translate-y-0.5 hover:bg-[#374A42]"
             >
               Save changes
             </button>

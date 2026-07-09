@@ -104,7 +104,7 @@ export function TexasCriminalDemoPage() {
 
   return (
     <div className="min-h-screen bg-[#FBFBFA] text-[#1B2623]">
-      <nav className="sticky top-0 z-40 border-b border-violet-100/80 bg-white/92 px-5 py-3 backdrop-blur-sm">
+      <nav className="sticky top-0 z-40 border-b border-[#D3DED6]/80 bg-white/92 px-5 py-3 backdrop-blur-sm">
         <div className="mx-auto flex max-w-2xl items-center justify-between">
           <span className="text-[15px] font-bold tracking-tight">one<span className="font-black text-[#42574E]">3</span>seven</span>
           <span className="rounded-full bg-[#F2F4EC] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-[#42574E]">TX criminal · demo</span>
@@ -136,13 +136,13 @@ export function TexasCriminalDemoPage() {
           {phase === 'intake' && (
             <motion.div key="intake" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-6">
               <Section title="His story, in his own words">
-                <p className="rounded-[14px] border border-violet-100 bg-white p-4 text-[14px] leading-relaxed text-[#1B2623]/80">{STORY_TEXT}</p>
+                <p className="rounded-[14px] border border-[#D3DED6] bg-white p-4 text-[14px] leading-relaxed text-[#1B2623]/80">{STORY_TEXT}</p>
               </Section>
 
               <Section title="What he has">
                 <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                   {DOCS.map((d) => (
-                    <div key={d.label} className="flex items-center gap-3 rounded-[12px] border border-violet-100 bg-white p-3">
+                    <div key={d.label} className="flex items-center gap-3 rounded-[12px] border border-[#D3DED6] bg-white p-3">
                       <d.icon className="h-4 w-4 shrink-0 text-[#42574E]" />
                       <div className="min-w-0">
                         <p className="truncate text-[13px] font-semibold">{d.label}</p>
@@ -154,9 +154,9 @@ export function TexasCriminalDemoPage() {
               </Section>
 
               <Section title="A few details — only what he knows">
-                <div className="overflow-hidden rounded-[14px] border border-violet-100 bg-white">
+                <div className="overflow-hidden rounded-[14px] border border-[#D3DED6] bg-white">
                   {KEY_FACTS.map((f, i) => (
-                    <div key={f.label} className={`flex flex-col gap-0.5 px-4 py-2.5 ${i ? 'border-t border-violet-50' : ''}`}>
+                    <div key={f.label} className={`flex flex-col gap-0.5 px-4 py-2.5 ${i ? 'border-t border-[#EEF2EE]' : ''}`}>
                       <span className="text-[11px] font-medium text-[#1B2623]/45">{f.label}</span>
                       <span className="text-[13px] text-[#1B2623]/85">{f.answer}</span>
                     </div>
@@ -192,7 +192,7 @@ export function TexasCriminalDemoPage() {
           {/* SUMMARY */}
           {phase === 'summary' && (
             <motion.div key="summary" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-6">
-              <div className="rounded-[16px] border border-violet-100 bg-white p-5">
+              <div className="rounded-[16px] border border-[#D3DED6] bg-white p-5">
                 <p className="text-[11px] font-bold uppercase tracking-wide text-[#42574E]">What the attorney receives</p>
                 <h2 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="mt-1 text-xl font-medium">{CLIENT}</h2>
                 <p className="text-[12px] text-[#1B2623]/50">{MATTER}</p>
@@ -205,7 +205,7 @@ export function TexasCriminalDemoPage() {
               <Section title="Timeline">
                 <div className="space-y-3">
                   {TIMELINE.map((t) => (
-                    <div key={t.label} className="flex gap-3 rounded-[12px] border border-violet-100 bg-white p-3">
+                    <div key={t.label} className="flex gap-3 rounded-[12px] border border-[#D3DED6] bg-white p-3">
                       <div className={`mt-1 h-2.5 w-2.5 shrink-0 rounded-full ${t.gap ? 'bg-amber-400' : 'bg-[#42574E]'}`} />
                       <div className="min-w-0">
                         <div className="flex flex-wrap items-center gap-2">
@@ -227,7 +227,7 @@ export function TexasCriminalDemoPage() {
                       <p className="mb-1 text-[11px] font-bold uppercase tracking-wide text-[#1B2623]/45">{c}</p>
                       <div className="flex flex-wrap gap-1.5">
                         {DOCS.filter((d) => d.cat === c).map((d) => (
-                          <span key={d.label} className="inline-flex items-center gap-1.5 rounded-full border border-violet-100 bg-white px-2.5 py-1 text-[11px] font-medium">
+                          <span key={d.label} className="inline-flex items-center gap-1.5 rounded-full border border-[#D3DED6] bg-white px-2.5 py-1 text-[11px] font-medium">
                             <d.icon className="h-3 w-3 text-[#42574E]" /> {d.label}
                           </span>
                         ))}

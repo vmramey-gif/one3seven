@@ -8,7 +8,7 @@ import type { LegalDoc } from '../constants/legalContent';
 
 export function LegalDocPage({ doc }: { doc: LegalDoc }) {
   return (
-    <div className="min-h-screen bg-[#f8f6ff] text-[#1B2623] antialiased">
+    <div className="min-h-screen bg-[#F1F3EF] text-[#1B2623] antialiased">
       {/* Header */}
       <header className="sticky top-0 z-10 border-b border-[#D3DED6] bg-white/90 backdrop-blur-sm">
         <div className="mx-auto flex h-14 max-w-3xl items-center justify-between px-5">
@@ -39,7 +39,7 @@ export function LegalDocPage({ doc }: { doc: LegalDoc }) {
                       <ul key={i} className="space-y-1.5">
                         {block.items.map((item, j) => (
                           <li key={j} className="flex gap-2.5 text-[14.5px] leading-relaxed text-[#1B2623]/72">
-                            <span className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#8B6DFF]" />
+                            <span className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#5E7268]" />
                             <span>{item}</span>
                           </li>
                         ))}

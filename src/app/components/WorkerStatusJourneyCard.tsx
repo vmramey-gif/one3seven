@@ -242,7 +242,7 @@ export function WorkerStatusJourneyCard({
 
     return (
       <div
-        className={`rounded-xl border border-[#E9E0FF]/90 bg-gradient-to-br from-white to-[#FAF8FF] px-4 py-4 shadow-[0_4px_16px_rgba(107,78,255,0.06)] ${className}`}
+        className={`rounded-xl border border-[#C6D0C8]/90 bg-gradient-to-br from-white to-[#FAF8FF] px-4 py-4 shadow-[0_4px_16px_rgba(107,78,255,0.06)] ${className}`}
         aria-label="Current status preview"
       >
         <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#64748B]">
@@ -257,9 +257,9 @@ export function WorkerStatusJourneyCard({
                 key={index}
                 className={`h-1.5 flex-1 rounded-full transition-colors ${
                   state === 'completed'
-                    ? 'bg-[#6B4EFF]'
+                    ? 'bg-[#5E7268]'
                     : state === 'current'
-                      ? 'bg-[#6B4EFF]/45 ring-1 ring-[#6B4EFF]/30'
+                      ? 'bg-[#5E7268]/45 ring-1 ring-[#5E7268]/30'
                       : 'bg-[#E2E8F0]'
                 }`}
               />
@@ -284,12 +284,12 @@ export function WorkerStatusJourneyCard({
 
   return (
     <div
-      className={`rounded-xl border border-[#E9E0FF] bg-white shadow-[0_8px_24px_rgba(107,78,255,0.08)] ${
+      className={`rounded-xl border border-[#C6D0C8] bg-white shadow-[0_8px_24px_rgba(107,78,255,0.08)] ${
         isRail ? 'p-6 sm:p-7' : 'p-4'
       } ${className}`}
       aria-label="Status journey"
     >
-      <div className={`${showSubtitle ? 'border-b border-[#F1EBFF] pb-4 mb-5' : 'mb-4'}`}>
+      <div className={`${showSubtitle ? 'border-b border-[#E7EDE8] pb-4 mb-5' : 'mb-4'}`}>
         <h2
           className={`font-semibold text-[#1B2623] tracking-tight ${
             isRail ? 'text-lg' : 'text-sm'
@@ -319,9 +319,9 @@ export function WorkerStatusJourneyCard({
                   <span
                     className={`flex ${nodeSize} items-center justify-center rounded-full border transition-colors ${
                       isCompleted
-                        ? 'border-[#7C8B6F] bg-[#EDE9FE] text-[#6B4EFF]'
+                        ? 'border-[#7C8B6F] bg-[#E7EDE8] text-[#5E7268]'
                         : isCurrent
-                          ? 'border-[#6B4EFF] bg-[#EDE9FE] ring-2 ring-[#6B4EFF]/15'
+                          ? 'border-[#5E7268] bg-[#E7EDE8] ring-2 ring-[#5E7268]/15'
                           : 'border-[#CBD5E1] bg-white'
                     }`}
                     aria-current={isCurrent ? 'step' : undefined}
@@ -329,7 +329,7 @@ export function WorkerStatusJourneyCard({
                     {isCompleted ? (
                       <Check className={checkSize} strokeWidth={2.5} aria-hidden />
                     ) : isCurrent ? (
-                      <span className={`${dotSize} rounded-full bg-[#6B4EFF]`} aria-hidden />
+                      <span className={`${dotSize} rounded-full bg-[#5E7268]`} aria-hidden />
                     ) : null}
                   </span>
                   {!isLast ? (
@@ -371,7 +371,7 @@ export function WorkerStatusJourneyCard({
       )}
 
       {isRail && futureOnlyFrom !== null ? (
-        <p className="mt-6 border-t border-[#F1EBFF] pt-4 text-xs leading-relaxed text-[#64748B]">
+        <p className="mt-6 border-t border-[#E7EDE8] pt-4 text-xs leading-relaxed text-[#64748B]">
           When a review concludes, your organized records remain available in Intakes.
         </p>
       ) : null}

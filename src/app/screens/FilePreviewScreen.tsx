@@ -22,9 +22,9 @@ export function FilePreviewScreen({
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#f8f6ff]">
+    <div className="min-h-screen bg-[#F1F3EF]">
       {/* Top Navigation */}
-      <nav className="sticky top-0 bg-[#f8f6ff]/80 backdrop-blur-md border-b border-[#e5def8] z-50">
+      <nav className="sticky top-0 bg-[#F1F3EF]/80 backdrop-blur-md border-b border-[#D3DED6] z-50">
         <div className="px-6 py-7">
           <button
             onClick={() => onNavigate('landing')}
@@ -39,7 +39,7 @@ export function FilePreviewScreen({
       <div className="px-6 pt-6">
         <button
           onClick={() => onNavigate('summary')}
-          className="flex items-center gap-1.5 text-xs uppercase tracking-wide text-[#66708f] hover:text-[#39415f] transition-colors duration-200 font-normal"
+          className="flex items-center gap-1.5 text-xs uppercase tracking-wide text-[#6A6D66] hover:text-[#40433F] transition-colors duration-200 font-normal"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           Back to summary
@@ -53,42 +53,42 @@ export function FilePreviewScreen({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, ease: 'easeOut' }}
         >
-          <h1 className="text-[32px] leading-[1.2] font-semibold text-[#111b3d] mb-4 tracking-tight">
+          <h1 className="text-[32px] leading-[1.2] font-semibold text-[#1B2623] mb-4 tracking-tight">
             Document Preview
           </h1>
-          <p className="text-base text-[#39415f] mb-10 leading-relaxed">
+          <p className="text-base text-[#40433F] mb-10 leading-relaxed">
             Reviewing uploaded document assignment.
           </p>
 
           {/* File Info Card */}
-          <div className="mb-8 bg-white rounded-[14px] p-6 border border-[#e5def8]">
+          <div className="mb-8 bg-white rounded-[14px] p-6 border border-[#D3DED6]">
             <div className="flex items-start gap-4 mb-4">
               <div className="w-10 h-10 bg-[#42574e] rounded-lg flex items-center justify-center flex-shrink-0">
                 <FileText className="w-5 h-5 text-white" />
               </div>
               <div className="flex-1 min-w-0">
-                <div className="text-sm font-medium text-[#111b3d] mb-2 break-words">{fileName}</div>
+                <div className="text-sm font-medium text-[#1B2623] mb-2 break-words">{fileName}</div>
                 <div className="flex items-center gap-2 flex-wrap">
-                  <div className="inline-block bg-[#eee9ff] px-2.5 py-1 rounded text-xs text-[#42574e] font-medium">
+                  <div className="inline-block bg-[#E7EDE8] px-2.5 py-1 rounded text-xs text-[#42574e] font-medium">
                     {category}
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="pt-4 border-t border-[#e5def8]">
-              <div className="text-xs font-semibold text-[#111b3d] mb-2">Related summary context</div>
-              <div className="text-xs text-[#39415f] leading-relaxed">{timelineEvent}</div>
+            <div className="pt-4 border-t border-[#D3DED6]">
+              <div className="text-xs font-semibold text-[#1B2623] mb-2">Related summary context</div>
+              <div className="text-xs text-[#40433F] leading-relaxed">{timelineEvent}</div>
             </div>
           </div>
 
           {/* File Preview Area */}
-          <div className="bg-gradient-to-br from-[#f8f6ff] to-[#eee9ff] rounded-[18px] p-8 border border-[#e5def8] mb-8">
-            <div className="bg-white rounded-lg p-12 shadow-[0_2px_8px_rgba(24,31,67,0.06)] border border-[#e5def8] min-h-[400px] flex items-center justify-center">
+          <div className="bg-gradient-to-br from-[#F1F3EF] to-[#E7EDE8] rounded-[18px] p-8 border border-[#D3DED6] mb-8">
+            <div className="bg-white rounded-lg p-12 shadow-[0_2px_8px_rgba(24,31,67,0.06)] border border-[#D3DED6] min-h-[400px] flex items-center justify-center">
               <div className="text-center">
-                <FileText className="w-16 h-16 text-[#c7b9ff] mx-auto mb-4" />
-                <p className="text-sm text-[#39415f] mb-2">Document Preview</p>
-                <p className="text-xs text-[#66708f]">{fileName}</p>
+                <FileText className="w-16 h-16 text-[#95AB9B] mx-auto mb-4" />
+                <p className="text-sm text-[#40433F] mb-2">Document Preview</p>
+                <p className="text-xs text-[#6A6D66]">{fileName}</p>
               </div>
             </div>
           </div>
@@ -97,11 +97,11 @@ export function FilePreviewScreen({
           <div className="space-y-3">
             <button
               onClick={() => onNavigate('summary')}
-              className="w-full bg-[#42574e] text-white py-4 px-6 rounded-[14px] hover:bg-[#5b39e6] transition-all shadow-[0_10px_22px_rgba(109,74,255,0.18)] font-medium"
+              className="w-full bg-[#42574e] text-white py-4 px-6 rounded-[14px] hover:bg-[#4F5F47] transition-all shadow-[0_10px_22px_rgba(66,87,78,0.18)] font-medium"
             >
               Return to intake summary
             </button>
-            <button className="w-full bg-[#eee9ff] text-[#42574e] py-4 px-6 rounded-[14px] hover:bg-[#e5def8] transition-colors font-medium">
+            <button className="w-full bg-[#E7EDE8] text-[#42574e] py-4 px-6 rounded-[14px] hover:bg-[#D3DED6] transition-colors font-medium">
               Download Document
             </button>
           </div>

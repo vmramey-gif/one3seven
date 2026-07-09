@@ -42,9 +42,9 @@ const OPTIONAL_FIELDS = [
 ];
 
 const DOCS = [
-  { icon: FileText, label: 'Pay stub — Oct 2025', cat: 'Wage Records', color: 'text-violet-600', bg: 'bg-violet-50', border: 'border-violet-200', size: '284 KB' },
-  { icon: FileText, label: 'Pay stub — Nov 2025', cat: 'Wage Records', color: 'text-violet-600', bg: 'bg-violet-50', border: 'border-violet-200', size: '291 KB' },
-  { icon: FileText, label: 'Pay stub — Dec 2025', cat: 'Wage Records', color: 'text-violet-600', bg: 'bg-violet-50', border: 'border-violet-200', size: '278 KB' },
+  { icon: FileText, label: 'Pay stub — Oct 2025', cat: 'Wage Records', color: 'text-[#42574E]', bg: 'bg-[#EEF2EE]', border: 'border-[#CBD6CF]', size: '284 KB' },
+  { icon: FileText, label: 'Pay stub — Nov 2025', cat: 'Wage Records', color: 'text-[#42574E]', bg: 'bg-[#EEF2EE]', border: 'border-[#CBD6CF]', size: '291 KB' },
+  { icon: FileText, label: 'Pay stub — Dec 2025', cat: 'Wage Records', color: 'text-[#42574E]', bg: 'bg-[#EEF2EE]', border: 'border-[#CBD6CF]', size: '278 KB' },
   { icon: MessageSquare, label: 'HR complaint — Nov 14 2025', cat: 'HR Communications', color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-200', size: '89 KB' },
   { icon: FileText, label: 'Written warning — Nov 25 2025', cat: 'Employer Documents', color: 'text-amber-600', bg: 'bg-amber-50', border: 'border-amber-200', size: '112 KB' },
   { icon: Image, label: 'Schedule screenshot — Q4 2022', cat: 'Time Records', color: 'text-pink-600', bg: 'bg-pink-50', border: 'border-pink-200', size: '1.2 MB' },
@@ -54,7 +54,7 @@ const DOCS = [
   { icon: FileText, label: 'Offer letter — March 2022', cat: 'Employment Records', color: 'text-slate-600', bg: 'bg-slate-50', border: 'border-slate-200', size: '167 KB' },
   { icon: FileText, label: 'Termination letter — Dec 19 2025', cat: 'Employer Documents', color: 'text-red-600', bg: 'bg-red-50', border: 'border-red-200', size: '156 KB' },
   { icon: MessageSquare, label: 'Email — HR acknowledgment', cat: 'HR Communications', color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-200', size: '44 KB' },
-  { icon: FileText, label: 'Final paycheck stub', cat: 'Wage Records', color: 'text-violet-600', bg: 'bg-violet-50', border: 'border-violet-200', size: '188 KB' },
+  { icon: FileText, label: 'Final paycheck stub', cat: 'Wage Records', color: 'text-[#42574E]', bg: 'bg-[#EEF2EE]', border: 'border-[#CBD6CF]', size: '188 KB' },
 ];
 
 const PROCESSING_STEPS = [
@@ -92,7 +92,7 @@ const SUGGESTIONS = [
 function NavBar({ step, phase, onBack, onSignUp }: { step: number; phase: Phase; onBack: () => void; onSignUp: () => void }) {
   const inIntake = phase === 'intake';
   return (
-    <nav className="sticky top-0 z-50 border-b border-violet-100/80 bg-white/92 backdrop-blur-sm">
+    <nav className="sticky top-0 z-50 border-b border-[#D3DED6]/80 bg-white/92 backdrop-blur-sm">
       <div className="mx-auto flex h-14 max-w-2xl items-center justify-between px-5">
         <div className="flex items-center gap-3">
           {inIntake && step > 1 && (
@@ -127,7 +127,7 @@ function NextButton({ onClick, label = 'Continue', disabled = false }: { onClick
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={`flex items-center gap-2 rounded-full px-7 py-3.5 text-[15px] font-semibold text-white shadow-[0_12px_32px_rgba(109,74,255,0.25)] transition ${disabled ? 'cursor-not-allowed bg-[#42574E]/30' : 'bg-[#42574E] hover:bg-[#42574E] hover:-translate-y-0.5'}`}
+      className={`flex items-center gap-2 rounded-full px-7 py-3.5 text-[15px] font-semibold text-white shadow-[0_12px_32px_rgba(66,87,78,0.25)] transition ${disabled ? 'cursor-not-allowed bg-[#42574E]/30' : 'bg-[#42574E] hover:bg-[#42574E] hover:-translate-y-0.5'}`}
     >
       {label} <ArrowRight className="h-4 w-4" />
     </button>
@@ -247,7 +247,7 @@ function Step2Records({ onNext }: { onNext: () => void }) {
         <div className="mb-2.5 text-[11px] font-bold uppercase tracking-wider text-[#42574E]">What to upload — common examples</div>
         <div className="grid grid-cols-2 gap-x-4 gap-y-1.5">
           {[
-            ['Pay stubs or payroll records', 'bg-violet-400'],
+            ['Pay stubs or payroll records', 'bg-[#7C8B6F]'],
             ['HR complaint or written grievance', 'bg-blue-400'],
             ['Written warnings or write-ups', 'bg-amber-400'],
             ['Termination or separation letter', 'bg-red-400'],
@@ -528,7 +528,7 @@ function PostSummary({ onNext }: { onNext: () => void }) {
   useEffect(() => { window.scrollTo({ top: 0, behavior: 'instant' }); }, []);
 
   const stats = [
-    { n: 13, label: 'Documents Organized', color: 'text-violet-700', bg: 'bg-violet-50', border: 'border-violet-200', delay: 0 },
+    { n: 13, label: 'Documents Organized', color: 'text-[#42574E]', bg: 'bg-[#EEF2EE]', border: 'border-[#CBD6CF]', delay: 0 },
     { n: 9, label: 'Timeline Events', color: 'text-blue-700', bg: 'bg-blue-50', border: 'border-blue-200', delay: 200 },
     { n: 3, label: 'Clarification Needs', color: 'text-amber-700', bg: 'bg-amber-50', border: 'border-amber-200', delay: 400 },
   ];
@@ -585,7 +585,7 @@ function PostDashboard({ onNext }: { onNext: () => void }) {
   const [docsOpen, setDocsOpen] = useState(false);
 
   const DOC_CATEGORIES = [
-    { label: 'Wage Records', count: 4, color: 'text-violet-700', bg: 'bg-violet-50', border: 'border-violet-200' },
+    { label: 'Wage Records', count: 4, color: 'text-[#42574E]', bg: 'bg-[#EEF2EE]', border: 'border-[#CBD6CF]' },
     { label: 'Employer Documents', count: 3, color: 'text-amber-700', bg: 'bg-amber-50', border: 'border-amber-200' },
     { label: 'HR Communications', count: 2, color: 'text-blue-700', bg: 'bg-blue-50', border: 'border-blue-200' },
     { label: 'Time Records', count: 2, color: 'text-pink-700', bg: 'bg-pink-50', border: 'border-pink-200' },
@@ -826,7 +826,7 @@ function PostControl({ onSignUp }: { onSignUp: () => void }) {
 
       <div className="flex flex-col gap-3 sm:flex-row">
         <button type="button" onClick={onSignUp}
-          className="flex items-center justify-center gap-2 rounded-full bg-[#42574E] px-7 py-3.5 text-[15px] font-semibold text-white shadow-[0_12px_32px_rgba(109,74,255,0.25)] transition hover:bg-[#42574E] hover:-translate-y-0.5">
+          className="flex items-center justify-center gap-2 rounded-full bg-[#42574E] px-7 py-3.5 text-[15px] font-semibold text-white shadow-[0_12px_32px_rgba(66,87,78,0.25)] transition hover:bg-[#42574E] hover:-translate-y-0.5">
           Request beta access <ArrowRight className="h-4 w-4" />
         </button>
         <button type="button" onClick={() => { window.location.href = '/'; }}

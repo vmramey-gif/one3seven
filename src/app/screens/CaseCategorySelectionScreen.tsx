@@ -50,27 +50,27 @@ function CategoryCard({
       } ${
         selected
           ? 'border-[#42574e] bg-[#42574e] text-white'
-          : 'border-[#e5def8] bg-white text-[#111b3d] hover:border-[#d5c9f3]'
+          : 'border-[#D3DED6] bg-white text-[#1B2623] hover:border-[#CBD6CF]'
       } touch-manipulation`}
     >
       <div className="flex items-center justify-between gap-2">
         <h2 className={`font-semibold ${compact ? 'text-sm' : 'text-sm'}`}>{category.name}</h2>
-        <ArrowRight className={`h-4 w-4 shrink-0 ${selected ? 'text-white' : 'text-[#66708f]'}`} />
+        <ArrowRight className={`h-4 w-4 shrink-0 ${selected ? 'text-white' : 'text-[#6A6D66]'}`} />
       </div>
       {hint && !compact ? (
-        <p className={`mt-1 text-xs ${selected ? 'text-white/80' : 'text-[#66708f]'}`}>{hint}</p>
+        <p className={`mt-1 text-xs ${selected ? 'text-white/80' : 'text-[#6A6D66]'}`}>{hint}</p>
       ) : null}
       {!compact ? (
         <>
-          <p className={`mt-2 text-sm leading-relaxed ${selected ? 'text-white/90' : 'text-[#39415f]'}`}>
+          <p className={`mt-2 text-sm leading-relaxed ${selected ? 'text-white/90' : 'text-[#40433F]'}`}>
             {category.description}
           </p>
-          <p className={`mt-2 text-xs leading-relaxed ${selected ? 'text-white/80' : 'text-[#66708f]'}`}>
+          <p className={`mt-2 text-xs leading-relaxed ${selected ? 'text-white/80' : 'text-[#6A6D66]'}`}>
             Helpful records: {category.helpfulRecords.join(', ')}
           </p>
         </>
       ) : (
-        <p className={`mt-1 text-sm leading-relaxed line-clamp-2 ${selected ? 'text-white/90' : 'text-[#39415f]'}`}>
+        <p className={`mt-1 text-sm leading-relaxed line-clamp-2 ${selected ? 'text-white/90' : 'text-[#40433F]'}`}>
           {category.description}
         </p>
       )}
@@ -87,35 +87,35 @@ export function CaseCategorySelectionScreen({
   const { priority, rest } = orderCategoriesForDisplay();
 
   return (
-    <div className="min-h-screen bg-[#f8f6ff]">
-      <header className="border-b border-[#e5def8] bg-white px-6 py-4">
+    <div className="min-h-screen bg-[#F1F3EF]">
+      <header className="border-b border-[#D3DED6] bg-white px-6 py-4">
         <div className={INTAKE_OPENING_SHELL}>
           <button
             type="button"
             onClick={onBackToLanding}
-            className="inline-flex items-center gap-1 text-xs font-medium text-[#39415f] hover:text-[#111b3d]"
+            className="inline-flex items-center gap-1 text-xs font-medium text-[#40433F] hover:text-[#1B2623]"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             Back
           </button>
-          <p className="mt-3 text-xs font-semibold uppercase tracking-wide text-[#66708f]">California beta</p>
-          <h1 className="mt-1 text-xl font-semibold text-[#111b3d]">Choose intake category</h1>
-          <p className="mt-2 text-sm text-[#39415f] leading-relaxed">
+          <p className="mt-3 text-xs font-semibold uppercase tracking-wide text-[#6A6D66]">California beta</p>
+          <h1 className="mt-1 text-xl font-semibold text-[#1B2623]">Choose intake category</h1>
+          <p className="mt-2 text-sm text-[#40433F] leading-relaxed">
             {INTAKE_OPENING_MICROCOPY.beforeUpload}. {INTAKE_OPENING_MICROCOPY.shareWhatRelevant}
           </p>
           {intakeNumber ? (
-            <p className="mt-2 text-xs text-[#66708f]">Intake {intakeNumber}</p>
+            <p className="mt-2 text-xs text-[#6A6D66]">Intake {intakeNumber}</p>
           ) : null}
         </div>
       </header>
 
       <main className={`${INTAKE_OPENING_SHELL} px-6 py-8`}>
-        <div className="mb-8 rounded-[14px] border border-[#e5def8] bg-white/90 px-4 py-3.5">
-          <p className="text-xs leading-relaxed text-[#39415f]">{UPLOAD_REDACTION_NOTICE}</p>
+        <div className="mb-8 rounded-[14px] border border-[#D3DED6] bg-white/90 px-4 py-3.5">
+          <p className="text-xs leading-relaxed text-[#40433F]">{UPLOAD_REDACTION_NOTICE}</p>
         </div>
 
         <section className="mb-8">
-          <p className="text-xs font-semibold uppercase tracking-wide text-[#66708f] mb-3">Common categories</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-[#6A6D66] mb-3">Common categories</p>
           <div className="space-y-3">
             {priority.map((category) => (
               <CategoryCard
@@ -128,10 +128,10 @@ export function CaseCategorySelectionScreen({
           </div>
         </section>
 
-        <div className="mb-6 border-t border-[#e5def8]" aria-hidden />
+        <div className="mb-6 border-t border-[#D3DED6]" aria-hidden />
 
         <section>
-          <p className="text-xs font-semibold uppercase tracking-wide text-[#66708f] mb-3">More categories</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-[#6A6D66] mb-3">More categories</p>
           <div className="space-y-2">
             {rest.map((category) => (
               <CategoryCard
@@ -145,7 +145,7 @@ export function CaseCategorySelectionScreen({
           </div>
         </section>
 
-        <p className="mt-8 text-xs text-[#66708f] leading-relaxed text-center">
+        <p className="mt-8 text-xs text-[#6A6D66] leading-relaxed text-center">
           {INTAKE_OPENING_MICROCOPY.editLater}
         </p>
         <One3SevenDisclaimer variant="compact" className="mt-6" />

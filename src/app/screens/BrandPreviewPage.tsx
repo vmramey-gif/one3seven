@@ -21,7 +21,7 @@ function TimelineCard() {
     <div className="rounded-2xl border border-[#E4E5DE] bg-[#FBFBFA] p-6 shadow-[0_1px_2px_rgba(27,38,35,0.04)]">
       <div className="mb-4 flex items-center justify-between">
         <span style={MONO} className="text-[10.5px] uppercase tracking-[0.1em] text-[#7c857f]">Source-linked intake</span>
-        <span style={MONO} className="rounded-full border border-[#DDD0F2] bg-[#EFE9FA] px-2.5 py-1 text-[10px] text-[#5B21B6]">AI · 0 conclusions</span>
+        <span style={MONO} className="rounded-full border border-[#C6D0C8] bg-[#E7EDE8] px-2.5 py-1 text-[10px] text-[#5B21B6]">AI · 0 conclusions</span>
       </div>
       <div>
         {EVENTS.map((e, i) => (
@@ -75,7 +75,7 @@ export function BrandPreviewPage() {
             <a href="/demo" className="rounded-full border border-[#B7BCB2] px-5 py-3 text-[14px] font-semibold text-[#22262a] transition hover:border-[#8f958b]">See a sample intake</a>
           </div>
           <div className="mt-6 flex items-center gap-2 text-[12.5px] text-[#5b5e59]">
-            <span className="h-[7px] w-[7px] rounded-full bg-[#5B21B6] shadow-[0_0_0_4px_rgba(91,33,182,0.16)]" />
+            <span className="h-[7px] w-[7px] rounded-full bg-[#5B21B6] shadow-[0_0_0_4px_rgba(66,87,78,0.16)]" />
             You don’t prompt a chatbot. The AI works in the background — you open the organized file.
           </div>
         </div>
@@ -125,7 +125,7 @@ export function BrandPreviewPage() {
             Every fact links to the source document it came from. one3seven doesn’t evaluate claims, score cases, or recommend anything. You verify, you decide — the legal judgment stays with your team.
           </p>
           <div className="mt-5 inline-flex items-center gap-2 text-[12.5px] text-[#5b5e59]">
-            <span className="h-[7px] w-[7px] rounded-full bg-[#5B21B6] shadow-[0_0_0_4px_rgba(91,33,182,0.16)]" />
+            <span className="h-[7px] w-[7px] rounded-full bg-[#5B21B6] shadow-[0_0_0_4px_rgba(66,87,78,0.16)]" />
             Built on Anthropic’s Claude for record organization.
           </div>
         </div>

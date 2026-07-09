@@ -3903,10 +3903,10 @@ export default function App() {
 
   if (authRestoringSplash) {
     return (
-      <div className="min-h-screen bg-[#f8f6ff] flex items-center justify-center px-6">
+      <div className="min-h-screen bg-[#F1F3EF] flex items-center justify-center px-6">
         <div className="text-center">
           <p className="text-lg font-semibold text-[#1B2623]"><WordMark /></p>
-          <p className="mt-2 text-sm text-[#66708f]">Restoring your secure session…</p>
+          <p className="mt-2 text-sm text-[#6A6D66]">Restoring your secure session…</p>
         </div>
       </div>
     );

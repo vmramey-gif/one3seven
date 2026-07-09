@@ -124,7 +124,7 @@ const FIRM_REVIEW_CARD =
 const FIRM_REVIEW_QUIET_CARD =
   'rounded-[20px] border border-[#E4E5DE] bg-white/70 p-4 shadow-[0_10px_30px_rgba(31,27,75,0.05)]';
 const FIRM_REVIEW_PRIMARY_BUTTON =
-  'bg-[#42574E] text-white shadow-[0_14px_34px_rgba(109,74,255,0.24)] hover:bg-[#42574E]';
+  'bg-[#42574E] text-white shadow-[0_14px_34px_rgba(66,87,78,0.24)] hover:bg-[#42574E]';
 const FIRM_REVIEW_SECONDARY_BUTTON =
   'border border-[#E4E5DE] bg-white text-[#1B2623] shadow-sm hover:border-[#7C8B6F] hover:bg-[#F2F4EC]';
 
@@ -1612,8 +1612,8 @@ export function IntakeReviewScreen({
                     key={`${step}-${index}`}
                     className={`rounded-full border px-3 py-1.5 text-xs ${
                       index === 0
-                        ? 'border-violet-700 bg-violet-700 text-white'
-                        : 'border-violet-100 bg-violet-50 text-[#6A6D66]'
+                        ? 'border-[#42574E] bg-[#42574E] text-white'
+                        : 'border-[#D3DED6] bg-[#EEF2EE] text-[#6A6D66]'
                     }`}
                   >
                     {step}
@@ -2825,7 +2825,7 @@ export function IntakeReviewScreen({
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
-                className="rounded-[28px] overflow-hidden shadow-[0_28px_80px_rgba(109,74,255,0.18)]"
+                className="rounded-[28px] overflow-hidden shadow-[0_28px_80px_rgba(66,87,78,0.18)]"
                 style={{ background: 'linear-gradient(145deg, #1B2623 0%, #2C3A34 55%, #42574E 100%)' }}
               >
                 <div className="px-7 py-8">
@@ -2842,7 +2842,7 @@ export function IntakeReviewScreen({
                     <button
                       onClick={() => { window.location.href = window.location.pathname; }}
                       className="rounded-full px-6 py-3 text-sm font-semibold text-white transition-colors"
-                      style={{ background: '#42574E', boxShadow: '0 8px 24px rgba(109,74,255,0.4)' }}
+                      style={{ background: '#42574E', boxShadow: '0 8px 24px rgba(66,87,78,0.4)' }}
                     >
                       Start 7-day free trial →
                     </button>

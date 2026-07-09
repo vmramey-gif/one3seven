@@ -44,7 +44,7 @@ export function WageExposureReviewSection({
         <h3 className="text-base font-semibold">Wage exposure estimate</h3>
         <span
           className="rounded-full px-2 py-0.5 text-[11px] font-semibold"
-          style={{ background: 'var(--o3s-primary-soft, #f3efff)', color: BRAND }}
+          style={{ background: 'var(--o3s-primary-soft, #E7EDE8)', color: BRAND }}
         >
           calculated from records
         </span>

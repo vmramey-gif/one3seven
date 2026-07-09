@@ -171,7 +171,7 @@ function StageStrip({ firms }: { firms: CrmFirm[] }) {
         ))}
         <div className="w-px self-stretch bg-[#D3DED6]" />
         {SIDE_STAGES.map((s) => (
-          <div key={s} className="min-w-[58px] rounded-[10px] border border-[#F0ECFA] bg-[#FBFBFA] px-2 py-1.5 text-center">
+          <div key={s} className="min-w-[58px] rounded-[10px] border border-[#E7EDE8] bg-[#FBFBFA] px-2 py-1.5 text-center">
             <div className="text-[18px] font-black leading-none text-[#1B2623]/40">{n(s)}</div>
             <div className="mt-0.5 text-[9px] font-semibold uppercase tracking-wide text-[#1B2623]/40">{CRM_STAGE_LABELS[s]}</div>
           </div>
@@ -451,7 +451,7 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
                   <button
                     type="button"
                     onClick={() => setOpenGroup(open ? null : group.id)}
-                    className={`relative flex ${tap} items-center gap-1.5 rounded-[10px] px-3 text-[13px] font-semibold transition ${activeHere ? 'bg-[#42574E] text-white' : 'bg-[#F2EEFF] text-[#1B2623]/70 hover:bg-[#F2F4EC]'}`}
+                    className={`relative flex ${tap} items-center gap-1.5 rounded-[10px] px-3 text-[13px] font-semibold transition ${activeHere ? 'bg-[#42574E] text-white' : 'bg-[#E7EDE8] text-[#1B2623]/70 hover:bg-[#F2F4EC]'}`}
                   >
                     <group.icon className="h-3.5 w-3.5" />
                     {activeHere && activeItem ? activeItem.label : group.label}
@@ -461,13 +461,13 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
                     )}
                   </button>
                   {open && (
-                    <div className="absolute left-0 z-40 mt-1 min-w-[190px] rounded-[12px] border border-[#D3DED6] bg-white p-1 shadow-[0_12px_30px_rgba(109,74,255,0.18)]">
+                    <div className="absolute left-0 z-40 mt-1 min-w-[190px] rounded-[12px] border border-[#D3DED6] bg-white p-1 shadow-[0_12px_30px_rgba(66,87,78,0.18)]">
                       {items.map((t) => (
                         <button
                           key={t.id}
                           type="button"
                           onClick={() => { setTab(t.id); setOpenGroup(null); }}
-                          className={`flex ${tap} w-full items-center gap-2 rounded-[8px] px-3 text-left text-[13px] font-medium transition ${tab === t.id ? 'bg-[#F2F4EC] text-[#42574E]' : 'text-[#1B2623]/70 hover:bg-[#F4F1FF]'}`}
+                          className={`flex ${tap} w-full items-center gap-2 rounded-[8px] px-3 text-left text-[13px] font-medium transition ${tab === t.id ? 'bg-[#F2F4EC] text-[#42574E]' : 'text-[#1B2623]/70 hover:bg-[#E7EDE8]'}`}
                         >
                           <t.icon className="h-3.5 w-3.5 shrink-0" /> {t.label}
                           {t.id === 'team' && unreadTeam && (
@@ -665,7 +665,7 @@ function QuickActionButton(
 ) {
   const tones = {
     green: 'border-emerald-200 bg-emerald-50 text-emerald-700',
-    purple: 'border-[#E0D6FF] bg-[#F4F1FF] text-[#42574E]',
+    purple: 'border-[#C6D0C8] bg-[#E7EDE8] text-[#42574E]',
     gray: 'border-[#D3DED6] bg-white text-[#1B2623]/55',
   } as const;
   return (
@@ -801,7 +801,7 @@ function FirmCard({ firm, onLog, today, onQuickEmail, onQuickLog, userId, onClai
               <ul className="mb-2 space-y-1">
                 {intel.topWins.map((w) => (
                   <li key={w} className="flex gap-2 text-[12px] leading-relaxed text-[#1B2623]/70">
-                    <span className="mt-[6px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#8B6DFF]" /><span>{w}</span>
+                    <span className="mt-[6px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#5E7268]" /><span>{w}</span>
                   </li>
                 ))}
               </ul>
@@ -836,7 +836,7 @@ function FirmCard({ firm, onLog, today, onQuickEmail, onQuickLog, userId, onClai
                   const m = members.find((x) => x.id === e.target.value);
                   void onAssign(firm.id, m ? m.id : null, m ? m.name : null);
                 }}
-                className="min-w-0 flex-1 rounded-[8px] border border-[#E0D6FF] bg-white px-2 py-1.5 text-[12px] font-medium text-[#1B2623] outline-none focus:border-[#42574E]"
+                className="min-w-0 flex-1 rounded-[8px] border border-[#C6D0C8] bg-white px-2 py-1.5 text-[12px] font-medium text-[#1B2623] outline-none focus:border-[#42574E]"
               >
                 <option value="">— Unclaimed —</option>
                 {members.map((m) => (
@@ -891,7 +891,7 @@ function SuitesHome({ greeting, isFounder, showEconomics, activeTab, onPick }: {
                   key={t.id}
                   type="button"
                   onClick={() => onPick(t.id)}
-                  className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[12px] font-semibold transition ${activeTab === t.id ? 'bg-[#42574E] text-white' : 'bg-[#F4F1FF] text-[#1B2623]/70 hover:bg-[#F2F4EC]'}`}
+                  className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[12px] font-semibold transition ${activeTab === t.id ? 'bg-[#42574E] text-white' : 'bg-[#E7EDE8] text-[#1B2623]/70 hover:bg-[#F2F4EC]'}`}
                 >
                   <t.icon className="h-3.5 w-3.5" /> {t.label}
                 </button>
@@ -938,7 +938,7 @@ function RepScoreboard({ firms, activity, members, today }: { firms: CrmFirm[]; 
           </thead>
           <tbody>
             {rows.map(({ m, callsToday, emailsToday, demosWeek, pilots, lastActive }) => (
-              <tr key={m.id} className="border-b border-[#F2EEFC] hover:bg-[#FAF8FF]">
+              <tr key={m.id} className="border-b border-[#E7EDE8] hover:bg-[#FAF8FF]">
                 <td className="px-3 py-2 font-semibold text-[#1B2623]">{m.name}</td>
                 <td className={`px-2 py-2 text-center font-bold ${callsToday > 0 ? 'text-[#42574E]' : 'text-[#1B2623]/30'}`}>{callsToday}</td>
                 <td className={`px-2 py-2 text-center ${emailsToday > 0 ? 'font-semibold text-[#1B2623]/70' : 'text-[#1B2623]/30'}`}>{emailsToday}</td>
@@ -989,7 +989,7 @@ function DashboardTab({ firms, activity, today, onLog, workerCount, onChanged, o
         </section>
       )}
       {isFounder && founderEmailCount > 0 && (
-        <div className="flex items-center gap-2 rounded-[14px] border border-[#CBD6CF] bg-[#F4F1FF] px-4 py-3">
+        <div className="flex items-center gap-2 rounded-[14px] border border-[#CBD6CF] bg-[#E7EDE8] px-4 py-3">
           <Mail className="h-4 w-4 shrink-0 text-[#374A42]" />
           <span className="text-[13px] font-semibold text-[#374A42]">{founderEmailCount} firm{founderEmailCount === 1 ? '' : 's'} flagged for a founder email</span>
           <span className="ml-auto text-[12px] font-bold text-[#42574E]">See “Victoria email f/u” tab →</span>
@@ -1327,7 +1327,7 @@ function CompanyEconomicsTab({ firms }: { firms: CrmFirm[] }) {
           </div>
 
           {/* Editable assumptions */}
-          <div className="rounded-[12px] border border-[#D3DED6] bg-[#FBFAFF] p-3">
+          <div className="rounded-[12px] border border-[#D3DED6] bg-[#FBFBFA] p-3">
             <div className="mb-2 text-[11px] font-bold uppercase tracking-wide text-[#1B2623]/55">Overhead assumptions</div>
             <div className="space-y-2">
               {([
@@ -1449,7 +1449,7 @@ function GrowthTab() {
               return daily.map((d) => (
                 <div key={d.day} className="flex items-center gap-2">
                   <span className="w-14 shrink-0 text-[11px] text-[#1B2623]/55">{d.day}</span>
-                  <div className="h-4 flex-1 overflow-hidden rounded bg-[#F3EFFF]">
+                  <div className="h-4 flex-1 overflow-hidden rounded bg-[#E7EDE8]">
                     <div className="h-full rounded bg-[#42574E]" style={{ width: `${Math.round((d.visits / max) * 100)}%` }} />
                   </div>
                   <span className="w-10 shrink-0 text-right text-[11px] font-semibold text-[#1B2623]">{d.visits}</span>
@@ -1488,7 +1488,7 @@ function GrowthTab() {
                   <div className="truncate text-[11px] text-[#1B2623]/50">{s.email} · {fmtDate(s.created_at)}</div>
                 </div>
                 {s.tier ? (
-                  <span className="shrink-0 rounded-full bg-[#F3EFFF] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-[#42574E]">{s.tier}{s.sub_status && s.sub_status !== 'active' ? ` · ${s.sub_status}` : ''}</span>
+                  <span className="shrink-0 rounded-full bg-[#E7EDE8] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-[#42574E]">{s.tier}{s.sub_status && s.sub_status !== 'active' ? ` · ${s.sub_status}` : ''}</span>
                 ) : (
                   <span className="shrink-0 rounded-full border border-[#D3DED6] px-2.5 py-1 text-[10px] font-semibold text-[#1B2623]/45">worker</span>
                 )}
@@ -1679,7 +1679,7 @@ function FounderEmailQueueTab({ firms, onFounderEmailDone }: { firms: CrmFirm[];
       ) : (
         <div className="space-y-2">
           {queue.map((f) => (
-            <div key={f.id} className="flex items-center gap-2 rounded-[12px] border border-[#E0D6FF] bg-white p-3">
+            <div key={f.id} className="flex items-center gap-2 rounded-[12px] border border-[#C6D0C8] bg-white p-3">
               <div className="min-w-0 flex-1">
                 <div className="break-words text-[14px] font-bold text-[#1B2623]">{f.name}</div>
                 {f.attorney_name && <div className="text-[11px] text-[#1B2623]/50">{f.attorney_name}</div>}
@@ -1714,7 +1714,7 @@ function FirmRow({ firm, me, today, onLog, onClaim, onNoContact, onNotInterested
   const due = !!firm.next_followup && firm.next_followup <= today;
   const owner = firm.contacted_by_name ? firm.contacted_by_name.split(' ')[0] : null;
   return (
-    <tr className="border-b border-[#F2EEFC] align-middle hover:bg-[#FAF8FF]">
+    <tr className="border-b border-[#E7EDE8] align-middle hover:bg-[#FAF8FF]">
       <td className="px-3 py-2">
         <div className="flex items-center gap-1.5">
           <button type="button" onClick={() => onLog(firm.id)} className="max-w-[200px] truncate text-left text-[13px] font-semibold text-[#1B2623] hover:text-[#42574E]" title={firm.name}>{firm.name}</button>
@@ -2018,7 +2018,7 @@ function MetricsTab({ firms, activity }: { firms: CrmFirm[]; activity: CrmActivi
                   <span className="font-bold text-[#42574E]">{n}</span>
                 </div>
                 <div className="h-2 overflow-hidden rounded-full bg-[#F2F4EC]">
-                  <div className="h-full rounded-full bg-[#8B6DFF]" style={{ width: `${Math.round((n / maxObj) * 100)}%` }} />
+                  <div className="h-full rounded-full bg-[#5E7268]" style={{ width: `${Math.round((n / maxObj) * 100)}%` }} />
                 </div>
               </div>
             ))}
@@ -2106,7 +2106,7 @@ function ScriptsTab() {
         <ul className="space-y-2">
           {CRM_SPECIALTIES.map((c) => (
             <li key={c} className="flex gap-2 text-[13px] leading-relaxed text-[#1B2623]/70">
-              <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#8B6DFF]" /><span>{c}</span>
+              <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#5E7268]" /><span>{c}</span>
             </li>
           ))}
         </ul>
@@ -2157,15 +2157,15 @@ function EmojiGifBar({ onInsert }: { onInsert: (s: string) => void }) {
     <div className="relative flex shrink-0 items-center gap-1">
       <button type="button" aria-label="Add emoji"
         onClick={() => { setShowEmoji((v) => !v); setShowGif(false); }}
-        className="flex h-9 w-9 items-center justify-center rounded-full text-lg hover:bg-[#F3EFFF]">😊</button>
+        className="flex h-9 w-9 items-center justify-center rounded-full text-lg hover:bg-[#E7EDE8]">😊</button>
       <button type="button" aria-label="Add GIF"
         onClick={() => { setShowGif((v) => !v); setShowEmoji(false); }}
-        className="flex h-9 items-center justify-center rounded-full px-2 text-[11px] font-bold text-[#42574E] hover:bg-[#F3EFFF]">GIF</button>
+        className="flex h-9 items-center justify-center rounded-full px-2 text-[11px] font-bold text-[#42574E] hover:bg-[#E7EDE8]">GIF</button>
       {showEmoji && (
         <div className="absolute bottom-11 left-0 z-20 grid w-[256px] grid-cols-8 gap-1 rounded-[12px] border border-[#D3DED6] bg-white p-2 shadow-lg">
           {QUICK_EMOJIS.map((e) => (
             <button key={e} type="button" onClick={() => onInsert(e)}
-              className="flex h-7 w-7 items-center justify-center rounded text-lg hover:bg-[#F3EFFF]">{e}</button>
+              className="flex h-7 w-7 items-center justify-center rounded text-lg hover:bg-[#E7EDE8]">{e}</button>
           ))}
         </div>
       )}
@@ -2229,7 +2229,7 @@ function TeamTab() {
             const mine = !!me.id && m.sender_id === me.id;
             return (
               <div key={m.id} className={`flex ${mine ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[82%] rounded-[14px] px-3.5 py-2 ${mine ? 'bg-[#42574E] text-white' : 'bg-[#F3EFFF] text-[#1B2623]'}`}>
+                <div className={`max-w-[82%] rounded-[14px] px-3.5 py-2 ${mine ? 'bg-[#42574E] text-white' : 'bg-[#E7EDE8] text-[#1B2623]'}`}>
                   {!mine && <div className="mb-0.5 text-[11px] font-bold text-[#42574E]">{m.sender_name || 'Member'}</div>}
                   <MessageBody text={m.body} />
                   <div className={`mt-0.5 text-[10px] ${mine ? 'text-white/60' : 'text-[#1B2623]/40'}`}>{new Date(m.created_at).toLocaleString()}</div>
@@ -2363,7 +2363,7 @@ function InboxTab({ onReadChange }: { onReadChange?: () => void }) {
           const mine = m.sender_id === me.id;
           return (
             <div key={m.id} className={`flex ${mine ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-[82%] rounded-[14px] px-3.5 py-2 ${mine ? 'bg-[#42574E] text-white' : 'bg-[#F3EFFF] text-[#1B2623]'}`}>
+              <div className={`max-w-[82%] rounded-[14px] px-3.5 py-2 ${mine ? 'bg-[#42574E] text-white' : 'bg-[#E7EDE8] text-[#1B2623]'}`}>
                 <MessageBody text={m.body} />
                 <div className={`mt-0.5 text-[10px] ${mine ? 'text-white/60' : 'text-[#1B2623]/40'}`}>{new Date(m.created_at).toLocaleString()}</div>
               </div>
@@ -2505,7 +2505,7 @@ function AskAITab() {
           <div className="space-y-2 py-6">
             <p className="px-1 text-[13px] font-semibold text-[#1B2623]/70">Ask anything about selling one3seven:</p>
             {STARTER_QUESTIONS.map((q) => (
-              <button key={q} type="button" onClick={() => send(q)} className="block w-full rounded-[12px] border border-[#D3DED6] bg-[#FAFAFF] px-3 py-2.5 text-left text-[13px] text-[#1B2623] transition hover:border-[#C9BEF5]">
+              <button key={q} type="button" onClick={() => send(q)} className="block w-full rounded-[12px] border border-[#D3DED6] bg-[#FAFAFF] px-3 py-2.5 text-left text-[13px] text-[#1B2623] transition hover:border-[#95AB9B]">
                 {q}
               </button>
             ))}
@@ -2513,7 +2513,7 @@ function AskAITab() {
         ) : (
           messages.map((m, i) => (
             <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-[85%] whitespace-pre-wrap rounded-[14px] px-3.5 py-2 text-[13px] leading-relaxed ${m.role === 'user' ? 'bg-[#42574E] text-white' : 'bg-[#F3EFFF] text-[#1B2623]'}`}>
+              <div className={`max-w-[85%] whitespace-pre-wrap rounded-[14px] px-3.5 py-2 text-[13px] leading-relaxed ${m.role === 'user' ? 'bg-[#42574E] text-white' : 'bg-[#E7EDE8] text-[#1B2623]'}`}>
                 {m.content}
               </div>
             </div>
@@ -2521,7 +2521,7 @@ function AskAITab() {
         )}
         {loading && (
           <div className="flex justify-start">
-            <div className="flex items-center gap-1 rounded-[14px] bg-[#F3EFFF] px-4 py-3">
+            <div className="flex items-center gap-1 rounded-[14px] bg-[#E7EDE8] px-4 py-3">
               <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-[#42574E]/50" style={{ animationDelay: '0ms' }} />
               <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-[#42574E]/50" style={{ animationDelay: '150ms' }} />
               <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-[#42574E]/50" style={{ animationDelay: '300ms' }} />
@@ -2750,9 +2750,9 @@ function ChecklistTab() {
                   key={item.id}
                   type="button"
                   onClick={() => toggle(item.id)}
-                  className={`flex w-full items-start gap-3 rounded-[12px] border p-3.5 text-left transition ${checked ? 'border-emerald-200 bg-emerald-50' : 'border-[#D3DED6] bg-white hover:border-[#C9BEF5]'}`}
+                  className={`flex w-full items-start gap-3 rounded-[12px] border p-3.5 text-left transition ${checked ? 'border-emerald-200 bg-emerald-50' : 'border-[#D3DED6] bg-white hover:border-[#95AB9B]'}`}
                 >
-                  <span className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border ${checked ? 'border-emerald-500 bg-emerald-500 text-white' : 'border-[#C9BEF5] bg-white'}`}>
+                  <span className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border ${checked ? 'border-emerald-500 bg-emerald-500 text-white' : 'border-[#95AB9B] bg-white'}`}>
                     {checked && <Check className="h-3.5 w-3.5" />}
                   </span>
                   <span className="min-w-0">
@@ -2778,7 +2778,7 @@ function TrainingTab() {
         <a href={`https://${FIRE_DEMO_TRAINING.link}`} target="_blank" rel="noreferrer" className="mb-3 inline-block text-[13px] font-semibold text-[#42574E] hover:underline">
           {FIRE_DEMO_TRAINING.link} ↗
         </a>
-        <div className="mb-4 rounded-[12px] border-2 border-[#42574E]/40 bg-[#F3EFFF] p-4">
+        <div className="mb-4 rounded-[12px] border-2 border-[#42574E]/40 bg-[#E7EDE8] p-4">
           <div className="mb-1 text-[11px] font-bold uppercase tracking-wide text-[#42574E]">Employment focus — read this first</div>
           <p className="text-[13px] leading-relaxed text-[#1B2623]/80">{FIRE_DEMO_TRAINING.employmentFocus}</p>
         </div>
@@ -2846,7 +2846,7 @@ function TrainingTab() {
 
         <ul className="mb-3 space-y-1.5">
           {CRM_COMMISSIONS.terms.map((l) => (
-            <li key={l} className="flex gap-2 text-[13px] leading-relaxed text-[#1B2623]/75"><span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#8B6DFF]" /><span>{l}</span></li>
+            <li key={l} className="flex gap-2 text-[13px] leading-relaxed text-[#1B2623]/75"><span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#5E7268]" /><span>{l}</span></li>
           ))}
         </ul>
 

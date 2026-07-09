@@ -224,7 +224,7 @@ export function TimelineDetailScreen({
                 <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
                 <div>
                   <div className="text-sm font-medium">Context saved</div>
-                  <div className="text-xs text-[#C9C2DC]">Intake summary refreshed</div>
+                  <div className="text-xs text-[#95AB9B]">Intake summary refreshed</div>
                 </div>
               </motion.div>
             )}

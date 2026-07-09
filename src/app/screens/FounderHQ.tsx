@@ -131,7 +131,7 @@ export function FounderHQ() {
 
         {(status === 'founder' || status === 'rep') && (
           <div>
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#42574E]/40 bg-[#42574E]/15 px-3 py-1.5 text-xs font-semibold text-[#C7B9FF]">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#42574E]/40 bg-[#42574E]/15 px-3 py-1.5 text-xs font-semibold text-[#95AB9B]">
               <ShieldCheck className="h-3.5 w-3.5" /> {status === 'founder' ? 'Founder access' : 'Sales rep access'}
             </div>
             <h1 className="mb-3 text-[30px] font-bold leading-tight tracking-tight">one3seven HQ</h1>
@@ -143,7 +143,7 @@ export function FounderHQ() {
             <button
               type="button"
               onClick={() => { setShowCRM(true); try { sessionStorage.setItem('o3s_hq_open_crm', '1'); } catch { /* ignore */ } }}
-              className="flex min-h-[52px] w-full items-center justify-center gap-2 rounded-full bg-[#42574E] text-[16px] font-semibold text-white shadow-[0_12px_40px_rgba(109,74,255,0.4)] transition hover:bg-[#374A42]"
+              className="flex min-h-[52px] w-full items-center justify-center gap-2 rounded-full bg-[#42574E] text-[16px] font-semibold text-white shadow-[0_12px_40px_rgba(66,87,78,0.4)] transition hover:bg-[#374A42]"
             >
               Open Sales CRM <ArrowRight className="h-5 w-5" />
             </button>
@@ -179,7 +179,7 @@ export function FounderHQ() {
             <p className="mb-6 text-[14px] leading-relaxed text-white/55">
               This account isn’t on the one3seven HQ access list. Ask the founder to invite your email, then sign in here.
             </p>
-            <button type="button" onClick={signOut} className="text-[13px] text-[#C7B9FF] hover:underline">Sign in with a different account</button>
+            <button type="button" onClick={signOut} className="text-[13px] text-[#95AB9B] hover:underline">Sign in with a different account</button>
             <div className="mt-4"><a href="/" className="text-[13px] text-white/40 hover:text-white/70">Back to one3seven</a></div>
           </div>
         )}
@@ -205,7 +205,7 @@ export function FounderHQ() {
             <button
               type="button"
               onClick={() => { setMode(mode === 'signin' ? 'signup' : 'signin'); setError(''); setNotice(''); }}
-              className="mt-4 w-full text-center text-[13px] text-[#C7B9FF] hover:underline"
+              className="mt-4 w-full text-center text-[13px] text-[#95AB9B] hover:underline"
             >
               {mode === 'signin' ? 'Invited rep? Create your account' : 'Already have an account? Sign in'}
             </button>
@@ -257,7 +257,7 @@ function RepsManager() {
         </button>
       </form>
 
-      <p className="mt-3 rounded-[10px] bg-[#42574E]/15 px-3 py-2 text-[12px] leading-relaxed text-[#C7B9FF]">
+      <p className="mt-3 rounded-[10px] bg-[#42574E]/15 px-3 py-2 text-[12px] leading-relaxed text-[#95AB9B]">
         Share this link with reps: <span className="font-semibold text-white">{hqLink}</span> — they create an account / sign in with the email you invited.
       </p>
 

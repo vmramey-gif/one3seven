@@ -149,7 +149,7 @@ export function CitationPanel({
         </div>
         <p
           className="mt-2 rounded-md px-2 py-1.5 text-xs leading-relaxed"
-          style={{ background: 'var(--o3s-primary-soft, #f3efff)', color: 'var(--o3s-text, #1B2623)' }}
+          style={{ background: 'var(--o3s-primary-soft, #E7EDE8)', color: 'var(--o3s-text, #1B2623)' }}
         >
           “{citation.sourceText}”
         </p>

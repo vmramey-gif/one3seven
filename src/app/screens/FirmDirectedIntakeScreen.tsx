@@ -166,7 +166,7 @@ export function FirmDirectedIntakeScreen({ firmName, onSubmit }: FirmDirectedInt
               <button
                 type="button"
                 onClick={handleFormContinue}
-                className="flex w-full items-center justify-center gap-2 rounded-full bg-[#42574E] px-6 py-4 text-[15px] font-semibold text-white shadow-[0_8px_32px_rgba(109,74,255,0.28)] transition hover:bg-[#42574E] hover:-translate-y-0.5"
+                className="flex w-full items-center justify-center gap-2 rounded-full bg-[#42574E] px-6 py-4 text-[15px] font-semibold text-white shadow-[0_8px_32px_rgba(66,87,78,0.28)] transition hover:bg-[#42574E] hover:-translate-y-0.5"
               >
                 Continue
                 <ArrowRight className="h-4 w-4" />
@@ -211,7 +211,7 @@ export function FirmDirectedIntakeScreen({ firmName, onSubmit }: FirmDirectedInt
               <button
                 type="submit"
                 disabled={busy}
-                className="flex w-full items-center justify-center gap-2 rounded-full bg-[#42574E] px-6 py-4 text-[15px] font-semibold text-white shadow-[0_8px_32px_rgba(109,74,255,0.28)] transition hover:bg-[#42574E] disabled:opacity-60"
+                className="flex w-full items-center justify-center gap-2 rounded-full bg-[#42574E] px-6 py-4 text-[15px] font-semibold text-white shadow-[0_8px_32px_rgba(66,87,78,0.28)] transition hover:bg-[#42574E] disabled:opacity-60"
               >
                 {busy ? 'Sending…' : 'Send my secure link'}
                 {!busy && <ArrowRight className="h-4 w-4" />}

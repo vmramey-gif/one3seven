@@ -483,7 +483,7 @@ export function FirmSettingsScreen({
                     key={plan.id}
                     className={`relative flex flex-col rounded-[22px] border p-5 transition ${
                       isPopular
-                        ? 'border-[#42574E] bg-[#F2F4EC] shadow-[0_8px_32px_rgba(109,74,255,0.14)]'
+                        ? 'border-[#42574E] bg-[#F2F4EC] shadow-[0_8px_32px_rgba(66,87,78,0.14)]'
                         : isCurrent
                         ? 'border-emerald-300 bg-emerald-50/60'
                         : 'border-[#E4E5DE] bg-white'
@@ -715,7 +715,7 @@ export function FirmSettingsScreen({
             <button
               onClick={handleSaveSettings}
               disabled={isSaving}
-              className="flex shrink-0 items-center justify-center gap-2 rounded-full bg-[#42574E] px-8 py-3 font-medium text-white shadow-[0_18px_48px_rgba(109,74,255,0.26)] transition hover:-translate-y-0.5 hover:bg-[#42574E] disabled:translate-y-0 disabled:opacity-60"
+              className="flex shrink-0 items-center justify-center gap-2 rounded-full bg-[#42574E] px-8 py-3 font-medium text-white shadow-[0_18px_48px_rgba(66,87,78,0.26)] transition hover:-translate-y-0.5 hover:bg-[#42574E] disabled:translate-y-0 disabled:opacity-60"
             >
               <Save className="w-4 h-4" />
               {isSaving ? 'Saving...' : 'Save firm profile'}
@@ -734,7 +734,7 @@ function PillButton({ selected, onClick, children }: { selected: boolean; onClic
       onClick={onClick}
       className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
         selected
-          ? 'bg-[#42574E] text-white shadow-[0_10px_24px_rgba(109,74,255,0.18)]'
+          ? 'bg-[#42574E] text-white shadow-[0_10px_24px_rgba(66,87,78,0.18)]'
           : 'border border-[#E4E5DE] bg-white text-[#1B2623]/70 hover:border-[#7C8B6F] hover:bg-[#F2F4EC] hover:text-[#1B2623]'
       }`}
     >

@@ -99,14 +99,14 @@ export function CompanyDemoGuide() {
   const html = (markup: string) => ({ dangerouslySetInnerHTML: { __html: markup } });
 
   return (
-    <div className="min-h-screen bg-[#FAF8FE] text-[#16121F] antialiased">
+    <div className="min-h-screen bg-[#FAF8FE] text-[#42574E] antialiased">
       <div className={`mx-auto px-5 pb-16 pt-7 ${present ? 'max-w-[880px]' : 'max-w-[760px]'}`}>
         {/* Masthead */}
         <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
           <div style={SERIF} className="text-[20px] font-bold tracking-tight">
             one<span className="text-[#42574E]">3</span>seven
           </div>
-          <div className="inline-flex gap-0.5 rounded-full border border-[#E8E3F2] bg-white p-[3px]">
+          <div className="inline-flex gap-0.5 rounded-full border border-[#C6D0C8] bg-white p-[3px]">
             {(['coach', 'present'] as const).map((m) => {
               const active = (m === 'present') === present;
               return (
@@ -115,8 +115,8 @@ export function CompanyDemoGuide() {
                   type="button"
                   aria-pressed={active}
                   onClick={() => setPresent(m === 'present')}
-                  className={`rounded-full px-3.5 py-[7px] text-[12.5px] font-semibold capitalize transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#7C4DD6] ${
-                    active ? 'bg-[#42574E] text-white shadow-sm' : 'text-[#4B4458]'
+                  className={`rounded-full px-3.5 py-[7px] text-[12.5px] font-semibold capitalize transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#5E7268] ${
+                    active ? 'bg-[#42574E] text-white shadow-sm' : 'text-[#4F5F47]'
                   }`}
                 >
                   {m}
@@ -128,14 +128,14 @@ export function CompanyDemoGuide() {
 
         {/* Title block */}
         <div className="mb-4">
-          <div className="mb-2 text-[12px] font-semibold uppercase tracking-[0.14em] text-[#7C4DD6]">
+          <div className="mb-2 text-[12px] font-semibold uppercase tracking-[0.14em] text-[#5E7268]">
             Company demo · Marcus Reyes
           </div>
           <h1 style={SERIF} className="text-[clamp(28px,7vw,40px)] font-bold leading-[1.02] tracking-[-0.03em]">
             Run the demo, click&nbsp;by&nbsp;click.
           </h1>
           {!present && (
-            <p className="mt-2.5 max-w-[58ch] text-[15.5px] text-[#4B4458]">
+            <p className="mt-2.5 max-w-[58ch] text-[15.5px] text-[#4F5F47]">
               Each step tells you what to click and exactly what to say. Three beats carry the whole thing:
               show the mess, show the cited timeline, point to one fact and its source.
             </p>
@@ -158,11 +158,11 @@ export function CompanyDemoGuide() {
               type="button"
               aria-label={`Go to ${st.phase}`}
               onClick={() => go(idx)}
-              className="relative h-[5px] flex-1 overflow-hidden rounded-full bg-[#E8E3F2] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#7C4DD6]"
+              className="relative h-[5px] flex-1 overflow-hidden rounded-full bg-[#C6D0C8] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#5E7268]"
             >
               <span
                 className={`absolute inset-0 origin-left rounded-full transition-transform duration-300 motion-reduce:transition-none ${
-                  idx < i ? 'scale-x-100 bg-[#42574E]' : idx === i ? 'scale-x-100 bg-[#7C4DD6]' : 'scale-x-0 bg-[#42574E]'
+                  idx < i ? 'scale-x-100 bg-[#42574E]' : idx === i ? 'scale-x-100 bg-[#5E7268]' : 'scale-x-0 bg-[#42574E]'
                 }`}
               />
             </button>
@@ -170,15 +170,15 @@ export function CompanyDemoGuide() {
         </div>
 
         {/* Step card */}
-        <div className="overflow-hidden rounded-[20px] border border-[#E8E3F2] bg-white shadow-[0_12px_40px_-12px_rgba(46,16,80,0.28)]">
-          <div className="h-[5px] w-full bg-gradient-to-r from-[#42574E] to-[#7C4DD6]" />
+        <div className="overflow-hidden rounded-[20px] border border-[#C6D0C8] bg-white shadow-[0_12px_40px_-12px_rgba(46,16,80,0.28)]">
+          <div className="h-[5px] w-full bg-gradient-to-r from-[#42574E] to-[#5E7268]" />
           <div className={present ? 'p-10' : 'p-6'}>
             <div className="mb-3.5 flex items-center gap-3">
               <div style={SERIF} className="grid h-[30px] w-[30px] flex-none place-items-center rounded-[9px] bg-[#42574E] text-[13px] font-bold text-white">
                 {i + 1}
               </div>
-              <div className="text-[11.5px] font-bold uppercase tracking-[0.12em] text-[#7C4DD6]">{s.phase}</div>
-              {!present && <div className="ml-auto text-[12px] font-medium text-[#4B4458]">{s.kicker}</div>}
+              <div className="text-[11.5px] font-bold uppercase tracking-[0.12em] text-[#5E7268]">{s.phase}</div>
+              {!present && <div className="ml-auto text-[12px] font-medium text-[#4F5F47]">{s.kicker}</div>}
             </div>
 
             <h2 style={SERIF} className={`mb-4 font-bold leading-[1.12] tracking-[-0.02em] ${present ? 'text-[30px]' : 'text-[23px]'}`}>
@@ -186,30 +186,30 @@ export function CompanyDemoGuide() {
             </h2>
 
             {/* Do this */}
-            <div className="mb-4 flex gap-3 rounded-[13px] bg-[#F3EDFD] p-[14px_15px]">
+            <div className="mb-4 flex gap-3 rounded-[13px] bg-[#E7EDE8] p-[14px_15px]">
               <div className="mt-0.5 grid h-[26px] w-[26px] flex-none place-items-center rounded-lg bg-[#42574E] text-[14px] text-white" aria-hidden>
                 ▷
               </div>
               <div className={present ? 'text-[17px]' : 'text-[14.5px]'}>
-                <span className="mb-0.5 block text-[10.5px] font-bold uppercase tracking-[0.1em] text-[#7C4DD6]">Do this</span>
+                <span className="mb-0.5 block text-[10.5px] font-bold uppercase tracking-[0.1em] text-[#5E7268]">Do this</span>
                 <span {...html(s.do)} />
               </div>
             </div>
 
             {/* Say bubble */}
-            <div className={`relative my-1.5 rounded-[15px] bg-[#16121F] p-[17px_18px_16px] leading-[1.5] text-white ${present ? 'text-[19px]' : 'text-[15.5px]'}`}>
-              <span className="absolute -top-[9px] left-[26px] border-x-[9px] border-b-[9px] border-x-transparent border-b-[#16121F]" aria-hidden />
-              <span className="mb-1.5 block text-[10.5px] font-bold uppercase tracking-[0.12em] text-[#B79AEC]">Say — word for word</span>
+            <div className={`relative my-1.5 rounded-[15px] bg-[#42574E] p-[17px_18px_16px] leading-[1.5] text-white ${present ? 'text-[19px]' : 'text-[15.5px]'}`}>
+              <span className="absolute -top-[9px] left-[26px] border-x-[9px] border-b-[9px] border-x-transparent border-b-[#42574E]" aria-hidden />
+              <span className="mb-1.5 block text-[10.5px] font-bold uppercase tracking-[0.12em] text-[#7C8B6F]">Say — word for word</span>
               <span>{s.say}</span>
             </div>
 
             {/* Coach-only: note, fallback, capture-after */}
             {!present && s.note && (
-              <div className="mt-3.5 border-l-2 border-[#E8E3F2] pl-3.5 text-[13px] text-[#4B4458]" {...html(s.note)} />
+              <div className="mt-3.5 border-l-2 border-[#C6D0C8] pl-3.5 text-[13px] text-[#4F5F47]" {...html(s.note)} />
             )}
             {!present && s.fallback && (
-              <div className="mt-3.5 border-l-2 border-[#E8E3F2] pl-3.5 text-[13px] text-[#4B4458]">
-                <span className="mb-1 block text-[10px] font-bold uppercase tracking-[0.1em] text-[#7C4DD6]">Coach only</span>
+              <div className="mt-3.5 border-l-2 border-[#C6D0C8] pl-3.5 text-[13px] text-[#4F5F47]">
+                <span className="mb-1 block text-[10px] font-bold uppercase tracking-[0.1em] text-[#5E7268]">Coach only</span>
                 <span {...html(s.fallback)} />
               </div>
             )}
@@ -230,16 +230,16 @@ export function CompanyDemoGuide() {
             type="button"
             onClick={() => go(i - 1)}
             disabled={i === 0}
-            className="inline-flex items-center gap-2 rounded-[11px] border border-[#E8E3F2] bg-white px-5 py-3 text-[14.5px] font-semibold transition hover:border-[#7C4DD6] disabled:cursor-not-allowed disabled:opacity-35 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#7C4DD6]"
+            className="inline-flex items-center gap-2 rounded-[11px] border border-[#C6D0C8] bg-white px-5 py-3 text-[14.5px] font-semibold transition hover:border-[#5E7268] disabled:cursor-not-allowed disabled:opacity-35 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#5E7268]"
           >
             ← Back
           </button>
-          <span className="mx-auto text-[13px] font-medium text-[#4B4458]">{i + 1} of {STEPS.length}</span>
+          <span className="mx-auto text-[13px] font-medium text-[#4F5F47]">{i + 1} of {STEPS.length}</span>
           {i === STEPS.length - 1 ? (
             <button
               type="button"
               onClick={() => go(0)}
-              className="inline-flex items-center gap-2 rounded-[11px] border border-[#42574E] bg-[#42574E] px-5 py-3 text-[14.5px] font-semibold text-white shadow-sm transition hover:bg-[#4C1A9C] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#7C4DD6]"
+              className="inline-flex items-center gap-2 rounded-[11px] border border-[#42574E] bg-[#42574E] px-5 py-3 text-[14.5px] font-semibold text-white shadow-sm transition hover:bg-[#42574E] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#5E7268]"
             >
               Run it again ↺
             </button>
@@ -247,7 +247,7 @@ export function CompanyDemoGuide() {
             <button
               type="button"
               onClick={() => go(i + 1)}
-              className="inline-flex items-center gap-2 rounded-[11px] border border-[#42574E] bg-[#42574E] px-5 py-3 text-[14.5px] font-semibold text-white shadow-sm transition hover:bg-[#4C1A9C] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#7C4DD6]"
+              className="inline-flex items-center gap-2 rounded-[11px] border border-[#42574E] bg-[#42574E] px-5 py-3 text-[14.5px] font-semibold text-white shadow-sm transition hover:bg-[#42574E] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#5E7268]"
             >
               Next →
             </button>
@@ -256,8 +256,8 @@ export function CompanyDemoGuide() {
 
         {/* Panic strip (coach only) */}
         {!present && (
-          <div className="mt-6 rounded-[14px] border border-dashed border-[#E8E3F2] bg-white/60 p-[16px_18px]">
-            <h3 style={SERIF} className="mb-2.5 text-[13px] font-bold uppercase tracking-[0.04em] text-[#4B4458]">
+          <div className="mt-6 rounded-[14px] border border-dashed border-[#C6D0C8] bg-white/60 p-[16px_18px]">
+            <h3 style={SERIF} className="mb-2.5 text-[13px] font-bold uppercase tracking-[0.04em] text-[#4F5F47]">
               If you freeze — the entire demo in 3 sentences
             </h3>
             <ol className="grid gap-[7px]">

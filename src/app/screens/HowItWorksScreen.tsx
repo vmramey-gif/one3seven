@@ -56,9 +56,9 @@ export function HowItWorksScreen({ onNavigate }: HowItWorksScreenProps) {
   ];
 
   return (
-    <div className="min-h-screen bg-[#f8f6ff]">
+    <div className="min-h-screen bg-[#F1F3EF]">
       {/* Top Navigation */}
-      <nav className="sticky top-0 bg-[#f8f6ff]/80 backdrop-blur-md border-b border-[#e5def8] z-50">
+      <nav className="sticky top-0 bg-[#F1F3EF]/80 backdrop-blur-md border-b border-[#D3DED6] z-50">
         <div className="px-6 py-7">
           <button
             onClick={() => onNavigate('landing')}
@@ -73,7 +73,7 @@ export function HowItWorksScreen({ onNavigate }: HowItWorksScreenProps) {
       <div className="px-6 pt-6">
         <button
           onClick={() => onNavigate('landing')}
-          className="flex items-center gap-1.5 text-xs uppercase tracking-wide text-[#66708f] hover:text-[#39415f] transition-colors duration-200 font-normal"
+          className="flex items-center gap-1.5 text-xs uppercase tracking-wide text-[#6A6D66] hover:text-[#40433F] transition-colors duration-200 font-normal"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           Back
@@ -87,10 +87,10 @@ export function HowItWorksScreen({ onNavigate }: HowItWorksScreenProps) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <h1 className="text-[32px] leading-[1.2] font-semibold text-[#111b3d] mb-4 tracking-tight">
+          <h1 className="text-[32px] leading-[1.2] font-semibold text-[#1B2623] mb-4 tracking-tight">
             How It Works
           </h1>
-          <p className="text-base text-[#39415f] mb-12 leading-relaxed">
+          <p className="text-base text-[#40433F] mb-12 leading-relaxed">
             A calm path from scattered records to a clearer, structured summary you can review and share.
           </p>
 
@@ -105,7 +105,7 @@ export function HowItWorksScreen({ onNavigate }: HowItWorksScreenProps) {
                 className="relative"
               >
                 {index < steps.length - 1 && (
-                  <div className="absolute left-[22px] top-[60px] w-0.5 h-16 bg-[#e5def8]" />
+                  <div className="absolute left-[22px] top-[60px] w-0.5 h-16 bg-[#D3DED6]" />
                 )}
 
                 <div className="flex items-start gap-5">
@@ -114,18 +114,18 @@ export function HowItWorksScreen({ onNavigate }: HowItWorksScreenProps) {
                   </div>
 
                   <div className="flex-1 pt-1">
-                    <div className="text-xs text-[#66708f] uppercase tracking-wide mb-2">
+                    <div className="text-xs text-[#6A6D66] uppercase tracking-wide mb-2">
                       Step {step.number}
                     </div>
-                    <h3 className="text-[17px] font-semibold text-[#111b3d] mb-3 leading-snug">
+                    <h3 className="text-[17px] font-semibold text-[#1B2623] mb-3 leading-snug">
                       {step.title}
                     </h3>
 
                     {step.examples && (
                       <div className="space-y-2">
                         {step.examples.map((example, i) => (
-                          <div key={i} className="flex items-center gap-2 text-sm text-[#39415f]">
-                            <div className="w-1 h-1 bg-[#c7b9ff] rounded-full flex-shrink-0" />
+                          <div key={i} className="flex items-center gap-2 text-sm text-[#40433F]">
+                            <div className="w-1 h-1 bg-[#95AB9B] rounded-full flex-shrink-0" />
                             <span>{example}</span>
                           </div>
                         ))}
@@ -133,7 +133,7 @@ export function HowItWorksScreen({ onNavigate }: HowItWorksScreenProps) {
                     )}
 
                     {step.description && (
-                      <p className="text-sm text-[#39415f] leading-relaxed">{step.description}</p>
+                      <p className="text-sm text-[#40433F] leading-relaxed">{step.description}</p>
                     )}
                   </div>
                 </div>
@@ -148,13 +148,13 @@ export function HowItWorksScreen({ onNavigate }: HowItWorksScreenProps) {
             transition={{ delay: 0.4, duration: 0.5 }}
             className="mb-16"
           >
-            <h2 className="text-lg font-semibold text-[#111b3d] mb-6">Accepted Document Types</h2>
-            <div className="bg-white rounded-[16px] p-6 border border-[#e5def8]">
+            <h2 className="text-lg font-semibold text-[#1B2623] mb-6">Accepted Document Types</h2>
+            <div className="bg-white rounded-[16px] p-6 border border-[#D3DED6]">
               <div className="space-y-3">
                 {documentTypes.map((type, index) => (
                   <div key={index} className="flex items-start gap-3">
                     <CheckCircle2 className="w-4 h-4 text-[#42574e] flex-shrink-0 mt-0.5" />
-                    <span className="text-sm text-[#39415f] leading-relaxed">{type}</span>
+                    <span className="text-sm text-[#40433F] leading-relaxed">{type}</span>
                   </div>
                 ))}
               </div>
@@ -170,7 +170,7 @@ export function HowItWorksScreen({ onNavigate }: HowItWorksScreenProps) {
           >
             <button
               onClick={() => onNavigate('upload')}
-              className="w-full bg-[#42574e] text-white py-4 px-6 rounded-[14px] hover:bg-[#5b39e6] transition-all shadow-[0_10px_22px_rgba(109,74,255,0.18)] font-medium"
+              className="w-full bg-[#42574e] text-white py-4 px-6 rounded-[14px] hover:bg-[#4F5F47] transition-all shadow-[0_10px_22px_rgba(66,87,78,0.18)] font-medium"
             >
               Start Organizing
             </button>
@@ -182,7 +182,7 @@ export function HowItWorksScreen({ onNavigate }: HowItWorksScreenProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6, duration: 0.5 }}
           >
-            <One3SevenDisclaimer variant="full" className="text-[#39415f] bg-white rounded-[16px] p-6 border border-[#e5def8]" />
+            <One3SevenDisclaimer variant="full" className="text-[#40433F] bg-white rounded-[16px] p-6 border border-[#D3DED6]" />
           </motion.div>
         </motion.div>
       </div>

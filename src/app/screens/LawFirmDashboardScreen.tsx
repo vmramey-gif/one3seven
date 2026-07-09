@@ -305,7 +305,7 @@ export function LawFirmDashboardScreen({
 
   const filterPillClass = (active: boolean) =>
     active
-      ? 'bg-[#42574E] text-white border-[#42574E] shadow-[0_10px_24px_rgba(91,33,182,0.18)]'
+      ? 'bg-[#42574E] text-white border-[#42574E] shadow-[0_10px_24px_rgba(66,87,78,0.18)]'
       : 'bg-white text-[#1B2623]/70 border-[#E4E5DE] hover:border-[#7C8B6F] hover:bg-[#F2F4EC]';
 
   return (
@@ -430,7 +430,7 @@ export function LawFirmDashboardScreen({
                         setNewIntakeSourceTab('connected');
                         setActiveTab('all');
                       }}
-                      className="inline-flex min-h-14 items-center justify-center rounded-full bg-[#42574E] px-9 py-4 text-[15px] font-semibold text-white shadow-[0_18px_48px_rgba(91,33,182,0.30)] transition hover:-translate-y-0.5 hover:bg-[#42574E] hover:shadow-[0_20px_54px_rgba(91,33,182,0.36)]"
+                      className="inline-flex min-h-14 items-center justify-center rounded-full bg-[#42574E] px-9 py-4 text-[15px] font-semibold text-white shadow-[0_18px_48px_rgba(66,87,78,0.30)] transition hover:-translate-y-0.5 hover:bg-[#42574E] hover:shadow-[0_20px_54px_rgba(66,87,78,0.36)]"
                     >
                       Review New Intakes
                     </button>
@@ -481,7 +481,7 @@ export function LawFirmDashboardScreen({
                       onClick={() => setNewIntakeSourceTab(tab)}
                       className={`rounded-full px-4 py-2 text-sm transition-colors ${
                         newIntakeSourceTab === tab
-                          ? 'bg-[#42574E] text-white shadow-[0_10px_24px_rgba(91,33,182,0.22)]'
+                          ? 'bg-[#42574E] text-white shadow-[0_10px_24px_rgba(66,87,78,0.22)]'
                           : 'text-[#1B2623]/64 hover:bg-[#F2F4EC] hover:text-[#1B2623]'
                       }`}
                     >
@@ -583,7 +583,7 @@ export function LawFirmDashboardScreen({
                   onClick={() => setActiveTab(tab)}
                   className={`rounded-full border px-4 py-2 text-sm min-h-[36px] transition-colors ${
                     activeTab === tab
-                      ? 'border-[#42574E] bg-[#42574E] text-white shadow-[0_10px_24px_rgba(91,33,182,0.18)]'
+                      ? 'border-[#42574E] bg-[#42574E] text-white shadow-[0_10px_24px_rgba(66,87,78,0.18)]'
                       : 'border-[#E4E5DE] bg-white text-[#1B2623]/60 hover:border-[#7C8B6F] hover:bg-[#F2F4EC]'
                   }`}
                 >

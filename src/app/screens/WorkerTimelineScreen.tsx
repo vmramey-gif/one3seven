@@ -161,14 +161,14 @@ export function WorkerTimelineScreen({
             </button>
           </div>
         ) : displayRows.length > 0 ? (
-          <ol className="relative ml-1 space-y-4 border-l border-[#E7DEF7] pl-6">
+          <ol className="relative ml-1 space-y-4 border-l border-[#C6D0C8] pl-6">
             {displayRows.map((item, i) => (
               <li key={item.timelineEventId ?? `${item.date}-${item.event}-${i}`} className="relative">
                 <span className="absolute -left-[31px] top-4 h-3 w-3 rounded-full bg-[#42574E] ring-4 ring-[#42574E]/10" />
                 <button
                   type="button"
                   onClick={() => onSelectItem(item)}
-                  className="w-full text-left rounded-2xl border border-[#E4E5DE] bg-white p-4 transition-all hover:border-[#7C8B6F] hover:shadow-[0_8px_28px_rgba(91,33,182,0.08)]"
+                  className="w-full text-left rounded-2xl border border-[#E4E5DE] bg-white p-4 transition-all hover:border-[#7C8B6F] hover:shadow-[0_8px_28px_rgba(66,87,78,0.08)]"
                 >
                   <p className="text-[11px] font-semibold uppercase tracking-wide text-[#42574E] mb-1">{item.date}</p>
                   <p className="text-[15px] font-medium text-[#1B2623] mb-1">{item.event}</p>
@@ -210,7 +210,7 @@ export function WorkerTimelineScreen({
                   workerAddedContext: null,
                 })
               }
-              className="w-full text-left rounded-2xl border border-[#E4E5DE] bg-white p-4 hover:border-[#7C8B6F] hover:shadow-[0_8px_28px_rgba(91,33,182,0.08)] transition-all"
+              className="w-full text-left rounded-2xl border border-[#E4E5DE] bg-white p-4 hover:border-[#7C8B6F] hover:shadow-[0_8px_28px_rgba(66,87,78,0.08)] transition-all"
             >
               <p className="text-[11px] font-semibold uppercase tracking-wide text-[#42574E] mb-1">Jan – Mar 2026</p>
               <p className="text-[15px] font-medium text-[#1B2623] mb-1">Payroll and schedule alignment window</p>
