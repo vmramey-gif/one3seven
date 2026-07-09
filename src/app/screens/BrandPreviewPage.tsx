@@ -7,7 +7,8 @@
  */
 
 const SERIF = { fontFamily: '"Fraunces", Georgia, "Times New Roman", serif' } as const;
-const MONO = { fontFamily: 'ui-monospace, "IBM Plex Mono", Menlo, monospace' } as const;
+const BODY = { fontFamily: '"Inter Tight", ui-sans-serif, system-ui, -apple-system, sans-serif' } as const;
+const MONO = { fontFamily: '"IBM Plex Mono", ui-monospace, Menlo, monospace' } as const;
 
 const EVENTS = [
   { date: 'Nov 2025', title: 'Concern raised with HR', doc: 'Rivera_HR_Complaint.pdf' },
@@ -48,7 +49,7 @@ function TimelineCard() {
 
 export function BrandPreviewPage() {
   return (
-    <div className="min-h-screen bg-[#F1F3EF] text-[#17181C]">
+    <div style={BODY} className="min-h-screen bg-[#F1F3EF] text-[#17181C]">
       {/* nav */}
       <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
         <span style={SERIF} className="text-[19px] font-semibold tracking-[-0.01em]">one3seven</span>
@@ -81,6 +82,14 @@ export function BrandPreviewPage() {
         <TimelineCard />
       </section>
 
+      {/* problem */}
+      <section className="mx-auto max-w-5xl px-6 py-16 md:py-20">
+        <p style={SERIF} className="text-balance text-[clamp(24px,3.6vw,38px)] font-medium leading-[1.25] tracking-[-0.012em] text-[#20242a]">
+          Workers arrive with records scattered across phones, emails, and folders — no order, no timeline. Too often, attorneys spend the first consultation{' '}
+          <span className="text-[#5E7268]">organizing records instead of evaluating them.</span>
+        </p>
+      </section>
+
       {/* roles legend + how it works */}
       <section className="mx-auto max-w-6xl px-6 pb-8">
         <div className="flex flex-wrap gap-x-6 gap-y-2 text-[12px] text-[#6a6d66]">
@@ -102,6 +111,53 @@ export function BrandPreviewPage() {
               <p className="mt-2 text-[14px] leading-[1.6] text-[#454a44]">{b}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* trust — organizes, never concludes */}
+      <section className="mx-auto grid max-w-6xl items-start gap-10 px-6 py-20 md:grid-cols-2">
+        <div>
+          <div style={MONO} className="text-[11px] uppercase tracking-[0.14em] text-[#42574E]">What it does — and doesn’t</div>
+          <h2 style={SERIF} className="mt-3 text-[clamp(26px,3.6vw,40px)] font-semibold leading-[1.1] tracking-[-0.015em] text-balance">
+            Organizes and reflects.<span className="block text-[#5E7268]">Never concludes.</span>
+          </h2>
+          <p className="mt-4 max-w-[46ch] text-[15px] leading-[1.6] text-[#40433f]">
+            Every fact links to the source document it came from. one3seven doesn’t evaluate claims, score cases, or recommend anything. You verify, you decide — the legal judgment stays with your team.
+          </p>
+          <div className="mt-5 inline-flex items-center gap-2 text-[12.5px] text-[#5b5e59]">
+            <span className="h-[7px] w-[7px] rounded-full bg-[#5B21B6] shadow-[0_0_0_4px_rgba(91,33,182,0.16)]" />
+            Built on Anthropic’s Claude for record organization.
+          </div>
+        </div>
+        <ul className="grid gap-2.5">
+          {[
+            'Source-linked — every entry opens the exact document',
+            'A dated timeline built from the records',
+            'Documents grouped: wage, HR, discipline, separation',
+            'Time-sensitive dates surfaced for attorney review',
+            '0 legal conclusions — organization only',
+          ].map((item) => (
+            <li key={item} className="flex items-start gap-3 rounded-xl border border-[#E1E4DD] bg-[#F7F9F5] px-4 py-3 text-[14px] text-[#2c332e]">
+              <span className="mt-[6px] h-2 w-2 flex-none rounded-full bg-[#42574E]" />
+              {item}
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {/* pilot CTA */}
+      <section id="pilot" className="border-t border-[#E1E4DD] bg-[#20302B]">
+        <div className="mx-auto max-w-4xl px-6 py-20 text-center">
+          <h2 style={SERIF} className="text-balance text-[clamp(30px,4.6vw,52px)] font-semibold leading-[1.02] tracking-[-0.02em] text-[#F1F5F1]">
+            Open your next intake<span className="block text-[#9FB3A8]">already organized.</span>
+          </h2>
+          <p className="mx-auto mt-5 max-w-[48ch] text-[15px] leading-[1.6] text-[#C3CEC7]">
+            We’re opening a small founding cohort of California employment firms — onboarded a few at a time, hands-on. Your pilot begins with your first real intake.
+          </p>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+            <a href="/for-firms" className="rounded-full bg-[#DDE7DF] px-6 py-3 text-[14px] font-semibold text-[#20302B] transition hover:bg-white">Request a pilot</a>
+            <a href="/demo" className="rounded-full border border-[#4A5A52] px-5 py-3 text-[14px] font-semibold text-[#DDE7DF] transition hover:border-[#7c8b81]">See a sample intake</a>
+          </div>
         </div>
       </section>
 
