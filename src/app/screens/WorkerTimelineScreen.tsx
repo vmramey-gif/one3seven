@@ -130,7 +130,7 @@ export function WorkerTimelineScreen({
         <button
           type="button"
           onClick={onBackToDashboard}
-          className="flex items-center gap-1.5 text-xs uppercase tracking-wide text-[#8B86A0] hover:text-[#5B21B6]"
+          className="flex items-center gap-1.5 text-xs uppercase tracking-wide text-[#8B86A0] hover:text-[#42574E]"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           Your dashboard
@@ -155,7 +155,7 @@ export function WorkerTimelineScreen({
             <button
               type="button"
               onClick={() => onNavigate('upload')}
-              className="text-sm font-semibold bg-[#5B21B6] text-white px-5 py-2.5 rounded-full hover:bg-[#4C1D96] transition"
+              className="text-sm font-semibold bg-[#42574E] text-white px-5 py-2.5 rounded-full hover:bg-[#4C1D96] transition"
             >
               Start organizing
             </button>
@@ -164,13 +164,13 @@ export function WorkerTimelineScreen({
           <ol className="relative ml-1 space-y-4 border-l border-[#E7DEF7] pl-6">
             {displayRows.map((item, i) => (
               <li key={item.timelineEventId ?? `${item.date}-${item.event}-${i}`} className="relative">
-                <span className="absolute -left-[31px] top-4 h-3 w-3 rounded-full bg-[#5B21B6] ring-4 ring-[#5B21B6]/10" />
+                <span className="absolute -left-[31px] top-4 h-3 w-3 rounded-full bg-[#42574E] ring-4 ring-[#42574E]/10" />
                 <button
                   type="button"
                   onClick={() => onSelectItem(item)}
                   className="w-full text-left rounded-2xl border border-[#ECE7F5] bg-white p-4 transition-all hover:border-[#C9B8F0] hover:shadow-[0_8px_28px_rgba(91,33,182,0.08)]"
                 >
-                  <p className="text-[11px] font-semibold uppercase tracking-wide text-[#5B21B6] mb-1">{item.date}</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-[#42574E] mb-1">{item.date}</p>
                   <p className="text-[15px] font-medium text-[#14112E] mb-1">{item.event}</p>
                   <p className="text-xs text-[#6B6685] line-clamp-2">{item.summary}</p>
                   {(item.workerAddedContext ?? '').trim() ? (
@@ -212,7 +212,7 @@ export function WorkerTimelineScreen({
               }
               className="w-full text-left rounded-2xl border border-[#ECE7F5] bg-white p-4 hover:border-[#C9B8F0] hover:shadow-[0_8px_28px_rgba(91,33,182,0.08)] transition-all"
             >
-              <p className="text-[11px] font-semibold uppercase tracking-wide text-[#5B21B6] mb-1">Jan – Mar 2026</p>
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-[#42574E] mb-1">Jan – Mar 2026</p>
               <p className="text-[15px] font-medium text-[#14112E] mb-1">Payroll and schedule alignment window</p>
               <p className="text-xs text-[#6B6685] line-clamp-3">{SAMPLE_INTAKE_SUMMARY_PREVIEW.timelineSummary}</p>
             </button>
@@ -225,7 +225,7 @@ export function WorkerTimelineScreen({
             <button
               type="button"
               onClick={() => onNavigate('upload')}
-              className="text-sm font-semibold bg-[#5B21B6] text-white px-5 py-2.5 rounded-full hover:bg-[#4C1D96] transition"
+              className="text-sm font-semibold bg-[#42574E] text-white px-5 py-2.5 rounded-full hover:bg-[#4C1D96] transition"
             >
               Go to upload
             </button>
@@ -237,7 +237,7 @@ export function WorkerTimelineScreen({
           <button
             type="button"
             onClick={() => setShowContact(true)}
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-[#5B21B6] hover:text-[#4C1D96]"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-[#42574E] hover:text-[#4C1D96]"
           >
             <MessageCircle className="h-4 w-4" />
             Questions? Contact us

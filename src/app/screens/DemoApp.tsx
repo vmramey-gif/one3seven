@@ -198,7 +198,7 @@ export function DemoApp() {
         </p>
         <button
           onClick={handleSignUp}
-          className="shrink-0 rounded-full bg-[#5B21B6] px-4 py-1.5 text-xs font-semibold text-white hover:bg-[#4C1D96] transition-colors"
+          className="shrink-0 rounded-full bg-[#42574E] px-4 py-1.5 text-xs font-semibold text-white hover:bg-[#4C1D96] transition-colors"
         >
           Get your firm intake link →
         </button>

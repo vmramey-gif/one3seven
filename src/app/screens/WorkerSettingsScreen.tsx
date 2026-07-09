@@ -18,7 +18,7 @@ function ComingSoonControl({ label }: { label: string }) {
     <button
       type="button"
       disabled
-      className="w-full cursor-not-allowed rounded-2xl border border-[#DCD3FF] bg-[#F8F6FF] px-4 py-2 text-sm text-[#1E1B4B]/42"
+      className="w-full cursor-not-allowed rounded-2xl border border-[#CBD6CF] bg-[#F8F6FF] px-4 py-2 text-sm text-[#1E1B4B]/42"
     >
       {label} — Coming soon
     </button>
@@ -45,8 +45,8 @@ export function WorkerSettingsScreen({ onNavigate, userEmail, profileId, onSignO
   };
 
   return (
-    <div className="min-h-screen bg-[#F6F2FF] text-[#1E1B4B]">
-      <div className="sticky top-0 z-50 border-b border-[#E7E1FF] bg-white/90 px-6 py-5 backdrop-blur">
+    <div className="min-h-screen bg-[#F2F4EC] text-[#1E1B4B]">
+      <div className="sticky top-0 z-50 border-b border-[#D3DED6] bg-white/90 px-6 py-5 backdrop-blur">
         <button
           onClick={() => onNavigate('landing')}
           className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs uppercase tracking-wide text-[#1E1B4B]/60 hover:bg-[#F7F3FF] hover:text-[#1E1B4B]"
@@ -61,27 +61,27 @@ export function WorkerSettingsScreen({ onNavigate, userEmail, profileId, onSignO
           <p className="mb-8 text-sm text-[#1E1B4B]/64">Account information and preferences (beta).</p>
 
           <div className="space-y-6">
-            <div className="rounded-[32px] border border-[#E7E1FF] bg-white/95 p-6 shadow-[0_28px_90px_rgba(31,27,75,0.12)] sm:p-8">
+            <div className="rounded-[32px] border border-[#D3DED6] bg-white/95 p-6 shadow-[0_28px_90px_rgba(31,27,75,0.12)] sm:p-8">
               <h2 className="mb-4 text-sm font-semibold text-[#1E1B4B]">Account information</h2>
               <label className="mb-2 flex items-center gap-2 text-sm font-medium text-[#1E1B4B]">
-                <User className="h-4 w-4 text-[#6D4AFF]" /> Name
+                <User className="h-4 w-4 text-[#42574E]" /> Name
               </label>
               <input
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                className="w-full rounded-2xl border border-[#DCD3FF] bg-[#F8F6FF] px-4 py-3 text-sm text-[#1E1B4B] placeholder:text-[#1E1B4B]/38 focus:border-[#6D4AFF] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#6D4AFF]/10"
+                className="w-full rounded-2xl border border-[#CBD6CF] bg-[#F8F6FF] px-4 py-3 text-sm text-[#1E1B4B] placeholder:text-[#1E1B4B]/38 focus:border-[#42574E] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#42574E]/10"
                 placeholder="Your name"
               />
               <label className="mb-2 mt-5 flex items-center gap-2 text-sm font-medium text-[#1E1B4B]">
-                <Mail className="h-4 w-4 text-[#6D4AFF]" /> Email
+                <Mail className="h-4 w-4 text-[#42574E]" /> Email
               </label>
-              <input value={userEmail ?? ''} disabled className="w-full rounded-2xl border border-[#DCD3FF] bg-[#F8F6FF] px-4 py-3 text-sm text-[#1E1B4B]/52" />
+              <input value={userEmail ?? ''} disabled className="w-full rounded-2xl border border-[#CBD6CF] bg-[#F8F6FF] px-4 py-3 text-sm text-[#1E1B4B]/52" />
               <p className="mt-2 text-xs text-[#1E1B4B]/52">Email is managed through Supabase Auth.</p>
             </div>
 
-            <div className="rounded-[32px] border border-[#E7E1FF] bg-white/95 p-6 opacity-95 shadow-[0_18px_56px_rgba(31,27,75,0.09)] sm:p-8">
+            <div className="rounded-[32px] border border-[#D3DED6] bg-white/95 p-6 opacity-95 shadow-[0_18px_56px_rgba(31,27,75,0.09)] sm:p-8">
               <div className="mb-3 flex items-center gap-2 text-sm font-medium text-[#1E1B4B]">
-                <KeyRound className="h-4 w-4 text-[#6D4AFF]" /> Password reset
+                <KeyRound className="h-4 w-4 text-[#42574E]" /> Password reset
               </div>
               <p className="mb-3 text-xs text-[#1E1B4B]/52">
                 Password reset email will be available when Supabase Auth templates are configured for this workspace.
@@ -89,7 +89,7 @@ export function WorkerSettingsScreen({ onNavigate, userEmail, profileId, onSignO
               <ComingSoonControl label="Send reset email" />
             </div>
 
-            <div className="rounded-[32px] border border-[#E7E1FF] bg-white/95 p-6 opacity-95 shadow-[0_18px_56px_rgba(31,27,75,0.09)] sm:p-8">
+            <div className="rounded-[32px] border border-[#D3DED6] bg-white/95 p-6 opacity-95 shadow-[0_18px_56px_rgba(31,27,75,0.09)] sm:p-8">
               <div className="mb-2 flex items-center gap-2 text-sm font-medium text-[#1E1B4B]">Google sign-in</div>
               <p className="mb-3 text-xs text-[#1E1B4B]/52">
                 Linking a Google account to an existing email sign-in will be available after OAuth is enabled.
@@ -98,7 +98,7 @@ export function WorkerSettingsScreen({ onNavigate, userEmail, profileId, onSignO
             </div>
 
             {!BETA_HIDE_WORKER_BILLING_UI ? (
-              <div className="rounded-[32px] border border-[#E7E1FF] bg-white/95 p-6 shadow-[0_18px_56px_rgba(31,27,75,0.09)] sm:p-8">
+              <div className="rounded-[32px] border border-[#D3DED6] bg-white/95 p-6 shadow-[0_18px_56px_rgba(31,27,75,0.09)] sm:p-8">
                 <div className="mb-2 flex items-center gap-2 text-sm font-medium text-[#1E1B4B]">Billing</div>
                 <p className="mb-1 text-xs font-medium text-[#1E1B4B]/72">Current plan: Beta personal access</p>
                 <p className="mb-1 text-xs text-[#1E1B4B]/64">Beta personal access is free during beta.</p>
@@ -110,30 +110,30 @@ export function WorkerSettingsScreen({ onNavigate, userEmail, profileId, onSignO
                 </p>
               </div>
             ) : (
-              <p className="rounded-[32px] border border-[#E7E1FF] bg-white/95 p-6 text-xs text-[#1E1B4B]/52 shadow-[0_18px_56px_rgba(31,27,75,0.09)]">
+              <p className="rounded-[32px] border border-[#D3DED6] bg-white/95 p-6 text-xs text-[#1E1B4B]/52 shadow-[0_18px_56px_rgba(31,27,75,0.09)]">
                 Billing is disabled during the beta. Personal access is free.
               </p>
             )}
 
-            <div className="rounded-[32px] border border-[#E7E1FF] bg-white/95 p-6 opacity-95 shadow-[0_18px_56px_rgba(31,27,75,0.09)] sm:p-8">
+            <div className="rounded-[32px] border border-[#D3DED6] bg-white/95 p-6 opacity-95 shadow-[0_18px_56px_rgba(31,27,75,0.09)] sm:p-8">
               <div className="mb-2 flex items-center gap-2 text-sm font-medium text-[#1E1B4B]">
-                <Bell className="h-4 w-4 text-[#6D4AFF]" /> Notifications
+                <Bell className="h-4 w-4 text-[#42574E]" /> Notifications
               </div>
               <p className="mb-3 text-xs text-[#1E1B4B]/52">Email and in-app alert preferences are not configurable in beta yet.</p>
               <ComingSoonControl label="Notification preferences" />
             </div>
 
-            <div className="rounded-[32px] border border-[#E7E1FF] bg-white/95 p-6 opacity-95 shadow-[0_18px_56px_rgba(31,27,75,0.09)] sm:p-8">
+            <div className="rounded-[32px] border border-[#D3DED6] bg-white/95 p-6 opacity-95 shadow-[0_18px_56px_rgba(31,27,75,0.09)] sm:p-8">
               <div className="mb-2 flex items-center gap-2 text-sm font-medium text-[#1E1B4B]">
-                <Shield className="h-4 w-4 text-[#6D4AFF]" /> Privacy
+                <Shield className="h-4 w-4 text-[#42574E]" /> Privacy
               </div>
               <p className="mb-3 text-xs text-[#1E1B4B]/52">{ONE3SEVEN_NOTICES.positioning}</p>
               <ComingSoonControl label="View privacy summary" />
             </div>
 
-            <div className="rounded-[32px] border border-[#E7E1FF] bg-white/95 p-6 opacity-95 shadow-[0_18px_56px_rgba(31,27,75,0.09)] sm:p-8">
+            <div className="rounded-[32px] border border-[#D3DED6] bg-white/95 p-6 opacity-95 shadow-[0_18px_56px_rgba(31,27,75,0.09)] sm:p-8">
               <div className="mb-2 flex items-center gap-2 text-sm font-medium text-[#1E1B4B]">
-                <Download className="h-4 w-4 text-[#6D4AFF]" /> Download / export data
+                <Download className="h-4 w-4 text-[#42574E]" /> Download / export data
               </div>
               <p className="mb-3 text-xs text-[#1E1B4B]/52">Bulk export of intake summaries and metadata is not available in beta yet.</p>
               <ComingSoonControl label="Request data export" />
@@ -152,7 +152,7 @@ export function WorkerSettingsScreen({ onNavigate, userEmail, profileId, onSignO
             <button
               type="button"
               onClick={() => void handleSave()}
-              className="w-full rounded-full bg-[#6D4AFF] py-4 font-medium text-white shadow-[0_18px_48px_rgba(109,74,255,0.26)] transition hover:-translate-y-0.5 hover:bg-[#5B35D5]"
+              className="w-full rounded-full bg-[#42574E] py-4 font-medium text-white shadow-[0_18px_48px_rgba(109,74,255,0.26)] transition hover:-translate-y-0.5 hover:bg-[#374A42]"
             >
               Save changes
             </button>
@@ -160,7 +160,7 @@ export function WorkerSettingsScreen({ onNavigate, userEmail, profileId, onSignO
             <button
               type="button"
               onClick={() => onSignOut()}
-              className="w-full rounded-full border border-[#DCD3FF] bg-white py-3 text-sm font-medium text-[#1E1B4B] shadow-[0_12px_32px_rgba(31,27,75,0.08)] hover:bg-[#F7F3FF]"
+              className="w-full rounded-full border border-[#CBD6CF] bg-white py-3 text-sm font-medium text-[#1E1B4B] shadow-[0_12px_32px_rgba(31,27,75,0.08)] hover:bg-[#F7F3FF]"
             >
               Sign out
             </button>

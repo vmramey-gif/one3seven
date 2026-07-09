@@ -87,7 +87,7 @@ export function SignInScreen({ onNavigate, onSignIn, onGoogleAuth }: SignInScree
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="your@email.com"
-                    className="w-full rounded-2xl border border-[#ECE7F5] bg-[#FAF9F6] py-4 pl-12 pr-4 text-sm text-[#14112E] placeholder:text-[#14112E]/38 focus:border-[#5B21B6] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#5B21B6]/10"
+                    className="w-full rounded-2xl border border-[#ECE7F5] bg-[#FAF9F6] py-4 pl-12 pr-4 text-sm text-[#14112E] placeholder:text-[#14112E]/38 focus:border-[#42574E] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#42574E]/10"
                     required
                   />
                 </div>
@@ -102,7 +102,7 @@ export function SignInScreen({ onNavigate, onSignIn, onGoogleAuth }: SignInScree
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full rounded-2xl border border-[#ECE7F5] bg-[#FAF9F6] py-4 pl-12 pr-4 text-sm text-[#14112E] placeholder:text-[#14112E]/38 focus:border-[#5B21B6] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#5B21B6]/10"
+                    className="w-full rounded-2xl border border-[#ECE7F5] bg-[#FAF9F6] py-4 pl-12 pr-4 text-sm text-[#14112E] placeholder:text-[#14112E]/38 focus:border-[#42574E] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#42574E]/10"
                     required
                   />
                 </div>
@@ -111,7 +111,7 @@ export function SignInScreen({ onNavigate, onSignIn, onGoogleAuth }: SignInScree
               <button
                 type="submit"
                 disabled={submitting}
-                className="flex w-full items-center justify-center gap-2 rounded-full bg-[#5B21B6] px-6 py-4 font-medium text-white shadow-[0_18px_48px_rgba(109,74,255,0.26)] transition hover:-translate-y-0.5 hover:bg-[#4C1D96] disabled:translate-y-0 disabled:opacity-60"
+                className="flex w-full items-center justify-center gap-2 rounded-full bg-[#42574E] px-6 py-4 font-medium text-white shadow-[0_18px_48px_rgba(109,74,255,0.26)] transition hover:-translate-y-0.5 hover:bg-[#4C1D96] disabled:translate-y-0 disabled:opacity-60"
               >
                 Continue
                 <ArrowRight className="w-5 h-5" />
@@ -160,7 +160,7 @@ export function SignInScreen({ onNavigate, onSignIn, onGoogleAuth }: SignInScree
               <button
                 type="button"
                 onClick={() => onNavigate('createAccount')}
-                className="text-sm font-medium text-[#5B21B6] transition-colors hover:text-[#4C1D96]"
+                className="text-sm font-medium text-[#42574E] transition-colors hover:text-[#4C1D96]"
               >
                 Create an account
               </button>

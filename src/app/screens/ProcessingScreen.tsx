@@ -171,7 +171,7 @@ export function ProcessingScreen({
           <button
             type="button"
             onClick={() => onNavigate('landing')}
-            className="text-xl font-semibold text-[#6d4aff] hover:opacity-70 transition-opacity duration-200"
+            className="text-xl font-semibold text-[#42574e] hover:opacity-70 transition-opacity duration-200"
           >
             <WordMark />
           </button>
@@ -250,19 +250,19 @@ export function ProcessingScreen({
                   animate={{ scale: [1, 1.1, 1], opacity: [0.5, 1, 0.5] }}
                   transition={{ duration: 2, repeat: Infinity }}
                 >
-                  <FileText className="w-8 h-8 text-[#6d4aff]" />
+                  <FileText className="w-8 h-8 text-[#42574e]" />
                 </motion.div>
                 <motion.div
                   animate={{ scale: [1, 1.1, 1], opacity: [0.5, 1, 0.5] }}
                   transition={{ duration: 2, repeat: Infinity, delay: 0.3 }}
                 >
-                  <Folder className="w-8 h-8 text-[#6d4aff]" />
+                  <Folder className="w-8 h-8 text-[#42574e]" />
                 </motion.div>
                 <motion.div
                   animate={{ scale: [1, 1.1, 1], opacity: [0.5, 1, 0.5] }}
                   transition={{ duration: 2, repeat: Infinity, delay: 0.6 }}
                 >
-                  <Calendar className="w-8 h-8 text-[#6d4aff]" />
+                  <Calendar className="w-8 h-8 text-[#42574e]" />
                 </motion.div>
               </div>
 
@@ -277,7 +277,7 @@ export function ProcessingScreen({
                     className="flex items-center justify-center gap-2 text-sm"
                   >
                     {index <= currentStep ? (
-                      <CheckCircle2 className="w-4 h-4 text-[#6d4aff]" />
+                      <CheckCircle2 className="w-4 h-4 text-[#42574e]" />
                     ) : (
                       <div className="w-4 h-4 border-2 border-[#d5c9f3] rounded-full" />
                     )}
@@ -288,7 +288,7 @@ export function ProcessingScreen({
 
               {phase === 'finalizing' ? (
                 <div className="mt-8 pt-6 border-t border-[#e5def8] flex flex-col items-center gap-3">
-                  <Loader2 className="w-8 h-8 text-[#6d4aff] animate-spin" aria-hidden />
+                  <Loader2 className="w-8 h-8 text-[#42574e] animate-spin" aria-hidden />
                   <p className="text-sm font-medium text-[#111b3d]">
                     {quickMode ? 'Sending updated files to the firm…' : 'Finalizing organization...'}
                   </p>
@@ -300,7 +300,7 @@ export function ProcessingScreen({
 
               {phase === 'complete' ? (
                 <div className="mt-8 pt-6 border-t border-[#e5def8] flex flex-col items-center gap-3">
-                  <CheckCircle2 className="w-10 h-10 text-[#6d4aff]" aria-hidden />
+                  <CheckCircle2 className="w-10 h-10 text-[#42574e]" aria-hidden />
                   <p className="text-sm font-medium text-[#111b3d]">
                     {quickMode ? 'Intake updated' : 'Intake summary updated'}
                   </p>

@@ -63,7 +63,7 @@ export function WorkerDetailsScreen({ onNavigate, onComplete, initialDetails }: 
     if (res.error) setError(res.error);
   };
 
-  const inputCls = 'w-full px-4 py-3 bg-[#f8f6ff] border border-[#e5def8] rounded-[14px] text-sm text-[#111b3d] placeholder:text-[#66708f] focus:border-[#6d4aff] focus:outline-none focus:ring-2 focus:ring-[#c7b9ff]';
+  const inputCls = 'w-full px-4 py-3 bg-[#f8f6ff] border border-[#e5def8] rounded-[14px] text-sm text-[#111b3d] placeholder:text-[#66708f] focus:border-[#42574e] focus:outline-none focus:ring-2 focus:ring-[#c7b9ff]';
 
   return (
     <div className="min-h-screen bg-[#f8f6ff]">
@@ -135,7 +135,7 @@ export function WorkerDetailsScreen({ onNavigate, onComplete, initialDetails }: 
             <button
               type="submit"
               disabled={submitting}
-              className="w-full mt-4 bg-[#6d4aff] text-white py-4 px-6 rounded-[14px] hover:bg-[#5b39e6] font-medium flex items-center justify-center gap-2 disabled:opacity-60"
+              className="w-full mt-4 bg-[#42574e] text-white py-4 px-6 rounded-[14px] hover:bg-[#5b39e6] font-medium flex items-center justify-center gap-2 disabled:opacity-60"
             >
               Continue to dashboard
               <ArrowRight className="w-5 h-5" />

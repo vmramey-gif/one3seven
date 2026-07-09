@@ -155,11 +155,11 @@ export function DemoInsightProvider({ children, onSignUp }: ProviderProps) {
               className="fixed inset-0 z-[1101] flex items-center justify-center p-5 pointer-events-none"
             >
               <div
-                className="pointer-events-auto relative w-full max-w-md rounded-[28px] bg-white shadow-[0_40px_120px_rgba(31,27,75,0.28),0_0_0_1.5px_#DCD3FF] overflow-hidden"
+                className="pointer-events-auto relative w-full max-w-md rounded-[28px] bg-white shadow-[0_40px_120px_rgba(31,27,75,0.28),0_0_0_1.5px_#CBD6CF] overflow-hidden"
                 onClick={(e) => e.stopPropagation()}
               >
                 {/* Glow bar at top */}
-                <div className="h-1 w-full bg-gradient-to-r from-[#6D4AFF] via-[#9C72FF] to-[#C4B5FD]" />
+                <div className="h-1 w-full bg-gradient-to-r from-[#42574E] via-[#9C72FF] to-[#7C8B6F]" />
 
                 <div className="p-7">
                   {/* Dismiss */}
@@ -177,11 +177,11 @@ export function DemoInsightProvider({ children, onSignUp }: ProviderProps) {
                       className="inline-block rounded-2xl px-4 py-3"
                       style={{
                         background: 'linear-gradient(135deg, #F0EBFF 0%, #E8E0FF 100%)',
-                        border: '1.5px solid #DCD3FF',
+                        border: '1.5px solid #CBD6CF',
                       }}
                     >
                       <p
-                        className="text-[42px] font-black leading-none tracking-tight text-[#6D4AFF]"
+                        className="text-[42px] font-black leading-none tracking-tight text-[#42574E]"
                         style={{ fontVariantNumeric: 'tabular-nums' }}
                       >
                         {insight.stat}
@@ -206,7 +206,7 @@ export function DemoInsightProvider({ children, onSignUp }: ProviderProps) {
                   <div className="flex gap-2.5">
                     <button
                       onClick={dismiss}
-                      className="flex-1 rounded-full border border-[#DCD3FF] bg-white py-2.5 text-sm font-semibold text-[#1E1B4B]/70 hover:border-[#B8A8FF] hover:bg-[#F7F3FF] transition-colors"
+                      className="flex-1 rounded-full border border-[#CBD6CF] bg-white py-2.5 text-sm font-semibold text-[#1E1B4B]/70 hover:border-[#B8A8FF] hover:bg-[#F7F3FF] transition-colors"
                     >
                       Got it
                     </button>
@@ -214,7 +214,7 @@ export function DemoInsightProvider({ children, onSignUp }: ProviderProps) {
                       <button
                         onClick={() => { dismiss(); onSignUp(); }}
                         className="flex-1 rounded-full py-2.5 text-sm font-semibold text-white transition-colors"
-                        style={{ background: 'linear-gradient(135deg, #6D4AFF, #5B35D5)' }}
+                        style={{ background: 'linear-gradient(135deg, #42574E, #374A42)' }}
                       >
                         Get your firm intake link →
                       </button>
@@ -252,9 +252,9 @@ export function DemoInsightBadge({ id, compact = false }: BadgeProps) {
       title="Why does this exist?"
       className={`
         relative inline-flex items-center justify-center rounded-full
-        bg-[#F0EBFF] border border-[#DCD3FF] text-[#6D4AFF]
+        bg-[#F0EBFF] border border-[#CBD6CF] text-[#42574E]
         font-bold leading-none select-none
-        hover:bg-[#E8E0FF] hover:border-[#C4B5FD] transition-colors
+        hover:bg-[#E8E0FF] hover:border-[#7C8B6F] transition-colors
         ${compact ? 'w-4 h-4 text-[9px]' : 'w-5 h-5 text-[10px]'}
       `}
       style={{ flexShrink: 0 }}
@@ -262,7 +262,7 @@ export function DemoInsightBadge({ id, compact = false }: BadgeProps) {
     >
       {/* Pulse ring */}
       <span
-        className="absolute inset-0 rounded-full border border-[#6D4AFF]/40 animate-ping"
+        className="absolute inset-0 rounded-full border border-[#42574E]/40 animate-ping"
         style={{ animationDuration: '2.2s' }}
       />
       ⓘ

@@ -25,15 +25,15 @@ const HOW_IT_WORKS = [
     title: 'Worker uploads their documents',
     body: 'Pay stubs, emails, HR complaints, text messages, doctor notes — anything relevant. No legal knowledge needed.',
     color: 'bg-white/[0.04] border-white/10',
-    accent: 'text-[#A78BFA]',
+    accent: 'text-[#7C8B6F]',
     tag: 'Worker',
   },
   {
     step: '02',
     title: 'AI organizes and structures the record',
     body: 'The engine organizes uploaded records into a chronological timeline, groups related documents, and surfaces information found in those records — flagging dates that may warrant timely attorney review.',
-    color: 'bg-[#6D4AFF]/[0.08] border-[#6D4AFF]/25',
-    accent: 'text-[#C4B5FD]',
+    color: 'bg-[#42574E]/[0.08] border-[#42574E]/25',
+    accent: 'text-[#7C8B6F]',
     tag: 'one3seven',
   },
   {
@@ -41,7 +41,7 @@ const HOW_IT_WORKS = [
     title: 'Attorney receives a structured intake',
     body: 'The intake the worker sent lands in your dashboard — organized and source-linked. You open it and decide, in minutes — no sorting, no follow-up calls.',
     color: 'bg-white/[0.04] border-white/10',
-    accent: 'text-[#A78BFA]',
+    accent: 'text-[#7C8B6F]',
     tag: 'Firm',
   },
 ];
@@ -64,41 +64,41 @@ const TRUST_ITEMS = [
 const O3S_CONCEPT_SVG = `<svg id="sv" viewBox="0 0 1280 720" xmlns="http://www.w3.org/2000/svg">
 <defs>
 <radialGradient id="bgR" cx="50%" cy="46%" r="68%"><stop offset="0%" stop-color="#2D1F6E"/><stop offset="100%" stop-color="#0E0B26"/></radialGradient>
-<radialGradient id="glowR" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#6D4AFF" stop-opacity=".55"/><stop offset="100%" stop-color="#6D4AFF" stop-opacity="0"/></radialGradient>
+<radialGradient id="glowR" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#42574E" stop-opacity=".55"/><stop offset="100%" stop-color="#42574E" stop-opacity="0"/></radialGradient>
 <linearGradient id="phG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1E1060"/><stop offset="100%" stop-color="#111827"/></linearGradient>
-<linearGradient id="btnG" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#7C3AED"/><stop offset="100%" stop-color="#6D4AFF"/></linearGradient>
+<linearGradient id="btnG" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#7C3AED"/><stop offset="100%" stop-color="#42574E"/></linearGradient>
 <filter id="glow4"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
 <filter id="cardSh"><feDropShadow dx="0" dy="8" stdDeviation="14" flood-color="#000" flood-opacity=".35"/></filter>
-<filter id="firmSh"><feDropShadow dx="0" dy="10" stdDeviation="18" flood-color="#6D4AFF" flood-opacity=".28"/></filter>
+<filter id="firmSh"><feDropShadow dx="0" dy="10" stdDeviation="18" flood-color="#42574E" flood-opacity=".28"/></filter>
 <clipPath id="phClip"><rect x="498" y="88" width="284" height="544" rx="32"/></clipPath>
 </defs>
 <rect width="1280" height="720" fill="url(#bgR)"/>
-<g opacity=".04" stroke="#A78BFA" stroke-width="1">
+<g opacity=".04" stroke="#7C8B6F" stroke-width="1">
 <line x1="0" y1="120" x2="1280" y2="120"/><line x1="0" y1="240" x2="1280" y2="240"/><line x1="0" y1="360" x2="1280" y2="360"/><line x1="0" y1="480" x2="1280" y2="480"/><line x1="0" y1="600" x2="1280" y2="600"/>
 <line x1="160" y1="0" x2="160" y2="720"/><line x1="320" y1="0" x2="320" y2="720"/><line x1="480" y1="0" x2="480" y2="720"/><line x1="640" y1="0" x2="640" y2="720"/><line x1="800" y1="0" x2="800" y2="720"/><line x1="960" y1="0" x2="960" y2="720"/><line x1="1120" y1="0" x2="1120" y2="720"/>
 </g>
 <ellipse id="ambGlow" cx="640" cy="340" rx="0" ry="0" fill="url(#glowR)" opacity="0"/>
-<g id="d0"><rect x="-65" y="-47" width="130" height="95" rx="10" fill="white" filter="url(#cardSh)"/><rect x="-65" y="-47" width="130" height="26" rx="10" fill="#EDE8FF"/><rect x="-65" y="-30" width="130" height="9" fill="#EDE8FF"/><text x="0" y="-28" text-anchor="middle" font-size="11" fill="#6D4AFF" font-weight="800" font-family="system-ui">INTAKE FORM</text><rect x="-52" y="-10" width="84" height="5" rx="2.5" fill="#E5E7EB"/><rect x="-52" y="4" width="68" height="5" rx="2.5" fill="#E5E7EB"/><rect x="-52" y="18" width="76" height="5" rx="2.5" fill="#E5E7EB"/><rect x="-52" y="32" width="56" height="5" rx="2.5" fill="#E5E7EB"/></g>
+<g id="d0"><rect x="-65" y="-47" width="130" height="95" rx="10" fill="white" filter="url(#cardSh)"/><rect x="-65" y="-47" width="130" height="26" rx="10" fill="#E7EDE8"/><rect x="-65" y="-30" width="130" height="9" fill="#E7EDE8"/><text x="0" y="-28" text-anchor="middle" font-size="11" fill="#42574E" font-weight="800" font-family="system-ui">INTAKE FORM</text><rect x="-52" y="-10" width="84" height="5" rx="2.5" fill="#E5E7EB"/><rect x="-52" y="4" width="68" height="5" rx="2.5" fill="#E5E7EB"/><rect x="-52" y="18" width="76" height="5" rx="2.5" fill="#E5E7EB"/><rect x="-52" y="32" width="56" height="5" rx="2.5" fill="#E5E7EB"/></g>
 <g id="d1"><rect x="-65" y="-47" width="130" height="95" rx="10" fill="white" filter="url(#cardSh)"/><rect x="-65" y="-47" width="130" height="26" rx="10" fill="#DCFCE7"/><rect x="-65" y="-30" width="130" height="9" fill="#DCFCE7"/><text x="0" y="-28" text-anchor="middle" font-size="11" fill="#166534" font-weight="800" font-family="system-ui">PAY STUB</text><text x="-52" y="-4" font-size="9.5" fill="#6B7280" font-family="system-ui">Gross</text><text x="52" y="-4" text-anchor="end" font-size="9.5" fill="#1E1B4B" font-weight="700" font-family="system-ui">$4,200</text><text x="-52" y="12" font-size="9.5" fill="#6B7280" font-family="system-ui">Net</text><text x="52" y="12" text-anchor="end" font-size="9.5" fill="#166534" font-weight="700" font-family="system-ui">$3,360</text><rect x="-52" y="22" width="104" height="1.5" fill="#E5E7EB"/><rect x="-52" y="30" width="78" height="5" rx="2.5" fill="#E5E7EB"/></g>
 <g id="d2"><rect x="-65" y="-47" width="130" height="95" rx="10" fill="white" filter="url(#cardSh)"/><rect x="-65" y="-47" width="130" height="26" rx="10" fill="#FEE2E2"/><rect x="-65" y="-30" width="130" height="9" fill="#FEE2E2"/><text x="0" y="-28" text-anchor="middle" font-size="11" fill="#991B1B" font-weight="800" font-family="system-ui">POLICE REPORT</text><rect x="-52" y="-10" width="84" height="5" rx="2.5" fill="#E5E7EB"/><rect x="-52" y="4" width="64" height="5" rx="2.5" fill="#E5E7EB"/><rect x="-52" y="18" width="72" height="5" rx="2.5" fill="#E5E7EB"/><rect x="-52" y="32" width="48" height="5" rx="2.5" fill="#E5E7EB"/></g>
 <g id="d3"><rect x="-65" y="-47" width="130" height="95" rx="10" fill="white" filter="url(#cardSh)"/><rect x="-65" y="-47" width="130" height="26" rx="10" fill="#FEF3C7"/><rect x="-65" y="-30" width="130" height="9" fill="#FEF3C7"/><text x="0" y="-28" text-anchor="middle" font-size="11" fill="#92400E" font-weight="800" font-family="system-ui">EVIDENCE</text><rect x="-52" y="-10" width="48" height="40" rx="4" fill="#FDE68A" opacity=".6"/><rect x="4" y="-10" width="48" height="40" rx="4" fill="#FDE68A" opacity=".4"/><rect x="-52" y="36" width="96" height="5" rx="2.5" fill="#E5E7EB"/></g>
 <g id="d4"><rect x="-65" y="-47" width="130" height="95" rx="10" fill="white" filter="url(#cardSh)"/><rect x="-65" y="-47" width="130" height="26" rx="10" fill="#E0F2FE"/><rect x="-65" y="-30" width="130" height="9" fill="#E0F2FE"/><text x="0" y="-28" text-anchor="middle" font-size="11" fill="#0369A1" font-weight="800" font-family="system-ui">TEXT MESSAGES</text><rect x="4" y="-8" width="44" height="15" rx="7.5" fill="#E0F2FE"/><rect x="-52" y="12" width="48" height="15" rx="7.5" fill="#F0F0F0"/><rect x="4" y="32" width="40" height="15" rx="7.5" fill="#E0F2FE"/></g>
-<g id="d5"><rect x="-65" y="-47" width="130" height="95" rx="10" fill="white" filter="url(#cardSh)"/><rect x="-65" y="-47" width="130" height="26" rx="10" fill="#F3E8FF"/><rect x="-65" y="-30" width="130" height="9" fill="#F3E8FF"/><text x="0" y="-28" text-anchor="middle" font-size="11" fill="#7C3AED" font-weight="800" font-family="system-ui">CALENDAR</text><text x="-38" y="-4" font-size="8" fill="#9CA3AF" font-family="system-ui">OCT 14</text><rect x="-52" y="2" width="104" height="16" rx="4" fill="#EDE8FF"/><text x="0" y="14" text-anchor="middle" font-size="9" fill="#6D4AFF" font-weight="700" font-family="system-ui">Incident Date</text><rect x="-52" y="24" width="84" height="5" rx="2.5" fill="#E5E7EB"/><rect x="-52" y="34" width="68" height="5" rx="2.5" fill="#E5E7EB"/></g>
+<g id="d5"><rect x="-65" y="-47" width="130" height="95" rx="10" fill="white" filter="url(#cardSh)"/><rect x="-65" y="-47" width="130" height="26" rx="10" fill="#F3E8FF"/><rect x="-65" y="-30" width="130" height="9" fill="#F3E8FF"/><text x="0" y="-28" text-anchor="middle" font-size="11" fill="#7C3AED" font-weight="800" font-family="system-ui">CALENDAR</text><text x="-38" y="-4" font-size="8" fill="#9CA3AF" font-family="system-ui">OCT 14</text><rect x="-52" y="2" width="104" height="16" rx="4" fill="#E7EDE8"/><text x="0" y="14" text-anchor="middle" font-size="9" fill="#42574E" font-weight="700" font-family="system-ui">Incident Date</text><rect x="-52" y="24" width="84" height="5" rx="2.5" fill="#E5E7EB"/><rect x="-52" y="34" width="68" height="5" rx="2.5" fill="#E5E7EB"/></g>
 <g id="d6"><rect x="-65" y="-47" width="130" height="95" rx="10" fill="white" filter="url(#cardSh)"/><rect x="-65" y="-47" width="130" height="26" rx="10" fill="#FFF1F2"/><rect x="-65" y="-30" width="130" height="9" fill="#FFF1F2"/><text x="0" y="-28" text-anchor="middle" font-size="11" fill="#9F1239" font-weight="800" font-family="system-ui">MEDICAL REC.</text><rect x="-52" y="-10" width="84" height="5" rx="2.5" fill="#E5E7EB"/><rect x="-52" y="4" width="72" height="5" rx="2.5" fill="#E5E7EB"/><rect x="-52" y="18" width="60" height="5" rx="2.5" fill="#E5E7EB"/><rect x="-52" y="32" width="80" height="5" rx="2.5" fill="#E5E7EB"/></g>
 <g id="d7"><rect x="-65" y="-47" width="130" height="95" rx="10" fill="white" filter="url(#cardSh)"/><rect x="-65" y="-47" width="130" height="26" rx="10" fill="#ECFDF5"/><rect x="-65" y="-30" width="130" height="9" fill="#ECFDF5"/><text x="0" y="-28" text-anchor="middle" font-size="11" fill="#065F46" font-weight="800" font-family="system-ui">EMPLOYMENT</text><rect x="-52" y="-10" width="84" height="5" rx="2.5" fill="#E5E7EB"/><rect x="-52" y="4" width="68" height="5" rx="2.5" fill="#E5E7EB"/><rect x="-52" y="18" width="76" height="5" rx="2.5" fill="#E5E7EB"/><rect x="-52" y="32" width="52" height="5" rx="2.5" fill="#E5E7EB"/></g>
 <g id="vParts" opacity="0">
-<circle id="vp0" cx="640" cy="340" r="4" fill="#A78BFA"/><circle id="vp1" cx="640" cy="340" r="3.5" fill="#7C3AED"/>
-<circle id="vp2" cx="640" cy="340" r="3" fill="#C4B5FD"/><circle id="vp3" cx="640" cy="340" r="4" fill="#6D4AFF"/>
-<circle id="vp4" cx="640" cy="340" r="3.5" fill="#A78BFA"/><circle id="vp5" cx="640" cy="340" r="3" fill="#DDD6FE"/>
-<circle id="vp6" cx="640" cy="340" r="4" fill="#7C3AED"/><circle id="vp7" cx="640" cy="340" r="3.5" fill="#C4B5FD"/>
-<circle id="vp8" cx="640" cy="340" r="3" fill="#6D4AFF"/><circle id="vp9" cx="640" cy="340" r="4" fill="#A78BFA"/>
+<circle id="vp0" cx="640" cy="340" r="4" fill="#7C8B6F"/><circle id="vp1" cx="640" cy="340" r="3.5" fill="#7C3AED"/>
+<circle id="vp2" cx="640" cy="340" r="3" fill="#7C8B6F"/><circle id="vp3" cx="640" cy="340" r="4" fill="#42574E"/>
+<circle id="vp4" cx="640" cy="340" r="3.5" fill="#7C8B6F"/><circle id="vp5" cx="640" cy="340" r="3" fill="#DDD6FE"/>
+<circle id="vp6" cx="640" cy="340" r="4" fill="#7C3AED"/><circle id="vp7" cx="640" cy="340" r="3.5" fill="#7C8B6F"/>
+<circle id="vp8" cx="640" cy="340" r="3" fill="#42574E"/><circle id="vp9" cx="640" cy="340" r="4" fill="#7C8B6F"/>
 <circle id="vp10" cx="640" cy="340" r="3.5" fill="#DDD6FE"/><circle id="vp11" cx="640" cy="340" r="3" fill="#7C3AED"/>
-<line id="vl0" x1="640" y1="340" x2="640" y2="340" stroke="#C4B5FD" stroke-width="2.5" stroke-linecap="round"/>
-<line id="vl1" x1="640" y1="340" x2="640" y2="340" stroke="#A78BFA" stroke-width="2"/>
+<line id="vl0" x1="640" y1="340" x2="640" y2="340" stroke="#7C8B6F" stroke-width="2.5" stroke-linecap="round"/>
+<line id="vl1" x1="640" y1="340" x2="640" y2="340" stroke="#7C8B6F" stroke-width="2"/>
 <line id="vl2" x1="640" y1="340" x2="640" y2="340" stroke="#DDD6FE" stroke-width="2.5"/>
 <line id="vl3" x1="640" y1="340" x2="640" y2="340" stroke="#7C3AED" stroke-width="2"/>
-<line id="vl4" x1="640" y1="340" x2="640" y2="340" stroke="#C4B5FD" stroke-width="2.5"/>
-<line id="vl5" x1="640" y1="340" x2="640" y2="340" stroke="#A78BFA" stroke-width="2"/>
+<line id="vl4" x1="640" y1="340" x2="640" y2="340" stroke="#7C8B6F" stroke-width="2.5"/>
+<line id="vl5" x1="640" y1="340" x2="640" y2="340" stroke="#7C8B6F" stroke-width="2"/>
 </g>
 <g id="sparkleLayer" opacity="0"/>
 <g id="doneRings" opacity="0">
@@ -113,13 +113,13 @@ const O3S_CONCEPT_SVG = `<svg id="sv" viewBox="0 0 1280 720" xmlns="http://www.w
 <rect x="498" y="88" width="284" height="544" rx="32" fill="#0D0B1E" filter="url(#firmSh)"/>
 <rect x="504" y="94" width="272" height="532" rx="28" fill="url(#phG)"/>
 <g clip-path="url(#phClip)">
-<rect x="498" y="88" width="284" height="80" fill="#6D4AFF"/>
+<rect x="498" y="88" width="284" height="80" fill="#42574E"/>
 <text x="640" y="136" text-anchor="middle" font-size="22" fill="white" font-weight="700" font-family="system-ui">one3seven</text>
 <rect x="602" y="96" width="76" height="18" rx="9" fill="#0D0B1E" opacity=".6"/>
 <text x="640" y="202" text-anchor="middle" font-size="18" fill="white" font-weight="700" font-family="system-ui">Your records, organized.</text>
-<text x="640" y="224" text-anchor="middle" font-size="12" fill="#A78BFA" font-family="system-ui">8 documents · Ready to send</text>
+<text x="640" y="224" text-anchor="middle" font-size="12" fill="#7C8B6F" font-family="system-ui">8 documents · Ready to send</text>
 <rect x="514" y="242" width="252" height="44" rx="10" fill="white" opacity=".07"/>
-<rect x="524" y="252" width="20" height="20" rx="4" fill="#EDE8FF" opacity=".8"/>
+<rect x="524" y="252" width="20" height="20" rx="4" fill="#E7EDE8" opacity=".8"/>
 <text x="554" y="267" font-size="12" fill="white" font-family="system-ui">Intake Form</text>
 <circle cx="750" cy="262" r="8" fill="#22C55E"/><text x="750" y="267" text-anchor="middle" font-size="11" fill="white">&#10003;</text>
 <rect x="514" y="292" width="252" height="44" rx="10" fill="white" opacity=".07"/>
@@ -137,54 +137,54 @@ const O3S_CONCEPT_SVG = `<svg id="sv" viewBox="0 0 1280 720" xmlns="http://www.w
 <rect x="514" y="456" width="252" height="54" rx="27" fill="url(#btnG)"/>
 <text x="640" y="489" text-anchor="middle" font-size="17" fill="white" font-weight="700" font-family="system-ui">Send to Firms</text>
 <rect x="514" y="522" width="252" height="8" rx="4" fill="white" opacity=".12"/>
-<rect id="progBar" x="514" y="522" width="0" height="8" rx="4" fill="#A78BFA"/>
+<rect id="progBar" x="514" y="522" width="0" height="8" rx="4" fill="#7C8B6F"/>
 </g>
 <rect x="591" y="96" width="98" height="18" rx="9" fill="#0D0B1E"/>
 <rect x="498" y="88" width="284" height="544" rx="32" fill="none" stroke="#4338CA" stroke-width="1.5" opacity=".4"/>
 </g>
-<path id="line1" d="M640,612 C580,640 400,640 240,590" stroke="#6D4AFF" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-dasharray="600" stroke-dashoffset="600" opacity=".7"/>
-<path id="line2" d="M640,612 C640,630 640,630 640,618" stroke="#6D4AFF" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-dasharray="20" stroke-dashoffset="20" opacity=".7"/>
-<path id="line3" d="M640,612 C700,640 900,640 1040,590" stroke="#6D4AFF" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-dasharray="600" stroke-dashoffset="600" opacity=".7"/>
+<path id="line1" d="M640,612 C580,640 400,640 240,590" stroke="#42574E" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-dasharray="600" stroke-dashoffset="600" opacity=".7"/>
+<path id="line2" d="M640,612 C640,630 640,630 640,618" stroke="#42574E" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-dasharray="20" stroke-dashoffset="20" opacity=".7"/>
+<path id="line3" d="M640,612 C700,640 900,640 1040,590" stroke="#42574E" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-dasharray="600" stroke-dashoffset="600" opacity=".7"/>
 <g id="plane1" opacity="0"><polygon points="0,-10 20,0 0,10 4,0" fill="white" filter="url(#glow4)"/><polygon points="0,-10 20,0 0,10 4,0" fill="white"/></g>
 <g id="plane2" opacity="0"><polygon points="0,-10 20,0 0,10 4,0" fill="white" filter="url(#glow4)"/><polygon points="0,-10 20,0 0,10 4,0" fill="white"/></g>
 <g id="plane3" opacity="0"><polygon points="0,-10 20,0 0,10 4,0" fill="white" filter="url(#glow4)"/><polygon points="0,-10 20,0 0,10 4,0" fill="white"/></g>
 <g id="firm1" opacity="0" transform="translate(240,560)">
-<rect x="-105" y="-52" width="210" height="96" rx="16" fill="#1A1048" stroke="#6D4AFF" stroke-width="1.5" filter="url(#firmSh)"/>
+<rect x="-105" y="-52" width="210" height="96" rx="16" fill="#1A1048" stroke="#42574E" stroke-width="1.5" filter="url(#firmSh)"/>
 <rect id="firm1glow" x="-105" y="-52" width="210" height="96" rx="16" fill="#F5C842" opacity="0"/>
-<text x="0" y="-18" text-anchor="middle" font-size="12" fill="#C4B5FD" font-weight="700" font-family="system-ui">LEE &amp; HOWARD LLC</text>
-<text x="0" y="0" text-anchor="middle" font-size="10.5" fill="#A78BFA" font-family="system-ui">Employment Law</text>
-<rect x="-70" y="12" width="140" height="20" rx="10" fill="#6D4AFF" opacity=".28"/>
+<text x="0" y="-18" text-anchor="middle" font-size="12" fill="#7C8B6F" font-weight="700" font-family="system-ui">LEE &amp; HOWARD LLC</text>
+<text x="0" y="0" text-anchor="middle" font-size="10.5" fill="#7C8B6F" font-family="system-ui">Employment Law</text>
+<rect x="-70" y="12" width="140" height="20" rx="10" fill="#42574E" opacity=".28"/>
 <circle id="ck1" cx="0" cy="22" r="0" fill="#22C55E"/>
 <text id="ckT1" x="14" y="27" text-anchor="middle" font-size="11" fill="white" opacity="0">Case Received &#10003;</text>
 </g>
 <g id="firm2" opacity="0" transform="translate(640,580)">
-<rect x="-105" y="-52" width="210" height="96" rx="16" fill="#1A1048" stroke="#6D4AFF" stroke-width="1.5" filter="url(#firmSh)"/>
+<rect x="-105" y="-52" width="210" height="96" rx="16" fill="#1A1048" stroke="#42574E" stroke-width="1.5" filter="url(#firmSh)"/>
 <rect id="firm2glow" x="-105" y="-52" width="210" height="96" rx="16" fill="#F5C842" opacity="0"/>
-<text x="0" y="-18" text-anchor="middle" font-size="12" fill="#C4B5FD" font-weight="700" font-family="system-ui">RIVERA PARTNERS</text>
-<text x="0" y="0" text-anchor="middle" font-size="10.5" fill="#A78BFA" font-family="system-ui">Civil Rights · Labor</text>
-<rect x="-70" y="12" width="140" height="20" rx="10" fill="#6D4AFF" opacity=".28"/>
+<text x="0" y="-18" text-anchor="middle" font-size="12" fill="#7C8B6F" font-weight="700" font-family="system-ui">RIVERA PARTNERS</text>
+<text x="0" y="0" text-anchor="middle" font-size="10.5" fill="#7C8B6F" font-family="system-ui">Civil Rights · Labor</text>
+<rect x="-70" y="12" width="140" height="20" rx="10" fill="#42574E" opacity=".28"/>
 <circle id="ck2" cx="0" cy="22" r="0" fill="#22C55E"/>
 <text id="ckT2" x="14" y="27" text-anchor="middle" font-size="11" fill="white" opacity="0">Case Received &#10003;</text>
 </g>
 <g id="firm3" opacity="0" transform="translate(1040,560)">
-<rect x="-105" y="-52" width="210" height="96" rx="16" fill="#1A1048" stroke="#6D4AFF" stroke-width="1.5" filter="url(#firmSh)"/>
+<rect x="-105" y="-52" width="210" height="96" rx="16" fill="#1A1048" stroke="#42574E" stroke-width="1.5" filter="url(#firmSh)"/>
 <rect id="firm3glow" x="-105" y="-52" width="210" height="96" rx="16" fill="#F5C842" opacity="0"/>
-<text x="0" y="-18" text-anchor="middle" font-size="12" fill="#C4B5FD" font-weight="700" font-family="system-ui">MURPHY &amp; ASSOC.</text>
-<text x="0" y="0" text-anchor="middle" font-size="10.5" fill="#A78BFA" font-family="system-ui">Employment dispute</text>
-<rect x="-70" y="12" width="140" height="20" rx="10" fill="#6D4AFF" opacity=".28"/>
+<text x="0" y="-18" text-anchor="middle" font-size="12" fill="#7C8B6F" font-weight="700" font-family="system-ui">MURPHY &amp; ASSOC.</text>
+<text x="0" y="0" text-anchor="middle" font-size="10.5" fill="#7C8B6F" font-family="system-ui">Employment dispute</text>
+<rect x="-70" y="12" width="140" height="20" rx="10" fill="#42574E" opacity=".28"/>
 <circle id="ck3" cx="0" cy="22" r="0" fill="#22C55E"/>
 <text id="ckT3" x="14" y="27" text-anchor="middle" font-size="11" fill="white" opacity="0">Case Received &#10003;</text>
 </g>
 <g id="hl1" opacity="0"><rect x="204" y="22" width="672" height="42" rx="21" fill="#0D0A28" opacity=".82"/><rect x="204" y="22" width="672" height="42" rx="21" fill="none" stroke="#3D2E8A" stroke-width="1"/><text x="640" y="49" text-anchor="middle" font-size="17" fill="#DDD6FE" font-weight="600" font-family="system-ui">Everything you&#39;ve gathered — scattered, overwhelming.</text></g>
 <g id="hl2" opacity="0"><rect x="420" y="22" width="440" height="42" rx="21" fill="#0D0A28" opacity=".82"/><rect x="420" y="22" width="440" height="42" rx="21" fill="none" stroke="#3D2E8A" stroke-width="1"/><text x="640" y="49" text-anchor="middle" font-size="17" fill="#DDD6FE" font-weight="600" font-family="system-ui">Bringing it all together.</text></g>
 <g id="hl3" opacity="0"><rect x="328" y="22" width="624" height="42" rx="21" fill="#0D0A28" opacity=".82"/><rect x="328" y="22" width="624" height="42" rx="21" fill="none" stroke="#3D2E8A" stroke-width="1"/><text x="640" y="49" text-anchor="middle" font-size="17" fill="#DDD6FE" font-weight="600" font-family="system-ui">Organized. Sent to firms who can help.</text></g>
-<g id="hl4" opacity="0"><rect x="322" y="14" width="636" height="66" rx="21" fill="#0D0A28" opacity=".88"/><rect x="322" y="14" width="636" height="66" rx="21" fill="none" stroke="#3D2E8A" stroke-width="1"/><text x="640" y="42" text-anchor="middle" font-size="18" fill="#F5C842" font-weight="700" font-family="system-ui">&#10022; Firms are reviewing your case &#10022;</text><text x="640" y="66" text-anchor="middle" font-size="13" fill="#A78BFA" font-family="system-ui">You&#39;ll hear back when one chooses to help.</text></g>
+<g id="hl4" opacity="0"><rect x="322" y="14" width="636" height="66" rx="21" fill="#0D0A28" opacity=".88"/><rect x="322" y="14" width="636" height="66" rx="21" fill="none" stroke="#3D2E8A" stroke-width="1"/><text x="640" y="42" text-anchor="middle" font-size="18" fill="#F5C842" font-weight="700" font-family="system-ui">&#10022; Firms are reviewing your case &#10022;</text><text x="640" y="66" text-anchor="middle" font-size="13" fill="#7C8B6F" font-family="system-ui">You&#39;ll hear back when one chooses to help.</text></g>
 <g id="logoCard" opacity="0">
-<rect x="490" y="288" width="300" height="144" rx="22" fill="#0D0B1E" stroke="#6D4AFF" stroke-width="1.5" filter="url(#firmSh)"/>
+<rect x="490" y="288" width="300" height="144" rx="22" fill="#0D0B1E" stroke="#42574E" stroke-width="1.5" filter="url(#firmSh)"/>
 <rect id="logoBling" x="490" y="288" width="300" height="144" rx="22" fill="#F5C842" opacity="0"/>
 <text x="640" y="352" text-anchor="middle" font-size="36" fill="white" font-weight="800" font-family="system-ui">one3seven</text>
-<text x="640" y="378" text-anchor="middle" font-size="12.5" fill="#A78BFA" font-family="system-ui">Organize smarter. You choose.</text>
-<text x="640" y="398" text-anchor="middle" font-size="12.5" fill="#A78BFA" font-family="system-ui">Get justice.</text>
+<text x="640" y="378" text-anchor="middle" font-size="12.5" fill="#7C8B6F" font-family="system-ui">Organize smarter. You choose.</text>
+<text x="640" y="398" text-anchor="middle" font-size="12.5" fill="#7C8B6F" font-family="system-ui">Get justice.</text>
 </g>
 </svg>`;
 
@@ -236,19 +236,19 @@ function IntakeTransformVisual() {
     ];
 
     const sparkDefs: [number,number,number,number,number,string,number][] = [
-      [198,512,10,4,0,'#F5C842',60],[262,516,7,3,120,'white',80],[290,545,12,5,60,'#A78BFA',50],
+      [198,512,10,4,0,'#F5C842',60],[262,516,7,3,120,'white',80],[290,545,12,5,60,'#7C8B6F',50],
       [282,585,8,3.5,180,'#F5C842',90],[245,602,10,4,240,'#34D399',70],[195,582,6,2.5,80,'white',100],
-      [168,548,9,4,140,'#F5C842',55],[228,524,7,3,200,'#C4B5FD',85],
-      [596,530,11,4.5,100,'#F5C842',65],[666,528,8,3.5,0,'white',75],[700,558,13,5.5,180,'#A78BFA',55],
+      [168,548,9,4,140,'#F5C842',55],[228,524,7,3,200,'#7C8B6F',85],
+      [596,530,11,4.5,100,'#F5C842',65],[666,528,8,3.5,0,'white',75],[700,558,13,5.5,180,'#7C8B6F',55],
       [694,600,9,3.5,260,'#F5C842',95],[648,614,11,4.5,80,'#34D399',60],[596,600,7,3,160,'white',85],
-      [568,565,10,4,220,'#F5C842',70],[630,546,8,3.5,40,'#C4B5FD',90],
-      [994,512,10,4,50,'#F5C842',65],[1066,516,7,3,170,'white',80],[1090,545,12,5,110,'#A78BFA',50],
+      [568,565,10,4,220,'#F5C842',70],[630,546,8,3.5,40,'#7C8B6F',90],
+      [994,512,10,4,50,'#F5C842',65],[1066,516,7,3,170,'white',80],[1090,545,12,5,110,'#7C8B6F',50],
       [1084,585,8,3.5,230,'#F5C842',95],[1043,602,10,4,290,'#34D399',72],[992,582,6,2.5,130,'white',88],
-      [965,548,9,4,190,'#F5C842',58],[1028,524,7,3,250,'#C4B5FD',82],
-      [380,200,14,6,0,'#F5C842',45],[160,280,9,4,150,'white',60],[900,200,13,5,80,'#A78BFA',52],
-      [1110,260,10,4,200,'#F5C842',68],[640,130,16,7,40,'white',40],[440,440,8,3.5,220,'#C4B5FD',75],
+      [965,548,9,4,190,'#F5C842',58],[1028,524,7,3,250,'#7C8B6F',82],
+      [380,200,14,6,0,'#F5C842',45],[160,280,9,4,150,'white',60],[900,200,13,5,80,'#7C8B6F',52],
+      [1110,260,10,4,200,'#F5C842',68],[640,130,16,7,40,'white',40],[440,440,8,3.5,220,'#7C8B6F',75],
       [840,440,10,4,100,'#F5C842',62],[200,160,7,3,280,'#34D399',80],[1080,160,9,4,160,'white',55],
-      [560,680,6,2.5,320,'#F5C842',90],[720,680,7,3,60,'#A78BFA',78],[340,650,8,3.5,140,'white',65],
+      [560,680,6,2.5,320,'#F5C842',90],[720,680,7,3,60,'#7C8B6F',78],[340,650,8,3.5,140,'white',65],
     ];
 
     const ns = 'http://www.w3.org/2000/svg';
@@ -418,7 +418,7 @@ function WorkerWorkflowScroll() {
       <div className="mx-auto max-w-2xl">
         {/* Header */}
         <div className="mb-14 text-center">
-          <p className="mb-3 text-xs font-bold uppercase tracking-[0.18em] text-[#A78BFA]">How it works</p>
+          <p className="mb-3 text-xs font-bold uppercase tracking-[0.18em] text-[#7C8B6F]">How it works</p>
           <h2 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="text-[28px] font-medium leading-snug tracking-[-0.01em] text-white sm:text-[34px]">
             From scattered records<br className="hidden sm:block" /> to review-ready intake
           </h2>
@@ -440,7 +440,7 @@ function WorkerWorkflowScroll() {
                 className={`relative flex gap-5 rounded-2xl border p-5 sm:p-6 ${s.color}`}
               >
                 {/* Step circle */}
-                <div className="relative z-10 flex h-[54px] w-[54px] shrink-0 flex-col items-center justify-center rounded-full bg-[#6d4aff] shadow-[0_4px_14px_rgba(109,74,255,0.30)]">
+                <div className="relative z-10 flex h-[54px] w-[54px] shrink-0 flex-col items-center justify-center rounded-full bg-[#42574e] shadow-[0_4px_14px_rgba(109,74,255,0.30)]">
                   <span className="text-[10px] font-bold uppercase tracking-widest text-white/60">step</span>
                   <span className="text-[15px] font-bold leading-none text-white">{s.step}</span>
                 </div>
@@ -466,7 +466,7 @@ function WorkerWorkflowScroll() {
           transition={{ duration: 0.45, delay: 0.3 }}
           className="mt-10 flex items-center justify-center gap-3 rounded-2xl border border-white/10 bg-white/[0.04] px-6 py-4"
         >
-          <CheckCircle2 className="h-5 w-5 shrink-0 text-[#A78BFA]" />
+          <CheckCircle2 className="h-5 w-5 shrink-0 text-[#7C8B6F]" />
           <p className="text-sm font-medium text-white">
             Open it and decide — before the first call.
           </p>
@@ -609,7 +609,7 @@ function _WorkerWorkflowScrollCanvas_unused() {
         if (p2 > .5) { ctx.beginPath(); ctx.arc(x+pw/2-15*s, iy+12*s, 4, 0, Math.PI*2); ctx.fillStyle = '#34D399'; ctx.fill(); }
       });
       const bvy = y + ph/2 - 38*s, ba = cl((checkP - .7) / .3, 0, 1);
-      if (ba > 0) { ctx.globalAlpha = alpha * ba; rr(x-pw/2+8*s, bvy, pw-16*s, 24*s, 12, '#6D4AFF'); tx('Send to Firms', x, bvy+15*s, 9.5*s, '#fff', 'center', '500'); ctx.globalAlpha = alpha; }
+      if (ba > 0) { ctx.globalAlpha = alpha * ba; rr(x-pw/2+8*s, bvy, pw-16*s, 24*s, 12, '#42574E'); tx('Send to Firms', x, bvy+15*s, 9.5*s, '#fff', 'center', '500'); ctx.globalAlpha = alpha; }
       ctx.restore();
     }
 
@@ -629,7 +629,7 @@ function _WorkerWorkflowScrollCanvas_unused() {
     function addSp(x: number, y: number, n = 4) {
       for (let i = 0; i < n; i++) {
         const a = Math.random() * Math.PI * 2, sp = 25 + Math.random() * 50;
-        sparkles.push({ x, y, vx: Math.cos(a)*sp, vy: Math.sin(a)*sp, life: 1, sz: 2 + Math.random()*2.5, col: Math.random() < .5 ? '#A78BFA' : '#34D399' });
+        sparkles.push({ x, y, vx: Math.cos(a)*sp, vy: Math.sin(a)*sp, life: 1, sz: 2 + Math.random()*2.5, col: Math.random() < .5 ? '#7C8B6F' : '#34D399' });
       }
     }
 
@@ -694,7 +694,7 @@ function _WorkerWorkflowScrollCanvas_unused() {
           if (t2v > 0 && t2v < 1) {
             const px = lerp(cx, fx, eOut(t2v)), py = lerp(animCy-22, fy-33, eOut(t2v)) - Math.sin(t2v*Math.PI)*ch*.08;
             ctx.save(); ctx.translate(px, py); ctx.rotate(Math.atan2((fy-33)-(animCy-22), (fx-cx))*.7);
-            ctx.fillStyle = '#A78BFA'; ctx.beginPath(); ctx.moveTo(11,0); ctx.lineTo(-5,-4); ctx.lineTo(-2,0); ctx.lineTo(-5,4); ctx.closePath(); ctx.fill(); ctx.restore();
+            ctx.fillStyle = '#7C8B6F'; ctx.beginPath(); ctx.moveTo(11,0); ctx.lineTo(-5,-4); ctx.lineTo(-2,0); ctx.lineTo(-5,4); ctx.closePath(); ctx.fill(); ctx.restore();
             if (t2v > .88) addSp(fx, fy-28, 1);
           }
           if (p >= .8) { firmReceived[i] = Math.min(firmReceived[i] + dt*3, band(p, .8, .97)); drawFirm(fx, fy, FIRMS[i].name, FIRMS[i].tag, 1, firmReceived[i]); }
@@ -752,14 +752,14 @@ function _WorkerWorkflowScrollCanvas_unused() {
 
         {/* Top label */}
         <div className="absolute top-5 left-0 right-0 flex flex-col items-center gap-1 pointer-events-none">
-          <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#A78BFA]">How it works</div>
+          <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#7C8B6F]">How it works</div>
           <div className="text-[10px] text-white/30 tracking-widest uppercase">scroll to explore</div>
         </div>
 
         {/* Step pips — right side on desktop, hidden on mobile (progress bar is enough) */}
         <div className="absolute top-1/2 -translate-y-1/2 right-4 hidden sm:flex flex-col gap-3 items-center">
           {[0,1,2].map(i => (
-            <div key={i} className="ww-pip w-1.5 h-1.5 rounded-full bg-white/20 transition-all duration-500 [&.active]:bg-[#6D4AFF] [&.active]:h-8 [&.active]:rounded-full [&.done]:bg-[#6D4AFF]/40" />
+            <div key={i} className="ww-pip w-1.5 h-1.5 rounded-full bg-white/20 transition-all duration-500 [&.active]:bg-[#42574E] [&.active]:h-8 [&.active]:rounded-full [&.done]:bg-[#42574E]/40" />
           ))}
         </div>
 
@@ -767,7 +767,7 @@ function _WorkerWorkflowScrollCanvas_unused() {
         {/* Mobile: bottom overlay */}
         <div className="absolute bottom-5 left-4 right-4 sm:hidden pointer-events-none">
           <div className="ww-card opacity-0 translate-y-2 transition-all duration-500 [&.show]:opacity-100 [&.show]:translate-y-0 rounded-2xl bg-white/[0.06] border border-white/10 backdrop-blur-sm px-5 py-4">
-            <div className="ww-num mb-1.5 text-[10px] font-bold text-[#A78BFA] uppercase tracking-[0.15em]" />
+            <div className="ww-num mb-1.5 text-[10px] font-bold text-[#7C8B6F] uppercase tracking-[0.15em]" />
             <div className="ww-title mb-1.5 text-[17px] font-bold text-white leading-snug" />
             <div className="ww-body text-[12px] text-white/50 leading-relaxed" />
           </div>
@@ -775,7 +775,7 @@ function _WorkerWorkflowScrollCanvas_unused() {
         {/* Desktop: left column */}
         <div className="absolute top-0 left-0 bottom-0 hidden sm:flex w-[300px] flex-col justify-center px-8 pointer-events-none">
           <div className="ww-card opacity-0 translate-y-3 transition-all duration-500 [&.show]:opacity-100 [&.show]:translate-y-0">
-            <div className="ww-num mb-3 text-[11px] font-bold text-[#A78BFA] uppercase tracking-[0.15em]" />
+            <div className="ww-num mb-3 text-[11px] font-bold text-[#7C8B6F] uppercase tracking-[0.15em]" />
             <div className="ww-title mb-3 text-[22px] font-bold text-white leading-snug" />
             <div className="ww-body text-[14px] text-white/50 leading-relaxed" />
           </div>
@@ -783,7 +783,7 @@ function _WorkerWorkflowScrollCanvas_unused() {
 
         {/* Scroll progress bar — bottom */}
         <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-white/8">
-          <div className="ww-fill h-full bg-[#6D4AFF] w-0" style={{ transition: 'width 0.05s linear' }} />
+          <div className="ww-fill h-full bg-[#42574E] w-0" style={{ transition: 'width 0.05s linear' }} />
         </div>
       </div>
     </>
@@ -810,13 +810,13 @@ function InfoTooltip({ tip }: { tip: string }) {
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="flex h-4 w-4 items-center justify-center rounded-full border border-[#DCD3FF] bg-white text-[9px] font-bold text-[#6D4AFF] hover:bg-[#F7F3FF] transition"
+        className="flex h-4 w-4 items-center justify-center rounded-full border border-[#CBD6CF] bg-white text-[9px] font-bold text-[#42574E] hover:bg-[#F7F3FF] transition"
         aria-label="More information"
       >
         ?
       </button>
       {open && (
-        <div className="absolute bottom-full left-1/2 z-50 mb-2 w-48 -translate-x-1/2 rounded-xl border border-[#E7E1FF] bg-white p-3 shadow-lg">
+        <div className="absolute bottom-full left-1/2 z-50 mb-2 w-48 -translate-x-1/2 rounded-xl border border-[#D3DED6] bg-white p-3 shadow-lg">
           <p className="text-[11px] leading-relaxed text-[#1E1B4B]/70">{tip}</p>
         </div>
       )}
@@ -831,9 +831,9 @@ function RecordsPathSection({ reduced }: { reduced: boolean }) {
       number: '1',
       label: 'Worker story',
       body: 'A worker uploads their documents — pay stubs, emails, HR complaints. Scattered files, no clear order.',
-      color: 'bg-[#F7F3FF] border-[#DCD3FF]',
-      accent: 'text-[#6D4AFF]',
-      dot: 'bg-[#6D4AFF]',
+      color: 'bg-[#F7F3FF] border-[#CBD6CF]',
+      accent: 'text-[#42574E]',
+      dot: 'bg-[#42574E]',
     },
     {
       number: '3',
@@ -856,8 +856,8 @@ function RecordsPathSection({ reduced }: { reduced: boolean }) {
       label: 'Attorney review ready',
       body: 'A structured intake record arrives in the firm dashboard before the first consultation. No legal conclusions — attorney decides.',
       color: 'bg-[#1E1B4B] border-[#2D2A6A]',
-      accent: 'text-[#A78BFA]',
-      dot: 'bg-[#A78BFA]',
+      accent: 'text-[#7C8B6F]',
+      dot: 'bg-[#7C8B6F]',
       dark: true,
     },
   ];
@@ -866,7 +866,7 @@ function RecordsPathSection({ reduced }: { reduced: boolean }) {
     <section className="px-5 py-16 sm:px-8 sm:py-20 overflow-hidden">
       <div className="mx-auto max-w-6xl">
         <div className="mb-10 text-center">
-          <div className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-[#6D4AFF]">The 137 path</div>
+          <div className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-[#42574E]">The 137 path</div>
           <h2 className="text-[26px] font-bold leading-tight tracking-tight text-[#1E1B4B] sm:text-[34px]">
             Records finding order
           </h2>
@@ -931,7 +931,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
             <button
               type="button"
               onClick={onSignUpFree}
-              className="flex items-center gap-1.5 rounded-full bg-[#5B21B6] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(91,33,182,0.22)] transition hover:bg-[#4C1D96] hover:-translate-y-px active:scale-[0.97]"
+              className="flex items-center gap-1.5 rounded-full bg-[#42574E] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(91,33,182,0.22)] transition hover:bg-[#4C1D96] hover:-translate-y-px active:scale-[0.97]"
             >
               {t('nav.signup')}
               <ArrowRight className="h-3.5 w-3.5" />
@@ -977,7 +977,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
             <div className="flex flex-col">
               <div className="py-2"><LangToggle tone="dark" /></div>
               <button type="button" onClick={onSignIn} className="flex items-center min-h-[48px] text-base font-medium text-white/60 text-left py-3">{t('nav.signin')}</button>
-              <button type="button" onClick={onSignUpFree} className="flex items-center gap-1.5 min-h-[48px] text-base font-semibold text-[#C4B5FD] text-left py-3">{t('nav.signup')} <ArrowRight className="h-4 w-4" /></button>
+              <button type="button" onClick={onSignUpFree} className="flex items-center gap-1.5 min-h-[48px] text-base font-semibold text-[#7C8B6F] text-left py-3">{t('nav.signup')} <ArrowRight className="h-4 w-4" /></button>
               <button type="button" onClick={onForFirms} className="flex items-center gap-1.5 min-h-[48px] text-base font-medium text-white/60 text-left py-3">{t('nav.firms')}</button>
               <button type="button" onClick={onWorkerStart} className="flex items-center gap-1.5 min-h-[48px] text-base font-semibold text-white/70 text-left py-3">{t('nav.workers')} <ArrowRight className="h-4 w-4" /></button>
               <a href="/hq" className="flex items-center min-h-[48px] text-base font-medium text-white/30 text-left py-3">HQ</a>
@@ -990,12 +990,12 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
       <section className="relative overflow-hidden bg-[#14112E] px-5 pb-16 pt-14 sm:px-8 sm:pb-24 sm:pt-20">
         {/* Background glow — slow drift */}
         <motion.div
-          className="pointer-events-none absolute -left-32 -top-32 h-[500px] w-[500px] rounded-full bg-[#6D4AFF]/20 blur-3xl"
+          className="pointer-events-none absolute -left-32 -top-32 h-[500px] w-[500px] rounded-full bg-[#42574E]/20 blur-3xl"
           animate={{ x: [0, 24, -12, 0], y: [0, -18, 14, 0] }}
           transition={{ duration: 14, repeat: Infinity, ease: 'easeInOut' }}
         />
         <motion.div
-          className="pointer-events-none absolute -right-32 top-1/2 h-[400px] w-[400px] rounded-full bg-[#A78BFA]/12 blur-3xl"
+          className="pointer-events-none absolute -right-32 top-1/2 h-[400px] w-[400px] rounded-full bg-[#7C8B6F]/12 blur-3xl"
           animate={{ x: [0, -20, 10, 0], y: [0, 16, -10, 0] }}
           transition={{ duration: 11, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
         />
@@ -1012,15 +1012,15 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
               {firmDirectedContext ? (
                 /* ── Journey 2: firm-directed worker entry ── */
                 <>
-                  <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-semibold text-[#C4B5FD]">
-                    <span className="h-1.5 w-1.5 rounded-full bg-[#C4B5FD] animate-pulse" />
+                  <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-semibold text-[#7C8B6F]">
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#7C8B6F] animate-pulse" />
                     Sent by {firmDirectedContext.firmName}
                   </div>
 
                   <h1 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="mb-5 text-[32px] font-medium leading-[1.05] tracking-[-0.01em] text-white sm:text-[44px] lg:text-[54px]">
                     {firmDirectedContext.firmName}
                     <br />
-                    <span className="text-[#C4B5FD]">asked you to</span>
+                    <span className="text-[#7C8B6F]">asked you to</span>
                     <br />
                     submit here.
                   </h1>
@@ -1033,7 +1033,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
                     <button
                       type="button"
                       onClick={onWorkerStart}
-                      className="flex items-center justify-center gap-2 rounded-full bg-[#6D4AFF] px-7 py-3.5 text-[15px] font-semibold text-white shadow-[0_16px_48px_rgba(109,74,255,0.28)] transition hover:bg-[#5B35D5] hover:-translate-y-0.5"
+                      className="flex items-center justify-center gap-2 rounded-full bg-[#42574E] px-7 py-3.5 text-[15px] font-semibold text-white shadow-[0_16px_48px_rgba(109,74,255,0.28)] transition hover:bg-[#374A42] hover:-translate-y-0.5"
                     >
                       Get Started
                       <ArrowRight className="h-4 w-4" />
@@ -1047,18 +1047,18 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
               ) : (
                 /* ── Journey 1: default homepage — firm-geared front door ── */
                 <>
-                  <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#C4B5FD]">
-                    <span className="h-1.5 w-1.5 rounded-full bg-[#C4B5FD]" />
+                  <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#7C8B6F]">
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#7C8B6F]" />
                     {t('home.badge')}
                   </div>
 
                   <h1 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="mb-5 text-[34px] font-medium leading-[1.04] tracking-[-0.01em] text-white sm:text-[48px] lg:text-[56px]">
                     {t('home.h1_1')}
                     <br />
-                    <span className="text-[#C4B5FD]">{t('home.h1_2')}</span>
+                    <span className="text-[#7C8B6F]">{t('home.h1_2')}</span>
                   </h1>
 
-                  <p className="mb-5 max-w-[520px] text-[15px] font-medium leading-relaxed text-[#A78BFA]">
+                  <p className="mb-5 max-w-[520px] text-[15px] font-medium leading-relaxed text-[#7C8B6F]">
                     {t('home.partner')}
                   </p>
 
@@ -1067,7 +1067,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
                   </p>
 
                   <p className="mb-7 flex items-center gap-2 text-sm font-medium text-[#C9C4E6]">
-                    <Shield className="h-4 w-4 flex-shrink-0 text-[#A78BFA]" />
+                    <Shield className="h-4 w-4 flex-shrink-0 text-[#7C8B6F]" />
                     {t('home.trust')}
                   </p>
 
@@ -1075,7 +1075,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
                     <button
                       type="button"
                       onClick={() => { track('cta_firm_pilot'); onForFirms(); }}
-                      className="flex items-center justify-center gap-2 rounded-full bg-[#6D4AFF] px-7 py-3.5 text-[15px] font-semibold text-white shadow-[0_16px_48px_rgba(109,74,255,0.40)] transition hover:bg-[#5B35D5] hover:-translate-y-0.5 active:scale-[0.97]"
+                      className="flex items-center justify-center gap-2 rounded-full bg-[#42574E] px-7 py-3.5 text-[15px] font-semibold text-white shadow-[0_16px_48px_rgba(109,74,255,0.40)] transition hover:bg-[#374A42] hover:-translate-y-0.5 active:scale-[0.97]"
                     >
                       {t('home.cta_pilot')}
                       <ArrowRight className="h-4 w-4" />
@@ -1108,7 +1108,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
                 {/* Caption beneath visual */}
                 <div className="mt-3 hidden items-center justify-center gap-6 text-xs text-[#8E88B5] sm:flex">
                   <span>Scattered records</span>
-                  <span className="text-[#A78BFA]">→ one3seven →</span>
+                  <span className="text-[#7C8B6F]">→ one3seven →</span>
                   <span>Organized for attorney review</span>
                 </div>
               </div>
@@ -1121,7 +1121,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
       <section className="bg-[#14112E] px-5 py-16 sm:px-8 sm:py-24">
         <div className="mx-auto max-w-6xl">
           <div className="mx-auto max-w-[640px] text-center">
-            <div className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-[#A78BFA]">The problem</div>
+            <div className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-[#7C8B6F]">The problem</div>
             <h2 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="mb-5 text-[30px] font-medium leading-tight tracking-[-0.01em] text-white sm:text-[38px]">
               Employment matters rarely arrive organized
             </h2>
@@ -1150,7 +1150,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
               },
             ].map((c) => (
               <div key={c.title} className="rounded-[20px] border border-white/10 bg-white/[0.04] p-6">
-                <c.Icon className="mb-3 h-7 w-7 text-[#A78BFA]" strokeWidth={1.5} />
+                <c.Icon className="mb-3 h-7 w-7 text-[#7C8B6F]" strokeWidth={1.5} />
                 <h3 className="mb-2 text-[15px] font-bold text-white">{c.title}</h3>
                 <p className="text-[13px] leading-relaxed text-[#C9C4E6]">{c.body}</p>
               </div>
@@ -1167,7 +1167,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
         <div className="mx-auto max-w-6xl">
           <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
             <div>
-              <div className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-[#A78BFA]">For attorneys</div>
+              <div className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-[#7C8B6F]">For attorneys</div>
               <h2 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="mb-5 text-[30px] font-medium leading-tight tracking-[-0.01em] text-white sm:text-[36px]">
                 Your intake, organized —
                 <br />
@@ -1180,7 +1180,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
                 <button
                   type="button"
                   onClick={openBetaModal}
-                  className="flex items-center justify-center gap-2 rounded-full bg-[#6D4AFF] px-7 py-3.5 text-[15px] font-semibold text-white shadow-[0_16px_48px_rgba(109,74,255,0.40)] transition hover:bg-[#5B35D5] hover:-translate-y-0.5 active:scale-[0.97]"
+                  className="flex items-center justify-center gap-2 rounded-full bg-[#42574E] px-7 py-3.5 text-[15px] font-semibold text-white shadow-[0_16px_48px_rgba(109,74,255,0.40)] transition hover:bg-[#374A42] hover:-translate-y-0.5 active:scale-[0.97]"
                 >
                   Start free pilot
                   <ArrowRight className="h-4 w-4" />
@@ -1203,7 +1203,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
                   whileHover={{ y: -5, backgroundColor: 'rgba(255,255,255,0.07)' }}
                   transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
                 >
-                  <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl bg-[#6D4AFF]/15"><f.icon className="h-[18px] w-[18px] text-[#C4B5FD]" /></div>
+                  <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl bg-[#42574E]/15"><f.icon className="h-[18px] w-[18px] text-[#7C8B6F]" /></div>
                   <div className="mb-1 flex items-center text-[14px] font-semibold text-white">
                     {f.label}
                     {f.tip && <InfoTooltip tip={f.tip} />}
@@ -1218,16 +1218,16 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
 
       {/* ── FOR WORKERS ── */}
       <section className="relative overflow-hidden bg-[#14112E] px-5 py-16 sm:px-8 sm:py-24">
-        <div className="pointer-events-none absolute -left-40 -top-40 h-[500px] w-[500px] rounded-full bg-[#6D4AFF]/14 blur-3xl" />
-        <div className="pointer-events-none absolute -right-40 bottom-0 h-[400px] w-[400px] rounded-full bg-[#A78BFA]/10 blur-3xl" />
+        <div className="pointer-events-none absolute -left-40 -top-40 h-[500px] w-[500px] rounded-full bg-[#42574E]/14 blur-3xl" />
+        <div className="pointer-events-none absolute -right-40 bottom-0 h-[400px] w-[400px] rounded-full bg-[#7C8B6F]/10 blur-3xl" />
         <div className="mx-auto max-w-6xl">
           <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
             <div>
-              <div className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-[#A78BFA]">For workers</div>
+              <div className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-[#7C8B6F]">For workers</div>
               <h2 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="mb-5 text-[30px] font-medium leading-tight tracking-[-0.01em] text-white sm:text-[36px]">
                 Your story, organized.
                 <br />
-                <span className="text-[#C4B5FD]">You control what's shared.</span>
+                <span className="text-[#7C8B6F]">You control what's shared.</span>
               </h2>
               <p className="mb-8 text-[15px] leading-relaxed text-white/60">
                 Upload your documents. one3seven organizes them into a structured intake. You see your own timeline, your status, and you decide when — and with whom — to share your intake.
@@ -1255,7 +1255,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
                   whileHover={{ backgroundColor: 'rgba(255,255,255,0.09)', y: -3 }}
                   transition={{ duration: 0.2, ease: 'easeOut' }}
                 >
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#6D4AFF]/15"><w.Icon className="h-[18px] w-[18px] text-[#C4B5FD]" strokeWidth={1.5} /></div>
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#42574E]/15"><w.Icon className="h-[18px] w-[18px] text-[#7C8B6F]" strokeWidth={1.5} /></div>
                   <div>
                     <div className="mb-1 text-[14px] font-bold text-white">{w.title}</div>
                     <div className="text-[12px] leading-relaxed text-white/55">{w.body}</div>
@@ -1272,7 +1272,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
         <div className="mx-auto max-w-6xl">
           <div className="flex flex-col items-center gap-8 sm:flex-row sm:items-start sm:gap-16">
             <div className="shrink-0 sm:w-[280px]">
-              <div className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-[#A78BFA]">Built for legal</div>
+              <div className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-[#7C8B6F]">Built for legal</div>
               <h3 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="text-[22px] font-medium leading-snug text-white">
                 Built for attorney review.
               </h3>
@@ -1294,7 +1294,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
               <ul className="grid gap-3 sm:grid-cols-2">
                 {TRUST_ITEMS.map((item) => (
                   <li key={item} className="flex items-start gap-2.5">
-                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#A78BFA]" />
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#7C8B6F]" />
                     <span className="text-[13px] text-[#C9C4E6]">{item}</span>
                   </li>
                 ))}
@@ -1328,7 +1328,7 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
               <button
                 type="button"
                 onClick={openBetaModal}
-                className="flex items-center gap-2 rounded-full bg-white px-8 py-4 text-[15px] font-bold text-[#5B21B6] shadow-[0_16px_48px_rgba(0,0,0,0.30)] transition hover:bg-white/93 hover:-translate-y-0.5 active:scale-[0.97]"
+                className="flex items-center gap-2 rounded-full bg-white px-8 py-4 text-[15px] font-bold text-[#42574E] shadow-[0_16px_48px_rgba(0,0,0,0.30)] transition hover:bg-white/93 hover:-translate-y-0.5 active:scale-[0.97]"
               >
                 Start free pilot
                 <ArrowRight className="h-4 w-4" />
@@ -1414,11 +1414,11 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
             onClick={(e) => e.stopPropagation()}
           >
             {/* Gradient accent bar */}
-            <div className="h-1.5 w-full bg-gradient-to-r from-[#6D4AFF] to-[#A78BFA]" />
+            <div className="h-1.5 w-full bg-gradient-to-r from-[#42574E] to-[#7C8B6F]" />
             <div className="p-8">
               <div className="mb-1 flex items-center gap-1.5">
-                <div className="h-3.5 w-3.5 rounded-[3px] bg-gradient-to-br from-[#6D4AFF] to-[#A78BFA]" />
-                <div className="text-xs font-bold uppercase tracking-wider text-[#6D4AFF]"><WordMark /></div>
+                <div className="h-3.5 w-3.5 rounded-[3px] bg-gradient-to-br from-[#42574E] to-[#7C8B6F]" />
+                <div className="text-xs font-bold uppercase tracking-wider text-[#42574E]"><WordMark /></div>
               </div>
               <h2 className="mb-3 text-[20px] font-bold leading-snug text-[#1E1B4B]">Controlled beta</h2>
               <p className="mb-6 text-[14px] leading-relaxed text-[#1E1B4B]/60">
@@ -1427,14 +1427,14 @@ export function PublicMarketingPage({ onWorkerStart, onFirmStart, onSignIn, onSi
               <div className="flex flex-col gap-2.5">
                 <a
                   href="/worker-demo"
-                  className="flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#6D4AFF] to-[#7C3AED] px-6 py-3 text-[14px] font-semibold text-white shadow-[0_8px_24px_rgba(109,74,255,0.28)] transition hover:shadow-[0_12px_32px_rgba(109,74,255,0.40)] hover:-translate-y-px active:scale-[0.97]"
+                  className="flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#42574E] to-[#7C3AED] px-6 py-3 text-[14px] font-semibold text-white shadow-[0_8px_24px_rgba(109,74,255,0.28)] transition hover:shadow-[0_12px_32px_rgba(109,74,255,0.40)] hover:-translate-y-px active:scale-[0.97]"
                 >
                   View worker demo
                   <ArrowRight className="h-4 w-4" />
                 </a>
                 <a
                   href="/?demo"
-                  className="flex items-center justify-center gap-2 rounded-full border border-[#E7E1FF] bg-[#F7F5FF] px-6 py-3 text-[14px] font-semibold text-[#6D4AFF] transition hover:bg-[#EDE8FF] active:scale-[0.97]"
+                  className="flex items-center justify-center gap-2 rounded-full border border-[#D3DED6] bg-[#F7F5FF] px-6 py-3 text-[14px] font-semibold text-[#42574E] transition hover:bg-[#E7EDE8] active:scale-[0.97]"
                 >
                   View firm demo
                   <ArrowRight className="h-4 w-4" />

@@ -4,7 +4,7 @@ import type { SourceCitation } from '../../services/damagesCalculator';
 
 // Brand purple is the one intentional hardcoded color (per spec). Everything else themes
 // via CSS variables so the components read correctly in light and dark mode.
-const BRAND = '#5B21B6';
+const BRAND = '#42574E';
 
 /**
  * Wraps a wage-exposure figure that has a source document. Renders as underlined brand
@@ -70,7 +70,7 @@ export function StatutoryRef({ refText, children }: { refText: string; children:
           style={{
             background: 'var(--o3s-surface, #fff)',
             color: 'var(--o3s-text, #1e1b4b)',
-            borderColor: 'var(--o3s-border, #e7e1ff)',
+            borderColor: 'var(--o3s-border, #d3ded6)',
           }}
         >
           {statute}

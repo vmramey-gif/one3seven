@@ -127,7 +127,7 @@ export function WorkerStoryIntakeScreen({
         <button
           type="button"
           onClick={() => playClip('intake_narrative')}
-          className="mb-2 inline-flex items-center gap-1.5 text-xs font-medium text-[#5B21B6] hover:text-[#4C1D96]"
+          className="mb-2 inline-flex items-center gap-1.5 text-xs font-medium text-[#42574E] hover:text-[#4C1D96]"
         >
           <Volume2 className={`h-3.5 w-3.5 ${playing === 'intake_narrative' ? 'animate-pulse' : ''}`} />
           {playing === 'intake_narrative' ? 'Playing…' : 'Listen to this question'}
@@ -157,9 +157,9 @@ export function WorkerStoryIntakeScreen({
                     type="button"
                     onClick={() => playClip(`intake_recall_${f.key}`)}
                     aria-label="Listen to this question"
-                    className="text-[#8B86A0] hover:text-[#5B21B6]"
+                    className="text-[#8B86A0] hover:text-[#42574E]"
                   >
-                    <Volume2 className={`h-3.5 w-3.5 ${playing === `intake_recall_${f.key}` ? 'animate-pulse text-[#5B21B6]' : ''}`} />
+                    <Volume2 className={`h-3.5 w-3.5 ${playing === `intake_recall_${f.key}` ? 'animate-pulse text-[#42574E]' : ''}`} />
                   </button>
                 </div>
                 <textarea
@@ -186,7 +186,7 @@ export function WorkerStoryIntakeScreen({
           <button
             type="button"
             onClick={handleContinue}
-            className="inline-flex items-center justify-center gap-2 rounded-[14px] bg-[#5B21B6] px-5 py-3.5 text-sm font-semibold text-white hover:bg-[#4C1D96] min-h-[48px]"
+            className="inline-flex items-center justify-center gap-2 rounded-[14px] bg-[#42574E] px-5 py-3.5 text-sm font-semibold text-white hover:bg-[#4C1D96] min-h-[48px]"
           >
             Continue to upload
             <ArrowRight className="h-4 w-4" />

@@ -104,7 +104,7 @@ export function CompanyDemoGuide() {
         {/* Masthead */}
         <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
           <div style={SERIF} className="text-[20px] font-bold tracking-tight">
-            one<span className="text-[#5B21B6]">3</span>seven
+            one<span className="text-[#42574E]">3</span>seven
           </div>
           <div className="inline-flex gap-0.5 rounded-full border border-[#E8E3F2] bg-white p-[3px]">
             {(['coach', 'present'] as const).map((m) => {
@@ -116,7 +116,7 @@ export function CompanyDemoGuide() {
                   aria-pressed={active}
                   onClick={() => setPresent(m === 'present')}
                   className={`rounded-full px-3.5 py-[7px] text-[12.5px] font-semibold capitalize transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#7C4DD6] ${
-                    active ? 'bg-[#5B21B6] text-white shadow-sm' : 'text-[#4B4458]'
+                    active ? 'bg-[#42574E] text-white shadow-sm' : 'text-[#4B4458]'
                   }`}
                 >
                   {m}
@@ -162,7 +162,7 @@ export function CompanyDemoGuide() {
             >
               <span
                 className={`absolute inset-0 origin-left rounded-full transition-transform duration-300 motion-reduce:transition-none ${
-                  idx < i ? 'scale-x-100 bg-[#5B21B6]' : idx === i ? 'scale-x-100 bg-[#7C4DD6]' : 'scale-x-0 bg-[#5B21B6]'
+                  idx < i ? 'scale-x-100 bg-[#42574E]' : idx === i ? 'scale-x-100 bg-[#7C4DD6]' : 'scale-x-0 bg-[#42574E]'
                 }`}
               />
             </button>
@@ -171,10 +171,10 @@ export function CompanyDemoGuide() {
 
         {/* Step card */}
         <div className="overflow-hidden rounded-[20px] border border-[#E8E3F2] bg-white shadow-[0_12px_40px_-12px_rgba(46,16,80,0.28)]">
-          <div className="h-[5px] w-full bg-gradient-to-r from-[#5B21B6] to-[#7C4DD6]" />
+          <div className="h-[5px] w-full bg-gradient-to-r from-[#42574E] to-[#7C4DD6]" />
           <div className={present ? 'p-10' : 'p-6'}>
             <div className="mb-3.5 flex items-center gap-3">
-              <div style={SERIF} className="grid h-[30px] w-[30px] flex-none place-items-center rounded-[9px] bg-[#5B21B6] text-[13px] font-bold text-white">
+              <div style={SERIF} className="grid h-[30px] w-[30px] flex-none place-items-center rounded-[9px] bg-[#42574E] text-[13px] font-bold text-white">
                 {i + 1}
               </div>
               <div className="text-[11.5px] font-bold uppercase tracking-[0.12em] text-[#7C4DD6]">{s.phase}</div>
@@ -187,7 +187,7 @@ export function CompanyDemoGuide() {
 
             {/* Do this */}
             <div className="mb-4 flex gap-3 rounded-[13px] bg-[#F3EDFD] p-[14px_15px]">
-              <div className="mt-0.5 grid h-[26px] w-[26px] flex-none place-items-center rounded-lg bg-[#5B21B6] text-[14px] text-white" aria-hidden>
+              <div className="mt-0.5 grid h-[26px] w-[26px] flex-none place-items-center rounded-lg bg-[#42574E] text-[14px] text-white" aria-hidden>
                 ▷
               </div>
               <div className={present ? 'text-[17px]' : 'text-[14.5px]'}>
@@ -239,7 +239,7 @@ export function CompanyDemoGuide() {
             <button
               type="button"
               onClick={() => go(0)}
-              className="inline-flex items-center gap-2 rounded-[11px] border border-[#5B21B6] bg-[#5B21B6] px-5 py-3 text-[14.5px] font-semibold text-white shadow-sm transition hover:bg-[#4C1A9C] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#7C4DD6]"
+              className="inline-flex items-center gap-2 rounded-[11px] border border-[#42574E] bg-[#42574E] px-5 py-3 text-[14.5px] font-semibold text-white shadow-sm transition hover:bg-[#4C1A9C] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#7C4DD6]"
             >
               Run it again ↺
             </button>
@@ -247,7 +247,7 @@ export function CompanyDemoGuide() {
             <button
               type="button"
               onClick={() => go(i + 1)}
-              className="inline-flex items-center gap-2 rounded-[11px] border border-[#5B21B6] bg-[#5B21B6] px-5 py-3 text-[14.5px] font-semibold text-white shadow-sm transition hover:bg-[#4C1A9C] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#7C4DD6]"
+              className="inline-flex items-center gap-2 rounded-[11px] border border-[#42574E] bg-[#42574E] px-5 py-3 text-[14.5px] font-semibold text-white shadow-sm transition hover:bg-[#4C1A9C] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#7C4DD6]"
             >
               Next →
             </button>
@@ -263,7 +263,7 @@ export function CompanyDemoGuide() {
             <ol className="grid gap-[7px]">
               {PANIC.map((line, idx) => (
                 <li key={idx} className="flex gap-2.5 text-[14px]">
-                  <span className="grid h-[19px] w-[19px] flex-none place-items-center rounded-md bg-[#5B21B6] text-[11px] font-bold text-white">
+                  <span className="grid h-[19px] w-[19px] flex-none place-items-center rounded-md bg-[#42574E] text-[11px] font-bold text-white">
                     {idx + 1}
                   </span>
                   {line}
@@ -276,7 +276,7 @@ export function CompanyDemoGuide() {
         {/* Debrief link (coach only) */}
         {!present && (
           <div className="mt-5 text-center">
-            <a href="/company-demo/debrief" className="text-[13px] font-semibold text-[#5B21B6] underline underline-offset-2">
+            <a href="/company-demo/debrief" className="text-[13px] font-semibold text-[#42574E] underline underline-offset-2">
               After the call → log the debrief
             </a>
           </div>

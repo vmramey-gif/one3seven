@@ -1,14 +1,14 @@
 import type { DamagesReport, DamagesLineItem, SourceCitation } from '../../services/damagesCalculator';
 import { CitationLink, StatutoryRef } from './CitationLink';
 
-const BRAND = '#5B21B6';
+const BRAND = '#42574E';
 const money = (n: number) => `$${n.toFixed(2)}`;
 
 /**
  * On-screen wage-exposure estimate for the attorney review UI (section 8B equivalent).
  * Firm-only. Figures with a source document are wrapped in CitationLink (opens CitationPanel);
  * statutory figures use StatutoryRef tooltips. Copy is constrained to neutral terms.
- * Themed entirely via CSS variables; #5B21B6 is the only intentional hardcoded color.
+ * Themed entirely via CSS variables; #42574E is the only intentional hardcoded color.
  */
 export function WageExposureReviewSection({
   wage,
@@ -38,7 +38,7 @@ export function WageExposureReviewSection({
   return (
     <section
       className="rounded-2xl border p-5"
-      style={{ borderColor: 'var(--o3s-border, #e7e1ff)', background: 'var(--o3s-surface, #fff)', color: 'var(--o3s-text, #1e1b4b)' }}
+      style={{ borderColor: 'var(--o3s-border, #d3ded6)', background: 'var(--o3s-surface, #fff)', color: 'var(--o3s-text, #1e1b4b)' }}
     >
       <div className="mb-3 flex items-center gap-2">
         <h3 className="text-base font-semibold">Wage exposure estimate</h3>
@@ -66,7 +66,7 @@ export function WageExposureReviewSection({
             value={<StatutoryRef refText={r.overtimePremiumPerHour.statutoryRef ?? ''}>{money(r.overtimePremiumPerHour.value)}</StatutoryRef>}
           />
           <Row label={r.overtimeHoursUnderpaid.label} value={<ValueOrCitation item={r.overtimeHoursUnderpaid} text={`${r.overtimeHoursUnderpaid.value} hrs`} />} />
-          <div className="mt-1 border-t pt-1" style={{ borderColor: 'var(--o3s-border, #e7e1ff)' }}>
+          <div className="mt-1 border-t pt-1" style={{ borderColor: 'var(--o3s-border, #d3ded6)' }}>
             <Row label="Estimated overtime premium" value={<span className="font-semibold" style={{ color: BRAND }}>{money(r.overtimeTotalEstimate)}</span>} />
           </div>
         </div>
@@ -80,13 +80,13 @@ export function WageExposureReviewSection({
             label={r.mealBreakPremiumPerBreak.label}
             value={<StatutoryRef refText={r.mealBreakPremiumPerBreak.statutoryRef ?? ''}>{money(r.mealBreakPremiumPerBreak.value)}</StatutoryRef>}
           />
-          <div className="mt-1 border-t pt-1" style={{ borderColor: 'var(--o3s-border, #e7e1ff)' }}>
+          <div className="mt-1 border-t pt-1" style={{ borderColor: 'var(--o3s-border, #d3ded6)' }}>
             <Row label="Estimated meal-break premium" value={<span className="font-semibold" style={{ color: BRAND }}>{money(r.mealBreakTotalEstimate)}</span>} />
           </div>
         </div>
       ) : null}
 
-      <div className="mt-3 border-t pt-2" style={{ borderColor: 'var(--o3s-border, #e7e1ff)' }}>
+      <div className="mt-3 border-t pt-2" style={{ borderColor: 'var(--o3s-border, #d3ded6)' }}>
         <Row
           label="Combined estimate"
           value={<span className="text-base font-bold" style={{ color: BRAND }}>{money(r.combinedEstimate)}</span>}
@@ -96,7 +96,7 @@ export function WageExposureReviewSection({
       {r.isPartialData && r.missingRecordsWarning ? (
         <p
           className="mt-3 rounded-md border px-3 py-2 text-xs leading-relaxed"
-          style={{ borderColor: 'var(--o3s-border, #e7e1ff)', color: 'var(--o3s-muted, #6b7280)' }}
+          style={{ borderColor: 'var(--o3s-border, #d3ded6)', color: 'var(--o3s-muted, #6b7280)' }}
         >
           <span className="font-semibold">Incomplete records.</span> {r.missingRecordsWarning}
         </p>

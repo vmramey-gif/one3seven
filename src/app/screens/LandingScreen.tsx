@@ -526,10 +526,10 @@ export function LandingScreen({
   const renderStatusJourneyTab = () => (
     <section className="px-5 sm:px-8 pt-5 pb-6 scroll-mt-4 max-w-3xl">
       {selectedStatusJourney ? (
-        <div className="mb-4 rounded-3xl border border-[#DCD3FF] bg-white/90 p-4 text-center shadow-[0_18px_45px_rgba(91,53,213,0.08)]">
+        <div className="mb-4 rounded-3xl border border-[#CBD6CF] bg-white/90 p-4 text-center shadow-[0_18px_45px_rgba(91,53,213,0.08)]">
           <div className="mx-auto flex w-full max-w-xl flex-col items-center gap-3">
             <div className="min-w-0">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#6D4AFF]">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#42574E]">
                 Status Journey
               </p>
               <h2 className="mt-2 break-words text-lg font-semibold text-[#1E1B4B]">
@@ -545,7 +545,7 @@ export function LandingScreen({
                 <select
                   value={selectedStatusJourney.intakeId}
                   onChange={(event) => setSelectedStatusIntakeId(event.target.value)}
-                  className="w-full max-w-full rounded-2xl border border-[#DCD3FF] bg-[#FBFAFF] px-3 py-2 text-sm font-medium text-[#1E1B4B] shadow-sm outline-none transition focus:border-[#6D4AFF] focus:ring-2 focus:ring-[#DCD3FF]"
+                  className="w-full max-w-full rounded-2xl border border-[#CBD6CF] bg-[#FBFAFF] px-3 py-2 text-sm font-medium text-[#1E1B4B] shadow-sm outline-none transition focus:border-[#42574E] focus:ring-2 focus:ring-[#CBD6CF]"
                 >
                   {statusJourneyOptions.map((option) => (
                     <option key={option.intakeId} value={option.intakeId}>
@@ -658,7 +658,7 @@ export function LandingScreen({
   const renderSummaryHome = () => (
     <section className="px-5 sm:px-8 pt-5 pb-6 max-w-3xl scroll-mt-4">
       <div className="mb-4">
-        <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#6D4AFF]">
+        <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#42574E]">
           Summary
         </h2>
         <p className="text-xs leading-relaxed text-[#1E1B4B]/64">
@@ -677,11 +677,11 @@ export function LandingScreen({
             return (
               <article
                 key={card.intakeId}
-                className="rounded-[18px] border border-[#E7E1FF] bg-white/94 p-4 shadow-[0_18px_42px_rgba(67,56,202,0.08)]"
+                className="rounded-[18px] border border-[#D3DED6] bg-white/94 p-4 shadow-[0_18px_42px_rgba(67,56,202,0.08)]"
               >
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div className="min-w-0">
-                    <div className="flex items-center gap-2 text-[#6D4AFF]">
+                    <div className="flex items-center gap-2 text-[#42574E]">
                       <FileText className="h-4 w-4" strokeWidth={1.8} aria-hidden />
                       <p className="text-sm font-semibold text-[#1E1B4B]">
                         Employment Intake Summary
@@ -707,7 +707,7 @@ export function LandingScreen({
                       }
                     }}
                     disabled={!onOpenWorkerSummaryForIntake && activeIntakeHub?.intakeId !== card.intakeId}
-                    className="w-full rounded-[14px] border border-[#6D4AFF] bg-[#6D4AFF] px-4 py-2 text-sm font-bold text-white shadow-[0_12px_28px_rgba(109,74,255,0.18)] transition-colors hover:bg-[#5B35D5] disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+                    className="w-full rounded-[14px] border border-[#42574E] bg-[#42574E] px-4 py-2 text-sm font-bold text-white shadow-[0_12px_28px_rgba(109,74,255,0.18)] transition-colors hover:bg-[#374A42] disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
                   >
                     View Summary
                   </button>
@@ -717,7 +717,7 @@ export function LandingScreen({
           })}
         </div>
       ) : (
-        <p className="rounded-[18px] border border-[#E7E1FF] bg-white/90 px-4 py-8 text-center text-sm leading-relaxed text-[#1E1B4B]/64">
+        <p className="rounded-[18px] border border-[#D3DED6] bg-white/90 px-4 py-8 text-center text-sm leading-relaxed text-[#1E1B4B]/64">
           No completed summaries yet. Organize an intake first, then its Employment Intake Summary will appear here.
         </p>
       )}
@@ -725,13 +725,13 @@ export function LandingScreen({
   );
 
   return (
-    <div className={`min-h-screen bg-[#F6F2FF] text-[#1E1B4B]${showWorkerHub ? ' pb-24 sm:pb-0' : ''}`}>
+    <div className={`min-h-screen bg-[#F2F4EC] text-[#1E1B4B]${showWorkerHub ? ' pb-24 sm:pb-0' : ''}`}>
       {/* Top Navigation */}
       {!shellMode ? (
       <nav className={`sticky top-0 z-50 border-b backdrop-blur-md ${
         showWorkerHub
-          ? 'border-[#E7E1FF] bg-white/86'
-          : 'border-[#E7E1FF] bg-white/90'
+          ? 'border-[#D3DED6] bg-white/86'
+          : 'border-[#D3DED6] bg-white/90'
       }`}>
         <div className={`flex flex-col gap-2 px-6 ${showWorkerHub || workerDashboardCompact ? 'py-2.5' : 'py-5'}`}>
           <div className="flex items-center justify-between">
@@ -784,7 +784,7 @@ export function LandingScreen({
               <section id="worker-mobile-records" className="px-4 pt-5 pb-4">
                 {openIntakeFeedback ? (
                   <p
-                    className="mb-3 rounded-lg border border-[#E7E1FF] bg-white px-3 py-1.5 text-xs leading-relaxed text-[#1E1B4B]/70"
+                    className="mb-3 rounded-lg border border-[#D3DED6] bg-white px-3 py-1.5 text-xs leading-relaxed text-[#1E1B4B]/70"
                     role="status"
                     aria-live="polite"
                   >
@@ -807,7 +807,7 @@ export function LandingScreen({
                   />
                 ) : null}
                 <div className="mb-4">
-                  <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#6D4AFF]">Intakes</h2>
+                  <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#42574E]">Intakes</h2>
                   <p className="text-xs leading-relaxed text-[#1E1B4B]/64">
                     All saved and created intakes remain available here. Tap + to start a new intake.
                   </p>
@@ -836,7 +836,7 @@ export function LandingScreen({
         >
           {openIntakeFeedback ? (
             <p
-              className="mb-3 rounded-lg border border-[#E7E1FF] bg-white px-3 py-1.5 text-xs leading-relaxed text-[#1E1B4B]/70"
+              className="mb-3 rounded-lg border border-[#D3DED6] bg-white px-3 py-1.5 text-xs leading-relaxed text-[#1E1B4B]/70"
               role="status"
               aria-live="polite"
             >
@@ -884,7 +884,7 @@ export function LandingScreen({
             </div>
           ) : null}
           <div className="mb-3">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#6D4AFF]">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#42574E]">
               Intakes
             </p>
             <p className="mt-1 text-xs leading-relaxed text-[#1E1B4B]/64">
@@ -915,15 +915,15 @@ export function LandingScreen({
                     }}
                     className={`relative rounded-[12px] border bg-white p-3 shadow-sm ${
                       actionNeeded
-                        ? 'border-[#BFAEFF] bg-[#FBFAFF] shadow-[0_18px_42px_rgba(109,74,255,0.14)] ring-1 ring-[#DCD3FF]'
+                        ? 'border-[#BFAEFF] bg-[#FBFAFF] shadow-[0_18px_42px_rgba(109,74,255,0.14)] ring-1 ring-[#CBD6CF]'
                         : isActive
                           ? 'border-slate-300 ring-1 ring-slate-200/80'
                           : 'border-slate-200'
-                    } ${onOpenWorkerIntakeWorkspaceForIntake ? 'cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#DCD3FF]' : ''}`}
+                    } ${onOpenWorkerIntakeWorkspaceForIntake ? 'cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#CBD6CF]' : ''}`}
                   >
                     {actionNeeded ? (
                       <span
-                        className="absolute right-3 top-3 h-2 w-2 rounded-full bg-[#6D4AFF] shadow-[0_0_0_4px_rgba(109,74,255,0.14)]"
+                        className="absolute right-3 top-3 h-2 w-2 rounded-full bg-[#42574E] shadow-[0_0_0_4px_rgba(109,74,255,0.14)]"
                         aria-hidden
                       />
                     ) : null}
@@ -1330,18 +1330,18 @@ export function LandingScreen({
 
       {/* Trust / Value Section */}
       <section
-        className={`px-6 bg-[#F6F2FF] ${workerDashboardCompact ? 'py-6' : 'py-16'} ${
+        className={`px-6 bg-[#F2F4EC] ${workerDashboardCompact ? 'py-6' : 'py-16'} ${
           mobileShellHub ? 'hidden sm:block' : ''
         }`}
       >
         {workerDashboardCompact ? (
-          <details className="group overflow-hidden rounded-2xl border border-[#E7E1FF] bg-white/86 shadow-[0_12px_32px_rgba(31,27,75,0.07)]">
+          <details className="group overflow-hidden rounded-2xl border border-[#D3DED6] bg-white/86 shadow-[0_12px_32px_rgba(31,27,75,0.07)]">
             <summary className="flex cursor-pointer list-none items-center justify-between gap-2 px-4 py-3 text-sm font-medium text-[#1E1B4B] hover:bg-[#F7F3FF]">
               About one3seven
               <span className="text-[11px] font-normal text-[#64748B] group-open:hidden">Show</span>
               <span className="hidden text-[11px] font-normal text-[#64748B] group-open:inline">Hide</span>
             </summary>
-            <div className="space-y-3 border-t border-[#E7E1FF] px-4 pb-4 pt-3">
+            <div className="space-y-3 border-t border-[#D3DED6] px-4 pb-4 pt-3">
               <p className="text-xs leading-relaxed text-[#1E1B4B]/64">
                 Organize your records into a calm, reviewable summary—ready when you choose to share with a firm.
               </p>
@@ -1376,23 +1376,23 @@ export function LandingScreen({
             </ul>
           </div>
 
-          <div className="rounded-[16px] border border-[#E7E1FF] bg-white p-7 text-[#1E1B4B] shadow-[0_14px_38px_rgba(31,27,75,0.08)]">
+          <div className="rounded-[16px] border border-[#D3DED6] bg-white p-7 text-[#1E1B4B] shadow-[0_14px_38px_rgba(31,27,75,0.08)]">
             <h3 className="mb-5 text-base font-semibold">For Participating Firms</h3>
             <ul className="space-y-4">
               <li className="flex items-start gap-3">
-                <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#6D4AFF]" />
+                <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#42574E]" />
                 <span className="text-sm leading-relaxed text-[#1E1B4B]/64">Receive more organized intake submissions</span>
               </li>
               <li className="flex items-start gap-3">
-                <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#6D4AFF]" />
+                <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#42574E]" />
                 <span className="text-sm leading-relaxed text-[#1E1B4B]/64">Reduce manual document sorting</span>
               </li>
               <li className="flex items-start gap-3">
-                <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#6D4AFF]" />
+                <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#42574E]" />
                 <span className="text-sm leading-relaxed text-[#1E1B4B]/64">Review structured timelines and categorized records</span>
               </li>
               <li className="flex items-start gap-3">
-                <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#6D4AFF]" />
+                <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#42574E]" />
                 <span className="text-sm leading-relaxed text-[#1E1B4B]/64">Improve intake workflow efficiency</span>
               </li>
             </ul>
@@ -1411,7 +1411,7 @@ export function LandingScreen({
 
       {/* Footer */}
       <footer
-        className={`border-t border-[#E7E1FF] bg-[#F6F2FF] px-6 ${workerDashboardCompact ? 'py-8' : 'py-12'} ${
+        className={`border-t border-[#D3DED6] bg-[#F2F4EC] px-6 ${workerDashboardCompact ? 'py-8' : 'py-12'} ${
           mobileShellHub ? 'hidden sm:block' : ''
         }`}
       >
@@ -1482,7 +1482,7 @@ export function LandingScreen({
               <div className="space-y-3">
                 <button
                   type="button"
-                  className="w-full border border-[#6D4AFF] text-[#6D4AFF] bg-white py-3.5 rounded-[14px] text-sm font-medium hover:bg-[#F7F3FF]"
+                  className="w-full border border-[#42574E] text-[#42574E] bg-white py-3.5 rounded-[14px] text-sm font-medium hover:bg-[#F7F3FF]"
                   onClick={() => handleLawFirmChoice('enter_firm_code')}
                 >
                   Share with a firm

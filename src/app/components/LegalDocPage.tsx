@@ -10,7 +10,7 @@ export function LegalDocPage({ doc }: { doc: LegalDoc }) {
   return (
     <div className="min-h-screen bg-[#f8f6ff] text-[#1E1B4B] antialiased">
       {/* Header */}
-      <header className="sticky top-0 z-10 border-b border-[#E7E1FF] bg-white/90 backdrop-blur-sm">
+      <header className="sticky top-0 z-10 border-b border-[#D3DED6] bg-white/90 backdrop-blur-sm">
         <div className="mx-auto flex h-14 max-w-3xl items-center justify-between px-5">
           <a href="/" className="flex items-center gap-2"><WordMark /></a>
           <a href="/" className="text-sm font-medium text-[#1E1B4B]/55 transition hover:text-[#1E1B4B]">Back to home</a>
@@ -19,7 +19,7 @@ export function LegalDocPage({ doc }: { doc: LegalDoc }) {
 
       <main className="mx-auto max-w-3xl px-5 py-12 sm:py-16">
         <h1 className="text-[28px] font-bold tracking-tight text-[#1E1B4B] sm:text-[34px]">{doc.title}</h1>
-        <p className="mt-2 text-[13px] font-semibold text-[#6D4AFF]">{doc.org}</p>
+        <p className="mt-2 text-[13px] font-semibold text-[#42574E]">{doc.org}</p>
         <p className="text-[13px] text-[#1E1B4B]/50">{doc.effective}</p>
         <p className="mt-5 text-[15px] leading-relaxed text-[#1E1B4B]/70">{doc.intro}</p>
 
@@ -55,7 +55,7 @@ export function LegalDocPage({ doc }: { doc: LegalDoc }) {
           ))}
         </div>
 
-        <div className="mt-12 border-t border-[#E7E1FF] pt-6 text-[12px] leading-relaxed text-[#1E1B4B]/40">
+        <div className="mt-12 border-t border-[#D3DED6] pt-6 text-[12px] leading-relaxed text-[#1E1B4B]/40">
           one3seven is not a law firm and does not provide legal advice. Use of this platform does not create an attorney-client relationship.
         </div>
       </main>

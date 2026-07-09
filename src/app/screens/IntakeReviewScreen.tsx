@@ -124,7 +124,7 @@ const FIRM_REVIEW_CARD =
 const FIRM_REVIEW_QUIET_CARD =
   'rounded-[20px] border border-[#ECE7F5] bg-white/70 p-4 shadow-[0_10px_30px_rgba(31,27,75,0.05)]';
 const FIRM_REVIEW_PRIMARY_BUTTON =
-  'bg-[#5B21B6] text-white shadow-[0_14px_34px_rgba(109,74,255,0.24)] hover:bg-[#4C1D96]';
+  'bg-[#42574E] text-white shadow-[0_14px_34px_rgba(109,74,255,0.24)] hover:bg-[#4C1D96]';
 const FIRM_REVIEW_SECONDARY_BUTTON =
   'border border-[#ECE7F5] bg-white text-[#14112E] shadow-sm hover:border-[#C9B8F0] hover:bg-[#F5F1FB]';
 
@@ -918,12 +918,12 @@ export function IntakeReviewScreen({
               )}
               <button
                 onClick={handleDownloadSummary}
-                className="hidden lg:flex items-center gap-1.5 rounded-full bg-[#5B21B6] px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-[#4C1D96] transition-colors"
+                className="hidden lg:flex items-center gap-1.5 rounded-full bg-[#42574E] px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-[#4C1D96] transition-colors"
               >
                 <Download className="w-3.5 h-3.5" />
                 Download
               </button>
-              <span className="rounded-full border border-[#ECE7F5] bg-[#F5F1FB] px-3 py-1 text-[11px] font-medium text-[#5B21B6]">
+              <span className="rounded-full border border-[#ECE7F5] bg-[#F5F1FB] px-3 py-1 text-[11px] font-medium text-[#42574E]">
                 Sample intake
               </span>
             </div>
@@ -959,7 +959,7 @@ export function IntakeReviewScreen({
                 )}
                 <button
                   onClick={handleDownloadSummary}
-                  className="hidden lg:flex items-center gap-1.5 rounded-full bg-[#5B21B6] px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-[#4C1D96] transition-colors"
+                  className="hidden lg:flex items-center gap-1.5 rounded-full bg-[#42574E] px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-[#4C1D96] transition-colors"
                 >
                   <Download className="w-3.5 h-3.5" />
                   Download
@@ -1051,7 +1051,7 @@ export function IntakeReviewScreen({
         <div className="bg-[#14112E] px-5 py-4 border-b border-[#221B47]">
           <p className="text-sm text-white/90 leading-relaxed max-w-2xl">
             Marcus Rivera submitted 11 documents last night.{' '}
-            <span className="text-[#A78BFA]">
+            <span className="text-[#7C8B6F]">
               This is what arrived in your review queue — organized, before your first call.
             </span>
           </p>
@@ -1180,7 +1180,7 @@ export function IntakeReviewScreen({
                   transition={{ delay: 0.03 }}
                   className="rounded-[20px] border border-[#ECE7F5] bg-white/95 p-5 shadow-[0_14px_38px_rgba(31,27,75,0.08)]"
                 >
-                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#5B21B6] mb-4">Processing Summary</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#42574E] mb-4">Processing Summary</p>
 
                   {/* Worker narrative — status chip */}
                   <div className="mb-3 flex flex-wrap gap-2">
@@ -1201,13 +1201,13 @@ export function IntakeReviewScreen({
                     <div className="flex flex-wrap gap-2.5">
                       {recordCount > 0 ? (
                         <div className="min-w-[104px] flex-1 rounded-[14px] border border-[#ECE7F5] bg-[#FAF9F6] p-3 text-center">
-                          <div className="text-[26px] font-black leading-none text-[#5B21B6]">{recordCount}</div>
+                          <div className="text-[26px] font-black leading-none text-[#42574E]">{recordCount}</div>
                           <div className="mt-1 text-[11px] font-semibold text-[#14112E]/55">Documents organized</div>
                         </div>
                       ) : null}
                       {eventCount > 0 ? (
                         <div className="min-w-[104px] flex-1 rounded-[14px] border border-[#ECE7F5] bg-[#FAF9F6] p-3 text-center">
-                          <div className="text-[26px] font-black leading-none text-[#5B21B6]">{eventCount}</div>
+                          <div className="text-[26px] font-black leading-none text-[#42574E]">{eventCount}</div>
                           <div className="mt-1 text-[11px] font-semibold text-[#14112E]/55">Timeline events</div>
                         </div>
                       ) : null}
@@ -1593,7 +1593,7 @@ export function IntakeReviewScreen({
               animate={{ opacity: 1, y: 0 }}
               className={FIRM_REVIEW_PROMINENT_CARD}
             >
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#5B21B6]">Chronology</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#42574E]">Chronology</p>
               <h2 className="mt-3 text-2xl font-semibold text-[#14112E]">
                 {timelineForDisplay.length} event{timelineForDisplay.length === 1 ? '' : 's'} from {reconstructedRecordCount} record{reconstructedRecordCount === 1 ? '' : 's'}
               </h2>
@@ -1638,11 +1638,11 @@ export function IntakeReviewScreen({
                         className="rounded-2xl border border-[#ECE7F5] bg-white p-4 shadow-[0_12px_34px_rgba(31,27,75,0.08)]"
                       >
                         <div className="flex items-start gap-3">
-                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#F5F1FB] text-xs font-semibold text-[#5B21B6]">
+                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#F5F1FB] text-xs font-semibold text-[#42574E]">
                             {index + 1}
                           </div>
                           <div className="min-w-0 flex-1 overflow-hidden">
-                            <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#5B21B6] whitespace-nowrap overflow-hidden text-ellipsis">
+                            <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#42574E] whitespace-nowrap overflow-hidden text-ellipsis">
                               {event.date}
                             </p>
                             <h3 className="mt-1 text-base font-semibold leading-snug text-[#14112E] break-words">
@@ -1760,7 +1760,7 @@ export function IntakeReviewScreen({
                       className="w-full flex items-center justify-between p-4 transition-colors hover:bg-[#F5F1FB]"
                     >
                       <div className="flex items-center gap-3">
-                        <FileText className="w-4 h-4 text-[#5B21B6]" />
+                        <FileText className="w-4 h-4 text-[#42574E]" />
                         <div className="text-left">
                           <div className="text-sm font-medium text-[#14112E]">{category.name}</div>
                           <div className="text-xs text-[#14112E]/52">{category.count} documents</div>
@@ -1885,7 +1885,7 @@ export function IntakeReviewScreen({
                   )}
 
                   <div className="flex items-center gap-2 mb-4">
-                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#5B21B6]">Extracted from documents</p>
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#42574E]">Extracted from documents</p>
                     <span className="text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-full px-2 py-0.5">
                       From document content
                     </span>
@@ -1921,12 +1921,12 @@ export function IntakeReviewScreen({
                               }`}
                             >
                               <span className={`text-2xl font-900 leading-none tracking-tight ${
-                                isShort ? 'text-red-600' : isMid ? 'text-amber-600' : 'text-[#5B21B6]'
+                                isShort ? 'text-red-600' : isMid ? 'text-amber-600' : 'text-[#42574E]'
                               }`} style={{ fontWeight: 900 }}>
                                 {t.days}d
                               </span>
                               <span className={`text-[10px] font-semibold uppercase tracking-wide ${
-                                isShort ? 'text-red-500' : isMid ? 'text-amber-600' : 'text-[#5B21B6]'
+                                isShort ? 'text-red-500' : isMid ? 'text-amber-600' : 'text-[#42574E]'
                               }`}>{t.label}</span>
                               <span className="text-[10px] text-[#14112E]/55 leading-snug">
                                 {t.description.replace(t.label + ': ', '')}
@@ -1961,7 +1961,7 @@ export function IntakeReviewScreen({
                           return (
                             <div key={q.file_name} className="rounded-lg bg-[#F5F1FB] border border-[#ECE7F5] px-3 py-2">
                               <div className="mb-1 flex items-center justify-between gap-2">
-                                <p className="text-[10px] text-[#5B21B6]">{q.category.replace(/_/g, ' ')} — {q.file_name.replace(/_/g, ' ').replace(/\.[^.]+$/, '')}</p>
+                                <p className="text-[10px] text-[#42574E]">{q.category.replace(/_/g, ' ')} — {q.file_name.replace(/_/g, ' ').replace(/\.[^.]+$/, '')}</p>
                                 {conf && (
                                   <span className={`shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-semibold ${labelStyle}`}>
                                     {extractionLabel}
@@ -1984,7 +1984,7 @@ export function IntakeReviewScreen({
                         </span>
                       )}
                       {intel.finalPayPresent && (
-                        <span className="text-[11px] bg-[#F5F1FB] text-[#5B21B6] border border-[#ECE7F5] rounded-full px-2.5 py-1">
+                        <span className="text-[11px] bg-[#F5F1FB] text-[#42574E] border border-[#ECE7F5] rounded-full px-2.5 py-1">
                           Final pay document present
                         </span>
                       )}
@@ -2058,7 +2058,7 @@ export function IntakeReviewScreen({
                   className="rounded-[24px] border border-[#ECE7F5] bg-white p-5 shadow-[0_14px_38px_rgba(31,27,75,0.08)]"
                 >
                   <div className="flex items-center justify-between mb-3">
-                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#5B21B6]">Document Checklist</p>
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#42574E]">Document Checklist</p>
                     {fulfilled.length > 0 && (
                       <span className="text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-full px-2 py-0.5">
                         {fulfilled.length}/{requested.length} received
@@ -2158,7 +2158,7 @@ export function IntakeReviewScreen({
                         <div
                           className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold border ${
                             isDone || isActive
-                              ? 'bg-[#5B21B6] text-white border-[#5B21B6]'
+                              ? 'bg-[#42574E] text-white border-[#42574E]'
                               : 'bg-white text-[#14112E]/34 border-[#ECE7F5]'
                           }`}
                         >
@@ -2681,7 +2681,7 @@ export function IntakeReviewScreen({
                       {savedNotes.map((note) => (
                         <div key={note.id} className="rounded-2xl border border-[#ECE7F5] bg-white p-5">
                           <div className="flex items-center gap-3 mb-3">
-                            <div className="w-8 h-8 bg-[#5B21B6] text-white rounded-full flex items-center justify-center text-xs font-medium">
+                            <div className="w-8 h-8 bg-[#42574E] text-white rounded-full flex items-center justify-center text-xs font-medium">
                               {note.reviewer || '?'}
                             </div>
                             <div className="flex-1">
@@ -2703,14 +2703,14 @@ export function IntakeReviewScreen({
                       value={internalNotes}
                       onChange={(e) => setInternalNotes(e.target.value)}
                       placeholder="Add internal notes for your team..."
-                      className="w-full h-32 px-3 py-2 bg-[#FAF9F6] border border-[#ECE7F5] rounded-lg text-sm text-[#14112E] placeholder:text-[#14112E]/38 focus:outline-none focus:ring-2 focus:ring-[#5B21B6]/20 focus:border-[#5B21B6] resize-none mb-3"
+                      className="w-full h-32 px-3 py-2 bg-[#FAF9F6] border border-[#ECE7F5] rounded-lg text-sm text-[#14112E] placeholder:text-[#14112E]/38 focus:outline-none focus:ring-2 focus:ring-[#42574E]/20 focus:border-[#42574E] resize-none mb-3"
                     />
                     <button
                       onClick={handleSaveNotes}
                       disabled={!internalNotes.trim()}
                       className={`w-full py-2.5 px-4 rounded-lg transition-colors text-sm font-medium ${
                         internalNotes.trim()
-                          ? 'bg-[#5B21B6] text-white hover:bg-[#4C1D96]'
+                          ? 'bg-[#42574E] text-white hover:bg-[#4C1D96]'
                           : 'bg-[#FAF9F6] text-[#14112E]/35 cursor-not-allowed'
                       }`}
                     >
@@ -2731,7 +2731,7 @@ export function IntakeReviewScreen({
               <div className="space-y-2">
                 <button
                   onClick={handleDownloadSummary}
-                  className="w-full flex items-center gap-2 px-4 py-2.5 bg-[#5B21B6] text-white rounded-lg hover:bg-[#4C1D96] transition-colors text-sm font-medium"
+                  className="w-full flex items-center gap-2 px-4 py-2.5 bg-[#42574E] text-white rounded-lg hover:bg-[#4C1D96] transition-colors text-sm font-medium"
                 >
                   <Download className="w-4 h-4" />
                   Download Intake Summary
@@ -2751,7 +2751,7 @@ export function IntakeReviewScreen({
                     {onAcceptIntake ? (
                       <button
                         onClick={() => void handleAcceptIntake()}
-                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-[#5B21B6] text-white rounded-lg hover:bg-[#4C1D96] transition-colors text-sm font-medium"
+                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-[#42574E] text-white rounded-lg hover:bg-[#4C1D96] transition-colors text-sm font-medium"
                       >
                         <CheckCircle2 className="w-4 h-4" />
                         Accept
@@ -2829,7 +2829,7 @@ export function IntakeReviewScreen({
                 style={{ background: 'linear-gradient(145deg, #14112E 0%, #221B47 55%, #4C1D96 100%)' }}
               >
                 <div className="px-7 py-8">
-                  <p className="text-[10px] font-700 uppercase tracking-[0.2em] text-[#A78BFA] mb-3" style={{ fontWeight: 700 }}>
+                  <p className="text-[10px] font-700 uppercase tracking-[0.2em] text-[#7C8B6F] mb-3" style={{ fontWeight: 700 }}>
                     Your practice · one3seven
                   </p>
                   <h3 className="text-2xl font-black text-white leading-tight mb-2" style={{ letterSpacing: '-0.02em' }}>
@@ -2842,7 +2842,7 @@ export function IntakeReviewScreen({
                     <button
                       onClick={() => { window.location.href = window.location.pathname; }}
                       className="rounded-full px-6 py-3 text-sm font-semibold text-white transition-colors"
-                      style={{ background: '#5B21B6', boxShadow: '0 8px 24px rgba(109,74,255,0.4)' }}
+                      style={{ background: '#42574E', boxShadow: '0 8px 24px rgba(109,74,255,0.4)' }}
                     >
                       Start 7-day free trial →
                     </button>
@@ -2896,7 +2896,7 @@ export function IntakeReviewScreen({
                   type="button"
                   onClick={() => void handleDeclineIntake()}
                   disabled={declineSubmitting}
-                  className="flex-1 rounded-full bg-[#5B21B6] py-3 text-sm font-medium text-white transition-colors hover:bg-[#4C1D96] disabled:opacity-50"
+                  className="flex-1 rounded-full bg-[#42574E] py-3 text-sm font-medium text-white transition-colors hover:bg-[#4C1D96] disabled:opacity-50"
                 >
                   {declineSubmitting ? 'Saving…' : 'Confirm'}
                 </button>
@@ -2913,7 +2913,7 @@ export function IntakeReviewScreen({
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed top-24 left-1/2 -translate-x-1/2 bg-[#5B21B6] text-white px-6 py-3 rounded-lg shadow-lg z-50 text-sm"
+            className="fixed top-24 left-1/2 -translate-x-1/2 bg-[#42574E] text-white px-6 py-3 rounded-lg shadow-lg z-50 text-sm"
           >
             {toastMessage}
           </motion.div>
@@ -2958,7 +2958,7 @@ export function IntakeReviewScreen({
                     onClick={() => handleUpdateStatus(status)}
                     className={`w-full px-4 py-3 rounded-lg text-sm font-medium text-left transition-colors ${
                       workflowStatus === status
-                        ? 'bg-[#5B21B6] text-white'
+                        ? 'bg-[#42574E] text-white'
                         : 'bg-[#FAF9F6] text-[#3A3552] hover:bg-[#F1ECFE]'
                     }`}
                   >
@@ -3009,7 +3009,7 @@ export function IntakeReviewScreen({
                     key={category}
                     className={`flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-sm cursor-pointer border transition-colors ${
                       docReqCategories.includes(category)
-                        ? 'bg-[#5B21B6] text-white border-[#5B21B6]'
+                        ? 'bg-[#42574E] text-white border-[#42574E]'
                         : 'bg-[#FAF9F6] text-[#3A3552] border-[#ECE7F5] hover:bg-[#F1ECFE]'
                     }`}
                   >
@@ -3054,7 +3054,7 @@ export function IntakeReviewScreen({
                 <button
                   type="submit"
                   disabled={docReqSubmitting || !onRequestAdditionalDocuments}
-                  className="flex-1 bg-[#5B21B6] text-white py-2.5 rounded-lg text-sm font-medium disabled:opacity-50"
+                  className="flex-1 bg-[#42574E] text-white py-2.5 rounded-lg text-sm font-medium disabled:opacity-50"
                 >
                   {docReqSubmitting ? 'Sending…' : 'Send request'}
                 </button>

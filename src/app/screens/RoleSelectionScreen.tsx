@@ -101,8 +101,8 @@ export function RoleSelectionScreen({ onNavigate, onSelectRole, onCommitRole, al
               className="group w-full rounded-[28px] border border-[#ECE7F5] bg-white/95 p-8 text-left shadow-[0_18px_56px_rgba(31,27,75,0.09)] transition-all hover:-translate-y-0.5 hover:border-[#C9B8F0] hover:shadow-[0_24px_68px_rgba(31,27,75,0.13)]"
             >
               <div className="flex items-start gap-4">
-                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-[#F5F1FB] transition-colors group-hover:bg-[#5B21B6]">
-                  <FileText className="h-6 w-6 text-[#5B21B6] transition-colors group-hover:text-white" />
+                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-[#F5F1FB] transition-colors group-hover:bg-[#42574E]">
+                  <FileText className="h-6 w-6 text-[#42574E] transition-colors group-hover:text-white" />
                 </div>
                 <div className="flex-1">
                   <h3 className="mb-2 text-lg font-semibold text-[#14112E]">
@@ -130,8 +130,8 @@ export function RoleSelectionScreen({ onNavigate, onSelectRole, onCommitRole, al
                 className="group w-full rounded-[28px] border border-[#ECE7F5] bg-white/95 p-8 text-left shadow-[0_18px_56px_rgba(31,27,75,0.09)] transition-all hover:-translate-y-0.5 hover:border-[#C9B8F0] hover:shadow-[0_24px_68px_rgba(31,27,75,0.13)]"
               >
                 <div className="flex items-start gap-4">
-                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-[#F5F1FB] transition-colors group-hover:bg-[#5B21B6]">
-                    <Briefcase className="h-6 w-6 text-[#5B21B6] transition-colors group-hover:text-white" />
+                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-[#F5F1FB] transition-colors group-hover:bg-[#42574E]">
+                    <Briefcase className="h-6 w-6 text-[#42574E] transition-colors group-hover:text-white" />
                   </div>
                   <div className="flex-1">
                     <h3 className="mb-2 text-lg font-semibold text-[#14112E]">

@@ -137,7 +137,7 @@ const digitsOf = (p: string) => p.replace(/[^\d+]/g, '');
 function PhoneLink({ phone, className = '' }: { phone: string | null; className?: string }) {
   if (!phone || !phone.trim()) return <span className="text-[#1E1B4B]/30">—</span>;
   return (
-    <a href={`tel:${digitsOf(phone)}`} className={`text-[#6D4AFF] underline-offset-2 hover:underline ${className}`}>
+    <a href={`tel:${digitsOf(phone)}`} className={`text-[#42574E] underline-offset-2 hover:underline ${className}`}>
       {phone}
     </a>
   );
@@ -146,7 +146,7 @@ function PhoneLink({ phone, className = '' }: { phone: string | null; className?
 function StageTag({ stage }: { stage: CrmStage }) {
   const hot = stage === 'pilot' || stage === 'paid' || stage === 'demo_booked' || stage === 'demo_done';
   return (
-    <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${hot ? 'bg-[#EDE7FF] text-[#6D4AFF]' : 'bg-slate-100 text-slate-600'}`}>
+    <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${hot ? 'bg-[#EDE7FF] text-[#42574E]' : 'bg-slate-100 text-slate-600'}`}>
       {CRM_STAGE_LABELS[stage]}
     </span>
   );
@@ -164,12 +164,12 @@ function StageStrip({ firms }: { firms: CrmFirm[] }) {
       <h2 className="mb-2 text-[13px] font-bold text-[#1E1B4B]">Pipeline by stage</h2>
       <div className="flex flex-wrap items-stretch gap-1.5">
         {PIPELINE_STAGES.map((s) => (
-          <div key={s} className="min-w-[62px] flex-1 rounded-[10px] border border-[#E7E1FF] bg-white px-2 py-1.5 text-center">
-            <div className="text-[18px] font-black leading-none text-[#6D4AFF]">{n(s)}</div>
+          <div key={s} className="min-w-[62px] flex-1 rounded-[10px] border border-[#D3DED6] bg-white px-2 py-1.5 text-center">
+            <div className="text-[18px] font-black leading-none text-[#42574E]">{n(s)}</div>
             <div className="mt-0.5 text-[9px] font-semibold uppercase tracking-wide text-[#1E1B4B]/50">{CRM_STAGE_LABELS[s]}</div>
           </div>
         ))}
-        <div className="w-px self-stretch bg-[#E7E1FF]" />
+        <div className="w-px self-stretch bg-[#D3DED6]" />
         {SIDE_STAGES.map((s) => (
           <div key={s} className="min-w-[58px] rounded-[10px] border border-[#F0ECFA] bg-[#FAF9FE] px-2 py-1.5 text-center">
             <div className="text-[18px] font-black leading-none text-[#1E1B4B]/40">{n(s)}</div>
@@ -416,9 +416,9 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
   };
 
   return (
-    <div className="min-h-screen bg-[#F6F2FF] text-[#1E1B4B] antialiased">
+    <div className="min-h-screen bg-[#F2F4EC] text-[#1E1B4B] antialiased">
       {/* Header */}
-      <header className="sticky top-0 z-30 border-b border-[#E7E1FF] bg-white/95 backdrop-blur-sm">
+      <header className="sticky top-0 z-30 border-b border-[#D3DED6] bg-white/95 backdrop-blur-sm">
         <div className="mx-auto flex max-w-3xl items-center justify-between px-4 py-3">
           <button type="button" onClick={onExit} className={`flex items-center gap-1.5 ${tap} px-1 text-sm font-medium text-[#1E1B4B]/60 hover:text-[#1E1B4B]`}>
             <ArrowLeft className="h-4 w-4" /> Exit
@@ -433,7 +433,7 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
               {realtimeLive ? 'Live' : 'Polling'}
             </span>
           </div>
-          <span className="rounded-full bg-[#EDE7FF] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[#6D4AFF]">{roleLabel}</span>
+          <span className="rounded-full bg-[#EDE7FF] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[#42574E]">{roleLabel}</span>
         </div>
         {/* Categorized dropdown nav — wraps, never scrolls sideways. */}
         <div className="relative mx-auto max-w-3xl px-3 pb-2">
@@ -451,7 +451,7 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
                   <button
                     type="button"
                     onClick={() => setOpenGroup(open ? null : group.id)}
-                    className={`relative flex ${tap} items-center gap-1.5 rounded-[10px] px-3 text-[13px] font-semibold transition ${activeHere ? 'bg-[#6D4AFF] text-white' : 'bg-[#F2EEFF] text-[#1E1B4B]/70 hover:bg-[#EDE7FF]'}`}
+                    className={`relative flex ${tap} items-center gap-1.5 rounded-[10px] px-3 text-[13px] font-semibold transition ${activeHere ? 'bg-[#42574E] text-white' : 'bg-[#F2EEFF] text-[#1E1B4B]/70 hover:bg-[#EDE7FF]'}`}
                   >
                     <group.icon className="h-3.5 w-3.5" />
                     {activeHere && activeItem ? activeItem.label : group.label}
@@ -461,13 +461,13 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
                     )}
                   </button>
                   {open && (
-                    <div className="absolute left-0 z-40 mt-1 min-w-[190px] rounded-[12px] border border-[#E7E1FF] bg-white p-1 shadow-[0_12px_30px_rgba(109,74,255,0.18)]">
+                    <div className="absolute left-0 z-40 mt-1 min-w-[190px] rounded-[12px] border border-[#D3DED6] bg-white p-1 shadow-[0_12px_30px_rgba(109,74,255,0.18)]">
                       {items.map((t) => (
                         <button
                           key={t.id}
                           type="button"
                           onClick={() => { setTab(t.id); setOpenGroup(null); }}
-                          className={`flex ${tap} w-full items-center gap-2 rounded-[8px] px-3 text-left text-[13px] font-medium transition ${tab === t.id ? 'bg-[#EDE7FF] text-[#6D4AFF]' : 'text-[#1E1B4B]/70 hover:bg-[#F4F1FF]'}`}
+                          className={`flex ${tap} w-full items-center gap-2 rounded-[8px] px-3 text-left text-[13px] font-medium transition ${tab === t.id ? 'bg-[#EDE7FF] text-[#42574E]' : 'text-[#1E1B4B]/70 hover:bg-[#F4F1FF]'}`}
                         >
                           <t.icon className="h-3.5 w-3.5 shrink-0" /> {t.label}
                           {t.id === 'team' && unreadTeam && (
@@ -559,7 +559,7 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
                     key={o}
                     type="button"
                     onClick={() => setFastChips((prev) => on ? prev.filter((x) => x !== o) : [...prev, o])}
-                    className={`rounded-full border px-3 py-1.5 text-[12px] font-semibold transition ${on ? 'border-[#6D4AFF] bg-[#6D4AFF] text-white' : 'border-[#E7E1FF] bg-white text-[#1E1B4B]/70 hover:border-[#B8A8FF]'}`}
+                    className={`rounded-full border px-3 py-1.5 text-[12px] font-semibold transition ${on ? 'border-[#42574E] bg-[#42574E] text-white' : 'border-[#D3DED6] bg-white text-[#1E1B4B]/70 hover:border-[#B8A8FF]'}`}
                   >
                     {on ? '✓ ' : ''}{o}
                   </button>
@@ -570,20 +570,20 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
               value={fastNotes}
               onChange={(e) => setFastNotes(e.target.value)}
               placeholder="Your notes (e.g. “asked for Bob, callback Fri”)"
-              className="mb-2 min-h-[72px] w-full rounded-[12px] border border-[#E7E1FF] px-3 py-2.5 text-sm outline-none focus:border-[#6D4AFF]"
+              className="mb-2 min-h-[72px] w-full rounded-[12px] border border-[#D3DED6] px-3 py-2.5 text-sm outline-none focus:border-[#42574E]"
             />
             <label className="mb-1 block text-[12px] font-semibold text-[#1E1B4B]/45">Next follow-up (optional)</label>
             <input
               type="date"
               value={fastFollowup}
               onChange={(e) => setFastFollowup(e.target.value)}
-              className={`mb-4 ${tap} w-full rounded-[12px] border border-[#E7E1FF] px-3 text-sm outline-none focus:border-[#6D4AFF]`}
+              className={`mb-4 ${tap} w-full rounded-[12px] border border-[#D3DED6] px-3 text-sm outline-none focus:border-[#42574E]`}
             />
             <button
               type="button"
               onClick={saveFast}
               disabled={fastChips.length === 0 || saving}
-              className={`flex ${tap} w-full items-center justify-center gap-2 rounded-full bg-[#6D4AFF] font-semibold text-white disabled:opacity-40`}
+              className={`flex ${tap} w-full items-center justify-center gap-2 rounded-full bg-[#42574E] font-semibold text-white disabled:opacity-40`}
             >
               {saving ? 'Saving…' : `Submit${fastChips.length ? ` (${fastChips.length})` : ''}`}
             </button>
@@ -599,7 +599,7 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
 function Collapsible({ title, defaultOpen = false, children }: { title: string; defaultOpen?: boolean; children: React.ReactNode }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className="overflow-hidden rounded-[12px] border border-[#E7E1FF] bg-white">
+    <div className="overflow-hidden rounded-[12px] border border-[#D3DED6] bg-white">
       <button type="button" onClick={() => setOpen((o) => !o)} className={`flex ${tap} w-full items-center justify-between px-4 text-left`}>
         <span className="text-[13px] font-bold text-[#1E1B4B]">{title}</span>
         <ChevronRight className={`h-4 w-4 shrink-0 text-[#1E1B4B]/35 transition-transform ${open ? 'rotate-90' : ''}`} />
@@ -665,8 +665,8 @@ function QuickActionButton(
 ) {
   const tones = {
     green: 'border-emerald-200 bg-emerald-50 text-emerald-700',
-    purple: 'border-[#E0D6FF] bg-[#F4F1FF] text-[#6D4AFF]',
-    gray: 'border-[#E7E1FF] bg-white text-[#1E1B4B]/55',
+    purple: 'border-[#E0D6FF] bg-[#F4F1FF] text-[#42574E]',
+    gray: 'border-[#D3DED6] bg-white text-[#1E1B4B]/55',
   } as const;
   return (
     <button
@@ -696,15 +696,15 @@ function FirmCard({ firm, onLog, today, onQuickEmail, onQuickLog, userId, onClai
   const claimedDate = firm.contacted_at ? firm.contacted_at.slice(0, 10) : null;
   const intel = crmFirmIntel[firm.name];
   return (
-    <div className="overflow-hidden rounded-[14px] border border-[#E7E1FF] bg-white">
+    <div className="overflow-hidden rounded-[14px] border border-[#D3DED6] bg-white">
       <div className="flex items-center gap-2 p-2.5">
         {claimable ? (
           // Open pool: tapping the row claims the firm (chevron on the right opens the brief).
           <button type="button" disabled={claiming} onClick={doClaim} className="flex min-w-0 flex-1 items-center gap-2 text-left disabled:opacity-50" aria-label={`Claim ${firm.name}`}>
-            <Hand className="h-4 w-4 shrink-0 text-[#6D4AFF]" />
+            <Hand className="h-4 w-4 shrink-0 text-[#42574E]" />
             <span className="break-words leading-snug text-[14px] font-bold">{firm.name}</span>
             <PriorityBadge priority={firm.priority} />
-            <span className="shrink-0 rounded-full bg-[#EDE7FF] px-2 py-0.5 text-[10px] font-bold text-[#6D4AFF]">{claiming ? 'Claiming…' : 'Tap to claim'}</span>
+            <span className="shrink-0 rounded-full bg-[#EDE7FF] px-2 py-0.5 text-[10px] font-bold text-[#42574E]">{claiming ? 'Claiming…' : 'Tap to claim'}</span>
           </button>
         ) : (
           <div className="flex min-w-0 flex-1 items-center gap-2">
@@ -718,7 +718,7 @@ function FirmCard({ firm, onLog, today, onQuickEmail, onQuickLog, userId, onClai
         )}
         {firm.contacted_by && (
           <span
-            className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold ${mine ? 'bg-emerald-100 text-emerald-700' : 'bg-[#EDE7FF] text-[#6D4AFF]'}`}
+            className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold ${mine ? 'bg-emerald-100 text-emerald-700' : 'bg-[#EDE7FF] text-[#42574E]'}`}
             title={`Claimed by ${firm.contacted_by_name ?? 'rep'}${claimedDate ? ' · ' + claimedDate : ''}`}
           >
             {mine ? 'You' : (firm.contacted_by_name ?? 'Claimed')}
@@ -731,7 +731,7 @@ function FirmCard({ firm, onLog, today, onQuickEmail, onQuickLog, userId, onClai
           </a>
         )}
         {firm.email && (
-          <a href={`mailto:${firm.email}`} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#EDE7FF] text-[#6D4AFF]" aria-label={`Email ${firm.name}`}>
+          <a href={`mailto:${firm.email}`} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#EDE7FF] text-[#42574E]" aria-label={`Email ${firm.name}`}>
             <Mail className="h-4 w-4" />
           </a>
         )}
@@ -739,7 +739,7 @@ function FirmCard({ firm, onLog, today, onQuickEmail, onQuickLog, userId, onClai
       <div className="space-y-2 border-t border-[#F0EBFF] p-3">
           {firm.attorney_name && <div className="text-[12px] text-[#1E1B4B]/55">{firm.attorney_name}</div>}
           {firm.email && (
-            <a href={`mailto:${firm.email}`} className="flex items-center gap-1.5 break-all text-[13px] font-semibold text-[#6D4AFF] underline underline-offset-2">
+            <a href={`mailto:${firm.email}`} className="flex items-center gap-1.5 break-all text-[13px] font-semibold text-[#42574E] underline underline-offset-2">
               <Mail className="h-3.5 w-3.5 shrink-0" /> {firm.email}
             </a>
           )}
@@ -756,12 +756,12 @@ function FirmCard({ firm, onLog, today, onQuickEmail, onQuickLog, userId, onClai
 
           {/* Call strip — quick-glance intel for use during the call */}
           {intel && (
-            <div className="rounded-[12px] border border-[#DCD3FF] bg-[#F7F3FF] p-3">
+            <div className="rounded-[12px] border border-[#CBD6CF] bg-[#F7F3FF] p-3">
               {intel.fireCaseSignal && (
                 <span className="mb-1.5 inline-flex items-center gap-1 rounded-full bg-orange-100 px-2 py-0.5 text-[10px] font-bold text-orange-700">🔥 Fire case signal</span>
               )}
               <p className="text-[12px] font-semibold text-[#1E1B4B]">{intel.headlineWin}</p>
-              <p className="mt-1.5 text-[12px] leading-relaxed text-[#1E1B4B]/75"><span className="font-bold text-[#6D4AFF]">Opener: </span>{intel.opener}</p>
+              <p className="mt-1.5 text-[12px] leading-relaxed text-[#1E1B4B]/75"><span className="font-bold text-[#42574E]">Opener: </span>{intel.opener}</p>
             </div>
           )}
 
@@ -769,22 +769,22 @@ function FirmCard({ firm, onLog, today, onQuickEmail, onQuickLog, userId, onClai
           {!intel && (() => {
             const play = firm.tier ? TIER_PLAYS[firm.tier] : null;
             return (
-              <div className="rounded-[12px] border border-[#DCD3FF] bg-[#F7F3FF] p-3">
+              <div className="rounded-[12px] border border-[#CBD6CF] bg-[#F7F3FF] p-3">
                 <div className="flex items-center justify-between gap-2">
-                  <p className="text-[11px] font-bold uppercase tracking-wide text-[#6D4AFF]">Call brief</p>
+                  <p className="text-[11px] font-bold uppercase tracking-wide text-[#42574E]">Call brief</p>
                   {play && (
-                    <span className="rounded-full bg-[#6D4AFF] px-2 py-0.5 text-[10px] font-bold text-white">{play.label}</span>
+                    <span className="rounded-full bg-[#42574E] px-2 py-0.5 text-[10px] font-bold text-white">{play.label}</span>
                   )}
                 </div>
                 {play ? (
                   <>
-                    <p className="mt-2 text-[12px] leading-relaxed text-[#1E1B4B]/80"><span className="font-bold text-[#6D4AFF]">Angle: </span>{play.angle}</p>
+                    <p className="mt-2 text-[12px] leading-relaxed text-[#1E1B4B]/80"><span className="font-bold text-[#42574E]">Angle: </span>{play.angle}</p>
                     <p className="mt-1.5 text-[12px] leading-relaxed text-[#1E1B4B]/65"><span className="font-bold text-[#1E1B4B]/75">If they push back: </span>{play.objection}</p>
                   </>
                 ) : (
                   <>
                     <p className="mt-1 text-[12px] leading-relaxed text-[#1E1B4B]/80">{practiceFit(firm.focus_areas)}</p>
-                    <p className="mt-2 text-[12px] leading-relaxed text-[#1E1B4B]/75"><span className="font-bold text-[#6D4AFF]">Opener: </span>{suggestedOpener(firm)}</p>
+                    <p className="mt-2 text-[12px] leading-relaxed text-[#1E1B4B]/75"><span className="font-bold text-[#42574E]">Opener: </span>{suggestedOpener(firm)}</p>
                   </>
                 )}
                 {localAngle(firm) && (
@@ -829,14 +829,14 @@ function FirmCard({ firm, onLog, today, onQuickEmail, onQuickLog, userId, onClai
           )}
           {isFounder && onAssign && members && members.length > 0 && (
             <div className="flex items-center gap-2 rounded-[10px] bg-[#F7F3FF] px-2.5 py-2">
-              <span className="shrink-0 text-[11px] font-semibold text-[#6D4AFF]">Assign to</span>
+              <span className="shrink-0 text-[11px] font-semibold text-[#42574E]">Assign to</span>
               <select
                 value={firm.contacted_by ?? ''}
                 onChange={(e) => {
                   const m = members.find((x) => x.id === e.target.value);
                   void onAssign(firm.id, m ? m.id : null, m ? m.name : null);
                 }}
-                className="min-w-0 flex-1 rounded-[8px] border border-[#E0D6FF] bg-white px-2 py-1.5 text-[12px] font-medium text-[#1E1B4B] outline-none focus:border-[#6D4AFF]"
+                className="min-w-0 flex-1 rounded-[8px] border border-[#E0D6FF] bg-white px-2 py-1.5 text-[12px] font-medium text-[#1E1B4B] outline-none focus:border-[#42574E]"
               >
                 <option value="">— Unclaimed —</option>
                 {members.map((m) => (
@@ -874,15 +874,15 @@ function SuitesHome({ greeting, isFounder, showEconomics, activeTab, onPick }: {
 
   return (
     <div className="mb-7">
-      <h1 className="font-display text-[clamp(1.5rem,5vw,2rem)] font-medium leading-[1.12] tracking-[-0.02em] text-transparent bg-[linear-gradient(110deg,#1E1B4B_0%,#5B35D5_42%,#1E1B4B_78%)] bg-[length:220%_100%] bg-clip-text">
+      <h1 className="font-display text-[clamp(1.5rem,5vw,2rem)] font-medium leading-[1.12] tracking-[-0.02em] text-transparent bg-[linear-gradient(110deg,#1E1B4B_0%,#374A42_42%,#1E1B4B_78%)] bg-[length:220%_100%] bg-clip-text">
         {greeting}
       </h1>
       <p className="mt-1 text-[13px] text-[#1E1B4B]/50">Your sales suite — jump back in.</p>
       <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
         {groups.map((g) => (
-          <div key={g.id} className="rounded-[18px] border border-[#E7E1FF] bg-white p-4 shadow-[0_10px_30px_rgba(31,27,75,0.05)]">
+          <div key={g.id} className="rounded-[18px] border border-[#D3DED6] bg-white p-4 shadow-[0_10px_30px_rgba(31,27,75,0.05)]">
             <div className="mb-3 flex items-center gap-2">
-              <span className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-[#EDE7FF] text-[#6D4AFF]"><g.icon className="h-4 w-4" /></span>
+              <span className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-[#EDE7FF] text-[#42574E]"><g.icon className="h-4 w-4" /></span>
               <span className="text-[14px] font-bold text-[#1E1B4B]">{g.label}</span>
             </div>
             <div className="flex flex-wrap gap-1.5">
@@ -891,7 +891,7 @@ function SuitesHome({ greeting, isFounder, showEconomics, activeTab, onPick }: {
                   key={t.id}
                   type="button"
                   onClick={() => onPick(t.id)}
-                  className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[12px] font-semibold transition ${activeTab === t.id ? 'bg-[#6D4AFF] text-white' : 'bg-[#F4F1FF] text-[#1E1B4B]/70 hover:bg-[#EDE7FF]'}`}
+                  className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[12px] font-semibold transition ${activeTab === t.id ? 'bg-[#42574E] text-white' : 'bg-[#F4F1FF] text-[#1E1B4B]/70 hover:bg-[#EDE7FF]'}`}
                 >
                   <t.icon className="h-3.5 w-3.5" /> {t.label}
                 </button>
@@ -924,7 +924,7 @@ function RepScoreboard({ firms, activity, members, today }: { firms: CrmFirm[]; 
   return (
     <section>
       <h2 className="mb-2 text-[14px] font-bold">Team — who's working</h2>
-      <div className="overflow-x-auto rounded-[12px] border border-[#E7E1FF] bg-white">
+      <div className="overflow-x-auto rounded-[12px] border border-[#D3DED6] bg-white">
         <table className="w-full min-w-[460px] text-[13px]">
           <thead>
             <tr className="border-b border-[#EFEAFF] text-left text-[10px] uppercase tracking-wide text-[#1E1B4B]/40">
@@ -940,7 +940,7 @@ function RepScoreboard({ firms, activity, members, today }: { firms: CrmFirm[]; 
             {rows.map(({ m, callsToday, emailsToday, demosWeek, pilots, lastActive }) => (
               <tr key={m.id} className="border-b border-[#F2EEFC] hover:bg-[#FAF8FF]">
                 <td className="px-3 py-2 font-semibold text-[#1E1B4B]">{m.name}</td>
-                <td className={`px-2 py-2 text-center font-bold ${callsToday > 0 ? 'text-[#6D4AFF]' : 'text-[#1E1B4B]/30'}`}>{callsToday}</td>
+                <td className={`px-2 py-2 text-center font-bold ${callsToday > 0 ? 'text-[#42574E]' : 'text-[#1E1B4B]/30'}`}>{callsToday}</td>
                 <td className={`px-2 py-2 text-center ${emailsToday > 0 ? 'font-semibold text-[#1E1B4B]/70' : 'text-[#1E1B4B]/30'}`}>{emailsToday}</td>
                 <td className="px-2 py-2 text-center text-[#1E1B4B]/70">{demosWeek}</td>
                 <td className={`px-2 py-2 text-center ${pilots > 0 ? 'font-bold text-emerald-600' : 'text-[#1E1B4B]/30'}`}>{pilots}</td>
@@ -989,17 +989,17 @@ function DashboardTab({ firms, activity, today, onLog, workerCount, onChanged, o
         </section>
       )}
       {isFounder && founderEmailCount > 0 && (
-        <div className="flex items-center gap-2 rounded-[14px] border border-[#DCD3FF] bg-[#F4F1FF] px-4 py-3">
-          <Mail className="h-4 w-4 shrink-0 text-[#5B35D5]" />
-          <span className="text-[13px] font-semibold text-[#5B35D5]">{founderEmailCount} firm{founderEmailCount === 1 ? '' : 's'} flagged for a founder email</span>
-          <span className="ml-auto text-[12px] font-bold text-[#6D4AFF]">See “Victoria email f/u” tab →</span>
+        <div className="flex items-center gap-2 rounded-[14px] border border-[#CBD6CF] bg-[#F4F1FF] px-4 py-3">
+          <Mail className="h-4 w-4 shrink-0 text-[#374A42]" />
+          <span className="text-[13px] font-semibold text-[#374A42]">{founderEmailCount} firm{founderEmailCount === 1 ? '' : 's'} flagged for a founder email</span>
+          <span className="ml-auto text-[12px] font-bold text-[#42574E]">See “Victoria email f/u” tab →</span>
         </div>
       )}
       {isFounder && (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
           {stats.map((s) => (
-            <div key={s.label} className="rounded-[14px] border border-[#E7E1FF] bg-white p-4">
-              <div className="text-[26px] font-black leading-none text-[#6D4AFF]">{s.value}</div>
+            <div key={s.label} className="rounded-[14px] border border-[#D3DED6] bg-white p-4">
+              <div className="text-[26px] font-black leading-none text-[#42574E]">{s.value}</div>
               <div className="mt-1 text-[11px] font-semibold text-[#1E1B4B]/55">{s.label}</div>
             </div>
           ))}
@@ -1015,7 +1015,7 @@ function DashboardTab({ firms, activity, today, onLog, workerCount, onChanged, o
       <section>
         <h2 className="mb-2 text-[14px] font-bold">Follow-ups due today</h2>
         {due.length === 0 ? (
-          <p className="rounded-[12px] border border-[#E7E1FF] bg-white px-4 py-3 text-[13px] text-[#1E1B4B]/45">Nothing due. Nice.</p>
+          <p className="rounded-[12px] border border-[#D3DED6] bg-white px-4 py-3 text-[13px] text-[#1E1B4B]/45">Nothing due. Nice.</p>
         ) : (
           <div className="space-y-3">{due.map((f) => <FirmCard key={f.id} firm={f} onLog={onLog} today={today} onQuickEmail={onQuickEmail} onQuickLog={onQuickLog} userId={claim?.userId} onClaim={claim?.onClaim} onRelease={claim?.onRelease} isFounder={claim?.isFounder} members={claim?.members} onAssign={claim?.onAssign} />)}</div>
         )}
@@ -1028,7 +1028,7 @@ function DashboardTab({ firms, activity, today, onLog, workerCount, onChanged, o
         <section>
           <h2 className="mb-2 text-[14px] font-bold">Recent activity</h2>
           {recent.length === 0 ? (
-            <p className="rounded-[12px] border border-[#E7E1FF] bg-white px-4 py-3 text-[13px] text-[#1E1B4B]/45">No activity logged yet.</p>
+            <p className="rounded-[12px] border border-[#D3DED6] bg-white px-4 py-3 text-[13px] text-[#1E1B4B]/45">No activity logged yet.</p>
           ) : (
             <div className="space-y-2">{recent.map((a) => <ActivityRow key={a.id} a={a} />)}</div>
           )}
@@ -1091,7 +1091,7 @@ function DemoPrepCard({ firms, today, onChanged }: { firms: CrmFirm[]; today: st
           {intel && (
             <div className="mb-2 rounded-[10px] border border-amber-300/60 bg-white/70 p-2.5">
               <p className="text-[12px] font-semibold text-[#1E1B4B]">{intel.headlineWin}</p>
-              <p className="mt-1 text-[12px] leading-relaxed text-[#1E1B4B]/75"><span className="font-bold text-[#6D4AFF]">Opener: </span>{intel.opener}</p>
+              <p className="mt-1 text-[12px] leading-relaxed text-[#1E1B4B]/75"><span className="font-bold text-[#42574E]">Opener: </span>{intel.opener}</p>
             </div>
           )}
           <div className="mb-1 text-[11px] font-bold uppercase tracking-wide text-amber-800/70">Lead with these</div>
@@ -1137,7 +1137,7 @@ function DailyTargetsScoreboard({ activity, today }: { activity: CrmActivityWith
           const color = colorMap[targetColor(c.count, c.target)];
           const pct = Math.min(100, Math.round((c.count / c.target) * 100));
           return (
-            <div key={c.label} className="rounded-[14px] border border-[#E7E1FF] bg-white p-3">
+            <div key={c.label} className="rounded-[14px] border border-[#D3DED6] bg-white p-3">
               <div className={`text-[26px] font-black leading-none ${color.text}`}>{c.count}</div>
               <div className="mt-1 text-[10px] font-semibold leading-tight text-[#1E1B4B]/55">{c.label}</div>
               <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[#F0EBFF]"><div className={`h-full rounded-full ${color.bar}`} style={{ width: `${pct}%` }} /></div>
@@ -1146,7 +1146,7 @@ function DailyTargetsScoreboard({ activity, today }: { activity: CrmActivityWith
           );
         })}
       </div>
-      <p className="mt-2 text-[12px] font-medium text-[#6D4AFF]">{dailyTargetsContext(calls, emails, demos)}</p>
+      <p className="mt-2 text-[12px] font-medium text-[#42574E]">{dailyTargetsContext(calls, emails, demos)}</p>
     </section>
   );
 }
@@ -1156,7 +1156,7 @@ function CompStat({ label, value, highlight }: { label: string; value: string; h
   return (
     <div>
       <div className="text-[11px] font-semibold text-[#1E1B4B]/55">{label}</div>
-      <div className={`text-[18px] font-black ${highlight ? 'text-[#6D4AFF]' : 'text-[#1E1B4B]'}`}>{value}</div>
+      <div className={`text-[18px] font-black ${highlight ? 'text-[#42574E]' : 'text-[#1E1B4B]'}`}>{value}</div>
     </div>
   );
 }
@@ -1177,9 +1177,9 @@ function CompTab({ firms }: { firms: CrmFirm[] }) {
       {/* Bonus tracker — the "bonus earned" signal */}
       <section>
         <h2 className="mb-2 text-[14px] font-bold">First 3 paying firms — launch bonus</h2>
-        <div className="rounded-[16px] border border-[#DCD3FF] bg-[#F7F3FF] p-4">
+        <div className="rounded-[16px] border border-[#CBD6CF] bg-[#F7F3FF] p-4">
           {bonus.earned > 0 ? (
-            <div className="mb-3 rounded-[12px] bg-[#6D4AFF] px-4 py-3 text-white">
+            <div className="mb-3 rounded-[12px] bg-[#42574E] px-4 py-3 text-white">
               <div className="text-[11px] font-bold uppercase tracking-wide text-white/70">Bonus earned</div>
               <div className="text-[26px] font-black leading-tight">{usd(bonus.earned)}</div>
               <div className="text-[12px] text-white/80">{paidCount} of {BONUS_LADDER.length} paying firms · pay within 1–2 business days of the cleared invoice</div>
@@ -1189,14 +1189,14 @@ function CompTab({ firms }: { firms: CrmFirm[] }) {
           )}
           <div className="grid grid-cols-3 gap-2">
             {bonus.steps.map((s) => (
-              <div key={s.n} className={`rounded-[10px] border px-2 py-2.5 text-center ${s.hit ? 'border-[#6D4AFF] bg-white' : 'border-[#E7E1FF] bg-white/60'}`}>
-                <div className={`text-[15px] font-black ${s.hit ? 'text-[#6D4AFF]' : 'text-[#1E1B4B]/30'}`}>{usd(s.amount)}</div>
+              <div key={s.n} className={`rounded-[10px] border px-2 py-2.5 text-center ${s.hit ? 'border-[#42574E] bg-white' : 'border-[#D3DED6] bg-white/60'}`}>
+                <div className={`text-[15px] font-black ${s.hit ? 'text-[#42574E]' : 'text-[#1E1B4B]/30'}`}>{usd(s.amount)}</div>
                 <div className="text-[10px] font-semibold text-[#1E1B4B]/55">Firm {s.n}{s.hit ? ' ✓' : ''}</div>
               </div>
             ))}
           </div>
           {!bonus.complete && bonus.nextAmount != null && (
-            <p className="mt-3 text-[12px] text-[#1E1B4B]/55">Next conversion: <b className="text-[#6D4AFF]">{usd(bonus.nextAmount)}</b></p>
+            <p className="mt-3 text-[12px] text-[#1E1B4B]/55">Next conversion: <b className="text-[#42574E]">{usd(bonus.nextAmount)}</b></p>
           )}
           <p className="mt-3 text-[12px] text-[#1E1B4B]/45">
             + {usd(SPRINT_BONUS)} sprint bonus if all 3 land in the sprint window — plus {Math.round(COMMISSION_RATE * 100)}% recurring on every firm, every month.
@@ -1210,7 +1210,7 @@ function CompTab({ firms }: { firms: CrmFirm[] }) {
       {/* Calculator sandbox */}
       <section>
         <h2 className="mb-2 text-[14px] font-bold">Earnings calculator</h2>
-        <div className="space-y-4 rounded-[16px] border border-[#E7E1FF] bg-white p-4">
+        <div className="space-y-4 rounded-[16px] border border-[#D3DED6] bg-white p-4">
           <div>
             <div className="mb-1 flex items-center justify-between">
               <label className="text-[12px] font-semibold text-[#1E1B4B]/70">Paying firms</label>
@@ -1220,13 +1220,13 @@ function CompTab({ firms }: { firms: CrmFirm[] }) {
                 max={500}
                 value={firmCount}
                 onChange={(e) => setFirmCount(Math.max(0, Math.min(500, Math.floor(+e.target.value) || 0)))}
-                className="w-20 rounded-[8px] border border-[#E7E1FF] px-2 py-1 text-right text-[13px] font-bold text-[#6D4AFF] outline-none focus:border-[#6D4AFF]"
+                className="w-20 rounded-[8px] border border-[#D3DED6] px-2 py-1 text-right text-[13px] font-bold text-[#42574E] outline-none focus:border-[#42574E]"
               />
             </div>
-            <input type="range" min={0} max={500} value={firmCount} onChange={(e) => setFirmCount(+e.target.value)} className="w-full accent-[#6D4AFF]" />
+            <input type="range" min={0} max={500} value={firmCount} onChange={(e) => setFirmCount(+e.target.value)} className="w-full accent-[#42574E]" />
             <div className="mt-1.5 flex gap-1.5">
               {[10, 50, 100, 250, 500].map((n) => (
-                <button key={n} type="button" onClick={() => setFirmCount(n)} className={`flex-1 rounded-[8px] border px-1 py-1 text-[11px] font-semibold transition ${firmCount === n ? 'border-[#6D4AFF] bg-[#6D4AFF] text-white' : 'border-[#E7E1FF] text-[#1E1B4B]/55 hover:border-[#B8A8FF]'}`}>
+                <button key={n} type="button" onClick={() => setFirmCount(n)} className={`flex-1 rounded-[8px] border px-1 py-1 text-[11px] font-semibold transition ${firmCount === n ? 'border-[#42574E] bg-[#42574E] text-white' : 'border-[#D3DED6] text-[#1E1B4B]/55 hover:border-[#B8A8FF]'}`}>
                   {n}
                 </button>
               ))}
@@ -1236,7 +1236,7 @@ function CompTab({ firms }: { firms: CrmFirm[] }) {
             <div className="mb-1 text-[12px] font-semibold text-[#1E1B4B]/70">Tier</div>
             <div className="flex gap-2">
               {(['practice', 'firm', 'surge'] as const).map((t) => (
-                <button key={t} type="button" onClick={() => setTier(t)} className={`flex-1 rounded-[10px] border px-2 py-2 text-[12px] font-semibold capitalize transition ${tier === t ? 'border-[#6D4AFF] bg-[#6D4AFF] text-white' : 'border-[#E7E1FF] text-[#1E1B4B]/60 hover:border-[#B8A8FF]'}`}>
+                <button key={t} type="button" onClick={() => setTier(t)} className={`flex-1 rounded-[10px] border px-2 py-2 text-[12px] font-semibold capitalize transition ${tier === t ? 'border-[#42574E] bg-[#42574E] text-white' : 'border-[#D3DED6] text-[#1E1B4B]/60 hover:border-[#B8A8FF]'}`}>
                   {t} ${TIER_PRICES[t]}
                 </button>
               ))}
@@ -1246,7 +1246,7 @@ function CompTab({ firms }: { firms: CrmFirm[] }) {
             <div className="mb-1 text-[12px] font-semibold text-[#1E1B4B]/70">Months retained</div>
             <div className="flex gap-2">
               {[1, 3, 6, 12].map((m) => (
-                <button key={m} type="button" onClick={() => setMonths(m)} className={`flex-1 rounded-[10px] border px-2 py-2 text-[12px] font-semibold transition ${months === m ? 'border-[#6D4AFF] bg-[#6D4AFF] text-white' : 'border-[#E7E1FF] text-[#1E1B4B]/60 hover:border-[#B8A8FF]'}`}>
+                <button key={m} type="button" onClick={() => setMonths(m)} className={`flex-1 rounded-[10px] border px-2 py-2 text-[12px] font-semibold transition ${months === m ? 'border-[#42574E] bg-[#42574E] text-white' : 'border-[#D3DED6] text-[#1E1B4B]/60 hover:border-[#B8A8FF]'}`}>
                   {m} mo
                 </button>
               ))}
@@ -1284,7 +1284,7 @@ function CompanyEconomicsTab({ firms }: { firms: CrmFirm[] }) {
   const input: EconomicsInput = { firmCount, tier, months, ...a };
   const r = companyEconomics(input);
 
-  const numCls = 'w-20 rounded-[8px] border border-[#E7E1FF] px-2 py-1 text-right text-[13px] font-bold text-[#6D4AFF] outline-none focus:border-[#6D4AFF]';
+  const numCls = 'w-20 rounded-[8px] border border-[#D3DED6] px-2 py-1 text-right text-[13px] font-bold text-[#42574E] outline-none focus:border-[#42574E]';
 
   return (
     <div className="space-y-5">
@@ -1293,17 +1293,17 @@ function CompanyEconomicsTab({ firms }: { firms: CrmFirm[] }) {
         <p className="mb-3 text-[11px] leading-relaxed text-[#1E1B4B]/45">
           The mirror of the rep calculator, from one3seven's side. Restricted view. AI and infra are estimates — tune them as real usage comes in.
         </p>
-        <div className="space-y-4 rounded-[16px] border border-[#E7E1FF] bg-white p-4">
+        <div className="space-y-4 rounded-[16px] border border-[#D3DED6] bg-white p-4">
           {/* Firm count */}
           <div>
             <div className="mb-1 flex items-center justify-between">
               <label className="text-[12px] font-semibold text-[#1E1B4B]/70">Paying firms</label>
               <input type="number" min={0} max={500} value={firmCount} onChange={(e) => setFirmCount(Math.max(0, Math.min(500, Math.floor(+e.target.value) || 0)))} className={numCls} />
             </div>
-            <input type="range" min={0} max={500} value={firmCount} onChange={(e) => setFirmCount(+e.target.value)} className="w-full accent-[#6D4AFF]" />
+            <input type="range" min={0} max={500} value={firmCount} onChange={(e) => setFirmCount(+e.target.value)} className="w-full accent-[#42574E]" />
             <div className="mt-1.5 flex gap-1.5">
               {[10, 50, 100, 250, 500].map((n) => (
-                <button key={n} type="button" onClick={() => setFirmCount(n)} className={`flex-1 rounded-[8px] border px-1 py-1 text-[11px] font-semibold transition ${firmCount === n ? 'border-[#6D4AFF] bg-[#6D4AFF] text-white' : 'border-[#E7E1FF] text-[#1E1B4B]/55 hover:border-[#B8A8FF]'}`}>{n}</button>
+                <button key={n} type="button" onClick={() => setFirmCount(n)} className={`flex-1 rounded-[8px] border px-1 py-1 text-[11px] font-semibold transition ${firmCount === n ? 'border-[#42574E] bg-[#42574E] text-white' : 'border-[#D3DED6] text-[#1E1B4B]/55 hover:border-[#B8A8FF]'}`}>{n}</button>
               ))}
             </div>
           </div>
@@ -1312,7 +1312,7 @@ function CompanyEconomicsTab({ firms }: { firms: CrmFirm[] }) {
             <div className="mb-1 text-[12px] font-semibold text-[#1E1B4B]/70">Tier</div>
             <div className="flex gap-2">
               {(['practice', 'firm', 'surge'] as const).map((t) => (
-                <button key={t} type="button" onClick={() => setTier(t)} className={`flex-1 rounded-[10px] border px-2 py-2 text-[12px] font-semibold capitalize transition ${tier === t ? 'border-[#6D4AFF] bg-[#6D4AFF] text-white' : 'border-[#E7E1FF] text-[#1E1B4B]/60 hover:border-[#B8A8FF]'}`}>{t} ${TIER_PRICES[t]}</button>
+                <button key={t} type="button" onClick={() => setTier(t)} className={`flex-1 rounded-[10px] border px-2 py-2 text-[12px] font-semibold capitalize transition ${tier === t ? 'border-[#42574E] bg-[#42574E] text-white' : 'border-[#D3DED6] text-[#1E1B4B]/60 hover:border-[#B8A8FF]'}`}>{t} ${TIER_PRICES[t]}</button>
               ))}
             </div>
           </div>
@@ -1321,13 +1321,13 @@ function CompanyEconomicsTab({ firms }: { firms: CrmFirm[] }) {
             <div className="mb-1 text-[12px] font-semibold text-[#1E1B4B]/70">Months retained</div>
             <div className="flex gap-2">
               {[1, 3, 6, 12].map((m) => (
-                <button key={m} type="button" onClick={() => setMonths(m)} className={`flex-1 rounded-[10px] border px-2 py-2 text-[12px] font-semibold transition ${months === m ? 'border-[#6D4AFF] bg-[#6D4AFF] text-white' : 'border-[#E7E1FF] text-[#1E1B4B]/60 hover:border-[#B8A8FF]'}`}>{m} mo</button>
+                <button key={m} type="button" onClick={() => setMonths(m)} className={`flex-1 rounded-[10px] border px-2 py-2 text-[12px] font-semibold transition ${months === m ? 'border-[#42574E] bg-[#42574E] text-white' : 'border-[#D3DED6] text-[#1E1B4B]/60 hover:border-[#B8A8FF]'}`}>{m} mo</button>
               ))}
             </div>
           </div>
 
           {/* Editable assumptions */}
-          <div className="rounded-[12px] border border-[#E7E1FF] bg-[#FBFAFF] p-3">
+          <div className="rounded-[12px] border border-[#D3DED6] bg-[#FBFAFF] p-3">
             <div className="mb-2 text-[11px] font-bold uppercase tracking-wide text-[#1E1B4B]/55">Overhead assumptions</div>
             <div className="space-y-2">
               {([
@@ -1402,8 +1402,8 @@ function GrowthTab() {
   const signups = data.recent_signups ?? [];
 
   const Stat = ({ label, value }: { label: string; value: string | number }) => (
-    <div className="rounded-[12px] border border-[#E7E1FF] bg-white p-4">
-      <div className="text-[24px] font-black leading-none text-[#6D4AFF]">{value}</div>
+    <div className="rounded-[12px] border border-[#D3DED6] bg-white p-4">
+      <div className="text-[24px] font-black leading-none text-[#42574E]">{value}</div>
       <div className="mt-1 text-[11px] font-semibold text-[#1E1B4B]/55">{label}</div>
     </div>
   );
@@ -1413,7 +1413,7 @@ function GrowthTab() {
       <section>
         <div className="mb-2 flex items-center justify-between">
           <h2 className="text-[14px] font-bold">Traffic</h2>
-          <button type="button" onClick={() => void load()} className="flex items-center gap-1.5 rounded-full border border-[#E7E1FF] px-3 py-1.5 text-[11px] font-semibold text-[#6D4AFF] transition hover:border-[#B8A8FF] hover:bg-[#F5F1FB]">
+          <button type="button" onClick={() => void load()} className="flex items-center gap-1.5 rounded-full border border-[#D3DED6] px-3 py-1.5 text-[11px] font-semibold text-[#42574E] transition hover:border-[#B8A8FF] hover:bg-[#F5F1FB]">
             <RefreshCw className="h-3 w-3" /> Refresh
           </button>
         </div>
@@ -1443,17 +1443,17 @@ function GrowthTab() {
       {daily.length > 0 && (
         <section>
           <h2 className="mb-2 text-[14px] font-bold">Last 7 days</h2>
-          <div className="space-y-2 rounded-[12px] border border-[#E7E1FF] bg-white p-4">
+          <div className="space-y-2 rounded-[12px] border border-[#D3DED6] bg-white p-4">
             {(() => {
               const max = Math.max(1, ...daily.map((d) => d.visits));
               return daily.map((d) => (
                 <div key={d.day} className="flex items-center gap-2">
                   <span className="w-14 shrink-0 text-[11px] text-[#1E1B4B]/55">{d.day}</span>
                   <div className="h-4 flex-1 overflow-hidden rounded bg-[#F3EFFF]">
-                    <div className="h-full rounded bg-[#6D4AFF]" style={{ width: `${Math.round((d.visits / max) * 100)}%` }} />
+                    <div className="h-full rounded bg-[#42574E]" style={{ width: `${Math.round((d.visits / max) * 100)}%` }} />
                   </div>
                   <span className="w-10 shrink-0 text-right text-[11px] font-semibold text-[#1E1B4B]">{d.visits}</span>
-                  <span className="w-16 shrink-0 text-right text-[11px] text-[#6D4AFF]">{d.signups} new</span>
+                  <span className="w-16 shrink-0 text-right text-[11px] text-[#42574E]">{d.signups} new</span>
                 </div>
               ));
             })()}
@@ -1467,8 +1467,8 @@ function GrowthTab() {
           <h2 className="mb-2 text-[14px] font-bold">Tier breakdown</h2>
           <div className="flex flex-wrap gap-2">
             {tiers.map((t) => (
-              <span key={t.tier} className="rounded-full border border-[#E7E1FF] bg-white px-3 py-1.5 text-[12px] text-[#1E1B4B]">
-                <b className="capitalize text-[#6D4AFF]">{t.tier}</b> · {t.count}
+              <span key={t.tier} className="rounded-full border border-[#D3DED6] bg-white px-3 py-1.5 text-[12px] text-[#1E1B4B]">
+                <b className="capitalize text-[#42574E]">{t.tier}</b> · {t.count}
               </span>
             ))}
           </div>
@@ -1478,19 +1478,19 @@ function GrowthTab() {
       <section>
         <h2 className="mb-2 text-[14px] font-bold">Signups ({signups.length})</h2>
         {signups.length === 0 ? (
-          <p className="rounded-[12px] border border-[#E7E1FF] bg-white px-4 py-3 text-[13px] text-[#1E1B4B]/45">No accounts yet.</p>
+          <p className="rounded-[12px] border border-[#D3DED6] bg-white px-4 py-3 text-[13px] text-[#1E1B4B]/45">No accounts yet.</p>
         ) : (
           <div className="space-y-2">
             {signups.map((s, i) => (
-              <div key={s.email + i} className="flex items-center gap-3 rounded-[12px] border border-[#E7E1FF] bg-white p-3">
+              <div key={s.email + i} className="flex items-center gap-3 rounded-[12px] border border-[#D3DED6] bg-white p-3">
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-[13px] font-semibold text-[#1E1B4B]">{s.name}</div>
                   <div className="truncate text-[11px] text-[#1E1B4B]/50">{s.email} · {fmtDate(s.created_at)}</div>
                 </div>
                 {s.tier ? (
-                  <span className="shrink-0 rounded-full bg-[#F3EFFF] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-[#6D4AFF]">{s.tier}{s.sub_status && s.sub_status !== 'active' ? ` · ${s.sub_status}` : ''}</span>
+                  <span className="shrink-0 rounded-full bg-[#F3EFFF] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-[#42574E]">{s.tier}{s.sub_status && s.sub_status !== 'active' ? ` · ${s.sub_status}` : ''}</span>
                 ) : (
-                  <span className="shrink-0 rounded-full border border-[#E7E1FF] px-2.5 py-1 text-[10px] font-semibold text-[#1E1B4B]/45">worker</span>
+                  <span className="shrink-0 rounded-full border border-[#D3DED6] px-2.5 py-1 text-[10px] font-semibold text-[#1E1B4B]/45">worker</span>
                 )}
               </div>
             ))}
@@ -1524,21 +1524,21 @@ function LinksTab() {
         <div className="space-y-4">
           {SITE_LINK_GROUPS.map((g) => (
             <div key={g.group}>
-              <div className="mb-1.5 text-[11px] font-bold uppercase tracking-wide text-[#6D4AFF]">{g.group}</div>
+              <div className="mb-1.5 text-[11px] font-bold uppercase tracking-wide text-[#42574E]">{g.group}</div>
               <div className="space-y-2">
                 {g.items.map((it) => {
                   const url = `${SITE_BASE}${it.path === '/' ? '' : it.path}`;
                   return (
-                    <div key={it.path} className="flex items-center gap-2 rounded-[12px] border border-[#E7E1FF] bg-white p-3">
+                    <div key={it.path} className="flex items-center gap-2 rounded-[12px] border border-[#D3DED6] bg-white p-3">
                       <div className="min-w-0 flex-1">
                         <div className="text-[13px] font-semibold text-[#1E1B4B]">{it.label}</div>
                         <div className="truncate text-[11px] text-[#1E1B4B]/50">{it.desc}</div>
-                        <div className="truncate text-[11px] font-medium text-[#6D4AFF]">{url}</div>
+                        <div className="truncate text-[11px] font-medium text-[#42574E]">{url}</div>
                       </div>
-                      <button type="button" onClick={() => copy(url)} aria-label="Copy link" className="rounded-lg border border-[#E7E1FF] p-2 text-[#1E1B4B]/55 transition hover:border-[#B8A8FF] hover:bg-[#F7F3FF]">
+                      <button type="button" onClick={() => copy(url)} aria-label="Copy link" className="rounded-lg border border-[#D3DED6] p-2 text-[#1E1B4B]/55 transition hover:border-[#B8A8FF] hover:bg-[#F7F3FF]">
                         {copied === url ? <Check className="h-4 w-4 text-emerald-600" /> : <Copy className="h-4 w-4" />}
                       </button>
-                      <a href={url} target="_blank" rel="noreferrer" aria-label="Open link" className="rounded-lg border border-[#E7E1FF] p-2 text-[#1E1B4B]/55 transition hover:border-[#B8A8FF] hover:bg-[#F7F3FF]">
+                      <a href={url} target="_blank" rel="noreferrer" aria-label="Open link" className="rounded-lg border border-[#D3DED6] p-2 text-[#1E1B4B]/55 transition hover:border-[#B8A8FF] hover:bg-[#F7F3FF]">
                         <ExternalLink className="h-4 w-4" />
                       </a>
                     </div>
@@ -1565,12 +1565,12 @@ function RevenueTab({ firms }: { firms: CrmFirm[] }) {
     <div className="space-y-5">
       <section>
         <h2 className="mb-2 text-[14px] font-bold">Current MRR (actual)</h2>
-        <div className="rounded-[16px] border border-[#DCD3FF] bg-[#F7F3FF] p-4">
-          <div className="text-[32px] font-black leading-none text-[#6D4AFF]">{usd(r.currentMrr)}<span className="text-[14px] font-semibold text-[#1E1B4B]/40">/mo</span></div>
+        <div className="rounded-[16px] border border-[#CBD6CF] bg-[#F7F3FF] p-4">
+          <div className="text-[32px] font-black leading-none text-[#42574E]">{usd(r.currentMrr)}<span className="text-[14px] font-semibold text-[#1E1B4B]/40">/mo</span></div>
           <div className="mt-1 text-[12px] text-[#1E1B4B]/55">{r.paidCount} paying firm{r.paidCount === 1 ? '' : 's'}</div>
           <div className="mt-3 grid grid-cols-3 gap-2">
             {r.perTier.map((t) => (
-              <div key={t.tier} className="rounded-[10px] border border-[#E7E1FF] bg-white px-2 py-2 text-center">
+              <div key={t.tier} className="rounded-[10px] border border-[#D3DED6] bg-white px-2 py-2 text-center">
                 <div className="text-[15px] font-black text-[#1E1B4B]">{t.count}</div>
                 <div className="text-[10px] font-semibold capitalize text-[#1E1B4B]/55">{t.tier} · ${TIER_PRICES[t.tier]}</div>
               </div>
@@ -1582,7 +1582,7 @@ function RevenueTab({ firms }: { firms: CrmFirm[] }) {
 
       <section>
         <h2 className="mb-2 text-[14px] font-bold">Pipeline forecast</h2>
-        <div className="rounded-[16px] border border-[#E7E1FF] bg-white p-4">
+        <div className="rounded-[16px] border border-[#D3DED6] bg-white p-4">
           <div className="text-[26px] font-black leading-none text-[#1E1B4B]">{usd(r.projectedMrr)}<span className="text-[13px] font-semibold text-[#1E1B4B]/40">/mo</span></div>
           <div className="mt-1 text-[12px] text-[#1E1B4B]/55">projected — 30% conversion estimate on {r.candidateCount} pipeline firm{r.candidateCount === 1 ? '' : 's'} at Practice tier</div>
         </div>
@@ -1590,27 +1590,27 @@ function RevenueTab({ firms }: { firms: CrmFirm[] }) {
 
       <section>
         <h2 className="mb-2 text-[14px] font-bold">Phase 1 target: {PHASE1_PAYING_TARGET} paying firms</h2>
-        <div className="rounded-[16px] border border-[#E7E1FF] bg-white p-4">
-          <div className="mb-2 flex items-center justify-between text-[13px] font-semibold"><span>{r.paidCount} of {PHASE1_PAYING_TARGET}</span><span className="text-[#6D4AFF]">{progressPct}%</span></div>
-          <div className="h-2.5 overflow-hidden rounded-full bg-[#F0EBFF]"><div className="h-full rounded-full bg-[#6D4AFF]" style={{ width: `${progressPct}%` }} /></div>
+        <div className="rounded-[16px] border border-[#D3DED6] bg-white p-4">
+          <div className="mb-2 flex items-center justify-between text-[13px] font-semibold"><span>{r.paidCount} of {PHASE1_PAYING_TARGET}</span><span className="text-[#42574E]">{progressPct}%</span></div>
+          <div className="h-2.5 overflow-hidden rounded-full bg-[#F0EBFF]"><div className="h-full rounded-full bg-[#42574E]" style={{ width: `${progressPct}%` }} /></div>
         </div>
       </section>
 
       <section>
         <h2 className="mb-2 text-[14px] font-bold">Commission liability ({Math.round(COMMISSION_RATE * 100)}% recurring)</h2>
         {paid.length === 0 ? (
-          <p className="rounded-[12px] border border-[#E7E1FF] bg-white px-4 py-3 text-[13px] text-[#1E1B4B]/45">No paying firms yet — $0 commission liability.</p>
+          <p className="rounded-[12px] border border-[#D3DED6] bg-white px-4 py-3 text-[13px] text-[#1E1B4B]/45">No paying firms yet — $0 commission liability.</p>
         ) : (
           <div className="space-y-2">
             {paid.map((f) => (
-              <div key={f.id} className="flex items-center justify-between rounded-[12px] border border-[#E7E1FF] bg-white px-4 py-2.5">
+              <div key={f.id} className="flex items-center justify-between rounded-[12px] border border-[#D3DED6] bg-white px-4 py-2.5">
                 <span className="break-words leading-snug text-[13px] font-semibold">{f.name}</span>
                 <span className="shrink-0 text-[13px] text-[#1E1B4B]/70">{usd(Math.round(tierPrice(f.subscription_tier) * COMMISSION_RATE))}/mo</span>
               </div>
             ))}
             <div className="flex items-center justify-between rounded-[12px] bg-[#EDE7FF] px-4 py-2.5">
-              <span className="text-[13px] font-bold text-[#6D4AFF]">Total monthly commission</span>
-              <span className="text-[13px] font-bold text-[#6D4AFF]">{usd(r.commissionMonthly)}/mo</span>
+              <span className="text-[13px] font-bold text-[#42574E]">Total monthly commission</span>
+              <span className="text-[13px] font-bold text-[#42574E]">{usd(r.commissionMonthly)}/mo</span>
             </div>
           </div>
         )}
@@ -1628,12 +1628,12 @@ function PipelineTab({ firms, onLog, workerCount, onQuickEmail, onQuickLog, clai
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 gap-3">
-        <div className="rounded-[14px] border border-[#E7E1FF] bg-white p-4">
-          <div className="text-[26px] font-black leading-none text-[#6D4AFF]">{firms.length}</div>
+        <div className="rounded-[14px] border border-[#D3DED6] bg-white p-4">
+          <div className="text-[26px] font-black leading-none text-[#42574E]">{firms.length}</div>
           <div className="mt-1 text-[11px] font-semibold text-[#1E1B4B]/55">Firms in pipeline</div>
         </div>
-        <div className="rounded-[14px] border border-[#E7E1FF] bg-white p-4">
-          <div className="text-[26px] font-black leading-none text-[#6D4AFF]">{workerCount}</div>
+        <div className="rounded-[14px] border border-[#D3DED6] bg-white p-4">
+          <div className="text-[26px] font-black leading-none text-[#42574E]">{workerCount}</div>
           <div className="mt-1 text-[11px] font-semibold text-[#1E1B4B]/55">Workers organized</div>
         </div>
       </div>
@@ -1641,8 +1641,8 @@ function PipelineTab({ firms, onLog, workerCount, onQuickEmail, onQuickLog, clai
         <h2 className="mb-2 text-[14px] font-bold">Stage counts</h2>
         <div className="grid grid-cols-3 gap-2 sm:grid-cols-3">
           {counts.map((c) => (
-            <div key={c.stage} className="rounded-[12px] border border-[#E7E1FF] bg-white p-3 text-center">
-              <div className="text-[20px] font-black text-[#6D4AFF]">{c.n}</div>
+            <div key={c.stage} className="rounded-[12px] border border-[#D3DED6] bg-white p-3 text-center">
+              <div className="text-[20px] font-black text-[#42574E]">{c.n}</div>
               <div className="mt-0.5 text-[10px] font-semibold text-[#1E1B4B]/55">{CRM_STAGE_LABELS[c.stage]}</div>
             </div>
           ))}
@@ -1651,7 +1651,7 @@ function PipelineTab({ firms, onLog, workerCount, onQuickEmail, onQuickLog, clai
       <section>
         <h2 className="mb-2 text-[14px] font-bold">Priority A firms</h2>
         {priorityA.length === 0 ? (
-          <p className="rounded-[12px] border border-[#E7E1FF] bg-white px-4 py-3 text-[13px] text-[#1E1B4B]/45">No Priority A firms yet.</p>
+          <p className="rounded-[12px] border border-[#D3DED6] bg-white px-4 py-3 text-[13px] text-[#1E1B4B]/45">No Priority A firms yet.</p>
         ) : (
           <div className="space-y-3">{priorityA.map((f) => <FirmCard key={f.id} firm={f} onLog={onLog} onQuickEmail={onQuickEmail} onQuickLog={onQuickLog} userId={claim?.userId} onClaim={claim?.onClaim} onRelease={claim?.onRelease} isFounder={claim?.isFounder} members={claim?.members} onAssign={claim?.onAssign} />)}</div>
         )}
@@ -1668,14 +1668,14 @@ function FounderEmailQueueTab({ firms, onFounderEmailDone }: { firms: CrmFirm[];
     <div className="space-y-4">
       <div>
         <div className="flex items-center gap-2">
-          <Mail className="h-4 w-4 text-[#5B35D5]" />
-          <h2 className="text-[15px] font-extrabold text-[#5B35D5]">Victoria — email follow-ups</h2>
-          {queue.length > 0 && <span className="rounded-full bg-[#6D4AFF] px-2 py-0.5 text-[11px] font-bold text-white">{queue.length}</span>}
+          <Mail className="h-4 w-4 text-[#374A42]" />
+          <h2 className="text-[15px] font-extrabold text-[#374A42]">Victoria — email follow-ups</h2>
+          {queue.length > 0 && <span className="rounded-full bg-[#42574E] px-2 py-0.5 text-[11px] font-bold text-white">{queue.length}</span>}
         </div>
         <p className="mt-1 text-[12px] leading-relaxed text-[#1E1B4B]/55">Firms the team flagged with “Victoria to email f/u”. Tap the address to write the email, then “Emailed ✓” to clear it from the queue.</p>
       </div>
       {queue.length === 0 ? (
-        <p className="rounded-[12px] border border-[#E7E1FF] bg-white px-4 py-6 text-center text-[13px] text-[#1E1B4B]/45">Nothing to email right now — the queue is clear.</p>
+        <p className="rounded-[12px] border border-[#D3DED6] bg-white px-4 py-6 text-center text-[13px] text-[#1E1B4B]/45">Nothing to email right now — the queue is clear.</p>
       ) : (
         <div className="space-y-2">
           {queue.map((f) => (
@@ -1684,11 +1684,11 @@ function FounderEmailQueueTab({ firms, onFounderEmailDone }: { firms: CrmFirm[];
                 <div className="break-words text-[14px] font-bold text-[#1E1B4B]">{f.name}</div>
                 {f.attorney_name && <div className="text-[11px] text-[#1E1B4B]/50">{f.attorney_name}</div>}
                 {f.email
-                  ? <a href={`mailto:${f.email}`} className="break-all text-[12px] font-semibold text-[#6D4AFF] underline">{f.email}</a>
+                  ? <a href={`mailto:${f.email}`} className="break-all text-[12px] font-semibold text-[#42574E] underline">{f.email}</a>
                   : <span className="text-[12px] text-[#1E1B4B]/40">no email on file</span>}
               </div>
               {onFounderEmailDone && (
-                <button type="button" onClick={() => onFounderEmailDone(f.id)} className="shrink-0 rounded-full bg-[#6D4AFF] px-3 py-2 text-[12px] font-bold text-white">Emailed ✓</button>
+                <button type="button" onClick={() => onFounderEmailDone(f.id)} className="shrink-0 rounded-full bg-[#42574E] px-3 py-2 text-[12px] font-bold text-white">Emailed ✓</button>
               )}
             </div>
           ))}
@@ -1717,7 +1717,7 @@ function FirmRow({ firm, me, today, onLog, onClaim, onNoContact, onNotInterested
     <tr className="border-b border-[#F2EEFC] align-middle hover:bg-[#FAF8FF]">
       <td className="px-3 py-2">
         <div className="flex items-center gap-1.5">
-          <button type="button" onClick={() => onLog(firm.id)} className="max-w-[200px] truncate text-left text-[13px] font-semibold text-[#1E1B4B] hover:text-[#6D4AFF]" title={firm.name}>{firm.name}</button>
+          <button type="button" onClick={() => onLog(firm.id)} className="max-w-[200px] truncate text-left text-[13px] font-semibold text-[#1E1B4B] hover:text-[#42574E]" title={firm.name}>{firm.name}</button>
           {firm.source === 'pilot_form' && <span className="shrink-0 rounded bg-[#F59E0B] px-1 py-0.5 text-[9px] font-extrabold text-white" title="Inbound pilot request">⚡</span>}
           <PriorityBadge priority={firm.priority} />
         </div>
@@ -1732,11 +1732,11 @@ function FirmRow({ firm, me, today, onLog, onClaim, onNoContact, onNotInterested
       <td className="relative px-2 py-2">
         <div className="flex items-center justify-end gap-1">
           {!owner && onClaim && (
-            <button type="button" disabled={claiming} onClick={async () => { setClaiming(true); try { await onClaim(firm.id); } finally { setClaiming(false); } }} className="rounded-full bg-[#EDE7FF] px-2 py-1 text-[10px] font-bold text-[#6D4AFF] disabled:opacity-50">{claiming ? '…' : 'Claim'}</button>
+            <button type="button" disabled={claiming} onClick={async () => { setClaiming(true); try { await onClaim(firm.id); } finally { setClaiming(false); } }} className="rounded-full bg-[#EDE7FF] px-2 py-1 text-[10px] font-bold text-[#42574E] disabled:opacity-50">{claiming ? '…' : 'Claim'}</button>
           )}
           {firm.phone && <a href={`tel:${digitsOf(firm.phone)}`} className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-50 text-emerald-600" aria-label={`Call ${firm.name}`}><Phone className="h-3.5 w-3.5" /></a>}
-          {firm.email && <a href={`mailto:${firm.email}`} className="flex h-7 w-7 items-center justify-center rounded-full bg-[#EDE7FF] text-[#6D4AFF]" aria-label={`Email ${firm.name}`}><Mail className="h-3.5 w-3.5" /></a>}
-          <button type="button" onClick={() => onLog(firm.id)} className="rounded-full bg-[#6D4AFF] px-3 py-1 text-[11px] font-bold text-white hover:bg-[#5B35D5]">Log</button>
+          {firm.email && <a href={`mailto:${firm.email}`} className="flex h-7 w-7 items-center justify-center rounded-full bg-[#EDE7FF] text-[#42574E]" aria-label={`Email ${firm.name}`}><Mail className="h-3.5 w-3.5" /></a>}
+          <button type="button" onClick={() => onLog(firm.id)} className="rounded-full bg-[#42574E] px-3 py-1 text-[11px] font-bold text-white hover:bg-[#374A42]">Log</button>
           {(onNoContact || onNotInterested) && (
             <button type="button" onClick={() => setMenu((v) => !v)} aria-label="More actions" className="flex h-7 w-7 items-center justify-center rounded-full text-[16px] font-bold leading-none text-[#1E1B4B]/50 hover:bg-[#EDE7FF]">⋯</button>
           )}
@@ -1744,7 +1744,7 @@ function FirmRow({ firm, me, today, onLog, onClaim, onNoContact, onNotInterested
         {menu && (
           <>
             <button type="button" aria-hidden className="fixed inset-0 z-10 cursor-default bg-transparent" onClick={() => setMenu(false)} />
-            <div className="absolute right-2 top-10 z-20 w-48 overflow-hidden rounded-[10px] border border-[#E7E1FF] bg-white shadow-xl">
+            <div className="absolute right-2 top-10 z-20 w-48 overflow-hidden rounded-[10px] border border-[#D3DED6] bg-white shadow-xl">
               {onNotInterested && (
                 <button type="button" onClick={() => { setMenu(false); void onNotInterested(firm.id); }} className="block w-full px-3 py-2.5 text-left text-[12px] font-semibold text-[#1E1B4B] hover:bg-[#F7F3FF]">Not interested<span className="block text-[10px] font-normal text-[#1E1B4B]/45">parks it — back in the queue in 3 months</span></button>
               )}
@@ -1796,7 +1796,7 @@ function FirmsTab({ firms, onLog, userId, onNoContact, onNotInterested, claim }:
   const base = view === 'open' ? firms.filter((f) => !f.contacted_by) : firms.filter((f) => !!me && f.contacted_by === me);
   const list = base.filter(passes);
 
-  const selCls = `${tap} rounded-[8px] border border-[#E7E1FF] bg-white px-2 text-[12px]`;
+  const selCls = `${tap} rounded-[8px] border border-[#D3DED6] bg-white px-2 text-[12px]`;
 
   return (
     <div className="space-y-3 pb-24">
@@ -1804,7 +1804,7 @@ function FirmsTab({ firms, onLog, userId, onNoContact, onNotInterested, claim }:
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         placeholder="Search firm or attorney…"
-        className="w-full rounded-[10px] border border-[#E7E1FF] bg-white px-3 py-2.5 text-[14px] outline-none focus:border-[#6D4AFF]"
+        className="w-full rounded-[10px] border border-[#D3DED6] bg-white px-3 py-2.5 text-[14px] outline-none focus:border-[#42574E]"
       />
 
       {/* Filter bar — CDK-style: slice by contacted / tier / priority / stage / timing / email */}
@@ -1842,14 +1842,14 @@ function FirmsTab({ firms, onLog, userId, onNoContact, onNotInterested, claim }:
       <div className="flex items-center justify-between text-[12px] text-[#1E1B4B]/50">
         <span>{list.length} firm{list.length === 1 ? '' : 's'}</span>
         {(contacted || tierFilter !== '' || priority || stageFilter || timing || emailFilter || q) && (
-          <button type="button" onClick={() => { setContacted(''); setTierFilter(''); setPriority(''); setStageFilter(''); setTiming(''); setEmailFilter(''); setSearch(''); }} className="font-semibold text-[#6D4AFF] hover:underline">Clear filters</button>
+          <button type="button" onClick={() => { setContacted(''); setTierFilter(''); setPriority(''); setStageFilter(''); setTiming(''); setEmailFilter(''); setSearch(''); }} className="font-semibold text-[#42574E] hover:underline">Clear filters</button>
         )}
       </div>
 
       {list.length === 0 ? (
-        <p className="rounded-[12px] border border-[#E7E1FF] bg-white px-4 py-6 text-center text-[13px] text-[#1E1B4B]/45">No firms match these filters.</p>
+        <p className="rounded-[12px] border border-[#D3DED6] bg-white px-4 py-6 text-center text-[13px] text-[#1E1B4B]/45">No firms match these filters.</p>
       ) : (
-        <div className="rounded-[12px] border border-[#E7E1FF] bg-white">
+        <div className="rounded-[12px] border border-[#D3DED6] bg-white">
           <table className="w-full">
             <thead>
               <tr className="border-b border-[#EFEAFF] text-left text-[10px] uppercase tracking-wide text-[#1E1B4B]/40">
@@ -1870,14 +1870,14 @@ function FirmsTab({ firms, onLog, userId, onNoContact, onNotInterested, claim }:
       )}
 
       {/* Bottom toggle — Open = shared pool; Mine = claimed. */}
-      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-[#E7E1FF] bg-white/95 px-4 py-2.5 backdrop-blur">
+      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-[#D3DED6] bg-white/95 px-4 py-2.5 backdrop-blur">
         <div className="mx-auto flex max-w-3xl gap-2">
           {([['open', 'Open', openTotal], ['mine', 'Mine', mineTotal]] as const).map(([key, label, n]) => (
             <button
               key={key}
               type="button"
               onClick={() => setView(key)}
-              className={`flex flex-1 flex-col items-center rounded-[14px] border px-3 py-2 transition ${view === key ? 'border-[#6D4AFF] bg-[#6D4AFF] text-white' : 'border-[#E7E1FF] bg-white text-[#1E1B4B] hover:border-[#B8A8FF]'}`}
+              className={`flex flex-1 flex-col items-center rounded-[14px] border px-3 py-2 transition ${view === key ? 'border-[#42574E] bg-[#42574E] text-white' : 'border-[#D3DED6] bg-white text-[#1E1B4B] hover:border-[#B8A8FF]'}`}
             >
               <span className="text-[22px] font-black leading-none">{n}</span>
               <span className={`mt-0.5 text-[11px] font-bold uppercase tracking-wide ${view === key ? 'text-white/80' : 'text-[#1E1B4B]/50'}`}>{label}</span>
@@ -1891,9 +1891,9 @@ function FirmsTab({ firms, onLog, userId, onNoContact, onNotInterested, claim }:
 
 // ── Activity ─────────────────────────────────────────────────────────────────
 function ActivityRow({ a }: { a: CrmActivityWithFirm }) {
-  const typeColor = a.activity_type === 'demo' ? 'bg-emerald-100 text-emerald-700' : a.activity_type === 'email' ? 'bg-blue-100 text-blue-700' : 'bg-[#EDE7FF] text-[#6D4AFF]';
+  const typeColor = a.activity_type === 'demo' ? 'bg-emerald-100 text-emerald-700' : a.activity_type === 'email' ? 'bg-blue-100 text-blue-700' : 'bg-[#EDE7FF] text-[#42574E]';
   return (
-    <div className="rounded-[12px] border border-[#E7E1FF] bg-white p-3.5">
+    <div className="rounded-[12px] border border-[#D3DED6] bg-white p-3.5">
       <div className="mb-1 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${typeColor}`}>{a.activity_type ?? '—'}</span>
@@ -1909,7 +1909,7 @@ function ActivityRow({ a }: { a: CrmActivityWithFirm }) {
 }
 
 function ActivityTab({ activity }: { activity: CrmActivityWithFirm[] }) {
-  if (activity.length === 0) return <p className="rounded-[12px] border border-[#E7E1FF] bg-white px-4 py-3 text-[13px] text-[#1E1B4B]/45">No activity logged yet.</p>;
+  if (activity.length === 0) return <p className="rounded-[12px] border border-[#D3DED6] bg-white px-4 py-3 text-[13px] text-[#1E1B4B]/45">No activity logged yet.</p>;
   return <div className="space-y-2">{activity.map((a) => <ActivityRow key={a.id} a={a} />)}</div>;
 }
 
@@ -1928,10 +1928,10 @@ function Bar({ label, value, target }: { label: string; value: number; target: n
     <div>
       <div className="mb-1 flex items-center justify-between text-[13px]">
         <span className="font-semibold text-[#1E1B4B]/70">{label}</span>
-        <span className="font-bold text-[#6D4AFF]">{value} / {target}</span>
+        <span className="font-bold text-[#42574E]">{value} / {target}</span>
       </div>
       <div className="h-2.5 overflow-hidden rounded-full bg-[#EDE7FF]">
-        <div className="h-full rounded-full bg-[#6D4AFF]" style={{ width: `${pct}%` }} />
+        <div className="h-full rounded-full bg-[#42574E]" style={{ width: `${pct}%` }} />
       </div>
     </div>
   );
@@ -1969,7 +1969,7 @@ function MetricsTab({ firms, activity }: { firms: CrmFirm[]; activity: CrmActivi
     <div className="space-y-6">
       <section>
         <h2 className="mb-2 text-[14px] font-bold">Firms contacted — credit by rep</h2>
-        <div className="rounded-[14px] border border-[#E7E1FF] bg-white p-4">
+        <div className="rounded-[14px] border border-[#D3DED6] bg-white p-4">
           {creditByRep.length === 0 ? (
             <p className="text-[13px] text-[#1E1B4B]/45">No firms contacted yet. Logging a firm credits the rep who logged it first.</p>
           ) : (
@@ -1977,7 +1977,7 @@ function MetricsTab({ firms, activity }: { firms: CrmFirm[]; activity: CrmActivi
               {creditByRep.map(([name, n]) => (
                 <div key={name} className="flex items-center justify-between text-[13px]">
                   <span className="font-semibold text-[#1E1B4B]">{name}</span>
-                  <span className="rounded-full bg-[#EDE7FF] px-2.5 py-0.5 text-[12px] font-bold text-[#6D4AFF]">{n} firm{n === 1 ? '' : 's'}</span>
+                  <span className="rounded-full bg-[#EDE7FF] px-2.5 py-0.5 text-[12px] font-bold text-[#42574E]">{n} firm{n === 1 ? '' : 's'}</span>
                 </div>
               ))}
             </div>
@@ -1986,10 +1986,10 @@ function MetricsTab({ firms, activity }: { firms: CrmFirm[]; activity: CrmActivi
       </section>
       <section>
         <h2 className="mb-2 text-[14px] font-bold">Time saved (the value claim)</h2>
-        <div className="rounded-[14px] border border-[#DCD3FF] bg-[#F7F3FF] p-4">
+        <div className="rounded-[14px] border border-[#CBD6CF] bg-[#F7F3FF] p-4">
           {mins.n > 0 ? (
             <>
-              <div className="text-[28px] font-black leading-none text-[#6D4AFF]">{mins.avg} min</div>
+              <div className="text-[28px] font-black leading-none text-[#42574E]">{mins.avg} min</div>
               <div className="mt-1 text-[12px] text-[#1E1B4B]/60">avg attorney time saved per intake — firm estimate · n={mins.n} firm{mins.n === 1 ? '' : 's'}</div>
             </>
           ) : (
@@ -2008,14 +2008,14 @@ function MetricsTab({ firms, activity }: { firms: CrmFirm[]; activity: CrmActivi
       <section>
         <h2 className="mb-2 text-[14px] font-bold">Top objections</h2>
         {objectionCounts.length === 0 ? (
-          <p className="rounded-[12px] border border-[#E7E1FF] bg-white px-4 py-3 text-[13px] text-[#1E1B4B]/45">No objections logged yet.</p>
+          <p className="rounded-[12px] border border-[#D3DED6] bg-white px-4 py-3 text-[13px] text-[#1E1B4B]/45">No objections logged yet.</p>
         ) : (
           <div className="space-y-2">
             {objectionCounts.map(([obj, n]) => (
-              <div key={obj} className="rounded-[12px] border border-[#E7E1FF] bg-white p-3">
+              <div key={obj} className="rounded-[12px] border border-[#D3DED6] bg-white p-3">
                 <div className="mb-1 flex items-center justify-between text-[13px]">
                   <span className="text-[#1E1B4B]/70">{obj}</span>
-                  <span className="font-bold text-[#6D4AFF]">{n}</span>
+                  <span className="font-bold text-[#42574E]">{n}</span>
                 </div>
                 <div className="h-2 overflow-hidden rounded-full bg-[#EDE7FF]">
                   <div className="h-full rounded-full bg-[#8B6DFF]" style={{ width: `${Math.round((n / maxObj) * 100)}%` }} />
@@ -2034,12 +2034,12 @@ function ScriptsTab() {
   return (
     <div className="space-y-3">
       {/* Positioning north star — the frame every call/email/demo runs on. */}
-      <div className="rounded-[14px] border-2 border-[#DCD3FF] bg-[#F7F3FF] p-4">
-        <div className="mb-2 text-[11px] font-bold uppercase tracking-wide text-[#6D4AFF]">How we position (read first)</div>
+      <div className="rounded-[14px] border-2 border-[#CBD6CF] bg-[#F7F3FF] p-4">
+        <div className="mb-2 text-[11px] font-bold uppercase tracking-wide text-[#42574E]">How we position (read first)</div>
         <p className="mb-3 text-[14px] font-semibold leading-relaxed text-[#1E1B4B]">{CRM_POSITIONING_NORTH_STAR}</p>
         <div className="space-y-2.5">
           {CRM_PARTNERSHIP.map((p) => (
-            <div key={p.line} className="rounded-[10px] border border-[#E7E1FF] bg-white p-2.5">
+            <div key={p.line} className="rounded-[10px] border border-[#D3DED6] bg-white p-2.5">
               <p className="text-[13px] font-medium leading-snug text-[#1E1B4B]">{p.line}</p>
               <p className="mt-1 text-[11px] leading-relaxed text-[#1E1B4B]/50">{p.why}</p>
             </div>
@@ -2051,7 +2051,7 @@ function ScriptsTab() {
         <div className="space-y-3">
           {CRM_CALL_SCRIPT.map((s) => (
             <div key={s.step}>
-              <div className="mb-1 text-[11px] font-bold uppercase tracking-wide text-[#6D4AFF]">{s.step}</div>
+              <div className="mb-1 text-[11px] font-bold uppercase tracking-wide text-[#42574E]">{s.step}</div>
               <p className="text-[14px] leading-relaxed text-[#1E1B4B]/75">{s.text}</p>
             </div>
           ))}
@@ -2075,7 +2075,7 @@ function ScriptsTab() {
           {CRM_COMPETITORS.map((c) => (
             <div key={c.name}>
               <div className="mb-1 text-[13px] font-bold text-[#1E1B4B]">{c.name}</div>
-              <div className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-[#6D4AFF]">{c.when}</div>
+              <div className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-[#42574E]">{c.when}</div>
               <p className="text-[13px] leading-relaxed text-[#1E1B4B]/65">{c.say}</p>
             </div>
           ))}
@@ -2088,7 +2088,7 @@ function ScriptsTab() {
         <ul className="space-y-2">
           {CRM_CREDIBILITY.map((c) => (
             <li key={c} className="flex gap-2 text-[13px] leading-relaxed text-[#1E1B4B]/70">
-              <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#6D4AFF]" /><span>{c}</span>
+              <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#42574E]" /><span>{c}</span>
             </li>
           ))}
         </ul>
@@ -2097,7 +2097,7 @@ function ScriptsTab() {
         <ul className="space-y-2">
           {CRM_WHY_AI_LOVE_HATE.map((c) => (
             <li key={c} className="flex gap-2 text-[13px] leading-relaxed text-[#1E1B4B]/70">
-              <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#6D4AFF]" /><span>{c}</span>
+              <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#42574E]" /><span>{c}</span>
             </li>
           ))}
         </ul>
@@ -2160,9 +2160,9 @@ function EmojiGifBar({ onInsert }: { onInsert: (s: string) => void }) {
         className="flex h-9 w-9 items-center justify-center rounded-full text-lg hover:bg-[#F3EFFF]">😊</button>
       <button type="button" aria-label="Add GIF"
         onClick={() => { setShowGif((v) => !v); setShowEmoji(false); }}
-        className="flex h-9 items-center justify-center rounded-full px-2 text-[11px] font-bold text-[#6D4AFF] hover:bg-[#F3EFFF]">GIF</button>
+        className="flex h-9 items-center justify-center rounded-full px-2 text-[11px] font-bold text-[#42574E] hover:bg-[#F3EFFF]">GIF</button>
       {showEmoji && (
-        <div className="absolute bottom-11 left-0 z-20 grid w-[256px] grid-cols-8 gap-1 rounded-[12px] border border-[#E7E1FF] bg-white p-2 shadow-lg">
+        <div className="absolute bottom-11 left-0 z-20 grid w-[256px] grid-cols-8 gap-1 rounded-[12px] border border-[#D3DED6] bg-white p-2 shadow-lg">
           {QUICK_EMOJIS.map((e) => (
             <button key={e} type="button" onClick={() => onInsert(e)}
               className="flex h-7 w-7 items-center justify-center rounded text-lg hover:bg-[#F3EFFF]">{e}</button>
@@ -2170,14 +2170,14 @@ function EmojiGifBar({ onInsert }: { onInsert: (s: string) => void }) {
         </div>
       )}
       {showGif && (
-        <div className="absolute bottom-11 left-0 z-20 w-[288px] rounded-[12px] border border-[#E7E1FF] bg-white p-3 shadow-lg">
+        <div className="absolute bottom-11 left-0 z-20 w-[288px] rounded-[12px] border border-[#D3DED6] bg-white p-3 shadow-lg">
           <p className="mb-1.5 text-[11px] font-semibold text-[#1E1B4B]">Paste a GIF link</p>
           <input value={gifUrl} onChange={(e) => setGifUrl(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addGif(); } }}
             placeholder="https://…/something.gif"
-            className="w-full rounded-[8px] border border-[#E7E1FF] px-2 py-1.5 text-[12px] outline-none focus:border-[#6D4AFF]" />
+            className="w-full rounded-[8px] border border-[#D3DED6] px-2 py-1.5 text-[12px] outline-none focus:border-[#42574E]" />
           <button type="button" onClick={addGif} disabled={!gifUrl.trim()}
-            className="mt-2 w-full rounded-full bg-[#6D4AFF] py-1.5 text-[12px] font-semibold text-white disabled:opacity-40">Add GIF</button>
+            className="mt-2 w-full rounded-full bg-[#42574E] py-1.5 text-[12px] font-semibold text-white disabled:opacity-40">Add GIF</button>
           <p className="mt-1.5 text-[10px] leading-snug text-[#1E1B4B]/45">On Giphy/Tenor: right-click a GIF → “Copy image address”, or use any link ending in .gif</p>
         </div>
       )}
@@ -2221,7 +2221,7 @@ function TeamTab() {
       <p className="mb-3 text-[12px] leading-relaxed text-[#1E1B4B]/55">
         Team chat — the founder and all sales reps share this channel. Everyone here sees these messages.
       </p>
-      <div className="flex-1 space-y-2 overflow-y-auto rounded-[12px] border border-[#E7E1FF] bg-white p-3">
+      <div className="flex-1 space-y-2 overflow-y-auto rounded-[12px] border border-[#D3DED6] bg-white p-3">
         {messages.length === 0 ? (
           <p className="py-12 text-center text-[13px] text-[#1E1B4B]/40">No messages yet. Say hi 👋</p>
         ) : (
@@ -2229,8 +2229,8 @@ function TeamTab() {
             const mine = !!me.id && m.sender_id === me.id;
             return (
               <div key={m.id} className={`flex ${mine ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[82%] rounded-[14px] px-3.5 py-2 ${mine ? 'bg-[#6D4AFF] text-white' : 'bg-[#F3EFFF] text-[#1E1B4B]'}`}>
-                  {!mine && <div className="mb-0.5 text-[11px] font-bold text-[#6D4AFF]">{m.sender_name || 'Member'}</div>}
+                <div className={`max-w-[82%] rounded-[14px] px-3.5 py-2 ${mine ? 'bg-[#42574E] text-white' : 'bg-[#F3EFFF] text-[#1E1B4B]'}`}>
+                  {!mine && <div className="mb-0.5 text-[11px] font-bold text-[#42574E]">{m.sender_name || 'Member'}</div>}
                   <MessageBody text={m.body} />
                   <div className={`mt-0.5 text-[10px] ${mine ? 'text-white/60' : 'text-[#1E1B4B]/40'}`}>{new Date(m.created_at).toLocaleString()}</div>
                 </div>
@@ -2249,9 +2249,9 @@ function TeamTab() {
           placeholder="Message the team… (Ctrl/⌘+Enter to send)"
           rows={2}
           onKeyDown={(e) => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); void send(); } }}
-          className="flex-1 rounded-[12px] border border-[#E7E1FF] px-3 py-2.5 text-sm outline-none focus:border-[#6D4AFF]"
+          className="flex-1 rounded-[12px] border border-[#D3DED6] px-3 py-2.5 text-sm outline-none focus:border-[#42574E]"
         />
-        <button type="button" onClick={send} disabled={sending || !body.trim()} className={`flex ${tap} shrink-0 items-center gap-1.5 rounded-full bg-[#6D4AFF] px-5 font-semibold text-white disabled:opacity-40`}>
+        <button type="button" onClick={send} disabled={sending || !body.trim()} className={`flex ${tap} shrink-0 items-center gap-1.5 rounded-full bg-[#42574E] px-5 font-semibold text-white disabled:opacity-40`}>
           <Send className="h-4 w-4" /> Send
         </button>
       </div>
@@ -2336,10 +2336,10 @@ function InboxTab({ onReadChange }: { onReadChange?: () => void }) {
           ) : sorted.map((m) => {
             const last = lastMsg(m.id); const unread = unreadFrom(m.id);
             return (
-              <button key={m.id} type="button" onClick={() => openThread(m)} className={`flex ${tap} w-full items-center gap-3 rounded-[12px] border border-[#E7E1FF] bg-white px-3 text-left`}>
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#EDE7FF] text-[13px] font-bold text-[#6D4AFF]">{m.name.slice(0, 1).toUpperCase()}</div>
+              <button key={m.id} type="button" onClick={() => openThread(m)} className={`flex ${tap} w-full items-center gap-3 rounded-[12px] border border-[#D3DED6] bg-white px-3 text-left`}>
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#EDE7FF] text-[13px] font-bold text-[#42574E]">{m.name.slice(0, 1).toUpperCase()}</div>
                 <div className="min-w-0 flex-1">
-                  <span className="truncate text-[14px] font-semibold">{m.name}{m.is_founder && <span className="ml-1 text-[10px] font-bold text-[#6D4AFF]">· Founder</span>}</span>
+                  <span className="truncate text-[14px] font-semibold">{m.name}{m.is_founder && <span className="ml-1 text-[10px] font-bold text-[#42574E]">· Founder</span>}</span>
                   <p className="truncate text-[12px] text-[#1E1B4B]/50">{last ? (last.sender_id === me.id ? 'You: ' : '') + last.body : 'Start a conversation'}</p>
                 </div>
                 {unread > 0 && <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-[11px] font-bold text-white">{unread}</span>}
@@ -2354,16 +2354,16 @@ function InboxTab({ onReadChange }: { onReadChange?: () => void }) {
   const thread = threadWith(selected.id);
   return (
     <div className="flex flex-col" style={{ minHeight: '62vh' }}>
-      <button type="button" onClick={() => setSelected(null)} className="mb-2 inline-flex items-center gap-1 text-[13px] font-semibold text-[#6D4AFF]"><ArrowLeft className="h-4 w-4" /> Inbox</button>
-      <div className="mb-2 text-[14px] font-bold">{selected.name}{selected.is_founder && <span className="ml-1 text-[11px] font-semibold text-[#6D4AFF]">· Founder</span>}</div>
-      <div className="flex-1 space-y-2 overflow-y-auto rounded-[12px] border border-[#E7E1FF] bg-white p-3">
+      <button type="button" onClick={() => setSelected(null)} className="mb-2 inline-flex items-center gap-1 text-[13px] font-semibold text-[#42574E]"><ArrowLeft className="h-4 w-4" /> Inbox</button>
+      <div className="mb-2 text-[14px] font-bold">{selected.name}{selected.is_founder && <span className="ml-1 text-[11px] font-semibold text-[#42574E]">· Founder</span>}</div>
+      <div className="flex-1 space-y-2 overflow-y-auto rounded-[12px] border border-[#D3DED6] bg-white p-3">
         {thread.length === 0 ? (
           <p className="py-12 text-center text-[13px] text-[#1E1B4B]/40">No messages yet. Say hi 👋</p>
         ) : thread.map((m) => {
           const mine = m.sender_id === me.id;
           return (
             <div key={m.id} className={`flex ${mine ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-[82%] rounded-[14px] px-3.5 py-2 ${mine ? 'bg-[#6D4AFF] text-white' : 'bg-[#F3EFFF] text-[#1E1B4B]'}`}>
+              <div className={`max-w-[82%] rounded-[14px] px-3.5 py-2 ${mine ? 'bg-[#42574E] text-white' : 'bg-[#F3EFFF] text-[#1E1B4B]'}`}>
                 <MessageBody text={m.body} />
                 <div className={`mt-0.5 text-[10px] ${mine ? 'text-white/60' : 'text-[#1E1B4B]/40'}`}>{new Date(m.created_at).toLocaleString()}</div>
               </div>
@@ -2381,9 +2381,9 @@ function InboxTab({ onReadChange }: { onReadChange?: () => void }) {
           placeholder={`Message ${selected.name}… (Ctrl/⌘+Enter to send)`}
           rows={2}
           onKeyDown={(e) => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); void send(); } }}
-          className="flex-1 rounded-[12px] border border-[#E7E1FF] px-3 py-2.5 text-sm outline-none focus:border-[#6D4AFF]"
+          className="flex-1 rounded-[12px] border border-[#D3DED6] px-3 py-2.5 text-sm outline-none focus:border-[#42574E]"
         />
-        <button type="button" onClick={send} disabled={sending || !body.trim()} className={`flex ${tap} shrink-0 items-center gap-1.5 rounded-full bg-[#6D4AFF] px-5 font-semibold text-white disabled:opacity-40`}>
+        <button type="button" onClick={send} disabled={sending || !body.trim()} className={`flex ${tap} shrink-0 items-center gap-1.5 rounded-full bg-[#42574E] px-5 font-semibold text-white disabled:opacity-40`}>
           <Send className="h-4 w-4" /> Send
         </button>
       </div>
@@ -2422,31 +2422,31 @@ function NotesTab({ isFounder }: { isFounder: boolean }) {
       <p className="text-[12px] leading-relaxed text-[#1E1B4B]/55">
         Shared team notes — tips, reminders, what’s working. Everyone on the team sees these.
       </p>
-      <div className="rounded-[12px] border border-[#E7E1FF] bg-white p-3">
+      <div className="rounded-[12px] border border-[#D3DED6] bg-white p-3">
         <textarea
           value={body}
           onChange={(e) => setBody(e.target.value)}
           placeholder="Add a note for the team…"
           rows={3}
-          className="w-full rounded-[10px] border border-[#E7E1FF] px-3 py-2.5 text-sm outline-none focus:border-[#6D4AFF]"
+          className="w-full rounded-[10px] border border-[#D3DED6] px-3 py-2.5 text-sm outline-none focus:border-[#42574E]"
         />
         <div className="mt-1"><EmojiGifBar onInsert={(s) => setBody((b) => b + s)} /></div>
         {err && <p className="mt-2 text-[12px] text-red-600">{err}</p>}
-        <button type="button" onClick={post} disabled={busy || !body.trim()} className={`mt-2 flex ${tap} w-full items-center justify-center gap-2 rounded-full bg-[#6D4AFF] font-semibold text-white disabled:opacity-40`}>
+        <button type="button" onClick={post} disabled={busy || !body.trim()} className={`mt-2 flex ${tap} w-full items-center justify-center gap-2 rounded-full bg-[#42574E] font-semibold text-white disabled:opacity-40`}>
           <Plus className="h-4 w-4" /> {busy ? 'Posting…' : 'Add note'}
         </button>
       </div>
 
       {notes.length === 0 ? (
-        <p className="rounded-[12px] border border-[#E7E1FF] bg-white px-4 py-3 text-[13px] text-[#1E1B4B]/45">No notes yet. Add the first one.</p>
+        <p className="rounded-[12px] border border-[#D3DED6] bg-white px-4 py-3 text-[13px] text-[#1E1B4B]/45">No notes yet. Add the first one.</p>
       ) : (
         <div className="space-y-2">
           {notes.map((n) => {
             const canDelete = isFounder || (!!me.id && n.author_id === me.id);
             return (
-              <div key={n.id} className="rounded-[12px] border border-[#E7E1FF] bg-white p-3.5">
+              <div key={n.id} className="rounded-[12px] border border-[#D3DED6] bg-white p-3.5">
                 <div className="mb-1 flex items-center justify-between gap-2">
-                  <span className="text-[12px] font-bold text-[#6D4AFF]">{n.author_name || 'Member'}</span>
+                  <span className="text-[12px] font-bold text-[#42574E]">{n.author_name || 'Member'}</span>
                   <div className="flex items-center gap-2">
                     <span className="text-[11px] text-[#1E1B4B]/40">{new Date(n.created_at).toLocaleString()}</span>
                     {canDelete && (
@@ -2496,16 +2496,16 @@ function AskAITab() {
       <div className="mb-2 flex items-center justify-between gap-3">
         <p className="text-[12px] leading-relaxed text-[#1E1B4B]/55">Internal sales assistant — product, pitch, objections. Not legal advice.</p>
         {messages.length > 0 && (
-          <button type="button" onClick={() => setMessages([])} className="shrink-0 text-[12px] font-semibold text-[#6D4AFF] hover:underline">Clear conversation</button>
+          <button type="button" onClick={() => setMessages([])} className="shrink-0 text-[12px] font-semibold text-[#42574E] hover:underline">Clear conversation</button>
         )}
       </div>
 
-      <div className="flex-1 space-y-2 overflow-y-auto rounded-[12px] border border-[#E7E1FF] bg-white p-3">
+      <div className="flex-1 space-y-2 overflow-y-auto rounded-[12px] border border-[#D3DED6] bg-white p-3">
         {messages.length === 0 ? (
           <div className="space-y-2 py-6">
             <p className="px-1 text-[13px] font-semibold text-[#1E1B4B]/70">Ask anything about selling one3seven:</p>
             {STARTER_QUESTIONS.map((q) => (
-              <button key={q} type="button" onClick={() => send(q)} className="block w-full rounded-[12px] border border-[#E7E1FF] bg-[#FAFAFF] px-3 py-2.5 text-left text-[13px] text-[#1E1B4B] transition hover:border-[#C9BEF5]">
+              <button key={q} type="button" onClick={() => send(q)} className="block w-full rounded-[12px] border border-[#D3DED6] bg-[#FAFAFF] px-3 py-2.5 text-left text-[13px] text-[#1E1B4B] transition hover:border-[#C9BEF5]">
                 {q}
               </button>
             ))}
@@ -2513,7 +2513,7 @@ function AskAITab() {
         ) : (
           messages.map((m, i) => (
             <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-[85%] whitespace-pre-wrap rounded-[14px] px-3.5 py-2 text-[13px] leading-relaxed ${m.role === 'user' ? 'bg-[#5B21B6] text-white' : 'bg-[#F3EFFF] text-[#1E1B4B]'}`}>
+              <div className={`max-w-[85%] whitespace-pre-wrap rounded-[14px] px-3.5 py-2 text-[13px] leading-relaxed ${m.role === 'user' ? 'bg-[#42574E] text-white' : 'bg-[#F3EFFF] text-[#1E1B4B]'}`}>
                 {m.content}
               </div>
             </div>
@@ -2522,9 +2522,9 @@ function AskAITab() {
         {loading && (
           <div className="flex justify-start">
             <div className="flex items-center gap-1 rounded-[14px] bg-[#F3EFFF] px-4 py-3">
-              <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-[#6D4AFF]/50" style={{ animationDelay: '0ms' }} />
-              <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-[#6D4AFF]/50" style={{ animationDelay: '150ms' }} />
-              <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-[#6D4AFF]/50" style={{ animationDelay: '300ms' }} />
+              <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-[#42574E]/50" style={{ animationDelay: '0ms' }} />
+              <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-[#42574E]/50" style={{ animationDelay: '150ms' }} />
+              <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-[#42574E]/50" style={{ animationDelay: '300ms' }} />
             </div>
           </div>
         )}
@@ -2537,9 +2537,9 @@ function AskAITab() {
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void send(input); } }}
           placeholder="Ask the assistant…"
-          className="flex-1 rounded-[12px] border border-[#E7E1FF] px-3 py-2.5 text-sm outline-none focus:border-[#6D4AFF]"
+          className="flex-1 rounded-[12px] border border-[#D3DED6] px-3 py-2.5 text-sm outline-none focus:border-[#42574E]"
         />
-        <button type="button" onClick={() => send(input)} disabled={loading || !input.trim()} className={`flex ${tap} shrink-0 items-center gap-1.5 rounded-full bg-[#6D4AFF] px-5 font-semibold text-white disabled:opacity-40`}>
+        <button type="button" onClick={() => send(input)} disabled={loading || !input.trim()} className={`flex ${tap} shrink-0 items-center gap-1.5 rounded-full bg-[#42574E] px-5 font-semibold text-white disabled:opacity-40`}>
           <Send className="h-4 w-4" /> Send
         </button>
       </div>
@@ -2624,7 +2624,7 @@ function AuditTab() {
 
   return (
     <div className="space-y-4">
-      <button type="button" onClick={runAudit} disabled={running} className="flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full bg-[#6D4AFF] font-semibold text-white transition hover:bg-[#5B35D5] disabled:opacity-50">
+      <button type="button" onClick={runAudit} disabled={running} className="flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full bg-[#42574E] font-semibold text-white transition hover:bg-[#374A42] disabled:opacity-50">
         <RefreshCw className={`h-4 w-4 ${running ? 'animate-spin' : ''}`} /> {running ? 'Running audit…' : 'Run audit'}
       </button>
       <p className="text-[12px] leading-relaxed text-[#1E1B4B]/55">
@@ -2729,10 +2729,10 @@ function ChecklistTab() {
       <div>
         <div className="mb-1.5 flex items-center justify-between text-[13px] font-bold">
           <span>Launch checklist</span>
-          <span className="text-[#6D4AFF]">{completed} of {allItems.length} done</span>
+          <span className="text-[#42574E]">{completed} of {allItems.length} done</span>
         </div>
         <div className="h-2.5 overflow-hidden rounded-full bg-[#EDE7FF]">
-          <div className="h-full rounded-full bg-[#6D4AFF] transition-all duration-500" style={{ width: `${pct}%` }} />
+          <div className="h-full rounded-full bg-[#42574E] transition-all duration-500" style={{ width: `${pct}%` }} />
         </div>
         <p className="mt-2 text-[12px] leading-relaxed text-[#1E1B4B]/55">
           Plain-English steps from “built” to “charging customers.” Tap to check off — saved on this device.
@@ -2750,7 +2750,7 @@ function ChecklistTab() {
                   key={item.id}
                   type="button"
                   onClick={() => toggle(item.id)}
-                  className={`flex w-full items-start gap-3 rounded-[12px] border p-3.5 text-left transition ${checked ? 'border-emerald-200 bg-emerald-50' : 'border-[#E7E1FF] bg-white hover:border-[#C9BEF5]'}`}
+                  className={`flex w-full items-start gap-3 rounded-[12px] border p-3.5 text-left transition ${checked ? 'border-emerald-200 bg-emerald-50' : 'border-[#D3DED6] bg-white hover:border-[#C9BEF5]'}`}
                 >
                   <span className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border ${checked ? 'border-emerald-500 bg-emerald-500 text-white' : 'border-[#C9BEF5] bg-white'}`}>
                     {checked && <Check className="h-3.5 w-3.5" />}
@@ -2775,22 +2775,22 @@ function TrainingTab() {
     <div className="space-y-3">
       <Collapsible title="🔥 Fire demo — how to run it" defaultOpen>
         <p className="mb-3 text-[13px] leading-relaxed text-[#1E1B4B]/65">{FIRE_DEMO_TRAINING.intro}</p>
-        <a href={`https://${FIRE_DEMO_TRAINING.link}`} target="_blank" rel="noreferrer" className="mb-3 inline-block text-[13px] font-semibold text-[#6D4AFF] hover:underline">
+        <a href={`https://${FIRE_DEMO_TRAINING.link}`} target="_blank" rel="noreferrer" className="mb-3 inline-block text-[13px] font-semibold text-[#42574E] hover:underline">
           {FIRE_DEMO_TRAINING.link} ↗
         </a>
-        <div className="mb-4 rounded-[12px] border-2 border-[#6D4AFF]/40 bg-[#F3EFFF] p-4">
-          <div className="mb-1 text-[11px] font-bold uppercase tracking-wide text-[#6D4AFF]">Employment focus — read this first</div>
+        <div className="mb-4 rounded-[12px] border-2 border-[#42574E]/40 bg-[#F3EFFF] p-4">
+          <div className="mb-1 text-[11px] font-bold uppercase tracking-wide text-[#42574E]">Employment focus — read this first</div>
           <p className="text-[13px] leading-relaxed text-[#1E1B4B]/80">{FIRE_DEMO_TRAINING.employmentFocus}</p>
         </div>
         <div className="space-y-2.5">
           {FIRE_DEMO_TRAINING.steps.map((s) => (
-            <div key={s.title} className="rounded-[12px] border border-[#E7E1FF] bg-white p-3.5">
+            <div key={s.title} className="rounded-[12px] border border-[#D3DED6] bg-white p-3.5">
               <div className="mb-0.5 text-[13px] font-bold text-[#1E1B4B]">{s.title}</div>
               <p className="text-[13px] leading-relaxed text-[#1E1B4B]/65">{s.text}</p>
             </div>
           ))}
         </div>
-        <p className="mt-3 rounded-[10px] bg-[#EDE7FF] px-3 py-2 text-[12px] font-semibold text-[#6D4AFF]">{FIRE_DEMO_TRAINING.theAsk}</p>
+        <p className="mt-3 rounded-[10px] bg-[#EDE7FF] px-3 py-2 text-[12px] font-semibold text-[#42574E]">{FIRE_DEMO_TRAINING.theAsk}</p>
       </Collapsible>
 
       <Collapsible title="⚠️ PI & scope rules — do not break these">
@@ -2807,12 +2807,12 @@ function TrainingTab() {
       <Collapsible title="💵 Subscription tiers — what firms pay">
         <div className="space-y-2">
           {CRM_SUBSCRIPTION_TIERS.map((t) => (
-            <div key={t.tier} className="flex items-center justify-between gap-3 rounded-[10px] border border-[#E7E1FF] bg-white px-3 py-2.5">
+            <div key={t.tier} className="flex items-center justify-between gap-3 rounded-[10px] border border-[#D3DED6] bg-white px-3 py-2.5">
               <div>
                 <div className="text-[13px] font-bold text-[#1E1B4B]">{t.tier}</div>
                 <div className="text-[11px] text-[#1E1B4B]/55">{t.detail}</div>
               </div>
-              <div className="shrink-0 text-[13px] font-bold text-[#6D4AFF]">{t.price}</div>
+              <div className="shrink-0 text-[13px] font-bold text-[#42574E]">{t.price}</div>
             </div>
           ))}
         </div>
@@ -2821,23 +2821,23 @@ function TrainingTab() {
       <Collapsible title={CRM_COMMISSIONS.headline}>
         <p className="mb-3 text-[13px] leading-relaxed text-[#1E1B4B]/65">{CRM_COMMISSIONS.intro}</p>
 
-        <div className="mb-1.5 text-[11px] font-bold uppercase tracking-wide text-[#6D4AFF]">Your commission by tier (20%)</div>
-        <div className="mb-4 overflow-hidden rounded-[12px] border border-[#E7E1FF]">
+        <div className="mb-1.5 text-[11px] font-bold uppercase tracking-wide text-[#42574E]">Your commission by tier (20%)</div>
+        <div className="mb-4 overflow-hidden rounded-[12px] border border-[#D3DED6]">
           {CRM_COMMISSIONS.perTier.map((r, i) => (
             <div key={r.tier} className={`flex items-center justify-between gap-2 px-3 py-2.5 text-[13px] ${i > 0 ? 'border-t border-[#F0EBFF]' : ''}`}>
               <span className="font-bold text-[#1E1B4B]">{r.tier} <span className="font-normal text-[#1E1B4B]/45">{r.price}</span></span>
-              <span className="text-right"><span className="font-bold text-[#6D4AFF]">{r.perMo}</span> <span className="text-[#1E1B4B]/45">· {r.perYr}</span></span>
+              <span className="text-right"><span className="font-bold text-[#42574E]">{r.perMo}</span> <span className="text-[#1E1B4B]/45">· {r.perYr}</span></span>
             </div>
           ))}
         </div>
 
-        <div className="mb-1.5 text-[11px] font-bold uppercase tracking-wide text-[#6D4AFF]">How it compounds as you build your book</div>
-        <div className="mb-4 overflow-hidden rounded-[12px] border border-[#E7E1FF]">
+        <div className="mb-1.5 text-[11px] font-bold uppercase tracking-wide text-[#42574E]">How it compounds as you build your book</div>
+        <div className="mb-4 overflow-hidden rounded-[12px] border border-[#D3DED6]">
           {CRM_COMMISSIONS.compounding.map((r, i) => (
             <div key={r.firms} className={`px-3 py-2.5 ${i > 0 ? 'border-t border-[#F0EBFF]' : ''}`}>
               <div className="flex items-center justify-between text-[13px]">
                 <span className="font-bold text-[#1E1B4B]">{r.firms}</span>
-                <span><span className="font-bold text-[#6D4AFF]">{r.mo}/mo</span> <span className="text-[#1E1B4B]/45">· {r.yr}/yr</span></span>
+                <span><span className="font-bold text-[#42574E]">{r.mo}/mo</span> <span className="text-[#1E1B4B]/45">· {r.yr}/yr</span></span>
               </div>
               <div className="text-[11px] text-[#1E1B4B]/50">{r.mix}</div>
             </div>
@@ -2850,7 +2850,7 @@ function TrainingTab() {
           ))}
         </ul>
 
-        <div className="mb-3 rounded-[10px] border border-[#E7E1FF] bg-[#FAFAFF] p-3">
+        <div className="mb-3 rounded-[10px] border border-[#D3DED6] bg-[#FAFAFF] p-3">
           <div className="mb-1 text-[11px] font-bold uppercase tracking-wide text-[#1E1B4B]/45">Not offered at this stage</div>
           <div className="text-[12px] text-[#1E1B4B]/60">{CRM_COMMISSIONS.notOffered.join(' · ')}</div>
         </div>
@@ -2858,8 +2858,8 @@ function TrainingTab() {
         <p className="rounded-[10px] border border-amber-300 bg-amber-50 px-3 py-2 text-[12px] font-semibold text-amber-800">{CRM_COMMISSIONS.note}</p>
       </Collapsible>
 
-      <div className="rounded-[12px] border border-[#E7E1FF] bg-white p-3.5 text-[13px] leading-relaxed text-[#1E1B4B]/70">
-        To contact one3seven, email <a href="mailto:info@one3seven.com" className="font-semibold text-[#6D4AFF] hover:underline">info@one3seven.com</a>.
+      <div className="rounded-[12px] border border-[#D3DED6] bg-white p-3.5 text-[13px] leading-relaxed text-[#1E1B4B]/70">
+        To contact one3seven, email <a href="mailto:info@one3seven.com" className="font-semibold text-[#42574E] hover:underline">info@one3seven.com</a>.
       </div>
     </div>
   );
@@ -2870,9 +2870,9 @@ function AddLogTab({ firms, lastFirmId, onSaved, setError }: { firms: CrmFirm[];
   const [mode, setMode] = useState<'firm' | 'log'>('firm');
   return (
     <div className="space-y-4">
-      <div className="flex rounded-[12px] border border-[#E7E1FF] bg-white p-1">
+      <div className="flex rounded-[12px] border border-[#D3DED6] bg-white p-1">
         {(['firm', 'log'] as const).map((m) => (
-          <button key={m} type="button" onClick={() => setMode(m)} className={`flex-1 ${tap} rounded-[9px] text-[13px] font-semibold ${mode === m ? 'bg-[#6D4AFF] text-white' : 'text-[#1E1B4B]/55'}`}>
+          <button key={m} type="button" onClick={() => setMode(m)} className={`flex-1 ${tap} rounded-[9px] text-[13px] font-semibold ${mode === m ? 'bg-[#42574E] text-white' : 'text-[#1E1B4B]/55'}`}>
             {m === 'firm' ? 'Add firm' : 'Log activity'}
           </button>
         ))}
@@ -2882,7 +2882,7 @@ function AddLogTab({ firms, lastFirmId, onSaved, setError }: { firms: CrmFirm[];
   );
 }
 
-const inputCls = `${tap} w-full rounded-[12px] border border-[#E7E1FF] px-3 text-sm outline-none focus:border-[#6D4AFF]`;
+const inputCls = `${tap} w-full rounded-[12px] border border-[#D3DED6] px-3 text-sm outline-none focus:border-[#42574E]`;
 
 function AddFirmForm({ onSaved, setError }: { onSaved: (firmId?: string) => void; setError: (s: string) => void }) {
   const [f, setF] = useState<NewFirmInput>({ name: '' });
@@ -2899,7 +2899,7 @@ function AddFirmForm({ onSaved, setError }: { onSaved: (firmId?: string) => void
     setTimeout(() => setOk(false), 2500);
   };
   return (
-    <div className="space-y-2.5 rounded-[14px] border border-[#E7E1FF] bg-white p-4">
+    <div className="space-y-2.5 rounded-[14px] border border-[#D3DED6] bg-white p-4">
       {ok && <div className="flex items-center gap-2 rounded-[10px] bg-emerald-50 px-3 py-2 text-[13px] font-semibold text-emerald-700"><CheckCircle2 className="h-4 w-4" /> Firm added</div>}
       <input className={inputCls} placeholder="Firm name *" value={f.name} onChange={(e) => set({ name: e.target.value })} />
       <input className={inputCls} placeholder="Attorney name" value={f.attorney_name ?? ''} onChange={(e) => set({ attorney_name: e.target.value })} />
@@ -2919,8 +2919,8 @@ function AddFirmForm({ onSaved, setError }: { onSaved: (firmId?: string) => void
       <input className={inputCls} placeholder="Source" value={f.source ?? ''} onChange={(e) => set({ source: e.target.value })} />
       <label className="block text-[12px] font-semibold text-[#1E1B4B]/45">Next follow-up</label>
       <input className={inputCls} type="date" value={f.next_followup ?? ''} onChange={(e) => set({ next_followup: e.target.value })} />
-      <textarea className="min-h-[64px] w-full rounded-[12px] border border-[#E7E1FF] px-3 py-2.5 text-sm outline-none focus:border-[#6D4AFF]" placeholder="Notes" value={f.notes ?? ''} onChange={(e) => set({ notes: e.target.value })} />
-      <button type="button" onClick={submit} disabled={saving} className={`flex ${tap} w-full items-center justify-center rounded-full bg-[#6D4AFF] font-semibold text-white disabled:opacity-40`}>{saving ? 'Saving…' : 'Add firm'}</button>
+      <textarea className="min-h-[64px] w-full rounded-[12px] border border-[#D3DED6] px-3 py-2.5 text-sm outline-none focus:border-[#42574E]" placeholder="Notes" value={f.notes ?? ''} onChange={(e) => set({ notes: e.target.value })} />
+      <button type="button" onClick={submit} disabled={saving} className={`flex ${tap} w-full items-center justify-center rounded-full bg-[#42574E] font-semibold text-white disabled:opacity-40`}>{saving ? 'Saving…' : 'Add firm'}</button>
     </div>
   );
 }
@@ -2947,7 +2947,7 @@ function FullLogForm({ firms, lastFirmId, onSaved, setError }: { firms: CrmFirm[
     setTimeout(() => setOk(false), 2500);
   };
   return (
-    <div className="space-y-2.5 rounded-[14px] border border-[#E7E1FF] bg-white p-4">
+    <div className="space-y-2.5 rounded-[14px] border border-[#D3DED6] bg-white p-4">
       {ok && <div className="flex items-center gap-2 rounded-[10px] bg-emerald-50 px-3 py-2 text-[13px] font-semibold text-emerald-700"><CheckCircle2 className="h-4 w-4" /> Activity logged</div>}
       <label className="block text-[12px] font-semibold text-[#1E1B4B]/45">Firm</label>
       <select className={inputCls} value={l.firm_id} onChange={(e) => set({ firm_id: e.target.value })}>
@@ -2975,8 +2975,8 @@ function FullLogForm({ firms, lastFirmId, onSaved, setError }: { firms: CrmFirm[
       <input className={inputCls} type="number" min="0" placeholder="Minutes saved per intake (firm's estimate)" value={minutesSaved} onChange={(e) => setMinutesSaved(e.target.value)} />
       <label className="block text-[12px] font-semibold text-[#1E1B4B]/45">Next follow-up</label>
       <input className={inputCls} type="date" value={l.next_followup ?? ''} onChange={(e) => set({ next_followup: e.target.value })} />
-      <textarea className="min-h-[64px] w-full rounded-[12px] border border-[#E7E1FF] px-3 py-2.5 text-sm outline-none focus:border-[#6D4AFF]" placeholder="Notes" value={l.notes ?? ''} onChange={(e) => set({ notes: e.target.value })} />
-      <button type="button" onClick={submit} disabled={saving} className={`flex ${tap} w-full items-center justify-center rounded-full bg-[#6D4AFF] font-semibold text-white disabled:opacity-40`}>{saving ? 'Saving…' : 'Log activity'}</button>
+      <textarea className="min-h-[64px] w-full rounded-[12px] border border-[#D3DED6] px-3 py-2.5 text-sm outline-none focus:border-[#42574E]" placeholder="Notes" value={l.notes ?? ''} onChange={(e) => set({ notes: e.target.value })} />
+      <button type="button" onClick={submit} disabled={saving} className={`flex ${tap} w-full items-center justify-center rounded-full bg-[#42574E] font-semibold text-white disabled:opacity-40`}>{saving ? 'Saving…' : 'Log activity'}</button>
     </div>
   );
 }

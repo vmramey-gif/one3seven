@@ -46,7 +46,7 @@ export class AppErrorBoundary extends Component<Props, State> {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-[#f6f2ff] flex flex-col items-center justify-center px-6 text-center">
+        <div className="min-h-screen bg-[#f2f4ec] flex flex-col items-center justify-center px-6 text-center">
           <div className="max-w-sm w-full">
             <p className="text-xl font-bold text-[#1e1b4b] mb-2"><WordMark /></p>
             <p className="text-sm text-[#1e1b4b]/60 mb-4">
@@ -59,7 +59,7 @@ export class AppErrorBoundary extends Component<Props, State> {
             )}
             <button
               onClick={this.handleReload}
-              className="w-full rounded-full bg-[#6d4aff] py-4 text-sm font-semibold text-white shadow-lg"
+              className="w-full rounded-full bg-[#42574e] py-4 text-sm font-semibold text-white shadow-lg"
             >
               Reload App
             </button>

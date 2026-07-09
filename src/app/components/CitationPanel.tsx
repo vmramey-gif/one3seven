@@ -6,7 +6,7 @@ import type { SourceCitation } from '../../services/damagesCalculator';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerSrc;
 
-const BRAND = '#5B21B6';
+const BRAND = '#42574E';
 
 type PanelStatus = 'loading' | 'located' | 'fallback';
 
@@ -126,11 +126,11 @@ export function CitationPanel({
       style={{
         background: 'var(--o3s-surface, #ffffff)',
         color: 'var(--o3s-text, #1e1b4b)',
-        borderColor: 'var(--o3s-border, #e7e1ff)',
+        borderColor: 'var(--o3s-border, #d3ded6)',
       }}
       aria-label="Source citation"
     >
-      <header className="border-b px-4 py-3" style={{ borderColor: 'var(--o3s-border, #e7e1ff)' }}>
+      <header className="border-b px-4 py-3" style={{ borderColor: 'var(--o3s-border, #d3ded6)' }}>
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
             <p className="truncate text-sm font-semibold">{citation.docName}</p>
@@ -165,7 +165,7 @@ export function CitationPanel({
         {status === 'fallback' ? (
           <p
             className="mb-3 rounded-md border px-3 py-2 text-xs leading-relaxed"
-            style={{ borderColor: 'var(--o3s-border, #e7e1ff)', color: 'var(--o3s-muted, #6b7280)' }}
+            style={{ borderColor: 'var(--o3s-border, #d3ded6)', color: 'var(--o3s-muted, #6b7280)' }}
           >
             Highlight unavailable — source text shown above for manual verification.
           </p>

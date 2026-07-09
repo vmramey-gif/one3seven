@@ -101,18 +101,18 @@ function NavBar({ step, phase, onBack, onSignUp }: { step: number; phase: Phase;
             </button>
           )}
           <span className="text-[15px] font-bold tracking-tight text-[#14112E]">
-            one<span className="font-black text-[#5B21B6]">3</span>seven
+            one<span className="font-black text-[#42574E]">3</span>seven
           </span>
         </div>
         <div className="flex items-center gap-4">
           {inIntake && (
             <div className="flex items-center gap-1.5">
               {Array.from({ length: INTAKE_STEPS }).map((_, i) => (
-                <div key={i} className={`h-1 rounded-full transition-all duration-500 ${i < step ? 'bg-[#5B21B6]' : 'bg-[#5B21B6]/15'} ${i === step - 1 ? 'w-6' : 'w-3'}`} />
+                <div key={i} className={`h-1 rounded-full transition-all duration-500 ${i < step ? 'bg-[#42574E]' : 'bg-[#42574E]/15'} ${i === step - 1 ? 'w-6' : 'w-3'}`} />
               ))}
             </div>
           )}
-          <button type="button" onClick={onSignUp} className="rounded-full border border-[#5B21B6]/30 px-4 py-1.5 text-xs font-semibold text-[#5B21B6] transition hover:bg-[#F5F1FB]">
+          <button type="button" onClick={onSignUp} className="rounded-full border border-[#42574E]/30 px-4 py-1.5 text-xs font-semibold text-[#42574E] transition hover:bg-[#F5F1FB]">
             Sign up free
           </button>
         </div>
@@ -127,7 +127,7 @@ function NextButton({ onClick, label = 'Continue', disabled = false }: { onClick
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={`flex items-center gap-2 rounded-full px-7 py-3.5 text-[15px] font-semibold text-white shadow-[0_12px_32px_rgba(109,74,255,0.25)] transition ${disabled ? 'cursor-not-allowed bg-[#5B21B6]/30' : 'bg-[#5B21B6] hover:bg-[#4C1D96] hover:-translate-y-0.5'}`}
+      className={`flex items-center gap-2 rounded-full px-7 py-3.5 text-[15px] font-semibold text-white shadow-[0_12px_32px_rgba(109,74,255,0.25)] transition ${disabled ? 'cursor-not-allowed bg-[#42574E]/30' : 'bg-[#42574E] hover:bg-[#4C1D96] hover:-translate-y-0.5'}`}
     >
       {label} <ArrowRight className="h-4 w-4" />
     </button>
@@ -137,7 +137,7 @@ function NextButton({ onClick, label = 'Continue', disabled = false }: { onClick
 function StepLabel({ step, total, title }: { step: number; total: number; title: string }) {
   return (
     <div className="mb-6">
-      <div className="mb-1 text-xs font-bold uppercase tracking-[0.2em] text-[#5B21B6]">Step {step} of {total}</div>
+      <div className="mb-1 text-xs font-bold uppercase tracking-[0.2em] text-[#42574E]">Step {step} of {total}</div>
       <h2 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="text-[24px] font-medium leading-tight tracking-[-0.01em] text-[#14112E] sm:text-[27px]">{title}</h2>
     </div>
   );
@@ -184,7 +184,7 @@ function Step1Story({ onNext }: { onNext: () => void }) {
         Use your own words. There are no wrong answers. You can add records in the next step.
       </p>
 
-      <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-[#ECE7F5] bg-white px-3 py-1.5 text-xs font-semibold text-[#5B21B6]">
+      <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-[#ECE7F5] bg-white px-3 py-1.5 text-xs font-semibold text-[#42574E]">
         <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" />
         <Mic className="h-3.5 w-3.5" />
         {done ? 'Story captured' : 'Marcus is speaking…'}
@@ -192,7 +192,7 @@ function Step1Story({ onNext }: { onNext: () => void }) {
 
       <div className="mb-6 min-h-[140px] w-full rounded-[18px] border border-[#ECE7F5] bg-[#FAF9F6] p-5 text-[14px] leading-relaxed text-[#14112E]">
         {displayed}
-        {!done && <span className="ml-0.5 inline-block h-[1em] w-0.5 animate-pulse bg-[#5B21B6] align-middle" />}
+        {!done && <span className="ml-0.5 inline-block h-[1em] w-0.5 animate-pulse bg-[#42574E] align-middle" />}
       </div>
 
       <AnimatePresence>
@@ -244,7 +244,7 @@ function Step2Records({ onNext }: { onNext: () => void }) {
 
       {/* Suggested file types tip */}
       <div className="mb-5 rounded-[14px] border border-[#ECE7F5] bg-white p-4">
-        <div className="mb-2.5 text-[11px] font-bold uppercase tracking-wider text-[#5B21B6]">What to upload — common examples</div>
+        <div className="mb-2.5 text-[11px] font-bold uppercase tracking-wider text-[#42574E]">What to upload — common examples</div>
         <div className="grid grid-cols-2 gap-x-4 gap-y-1.5">
           {[
             ['Pay stubs or payroll records', 'bg-violet-400'],
@@ -269,8 +269,8 @@ function Step2Records({ onNext }: { onNext: () => void }) {
 
       {/* Drop zone */}
       <div className="mb-5 flex flex-col items-center justify-center gap-2 rounded-[18px] border-2 border-dashed border-[#ECE7F5] bg-[#FAF9F6] py-7">
-        <Upload className="h-7 w-7 text-[#5B21B6]/40" />
-        <span className="text-[13px] font-semibold text-[#5B21B6]">Drop files here, or click to browse</span>
+        <Upload className="h-7 w-7 text-[#42574E]/40" />
+        <span className="text-[13px] font-semibold text-[#42574E]">Drop files here, or click to browse</span>
         <span className="text-[11px] text-[#14112E]/35">PDF · Images · Word · Any format</span>
       </div>
 
@@ -376,10 +376,10 @@ function Step3Details({ onSubmit }: { onSubmit: () => void }) {
       <div className="sticky top-14 z-10 mb-6 rounded-[14px] border border-[#ECE7F5] bg-white/95 backdrop-blur-sm p-4 shadow-sm">
         <div className="mb-2 flex items-center justify-between">
           <span className="text-[12px] font-bold text-[#14112E]">Intake Completeness</span>
-          <span className="text-[12px] font-bold text-[#5B21B6]">{showAnswer.filter(Boolean).length} of {OPTIONAL_FIELDS.length}</span>
+          <span className="text-[12px] font-bold text-[#42574E]">{showAnswer.filter(Boolean).length} of {OPTIONAL_FIELDS.length}</span>
         </div>
         <div className="h-2 overflow-hidden rounded-full bg-[#ECE7F5]">
-          <motion.div className="h-full rounded-full bg-[#5B21B6]" animate={{ width: `${pct}%` }} transition={{ duration: 0.4, ease: 'easeOut' }} />
+          <motion.div className="h-full rounded-full bg-[#42574E]" animate={{ width: `${pct}%` }} transition={{ duration: 0.4, ease: 'easeOut' }} />
         </div>
       </div>
 
@@ -400,7 +400,7 @@ function Step3Details({ onSubmit }: { onSubmit: () => void }) {
                     className="mb-1.5 flex items-start gap-2"
                   >
                     <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[#ECE7F5] bg-[#F5F1FB] mt-0.5">
-                      <span className="text-[8px] font-black text-[#5B21B6]">137</span>
+                      <span className="text-[8px] font-black text-[#42574E]">137</span>
                     </div>
                     <div className="max-w-[78%] rounded-[14px] rounded-tl-[4px] border border-[#ECE7F5] bg-white px-4 py-2.5 text-[13px] font-medium text-[#14112E]">
                       {f.label}
@@ -419,10 +419,10 @@ function Step3Details({ onSubmit }: { onSubmit: () => void }) {
                     transition={{ duration: 0.15 }}
                     className="mb-1.5 flex justify-end"
                   >
-                    <div className="flex items-center gap-1 rounded-[14px] rounded-tr-[4px] bg-[#5B21B6]/10 px-4 py-2.5">
-                      <span className="h-1.5 w-1.5 rounded-full bg-[#5B21B6]/40" style={{ animation: 'o3s-dot-pulse 1.6s ease-in-out 0ms infinite' }} />
-                      <span className="h-1.5 w-1.5 rounded-full bg-[#5B21B6]/40" style={{ animation: 'o3s-dot-pulse 1.6s ease-in-out 0.3s infinite' }} />
-                      <span className="h-1.5 w-1.5 rounded-full bg-[#5B21B6]/40" style={{ animation: 'o3s-dot-pulse 1.6s ease-in-out 0.6s infinite' }} />
+                    <div className="flex items-center gap-1 rounded-[14px] rounded-tr-[4px] bg-[#42574E]/10 px-4 py-2.5">
+                      <span className="h-1.5 w-1.5 rounded-full bg-[#42574E]/40" style={{ animation: 'o3s-dot-pulse 1.6s ease-in-out 0ms infinite' }} />
+                      <span className="h-1.5 w-1.5 rounded-full bg-[#42574E]/40" style={{ animation: 'o3s-dot-pulse 1.6s ease-in-out 0.3s infinite' }} />
+                      <span className="h-1.5 w-1.5 rounded-full bg-[#42574E]/40" style={{ animation: 'o3s-dot-pulse 1.6s ease-in-out 0.6s infinite' }} />
                     </div>
                     <style>{`
                       @keyframes o3s-dot-pulse {
@@ -486,7 +486,7 @@ function PostProcessing({ onNext }: { onNext: () => void }) {
 
   return (
     <motion.div key="processing" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }} className="mx-auto max-w-2xl px-5 py-12">
-      <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-[#ECE7F5] bg-[#F5F1FB] px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[#5B21B6]">
+      <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-[#ECE7F5] bg-[#F5F1FB] px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[#42574E]">
         What one3seven builds from this
       </div>
       <h2 className="mb-8 text-[24px] font-bold leading-tight tracking-tight text-[#14112E]">Organizing your intake</h2>
@@ -504,11 +504,11 @@ function PostProcessing({ onNext }: { onNext: () => void }) {
               <motion.div key={s} initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3, delay: i * 0.07 }} className="flex items-center gap-2.5">
                 <AnimatePresence mode="wait">
                   {done
-                    ? <motion.div key="done" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 400, damping: 20 }}><CheckCircle2 className={`h-4 w-4 shrink-0 ${active ? 'text-[#5B21B6]' : 'text-emerald-500'}`} /></motion.div>
+                    ? <motion.div key="done" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 400, damping: 20 }}><CheckCircle2 className={`h-4 w-4 shrink-0 ${active ? 'text-[#42574E]' : 'text-emerald-500'}`} /></motion.div>
                     : <div key="empty" className="h-4 w-4 shrink-0 rounded-full border-2 border-[#ECE7F5]" />
                   }
                 </AnimatePresence>
-                <span className={`text-[13px] transition-colors ${done ? (active ? 'font-semibold text-[#5B21B6]' : 'font-medium text-[#14112E]') : 'text-[#14112E]/30'}`}>{s}</span>
+                <span className={`text-[13px] transition-colors ${done ? (active ? 'font-semibold text-[#42574E]' : 'font-medium text-[#14112E]') : 'text-[#14112E]/30'}`}>{s}</span>
               </motion.div>
             );
           })}
@@ -535,7 +535,7 @@ function PostSummary({ onNext }: { onNext: () => void }) {
 
   return (
     <motion.div key="postsummary" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }} className="mx-auto max-w-2xl px-5 py-12">
-      <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-[#ECE7F5] bg-[#F5F1FB] px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[#5B21B6]">
+      <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-[#ECE7F5] bg-[#F5F1FB] px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[#42574E]">
         What one3seven builds from this
       </div>
       <div className="mb-2 mt-3 flex items-center gap-3">
@@ -597,7 +597,7 @@ function PostDashboard({ onNext }: { onNext: () => void }) {
 
   return (
     <motion.div key="dashboard" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }} className="mx-auto max-w-2xl px-5 py-10">
-      <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-[#ECE7F5] bg-[#F5F1FB] px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[#5B21B6]">
+      <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-[#ECE7F5] bg-[#F5F1FB] px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[#42574E]">
         What one3seven builds from this
       </div>
 
@@ -614,7 +614,7 @@ function PostDashboard({ onNext }: { onNext: () => void }) {
       <div className="mb-5 flex rounded-[12px] border border-[#ECE7F5] bg-white p-1">
         {([['firm', 'What Firms See'], ['full', 'Full Review']] as const).map(([key, label]) => (
           <button key={key} type="button" onClick={() => setView(key)}
-            className={`flex-1 rounded-[9px] py-2 text-[13px] font-semibold transition ${view === key ? 'bg-[#5B21B6] text-white shadow-sm' : 'text-[#14112E]/55 hover:text-[#14112E]'}`}>
+            className={`flex-1 rounded-[9px] py-2 text-[13px] font-semibold transition ${view === key ? 'bg-[#42574E] text-white shadow-sm' : 'text-[#14112E]/55 hover:text-[#14112E]'}`}>
             {label}
           </button>
         ))}
@@ -632,7 +632,7 @@ function PostDashboard({ onNext }: { onNext: () => void }) {
 
       {/* Organized summary */}
       <div className="mb-4 rounded-[16px] border border-[#ECE7F5] bg-[#F5F1FB] p-5">
-        <div className="mb-2 text-[10px] font-bold uppercase tracking-wider text-[#5B21B6]">Organized Summary</div>
+        <div className="mb-2 text-[10px] font-bold uppercase tracking-wider text-[#42574E]">Organized Summary</div>
         <p className="text-[13px] leading-relaxed text-[#14112E]/80">{ORGANIZED_SUMMARY}</p>
       </div>
 
@@ -641,7 +641,7 @@ function PostDashboard({ onNext }: { onNext: () => void }) {
         <div className="mb-2 text-[10px] font-bold uppercase tracking-wider text-[#14112E]/40">Possible Review Areas</div>
         <div className="mb-4 flex flex-wrap gap-2">
           {CONCERNS.map(c => (
-            <span key={c} className="rounded-full border border-[#ECE7F5] bg-[#F5F1FB] px-3 py-1.5 text-[12px] font-semibold text-[#5B21B6]">{c}</span>
+            <span key={c} className="rounded-full border border-[#ECE7F5] bg-[#F5F1FB] px-3 py-1.5 text-[12px] font-semibold text-[#42574E]">{c}</span>
           ))}
         </div>
         {!concernsConfirmed ? (
@@ -649,7 +649,7 @@ function PostDashboard({ onNext }: { onNext: () => void }) {
             <p className="mb-3 text-[13px] font-medium text-[#14112E]">Does this sound accurate?</p>
             <div className="flex gap-2">
               <button type="button" onClick={() => setConcernsConfirmed(true)}
-                className="flex items-center gap-1.5 rounded-full bg-[#5B21B6] px-5 py-2 text-[13px] font-semibold text-white transition hover:bg-[#4C1D96]">
+                className="flex items-center gap-1.5 rounded-full bg-[#42574E] px-5 py-2 text-[13px] font-semibold text-white transition hover:bg-[#4C1D96]">
                 <CheckCircle2 className="h-3.5 w-3.5" /> Yes, that's accurate
               </button>
               <button type="button" className="rounded-full border border-[#ECE7F5] px-5 py-2 text-[13px] font-semibold text-[#14112E]/55 transition hover:bg-[#F5F1FB]">
@@ -688,7 +688,7 @@ function PostDashboard({ onNext }: { onNext: () => void }) {
                           <div className="pb-3 min-w-0">
                             <div className="flex flex-wrap items-center gap-1.5 mb-0.5">
                               <span className="text-[10px] font-bold text-[#14112E]/40">{e.date}</span>
-                              {e.tag && <span className={`rounded-full px-1.5 py-0.5 text-[9px] font-bold ${e.gap ? 'bg-red-100 text-red-600' : 'bg-[#F5F1FB] text-[#5B21B6]'}`}>{e.tag}</span>}
+                              {e.tag && <span className={`rounded-full px-1.5 py-0.5 text-[9px] font-bold ${e.gap ? 'bg-red-100 text-red-600' : 'bg-[#F5F1FB] text-[#42574E]'}`}>{e.tag}</span>}
                             </div>
                             <div className="text-[12px] font-semibold text-[#14112E]">{e.label}</div>
                             <div className="text-[11px] leading-relaxed text-[#14112E]/50 mt-0.5">{e.detail}</div>
@@ -757,15 +757,15 @@ function PostControl({ onSignUp }: { onSignUp: () => void }) {
 
   return (
     <motion.div key="control" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }} className="mx-auto max-w-2xl px-5 py-10">
-      <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-[#ECE7F5] bg-[#F5F1FB] px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[#5B21B6]">
+      <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-[#ECE7F5] bg-[#F5F1FB] px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[#42574E]">
         What one3seven builds from this
       </div>
 
       {/* Privacy banner */}
       <div className="mb-6 mt-3 rounded-[18px] border border-[#ECE7F5] bg-[#14112E] p-6">
         <div className="mb-3 flex items-center gap-3">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#5B21B6]/20">
-            <Lock className="h-4 w-4 text-[#A78BFA]" />
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#42574E]/20">
+            <Lock className="h-4 w-4 text-[#7C8B6F]" />
           </div>
           <div className="text-[15px] font-bold text-white">Your information is not shared until you approve.</div>
         </div>
@@ -777,7 +777,7 @@ function PostControl({ onSignUp }: { onSignUp: () => void }) {
             'You can continue editing your records after organizing',
           ].map(item => (
             <div key={item} className="flex items-start gap-2">
-              <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-[#A78BFA] mt-0.5" />
+              <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-[#7C8B6F] mt-0.5" />
               <span className="text-[12px] leading-relaxed text-white/65">{item}</span>
             </div>
           ))}
@@ -790,8 +790,8 @@ function PostControl({ onSignUp }: { onSignUp: () => void }) {
       <div className="mb-6 space-y-3">
         {actions.map(a => (
           <div key={a.label} className={`flex items-center gap-4 rounded-[16px] border p-5 ${a.primary ? 'border-[#ECE7F5] bg-[#F5F1FB]' : 'border-[#ECE7F5] bg-white'}`}>
-            <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${a.primary ? 'bg-[#5B21B6]' : 'bg-[#ECE7F5]'}`}>
-              <a.icon className={`h-4 w-4 ${a.primary ? 'text-white' : 'text-[#5B21B6]'}`} />
+            <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${a.primary ? 'bg-[#42574E]' : 'bg-[#ECE7F5]'}`}>
+              <a.icon className={`h-4 w-4 ${a.primary ? 'text-white' : 'text-[#42574E]'}`} />
             </div>
             <div>
               <div className="text-[14px] font-bold text-[#14112E]">{a.label}</div>
@@ -826,7 +826,7 @@ function PostControl({ onSignUp }: { onSignUp: () => void }) {
 
       <div className="flex flex-col gap-3 sm:flex-row">
         <button type="button" onClick={onSignUp}
-          className="flex items-center justify-center gap-2 rounded-full bg-[#5B21B6] px-7 py-3.5 text-[15px] font-semibold text-white shadow-[0_12px_32px_rgba(109,74,255,0.25)] transition hover:bg-[#4C1D96] hover:-translate-y-0.5">
+          className="flex items-center justify-center gap-2 rounded-full bg-[#42574E] px-7 py-3.5 text-[15px] font-semibold text-white shadow-[0_12px_32px_rgba(109,74,255,0.25)] transition hover:bg-[#4C1D96] hover:-translate-y-0.5">
           Request beta access <ArrowRight className="h-4 w-4" />
         </button>
         <button type="button" onClick={() => { window.location.href = '/'; }}

@@ -56,7 +56,7 @@ import type { AppNotificationItem } from '../components/NotificationsBell';
 import { WordMark } from '../components/WordMark';
 
 const UPLOAD_PAGE_SHELL =
-  'min-h-screen bg-[#f6f2ff] text-[#111827] selection:bg-violet-200/70 selection:text-[#111827]';
+  'min-h-screen bg-[#f2f4ec] text-[#111827] selection:bg-violet-200/70 selection:text-[#111827]';
 const UPLOAD_NAV_TOP = 'sticky top-0 z-40 border-b border-violet-100/80 bg-white/88 backdrop-blur-xl';
 const UPLOAD_NAV_BRAND =
   'text-[15px] font-semibold tracking-tight text-[#15112f] hover:text-violet-700 transition-colors';

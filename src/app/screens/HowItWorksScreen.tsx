@@ -62,7 +62,7 @@ export function HowItWorksScreen({ onNavigate }: HowItWorksScreenProps) {
         <div className="px-6 py-7">
           <button
             onClick={() => onNavigate('landing')}
-            className="text-xl font-semibold text-[#6d4aff] hover:opacity-70 transition-opacity duration-200"
+            className="text-xl font-semibold text-[#42574e] hover:opacity-70 transition-opacity duration-200"
           >
             <WordMark />
           </button>
@@ -109,7 +109,7 @@ export function HowItWorksScreen({ onNavigate }: HowItWorksScreenProps) {
                 )}
 
                 <div className="flex items-start gap-5">
-                  <div className="w-11 h-11 bg-[#6d4aff] rounded-full flex items-center justify-center flex-shrink-0">
+                  <div className="w-11 h-11 bg-[#42574e] rounded-full flex items-center justify-center flex-shrink-0">
                     <step.icon className="w-5 h-5 text-white" />
                   </div>
 
@@ -153,7 +153,7 @@ export function HowItWorksScreen({ onNavigate }: HowItWorksScreenProps) {
               <div className="space-y-3">
                 {documentTypes.map((type, index) => (
                   <div key={index} className="flex items-start gap-3">
-                    <CheckCircle2 className="w-4 h-4 text-[#6d4aff] flex-shrink-0 mt-0.5" />
+                    <CheckCircle2 className="w-4 h-4 text-[#42574e] flex-shrink-0 mt-0.5" />
                     <span className="text-sm text-[#39415f] leading-relaxed">{type}</span>
                   </div>
                 ))}
@@ -170,7 +170,7 @@ export function HowItWorksScreen({ onNavigate }: HowItWorksScreenProps) {
           >
             <button
               onClick={() => onNavigate('upload')}
-              className="w-full bg-[#6d4aff] text-white py-4 px-6 rounded-[14px] hover:bg-[#5b39e6] transition-all shadow-[0_10px_22px_rgba(109,74,255,0.18)] font-medium"
+              className="w-full bg-[#42574e] text-white py-4 px-6 rounded-[14px] hover:bg-[#5b39e6] transition-all shadow-[0_10px_22px_rgba(109,74,255,0.18)] font-medium"
             >
               Start Organizing
             </button>

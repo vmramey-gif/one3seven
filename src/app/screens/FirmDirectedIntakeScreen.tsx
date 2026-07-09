@@ -73,8 +73,8 @@ export function FirmDirectedIntakeScreen({ firmName, onSubmit }: FirmDirectedInt
 
       <div className="mx-auto max-w-[520px] px-6 py-10">
         {/* Firm badge */}
-        <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#ECE7F5] bg-white px-4 py-1.5 text-xs font-semibold text-[#5B21B6]">
-          <span className="h-1.5 w-1.5 rounded-full bg-[#5B21B6] animate-pulse" />
+        <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#ECE7F5] bg-white px-4 py-1.5 text-xs font-semibold text-[#42574E]">
+          <span className="h-1.5 w-1.5 rounded-full bg-[#42574E] animate-pulse" />
           Submitted to {firmName}
         </div>
 
@@ -100,7 +100,7 @@ export function FirmDirectedIntakeScreen({ firmName, onSubmit }: FirmDirectedInt
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
                     placeholder="First"
-                    className="w-full rounded-xl border border-[#ECE7F5] bg-white px-4 py-3 text-sm text-[#14112E] placeholder-[#14112E]/30 focus:border-[#5B21B6] focus:outline-none focus:ring-2 focus:ring-[#5B21B6]/20"
+                    className="w-full rounded-xl border border-[#ECE7F5] bg-white px-4 py-3 text-sm text-[#14112E] placeholder-[#14112E]/30 focus:border-[#42574E] focus:outline-none focus:ring-2 focus:ring-[#42574E]/20"
                   />
                 </div>
                 <div>
@@ -112,7 +112,7 @@ export function FirmDirectedIntakeScreen({ firmName, onSubmit }: FirmDirectedInt
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
                     placeholder="Last"
-                    className="w-full rounded-xl border border-[#ECE7F5] bg-white px-4 py-3 text-sm text-[#14112E] placeholder-[#14112E]/30 focus:border-[#5B21B6] focus:outline-none focus:ring-2 focus:ring-[#5B21B6]/20"
+                    className="w-full rounded-xl border border-[#ECE7F5] bg-white px-4 py-3 text-sm text-[#14112E] placeholder-[#14112E]/30 focus:border-[#42574E] focus:outline-none focus:ring-2 focus:ring-[#42574E]/20"
                   />
                 </div>
               </div>
@@ -127,7 +127,7 @@ export function FirmDirectedIntakeScreen({ firmName, onSubmit }: FirmDirectedInt
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="(555) 000-0000"
-                  className="w-full rounded-xl border border-[#ECE7F5] bg-white px-4 py-3 text-sm text-[#14112E] placeholder-[#14112E]/30 focus:border-[#5B21B6] focus:outline-none focus:ring-2 focus:ring-[#5B21B6]/20"
+                  className="w-full rounded-xl border border-[#ECE7F5] bg-white px-4 py-3 text-sm text-[#14112E] placeholder-[#14112E]/30 focus:border-[#42574E] focus:outline-none focus:ring-2 focus:ring-[#42574E]/20"
                 />
               </div>
 
@@ -141,7 +141,7 @@ export function FirmDirectedIntakeScreen({ firmName, onSubmit }: FirmDirectedInt
                   value={employer}
                   onChange={(e) => setEmployer(e.target.value)}
                   placeholder="Who did you work for?"
-                  className="w-full rounded-xl border border-[#ECE7F5] bg-white px-4 py-3 text-sm text-[#14112E] placeholder-[#14112E]/30 focus:border-[#5B21B6] focus:outline-none focus:ring-2 focus:ring-[#5B21B6]/20"
+                  className="w-full rounded-xl border border-[#ECE7F5] bg-white px-4 py-3 text-sm text-[#14112E] placeholder-[#14112E]/30 focus:border-[#42574E] focus:outline-none focus:ring-2 focus:ring-[#42574E]/20"
                 />
               </div>
 
@@ -155,7 +155,7 @@ export function FirmDirectedIntakeScreen({ firmName, onSubmit }: FirmDirectedInt
                   onChange={(e) => setStory(e.target.value)}
                   placeholder="Describe your situation in your own words. Include dates, key events, and anything you think matters."
                   rows={5}
-                  className="w-full rounded-xl border border-[#ECE7F5] bg-white px-4 py-3 text-sm text-[#14112E] placeholder-[#14112E]/30 focus:border-[#5B21B6] focus:outline-none focus:ring-2 focus:ring-[#5B21B6]/20 resize-none"
+                  className="w-full rounded-xl border border-[#ECE7F5] bg-white px-4 py-3 text-sm text-[#14112E] placeholder-[#14112E]/30 focus:border-[#42574E] focus:outline-none focus:ring-2 focus:ring-[#42574E]/20 resize-none"
                 />
               </div>
 
@@ -166,7 +166,7 @@ export function FirmDirectedIntakeScreen({ firmName, onSubmit }: FirmDirectedInt
               <button
                 type="button"
                 onClick={handleFormContinue}
-                className="flex w-full items-center justify-center gap-2 rounded-full bg-[#5B21B6] px-6 py-4 text-[15px] font-semibold text-white shadow-[0_8px_32px_rgba(109,74,255,0.28)] transition hover:bg-[#4C1D96] hover:-translate-y-0.5"
+                className="flex w-full items-center justify-center gap-2 rounded-full bg-[#42574E] px-6 py-4 text-[15px] font-semibold text-white shadow-[0_8px_32px_rgba(109,74,255,0.28)] transition hover:bg-[#4C1D96] hover:-translate-y-0.5"
               >
                 Continue
                 <ArrowRight className="h-4 w-4" />
@@ -200,7 +200,7 @@ export function FirmDirectedIntakeScreen({ firmName, onSubmit }: FirmDirectedInt
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
                   autoFocus
-                  className="w-full rounded-xl border border-[#ECE7F5] bg-white px-4 py-3 text-sm text-[#14112E] placeholder-[#14112E]/30 focus:border-[#5B21B6] focus:outline-none focus:ring-2 focus:ring-[#5B21B6]/20"
+                  className="w-full rounded-xl border border-[#ECE7F5] bg-white px-4 py-3 text-sm text-[#14112E] placeholder-[#14112E]/30 focus:border-[#42574E] focus:outline-none focus:ring-2 focus:ring-[#42574E]/20"
                 />
               </div>
 
@@ -211,7 +211,7 @@ export function FirmDirectedIntakeScreen({ firmName, onSubmit }: FirmDirectedInt
               <button
                 type="submit"
                 disabled={busy}
-                className="flex w-full items-center justify-center gap-2 rounded-full bg-[#5B21B6] px-6 py-4 text-[15px] font-semibold text-white shadow-[0_8px_32px_rgba(109,74,255,0.28)] transition hover:bg-[#4C1D96] disabled:opacity-60"
+                className="flex w-full items-center justify-center gap-2 rounded-full bg-[#42574E] px-6 py-4 text-[15px] font-semibold text-white shadow-[0_8px_32px_rgba(109,74,255,0.28)] transition hover:bg-[#4C1D96] disabled:opacity-60"
               >
                 {busy ? 'Sending…' : 'Send my secure link'}
                 {!busy && <ArrowRight className="h-4 w-4" />}
@@ -247,7 +247,7 @@ export function FirmDirectedIntakeScreen({ firmName, onSubmit }: FirmDirectedInt
               <button
                 type="button"
                 onClick={() => setStep('email')}
-                className="text-[#5B21B6] underline underline-offset-2"
+                className="text-[#42574E] underline underline-offset-2"
               >
                 try again
               </button>

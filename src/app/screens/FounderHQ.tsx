@@ -18,14 +18,14 @@ type Status = 'loading' | 'anon' | 'rep' | 'founder' | 'not_authorized' | 'recov
 function HQWordMark() {
   return (
     <span className="text-[17px] font-bold tracking-tight text-white">
-      one<span className="font-black text-[#A78BFA]">3</span>seven
-      <span className="ml-1 rounded-md bg-[#6D4AFF] px-1.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-white">HQ</span>
+      one<span className="font-black text-[#7C8B6F]">3</span>seven
+      <span className="ml-1 rounded-md bg-[#42574E] px-1.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-white">HQ</span>
     </span>
   );
 }
 
 const fieldCls =
-  'min-h-[48px] w-full rounded-[12px] border border-white/15 bg-white/5 px-4 text-[15px] text-white placeholder:text-white/35 outline-none focus:border-[#A78BFA]';
+  'min-h-[48px] w-full rounded-[12px] border border-white/15 bg-white/5 px-4 text-[15px] text-white placeholder:text-white/35 outline-none focus:border-[#7C8B6F]';
 
 export function FounderHQ() {
   const [status, setStatus] = useState<Status>('loading');
@@ -131,7 +131,7 @@ export function FounderHQ() {
 
         {(status === 'founder' || status === 'rep') && (
           <div>
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#6D4AFF]/40 bg-[#6D4AFF]/15 px-3 py-1.5 text-xs font-semibold text-[#C7B9FF]">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#42574E]/40 bg-[#42574E]/15 px-3 py-1.5 text-xs font-semibold text-[#C7B9FF]">
               <ShieldCheck className="h-3.5 w-3.5" /> {status === 'founder' ? 'Founder access' : 'Sales rep access'}
             </div>
             <h1 className="mb-3 text-[30px] font-bold leading-tight tracking-tight">one3seven HQ</h1>
@@ -143,7 +143,7 @@ export function FounderHQ() {
             <button
               type="button"
               onClick={() => { setShowCRM(true); try { sessionStorage.setItem('o3s_hq_open_crm', '1'); } catch { /* ignore */ } }}
-              className="flex min-h-[52px] w-full items-center justify-center gap-2 rounded-full bg-[#6D4AFF] text-[16px] font-semibold text-white shadow-[0_12px_40px_rgba(109,74,255,0.4)] transition hover:bg-[#5B35D5]"
+              className="flex min-h-[52px] w-full items-center justify-center gap-2 rounded-full bg-[#42574E] text-[16px] font-semibold text-white shadow-[0_12px_40px_rgba(109,74,255,0.4)] transition hover:bg-[#374A42]"
             >
               Open Sales CRM <ArrowRight className="h-5 w-5" />
             </button>
@@ -165,7 +165,7 @@ export function FounderHQ() {
               <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="New password (8+ characters)" autoComplete="new-password" className={fieldCls} />
               {error && <p className="text-[13px] text-red-300">{error}</p>}
               {notice && <p className="text-[13px] text-emerald-300">{notice}</p>}
-              <button type="submit" disabled={busy || newPassword.length < 8} className="flex min-h-[52px] w-full items-center justify-center gap-2 rounded-full bg-[#6D4AFF] text-[16px] font-semibold text-white transition hover:bg-[#5B35D5] disabled:opacity-40">
+              <button type="submit" disabled={busy || newPassword.length < 8} className="flex min-h-[52px] w-full items-center justify-center gap-2 rounded-full bg-[#42574E] text-[16px] font-semibold text-white transition hover:bg-[#374A42] disabled:opacity-40">
                 {busy ? 'Saving…' : 'Save new password'} <ArrowRight className="h-5 w-5" />
               </button>
             </form>
@@ -198,7 +198,7 @@ export function FounderHQ() {
               <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" autoComplete={mode === 'signin' ? 'current-password' : 'new-password'} className={fieldCls} />
               {error && <p className="text-[13px] text-red-300">{error}</p>}
               {notice && <p className="text-[13px] text-emerald-300">{notice}</p>}
-              <button type="submit" disabled={busy || !email || !password} className="flex min-h-[52px] w-full items-center justify-center gap-2 rounded-full bg-[#6D4AFF] text-[16px] font-semibold text-white transition hover:bg-[#5B35D5] disabled:opacity-40">
+              <button type="submit" disabled={busy || !email || !password} className="flex min-h-[52px] w-full items-center justify-center gap-2 rounded-full bg-[#42574E] text-[16px] font-semibold text-white transition hover:bg-[#374A42] disabled:opacity-40">
                 {busy ? 'Working…' : mode === 'signin' ? 'Sign in' : 'Create account'} <ArrowRight className="h-5 w-5" />
               </button>
             </form>
@@ -247,7 +247,7 @@ function RepsManager() {
 
   return (
     <div className="mt-8 rounded-[16px] border border-white/10 bg-white/5 p-5">
-      <div className="mb-3 flex items-center gap-2 text-[14px] font-bold"><Users className="h-4 w-4 text-[#A78BFA]" /> Sales reps</div>
+      <div className="mb-3 flex items-center gap-2 text-[14px] font-bold"><Users className="h-4 w-4 text-[#7C8B6F]" /> Sales reps</div>
       <form onSubmit={add} className="space-y-2.5">
         <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Rep name" className={fieldCls} />
         <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Rep email" className={fieldCls} />
@@ -257,7 +257,7 @@ function RepsManager() {
         </button>
       </form>
 
-      <p className="mt-3 rounded-[10px] bg-[#6D4AFF]/15 px-3 py-2 text-[12px] leading-relaxed text-[#C7B9FF]">
+      <p className="mt-3 rounded-[10px] bg-[#42574E]/15 px-3 py-2 text-[12px] leading-relaxed text-[#C7B9FF]">
         Share this link with reps: <span className="font-semibold text-white">{hqLink}</span> — they create an account / sign in with the email you invited.
       </p>
 

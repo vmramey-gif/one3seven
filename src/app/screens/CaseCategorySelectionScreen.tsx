@@ -49,7 +49,7 @@ function CategoryCard({
         compact ? 'px-3.5 py-3' : 'px-4 py-4'
       } ${
         selected
-          ? 'border-[#6d4aff] bg-[#6d4aff] text-white'
+          ? 'border-[#42574e] bg-[#42574e] text-white'
           : 'border-[#e5def8] bg-white text-[#111b3d] hover:border-[#d5c9f3]'
       } touch-manipulation`}
     >

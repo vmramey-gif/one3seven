@@ -259,7 +259,7 @@ function TruncatedNameButton({ fullName, display }: { fullName: string; display:
             <button
               type="button"
               onClick={() => setOpen(false)}
-              className="mt-4 w-full text-sm font-medium py-2.5 rounded-[12px] bg-[#5B21B6] text-white hover:bg-[#4C1D96]"
+              className="mt-4 w-full text-sm font-medium py-2.5 rounded-[12px] bg-[#42574E] text-white hover:bg-[#4C1D96]"
             >
               Close
             </button>
@@ -1145,7 +1145,7 @@ export function IntakeSummaryScreen({
             ) : null}
           </div>
 
-          <div className="mb-4 rounded-[18px] border border-[#DCD3FF] bg-white/90 p-3 shadow-[0_14px_36px_rgba(91,53,213,0.08)]">
+          <div className="mb-4 rounded-[18px] border border-[#CBD6CF] bg-white/90 p-3 shadow-[0_14px_36px_rgba(91,53,213,0.08)]">
             <p className="mb-3 text-sm leading-relaxed text-[#1E1B4B]/72">
               This is the organized summary one3seven created from your story and records.
             </p>
@@ -1155,7 +1155,7 @@ export function IntakeSummaryScreen({
                 onClick={() => setFullReviewMode(false)}
                 className={`rounded-[12px] px-3 py-2.5 text-xs font-semibold transition ${
                   !fullReviewMode
-                    ? 'bg-white text-[#5B35D5] shadow-sm'
+                    ? 'bg-white text-[#374A42] shadow-sm'
                     : 'text-[#475569] hover:bg-white/60'
                 }`}
               >
@@ -1166,7 +1166,7 @@ export function IntakeSummaryScreen({
                 onClick={() => setFullReviewMode(true)}
                 className={`rounded-[12px] px-3 py-2.5 text-xs font-semibold transition ${
                   fullReviewMode
-                    ? 'bg-white text-[#5B35D5] shadow-sm'
+                    ? 'bg-white text-[#374A42] shadow-sm'
                     : 'text-[#475569] hover:bg-white/60'
                 }`}
               >
@@ -1180,9 +1180,9 @@ export function IntakeSummaryScreen({
             </p>
           </div>
 
-          <section className="mb-4 rounded-[20px] border border-[#DCD3FF] bg-white/95 p-4 shadow-[0_16px_42px_rgba(91,53,213,0.09)]">
+          <section className="mb-4 rounded-[20px] border border-[#CBD6CF] bg-white/95 p-4 shadow-[0_16px_42px_rgba(91,53,213,0.09)]">
             <div className="mb-4">
-              <p className="text-[11px] font-semibold uppercase tracking-wide text-[#6D4AFF]">Organized Summary</p>
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-[#42574E]">Organized Summary</p>
               <div className="mt-2 space-y-2">
                 {organizedSummaryParagraphs.length > 0 ? (
                   organizedSummaryParagraphs.map((paragraph, index) => (
@@ -1211,13 +1211,13 @@ export function IntakeSummaryScreen({
                     key={item.label}
                     className={`rounded-[14px] border px-3 py-3 ${
                       item.complete
-                        ? 'border-[#DCD3FF] bg-[#F8F4FF]'
+                        ? 'border-[#CBD6CF] bg-[#F8F4FF]'
                         : 'border-[#ECE7F5] bg-[#FAF9F6]'
                     }`}
                   >
                     <div className="flex items-start gap-2">
                       <CheckCircle2
-                        className={`mt-0.5 h-4 w-4 shrink-0 ${item.complete ? 'text-[#6D4AFF]' : 'text-[#A8A3BC]'}`}
+                        className={`mt-0.5 h-4 w-4 shrink-0 ${item.complete ? 'text-[#42574E]' : 'text-[#A8A3BC]'}`}
                         aria-hidden
                       />
                       <div>
@@ -1263,7 +1263,7 @@ export function IntakeSummaryScreen({
                 )}
               </div>
 
-              <div className="rounded-[14px] border border-[#DCD3FF] bg-white px-3 py-3">
+              <div className="rounded-[14px] border border-[#CBD6CF] bg-white px-3 py-3">
                 <h2 className="text-sm font-semibold text-[#0B1033]">Next Recommended Action</h2>
                 <p className="mt-2 text-sm leading-relaxed text-[#475569]">{nextRecommendedAction}</p>
               </div>
@@ -1283,7 +1283,7 @@ export function IntakeSummaryScreen({
                     <button
                       type="button"
                       onClick={() => setConcernsAcknowledged(true)}
-                      className="rounded-full border border-[#6D4AFF] px-3 py-1 text-xs font-medium text-[#6D4AFF] hover:bg-[#F7F3FF]"
+                      className="rounded-full border border-[#42574E] px-3 py-1 text-xs font-medium text-[#42574E] hover:bg-[#F7F3FF]"
                     >
                       Yes, that's right
                     </button>
@@ -1350,7 +1350,7 @@ export function IntakeSummaryScreen({
                             href={barSearchUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="mt-1.5 inline-flex items-center gap-1 text-xs font-medium text-[#5B35D5] underline underline-offset-2 hover:text-[#1E1B4B]"
+                            className="mt-1.5 inline-flex items-center gap-1 text-xs font-medium text-[#374A42] underline underline-offset-2 hover:text-[#1E1B4B]"
                           >
                             Search {barStateLabel} State Bar directory ↗
                           </a>
@@ -1376,7 +1376,7 @@ export function IntakeSummaryScreen({
                       type="button"
                       disabled={Boolean(accessApprovalBusyRouteId)}
                       onClick={() => void handleApproveAccess(req.routeId)}
-                      className="mt-4 w-full min-h-[44px] touch-manipulation text-sm font-medium bg-[#5B21B6] text-white px-4 py-3 rounded-[12px] hover:bg-[#4C1D96] disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="mt-4 w-full min-h-[44px] touch-manipulation text-sm font-medium bg-[#42574E] text-white px-4 py-3 rounded-[12px] hover:bg-[#4C1D96] disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {busy ? (
                         <span className="inline-flex items-center justify-center gap-2">
@@ -1539,7 +1539,7 @@ export function IntakeSummaryScreen({
                       setIntakeNotesOpen(true);
                       setIntakeNoteMessage(null);
                     }}
-                    className="text-sm font-medium px-4 py-2.5 rounded-[12px] bg-[#5B21B6] text-white hover:bg-[#4C1D96]"
+                    className="text-sm font-medium px-4 py-2.5 rounded-[12px] bg-[#42574E] text-white hover:bg-[#4C1D96]"
                   >
                     {savedAdditionalNotesRaw ? 'Edit Notes' : 'Add Notes'}
                   </button>
@@ -1572,7 +1572,7 @@ export function IntakeSummaryScreen({
                       className={`text-sm font-medium px-4 py-2.5 rounded-[12px] ${
                         intakeNoteSaving || intakeNoteDraft === savedAdditionalNotesRaw
                           ? 'bg-[#ECE7F5] text-[#8B86A0] cursor-not-allowed'
-                          : 'bg-[#5B21B6] text-white hover:bg-[#4C1D96]'
+                          : 'bg-[#42574E] text-white hover:bg-[#4C1D96]'
                       }`}
                     >
                       {intakeNoteSaving ? 'Saving…' : 'Save notes'}
@@ -1709,7 +1709,7 @@ export function IntakeSummaryScreen({
                                 onUploadedFileLabelChange(key, editingFileLabel.trim() || truncateFileLabel(file.name));
                                 setEditingFileKey(null);
                               }}
-                              className="text-xs font-medium px-3 py-2 rounded-lg bg-[#5B21B6] text-white"
+                              className="text-xs font-medium px-3 py-2 rounded-lg bg-[#42574E] text-white"
                             >
                               Save label
                             </button>
@@ -1815,7 +1815,7 @@ export function IntakeSummaryScreen({
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="mb-4 bg-[#5B21B6] text-white rounded-[14px] p-4 flex items-center gap-3"
+                  className="mb-4 bg-[#42574E] text-white rounded-[14px] p-4 flex items-center gap-3"
                 >
                   <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
                   <div className="text-sm">Your intake workspace has been saved.</div>
@@ -1830,7 +1830,7 @@ export function IntakeSummaryScreen({
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="mb-4 bg-[#5B21B6] text-white rounded-[14px] p-4 flex items-center gap-3"
+                  className="mb-4 bg-[#42574E] text-white rounded-[14px] p-4 flex items-center gap-3"
                 >
                   <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
                   <div className="text-sm">
@@ -1847,7 +1847,7 @@ export function IntakeSummaryScreen({
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="mb-4 bg-[#5B21B6] text-white rounded-[14px] p-5"
+                  className="mb-4 bg-[#42574E] text-white rounded-[14px] p-5"
                 >
                   <div className="flex items-start gap-3 mb-2">
                     <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
@@ -2038,7 +2038,7 @@ export function IntakeSummaryScreen({
                 <button
                   type="button"
                   onClick={() => onNavigate('upload')}
-                  className="text-sm font-medium bg-[#5B21B6] text-white px-4 py-2.5 rounded-[12px] hover:bg-[#4C1D96] mb-4"
+                  className="text-sm font-medium bg-[#42574E] text-white px-4 py-2.5 rounded-[12px] hover:bg-[#4C1D96] mb-4"
                 >
                   Upload requested documents
                 </button>
@@ -2063,7 +2063,7 @@ export function IntakeSummaryScreen({
                         <label
                           className={`flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm cursor-pointer border ${
                             fulfilledDraft.includes('Other')
-                              ? 'bg-[#5B21B6] text-white border-[#5B21B6]'
+                              ? 'bg-[#42574E] text-white border-[#42574E]'
                               : 'bg-white text-[#14112E] border-[#ECE7F5]'
                           }`}
                         >
@@ -2087,7 +2087,7 @@ export function IntakeSummaryScreen({
                           key={category}
                           className={`flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm cursor-pointer border ${
                             fulfilledDraft.includes(category)
-                              ? 'bg-[#5B21B6] text-white border-[#5B21B6]'
+                              ? 'bg-[#42574E] text-white border-[#42574E]'
                               : 'bg-white text-[#14112E] border-[#ECE7F5]'
                           }`}
                         >
@@ -2156,7 +2156,7 @@ export function IntakeSummaryScreen({
                           setNoteToFirmDraft('');
                         })()
                       }
-                      className="text-sm font-medium bg-[#5B21B6] text-white px-4 py-2.5 rounded-[12px] hover:bg-[#4C1D96] disabled:opacity-50"
+                      className="text-sm font-medium bg-[#42574E] text-white px-4 py-2.5 rounded-[12px] hover:bg-[#4C1D96] disabled:opacity-50"
                     >
                       {docConfirmBusy ? 'Saving…' : 'Confirm response to firm'}
                     </button>
@@ -2248,7 +2248,7 @@ export function IntakeSummaryScreen({
                     value={emailAddress}
                     onChange={(e) => setEmailAddress(e.target.value)}
                     placeholder="your@email.com"
-                    className="w-full px-4 py-3 bg-[#FAF9F6] border border-[#ECE7F5] rounded-[14px] text-sm text-[#14112E] placeholder:text-[#A8A3BC] focus:outline-none focus:ring-2 focus:ring-[#5B21B6] focus:border-transparent"
+                    className="w-full px-4 py-3 bg-[#FAF9F6] border border-[#ECE7F5] rounded-[14px] text-sm text-[#14112E] placeholder:text-[#A8A3BC] focus:outline-none focus:ring-2 focus:ring-[#42574E] focus:border-transparent"
                     disabled={isSending}
                   />
                 </div>
@@ -2260,7 +2260,7 @@ export function IntakeSummaryScreen({
                     value={emailNote}
                     onChange={(e) => setEmailNote(e.target.value)}
                     placeholder="Add a note to yourself (optional)"
-                    className="w-full h-24 px-4 py-3 bg-[#FAF9F6] border border-[#ECE7F5] rounded-[14px] text-sm text-[#14112E] placeholder:text-[#A8A3BC] focus:outline-none focus:ring-2 focus:ring-[#5B21B6] focus:border-transparent resize-none"
+                    className="w-full h-24 px-4 py-3 bg-[#FAF9F6] border border-[#ECE7F5] rounded-[14px] text-sm text-[#14112E] placeholder:text-[#A8A3BC] focus:outline-none focus:ring-2 focus:ring-[#42574E] focus:border-transparent resize-none"
                     disabled={isSending}
                   />
                 </div>
@@ -2273,7 +2273,7 @@ export function IntakeSummaryScreen({
                     className={`w-full py-4 px-6 rounded-[14px] transition-all font-medium flex items-center justify-center gap-2 ${
                       !emailAddress.trim() || isSending
                         ? 'bg-[#ECE7F5] text-[#A8A3BC] cursor-not-allowed'
-                        : 'bg-[#5B21B6] text-white hover:bg-[#4C1D96] shadow-sm hover:shadow-md'
+                        : 'bg-[#42574E] text-white hover:bg-[#4C1D96] shadow-sm hover:shadow-md'
                     }`}
                   >
                     {isSending ? (
@@ -2402,7 +2402,7 @@ export function IntakeSummaryScreen({
                           className={`w-full py-4 px-6 rounded-[14px] transition-all font-medium flex items-center justify-center gap-2 ${
                             isSharing
                               ? 'bg-[#A8A3BC] text-white cursor-not-allowed'
-                              : 'bg-[#5B21B6] text-white hover:bg-[#4C1D96] shadow-sm hover:shadow-md'
+                              : 'bg-[#42574E] text-white hover:bg-[#4C1D96] shadow-sm hover:shadow-md'
                           }`}
                         >
                           {isSharing ? (
@@ -2443,7 +2443,7 @@ export function IntakeSummaryScreen({
                           className={`w-full py-4 px-6 rounded-[14px] transition-all font-medium flex items-center justify-center gap-2 ${
                             isSharing
                               ? 'bg-[#A8A3BC] text-white cursor-not-allowed'
-                              : 'bg-[#5B21B6] text-white hover:bg-[#4C1D96] shadow-sm hover:shadow-md'
+                              : 'bg-[#42574E] text-white hover:bg-[#4C1D96] shadow-sm hover:shadow-md'
                           }`}
                         >
                           {isSharing ? (
@@ -2466,7 +2466,7 @@ export function IntakeSummaryScreen({
                           className={`w-full py-4 px-6 rounded-[14px] transition-all font-medium flex items-center justify-center gap-2 ${
                             isSharing
                               ? 'bg-[#A8A3BC] text-white cursor-not-allowed'
-                              : 'bg-[#5B21B6] text-white hover:bg-[#4C1D96] shadow-sm hover:shadow-md'
+                              : 'bg-[#42574E] text-white hover:bg-[#4C1D96] shadow-sm hover:shadow-md'
                           }`}
                         >
                           {isSharing ? (
@@ -2490,7 +2490,7 @@ export function IntakeSummaryScreen({
                           type="button"
                           disabled={isSharing || !firmCodeInput.trim()}
                           onClick={() => void handleFirmCodeShare()}
-                          className="w-full bg-[#5B21B6] text-white py-4 rounded-[14px] font-medium disabled:opacity-50"
+                          className="w-full bg-[#42574E] text-white py-4 rounded-[14px] font-medium disabled:opacity-50"
                         >
                           {isSharing ? 'Routing…' : 'Route with Firm Code'}
                         </button>

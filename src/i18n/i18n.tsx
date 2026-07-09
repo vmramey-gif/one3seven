@@ -131,7 +131,7 @@ export function LangToggle({ tone = 'dark' }: { tone?: 'dark' | 'light' }) {
   const { lang, setLang } = useLang();
   const base = tone === 'dark'
     ? 'border-white/15 bg-white/5'
-    : 'border-[#E7E1FF] bg-white';
+    : 'border-[#D3DED6] bg-white';
   const activeCls = 'bg-[#42574E] text-white';
   const idleCls = tone === 'dark' ? 'text-white/55' : 'text-[#2c332e]/55';
   return (

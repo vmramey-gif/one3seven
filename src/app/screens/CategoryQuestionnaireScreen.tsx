@@ -145,7 +145,7 @@ export function CategoryQuestionnaireScreen({
                         onChange={(e) => setAnswersByIndex((prev) => ({ ...prev, [idx]: e.target.value }))}
                         rows={3}
                         placeholder="Optional — leave blank if not applicable"
-                        className="w-full rounded-[12px] border border-[#e5def8] bg-[#f8f6ff] px-3 py-2.5 text-sm text-[#111b3d] placeholder:text-[#66708f] focus:border-[#6d4aff] focus:outline-none focus:ring-2 focus:ring-[#c7b9ff] focus:bg-white"
+                        className="w-full rounded-[12px] border border-[#e5def8] bg-[#f8f6ff] px-3 py-2.5 text-sm text-[#111b3d] placeholder:text-[#66708f] focus:border-[#42574e] focus:outline-none focus:ring-2 focus:ring-[#c7b9ff] focus:bg-white"
                       />
                     </div>
                   );
@@ -167,7 +167,7 @@ export function CategoryQuestionnaireScreen({
           <button
             type="button"
             onClick={saveAndContinue}
-            className="inline-flex items-center gap-1 rounded-[12px] bg-[#6d4aff] px-4 py-3 text-sm font-semibold text-white hover:bg-[#5b39e6] min-h-[44px] touch-manipulation"
+            className="inline-flex items-center gap-1 rounded-[12px] bg-[#42574e] px-4 py-3 text-sm font-semibold text-white hover:bg-[#5b39e6] min-h-[44px] touch-manipulation"
           >
             Continue to upload
             <ArrowRight className="h-4 w-4" />

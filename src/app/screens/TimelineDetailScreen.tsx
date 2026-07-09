@@ -150,7 +150,7 @@ export function TimelineDetailScreen({
                 <textarea
                   value={timelineSummary}
                   onChange={(e) => setTimelineSummary(e.target.value)}
-                  className="w-full h-24 px-3 py-3 bg-white border border-[#D6CEE8] rounded-lg text-xs text-[#3A3552] placeholder:text-[#A8A3BC] focus:outline-none focus:ring-2 focus:ring-[#5B21B6] focus:border-transparent resize-none"
+                  className="w-full h-24 px-3 py-3 bg-white border border-[#D6CEE8] rounded-lg text-xs text-[#3A3552] placeholder:text-[#A8A3BC] focus:outline-none focus:ring-2 focus:ring-[#42574E] focus:border-transparent resize-none"
                 />
                 <p className="text-xs text-[#8B86A0] mt-2 leading-relaxed">
                   You can adjust this summary if you want the timeline entry to describe the record more clearly.
@@ -196,7 +196,7 @@ export function TimelineDetailScreen({
               value={context}
               onChange={(e) => setContext(e.target.value)}
               placeholder="Add factual details that help interpret this timeline entry. This saves with your intake."
-              className="w-full h-32 px-4 py-3 bg-[#FAF9F6] border border-[#ECE7F5] rounded-[14px] text-sm text-[#14112E] placeholder:text-[#A8A3BC] focus:outline-none focus:ring-2 focus:ring-[#5B21B6] focus:border-transparent resize-none leading-relaxed"
+              className="w-full h-32 px-4 py-3 bg-[#FAF9F6] border border-[#ECE7F5] rounded-[14px] text-sm text-[#14112E] placeholder:text-[#A8A3BC] focus:outline-none focus:ring-2 focus:ring-[#42574E] focus:border-transparent resize-none leading-relaxed"
             />
             {context.trim().length > 0 && (
               <motion.div
@@ -219,7 +219,7 @@ export function TimelineDetailScreen({
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                className="mb-6 bg-[#5B21B6] text-white rounded-[14px] p-4 flex items-center gap-3"
+                className="mb-6 bg-[#42574E] text-white rounded-[14px] p-4 flex items-center gap-3"
               >
                 <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
                 <div>
@@ -258,7 +258,7 @@ export function TimelineDetailScreen({
               className={`w-full py-4 px-6 rounded-[14px] transition-all shadow-sm font-medium flex items-center justify-center gap-2 ${
                 isSaving
                   ? 'bg-[#A8A3BC] text-white cursor-not-allowed'
-                  : 'bg-[#5B21B6] text-white hover:bg-[#4C1D96] hover:shadow-md'
+                  : 'bg-[#42574E] text-white hover:bg-[#4C1D96] hover:shadow-md'
               }`}
             >
               {isSaving ? (

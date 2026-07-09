@@ -319,7 +319,7 @@ export function WorkerStatusJourneyCard({
                   <span
                     className={`flex ${nodeSize} items-center justify-center rounded-full border transition-colors ${
                       isCompleted
-                        ? 'border-[#C4B5FD] bg-[#EDE9FE] text-[#6B4EFF]'
+                        ? 'border-[#7C8B6F] bg-[#EDE9FE] text-[#6B4EFF]'
                         : isCurrent
                           ? 'border-[#6B4EFF] bg-[#EDE9FE] ring-2 ring-[#6B4EFF]/15'
                           : 'border-[#CBD5E1] bg-white'
@@ -335,7 +335,7 @@ export function WorkerStatusJourneyCard({
                   {!isLast ? (
                     <span
                       className={`my-1 ${connectorWidth} flex-1 ${connectorMin} rounded-full ${
-                        isCompleted ? 'bg-[#C4B5FD]' : 'bg-[#E2E8F0]'
+                        isCompleted ? 'bg-[#7C8B6F]' : 'bg-[#E2E8F0]'
                       }`}
                       aria-hidden
                     />

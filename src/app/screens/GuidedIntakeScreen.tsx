@@ -754,7 +754,7 @@ export function GuidedIntakeScreen({
                           type="button"
                           onClick={toggleVoice}
                           aria-pressed={voiceOn}
-                          className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#6D4AFF] hover:text-[#5636E8]"
+                          className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#42574E] hover:text-[#5636E8]"
                         >
                           {voiceOn ? <Volume2 className="h-3.5 w-3.5" /> : <VolumeX className="h-3.5 w-3.5" />}
                           {voiceOn ? 'Voice on' : 'Voice off'}
@@ -777,7 +777,7 @@ export function GuidedIntakeScreen({
                                 >
                                   {q.question}
                                 </button>
-                                <div className="ml-auto max-w-[88%] rounded-[16px] rounded-tr-[4px] bg-[#6D4AFF] px-3 py-2 text-sm leading-relaxed text-white">
+                                <div className="ml-auto max-w-[88%] rounded-[16px] rounded-tr-[4px] bg-[#42574E] px-3 py-2 text-sm leading-relaxed text-white">
                                   {isEditing ? (
                                     <div className="space-y-2">
                                       <textarea
@@ -790,7 +790,7 @@ export function GuidedIntakeScreen({
                                         <button
                                           type="button"
                                           onClick={() => saveEditAnswer(q.label)}
-                                          className="rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-[#6D4AFF]"
+                                          className="rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-[#42574E]"
                                         >
                                           Save
                                         </button>
@@ -840,7 +840,7 @@ export function GuidedIntakeScreen({
                             <button
                               type="button"
                               onClick={() => playPrompt(activeVoiceQuestion.voiceKey)}
-                              className="mt-1.5 inline-flex items-center gap-1.5 text-xs font-medium text-[#6D4AFF] hover:text-[#5636E8]"
+                              className="mt-1.5 inline-flex items-center gap-1.5 text-xs font-medium text-[#42574E] hover:text-[#5636E8]"
                             >
                               <Volume2 className={`h-3.5 w-3.5 ${playingPrompt ? 'animate-pulse' : ''}`} />
                               {playingPrompt ? 'Asking…' : 'Replay'}
@@ -851,7 +851,7 @@ export function GuidedIntakeScreen({
 
                       {/* Acknowledgment after a saved answer */}
                       {voiceAcknowledgment ? (
-                        <p className="mt-3 text-xs font-medium text-[#6D4AFF]">{voiceAcknowledgment}</p>
+                        <p className="mt-3 text-xs font-medium text-[#42574E]">{voiceAcknowledgment}</p>
                       ) : null}
 
                       {/* Answer box — type, or tap the microphone on your phone keyboard to talk */}
@@ -860,7 +860,7 @@ export function GuidedIntakeScreen({
                         onChange={(e) => setGuidedDraft(e.target.value)}
                         rows={4}
                         placeholder="Type your answer here — or tap the microphone on your keyboard to talk."
-                        className="mt-4 w-full resize-none rounded-[14px] border border-[#E4DAFF] bg-white px-4 py-3 text-sm leading-relaxed text-[#0B1033] placeholder:text-[#94A3B8] focus:border-[#6D4AFF] focus:outline-none focus:ring-2 focus:ring-[#DED6FF]"
+                        className="mt-4 w-full resize-none rounded-[14px] border border-[#E4DAFF] bg-white px-4 py-3 text-sm leading-relaxed text-[#0B1033] placeholder:text-[#94A3B8] focus:border-[#42574E] focus:outline-none focus:ring-2 focus:ring-[#DED6FF]"
                       />
                       <p className="mt-1.5 flex items-center gap-1.5 text-[11px] leading-relaxed text-[#64748B]">
                         <Mic className="h-3 w-3" />
@@ -870,7 +870,7 @@ export function GuidedIntakeScreen({
                       <button
                         type="button"
                         onClick={() => saveGuidedAnswerAndAdvance(guidedDraft)}
-                        className="mt-4 inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full bg-[#6D4AFF] px-5 py-3 text-sm font-semibold text-white shadow-[0_12px_26px_rgba(109,74,255,0.22)] transition hover:bg-[#5636E8]"
+                        className="mt-4 inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full bg-[#42574E] px-5 py-3 text-sm font-semibold text-white shadow-[0_12px_26px_rgba(109,74,255,0.22)] transition hover:bg-[#5636E8]"
                       >
                         {guidedDraft.trim() ? 'Save & next question' : 'Skip this question'}
                         <ArrowRight className="h-4 w-4" />

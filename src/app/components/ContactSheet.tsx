@@ -4,7 +4,7 @@ import { submitContactMessage } from '../../services/contactService';
 import { track } from '../../lib/analytics';
 
 const inputCls =
-  'w-full rounded-xl border border-[#ECE7F5] bg-white px-4 py-3 text-sm text-[#14112E] placeholder:text-[#8B86A0] focus:border-[#5B21B6] focus:outline-none focus:ring-4 focus:ring-[#5B21B6]/10';
+  'w-full rounded-xl border border-[#ECE7F5] bg-white px-4 py-3 text-sm text-[#14112E] placeholder:text-[#8B86A0] focus:border-[#42574E] focus:outline-none focus:ring-4 focus:ring-[#42574E]/10';
 
 /** Lightweight contact form modal. Light work-surface styling. Saves to contact_messages. */
 export function ContactSheet({ source, onClose }: { source: string; onClose: () => void }) {
@@ -43,10 +43,10 @@ export function ContactSheet({ source, onClose }: { source: string; onClose: () 
 
         {sent ? (
           <div className="py-6 text-center">
-            <Check className="mx-auto mb-3 h-8 w-8 text-[#5B21B6]" />
+            <Check className="mx-auto mb-3 h-8 w-8 text-[#42574E]" />
             <p className="text-[15px] font-semibold text-[#14112E]">Message sent.</p>
             <p className="mt-1 text-[13px] text-[#6B6685]">We'll get back to you at the email you provided.</p>
-            <button type="button" onClick={onClose} className="mt-4 rounded-full bg-[#5B21B6] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#4C1D96]">Done</button>
+            <button type="button" onClick={onClose} className="mt-4 rounded-full bg-[#42574E] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#4C1D96]">Done</button>
           </div>
         ) : (
           <form onSubmit={submit} className="space-y-3">
@@ -54,11 +54,11 @@ export function ContactSheet({ source, onClose }: { source: string; onClose: () 
             <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name (optional)" className={inputCls} />
             <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="Your email *" className={inputCls} />
             <textarea value={message} onChange={(e) => setMessage(e.target.value)} required rows={4} placeholder="How can we help? *" className={`${inputCls} resize-none`} />
-            <button type="submit" disabled={submitting} className="w-full rounded-full bg-[#5B21B6] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#4C1D96] disabled:opacity-60">
+            <button type="submit" disabled={submitting} className="w-full rounded-full bg-[#42574E] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#4C1D96] disabled:opacity-60">
               {submitting ? 'Sending…' : 'Send message'}
             </button>
             <p className="text-center text-[11px] text-[#8B86A0]">
-              Or email <a href="mailto:info@one3seven.com" className="font-semibold text-[#5B21B6] hover:underline">info@one3seven.com</a>
+              Or email <a href="mailto:info@one3seven.com" className="font-semibold text-[#42574E] hover:underline">info@one3seven.com</a>
             </p>
           </form>
         )}

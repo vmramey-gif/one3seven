@@ -4027,7 +4027,7 @@ export default function App() {
           )}
           {currentScreen === 'firmDirectedIntake' && !firmDirectedContext && (
             <motion.div key="firmDirectedIntakeLoading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="flex min-h-screen items-center justify-center bg-[#F6F2FF]">
+              className="flex min-h-screen items-center justify-center bg-[#F2F4EC]">
               <span className="text-sm text-[#1E1B4B]/40">Loading…</span>
             </motion.div>
           )}

@@ -51,7 +51,7 @@ export function CrmAccessGate({ children }: { children: ReactNode }) {
         </p>
         <a
           href="/hq"
-          className="rounded-full bg-[#6D4AFF] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#5B35D5]"
+          className="rounded-full bg-[#42574E] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#374A42]"
         >
           Go to one3sevenHQ
         </a>

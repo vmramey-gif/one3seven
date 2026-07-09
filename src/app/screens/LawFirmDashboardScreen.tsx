@@ -305,7 +305,7 @@ export function LawFirmDashboardScreen({
 
   const filterPillClass = (active: boolean) =>
     active
-      ? 'bg-[#5B21B6] text-white border-[#5B21B6] shadow-[0_10px_24px_rgba(91,33,182,0.18)]'
+      ? 'bg-[#42574E] text-white border-[#42574E] shadow-[0_10px_24px_rgba(91,33,182,0.18)]'
       : 'bg-white text-[#14112E]/70 border-[#ECE7F5] hover:border-[#C9B8F0] hover:bg-[#F5F1FB]';
 
   return (
@@ -363,7 +363,7 @@ export function LawFirmDashboardScreen({
                   </p>
                   {firmIntakeLink ? (
                     <div className="rounded-2xl border border-[#ECE7F5] bg-[#F5F1FB] p-5 mb-5">
-                      <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#5B21B6] mb-2">
+                      <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#42574E] mb-2">
                         Your client intake link
                       </p>
                       <div className="flex items-center gap-2">
@@ -373,7 +373,7 @@ export function LawFirmDashboardScreen({
                         <button
                           type="button"
                           onClick={copyIntakeLink}
-                          className="shrink-0 rounded-full bg-[#5B21B6] px-4 py-2 text-xs font-semibold text-white hover:bg-[#4C1D96] transition-colors"
+                          className="shrink-0 rounded-full bg-[#42574E] px-4 py-2 text-xs font-semibold text-white hover:bg-[#4C1D96] transition-colors"
                         >
                           {intakeLinkCopied ? 'Copied ✓' : 'Copy link'}
                         </button>
@@ -416,7 +416,7 @@ export function LawFirmDashboardScreen({
                       <button
                         type="button"
                         onClick={() => onNavigate('firmSettings')}
-                        className="text-[#5B21B6] hover:underline"
+                        className="text-[#42574E] hover:underline"
                       >
                         Firm Settings
                       </button>
@@ -430,7 +430,7 @@ export function LawFirmDashboardScreen({
                         setNewIntakeSourceTab('connected');
                         setActiveTab('all');
                       }}
-                      className="inline-flex min-h-14 items-center justify-center rounded-full bg-[#5B21B6] px-9 py-4 text-[15px] font-semibold text-white shadow-[0_18px_48px_rgba(91,33,182,0.30)] transition hover:-translate-y-0.5 hover:bg-[#4C1D96] hover:shadow-[0_20px_54px_rgba(91,33,182,0.36)]"
+                      className="inline-flex min-h-14 items-center justify-center rounded-full bg-[#42574E] px-9 py-4 text-[15px] font-semibold text-white shadow-[0_18px_48px_rgba(91,33,182,0.30)] transition hover:-translate-y-0.5 hover:bg-[#4C1D96] hover:shadow-[0_20px_54px_rgba(91,33,182,0.36)]"
                     >
                       Review New Intakes
                     </button>
@@ -462,7 +462,7 @@ export function LawFirmDashboardScreen({
                 >
                   Back to Firm Home
                 </button>
-                <p className="text-xs uppercase tracking-[0.22em] text-[#5B21B6]">Review Workspace</p>
+                <p className="text-xs uppercase tracking-[0.22em] text-[#42574E]">Review Workspace</p>
                 <h2 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="mt-2 text-3xl font-medium tracking-[-0.01em] text-[#14112E]">
                   {dashboardView === 'continueReviews' ? 'Continue My Reviews' : 'Review New Intakes'}
                 </h2>
@@ -481,7 +481,7 @@ export function LawFirmDashboardScreen({
                       onClick={() => setNewIntakeSourceTab(tab)}
                       className={`rounded-full px-4 py-2 text-sm transition-colors ${
                         newIntakeSourceTab === tab
-                          ? 'bg-[#5B21B6] text-white shadow-[0_10px_24px_rgba(91,33,182,0.22)]'
+                          ? 'bg-[#42574E] text-white shadow-[0_10px_24px_rgba(91,33,182,0.22)]'
                           : 'text-[#14112E]/64 hover:bg-[#F5F1FB] hover:text-[#14112E]'
                       }`}
                     >
@@ -501,7 +501,7 @@ export function LawFirmDashboardScreen({
                   placeholder="Find a case file by timeline, record type, intake number, or review note"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full rounded-2xl border border-[#ECE7F5] bg-[#FAF9F6] py-3 pl-11 pr-4 text-sm text-[#14112E] placeholder:text-[#14112E]/38 focus:border-[#5B21B6] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#5B21B6]/10"
+                  className="w-full rounded-2xl border border-[#ECE7F5] bg-[#FAF9F6] py-3 pl-11 pr-4 text-sm text-[#14112E] placeholder:text-[#14112E]/38 focus:border-[#42574E] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#42574E]/10"
                 />
               </div>
               <button
@@ -583,7 +583,7 @@ export function LawFirmDashboardScreen({
                   onClick={() => setActiveTab(tab)}
                   className={`rounded-full border px-4 py-2 text-sm min-h-[36px] transition-colors ${
                     activeTab === tab
-                      ? 'border-[#5B21B6] bg-[#5B21B6] text-white shadow-[0_10px_24px_rgba(91,33,182,0.18)]'
+                      ? 'border-[#42574E] bg-[#42574E] text-white shadow-[0_10px_24px_rgba(91,33,182,0.18)]'
                       : 'border-[#ECE7F5] bg-white text-[#14112E]/60 hover:border-[#C9B8F0] hover:bg-[#F5F1FB]'
                   }`}
                 >
@@ -635,11 +635,11 @@ export function LawFirmDashboardScreen({
                     <div className="min-w-0">
                       <p className="text-xs uppercase tracking-[0.2em] text-[#14112E]/34">Case file {intake.intakeNumber}</p>
                       <h3 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="mt-2 text-2xl font-medium tracking-[-0.01em] text-[#14112E]">{workerLabel}</h3>
-                      <p className="mt-3 text-sm font-medium text-[#5B21B6]">{timelineState}</p>
+                      <p className="mt-3 text-sm font-medium text-[#42574E]">{timelineState}</p>
                       <p className="mt-2 text-sm leading-relaxed text-[#14112E]/72">{recordLine}</p>
                       <p className="mt-1 text-sm leading-relaxed text-[#14112E]/58">{gapLine}</p>
                     </div>
-                    <div className="flex items-center gap-2 text-sm font-medium text-[#5B21B6]">
+                    <div className="flex items-center gap-2 text-sm font-medium text-[#42574E]">
                       Review Timeline
                       <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                     </div>
@@ -662,7 +662,7 @@ export function LawFirmDashboardScreen({
                       Latest activity: {intake.lastActivity}
                     </span>
                     {intake.requestedDocumentsStatus ? (
-                      <span className="rounded-full border border-[#5B21B6]/28 bg-[#F5F1FB] px-3 py-1.5 text-xs text-[#4C1D96]">
+                      <span className="rounded-full border border-[#42574E]/28 bg-[#F5F1FB] px-3 py-1.5 text-xs text-[#4C1D96]">
                         {intake.requestedDocumentsStatus}
                       </span>
                     ) : null}
@@ -680,14 +680,14 @@ export function LawFirmDashboardScreen({
 
             {activeTab !== 'archived' && noRealFirmIntakes ? (
               <div className="max-w-2xl rounded-3xl border border-[#ECE7F5] bg-white p-8 shadow-[0_16px_44px_rgba(20,17,46,0.09)]">
-                <FileText className="mb-4 h-7 w-7 text-[#5B21B6]" />
+                <FileText className="mb-4 h-7 w-7 text-[#42574E]" />
                 <h3 className="text-lg font-semibold text-[#14112E]">No intakes yet</h3>
                 <p className="mt-2 text-sm leading-relaxed text-[#14112E]/62">
                   Send your intake link to a client. Once they submit their documents, the organized intake appears here before your first call.
                 </p>
                 {firmIntakeLink ? (
                   <div className="mt-5 rounded-xl border border-[#ECE7F5] bg-[#F5F1FB] p-4">
-                    <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#5B21B6] mb-2">
+                    <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#42574E] mb-2">
                       Your client intake link
                     </p>
                     <div className="flex items-center gap-2">
@@ -697,7 +697,7 @@ export function LawFirmDashboardScreen({
                       <button
                         type="button"
                         onClick={copyIntakeLink}
-                        className="shrink-0 rounded-full bg-[#5B21B6] px-4 py-2 text-xs font-semibold text-white hover:bg-[#4C1D96] transition-colors"
+                        className="shrink-0 rounded-full bg-[#42574E] px-4 py-2 text-xs font-semibold text-white hover:bg-[#4C1D96] transition-colors"
                       >
                         {intakeLinkCopied ? 'Copied ✓' : 'Copy'}
                       </button>

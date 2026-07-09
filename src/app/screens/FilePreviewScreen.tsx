@@ -28,7 +28,7 @@ export function FilePreviewScreen({
         <div className="px-6 py-7">
           <button
             onClick={() => onNavigate('landing')}
-            className="text-xl font-semibold text-[#6d4aff] hover:opacity-70 transition-opacity duration-200"
+            className="text-xl font-semibold text-[#42574e] hover:opacity-70 transition-opacity duration-200"
           >
             <WordMark />
           </button>
@@ -63,13 +63,13 @@ export function FilePreviewScreen({
           {/* File Info Card */}
           <div className="mb-8 bg-white rounded-[14px] p-6 border border-[#e5def8]">
             <div className="flex items-start gap-4 mb-4">
-              <div className="w-10 h-10 bg-[#6d4aff] rounded-lg flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 bg-[#42574e] rounded-lg flex items-center justify-center flex-shrink-0">
                 <FileText className="w-5 h-5 text-white" />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="text-sm font-medium text-[#111b3d] mb-2 break-words">{fileName}</div>
                 <div className="flex items-center gap-2 flex-wrap">
-                  <div className="inline-block bg-[#eee9ff] px-2.5 py-1 rounded text-xs text-[#6d4aff] font-medium">
+                  <div className="inline-block bg-[#eee9ff] px-2.5 py-1 rounded text-xs text-[#42574e] font-medium">
                     {category}
                   </div>
                 </div>
@@ -97,11 +97,11 @@ export function FilePreviewScreen({
           <div className="space-y-3">
             <button
               onClick={() => onNavigate('summary')}
-              className="w-full bg-[#6d4aff] text-white py-4 px-6 rounded-[14px] hover:bg-[#5b39e6] transition-all shadow-[0_10px_22px_rgba(109,74,255,0.18)] font-medium"
+              className="w-full bg-[#42574e] text-white py-4 px-6 rounded-[14px] hover:bg-[#5b39e6] transition-all shadow-[0_10px_22px_rgba(109,74,255,0.18)] font-medium"
             >
               Return to intake summary
             </button>
-            <button className="w-full bg-[#eee9ff] text-[#6d4aff] py-4 px-6 rounded-[14px] hover:bg-[#e5def8] transition-colors font-medium">
+            <button className="w-full bg-[#eee9ff] text-[#42574e] py-4 px-6 rounded-[14px] hover:bg-[#e5def8] transition-colors font-medium">
               Download Document
             </button>
           </div>

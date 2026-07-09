@@ -19,7 +19,7 @@ const SPIRAL_TURNS = 0.32; // a soft inward arc, not a spin
 const FORM_MS = 2400; // scatter → formed (seeds accelerate inward)
 const STAGGER = 0.55; // staggered arrival gathered into a collective rush
 
-// Scattered lavender → organized brand purple (#5B21B6 = 91,33,182).
+// Scattered lavender → organized brand purple (#42574E = 91,33,182).
 const LAV: [number, number, number] = [198, 190, 232];
 const BRAND: [number, number, number] = [91, 33, 182];
 
@@ -138,7 +138,7 @@ export function OneThreeSevenLoader({ size = 'lg' }: { size?: 'lg' | 'sm' }) {
       <span className="inline-flex items-center gap-2 text-sm text-[#1E1B4B]/60" role="status" aria-label="Organizing records">
         <span className="text-[15px] leading-none" aria-hidden="true">
           <span className="font-normal text-[#1E1B4B]/70">1</span>
-          <span className="font-black text-[#5B21B6]">3</span>
+          <span className="font-black text-[#42574E]">3</span>
           <span className="font-normal text-[#1E1B4B]/70">7</span>
         </span>
         Organizing records...

@@ -76,20 +76,20 @@ export function FirmTimelineEventCard({
         <div
           className={`relative w-9 h-9 rounded-full border-2 flex items-center justify-center ${
             important
-              ? 'border-[#6D4AFF] bg-[#F1ECFF]'
-              : 'border-[#DCD3FF] bg-white'
+              ? 'border-[#42574E] bg-[#F1ECFF]'
+              : 'border-[#CBD6CF] bg-white'
           }`}
         >
-          <div className={`h-2 w-2 rounded-full ${important ? 'bg-[#6D4AFF]' : 'bg-[#B8A8FF]'}`} />
+          <div className={`h-2 w-2 rounded-full ${important ? 'bg-[#42574E]' : 'bg-[#B8A8FF]'}`} />
         </div>
       </div>
-      <div className="min-w-0 flex-1 rounded-2xl border border-[#E7E1FF] bg-white/95 p-5 shadow-[0_16px_46px_rgba(31,27,75,0.09)]">
+      <div className="min-w-0 flex-1 rounded-2xl border border-[#D3DED6] bg-white/95 p-5 shadow-[0_16px_46px_rgba(31,27,75,0.09)]">
         <div className="flex flex-wrap items-center gap-2 mb-2">
-          <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[#6D4AFF]">
+          <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[#42574E]">
             {displayDate}
-            {dateIsInferred ? <span className="ml-1 text-[10px] font-normal normal-case tracking-normal text-[#6D4AFF]/55">(year from filename)</span> : null}
+            {dateIsInferred ? <span className="ml-1 text-[10px] font-normal normal-case tracking-normal text-[#42574E]/55">(year from filename)</span> : null}
           </span>
-          <span className="rounded-md border border-[#E7E1FF] bg-[#F7F3FF] px-2 py-0.5 text-[11px] text-[#1E1B4B]/62">
+          <span className="rounded-md border border-[#D3DED6] bg-[#F7F3FF] px-2 py-0.5 text-[11px] text-[#1E1B4B]/62">
             {displayCategory}
           </span>
           {confidenceLabel ? (
@@ -113,26 +113,26 @@ export function FirmTimelineEventCard({
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
-            className="mt-2 text-xs font-medium text-[#5B35D5] hover:text-[#1E1B4B]"
+            className="mt-2 text-xs font-medium text-[#374A42] hover:text-[#1E1B4B]"
           >
             {open ? FIRM_INTAKE_ACTIONS.showLess : FIRM_INTAKE_ACTIONS.showMore}
           </button>
         ) : null}
         {hasSupportingRecords && open ? (
-          <div className="pt-3 mt-3 border-t border-[#E7E1FF]">
+          <div className="pt-3 mt-3 border-t border-[#D3DED6]">
             <div className="text-[11px] text-[#1E1B4B]/50 mb-2">Supporting Records</div>
             <div className="flex flex-wrap gap-1.5">
               {labels.map((label) => (
                 <span
                   key={label}
-                  className="max-w-[200px] truncate px-2 py-1 bg-[#F7F3FF] text-[11px] text-[#1E1B4B]/68 rounded border border-[#E7E1FF]"
+                  className="max-w-[200px] truncate px-2 py-1 bg-[#F7F3FF] text-[11px] text-[#1E1B4B]/68 rounded border border-[#D3DED6]"
                   title={label.replace(/_/g, ' ').replace(/\.[^.]+$/, '')}
                 >
                   {label.replace(/_/g, ' ').replace(/\.[^.]+$/, '')}
                 </span>
               ))}
               {relatedDocLabels.length === 0 ? (
-                <span className="max-w-full break-words px-2 py-1 bg-[#F7F3FF] text-[11px] text-[#1E1B4B]/68 rounded border border-[#E7E1FF]">
+                <span className="max-w-full break-words px-2 py-1 bg-[#F7F3FF] text-[11px] text-[#1E1B4B]/68 rounded border border-[#D3DED6]">
                   {relatedDocs} record{relatedDocs === 1 ? '' : 's'} in this category
                 </span>
               ) : null}

@@ -25,15 +25,15 @@ export function WorkerIntakeCompactRow({
     <div
       className={`relative rounded-[18px] border bg-white/95 p-3 shadow-[0_14px_34px_rgba(67,56,202,0.07)] transition-colors ${
         actionNeeded
-          ? 'border-[#BFAEFF] bg-[#FBFAFF] shadow-[0_18px_42px_rgba(109,74,255,0.14)] ring-1 ring-[#DCD3FF]'
+          ? 'border-[#BFAEFF] bg-[#FBFAFF] shadow-[0_18px_42px_rgba(109,74,255,0.14)] ring-1 ring-[#CBD6CF]'
           : highlighted
-          ? 'border-[#CFC3FF] bg-[#FBFAFF] ring-1 ring-[#DCD3FF]'
-          : 'border-[#E7E1FF]'
+          ? 'border-[#CFC3FF] bg-[#FBFAFF] ring-1 ring-[#CBD6CF]'
+          : 'border-[#D3DED6]'
       }`}
     >
       {actionNeeded ? (
         <span
-          className="absolute right-3 top-3 h-2 w-2 rounded-full bg-[#6D4AFF] shadow-[0_0_0_4px_rgba(109,74,255,0.14)]"
+          className="absolute right-3 top-3 h-2 w-2 rounded-full bg-[#42574E] shadow-[0_0_0_4px_rgba(109,74,255,0.14)]"
           aria-hidden
         />
       ) : null}
@@ -41,7 +41,7 @@ export function WorkerIntakeCompactRow({
         type={onOpenWorkspace ? 'button' : undefined}
         onClick={onOpenWorkspace}
         className={`flex w-full items-start justify-between gap-3 rounded-[14px] px-1 py-1.5 text-left ${
-          onOpenWorkspace ? 'cursor-pointer hover:bg-[#F7F3FF] focus:outline-none focus:ring-2 focus:ring-[#DCD3FF]' : ''
+          onOpenWorkspace ? 'cursor-pointer hover:bg-[#F7F3FF] focus:outline-none focus:ring-2 focus:ring-[#CBD6CF]' : ''
         }`}
       >
         <div className="min-w-0 flex-1">

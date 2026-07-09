@@ -58,7 +58,7 @@ export function CompanyDemoDebrief() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#FAF8FE] px-5">
         <div className="w-full max-w-[440px] rounded-[20px] border border-[#E8E3F2] bg-white p-8 text-center shadow-[0_12px_40px_-12px_rgba(46,16,80,0.28)]">
-          <div className="mx-auto mb-3 grid h-10 w-10 place-items-center rounded-full bg-[#5B21B6] text-white">✓</div>
+          <div className="mx-auto mb-3 grid h-10 w-10 place-items-center rounded-full bg-[#42574E] text-white">✓</div>
           <h2 style={SERIF} className="text-[20px] font-medium text-[#16121F]">Saved — debrief logged</h2>
           <p className="mt-2 text-[13.5px] text-[#4B4458]">That signal is captured. Schedule the follow-up before it goes cold.</p>
           <div className="mt-5 flex justify-center gap-3">
@@ -69,7 +69,7 @@ export function CompanyDemoDebrief() {
             >
               Log another
             </button>
-            <a href="/company-demo" className="rounded-full bg-[#5B21B6] px-5 py-2.5 text-[13.5px] font-semibold text-white transition hover:bg-[#4C1A9C]">
+            <a href="/company-demo" className="rounded-full bg-[#42574E] px-5 py-2.5 text-[13.5px] font-semibold text-white transition hover:bg-[#4C1A9C]">
               Back to the guide
             </a>
           </div>
@@ -115,7 +115,7 @@ export function CompanyDemoDebrief() {
                   type="button"
                   onClick={() => set('leanInMoment', v.leanInMoment === o.v ? null : o.v)}
                   className={`rounded-full border px-4 py-2 text-[13px] font-medium transition ${
-                    v.leanInMoment === o.v ? 'border-[#5B21B6] bg-[#5B21B6] text-white' : 'border-[#E8E3F2] bg-white text-[#4B4458] hover:border-[#7C4DD6]'
+                    v.leanInMoment === o.v ? 'border-[#42574E] bg-[#42574E] text-white' : 'border-[#E8E3F2] bg-white text-[#4B4458] hover:border-[#7C4DD6]'
                   }`}
                 >
                   {o.t}
@@ -142,7 +142,7 @@ export function CompanyDemoDebrief() {
                 type="checkbox"
                 checked={v.askedForSearch}
                 onChange={(e) => set('askedForSearch', e.target.checked)}
-                className="mt-0.5 h-4 w-4 flex-none accent-[#5B21B6]"
+                className="mt-0.5 h-4 w-4 flex-none accent-[#42574E]"
               />
               <span className="text-[13.5px] text-[#16121F]">
                 <b>Asked to search / interrogate the record</b>
@@ -161,7 +161,7 @@ export function CompanyDemoDebrief() {
                     type="button"
                     onClick={() => set('outcome', v.outcome === o.v ? null : o.v)}
                     className={`rounded-[11px] border px-4 py-2.5 text-left text-[13.5px] font-medium transition ${
-                      v.outcome === o.v ? 'border-[#5B21B6] bg-[#5B21B6] text-white' : 'border-[#E8E3F2] bg-white text-[#4B4458] hover:border-[#7C4DD6]'
+                      v.outcome === o.v ? 'border-[#42574E] bg-[#42574E] text-white' : 'border-[#E8E3F2] bg-white text-[#4B4458] hover:border-[#7C4DD6]'
                     }`}
                   >
                     {o.t}
@@ -190,7 +190,7 @@ export function CompanyDemoDebrief() {
             type="button"
             onClick={save}
             disabled={busy}
-            className="flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full bg-[#5B21B6] px-6 py-3 text-[15px] font-semibold text-white transition hover:bg-[#4C1A9C] disabled:opacity-60"
+            className="flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full bg-[#42574E] px-6 py-3 text-[15px] font-semibold text-white transition hover:bg-[#4C1A9C] disabled:opacity-60"
           >
             {busy ? 'Saving…' : 'Save debrief'}
           </button>
