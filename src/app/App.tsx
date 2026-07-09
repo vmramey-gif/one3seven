@@ -5,7 +5,7 @@ import { GalleryScreen } from './screens/GalleryScreen';
 import { DevNavMapScreen } from './screens/DevNavMapScreen';
 import { AuthWelcomeScreen } from './screens/AuthWelcomeScreen';
 import { PendingApprovalScreen } from './screens/PendingApprovalScreen';
-import { PublicMarketingPage } from './screens/PublicMarketingPage';
+import { SageMarketingPage } from './screens/SageMarketingPage';
 import { ForFirmsPage } from './screens/ForFirmsPage';
 import { SignInScreen } from './screens/SignInScreen';
 import { CreateAccountScreen } from './screens/CreateAccountScreen';
@@ -3984,7 +3984,7 @@ export default function App() {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.35, ease: 'easeOut' }}
             >
-              <PublicMarketingPage
+              <SageMarketingPage
                 onWorkerStart={
                   firmDirectedContext
                     ? () => void startFirmDirectedGuestIntake()
