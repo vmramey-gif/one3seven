@@ -747,7 +747,7 @@ export function GuidedIntakeScreen({
                     <div className="mt-4 rounded-[22px] border border-[#C6D0C8] bg-gradient-to-br from-[#F8F4FF] via-white to-[#FFF5FA] px-4 py-4 shadow-[0_18px_44px_rgba(66,87,78,0.10)]">
                       {/* Conversation header */}
                       <div className="flex items-center justify-between gap-3">
-                        <p className="text-[11px] font-semibold uppercase tracking-wide text-[#64748B]">
+                        <p className="text-[11px] font-semibold uppercase tracking-wide text-[#6A6D66]">
                           Guided conversation · {activeVoiceQuestionIndex + 1} of {allVoiceQuestions.length}
                         </p>
                         <button
@@ -773,7 +773,7 @@ export function GuidedIntakeScreen({
                                 <button
                                   type="button"
                                   onClick={() => goToVoiceQuestion(q.label)}
-                                  className="block max-w-[88%] rounded-[16px] rounded-tl-[4px] border border-[#E7EDE8] bg-white/70 px-3 py-2 text-left text-xs leading-relaxed text-[#475569] transition hover:border-[#C6D0C8]"
+                                  className="block max-w-[88%] rounded-[16px] rounded-tl-[4px] border border-[#E7EDE8] bg-white/70 px-3 py-2 text-left text-xs leading-relaxed text-[#40433F] transition hover:border-[#C6D0C8]"
                                 >
                                   {q.question}
                                 </button>
@@ -784,7 +784,7 @@ export function GuidedIntakeScreen({
                                         value={editDraft}
                                         onChange={(e) => setEditDraft(e.target.value)}
                                         rows={3}
-                                        className="w-full resize-none rounded-[10px] border border-white/40 bg-white/95 px-2.5 py-2 text-sm text-[#0B1033] focus:outline-none"
+                                        className="w-full resize-none rounded-[10px] border border-white/40 bg-white/95 px-2.5 py-2 text-sm text-[#131A17] focus:outline-none"
                                       />
                                       <div className="flex gap-2">
                                         <button
@@ -833,7 +833,7 @@ export function GuidedIntakeScreen({
                           transition={{ duration: 0.28, ease: 'easeOut' }}
                           className="mt-4"
                         >
-                          <p className="text-lg font-semibold leading-snug text-[#0B1033]">
+                          <p className="text-lg font-semibold leading-snug text-[#131A17]">
                             {activeVoiceQuestion.question}
                           </p>
                           {activeVoiceQuestion.voiceKey && voiceOn ? (
@@ -860,9 +860,9 @@ export function GuidedIntakeScreen({
                         onChange={(e) => setGuidedDraft(e.target.value)}
                         rows={4}
                         placeholder="Type your answer here — or tap the microphone on your keyboard to talk."
-                        className="mt-4 w-full resize-none rounded-[14px] border border-[#C6D0C8] bg-white px-4 py-3 text-sm leading-relaxed text-[#0B1033] placeholder:text-[#94A3B8] focus:border-[#42574E] focus:outline-none focus:ring-2 focus:ring-[#C6D0C8]"
+                        className="mt-4 w-full resize-none rounded-[14px] border border-[#C6D0C8] bg-white px-4 py-3 text-sm leading-relaxed text-[#131A17] placeholder:text-[#9AA39B] focus:border-[#42574E] focus:outline-none focus:ring-2 focus:ring-[#C6D0C8]"
                       />
-                      <p className="mt-1.5 flex items-center gap-1.5 text-[11px] leading-relaxed text-[#64748B]">
+                      <p className="mt-1.5 flex items-center gap-1.5 text-[11px] leading-relaxed text-[#6A6D66]">
                         <Mic className="h-3 w-3" />
                         Prefer to talk? Tap the microphone on your keyboard and just speak.
                       </p>
@@ -882,7 +882,7 @@ export function GuidedIntakeScreen({
                           type="button"
                           onClick={goToPreviousGuidedVoiceQuestion}
                           disabled={activeVoiceQuestionIndex === 0}
-                          className="rounded-full border border-[#C6D0C8] bg-white/85 px-3 py-2 text-xs font-semibold text-[#475569] hover:bg-white disabled:cursor-not-allowed disabled:opacity-45"
+                          className="rounded-full border border-[#C6D0C8] bg-white/85 px-3 py-2 text-xs font-semibold text-[#40433F] hover:bg-white disabled:cursor-not-allowed disabled:opacity-45"
                         >
                           Previous
                         </button>

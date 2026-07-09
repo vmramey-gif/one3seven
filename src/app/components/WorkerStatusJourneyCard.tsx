@@ -245,7 +245,7 @@ export function WorkerStatusJourneyCard({
         className={`rounded-xl border border-[#C6D0C8]/90 bg-gradient-to-br from-white to-[#FAF8FF] px-4 py-4 shadow-[0_4px_16px_rgba(107,78,255,0.06)] ${className}`}
         aria-label="Current status preview"
       >
-        <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#64748B]">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#6A6D66]">
           Current status
         </p>
         <p className="mt-2 text-base font-medium leading-snug text-[#1B2623]">{currentLabel}</p>
@@ -266,8 +266,8 @@ export function WorkerStatusJourneyCard({
             );
           })}
         </div>
-        <p className="mt-3 text-xs leading-relaxed text-[#64748B]">
-          Open <span className="font-medium text-[#475569]">Status Journey</span> for the full progress path.
+        <p className="mt-3 text-xs leading-relaxed text-[#6A6D66]">
+          Open <span className="font-medium text-[#40433F]">Status Journey</span> for the full progress path.
         </p>
       </div>
     );
@@ -298,7 +298,7 @@ export function WorkerStatusJourneyCard({
           Status Journey
         </h2>
         {showSubtitle ? (
-          <p className={`mt-2 leading-relaxed text-[#64748B] ${isRail ? 'text-sm' : 'text-xs'}`}>
+          <p className={`mt-2 leading-relaxed text-[#6A6D66] ${isRail ? 'text-sm' : 'text-xs'}`}>
             {subtitle}
           </p>
         ) : null}
@@ -348,16 +348,16 @@ export function WorkerStatusJourneyCard({
                         ? 'font-medium text-[#1B2623]'
                         : isCurrent
                           ? 'font-semibold text-[#1B2623]'
-                          : 'font-normal text-[#64748B]'
+                          : 'font-normal text-[#6A6D66]'
                     }`}
                   >
                     {label}
                   </p>
                   {isCurrent && isRail ? (
-                    <p className="mt-1.5 text-xs leading-relaxed text-[#64748B]">You are here</p>
+                    <p className="mt-1.5 text-xs leading-relaxed text-[#6A6D66]">You are here</p>
                   ) : null}
                   {isFuture && futureOnlyFrom !== null && index >= futureOnlyFrom && isRail ? (
-                    <p className="mt-1 text-[11px] leading-relaxed text-[#64748B]">
+                    <p className="mt-1 text-[11px] leading-relaxed text-[#6A6D66]">
                       Possible next step
                     </p>
                   ) : null}
@@ -367,11 +367,11 @@ export function WorkerStatusJourneyCard({
           })}
         </ol>
       ) : (
-        <p className="text-sm leading-relaxed text-[#64748B]">{FALLBACK_MESSAGE}</p>
+        <p className="text-sm leading-relaxed text-[#6A6D66]">{FALLBACK_MESSAGE}</p>
       )}
 
       {isRail && futureOnlyFrom !== null ? (
-        <p className="mt-6 border-t border-[#E7EDE8] pt-4 text-xs leading-relaxed text-[#64748B]">
+        <p className="mt-6 border-t border-[#E7EDE8] pt-4 text-xs leading-relaxed text-[#6A6D66]">
           When a review concludes, your organized records remain available in Intakes.
         </p>
       ) : null}

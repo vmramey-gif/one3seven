@@ -121,7 +121,7 @@ export function FounderHQ() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0B1033] text-white antialiased">
+    <div className="min-h-screen bg-[#131A17] text-white antialiased">
       <header className="border-b border-white/10 px-5 py-4">
         <div className="mx-auto max-w-md"><HQWordMark /></div>
       </header>

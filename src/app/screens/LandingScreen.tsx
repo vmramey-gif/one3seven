@@ -535,7 +535,7 @@ export function LandingScreen({
               <h2 className="mt-2 break-words text-lg font-semibold text-[#1B2623]">
                 {selectedStatusJourney.title}
               </h2>
-              <p className="mt-1 break-words text-xs text-[#64748B]">
+              <p className="mt-1 break-words text-xs text-[#6A6D66]">
                 Reference: {selectedStatusJourney.intakeNumber}
               </p>
             </div>
@@ -939,7 +939,7 @@ export function LandingScreen({
                             <EmploymentMatterTagsLine tags={card.employmentMatterTags ?? []} />
                           </div>
                         ) : card.caseCategory ? (
-                        <p className="mt-0.5 text-[10px] text-[#64748B]">
+                        <p className="mt-0.5 text-[10px] text-[#6A6D66]">
                             Category: {displayCaseCategoryLabel(card.caseCategory)}
                           </p>
                         ) : null}
@@ -949,12 +949,12 @@ export function LandingScreen({
                         </p>
                       </div>
                       {isActive ? (
-                        <span className="shrink-0 text-[10px] font-semibold uppercase tracking-wide text-[#64748B]">
+                        <span className="shrink-0 text-[10px] font-semibold uppercase tracking-wide text-[#6A6D66]">
                           Active
                         </span>
                       ) : null}
                     </div>
-                    <p className="mb-2 line-clamp-2 text-[11px] leading-relaxed text-[#475569]">{routingPeek}</p>
+                    <p className="mb-2 line-clamp-2 text-[11px] leading-relaxed text-[#40433F]">{routingPeek}</p>
                     {card.hasSummary ? (
                       <p className="text-[10px] text-emerald-800/90 mb-2">{WORKER_HUB_COPY.summaryReady}</p>
                     ) : null}
@@ -1338,8 +1338,8 @@ export function LandingScreen({
           <details className="group overflow-hidden rounded-2xl border border-[#D3DED6] bg-white/86 shadow-[0_12px_32px_rgba(31,27,75,0.07)]">
             <summary className="flex cursor-pointer list-none items-center justify-between gap-2 px-4 py-3 text-sm font-medium text-[#1B2623] hover:bg-[#F7F9F5]">
               About one3seven
-              <span className="text-[11px] font-normal text-[#64748B] group-open:hidden">Show</span>
-              <span className="hidden text-[11px] font-normal text-[#64748B] group-open:inline">Hide</span>
+              <span className="text-[11px] font-normal text-[#6A6D66] group-open:hidden">Show</span>
+              <span className="hidden text-[11px] font-normal text-[#6A6D66] group-open:inline">Hide</span>
             </summary>
             <div className="space-y-3 border-t border-[#D3DED6] px-4 pb-4 pt-3">
               <p className="text-xs leading-relaxed text-[#1B2623]/64">
@@ -1417,10 +1417,10 @@ export function LandingScreen({
       >
         <div className="text-center">
           <div className="mb-2 text-lg font-semibold text-[#1B2623]"><WordMark /></div>
-          <p className="mb-8 text-sm leading-relaxed text-[#475569]">
+          <p className="mb-8 text-sm leading-relaxed text-[#40433F]">
             A workflow organization platform for intake preparation.
           </p>
-          <p className="mx-auto mb-6 max-w-lg text-xs leading-relaxed text-[#64748B]">{ONE3SEVEN_NOTICES.positioning}</p>
+          <p className="mx-auto mb-6 max-w-lg text-xs leading-relaxed text-[#6A6D66]">{ONE3SEVEN_NOTICES.positioning}</p>
           <div className="flex flex-wrap justify-center gap-8 text-sm text-[#1B2623]/64">
             <a
               href="https://one3seven.com/privacy"

@@ -894,7 +894,7 @@ export function UploadScreen({
                 {STORY_FIRST_UPLOAD_HEADING}
               </h1>
               <p className="text-sm text-[#6A6D66] mt-1 leading-relaxed">{STORY_FIRST_UPLOAD_INTRO}</p>
-              <p className="text-[11px] text-[#475569] mt-2 leading-relaxed">
+              <p className="text-[11px] text-[#40433F] mt-2 leading-relaxed">
                 {STORY_FIRST_UPLOAD_EXAMPLES.slice(0, 4).join(' · ')}
                 {STORY_FIRST_UPLOAD_EXAMPLES.length > 4 ? ' · …' : ''}
               </p>
@@ -1568,7 +1568,7 @@ export function UploadScreen({
                 <ChevronDown className="h-4 w-4 text-[#7C857F] group-open:rotate-180 transition-transform" />
               </summary>
               <div className="pb-3">
-                <p className="text-xs text-[#475569] leading-relaxed mb-2">
+                <p className="text-xs text-[#40433F] leading-relaxed mb-2">
                   {WORKER_DOC_REQUEST_PANEL_COPY.summaryCollapsedHint}
                 </p>
                 <button
@@ -1612,13 +1612,13 @@ export function UploadScreen({
               {intakeHasGeneratedSummary ? 'Update Intake Summary' : 'Begin Organizing'}
             </motion.button>
             {hasMeaningfulStoryContext && uploadedFiles.length === 0 ? (
-              <p className="rounded-[12px] border border-[#D3DED6] bg-white px-3 py-2 text-xs leading-relaxed text-[#475569]">
+              <p className="rounded-[12px] border border-[#D3DED6] bg-white px-3 py-2 text-xs leading-relaxed text-[#40433F]">
                 You can begin with your story now. Records can be added later to strengthen the timeline.
               </p>
             ) : null}
             {intakeHasGeneratedSummary ? (
               <div className="space-y-2 rounded-[14px] border border-[#D3DED6] bg-white p-4 shadow-sm">
-                <p className="text-xs font-semibold uppercase tracking-wide text-[#64748B]">
+                <p className="text-xs font-semibold uppercase tracking-wide text-[#6A6D66]">
                   After organization
                 </p>
                 <button
@@ -1657,17 +1657,17 @@ export function UploadScreen({
 
           {/* Privacy & reassurance — low priority footer */}
           <div className="mt-6 pt-4 border-t border-[#D3DED6] space-y-2">
-            <p className="text-[10px] text-[#64748B] leading-relaxed">{UPLOAD_CONSENT_NOTICE}</p>
-            <p className="text-[10px] text-[#64748B] leading-relaxed">
+            <p className="text-[10px] text-[#6A6D66] leading-relaxed">{UPLOAD_CONSENT_NOTICE}</p>
+            <p className="text-[10px] text-[#6A6D66] leading-relaxed">
               Uploaded records are organized to support intake preparation workflows.
             </p>
-            <p className="text-[10px] text-[#64748B] leading-relaxed">
+            <p className="text-[10px] text-[#6A6D66] leading-relaxed">
               Shared materials remain connected to your intake workspace unless exported or submitted by you.
             </p>
             <One3SevenDisclaimer
               variant="compact"
-              summaryClassName="text-[10px] text-[#64748B]"
-              bodyClassName="text-[10px] leading-relaxed text-[#64748B]"
+              summaryClassName="text-[10px] text-[#6A6D66]"
+              bodyClassName="text-[10px] leading-relaxed text-[#6A6D66]"
             />
           </div>
         </motion.div>
@@ -1698,7 +1698,7 @@ export function UploadScreen({
               <p className="text-sm text-[#6A6D66] leading-relaxed mb-4">
                 If your law firm gave you a one3seven Firm Code, you can enter it now so your organized intake routes directly to their dashboard after processing.
               </p>
-              <p className="text-xs text-[#475569] mb-4">
+              <p className="text-xs text-[#40433F] mb-4">
                 Firm Code is the official routing code assigned to a participating law firm—not a random invite code.
               </p>
               {firmGateStep === 'intro' ? (

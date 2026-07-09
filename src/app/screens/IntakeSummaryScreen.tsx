@@ -1156,7 +1156,7 @@ export function IntakeSummaryScreen({
                 className={`rounded-[12px] px-3 py-2.5 text-xs font-semibold transition ${
                   !fullReviewMode
                     ? 'bg-white text-[#374A42] shadow-sm'
-                    : 'text-[#475569] hover:bg-white/60'
+                    : 'text-[#40433F] hover:bg-white/60'
                 }`}
               >
                 What Firms See
@@ -1167,13 +1167,13 @@ export function IntakeSummaryScreen({
                 className={`rounded-[12px] px-3 py-2.5 text-xs font-semibold transition ${
                   fullReviewMode
                     ? 'bg-white text-[#374A42] shadow-sm'
-                    : 'text-[#475569] hover:bg-white/60'
+                    : 'text-[#40433F] hover:bg-white/60'
                 }`}
               >
                 Full Review Version
               </button>
             </div>
-            <p className="mt-3 text-xs leading-relaxed text-[#475569]">
+            <p className="mt-3 text-xs leading-relaxed text-[#40433F]">
               {fullReviewMode
                 ? 'This view shows the fuller organized packet available after expanded review access is approved.'
                 : 'This view reflects the limited preview a firm can review before expanded access is approved.'}
@@ -1191,12 +1191,12 @@ export function IntakeSummaryScreen({
                     </p>
                   ))
                 ) : (
-                  <p className="text-sm leading-relaxed text-[#475569]">
+                  <p className="text-sm leading-relaxed text-[#40433F]">
                     {maturityMessage[intakeMaturityState]}
                   </p>
                 )}
                 {organizedSummaryParagraphs.length > 0 ? (
-                  <p className="rounded-[14px] border border-[#E7EDE8] bg-[#FBFBFA] px-3 py-2 text-sm leading-relaxed text-[#475569]">
+                  <p className="rounded-[14px] border border-[#E7EDE8] bg-[#FBFBFA] px-3 py-2 text-sm leading-relaxed text-[#40433F]">
                     {maturityMessage[intakeMaturityState]}
                   </p>
                 ) : null}
@@ -1204,7 +1204,7 @@ export function IntakeSummaryScreen({
             </div>
 
             <div className="border-t border-[#E7EDE8] pt-4">
-              <h2 className="text-sm font-semibold text-[#0B1033]">What one3seven Organized</h2>
+              <h2 className="text-sm font-semibold text-[#131A17]">What one3seven Organized</h2>
               <div className="mt-3 grid gap-2 sm:grid-cols-2">
                 {confidenceItems.map((item) => (
                   <div
@@ -1221,8 +1221,8 @@ export function IntakeSummaryScreen({
                         aria-hidden
                       />
                       <div>
-                        <p className="text-sm font-semibold text-[#0B1033]">{item.label}</p>
-                        <p className="mt-0.5 text-xs leading-relaxed text-[#475569]">{item.detail}</p>
+                        <p className="text-sm font-semibold text-[#131A17]">{item.label}</p>
+                        <p className="mt-0.5 text-xs leading-relaxed text-[#40433F]">{item.detail}</p>
                       </div>
                     </div>
                   </div>
@@ -1232,23 +1232,23 @@ export function IntakeSummaryScreen({
 
             {(showEmploymentHandoff || showInjuryHandoff) ? (
               <div className="border-t border-[#E7EDE8] pt-4">
-                <h2 className="text-sm font-semibold text-[#0B1033]">{WORKER_RECORD_HANDOFF.heading}</h2>
-                <p className="mt-2 text-sm leading-relaxed text-[#475569]">{WORKER_RECORD_HANDOFF.intro}</p>
-                <ul className="mt-2 space-y-1 text-sm leading-relaxed text-[#475569]">
+                <h2 className="text-sm font-semibold text-[#131A17]">{WORKER_RECORD_HANDOFF.heading}</h2>
+                <p className="mt-2 text-sm leading-relaxed text-[#40433F]">{WORKER_RECORD_HANDOFF.intro}</p>
+                <ul className="mt-2 space-y-1 text-sm leading-relaxed text-[#40433F]">
                   {showEmploymentHandoff ? <li>{WORKER_RECORD_HANDOFF.employmentLine}</li> : null}
                   {showInjuryHandoff ? <li>{WORKER_RECORD_HANDOFF.injuryLine}</li> : null}
                 </ul>
                 {showBothHandoffNote ? (
-                  <p className="mt-2 text-sm leading-relaxed text-[#475569]">{WORKER_RECORD_HANDOFF.bothNote}</p>
+                  <p className="mt-2 text-sm leading-relaxed text-[#40433F]">{WORKER_RECORD_HANDOFF.bothNote}</p>
                 ) : null}
               </div>
             ) : null}
 
             <div className="mt-4 grid gap-3 border-t border-[#E7EDE8] pt-4 lg:grid-cols-2">
               <div className="rounded-[14px] border border-[#E7EDE8] bg-[#FBFBFA] px-3 py-3">
-                <h2 className="text-sm font-semibold text-[#0B1033]">Additional Information May Help</h2>
+                <h2 className="text-sm font-semibold text-[#131A17]">Additional Information May Help</h2>
                 {missingInformationItems.length > 0 ? (
-                  <ul className="mt-2 space-y-1.5 text-sm leading-relaxed text-[#475569]">
+                  <ul className="mt-2 space-y-1.5 text-sm leading-relaxed text-[#40433F]">
                     {missingInformationItems.map((item, index) => (
                       <li key={`missing-confidence-${index}`} className="flex gap-2">
                         <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#5E7268]" />
@@ -1257,15 +1257,15 @@ export function IntakeSummaryScreen({
                     ))}
                   </ul>
                 ) : (
-                  <p className="mt-2 text-sm leading-relaxed text-[#475569]">
+                  <p className="mt-2 text-sm leading-relaxed text-[#40433F]">
                     No obvious missing information is listed yet.
                   </p>
                 )}
               </div>
 
               <div className="rounded-[14px] border border-[#CBD6CF] bg-white px-3 py-3">
-                <h2 className="text-sm font-semibold text-[#0B1033]">Next Recommended Action</h2>
-                <p className="mt-2 text-sm leading-relaxed text-[#475569]">{nextRecommendedAction}</p>
+                <h2 className="text-sm font-semibold text-[#131A17]">Next Recommended Action</h2>
+                <p className="mt-2 text-sm leading-relaxed text-[#40433F]">{nextRecommendedAction}</p>
               </div>
             </div>
           </section>
@@ -1522,7 +1522,7 @@ export function IntakeSummaryScreen({
           <section id="worker-intake-notes-section" className="px-6 pb-6">
             <div className="rounded-[12px] border border-[#E4E5DE] bg-white p-4 shadow-sm">
               <h2 className="text-base font-semibold text-[#1B2623] mb-1">Intake notes</h2>
-              <p className="text-xs text-[#475569] mb-2 leading-relaxed">
+              <p className="text-xs text-[#40433F] mb-2 leading-relaxed">
                 Optional notes you add after organization—separate from your guided story.
               </p>
               {!intakeNotesOpen ? (
@@ -1547,7 +1547,7 @@ export function IntakeSummaryScreen({
               ) : (
                 <>
                   <p className="text-sm font-medium text-[#1B2623] mb-1">Additional intake notes</p>
-                  <p className="text-xs text-[#475569] mb-4 leading-relaxed">
+                  <p className="text-xs text-[#40433F] mb-4 leading-relaxed">
                     Optional context for your firm—separate from your guided story.
                   </p>
                   <textarea
@@ -1670,7 +1670,7 @@ export function IntakeSummaryScreen({
                 defaultOpen={fullReviewMode}
                 titleClassName={expandableTitleClass}
               >
-              <p className="text-xs text-[#475569] mb-3 leading-relaxed">
+              <p className="text-xs text-[#40433F] mb-3 leading-relaxed">
                 Tap a name for the full label. Rename or remove files here.
               </p>
               <ul className="space-y-2">
@@ -2344,7 +2344,7 @@ export function IntakeSummaryScreen({
                         <p className="text-sm text-[#384039] leading-relaxed mb-4">
                           {FIRM_ROUTING_COPY.sendOrganizedIntro}
                         </p>
-                        <p className="text-xs text-[#475569] leading-relaxed mb-6">
+                        <p className="text-xs text-[#40433F] leading-relaxed mb-6">
                           {FIRM_ROUTING_COPY.firmCodeFieldHelp}
                         </p>
                       </>
@@ -2357,7 +2357,7 @@ export function IntakeSummaryScreen({
                         <p className="text-xs text-[#6A6D66] leading-relaxed mb-3">
                           {PARTICIPATING_NETWORK_COPY.shareModalBody}
                         </p>
-                        <p className="text-xs text-[#475569] leading-relaxed mb-6">
+                        <p className="text-xs text-[#40433F] leading-relaxed mb-6">
                           {PARTICIPATING_NETWORK_COPY.firmsSeeNow} {PARTICIPATING_NETWORK_COPY.firmsDoNotSee}
                         </p>
                       </>
