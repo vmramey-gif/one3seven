@@ -39,7 +39,7 @@ type Tab = 'dashboard' | 'pipeline' | 'firms' | 'activity' | 'metrics' | 'revenu
 // FROM victoria@ — so it lands in Sent and replies thread back — with the firm's own
 // personalized hook (from notes) already drafted. Founder reviews and sends.
 // Verb-test clean: organizes & reflects, never concludes; free pilot; honest opt-out.
-function outreachMailto(firm: { email: string | null; name: string; attorney_name: string | null; notes: string | null }): string {
+function outreachHref(firm: { email: string | null; name: string; attorney_name: string | null; notes: string | null }): string {
   const first = (firm.attorney_name ?? '').trim().split(/\s+/)[0] || 'there';
   const hook = (firm.notes ?? '').trim();
   const subject = `Organized employment intakes for ${firm.name}`;
@@ -58,7 +58,11 @@ function outreachMailto(firm: { email: string | null; name: string; attorney_nam
     '',
     'Not the right fit? Reply "no thanks" and I won\'t follow up.',
   ].join('\n');
-  return `mailto:${firm.email ?? ''}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  const to = firm.email ?? '';
+  // Outlook-on-the-web (Microsoft 365) compose deeplink. Opens a real pre-filled compose
+  // window from victoria@ in a new tab — reliable, unlike a bare mailto (which can open a
+  // blank tab or need a registered handler). Requires being signed into outlook.office.com.
+  return `https://outlook.office.com/mail/deeplink/compose?to=${encodeURIComponent(to)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
 
 // Every URL off www.one3seven.com, grouped — the founder "links in one place" directory.
@@ -769,7 +773,7 @@ function FirmCard({ firm, onLog, today, onQuickEmail, onQuickLog, userId, onClai
           </a>
         )}
         {firm.email && (
-          <a href={outreachMailto(firm)} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#F2F4EC] text-[#42574E]" aria-label={`Email ${firm.name}`}>
+          <a href={outreachHref(firm)} target="_blank" rel="noreferrer" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#F2F4EC] text-[#42574E]" aria-label={`Email ${firm.name}`}>
             <Mail className="h-4 w-4" />
           </a>
         )}
@@ -777,7 +781,7 @@ function FirmCard({ firm, onLog, today, onQuickEmail, onQuickLog, userId, onClai
       <div className="space-y-2 border-t border-[#F2F4EC] p-3">
           {firm.attorney_name && <div className="text-[12px] text-[#1B2623]/55">{firm.attorney_name}</div>}
           {firm.email && (
-            <a href={outreachMailto(firm)} className="flex items-center gap-1.5 break-all text-[13px] font-semibold text-[#42574E] underline underline-offset-2">
+            <a href={outreachHref(firm)} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 break-all text-[13px] font-semibold text-[#42574E] underline underline-offset-2">
               <Mail className="h-3.5 w-3.5 shrink-0" /> {firm.email}
             </a>
           )}
@@ -1738,7 +1742,7 @@ function OutreachBatchTab({ firms, onSent }: { firms: CrmFirm[]; onSent: (id: st
             {f.notes && <p className="mt-2 text-[12.5px] italic leading-relaxed text-[#1B2623]/70">&ldquo;{f.notes}&rdquo;</p>}
           </div>
           <div className="mt-3 flex items-center gap-2">
-            <a href={outreachMailto(f)} target="_blank" rel="noreferrer" className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-[#42574E] px-4 py-2.5 text-[13px] font-semibold text-[#EAF0EC] transition hover:bg-[#374A42]">
+            <a href={outreachHref(f)} target="_blank" rel="noreferrer" className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-[#42574E] px-4 py-2.5 text-[13px] font-semibold text-[#EAF0EC] transition hover:bg-[#374A42]">
               <Mail className="h-4 w-4" /> Open email
             </a>
             <button type="button" disabled={busy === f.id} onClick={() => send(f.id)} className="inline-flex items-center justify-center gap-1.5 rounded-full border border-[#B7BCB2] px-4 py-2.5 text-[13px] font-semibold text-[#22262a] transition hover:border-[#8f958b] disabled:opacity-50">
@@ -1774,7 +1778,7 @@ function FounderEmailQueueTab({ firms, onFounderEmailDone }: { firms: CrmFirm[];
                 <div className="break-words text-[14px] font-bold text-[#1B2623]">{f.name}</div>
                 {f.attorney_name && <div className="text-[11px] text-[#1B2623]/50">{f.attorney_name}</div>}
                 {f.email
-                  ? <a href={outreachMailto(f)} className="break-all text-[12px] font-semibold text-[#42574E] underline">{f.email}</a>
+                  ? <a href={outreachHref(f)} target="_blank" rel="noreferrer" className="break-all text-[12px] font-semibold text-[#42574E] underline">{f.email}</a>
                   : <span className="text-[12px] text-[#1B2623]/40">no email on file</span>}
               </div>
               {onFounderEmailDone && (
@@ -1825,7 +1829,7 @@ function FirmRow({ firm, me, today, onLog, onClaim, onNoContact, onNotInterested
             <button type="button" disabled={claiming} onClick={async () => { setClaiming(true); try { await onClaim(firm.id); } finally { setClaiming(false); } }} className="rounded-full bg-[#F2F4EC] px-2 py-1 text-[10px] font-bold text-[#42574E] disabled:opacity-50">{claiming ? '…' : 'Claim'}</button>
           )}
           {firm.phone && <a href={`tel:${digitsOf(firm.phone)}`} className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-50 text-emerald-600" aria-label={`Call ${firm.name}`}><Phone className="h-3.5 w-3.5" /></a>}
-          {firm.email && <a href={outreachMailto(firm)} className="flex h-7 w-7 items-center justify-center rounded-full bg-[#F2F4EC] text-[#42574E]" aria-label={`Email ${firm.name}`}><Mail className="h-3.5 w-3.5" /></a>}
+          {firm.email && <a href={outreachHref(firm)} target="_blank" rel="noreferrer" className="flex h-7 w-7 items-center justify-center rounded-full bg-[#F2F4EC] text-[#42574E]" aria-label={`Email ${firm.name}`}><Mail className="h-3.5 w-3.5" /></a>}
           <button type="button" onClick={() => onLog(firm.id)} className="rounded-full bg-[#42574E] px-3 py-1 text-[11px] font-bold text-white hover:bg-[#374A42]">Log</button>
           {(onNoContact || onNotInterested) && (
             <button type="button" onClick={() => setMenu((v) => !v)} aria-label="More actions" className="flex h-7 w-7 items-center justify-center rounded-full text-[16px] font-bold leading-none text-[#1B2623]/50 hover:bg-[#F2F4EC]">⋯</button>
