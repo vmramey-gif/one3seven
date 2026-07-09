@@ -33,7 +33,7 @@ import { AUDIT_SITE_CHECKS, AUDIT_MANUAL_GROUPS } from '../constants/crmAudit';
 import { crmFirmIntel } from '../constants/crmFirmIntel';
 import { STARTER_QUESTIONS, askAssistant, type ChatMessage } from '../../services/chatAssistant';
 
-type Tab = 'dashboard' | 'pipeline' | 'firms' | 'activity' | 'metrics' | 'revenue' | 'comp' | 'economics' | 'growth' | 'team' | 'inbox' | 'notes' | 'scripts' | 'training' | 'askai' | 'checklist' | 'audit' | 'links' | 'email_fu' | 'add';
+type Tab = 'dashboard' | 'pipeline' | 'firms' | 'activity' | 'metrics' | 'revenue' | 'comp' | 'economics' | 'growth' | 'team' | 'inbox' | 'notes' | 'scripts' | 'training' | 'askai' | 'checklist' | 'audit' | 'links' | 'email_fu' | 'outreach' | 'add';
 
 // Pre-filled outreach email. Opens the founder's default mail app (Outlook) composing
 // FROM victoria@ — so it lands in Sent and replies thread back — with the firm's own
@@ -93,6 +93,7 @@ const TABS: { id: Tab; label: string; icon: typeof LayoutGrid; founderOnly?: boo
   { id: 'pipeline', label: 'Pipeline', icon: TrendingUp, founderOnly: true },
   { id: 'firms', label: 'Firms', icon: Building2 },
   { id: 'email_fu', label: 'Victoria email f/u', icon: Mail, founderOnly: true },
+  { id: 'outreach', label: 'Send emails', icon: Send, founderOnly: true },
   { id: 'activity', label: 'Activity', icon: ClipboardList, founderOnly: true },
   { id: 'metrics', label: 'Metrics', icon: BarChart3, founderOnly: true },
   { id: 'team', label: 'Team chat', icon: MessageSquare },
@@ -118,7 +119,7 @@ const TAB_BY_ID: Record<Tab, { id: Tab; label: string; icon: typeof LayoutGrid; 
   Object.fromEntries(TABS.map((t) => [t.id, t])) as Record<Tab, (typeof TABS)[number]>;
 
 const NAV_GROUPS: { id: string; label: string; icon: typeof LayoutGrid; tabIds: Tab[] }[] = [
-  { id: 'sell', label: 'Sell', icon: TrendingUp, tabIds: ['dashboard', 'firms', 'email_fu', 'pipeline', 'add', 'activity'] },
+  { id: 'sell', label: 'Sell', icon: TrendingUp, tabIds: ['dashboard', 'firms', 'outreach', 'email_fu', 'pipeline', 'add', 'activity'] },
   { id: 'me', label: 'My numbers', icon: Trophy, tabIds: ['comp', 'metrics'] },
   { id: 'learn', label: 'Learn', icon: BookOpen, tabIds: ['scripts', 'training', 'askai'] },
   { id: 'team', label: 'Team', icon: MessageSquare, tabIds: ['inbox', 'team', 'notes'] },
@@ -398,6 +399,16 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
     await load();
   };
 
+  /** Batch outreach: mark a cold email as sent (founder sent it from Outlook), advance target -> contacted. */
+  const markEmailSent = async (firmId: string) => {
+    const f = firmsById[firmId];
+    const bump: CrmStage | '' = f && f.stage === 'target' ? 'contacted' : '';
+    const r = await logActivity({ firm_id: firmId, activity_type: 'email', activity_date: today, outcome: 'Cold email sent', new_stage: bump });
+    if (r?.error) { setError(r.error); return; }
+    setLastFirmId(firmId);
+    await load();
+  };
+
   /** "Not interested" — park the firm as nurture and auto-resurface it in the queue in 3 months. */
   const markNotInterested = async (firmId: string) => {
     const d = new Date(today + 'T00:00:00'); d.setMonth(d.getMonth() + 3);
@@ -541,6 +552,7 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
             {tab === 'pipeline' && isFounder && <PipelineTab firms={firms} onLog={openFast} workerCount={workerCount} onQuickEmail={quickEmail} onQuickLog={quickLog} claim={claim} />}
             {tab === 'firms' && <FirmsTab firms={firms} onLog={openFast} userId={userId} onNoContact={(id) => quickLog(id, 'no_contact')} onNotInterested={markNotInterested} claim={claim} />}
             {tab === 'email_fu' && isFounder && <FounderEmailQueueTab firms={firms} onFounderEmailDone={founderEmailDone} />}
+            {tab === 'outreach' && isFounder && <OutreachBatchTab firms={firms} onSent={markEmailSent} />}
             {tab === 'activity' && isFounder && <ActivityTab activity={activity} />}
             {tab === 'metrics' && isFounder && <MetricsTab firms={firms} activity={activity} />}
             {tab === 'team' && <TeamTab />}
@@ -1688,6 +1700,58 @@ function PipelineTab({ firms, onLog, workerCount, onQuickEmail, onQuickLog, clai
 
 // ── Firms ────────────────────────────────────────────────────────────────────
 // ── Victoria's email follow-up queue — its own tab (founder-only) ─────────────
+// ── Send-emails batch mode — rip through cold outreach one click at a time (founder-only) ──
+function OutreachBatchTab({ firms, onSent }: { firms: CrmFirm[]; onSent: (id: string) => Promise<void> }) {
+  const [busy, setBusy] = useState<string | null>(null);
+  const prioRank: Record<string, number> = { A: 0, B: 1, C: 2 };
+  // Ready to cold-email: has an email AND still uncontacted (stage 'target'). Sorted A -> C.
+  const queue = firms
+    .filter((f) => f.email && f.stage === 'target')
+    .sort((a, b) => (prioRank[a.priority ?? 'C'] ?? 3) - (prioRank[b.priority ?? 'C'] ?? 3));
+  const noEmailTargets = firms.filter((f) => !f.email && f.stage === 'target').length;
+
+  const send = async (id: string) => { setBusy(id); await onSent(id); setBusy(null); };
+
+  return (
+    <div className="space-y-4">
+      <div className="rounded-2xl border border-[#E1E4DD] bg-[#F7F9F5] p-4">
+        <h2 className="text-[15px] font-extrabold text-[#374A42]">Send emails — {queue.length} ready</h2>
+        <p className="mt-1 text-[12.5px] leading-relaxed text-[#1B2623]/60">
+          Each opens a personalized email in Outlook (from victoria@), already written with that firm&rsquo;s hook. Send it, then tap <b>Sent</b> to log it and drop it from the queue.
+          {noEmailTargets > 0 ? ` ${noEmailTargets} more targets have no email yet — call those.` : ''}
+        </p>
+      </div>
+      {queue.length === 0 ? (
+        <div className="rounded-2xl border border-[#E1E4DD] bg-white p-6 text-center text-[13px] text-[#1B2623]/55">
+          No emailable uncontacted firms in the queue. Add more, or work the phone list.
+        </div>
+      ) : queue.map((f, i) => (
+        <div key={f.id} className="rounded-2xl border border-[#E4E5DE] bg-white p-4">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2">
+              <span className="font-mono text-[11px] text-[#7c857f]">#{i + 1}</span>
+              {f.priority && <span className="rounded-full bg-[#E7EDE8] px-2 py-0.5 text-[10px] font-bold text-[#42574E]">{f.priority}</span>}
+              <span className="truncate text-[14px] font-bold text-[#1B2623]">{f.name}</span>
+            </div>
+            {f.attorney_name && <div className="mt-0.5 text-[12px] text-[#1B2623]/55">{f.attorney_name}{f.region ? ` · ${f.region}` : ''}</div>}
+            <div className="mt-0.5 break-all text-[12px] text-[#42574E]">{f.email}</div>
+            {f.notes && <p className="mt-2 text-[12.5px] italic leading-relaxed text-[#1B2623]/70">&ldquo;{f.notes}&rdquo;</p>}
+          </div>
+          <div className="mt-3 flex items-center gap-2">
+            <a href={outreachMailto(f)} target="_blank" rel="noreferrer" className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-[#42574E] px-4 py-2.5 text-[13px] font-semibold text-[#EAF0EC] transition hover:bg-[#374A42]">
+              <Mail className="h-4 w-4" /> Open email
+            </a>
+            <button type="button" disabled={busy === f.id} onClick={() => send(f.id)} className="inline-flex items-center justify-center gap-1.5 rounded-full border border-[#B7BCB2] px-4 py-2.5 text-[13px] font-semibold text-[#22262a] transition hover:border-[#8f958b] disabled:opacity-50">
+              <Check className="h-4 w-4" /> {busy === f.id ? '…' : 'Sent'}
+            </button>
+            {f.phone && <a href={`tel:${digitsOf(f.phone)}`} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-600" aria-label={`Call ${f.name}`}><Phone className="h-4 w-4" /></a>}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function FounderEmailQueueTab({ firms, onFounderEmailDone }: { firms: CrmFirm[]; onFounderEmailDone?: (id: string) => Promise<void> }) {
   const queue = firms.filter((f) => f.needs_founder_email);
   return (
