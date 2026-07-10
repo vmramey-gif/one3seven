@@ -6,7 +6,7 @@
  * App's routing (worker/firm/sign-in/firm-directed intake) is unchanged.
  * Bilingual via i18n t().
  */
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, FileText } from 'lucide-react';
 import { useLang, LangToggle } from '../../i18n/i18n';
 import { track } from '../../lib/analytics';
 import { motion, useReducedMotion } from 'motion/react';
@@ -149,10 +149,75 @@ export function SageMarketingPage({ onWorkerStart, onSignIn, onForFirms, firmDir
         </motion.div>
       </section>
 
-      {/* problem */}
-      <section className="mx-auto max-w-5xl px-6 py-16 md:py-20">
-        <p style={SERIF} className="text-balance text-[clamp(24px,3.6vw,38px)] font-medium leading-[1.25] tracking-[-0.012em] text-[#20242a]">
-          {t('home.problem')}
+      {/* problem — the pain, shown as before → after */}
+      <section className="mx-auto max-w-6xl px-6 py-20 md:py-24">
+        <div style={MONO} className="text-[11px] uppercase tracking-[0.16em] text-[#42574E]">{t('prob.eyebrow')}</div>
+        <h2 style={SERIF} className="mt-3 max-w-[20ch] text-balance text-[clamp(26px,4vw,44px)] font-semibold leading-[1.05] tracking-[-0.02em] text-[#17181C]">
+          {t('prob.head')}
+        </h2>
+
+        <div className="mt-12 grid items-stretch gap-5 md:grid-cols-[1fr_auto_1fr]">
+          {/* BEFORE — the pile */}
+          <motion.div
+            initial={reduce ? false : { opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-80px' }} transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            className="rounded-2xl border border-[#E1E4DD] bg-[#ECEFEA] p-6"
+          >
+            <div style={MONO} className="text-[10.5px] uppercase tracking-[0.1em] text-[#7c857f]">{t('prob.before')}</div>
+            <div className="relative mt-4 h-[196px]">
+              {[
+                { k: 'prob.c1', top: '2%', left: '2%', rot: '-6deg' },
+                { k: 'prob.c2', top: '5%', left: '40%', rot: '5deg' },
+                { k: 'prob.c3', top: '40%', left: '5%', rot: '-3deg' },
+                { k: 'prob.c4', top: '30%', left: '55%', rot: '8deg' },
+                { k: 'prob.c5', top: '66%', left: '22%', rot: '-4deg' },
+                { k: 'prob.c6', top: '60%', left: '56%', rot: '6deg' },
+              ].map((c) => (
+                <div key={c.k} style={{ top: c.top, left: c.left, rotate: c.rot }}
+                  className="absolute inline-flex items-center gap-1.5 rounded-lg border border-[#D8D3C8] bg-white px-2.5 py-1.5 text-[11px] font-medium text-[#5c5c55] shadow-[0_6px_16px_-8px_rgba(46,64,56,0.4)]">
+                  <FileText className="h-3 w-3 text-[#9aa39b]" /> {t(c.k)}
+                </div>
+              ))}
+            </div>
+            <p className="mt-3 text-[12.5px] italic text-[#6a6d66]">{t('prob.before_cap')}</p>
+          </motion.div>
+
+          {/* arrow */}
+          <div className="flex items-center justify-center py-1 md:py-0">
+            <div className="flex flex-col items-center gap-2">
+              <span style={MONO} className="rounded-full bg-[#42574E] px-3 py-1 text-[9.5px] font-semibold uppercase tracking-wide text-[#EAF0EC]">{t('prob.arrow')}</span>
+              <ArrowRight className="h-5 w-5 rotate-90 text-[#42574E] md:rotate-0" />
+            </div>
+          </div>
+
+          {/* AFTER — organized */}
+          <motion.div
+            initial={reduce ? false : { opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-80px' }} transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: 0.12 }}
+            className="rounded-2xl border border-[#E4E5DE] bg-[#FBFBFA] p-6 shadow-[0_24px_60px_-28px_rgba(46,64,56,0.3)]"
+          >
+            <div style={MONO} className="text-[10.5px] uppercase tracking-[0.1em] text-[#7c857f]">{t('prob.after')}</div>
+            <div className="relative mt-4">
+              <span aria-hidden className="absolute left-[5px] top-[4px] bottom-[16px] w-[2px] bg-[#CBD6CF]" />
+              {[
+                { d: 'Nov 2025', k: 'tl.e1', doc: 'Rivera_HR_Complaint.pdf' },
+                { d: 'Dec 2025', k: 'tl.e2', doc: 'Rivera_Warning_Dec2025.pdf' },
+                { d: 'Jan 2026', k: 'tl.e3', doc: 'Rivera_Termination.pdf' },
+              ].map((e, i, arr) => (
+                <div key={e.doc} className="flex gap-3.5">
+                  <div className="relative w-3 flex-none"><span className="absolute left-[1px] top-[3px] h-2.5 w-2.5 rounded-full bg-[#42574E]" /></div>
+                  <div className={i < arr.length - 1 ? 'pb-4' : ''}>
+                    <div style={MONO} className="text-[10.5px] text-[#7c857f]">{e.d}</div>
+                    <div className="mt-px text-[13px] font-semibold text-[#20242a]">{t(e.k)}</div>
+                    <span style={MONO} className="mt-1 inline-flex items-center gap-1.5 rounded-[6px] border border-[#D3DED6] bg-[#E7EDE8] px-2 py-[2px] text-[10px] text-[#3c5049]"><span className="h-2 w-[6px] flex-none rounded-[1px] bg-[#42574E]" />{e.doc}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <p className="mt-3 text-[12.5px] italic text-[#3c5049]">{t('prob.after_cap')}</p>
+          </motion.div>
+        </div>
+
+        <p className="mx-auto mt-12 max-w-[64ch] text-center text-[15.5px] leading-[1.7] text-[#40433f]">
+          {t('prob.body')}
         </p>
       </section>
 
