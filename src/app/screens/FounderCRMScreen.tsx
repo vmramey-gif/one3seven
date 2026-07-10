@@ -33,7 +33,7 @@ import { AUDIT_SITE_CHECKS, AUDIT_MANUAL_GROUPS } from '../constants/crmAudit';
 import { crmFirmIntel } from '../constants/crmFirmIntel';
 import { STARTER_QUESTIONS, askAssistant, type ChatMessage } from '../../services/chatAssistant';
 
-type Tab = 'dashboard' | 'pipeline' | 'firms' | 'activity' | 'metrics' | 'revenue' | 'comp' | 'economics' | 'growth' | 'team' | 'inbox' | 'notes' | 'scripts' | 'training' | 'askai' | 'checklist' | 'audit' | 'links' | 'email_fu' | 'outreach' | 'add';
+type Tab = 'dashboard' | 'pipeline' | 'firms' | 'activity' | 'metrics' | 'revenue' | 'comp' | 'economics' | 'growth' | 'team' | 'inbox' | 'notes' | 'scripts' | 'training' | 'askai' | 'checklist' | 'audit' | 'links' | 'email_fu' | 'outreach' | 'callqueue' | 'add';
 
 // Pre-filled outreach email. Opens the founder's default mail app (Outlook) composing
 // FROM victoria@ — so it lands in Sent and replies thread back — with the firm's own
@@ -98,6 +98,7 @@ const TABS: { id: Tab; label: string; icon: typeof LayoutGrid; founderOnly?: boo
   { id: 'firms', label: 'Firms', icon: Building2 },
   { id: 'email_fu', label: 'Victoria email f/u', icon: Mail, founderOnly: true },
   { id: 'outreach', label: 'Send emails', icon: Send, founderOnly: true },
+  { id: 'callqueue', label: 'Call queue', icon: Phone },
   { id: 'activity', label: 'Activity', icon: ClipboardList, founderOnly: true },
   { id: 'metrics', label: 'Metrics', icon: BarChart3, founderOnly: true },
   { id: 'team', label: 'Team chat', icon: MessageSquare },
@@ -123,7 +124,7 @@ const TAB_BY_ID: Record<Tab, { id: Tab; label: string; icon: typeof LayoutGrid; 
   Object.fromEntries(TABS.map((t) => [t.id, t])) as Record<Tab, (typeof TABS)[number]>;
 
 const NAV_GROUPS: { id: string; label: string; icon: typeof LayoutGrid; tabIds: Tab[] }[] = [
-  { id: 'sell', label: 'Sell', icon: TrendingUp, tabIds: ['dashboard', 'firms', 'outreach', 'email_fu', 'pipeline', 'add', 'activity'] },
+  { id: 'sell', label: 'Sell', icon: TrendingUp, tabIds: ['dashboard', 'firms', 'outreach', 'callqueue', 'email_fu', 'pipeline', 'add', 'activity'] },
   { id: 'me', label: 'My numbers', icon: Trophy, tabIds: ['comp', 'metrics'] },
   { id: 'learn', label: 'Learn', icon: BookOpen, tabIds: ['scripts', 'training', 'askai'] },
   { id: 'team', label: 'Team', icon: MessageSquare, tabIds: ['inbox', 'team', 'notes'] },
@@ -557,6 +558,7 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
             {tab === 'firms' && <FirmsTab firms={firms} onLog={openFast} userId={userId} onNoContact={(id) => quickLog(id, 'no_contact')} onNotInterested={markNotInterested} claim={claim} />}
             {tab === 'email_fu' && isFounder && <FounderEmailQueueTab firms={firms} onFounderEmailDone={founderEmailDone} />}
             {tab === 'outreach' && isFounder && <OutreachBatchTab firms={firms} onSent={markEmailSent} />}
+            {tab === 'callqueue' && <CallQueueTab firms={firms} activity={activity} onLog={openFast} today={today} onQuickEmail={quickEmail} onQuickLog={quickLog} claim={claim} />}
             {tab === 'activity' && isFounder && <ActivityTab activity={activity} />}
             {tab === 'metrics' && isFounder && <MetricsTab firms={firms} activity={activity} />}
             {tab === 'team' && <TeamTab />}
@@ -1704,6 +1706,65 @@ function PipelineTab({ firms, onLog, workerCount, onQuickEmail, onQuickLog, clai
 
 // ── Firms ────────────────────────────────────────────────────────────────────
 // ── Victoria's email follow-up queue — its own tab (founder-only) ─────────────
+// ── Call queue — firms that have been emailed but not yet called; freshest email first ──
+// Fulfils the email-first workflow: emails sent from "Send emails" auto-surface here as the
+// rep's priority call list, each stamped with when the email went out and who sent it.
+function CallQueueTab({ firms, activity, onLog, today, onQuickEmail, onQuickLog, claim }: {
+  firms: CrmFirm[];
+  activity: CrmActivityWithFirm[];
+  onLog: (firmId: string) => void;
+  today: string;
+  onQuickEmail: (firmId: string) => void;
+  onQuickLog: (firmId: string, kind: QuickLogKind) => void;
+  claim?: { userId?: string; onClaim?: (id: string) => void; onRelease?: (id: string) => void; isFounder?: boolean; members?: CrmMember[]; onAssign?: (firmId: string, memberId: string | null, memberName: string | null) => Promise<void> };
+}) {
+  const lastEmail = new Map<string, { date: string; at: string; by: string | null }>();
+  const called = new Set<string>();
+  for (const a of activity) {
+    if (!a.firm_id) continue;
+    if (a.activity_type === 'email') {
+      const p = lastEmail.get(a.firm_id);
+      if (!p || a.created_at > p.at) lastEmail.set(a.firm_id, { date: a.activity_date, at: a.created_at, by: a.logged_by_name });
+    } else if (a.activity_type === 'call') {
+      called.add(a.firm_id);
+    }
+  }
+  const queue = firms
+    .filter((f) => lastEmail.has(f.id) && !called.has(f.id))
+    .sort((x, y) => lastEmail.get(y.id)!.at.localeCompare(lastEmail.get(x.id)!.at));
+
+  const fmtWhen = (iso: string) => {
+    try { return new Date(iso).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }); }
+    catch { return iso; }
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="rounded-2xl border border-[#E1E4DD] bg-[#F7F9F5] p-4">
+        <h2 className="text-[15px] font-extrabold text-[#374A42]">Call queue — {queue.length} emailed, awaiting a call</h2>
+        <p className="mt-1 text-[12.5px] leading-relaxed text-[#1B2623]/60">
+          Firms already emailed but not yet called — freshest email first, so you call while it&rsquo;s warm. Each shows when the email went out and who sent it. Call, log it, and it drops off.
+        </p>
+      </div>
+      {queue.length === 0 ? (
+        <div className="rounded-2xl border border-[#E1E4DD] bg-white p-6 text-center text-[13px] text-[#1B2623]/55">
+          Nothing emailed-and-uncalled right now. Emails sent from &ldquo;Send emails&rdquo; land here for the follow-up call.
+        </div>
+      ) : queue.map((f) => {
+        const e = lastEmail.get(f.id)!;
+        return (
+          <div key={f.id} className="space-y-1.5">
+            <div className="inline-flex items-center gap-1.5 rounded-full bg-[#E7EDE8] px-3 py-1 text-[11px] font-semibold text-[#42574E]">
+              <Mail className="h-3 w-3" /> Emailed {fmtWhen(e.at)}{e.by ? ` · ${e.by.split(' ')[0]}` : ''}
+            </div>
+            <FirmCard firm={f} onLog={onLog} today={today} onQuickEmail={onQuickEmail} onQuickLog={onQuickLog} userId={claim?.userId} onClaim={claim?.onClaim} onRelease={claim?.onRelease} isFounder={claim?.isFounder} members={claim?.members} onAssign={claim?.onAssign} />
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 // ── Send-emails batch mode — rip through cold outreach one click at a time (founder-only) ──
 function OutreachBatchTab({ firms, onSent }: { firms: CrmFirm[]; onSent: (id: string) => Promise<void> }) {
   const [busy, setBusy] = useState<string | null>(null);
@@ -1993,7 +2054,7 @@ function ActivityRow({ a }: { a: CrmActivityWithFirm }) {
           <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${typeColor}`}>{a.activity_type ?? '—'}</span>
           <span className="text-[13px] font-semibold">{a.firm_name ?? 'Unknown firm'}</span>
         </div>
-        <span className="text-[11px] text-[#1B2623]/40">{a.activity_date}</span>
+        <span className="text-[11px] text-[#1B2623]/40">{a.logged_by_name ? `${a.logged_by_name.split(' ')[0]} · ` : ''}{a.activity_date}</span>
       </div>
       {a.outcome && <div className="text-[13px] text-[#1B2623]/70">{a.outcome}</div>}
       {a.objection && <div className="mt-0.5 text-[12px] text-amber-700">Objection: {a.objection}</div>}
