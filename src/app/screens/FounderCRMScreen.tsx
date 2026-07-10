@@ -414,6 +414,13 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
     await load();
   };
 
+  /** Activity CTA: jump to a firm's card in the Firms tab (seed the Firms search, then switch tabs). */
+  const openFirmByName = (name: string | null) => {
+    if (!name) return;
+    try { localStorage.setItem('crm_firms_search', name); } catch { /* ignore */ }
+    setTab('firms');
+  };
+
   /** "Not interested" — park the firm as nurture and auto-resurface it in the queue in 3 months. */
   const markNotInterested = async (firmId: string) => {
     const d = new Date(today + 'T00:00:00'); d.setMonth(d.getMonth() + 3);
@@ -553,13 +560,13 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
             {tab === 'dashboard' && (
               <SuitesHome greeting={crmGreeting(memberName)} isFounder={isFounder} showEconomics={showEconomics} activeTab={tab} onPick={setTab} />
             )}
-            {tab === 'dashboard' && <DashboardTab firms={firms} activity={activity} today={today} onLog={openFast} workerCount={workerCount} onChanged={load} onQuickEmail={quickEmail} onQuickLog={quickLog} onFounderEmailDone={founderEmailDone} claim={claim} isFounder={isFounder} />}
+            {tab === 'dashboard' && <DashboardTab firms={firms} activity={activity} today={today} onLog={openFast} workerCount={workerCount} onChanged={load} onQuickEmail={quickEmail} onQuickLog={quickLog} onFounderEmailDone={founderEmailDone} claim={claim} isFounder={isFounder} onOpenFirm={openFirmByName} />}
             {tab === 'pipeline' && isFounder && <PipelineTab firms={firms} onLog={openFast} workerCount={workerCount} onQuickEmail={quickEmail} onQuickLog={quickLog} claim={claim} />}
             {tab === 'firms' && <FirmsTab firms={firms} onLog={openFast} userId={userId} onNoContact={(id) => quickLog(id, 'no_contact')} onNotInterested={markNotInterested} claim={claim} />}
             {tab === 'email_fu' && isFounder && <FounderEmailQueueTab firms={firms} onFounderEmailDone={founderEmailDone} />}
             {tab === 'outreach' && isFounder && <OutreachBatchTab firms={firms} onSent={markEmailSent} />}
             {tab === 'callqueue' && <CallQueueTab firms={firms} activity={activity} onLog={openFast} today={today} onQuickEmail={quickEmail} onQuickLog={quickLog} claim={claim} />}
-            {tab === 'activity' && isFounder && <ActivityTab activity={activity} />}
+            {tab === 'activity' && isFounder && <ActivityTab activity={activity} onOpenFirm={openFirmByName} />}
             {tab === 'metrics' && isFounder && <MetricsTab firms={firms} activity={activity} />}
             {tab === 'team' && <TeamTab />}
             {tab === 'inbox' && <InboxTab onReadChange={async () => setUnreadDm(await getUnreadDmCount())} />}
@@ -998,7 +1005,7 @@ function RepScoreboard({ firms, activity, members, today }: { firms: CrmFirm[]; 
   );
 }
 
-function DashboardTab({ firms, activity, today, onLog, workerCount, onChanged, onQuickEmail, onQuickLog, onFounderEmailDone, claim, isFounder }: { firms: CrmFirm[]; activity: CrmActivityWithFirm[]; today: string; onLog: (id: string) => void; workerCount: number; onChanged: () => void; onQuickEmail?: (id: string) => Promise<void>; onQuickLog?: QuickLogFn; onFounderEmailDone?: (id: string) => Promise<void>; claim?: ClaimBundle; isFounder: boolean }) {
+function DashboardTab({ firms, activity, today, onLog, workerCount, onChanged, onQuickEmail, onQuickLog, onFounderEmailDone, claim, isFounder, onOpenFirm }: { firms: CrmFirm[]; activity: CrmActivityWithFirm[]; today: string; onLog: (id: string) => void; workerCount: number; onChanged: () => void; onQuickEmail?: (id: string) => Promise<void>; onQuickLog?: QuickLogFn; onFounderEmailDone?: (id: string) => Promise<void>; claim?: ClaimBundle; isFounder: boolean; onOpenFirm?: (name: string | null) => void }) {
   // Reps see only their own numbers/activity; founders see team-wide.
   const me = claim?.userId ?? null;
   const myActivity = isFounder ? activity : activity.filter((a) => a.logged_by === me);
@@ -1074,7 +1081,7 @@ function DashboardTab({ firms, activity, today, onLog, workerCount, onChanged, o
           {recent.length === 0 ? (
             <p className="rounded-[12px] border border-[#D3DED6] bg-white px-4 py-3 text-[13px] text-[#1B2623]/45">No activity logged yet.</p>
           ) : (
-            <div className="space-y-2">{recent.map((a) => <ActivityRow key={a.id} a={a} />)}</div>
+            <div className="space-y-2">{recent.map((a) => <ActivityRow key={a.id} a={a} onOpen={() => onOpenFirm?.(a.firm_name)} />)}</div>
           )}
         </section>
       )}
@@ -2045,27 +2052,36 @@ function FirmsTab({ firms, onLog, userId, onNoContact, onNotInterested, claim }:
 }
 
 // ── Activity ─────────────────────────────────────────────────────────────────
-function ActivityRow({ a }: { a: CrmActivityWithFirm }) {
+function ActivityRow({ a, onOpen }: { a: CrmActivityWithFirm; onOpen?: () => void }) {
   const typeColor = a.activity_type === 'demo' ? 'bg-emerald-100 text-emerald-700' : a.activity_type === 'email' ? 'bg-blue-100 text-blue-700' : 'bg-[#F2F4EC] text-[#42574E]';
+  const clickable = !!(onOpen && a.firm_id);
   return (
-    <div className="rounded-[12px] border border-[#D3DED6] bg-white p-3.5">
+    <button
+      type="button"
+      disabled={!clickable}
+      onClick={onOpen}
+      className={`w-full rounded-[12px] border border-[#D3DED6] bg-white p-3.5 text-left transition ${clickable ? 'cursor-pointer hover:border-[#42574E] hover:bg-[#F7F9F5]' : 'cursor-default'}`}
+    >
       <div className="mb-1 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${typeColor}`}>{a.activity_type ?? '—'}</span>
           <span className="text-[13px] font-semibold">{a.firm_name ?? 'Unknown firm'}</span>
         </div>
-        <span className="text-[11px] text-[#1B2623]/40">{a.logged_by_name ? `${a.logged_by_name.split(' ')[0]} · ` : ''}{a.activity_date}</span>
+        <div className="flex items-center gap-1.5">
+          <span className="text-[11px] text-[#1B2623]/40">{a.logged_by_name ? `${a.logged_by_name.split(' ')[0]} · ` : ''}{a.activity_date}</span>
+          {clickable && <ChevronRight className="h-3.5 w-3.5 text-[#42574E]/50" />}
+        </div>
       </div>
       {a.outcome && <div className="text-[13px] text-[#1B2623]/70">{a.outcome}</div>}
       {a.objection && <div className="mt-0.5 text-[12px] text-amber-700">Objection: {a.objection}</div>}
       {a.notes && <p className="mt-1 line-clamp-2 text-[12px] leading-relaxed text-[#1B2623]/50">{a.notes}</p>}
-    </div>
+    </button>
   );
 }
 
-function ActivityTab({ activity }: { activity: CrmActivityWithFirm[] }) {
+function ActivityTab({ activity, onOpenFirm }: { activity: CrmActivityWithFirm[]; onOpenFirm?: (name: string | null) => void }) {
   if (activity.length === 0) return <p className="rounded-[12px] border border-[#D3DED6] bg-white px-4 py-3 text-[13px] text-[#1B2623]/45">No activity logged yet.</p>;
-  return <div className="space-y-2">{activity.map((a) => <ActivityRow key={a.id} a={a} />)}</div>;
+  return <div className="space-y-2">{activity.map((a) => <ActivityRow key={a.id} a={a} onOpen={() => onOpenFirm?.(a.firm_name)} />)}</div>;
 }
 
 // ── Weekly metrics ───────────────────────────────────────────────────────────
