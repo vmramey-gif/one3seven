@@ -133,6 +133,7 @@ export function SageMarketingPage({ onWorkerStart, onSignIn, onForFirms, firmDir
       <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
         <span style={SERIF} className="text-[19px] font-semibold tracking-[-0.01em]">one3seven</span>
         <div className="flex items-center gap-3 sm:gap-5">
+          <a href="/hq" className="text-[12px] font-medium text-[#9aa39b] transition hover:text-[#42574E]">HQ</a>
           <LangToggle tone="light" />
           <button type="button" onClick={() => { track('nav_for_workers'); onWorkerStart(); }} className="hidden text-[13.5px] font-medium text-[#3f4a44] hover:text-[#17181C] sm:block">{t('nav.workers')}</button>
           <button type="button" onClick={onSignIn} className="hidden text-[13.5px] font-medium text-[#3f4a44] hover:text-[#17181C] sm:block">{t('nav.signin')}</button>
