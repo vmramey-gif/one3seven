@@ -60,7 +60,11 @@ export const STRINGS: Dict = {
   'pending.signout': { en: 'Sign out',                          es: 'Cerrar sesión' },
 
   // ── Sage homepage (SageMarketingPage) ──
-  'home.eyebrow':    { en: 'Employment intake, organized',       es: 'Admisión laboral, organizada' },
+  'home.eyebrow':    { en: 'For California employment firms',    es: 'Para bufetes de derecho laboral de California' },
+  'home.belief':     { en: 'Every legal decision starts with the record.',
+                       es: 'Toda decisión legal empieza con el expediente.' },
+  'home.explain':    { en: 'A worker uploads scattered employment records. one3seven organizes them into a review-ready, source-linked intake — so you begin with the record, not the paperwork.',
+                       es: 'Un trabajador sube documentos laborales dispersos. one3seven los organiza en una admisión lista para revisar, con enlaces a la fuente — para que empieces con el expediente, no con el papeleo.' },
   'home.ai_line':    { en: 'You don’t prompt a chatbot. The AI works in the background — you open the organized file.',
                        es: 'No usas un chatbot. La IA trabaja en segundo plano — tú abres el expediente organizado.' },
   'home.sample':     { en: 'See a sample intake',                es: 'Ver una admisión de ejemplo' },

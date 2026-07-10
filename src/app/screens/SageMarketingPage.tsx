@@ -156,10 +156,13 @@ export function SageMarketingPage({ onWorkerStart, onSignIn, onForFirms, firmDir
               {t('home.h1_1')}
               <span className="block text-[#5E7268]">{t('home.h1_2')}</span>
             </motion.h1>
-            <motion.p variants={heroItem} className="mt-5 max-w-[46ch] text-[15px] leading-[1.65] text-[#40433f]">
+            <motion.p variants={heroItem} style={SERIF} className="mt-4 max-w-[30ch] text-[clamp(17px,2.2vw,21px)] font-medium italic leading-snug text-[#42574E]">
+              {t('home.belief')}
+            </motion.p>
+            <motion.p variants={heroItem} className="mt-4 max-w-[48ch] text-[15px] leading-[1.65] text-[#40433f]">
               {directed && firmDirectedContext
                 ? `${firmDirectedContext.firmName}: ${t('home.sub')}`
-                : t('home.sub')}
+                : t('home.explain')}
             </motion.p>
             <motion.div variants={heroItem} className="mt-6 flex flex-wrap items-center gap-3">
               {directed ? (
