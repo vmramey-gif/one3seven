@@ -41,14 +41,15 @@ type Tab = 'dashboard' | 'pipeline' | 'firms' | 'activity' | 'metrics' | 'revenu
 // Verb-test clean: organizes & reflects, never concludes; free pilot; honest opt-out.
 function outreachHref(firm: { email: string | null; name: string; attorney_name: string | null; notes: string | null }): string {
   const first = (firm.attorney_name ?? '').trim().split(/\s+/)[0] || 'there';
-  const hook = (firm.notes ?? '').trim();
   const subject = `Organized employment intakes for ${firm.name}`;
+  // NOTE: never put firm.notes (the internal sales-research hook, written about the firm in
+  // the third person) into the outbound email — it is internal-only and must never be sent.
   const body = [
     `Hi ${first},`,
     '',
-    hook || 'I work with California plaintiff-side employment firms.',
+    'I work with California plaintiff-side employment firms, and I think one3seven could take real time off your intake.',
     '',
-    'I built one3seven for firms like yours: a worker uploads their scattered records, and you open a clean, source-linked intake — a dated timeline, grouped documents, every fact traceable to its source — before your first call. It organizes and reflects; it never draws legal conclusions. You evaluate everything.',
+    'A worker uploads their scattered records, and you open a clean, source-linked intake — a dated timeline, grouped documents, every fact traceable to its source — before your first call. It organizes and reflects; it never draws legal conclusions. You evaluate everything.',
     '',
     "We're opening a small founding cohort with a free pilot. Could I send you a real sample intake to look at?",
     '',
