@@ -95,8 +95,32 @@ export function ForFirmsPage({ onBack, onStartWorker }: ForFirmsPageProps) {
         </div>
       </section>
 
+      {/* The change is here — why now (firm-page only; kept off the homepage) */}
+      <section className="px-5 pb-4 pt-2 sm:px-8">
+        <div className="mx-auto max-w-3xl">
+          <div style={MONO} className="mb-4 text-[11px] uppercase tracking-[0.16em] text-[#42574E]">The change is here</div>
+          <h2 style={SERIF} className="text-[30px] font-semibold leading-[1.04] tracking-[-0.015em] text-[#17181C] sm:text-[44px]">
+            The tools are changing.
+            <span className="block text-[#5E7268]">Your judgment shouldn't.</span>
+          </h2>
+          <div className="mt-6 space-y-4 text-[15px] leading-relaxed text-[#40433f] sm:text-[16px]">
+            <p className="max-w-[62ch]">
+              Artificial intelligence is changing how records can be organized and reviewed. We built
+              one3seven to help firms adopt that change without changing how legal decisions are made.
+            </p>
+            <p className="max-w-[62ch]">
+              A worker uploads scattered employment records. one3seven organizes them into a review-ready,
+              source-linked intake. Every source document remains available. Every legal judgment remains yours.
+            </p>
+            <p className="max-w-[62ch] text-[16px] font-medium text-[#2c332e] sm:text-[17px]">
+              The technology changes how the record arrives. It doesn't change who evaluates it.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Metrics */}
-      <section className="px-5 pt-2 sm:px-8">
+      <section className="px-5 pb-2 pt-12 sm:px-8 sm:pt-16">
         <div className="mx-auto grid max-w-3xl grid-cols-2 gap-4 sm:grid-cols-4">
           {([['0', 'Legal conclusions drawn'], ['100%', 'Source documents preserved for review'], ['1 link', 'Shared with your clients, on your terms'], ['Minutes', 'From upload to an organized packet']] as const).map(([n, l]) => (
             <div key={l} className="text-center">
