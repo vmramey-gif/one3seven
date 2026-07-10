@@ -124,6 +124,14 @@ export const STRINGS: Dict = {
   'prob.c5':         { en: 'Termination letter',                 es: 'Carta de despido' },
   'prob.c6':         { en: 'Doctor’s note',                  es: 'Nota médica' },
 
+  // ── Source-linked extraction card (hero right) ──
+  'ext.header':      { en: 'Source-linked facts',               es: 'Datos con enlace a la fuente' },
+  'ext.from_hr':     { en: 'From the HR complaint',             es: 'De la queja a RR. HH.' },
+  'ext.from_term':   { en: 'From the termination letter',       es: 'De la carta de despido' },
+  'ext.view':        { en: 'view source',                       es: 'ver fuente' },
+  'ext.foot':        { en: 'Every fact links to its exact page — nothing to trust blindly.',
+                       es: 'Cada dato enlaza a su página exacta — nada que creer a ciegas.' },
+
   // LEGAL-REVIEW: footer disclaimer — bilingual read recommended.
   'foot.disc':       { en: 'one3seven organizes records — attorneys independently evaluate them. It is not a law firm, does not provide legal advice, and is not a lawyer referral service; it does not recommend, rank, or select attorneys for workers. Built on Anthropic’s Claude for record organization.',
                        es: 'one3seven organiza documentos — los abogados los evalúan de forma independiente. No es un bufete de abogados, no brinda asesoría legal y no es un servicio de referencia de abogados; no recomienda, clasifica ni selecciona abogados para los trabajadores. Desarrollado con Claude de Anthropic para la organización de documentos.' },

@@ -80,6 +80,48 @@ function TimelineCard({ t }: { t: (k: string) => string }) {
   );
 }
 
+// Hero-right feature card: source-linked extraction — a fact pulled from a document,
+// shown with its verbatim quote and a clickable citation to the exact source page.
+function ExtractionCard({ t }: { t: (k: string) => string }) {
+  const reduce = useReducedMotion();
+  const facts = [
+    { from: t('ext.from_hr'), quote: '“…formally requesting a payroll audit covering October 2022 to present, specifically regarding overtime calculation and meal-break compensation.”', src: 'Rivera_HR_Complaint_Nov2025.pdf · p.1' },
+    { from: t('ext.from_term'), quote: '“…the Company has determined that your continued employment is no longer consistent with our performance standards.”', src: 'Rivera_Termination.pdf · p.1' },
+  ];
+  return (
+    <motion.div
+      initial={reduce ? false : { opacity: 0, y: 26, scale: 0.985 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.15 }}
+      className="rounded-2xl border border-[#E4E5DE] bg-[#FBFBFA] p-6 shadow-[0_30px_70px_-26px_rgba(46,64,56,0.35)]"
+    >
+      <div className="mb-4 flex items-center justify-between">
+        <span style={MONO} className="text-[10.5px] uppercase tracking-[0.1em] text-[#7c857f]">{t('ext.header')}</span>
+        <span style={MONO} className="rounded-full border border-[#C6D0C8] bg-[#E7EDE8] px-2.5 py-1 text-[10px] text-[#5B21B6]">{t('tl.ai')}</span>
+      </div>
+      <div className="space-y-3.5">
+        {facts.map((f, i) => (
+          <motion.div key={i}
+            initial={reduce ? false : { opacity: 0, x: 10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, ease: 'easeOut', delay: 0.5 + i * 0.22 }}
+            className="rounded-xl border border-[#E4E5DE] bg-white p-3.5"
+          >
+            <div style={MONO} className="text-[10px] uppercase tracking-[0.1em] text-[#7c857f]">{f.from}</div>
+            <p className="mt-1.5 border-l-2 border-[#CBD6CF] pl-3 text-[12.5px] italic leading-relaxed text-[#20242a]">{f.quote}</p>
+            <div className="mt-2.5 flex items-center gap-1.5 text-[11px] font-medium text-[#42574E]">
+              <FileText className="h-3.5 w-3.5 flex-none" />
+              <span style={MONO} className="truncate text-[10.5px] text-[#3c5049]">{f.src}</span>
+              <span className="ml-auto inline-flex flex-none items-center gap-0.5 whitespace-nowrap">{t('ext.view')} <ArrowRight className="h-3 w-3" /></span>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+      <p className="mt-4 text-[11.5px] leading-relaxed text-[#6a6d66]">{t('ext.foot')}</p>
+    </motion.div>
+  );
+}
+
 export function SageMarketingPage({ onWorkerStart, onSignIn, onForFirms, firmDirectedContext = null }: SageMarketingPageProps) {
   const { t } = useLang();
   const reduce = useReducedMotion();
@@ -145,7 +187,7 @@ export function SageMarketingPage({ onWorkerStart, onSignIn, onForFirms, firmDir
               <span>Free 7-day pilot</span>
             </motion.div>
           </div>
-          <TimelineCard t={t} />
+          <ExtractionCard t={t} />
         </motion.div>
       </section>
 
