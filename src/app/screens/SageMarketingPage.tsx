@@ -9,6 +9,7 @@
 import { ArrowRight } from 'lucide-react';
 import { useLang, LangToggle } from '../../i18n/i18n';
 import { track } from '../../lib/analytics';
+import { motion, useReducedMotion } from 'motion/react';
 
 interface SageMarketingPageProps {
   onWorkerStart: () => void;
@@ -23,24 +24,46 @@ const SERIF = { fontFamily: '"Fraunces", Georgia, "Times New Roman", serif' } as
 const BODY = { fontFamily: '"Inter Tight", ui-sans-serif, system-ui, -apple-system, sans-serif' } as const;
 const MONO = { fontFamily: '"IBM Plex Mono", ui-monospace, Menlo, monospace' } as const;
 
+// Entrance motion — a calm, staggered reveal (the page composes itself, like the product).
+const heroContainer = { hidden: {}, show: { transition: { staggerChildren: 0.08, delayChildren: 0.04 } } };
+const heroItem = { hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } } };
+
 function TimelineCard({ t }: { t: (k: string) => string }) {
   const events = [
     { date: 'Nov 2025', title: t('tl.e1'), doc: 'Rivera_HR_Complaint.pdf' },
     { date: 'Dec 2025', title: t('tl.e2'), doc: 'Rivera_Warning_Dec2025.pdf' },
     { date: 'Jan 2026', title: t('tl.e3'), doc: 'Rivera_Termination.pdf' },
   ];
+  const reduce = useReducedMotion();
   return (
-    <div className="rounded-2xl border border-[#E4E5DE] bg-[#FBFBFA] p-6 shadow-[0_1px_2px_rgba(27,38,35,0.04)]">
+    <motion.div
+      initial={reduce ? false : { opacity: 0, y: 26, scale: 0.985 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.15 }}
+      className="rounded-2xl border border-[#E4E5DE] bg-[#FBFBFA] p-6 shadow-[0_30px_70px_-26px_rgba(46,64,56,0.35)]"
+    >
       <div className="mb-4 flex items-center justify-between">
         <span style={MONO} className="text-[10.5px] uppercase tracking-[0.1em] text-[#7c857f]">{t('tl.header')}</span>
         <span style={MONO} className="rounded-full border border-[#C6D0C8] bg-[#E7EDE8] px-2.5 py-1 text-[10px] text-[#5B21B6]">{t('tl.ai')}</span>
       </div>
-      <div>
+      <div className="relative">
+        {/* signature rail draws down as the events organize themselves in */}
+        <motion.span aria-hidden
+          initial={reduce ? false : { scaleY: 0 }}
+          animate={{ scaleY: 1 }}
+          transition={{ duration: 0.85, ease: 'easeInOut', delay: 0.4 }}
+          style={{ transformOrigin: 'top' }}
+          className="absolute left-[5px] top-[4px] bottom-[20px] w-[2px] bg-[#CBD6CF]"
+        />
         {events.map((e, i) => (
-          <div key={e.doc} className="flex gap-3.5">
+          <motion.div key={e.doc}
+            initial={reduce ? false : { opacity: 0, x: 10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, ease: 'easeOut', delay: 0.55 + i * 0.2 }}
+            className="flex gap-3.5"
+          >
             <div className="relative w-3 flex-none">
               <span className="absolute left-[1px] top-[3px] h-2.5 w-2.5 rounded-full bg-[#42574E]" />
-              {i < events.length - 1 && <span className="absolute left-[5px] top-[13px] bottom-[-13px] w-[2px] bg-[#CBD6CF]" />}
             </div>
             <div className={i < events.length - 1 ? 'pb-5' : ''}>
               <div style={MONO} className="text-[11px] text-[#7c857f]">{e.date}</div>
@@ -50,15 +73,16 @@ function TimelineCard({ t }: { t: (k: string) => string }) {
                 {e.doc}
               </span>
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
-    </div>
+    </motion.div>
   );
 }
 
 export function SageMarketingPage({ onWorkerStart, onSignIn, onForFirms, firmDirectedContext = null }: SageMarketingPageProps) {
   const { t } = useLang();
+  const reduce = useReducedMotion();
   const directed = !!firmDirectedContext;
 
   return (
@@ -75,36 +99,54 @@ export function SageMarketingPage({ onWorkerStart, onSignIn, onForFirms, firmDir
       </header>
 
       {/* hero */}
-      <section className="mx-auto grid max-w-6xl items-center gap-11 px-6 py-14 md:grid-cols-[1.08fr_.92fr] md:py-20">
-        <div>
-          <div style={MONO} className="text-[11px] uppercase tracking-[0.16em] text-[#42574E]">
-            {directed ? `${t('aw.badge')}` : t('home.eyebrow')}
+      <section className="relative overflow-hidden">
+        <div aria-hidden className="pointer-events-none absolute -left-40 -top-10 h-[540px] w-[540px] rounded-full bg-[#42574E]/[0.06] blur-3xl" />
+        <div aria-hidden className="pointer-events-none absolute -right-24 top-28 h-[440px] w-[440px] rounded-full bg-[#95AB9B]/[0.16] blur-3xl" />
+        <motion.div
+          className="relative mx-auto grid max-w-6xl items-center gap-11 px-6 py-14 md:grid-cols-[1.08fr_.92fr] md:py-20"
+          initial={reduce ? false : 'hidden'} animate="show" variants={heroContainer}
+        >
+          <div>
+            <motion.div variants={heroItem} style={MONO} className="text-[11px] uppercase tracking-[0.16em] text-[#42574E]">
+              {directed ? `${t('aw.badge')}` : t('home.eyebrow')}
+            </motion.div>
+            <motion.h1 variants={heroItem} style={SERIF} className="mt-3.5 text-[clamp(40px,6.5vw,66px)] font-semibold leading-[0.96] tracking-[-0.022em] text-balance">
+              {t('home.h1_1')}
+              <span className="block text-[#5E7268]">{t('home.h1_2')}</span>
+            </motion.h1>
+            <motion.p variants={heroItem} className="mt-5 max-w-[46ch] text-[15px] leading-[1.65] text-[#40433f]">
+              {directed && firmDirectedContext
+                ? `${firmDirectedContext.firmName}: ${t('home.sub')}`
+                : t('home.sub')}
+            </motion.p>
+            <motion.div variants={heroItem} className="mt-6 flex flex-wrap items-center gap-3">
+              {directed ? (
+                <button type="button" onClick={() => { track('cta_worker_start'); onWorkerStart(); }} className="inline-flex items-center gap-2 rounded-full bg-[#42574E] px-6 py-3 text-[14px] font-semibold text-[#EAF0EC] shadow-[0_14px_30px_-12px_rgba(66,87,78,0.55)] transition hover:-translate-y-0.5 hover:bg-[#374a42]">{t('aw.start')} <ArrowRight className="h-4 w-4" /></button>
+              ) : (
+                <>
+                  <button type="button" onClick={() => { track('cta_firm_pilot'); onForFirms(); }} className="rounded-full bg-[#42574E] px-6 py-3 text-[14px] font-semibold text-[#EAF0EC] shadow-[0_14px_30px_-12px_rgba(66,87,78,0.55)] transition hover:-translate-y-0.5 hover:bg-[#374a42]">{t('home.request')}</button>
+                  <a href="/demo" onClick={() => track('firm_see_sample')} className="rounded-full border border-[#B7BCB2] bg-white/50 px-5 py-3 text-[14px] font-semibold text-[#22262a] transition hover:border-[#8f958b] hover:bg-white">{t('home.sample')}</a>
+                </>
+              )}
+            </motion.div>
+            <motion.div variants={heroItem} className="mt-6 flex items-center gap-2 text-[12.5px] text-[#5b5e59]">
+              <motion.span
+                className="h-[7px] w-[7px] rounded-full bg-[#5B21B6]"
+                animate={reduce ? {} : { boxShadow: ['0 0 0 0 rgba(91,33,182,0.30)', '0 0 0 5px rgba(91,33,182,0)'] }}
+                transition={{ duration: 1.9, repeat: Infinity, ease: 'easeOut' }}
+              />
+              {t('home.ai_line')}
+            </motion.div>
+            <motion.div variants={heroItem} className="mt-7 flex flex-wrap items-center gap-x-4 gap-y-1.5 border-t border-[#E1E4DD] pt-4 text-[11.5px] font-medium text-[#6a6d66]">
+              <span>Built on Anthropic&rsquo;s Claude</span>
+              <span className="h-1 w-1 rounded-full bg-[#B7BCB2]" />
+              <span>California employment firms</span>
+              <span className="h-1 w-1 rounded-full bg-[#B7BCB2]" />
+              <span>Free 7-day pilot</span>
+            </motion.div>
           </div>
-          <h1 style={SERIF} className="mt-3.5 text-[clamp(40px,6.5vw,66px)] font-semibold leading-[0.96] tracking-[-0.022em] text-balance">
-            {t('home.h1_1')}
-            <span className="block text-[#5E7268]">{t('home.h1_2')}</span>
-          </h1>
-          <p className="mt-5 max-w-[46ch] text-[15px] leading-[1.65] text-[#40433f]">
-            {directed && firmDirectedContext
-              ? `${firmDirectedContext.firmName}: ${t('home.sub')}`
-              : t('home.sub')}
-          </p>
-          <div className="mt-6 flex flex-wrap items-center gap-3">
-            {directed ? (
-              <button type="button" onClick={() => { track('cta_worker_start'); onWorkerStart(); }} className="inline-flex items-center gap-2 rounded-full bg-[#42574E] px-6 py-3 text-[14px] font-semibold text-[#EAF0EC] transition hover:bg-[#374a42]">{t('aw.start')} <ArrowRight className="h-4 w-4" /></button>
-            ) : (
-              <>
-                <button type="button" onClick={() => { track('cta_firm_pilot'); onForFirms(); }} className="rounded-full bg-[#42574E] px-6 py-3 text-[14px] font-semibold text-[#EAF0EC] transition hover:bg-[#374a42]">{t('home.request')}</button>
-                <a href="/demo" onClick={() => track('firm_see_sample')} className="rounded-full border border-[#B7BCB2] px-5 py-3 text-[14px] font-semibold text-[#22262a] transition hover:border-[#8f958b]">{t('home.sample')}</a>
-              </>
-            )}
-          </div>
-          <div className="mt-6 flex items-center gap-2 text-[12.5px] text-[#5b5e59]">
-            <span className="h-[7px] w-[7px] rounded-full bg-[#5B21B6] shadow-[0_0_0_4px_rgba(66,87,78,0.16)]" />
-            {t('home.ai_line')}
-          </div>
-        </div>
-        <TimelineCard t={t} />
+          <TimelineCard t={t} />
+        </motion.div>
       </section>
 
       {/* problem */}
