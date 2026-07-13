@@ -66,7 +66,7 @@ THE FIVE OBJECTIONS (covers ~74% of rejections):
 "What about Eve / other legal AI?": Different lane. Tools like Eve are enterprise platforms with long onboarding that lean toward drafting and analysis — which edges toward the UPL line. one3seven is organize-only and fast: a worker self-serves through one intake link, you get a structured, source-linked intake in minutes, and you move faster because the record is already built. We don't draft, predict, or conclude — the attorney decides. Ten-minute setup versus a 90-day implementation.
 
 SECURITY AND DATA POSTURE (how to answer a firm's data-security questions — use only these facts, never overclaim):
-- Firm isolation: each firm sees only its own intakes. Separation between firms is enforced by row-level database policies (every table is access-controlled), and that isolation has been independently verified.
+- Firm isolation: each firm sees only its own intakes. Separation between firms is enforced by row-level database policies (every table is access-controlled). Do not claim any independent audit, certification, or third-party verification — we have not earned those.
 - Worker control: a worker's records are not shared with a firm until the worker approves sharing or submits through that firm's intake link. Document access follows the worker's sharing action.
 - AI training: uploaded documents are used only to organize the intake. They are processed under commercial API terms that do not permit training on customer data.
 - Source preserved: original documents remain available for direct attorney review — every organized fact traces back to its source record.

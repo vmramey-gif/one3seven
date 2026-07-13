@@ -56,3 +56,15 @@ Pairs with `COPY_STYLE_GUIDE.md` (the verb test) and the automated copy-lint tes
 - [ ] Viewed on a real phone, not just desktop.
 - [ ] Re-read the single most confident sentence on the page and ask: *is that a claim I can defend
       in front of the State Bar?* If you hesitate, weaken the verb.
+
+## D. Residual sweep — STANDARD after ANY copy/compliance fix (not optional)
+Twice now, a "final" compliance fix had the same problem lurking elsewhere (docs contradiction; then the
+CRM script + AI prompt). A single-person team doing legal-adjacent fixes must confirm a fix landed
+*everywhere*, not just where it was noticed. After any such change:
+- [ ] `git grep -i` the fixed phrase AND its *pattern* (reworded variants) across the WHOLE repo — `src/`,
+      `docs/`, and `supabase/functions/` (rep scripts + AI prompts live outside the marketing pages).
+- [ ] Run `npm test` — the copy guardrail now scans marketing pages, `crmReference.ts`,
+      `systemPrompt.ts`, and the demo/intake screens. Add any newly-found risky phrase to its pattern list
+      so the net grows.
+- [ ] Remember the split: a git push updates the frontend (Vercel); the **AI prompt only changes on an
+      edge-function redeploy** (`npx supabase functions deploy chat-assistant`). Confirm that separately.

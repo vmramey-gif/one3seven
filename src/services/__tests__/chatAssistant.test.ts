@@ -19,9 +19,13 @@ describe('Ask one3seven AI — system prompt integrity', () => {
   });
   it('contains the security posture and the no-overclaim guardrail', () => {
     expect(SYSTEM_PROMPT).toContain('SECURITY AND DATA POSTURE');
-    expect(SYSTEM_PROMPT).toContain('independently verified');
     expect(SYSTEM_PROMPT).toContain('DO NOT CLAIM');
     expect(SYSTEM_PROMPT).toContain('SOC 2');
+  });
+  it('does NOT tell the AI to claim an unverified independent audit (2026-07-13 legal fix)', () => {
+    // We have no independent audit; the prompt must never instruct the AI to assert one.
+    expect(SYSTEM_PROMPT).not.toContain('independently verified');
+    expect(SYSTEM_PROMPT).not.toContain('has been independently');
   });
 });
 

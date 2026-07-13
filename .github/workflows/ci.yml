@@ -1,0 +1,29 @@
+name: CI
+
+# Runs the full test suite — including the copy-guardrail verb test
+# (src/services/__tests__/marketingCopyGuardrails.test.ts) — on every push and PR,
+# so a banned UPL / outcome / trademark / pricing / metric claim in the marketing
+# pages, rep scripts, or the AI prompt cannot ship unnoticed.
+#
+# NOTE: this makes the check VISIBLE. To make it BLOCKING, enable branch protection
+# on `main` and require the "test" check to pass before merge (repo Settings →
+# Branches → Branch protection rules). Vercel deploys independently of this workflow.
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: ['**']
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - name: Run tests (includes copy guardrail)
+        run: npm test
