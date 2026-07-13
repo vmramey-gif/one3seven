@@ -248,9 +248,10 @@ export function ForFirmsPage({ onBack, onStartWorker }: ForFirmsPageProps) {
               matter types, your review process, your documents, and the way your team evaluates new matters.
             </p>
             <p className="mt-3 text-[14px] leading-relaxed text-[#40433f]">
-              Founding firms receive hands-on onboarding, direct founder access, and founder pricing locked
-              for life during the founding program. Your pilot begins with your first real intake and runs
-              30 days from there — enough time to evaluate it on real matters, not a rushed week.
+              Founding firms receive hands-on onboarding, direct founder access, and founder pricing — with
+              the specific terms set out in a founding-firm agreement we&rsquo;ll walk you through. Your pilot
+              begins with your first real intake and runs 30 days from there — enough time to evaluate it on
+              real matters, not a rushed week.
             </p>
             <p className="mt-3 text-[13px] leading-relaxed text-[#6a6d66]">
               Your firm stays in control. Attorney judgment stays with your team. one3seven only organizes the intake file.
