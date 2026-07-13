@@ -1,5 +1,11 @@
 # one3seven — Caller Brief
 
+> ⚠️ **FROZEN ITEM — 2026-07-13.** Do **not** say Anthropic is "used by / partnered with / adopted by
+> California or any government." A legal scan found this claim contradicts our own copy rules and its
+> factual basis is unconfirmed — it is pending attorney review. Until counsel clears it, the ONLY approved
+> phrasing is **"Built on Anthropic's Claude."** This is a live call script, so this freeze is effective
+> immediately.
+
 **Your only job: get 15 minutes on their calendar. Do not explain the product.**
 
 ---
@@ -39,7 +45,7 @@ Every call outcome — yes, no, maybe, call me back — gets texted to Tad the s
 - Workers upload their records and answer guided questions
 - one3seven organizes it into a dated, source-linked intake packet
 - The attorney opens a clean packet instead of running an intake meeting
-- Built on Anthropic's Claude — the same AI made broadly available to California state agencies through a statewide partnership
+- Built on Anthropic's Claude  ⚠️ **DO NOT** add "California / state agencies / statewide partnership / adopted / approved" — that line is FROZEN pending counsel (see banner at top). Say only "Built on Anthropic's Claude."
 - Free pilot for the first 100 firms. No credit card. Quick to set up.
 
 ---
