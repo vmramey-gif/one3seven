@@ -155,9 +155,9 @@ HOW TO RUN IT
 // who'd rather read than query). Rule: only raise a competitor if the prospect does;
 // state facts, never trash-talk, then pivot to our lane. ────────────────────────────
 export const CRM_CREDIBILITY: string[] = [
-  'Built on Anthropic’s Claude — the same AI platform California adopted statewide for its own agencies. Strongest said out loud on a call.',
-  'Safe to say: "built on / powered by Anthropic’s Claude" and the California-adopted line. NOT safe: "partner," "certified," "endorsed," any government-affiliation implication, or logos.',
-  'Pair it with our own line (needs no permission): "one3seven only organizes and reflects — it never concludes." First borrows California’s credibility; second is ours.',
+  'Built on Anthropic’s Claude. ⚠️ FROZEN pending counsel (2026-07-13): do NOT use the "California adopted Claude statewide / for its own agencies" line on calls or anywhere else. Its factual basis and safe wording are on hold until an attorney confirms them (see docs/attorney-brief.md, Q1). Until then, say only "built on / powered by Anthropic’s Claude."',
+  'Safe to say: "built on / powered by Anthropic’s Claude." NOT safe: "partner," "certified," "endorsed," any government-affiliation implication, or logos.',
+  'Pair it with our own line (needs no permission): "one3seven only organizes and reflects — it never concludes."',
 ];
 
 export const CRM_COMPETITORS: { name: string; when: string; say: string }[] = [

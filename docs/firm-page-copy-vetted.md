@@ -115,7 +115,7 @@ No more repeating the same timeline from memory or showing up with scattered scr
 
 The first 100 California employment firms to join one3seven receive founder pricing, priority support, and a direct line to the founders as we refine the intake packet around real firm workflows.
 
-- ✓ Founder pricing locked for life
+- ✓ Founder pricing — terms set in a signed founding-firm order form (⚠️ do NOT publish "locked for life"; must be cohort-capped + conditioned on continuous subscription per legal scan 2026-07-13)
 - ✓ Free pilot — no credit card
 - ✓ Your own intake link
 - ✓ Direct feedback channel with the founders

@@ -51,7 +51,7 @@ one3seven is a California plaintiff-employment intake platform: a worker uploads
 - **Readiness band + firm exposure surfacing are demo-only** — do NOT ship to production worker/firm screens without counsel sign-off (UPL line).
 - **Voice = TTS of fixed vetted scripts only**, never a live conversational agent.
 - **No overclaiming** in marketing: only defensible metrics. Removed false "15 minutes," "6 schemas," "100% traceable." Kept: "0 legal conclusions · 100% source docs preserved · 1 link · Minutes."
-- **Anthropic:** "Built on/Powered by Claude" + CA-statewide adoption line OK; no partner/endorsed/logo lockup. "Only Organizes and Reflects, Never Concludes" is ours.
+- **Anthropic:** "Built on/Powered by Claude" OK; no partner/endorsed/logo lockup. "Only Organizes and Reflects, Never Concludes" is ours. ⚠️ **The "CA-statewide adoption line" is CONTESTED and FROZEN** (2026-07-13 legal scan) — this doc and one3seven-full-audit:67 say it's OK, but COPY_STYLE_GUIDE says avoid it; do NOT treat it as cleared until the attorney resolves it (attorney-brief Q1).
 - **Texas:** firm-tool + flat-fee only; no case %, no solicitation (barratry §38.12).
 - **Security:** each firm sees only its own intakes (row-level policies, independently verified). Uploaded docs organize the intake; not used to train models.
 

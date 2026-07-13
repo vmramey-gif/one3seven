@@ -1056,7 +1056,7 @@ export function IntakeReviewScreen({
             </span>
           </p>
           <p className="text-xs text-white/38 mt-1">
-            Scroll to read the full intake · what normally takes 4–6 hours arrived structured
+            Scroll to read the full intake · scattered records arrived structured, before your first call
           </p>
         </div>
       )}
