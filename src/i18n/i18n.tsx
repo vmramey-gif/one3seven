@@ -141,6 +141,7 @@ export const STRINGS: Dict = {
                        es: 'one3seven organiza documentos — los abogados los evalúan de forma independiente. No es un bufete de abogados, no brinda asesoría legal y no es un servicio de referencia de abogados; no recomienda, clasifica ni selecciona abogados para los trabajadores. Desarrollado con Claude de Anthropic para la organización de documentos.' },
   'foot.terms':      { en: 'Terms', es: 'Términos' },
   'foot.privacy':    { en: 'Privacy', es: 'Privacidad' },
+  'foot.choices':    { en: 'Your Privacy Choices', es: 'Sus opciones de privacidad' },
   'foot.contact':    { en: 'Contact', es: 'Contacto' },
 };
 

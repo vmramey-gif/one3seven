@@ -179,7 +179,7 @@ export const PRIVACY_POLICY: LegalDoc = {
           'To communicate with you about your account or the platform.',
           'To improve the platform based on how it is being used.',
         ] },
-        { type: 'p', text: 'We do not sell your information. We do not use your documents for advertising. We do not share your documents with third parties except as described in this policy.' },
+        { type: 'p', text: 'We do not sell your personal information, and we do not share it for cross-context behavioral advertising, as those terms are defined under the California Consumer Privacy Act (CCPA/CPRA). We do not use your documents for advertising. We do not share your documents with third parties except as described in this policy. Because we do not sell or share your information in this way, there is nothing to opt out of, but you may still exercise the privacy choices described in Section 6.' },
       ],
     },
     {
@@ -215,19 +215,19 @@ export const PRIVACY_POLICY: LegalDoc = {
       heading: '6. Your rights and choices',
       blocks: [
         { type: 'subhead', text: 'Delete individual intakes' },
-        { type: 'p', text: 'You can delete any individual intake and its associated records from your account at any time through the platform. Deletion removes the records from one3seven’s active systems. Automated database backups may retain deleted data for a limited period as part of standard infrastructure operations before those backups are cycled.' },
+        { type: 'p', text: 'You can delete any individual intake and its associated records from your account at any time through the platform. Deletion removes the records from one3seven’s active systems. Automated database backups may retain deleted data for up to 90 days as part of standard infrastructure operations, after which those backups are cycled and the data is purged.' },
         { type: 'subhead', text: 'Delete your account' },
-        { type: 'p', text: 'Self-service account deletion is not available during the current beta period. To request that your account and all associated data be deleted, contact us at legal@one3seven.com. We will process your request promptly.' },
+        { type: 'p', text: 'Self-service account deletion is not available during the current beta period. To request that your account and all associated data be deleted, contact us at legal@one3seven.com. We will delete your account and all associated data within 45 days of a verified request, as required by California law.' },
         { type: 'subhead', text: 'Access and correction' },
         { type: 'p', text: 'You can view and update your account information through your account settings. If you believe information in your organized intake is inaccurate, you can add notes, upload additional documents, or delete and re-upload corrected records.' },
         { type: 'subhead', text: 'California privacy rights' },
-        { type: 'p', text: 'If you are a California resident, you have rights under the California Consumer Privacy Act, as amended by the California Privacy Rights Act (CCPA/CPRA). These include the right to know the categories and specific pieces of personal information we collect, the sources of that information, the purposes for collecting it, and the categories of any recipients; the right to delete your personal information; the right to correct inaccurate information; and the right not to be discriminated against for exercising these rights. To exercise these rights, contact us at legal@one3seven.com.' },
+        { type: 'p', text: 'If you are a California resident, you have rights under the California Consumer Privacy Act, as amended by the California Privacy Rights Act (CCPA/CPRA). These include the right to know the categories and specific pieces of personal information we collect, the sources of that information, the purposes for collecting it, and the categories of any recipients; the right to delete your personal information; the right to correct inaccurate information; the right to opt out of the sale or sharing of your personal information; the right to limit the use of sensitive personal information; and the right not to be discriminated against for exercising these rights. As described in Section 2, we do not sell or share your personal information, and we use your documents only to organize your intake — not for advertising or any secondary purpose that would require an opt-out. To exercise any of these rights, contact us at legal@one3seven.com. We will respond within 45 days of a verified request. You may also designate an authorized agent to make a request on your behalf.' },
       ],
     },
     {
       heading: '7. Data retention',
       blocks: [
-        { type: 'p', text: 'We retain your account information and intake records for as long as your account is active. If you delete individual intakes, those records are removed from active systems promptly. When you request account deletion, we will delete your account and associated records within a reasonable time.' },
+        { type: 'p', text: 'We retain your account information and intake records for as long as your account is active. If you delete individual intakes, those records are removed from active systems promptly. When you request account deletion, we will delete your account and associated records within 45 days of a verified request, as required by California law.' },
         { type: 'p', text: 'We may retain certain information for longer periods where required by law, for legitimate business purposes such as fraud prevention, or to resolve disputes.' },
       ],
     },

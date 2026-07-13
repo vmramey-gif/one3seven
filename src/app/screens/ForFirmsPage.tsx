@@ -318,6 +318,8 @@ export function ForFirmsPage({ onBack, onStartWorker }: ForFirmsPageProps) {
             <a href="/terms" className="font-medium text-[#42574E] hover:underline">Terms</a>
             <span aria-hidden className="text-[#c3c7bd]">·</span>
             <a href="/privacy" className="font-medium text-[#42574E] hover:underline">Privacy</a>
+            <span aria-hidden className="text-[#c3c7bd]">·</span>
+            <a href="/privacy#california-privacy-rights" className="font-medium text-[#42574E] hover:underline">Your Privacy Choices</a>
           </div>
           <p className="max-w-[640px] text-[11px] leading-relaxed text-[#6a6d66]">
             one3seven is not a law firm and does not provide legal advice. one3seven is not a lawyer referral

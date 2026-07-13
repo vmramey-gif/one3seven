@@ -60,8 +60,10 @@ Every fact in the packet **links to its source document** — click and verify t
 ---
 
 ## Credibility lines (safe to say — every word verifiable)
-- "Built on **Anthropic's Claude** — the same AI platform **California adopted statewide** for its own agencies."
-- *Do not say:* Anthropic partner / certified / endorsed, or use their logo. Plain text only.
+- "Built on **Anthropic's Claude** for record organization."
+- *Do not say:* Anthropic partner / certified / endorsed, or use their logo; and do NOT claim California
+  (or any government) adopted/approved it — that implies an endorsement we don't have. Plain factual
+  "Built on Anthropic's Claude" only.
 
 ## The pricing posture (so it never becomes a UPL problem)
 **Flat subscription.** Never a percentage of fees, never per-signed-client, never a referral cut.

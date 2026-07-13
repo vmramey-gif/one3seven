@@ -328,6 +328,8 @@ export function SageMarketingPage({ onWorkerStart, onSignIn, onForFirms, firmDir
           <span aria-hidden className="text-[#c3c7bd]">·</span>
           <a href="/privacy" className="font-medium text-[#42574E] hover:underline">{t('foot.privacy')}</a>
           <span aria-hidden className="text-[#c3c7bd]">·</span>
+          <a href="/privacy#california-privacy-rights" className="font-medium text-[#42574E] hover:underline">{t('foot.choices')}</a>
+          <span aria-hidden className="text-[#c3c7bd]">·</span>
           <a href="mailto:info@one3seven.com" className="font-medium text-[#42574E] hover:underline">{t('foot.contact')}</a>
           <span className="ml-auto text-[#9a9d95]">© {new Date().getFullYear()} one3seven</span>
         </div>
