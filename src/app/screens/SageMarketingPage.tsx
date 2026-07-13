@@ -323,6 +323,14 @@ export function SageMarketingPage({ onWorkerStart, onSignIn, onForFirms, firmDir
 
       <footer className="mx-auto max-w-6xl px-6 py-10">
         <p className="max-w-[74ch] text-[12px] leading-[1.6] text-[#7a7d76]">{t('foot.disc')}</p>
+        <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-1.5 border-t border-[#E1E4DD] pt-4 text-[12px] text-[#7a7d76]">
+          <a href="/terms" className="font-medium text-[#42574E] hover:underline">{t('foot.terms')}</a>
+          <span aria-hidden className="text-[#c3c7bd]">·</span>
+          <a href="/privacy" className="font-medium text-[#42574E] hover:underline">{t('foot.privacy')}</a>
+          <span aria-hidden className="text-[#c3c7bd]">·</span>
+          <a href="mailto:info@one3seven.com" className="font-medium text-[#42574E] hover:underline">{t('foot.contact')}</a>
+          <span className="ml-auto text-[#9a9d95]">© {new Date().getFullYear()} one3seven</span>
+        </div>
       </footer>
     </div>
   );

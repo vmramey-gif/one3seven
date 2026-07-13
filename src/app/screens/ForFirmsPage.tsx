@@ -313,6 +313,11 @@ export function ForFirmsPage({ onBack, onStartWorker }: ForFirmsPageProps) {
           <p className="text-[12px] text-[#6a6d66]">
             Contact: <a href="mailto:info@one3seven.com" className="font-semibold text-[#42574E] hover:underline">info@one3seven.com</a>
           </p>
+          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[12px] text-[#6a6d66]">
+            <a href="/terms" className="font-medium text-[#42574E] hover:underline">Terms</a>
+            <span aria-hidden className="text-[#c3c7bd]">·</span>
+            <a href="/privacy" className="font-medium text-[#42574E] hover:underline">Privacy</a>
+          </div>
           <p className="max-w-[640px] text-[11px] leading-relaxed text-[#6a6d66]">
             one3seven is not a law firm and does not provide legal advice. one3seven is not a lawyer referral
             service and does not recommend, rank, or select attorneys for workers. It organizes records and

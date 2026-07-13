@@ -139,6 +139,9 @@ export const STRINGS: Dict = {
   // LEGAL-REVIEW: footer disclaimer — bilingual read recommended.
   'foot.disc':       { en: 'one3seven organizes records — attorneys independently evaluate them. It is not a law firm, does not provide legal advice, and is not a lawyer referral service; it does not recommend, rank, or select attorneys for workers. Built on Anthropic’s Claude for record organization.',
                        es: 'one3seven organiza documentos — los abogados los evalúan de forma independiente. No es un bufete de abogados, no brinda asesoría legal y no es un servicio de referencia de abogados; no recomienda, clasifica ni selecciona abogados para los trabajadores. Desarrollado con Claude de Anthropic para la organización de documentos.' },
+  'foot.terms':      { en: 'Terms', es: 'Términos' },
+  'foot.privacy':    { en: 'Privacy', es: 'Privacidad' },
+  'foot.contact':    { en: 'Contact', es: 'Contacto' },
 };
 
 type Ctx = { lang: Lang; setLang: (l: Lang) => void; t: (key: string) => string };
