@@ -9,7 +9,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Phone, Mail, Calendar, ArrowLeft, Plus, X, TrendingUp,
   ClipboardList, LayoutGrid, Building2, BookOpen, BarChart3, CheckCircle2,
-  GraduationCap, ListChecks, Check, MessageSquare, Send, StickyNote, Trash2, ChevronRight, ChevronDown, ShieldCheck, RefreshCw, AlertTriangle, DollarSign, Flame, Sparkles, Trophy, Calculator, Link2, Copy, ExternalLink, Globe, Hand, Lock,
+  GraduationCap, ListChecks, Check, MessageSquare, Send, StickyNote, Trash2, ChevronRight, ChevronDown, ShieldCheck, RefreshCw, AlertTriangle, DollarSign, Flame, Sparkles, Trophy, Calculator, Link2, Copy, ExternalLink, Globe, Hand, Lock, Linkedin,
 } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
 import {
@@ -33,7 +33,7 @@ import { AUDIT_SITE_CHECKS, AUDIT_MANUAL_GROUPS } from '../constants/crmAudit';
 import { crmFirmIntel } from '../constants/crmFirmIntel';
 import { STARTER_QUESTIONS, askAssistant, type ChatMessage } from '../../services/chatAssistant';
 
-type Tab = 'dashboard' | 'pipeline' | 'firms' | 'activity' | 'metrics' | 'revenue' | 'comp' | 'economics' | 'growth' | 'team' | 'inbox' | 'notes' | 'scripts' | 'training' | 'askai' | 'checklist' | 'audit' | 'links' | 'email_fu' | 'outreach' | 'callqueue' | 'add';
+type Tab = 'dashboard' | 'pipeline' | 'firms' | 'activity' | 'metrics' | 'revenue' | 'comp' | 'economics' | 'growth' | 'team' | 'inbox' | 'notes' | 'scripts' | 'training' | 'askai' | 'checklist' | 'audit' | 'links' | 'email_fu' | 'outreach' | 'callqueue' | 'linkedin' | 'add';
 
 // Pre-filled outreach email. Opens the founder's default mail app (Outlook) composing
 // FROM victoria@ — so it lands in Sent and replies thread back — with the firm's own
@@ -64,6 +64,23 @@ function outreachHref(firm: { email: string | null; name: string; attorney_name:
   // window from victoria@ in a new tab — reliable, unlike a bare mailto (which can open a
   // blank tab or need a registered handler). Requires being signed into outlook.office.com.
   return `https://outlook.office.com/mail/deeplink/compose?to=${encodeURIComponent(to)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
+// Personalized LinkedIn connection note (<=300 chars — LinkedIn's note limit). Copy/paste,
+// never automated. Verb-test clean: organizes & reflects, never concludes. NEVER include
+// firm.notes (internal research hook, written about the firm) — same rule as the email body.
+function linkedInNote(firm: { name: string; attorney_name: string | null }): string {
+  const first = (firm.attorney_name ?? '').trim().split(/\s+/)[0] || 'there';
+  const note =
+    `Hi ${first} — I build one3seven, a tool that organizes a worker's scattered employment records into a source-linked intake for attorney review (it organizes and reflects; it never concludes). Would value connecting with California employment attorneys.`;
+  return note.length > 300 ? note.slice(0, 297).trimEnd() + '…' : note;
+}
+
+// Safe LinkedIn people-search URL for the attorney + firm. Just opens a search results page
+// in a new tab — no automation, no scraping, no auto-connect (all against LinkedIn's terms).
+function linkedInSearchHref(firm: { name: string; attorney_name: string | null }): string {
+  const q = [firm.attorney_name, firm.name].filter(Boolean).join(' ').trim() || firm.name;
+  return `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(q)}`;
 }
 
 // Every URL off www.one3seven.com, grouped — the founder "links in one place" directory.
@@ -100,6 +117,7 @@ const TABS: { id: Tab; label: string; icon: typeof LayoutGrid; founderOnly?: boo
   { id: 'email_fu', label: 'Victoria email f/u', icon: Mail, founderOnly: true },
   { id: 'outreach', label: 'Send emails', icon: Send, founderOnly: true },
   { id: 'callqueue', label: 'Call queue', icon: Phone },
+  { id: 'linkedin', label: 'LinkedIn queue', icon: Linkedin },
   { id: 'activity', label: 'Activity', icon: ClipboardList, founderOnly: true },
   { id: 'metrics', label: 'Metrics', icon: BarChart3, founderOnly: true },
   { id: 'team', label: 'Team chat', icon: MessageSquare },
@@ -125,7 +143,7 @@ const TAB_BY_ID: Record<Tab, { id: Tab; label: string; icon: typeof LayoutGrid; 
   Object.fromEntries(TABS.map((t) => [t.id, t])) as Record<Tab, (typeof TABS)[number]>;
 
 const NAV_GROUPS: { id: string; label: string; icon: typeof LayoutGrid; tabIds: Tab[] }[] = [
-  { id: 'sell', label: 'Sell', icon: TrendingUp, tabIds: ['dashboard', 'firms', 'outreach', 'callqueue', 'email_fu', 'pipeline', 'add', 'activity'] },
+  { id: 'sell', label: 'Sell', icon: TrendingUp, tabIds: ['dashboard', 'firms', 'outreach', 'callqueue', 'linkedin', 'email_fu', 'pipeline', 'add', 'activity'] },
   { id: 'me', label: 'My numbers', icon: Trophy, tabIds: ['comp', 'metrics'] },
   { id: 'learn', label: 'Learn', icon: BookOpen, tabIds: ['scripts', 'training', 'askai'] },
   { id: 'team', label: 'Team', icon: MessageSquare, tabIds: ['inbox', 'team', 'notes'] },
@@ -395,7 +413,9 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
       r = await logActivity({ firm_id: firmId, activity_type: 'call', activity_date: today, outcome: 'Called', new_stage: bump });
     } else if (kind === 'email_fu') {
       r = await logActivity({ firm_id: firmId, activity_type: 'email', activity_date: today, outcome: 'Victoria to send email f/u', new_stage: bump, next_followup: today });
-      void flagFounderEmail(firmId, true); // collect into the founder email queue (best-effort)
+      // Flag into Victoria's "Victoria email f/u" category. AWAIT it (not fire-and-forget) and surface
+      // any error, so the firm reliably lands in that category — or the rep sees why it didn't.
+      if (!r?.error) { const fr = await flagFounderEmail(firmId, true); if (fr?.error) r = fr; }
     } else { // follow_up → remind in 3 days
       const d = new Date(today + 'T00:00:00'); d.setDate(d.getDate() + 3);
       r = await logActivity({ firm_id: firmId, activity_type: 'call', activity_date: today, outcome: 'Follow up needed', next_followup: d.toISOString().slice(0, 10) });
@@ -459,7 +479,7 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
     });
     setSaving(false);
     if (r.error) { setError(r.error); return; }
-    if (fastChips.includes('Victoria to email f/u')) void flagFounderEmail(fastFirmId, true);
+    if (fastChips.includes('Victoria to email f/u')) await flagFounderEmail(fastFirmId, true);
     setLastFirmId(fastFirmId);
     closeFast();
     void load();
@@ -567,6 +587,7 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
             {tab === 'email_fu' && isFounder && <FounderEmailQueueTab firms={firms} onFounderEmailDone={founderEmailDone} />}
             {tab === 'outreach' && isFounder && <OutreachBatchTab firms={firms} onSent={markEmailSent} />}
             {tab === 'callqueue' && <CallQueueTab firms={firms} activity={activity} onLog={openFast} today={today} onQuickEmail={quickEmail} onQuickLog={quickLog} claim={claim} />}
+            {tab === 'linkedin' && <LinkedInQueueTab firms={firms} />}
             {tab === 'activity' && isFounder && <ActivityTab activity={activity} onOpenFirm={openFirmByName} />}
             {tab === 'metrics' && isFounder && <MetricsTab firms={firms} activity={activity} />}
             {tab === 'team' && <TeamTab />}
@@ -593,16 +614,54 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
       {fastFirmId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={closeFast}>
           <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-[20px] bg-white p-5 shadow-2xl" onClick={(e) => e.stopPropagation()}>
-            <div className="mb-3 flex items-center justify-between">
-              <div className="text-[15px] font-bold">Log · {firmsById[fastFirmId]?.name}</div>
-              <button type="button" onClick={closeFast} className={`flex ${tap} w-11 items-center justify-center rounded-full hover:bg-slate-100`}><X className="h-4 w-4" /></button>
+            <div className="mb-3 flex items-center justify-between gap-2">
+              <div className="min-w-0">
+                <div className="truncate text-[15px] font-bold">{firmsById[fastFirmId]?.name}</div>
+                <div className="text-[11px] text-[#1B2623]/45">Firm profile · notes · activity</div>
+              </div>
+              <button type="button" onClick={closeFast} className={`flex ${tap} w-11 shrink-0 items-center justify-center rounded-full hover:bg-slate-100`}><X className="h-4 w-4" /></button>
             </div>
             {firmsById[fastFirmId]?.phone && (
               <a href={`tel:${digitsOf(firmsById[fastFirmId]!.phone!)}`} className={`mb-3 flex ${tap} items-center justify-center gap-2 rounded-[12px] bg-emerald-600 px-4 font-semibold text-white`}>
                 <Phone className="h-4 w-4" /> Call {firmsById[fastFirmId]?.phone}
               </a>
             )}
-            <div className="mb-2 text-[12px] font-semibold uppercase tracking-wide text-[#1B2623]/45">Outcome — tap all that apply</div>
+
+            {/* Firm profile: notes on file + this firm's full activity history */}
+            {firmsById[fastFirmId]?.notes && (
+              <div className="mb-3 rounded-[12px] border border-[#E4E5DE] bg-[#F7F9F5] p-3 text-[12px] leading-relaxed text-[#1B2623]/70">
+                <div className="mb-1 text-[11px] font-bold uppercase tracking-wide text-[#42574E]">Notes on file</div>
+                {firmsById[fastFirmId]?.notes}
+              </div>
+            )}
+            {(() => {
+              const hist = activity
+                .filter((a) => a.firm_id === fastFirmId)
+                .sort((a, b) => String(b.activity_date ?? '').localeCompare(String(a.activity_date ?? '')));
+              return (
+                <div className="mb-4">
+                  <div className="mb-1.5 text-[12px] font-semibold uppercase tracking-wide text-[#1B2623]/45">Activity history ({hist.length})</div>
+                  {hist.length === 0 ? (
+                    <p className="rounded-[10px] border border-dashed border-[#D3DED6] px-3 py-2 text-[12px] text-[#1B2623]/40">No activity logged yet — add the first below.</p>
+                  ) : (
+                    <ul className="max-h-40 space-y-1.5 overflow-y-auto">
+                      {hist.map((a) => (
+                        <li key={a.id} className="rounded-[10px] border border-[#F2F4EC] bg-white px-3 py-2 text-[12px]">
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="font-semibold uppercase text-[#42574E]">{a.activity_type ?? '—'}</span>
+                            <span className="text-[#1B2623]/40">{a.activity_date}</span>
+                          </div>
+                          {a.outcome && <div className="mt-0.5 text-[#1B2623]/70">{a.outcome}</div>}
+                          {a.logged_by_name && <div className="mt-0.5 text-[10px] text-[#1B2623]/40">by {a.logged_by_name}</div>}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              );
+            })()}
+
+            <div className="mb-2 text-[12px] font-semibold uppercase tracking-wide text-[#1B2623]/45">Log a new activity — tap all that apply</div>
             <div className="mb-3 flex flex-wrap gap-2">
               {LOG_CHIPS.map((o) => {
                 const on = fastChips.includes(o);
@@ -759,11 +818,11 @@ function FirmCard({ firm, onLog, today, onQuickEmail, onQuickLog, userId, onClai
             <span className="shrink-0 rounded-full bg-[#F2F4EC] px-2 py-0.5 text-[10px] font-bold text-[#42574E]">{claiming ? 'Claiming…' : 'Tap to claim'}</span>
           </button>
         ) : (
-          <div className="flex min-w-0 flex-1 items-center gap-2">
-            <span className="break-words leading-snug text-[14px] font-bold">{firm.name}</span>
+          <button type="button" onClick={() => onLog(firm.id)} className="flex min-w-0 flex-1 items-center gap-2 text-left" aria-label={`Open ${firm.name} profile & notes`}>
+            <span className="break-words leading-snug text-[14px] font-bold underline-offset-2 hover:underline">{firm.name}</span>
             <PriorityBadge priority={firm.priority} />
             {due && <span className="shrink-0 rounded-full bg-red-100 px-1.5 py-0.5 text-[10px] font-bold text-red-600">due</span>}
-          </div>
+          </button>
         )}
         {firm.source === 'pilot_form' && (
           <span className="shrink-0 rounded-full bg-[#F59E0B] px-2 py-0.5 text-[10px] font-extrabold text-white" title="Inbound pilot request from /for-firms">⚡ INBOUND</span>
@@ -787,6 +846,10 @@ function FirmCard({ firm, onLog, today, onQuickEmail, onQuickLog, userId, onClai
             <Mail className="h-4 w-4" />
           </a>
         )}
+        {/* Every card opens its firm profile (notes + full activity history) — no dead cards. */}
+        <button type="button" onClick={() => onLog(firm.id)} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#42574E] text-white hover:bg-[#374A42]" aria-label={`Open ${firm.name} profile`} title="Open profile & notes">
+          <ChevronRight className="h-4 w-4" />
+        </button>
       </div>
       <div className="space-y-2 border-t border-[#F2F4EC] p-3">
           {firm.attorney_name && <div className="text-[12px] text-[#1B2623]/55">{firm.attorney_name}</div>}
@@ -1821,6 +1884,99 @@ function OutreachBatchTab({ firms, onSent }: { firms: CrmFirm[]; onSent: (id: st
           </div>
         </div>
       ))}
+    </div>
+  );
+}
+
+// LinkedIn outreach queue. ToS-safe by design: NO automation, scraping, or auto-connect
+// (all banned by LinkedIn and a real ban risk). Per firm it (1) copies a personalized
+// connection note to the clipboard and (2) opens a LinkedIn people-search in a new tab.
+// The founder finds the person and sends the request themselves, then taps "Sent" to drop
+// it from the queue. "Sent" state lives in localStorage only — it never writes crm_activity
+// (the DB constraint allows call/email/demo only, and logging LinkedIn as "email" would
+// inflate the email metrics). Self-pace ~20-25/day to stay clear of LinkedIn's weekly limit.
+const LINKEDIN_DONE_KEY = 'crm_linkedin_done';
+function LinkedInQueueTab({ firms }: { firms: CrmFirm[] }) {
+  const [done, setDone] = useState<Set<string>>(() => {
+    try { return new Set(JSON.parse(localStorage.getItem(LINKEDIN_DONE_KEY) || '[]')); } catch { return new Set(); }
+  });
+  const [copied, setCopied] = useState<string | null>(null);
+
+  const persist = (next: Set<string>) => {
+    try { localStorage.setItem(LINKEDIN_DONE_KEY, JSON.stringify([...next])); } catch { /* ignore */ }
+  };
+  const markSent = (id: string) => setDone((prev) => { const n = new Set(prev); n.add(id); persist(n); return n; });
+  const undo = (id: string) => setDone((prev) => { const n = new Set(prev); n.delete(id); persist(n); return n; });
+  const copyNote = async (id: string, text: string) => {
+    try { await navigator.clipboard.writeText(text); } catch { /* clipboard blocked — user can still read the note */ }
+    setCopied(id);
+    setTimeout(() => setCopied((c) => (c === id ? null : c)), 1600);
+  };
+
+  const prioRank: Record<string, number> = { A: 0, B: 1, C: 2 };
+  const queue = firms
+    .filter((f) => !done.has(f.id) && f.stage !== 'no')
+    .sort((a, b) => (prioRank[a.priority ?? 'C'] ?? 3) - (prioRank[b.priority ?? 'C'] ?? 3));
+
+  return (
+    <div className="space-y-4">
+      <div className="rounded-2xl border border-[#E1E4DD] bg-[#F7F9F5] p-4">
+        <div className="flex items-center gap-2">
+          <Linkedin className="h-4 w-4 text-[#374A42]" />
+          <h2 className="text-[15px] font-extrabold text-[#374A42]">LinkedIn queue — {queue.length} to work</h2>
+          {done.size > 0 && <span className="rounded-full bg-[#42574E] px-2 py-0.5 text-[11px] font-bold text-white">{done.size} sent</span>}
+        </div>
+        <p className="mt-1 text-[12.5px] leading-relaxed text-[#1B2623]/60">
+          For each firm: <b>Copy note</b>, then <b>Open on LinkedIn</b> (a people search opens in a new tab), find the attorney, and send the request yourself — paste the note. Tap <b>Sent</b> to drop it from the queue.
+          <br />No automation: LinkedIn bans auto-connect/scraping. Keep it to <b>~20-25/day</b> so your account stays clear.
+        </p>
+      </div>
+
+      {queue.length === 0 ? (
+        <div className="rounded-2xl border border-[#E1E4DD] bg-white p-6 text-center text-[13px] text-[#1B2623]/55">
+          Queue clear — every firm is marked sent. Add more firms, or reset a few below.
+        </div>
+      ) : queue.map((f, i) => {
+        const note = linkedInNote(f);
+        return (
+          <div key={f.id} className="rounded-2xl border border-[#E4E5DE] bg-white p-4">
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <span className="font-mono text-[11px] text-[#7c857f]">#{i + 1}</span>
+                {f.priority && <span className="rounded-full bg-[#E7EDE8] px-2 py-0.5 text-[10px] font-bold text-[#42574E]">{f.priority}</span>}
+                <span className="truncate text-[14px] font-bold text-[#1B2623]">{f.name}</span>
+              </div>
+              {f.attorney_name && <div className="mt-0.5 text-[12px] text-[#1B2623]/55">{f.attorney_name}{f.region ? ` · ${f.region}` : ''}</div>}
+              {f.focus_areas && <div className="mt-0.5 text-[11px] text-[#1B2623]/45">Focus: {f.focus_areas}</div>}
+              <p className="mt-2 rounded-lg border border-[#E4E5DE] bg-[#F7F9F5] px-3 py-2 text-[12.5px] leading-relaxed text-[#1B2623]/75">{note}</p>
+            </div>
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <button type="button" onClick={() => copyNote(f.id, note)} className="inline-flex items-center justify-center gap-1.5 rounded-full border border-[#B7BCB2] px-4 py-2.5 text-[13px] font-semibold text-[#22262a] transition hover:border-[#8f958b]">
+                {copied === f.id ? <><Check className="h-4 w-4 text-[#42574E]" /> Copied</> : <><Copy className="h-4 w-4" /> Copy note</>}
+              </button>
+              <a href={linkedInSearchHref(f)} target="_blank" rel="noreferrer" className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-[#42574E] px-4 py-2.5 text-[13px] font-semibold text-[#EAF0EC] transition hover:bg-[#374A42]">
+                <Linkedin className="h-4 w-4" /> Open on LinkedIn
+              </a>
+              <button type="button" onClick={() => markSent(f.id)} className="inline-flex items-center justify-center gap-1.5 rounded-full border border-[#B7BCB2] px-4 py-2.5 text-[13px] font-semibold text-[#22262a] transition hover:border-[#8f958b]">
+                <Check className="h-4 w-4" /> Sent
+              </button>
+            </div>
+          </div>
+        );
+      })}
+
+      {done.size > 0 && (
+        <div className="rounded-2xl border border-[#E1E4DD] bg-white p-4">
+          <div className="mb-2 text-[12px] font-bold text-[#1B2623]/70">Sent ({done.size}) — tap to return to the queue</div>
+          <div className="flex flex-wrap gap-2">
+            {firms.filter((f) => done.has(f.id)).map((f) => (
+              <button key={f.id} type="button" onClick={() => undo(f.id)} className="inline-flex items-center gap-1 rounded-full border border-[#D3DED6] bg-[#F7F9F5] px-3 py-1.5 text-[11.5px] text-[#42574E] hover:border-[#8f958b]">
+                <RefreshCw className="h-3 w-3" /> {f.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
