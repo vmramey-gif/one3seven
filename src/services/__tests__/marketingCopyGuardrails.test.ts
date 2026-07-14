@@ -34,6 +34,7 @@ const SCANNED_FILES = [
   // public marketing
   'src/app/screens/SageMarketingPage.tsx',
   'src/app/screens/ForFirmsPage.tsx',
+  'src/app/screens/WorkerLandingPage.tsx',
   'src/app/screens/BrandPreviewPage.tsx',
   'src/i18n/i18n.tsx',
   // demo / semi-public product surfaces
@@ -87,12 +88,13 @@ const NEGATABLE: { label: string; re: RegExp }[] = [
 ];
 
 // Negation OR quantification (a leading "0"/"zero"/number makes "0 legal conclusions" safe).
-const NEGATION = /\b(no|not|never|cannot|can'?t|do(es)?n'?t|without|isn'?t|aren'?t|nor|non|un|zero|\d+)\b/i;
+// Apostrophes: match both straight (') and typographic (’) so "don’t" is read as a negation.
+const NEGATION = /\b(no|not|never|cannot|can['’]?t|do(es)?n['’]?t|without|isn['’]?t|aren['’]?t|nor|non|un|zero|\d+)\b/i;
 // Deliberate escape hatch: a line marked FROZEN/LEGAL-ALLOW may quote a banned phrase to forbid it.
 const ALLOW = /\b(FROZEN|LEGAL-ALLOW)\b/;
 // Anti-instruction format: a line that FORBIDS a phrase (guardrail lists in rep scripts / AI prompts)
 // quotes the banned words on purpose. This is a designated, greppable format — not intent inference.
-const ANTI = /\bnever (say|assert|claim|state|imply|use|overclaim)\b|\bdo(es)? not (say|answer|assert|claim|use|imply|invent|draw|provide|evaluate|determine)\b|\bdon'?t (say|assert|claim|use|draw)\b|\bnot safe\b|\bbanned\b|acceptable:|objection:/i;
+const ANTI = /\bnever (say|assert|claim|state|imply|use|overclaim)\b|\bdo(es)? not (say|answer|assert|claim|use|imply|invent|draw|provide|evaluate|determine)\b|\bdon['’]?t (say|assert|claim|use|draw)\b|\bnot safe\b|\bbanned\b|acceptable:|objection:/i;
 
 function lineOf(text: string, index: number): string {
   const start = text.lastIndexOf('\n', index) + 1;

@@ -14,6 +14,7 @@ import { CompanyDemoDebrief } from './app/screens/CompanyDemoDebrief.tsx';
 import { CrmAccessGate } from './app/components/CrmAccessGate.tsx';
 import { TermsPage } from './app/screens/TermsPage.tsx';
 import { PrivacyPage } from './app/screens/PrivacyPage.tsx';
+import { WorkerLandingPage } from './app/screens/WorkerLandingPage.tsx';
 import { ForFirmsPage } from './app/screens/ForFirmsPage.tsx';
 import { BrandPreviewPage } from './app/screens/BrandPreviewPage.tsx';
 import { LanguageProvider } from './i18n/i18n.tsx';
@@ -56,6 +57,10 @@ const isForFirms =
   url.searchParams.has('for-firms') ||
   url.pathname === '/for-firms';
 
+const isForWorkers =
+  url.searchParams.has('for-workers') ||
+  url.pathname === '/for-workers';
+
 const isBrand =
   url.searchParams.has('brand') ||
   url.pathname === '/brand';
@@ -97,6 +102,7 @@ const routeTitle =
   : isWorkerDemo ? 'Worker Demo — one3seven'
   : isDemo ? 'Sample Intake Demo — one3seven'
   : isForFirms ? 'one3seven for Firms — Organized Employment Intake'
+  : isForWorkers ? 'one3seven for Workers — Organize Your Employment Records'
   : isBrand ? 'one3seven — Brand Preview'
   : null;
 if (routeTitle) document.title = routeTitle;
@@ -136,6 +142,23 @@ if (url.pathname === '/terms') {
 } else if (isBrand) {
   createRoot(rootEl).render(
     <AppErrorBoundary><BrandPreviewPage /></AppErrorBoundary>
+  );
+} else if (isForWorkers) {
+  // Direct/ad hits to /for-workers render the worker landing standalone. The CTAs set a
+  // one-shot flag and reload to '/', where App resolves it to the low-friction worker sign-up
+  // (or sign-in) — so the handoff lands on Create Account, not the firm-first homepage.
+  const goHomeWith = (v: 'start' | 'signin') => {
+    try { sessionStorage.setItem('o3s_worker_cta', v); } catch { /* ignore */ }
+    window.location.href = '/';
+  };
+  createRoot(rootEl).render(
+    <AppErrorBoundary>
+      <WorkerLandingPage
+        onStart={() => goHomeWith('start')}
+        onSignIn={() => goHomeWith('signin')}
+        onBack={() => { window.location.href = '/'; }}
+      />
+    </AppErrorBoundary>
   );
 } else if (isForFirms) {
   createRoot(rootEl).render(

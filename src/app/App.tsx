@@ -7,6 +7,7 @@ import { AuthWelcomeScreen } from './screens/AuthWelcomeScreen';
 import { PendingApprovalScreen } from './screens/PendingApprovalScreen';
 import { SageMarketingPage } from './screens/SageMarketingPage';
 import { ForFirmsPage } from './screens/ForFirmsPage';
+import { WorkerLandingPage } from './screens/WorkerLandingPage';
 import { SignInScreen } from './screens/SignInScreen';
 import { CreateAccountScreen } from './screens/CreateAccountScreen';
 import { RoleSelectionScreen } from './screens/RoleSelectionScreen';
@@ -190,7 +191,8 @@ export type Screen =
   | 'firmSettings'
   | 'comparison'
   | 'firmDirectedIntake'
-  | 'forFirms';
+  | 'forFirms'
+  | 'forWorkers';
 
 const AUTH_FLOW_SCREENS: Screen[] = ['publicMarketing', 'authWelcome', 'signIn', 'createAccount', 'roleSelection', 'workerDetails'];
 
@@ -240,6 +242,10 @@ export default function App() {
     // If a firm code is already in sessionStorage, skip the marketing page entirely
     // and go straight to the firm-directed intake. firmDirectedContext will resolve async.
     try {
+      // Worker landing (/for-workers) handoff: a one-shot flag set before reloading to '/'.
+      // Lands the worker on the low-friction Create Account (or Sign in) — not the firm homepage.
+      const workerCta = sessionStorage.getItem('o3s_worker_cta'); // read-only; cleared in an effect (pure initializer)
+      if (workerCta) return workerCta === 'signin' ? 'signIn' : 'createAccount';
       if (sessionStorage.getItem('o3s_prefill_fc')) return 'firmDirectedIntake';
     } catch { /* ignore */ }
     return 'publicMarketing';
@@ -252,6 +258,7 @@ export default function App() {
     const SCREEN_PATHS: Partial<Record<Screen, string>> = {
       publicMarketing: '/',
       forFirms: '/for-firms',
+      forWorkers: '/for-workers',
       firmDirectedIntake: '/intake',
       upload: '/intake/upload',
       intakeSummary: '/intake/summary',
@@ -608,6 +615,14 @@ export default function App() {
         userId: session?.user?.id ?? null,
         email: session?.user?.email ?? null,
       });
+      // Worker-landing handoff: a guest arriving via /for-workers "Start" carries a one-shot flag.
+      // Consume it here (the auth handler is the single consumer) so the no-session reset below
+      // lands them on Create Account / Sign in instead of the firm-first marketing home.
+      let workerCtaScreen: Screen | null = null;
+      try {
+        const wc = sessionStorage.getItem('o3s_worker_cta');
+        if (wc) { sessionStorage.removeItem('o3s_worker_cta'); workerCtaScreen = wc === 'signin' ? 'signIn' : 'createAccount'; }
+      } catch { /* ignore */ }
       if (!session?.user) {
         setAuthUser(null);
         setProfile(null);
@@ -650,7 +665,7 @@ export default function App() {
         setHasCompletedIntake(false);
         setWorkerUploadFirmIntent('default');
         setFirmLiveViewLoading(false);
-        setCurrentScreen('publicMarketing');
+        setCurrentScreen(workerCtaScreen ?? 'publicMarketing');
         firmSignInIntentRef.current = false;
         try {
           sessionStorage.removeItem('o3s_offline_role');
@@ -3988,7 +4003,7 @@ export default function App() {
                 onWorkerStart={
                   firmDirectedContext
                     ? () => void startFirmDirectedGuestIntake()
-                    : () => setCurrentScreen('authWelcome')
+                    : () => setCurrentScreen('forWorkers')
                 }
                 onFirmStart={() => {
                   firmSignInIntentRef.current = true;
@@ -4021,6 +4036,25 @@ export default function App() {
                 onStartWorker={() => {
                   firmSignInIntentRef.current = false;
                   setCurrentScreen('authWelcome');
+                }}
+              />
+            </motion.div>
+          )}
+          {currentScreen === 'forWorkers' && (
+            <motion.div
+              key="forWorkers"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.35, ease: 'easeOut' }}
+            >
+              <WorkerLandingPage
+                onBack={() => setCurrentScreen('publicMarketing')}
+                onSignIn={() => { firmSignInIntentRef.current = false; setCurrentScreen('signIn'); }}
+                onStart={() => {
+                  // Low-friction: straight to worker Create Account (matches the page's calm promise).
+                  firmSignInIntentRef.current = false;
+                  setCurrentScreen('createAccount');
                 }}
               />
             </motion.div>
