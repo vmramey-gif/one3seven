@@ -63,11 +63,11 @@ export function WorkerLandingPage({ onStart, onSignIn, onBack }: WorkerLandingPa
             tell your story and organize your scattered records — texts, pay stubs, emails, photos — into one
             clear, dated file you can bring to any attorney you choose. Free, private, and yours to keep.
           </p>
-          <div className="flex flex-wrap gap-3">
-            <button type="button" onClick={onStart} className="inline-flex items-center gap-2 rounded-full bg-[#42574E] px-7 py-3.5 text-[16px] font-semibold text-[#EAF0EC] shadow-[0_14px_30px_-12px_rgba(66,87,78,0.55)] transition hover:-translate-y-0.5 hover:bg-[#374a42]">
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <button type="button" onClick={onStart} className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#42574E] px-7 py-3.5 text-[16px] font-semibold text-[#EAF0EC] shadow-[0_14px_30px_-12px_rgba(66,87,78,0.55)] transition hover:-translate-y-0.5 hover:bg-[#374a42] sm:w-auto">
               Start organizing — free <ArrowRight className="h-4 w-4" />
             </button>
-            <a href="#how" className="inline-flex items-center rounded-full border border-[#B7BCB2] bg-white/60 px-6 py-3.5 text-[16px] font-semibold text-[#22262a] transition hover:border-[#8f958b] hover:bg-white">
+            <a href="#how" className="inline-flex w-full items-center justify-center rounded-full border border-[#B7BCB2] bg-white/60 px-6 py-3.5 text-[16px] font-semibold text-[#22262a] transition hover:border-[#8f958b] hover:bg-white sm:w-auto">
               See how it works
             </a>
           </div>
@@ -137,7 +137,7 @@ export function WorkerLandingPage({ onStart, onSignIn, onBack }: WorkerLandingPa
           <h2 style={SERIF} className="text-[clamp(24px,4vw,32px)] font-semibold tracking-[-0.01em]">Get your story in order — free.</h2>
           <p className="mx-auto mt-3 max-w-[52ch] text-[15.5px] leading-relaxed text-[#40433f]">It takes minutes to start, and you keep everything you build.</p>
           <div className="mt-6 flex justify-center">
-            <button type="button" onClick={onStart} className="inline-flex items-center gap-2 rounded-full bg-[#42574E] px-7 py-3.5 text-[16px] font-semibold text-[#EAF0EC] shadow-[0_14px_30px_-12px_rgba(66,87,78,0.55)] transition hover:-translate-y-0.5 hover:bg-[#374a42]">
+            <button type="button" onClick={onStart} className="inline-flex w-full max-w-sm items-center justify-center gap-2 rounded-full bg-[#42574E] px-7 py-3.5 text-[16px] font-semibold text-[#EAF0EC] shadow-[0_14px_30px_-12px_rgba(66,87,78,0.55)] transition hover:-translate-y-0.5 hover:bg-[#374a42] sm:w-auto">
               Start organizing — free <ArrowRight className="h-4 w-4" />
             </button>
           </div>
