@@ -40,7 +40,7 @@ function TimelineCard({ t }: { t: (k: string) => string }) {
       initial={reduce ? false : { opacity: 0, y: 26, scale: 0.985 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.15 }}
-      className="rounded-2xl border border-[#E4E5DE] bg-[#FBFBFA] p-6 shadow-[0_30px_70px_-26px_rgba(46,64,56,0.35)]"
+      className="min-w-0 rounded-2xl border border-[#E4E5DE] bg-[#FBFBFA] p-6 shadow-[0_30px_70px_-26px_rgba(46,64,56,0.35)]"
     >
       <div className="mb-4 flex items-center justify-between">
         <span style={MONO} className="text-[10.5px] uppercase tracking-[0.1em] text-[#7c857f]">{t('tl.header')}</span>
@@ -93,7 +93,7 @@ function ExtractionCard({ t }: { t: (k: string) => string }) {
       initial={reduce ? false : { opacity: 0, y: 26, scale: 0.985 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.15 }}
-      className="rounded-2xl border border-[#E4E5DE] bg-[#FBFBFA] p-6 shadow-[0_30px_70px_-26px_rgba(46,64,56,0.35)]"
+      className="min-w-0 rounded-2xl border border-[#E4E5DE] bg-[#FBFBFA] p-6 shadow-[0_30px_70px_-26px_rgba(46,64,56,0.35)]"
     >
       <div className="mb-4 flex items-center justify-between">
         <span style={MONO} className="text-[10.5px] uppercase tracking-[0.1em] text-[#7c857f]">{t('ext.header')}</span>
@@ -111,7 +111,7 @@ function ExtractionCard({ t }: { t: (k: string) => string }) {
             <p className="mt-1.5 border-l-2 border-[#CBD6CF] pl-3 text-[12.5px] italic leading-relaxed text-[#20242a]">{f.quote}</p>
             <div className="mt-2.5 flex items-center gap-1.5 text-[11px] font-medium text-[#42574E]">
               <FileText className="h-3.5 w-3.5 flex-none" />
-              <span style={MONO} className="truncate text-[10.5px] text-[#3c5049]">{f.src}</span>
+              <span style={MONO} className="min-w-0 truncate text-[10.5px] text-[#3c5049]">{f.src}</span>
               <span className="ml-auto inline-flex flex-none items-center gap-0.5 whitespace-nowrap">{t('ext.view')} <ArrowRight className="h-3 w-3" /></span>
             </div>
           </motion.div>
@@ -149,7 +149,7 @@ export function SageMarketingPage({ onWorkerStart, onSignIn, onForFirms, firmDir
           className="relative mx-auto grid max-w-6xl items-center gap-11 px-6 py-14 md:grid-cols-[1.08fr_.92fr] md:py-20"
           initial={reduce ? false : 'hidden'} animate="show" variants={heroContainer}
         >
-          <div>
+          <div className="min-w-0">
             <motion.div variants={heroItem} style={MONO} className="text-[11px] uppercase tracking-[0.16em] text-[#42574E]">
               {directed ? `${t('aw.badge')}` : t('home.eyebrow')}
             </motion.div>
