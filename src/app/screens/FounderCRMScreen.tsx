@@ -584,7 +584,7 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
             {tab === 'dashboard' && <DashboardTab firms={firms} activity={activity} today={today} onLog={openFast} workerCount={workerCount} onChanged={load} onQuickEmail={quickEmail} onQuickLog={quickLog} onFounderEmailDone={founderEmailDone} claim={claim} isFounder={isFounder} onOpenFirm={openFirmByName} />}
             {tab === 'pipeline' && isFounder && <PipelineTab firms={firms} onLog={openFast} workerCount={workerCount} onQuickEmail={quickEmail} onQuickLog={quickLog} claim={claim} />}
             {tab === 'firms' && <FirmsTab firms={firms} onLog={openFast} userId={userId} onNoContact={(id) => quickLog(id, 'no_contact')} onNotInterested={markNotInterested} claim={claim} />}
-            {tab === 'email_fu' && isFounder && <FounderEmailQueueTab firms={firms} onFounderEmailDone={founderEmailDone} />}
+            {tab === 'email_fu' && isFounder && <FounderEmailQueueTab firms={firms} onFounderEmailDone={founderEmailDone} onLog={openFast} />}
             {tab === 'outreach' && isFounder && <OutreachBatchTab firms={firms} onSent={markEmailSent} />}
             {tab === 'callqueue' && <CallQueueTab firms={firms} activity={activity} onLog={openFast} today={today} onQuickEmail={quickEmail} onQuickLog={quickLog} claim={claim} />}
             {tab === 'linkedin' && <LinkedInQueueTab firms={firms} />}
@@ -1981,7 +1981,7 @@ function LinkedInQueueTab({ firms }: { firms: CrmFirm[] }) {
   );
 }
 
-function FounderEmailQueueTab({ firms, onFounderEmailDone }: { firms: CrmFirm[]; onFounderEmailDone?: (id: string) => Promise<void> }) {
+function FounderEmailQueueTab({ firms, onFounderEmailDone, onLog }: { firms: CrmFirm[]; onFounderEmailDone?: (id: string) => Promise<void>; onLog: (id: string) => void }) {
   const queue = firms.filter((f) => f.needs_founder_email);
   return (
     <div className="space-y-4">
@@ -1991,24 +1991,46 @@ function FounderEmailQueueTab({ firms, onFounderEmailDone }: { firms: CrmFirm[];
           <h2 className="text-[15px] font-extrabold text-[#374A42]">Victoria — email follow-ups</h2>
           {queue.length > 0 && <span className="rounded-full bg-[#42574E] px-2 py-0.5 text-[11px] font-bold text-white">{queue.length}</span>}
         </div>
-        <p className="mt-1 text-[12px] leading-relaxed text-[#1B2623]/55">Firms the team flagged with “Victoria to email f/u”. Tap the address to write the email, then “Emailed ✓” to clear it from the queue.</p>
+        <p className="mt-1 text-[12px] leading-relaxed text-[#1B2623]/55">Firms the team flagged with “Victoria to email f/u”. <b>Open email</b> writes it from victoria@ (same as Send emails); tap the firm name to open its full profile. <b>Emailed ✓</b> clears it from the queue.</p>
       </div>
       {queue.length === 0 ? (
         <p className="rounded-[12px] border border-[#D3DED6] bg-white px-4 py-6 text-center text-[13px] text-[#1B2623]/45">Nothing to email right now — the queue is clear.</p>
       ) : (
-        <div className="space-y-2">
+        <div className="space-y-3">
           {queue.map((f) => (
-            <div key={f.id} className="flex items-center gap-2 rounded-[12px] border border-[#C6D0C8] bg-white p-3">
-              <div className="min-w-0 flex-1">
-                <div className="break-words text-[14px] font-bold text-[#1B2623]">{f.name}</div>
-                {f.attorney_name && <div className="text-[11px] text-[#1B2623]/50">{f.attorney_name}</div>}
+            <div key={f.id} className="rounded-2xl border border-[#C6D0C8] bg-white p-4">
+              {/* Firm name + priority → opens the full profile (notes + activity history) */}
+              <button type="button" onClick={() => onLog(f.id)} className="flex w-full items-start justify-between gap-2 text-left" aria-label={`Open ${f.name} profile`}>
+                <div className="min-w-0">
+                  <div className="break-words text-[14px] font-bold text-[#1B2623] underline-offset-2 hover:underline">{f.name}</div>
+                  {(f.attorney_name || f.region) && <div className="mt-0.5 text-[12px] text-[#1B2623]/55">{[f.attorney_name, f.region].filter(Boolean).join(' · ')}</div>}
+                </div>
+                <span className="mt-0.5 inline-flex shrink-0 items-center gap-0.5 rounded-full bg-[#F2F4EC] px-2.5 py-1 text-[11px] font-semibold text-[#42574E]">Profile <ChevronRight className="h-3.5 w-3.5" /></span>
+              </button>
+
+              {/* Contact info */}
+              <div className="mt-2.5 space-y-1 text-[12.5px]">
                 {f.email
-                  ? <a href={outreachHref(f)} target="_blank" rel="noreferrer" className="break-all text-[12px] font-semibold text-[#42574E] underline">{f.email}</a>
-                  : <span className="text-[12px] text-[#1B2623]/40">no email on file</span>}
+                  ? <a href={outreachHref(f)} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 break-all font-semibold text-[#42574E] underline underline-offset-2"><Mail className="h-3.5 w-3.5 shrink-0" /> {f.email}</a>
+                  : <div className="text-[12px] text-[#1B2623]/40">no email on file</div>}
+                <div className="flex items-center gap-1.5 text-[#1B2623]/70"><Phone className="h-3.5 w-3.5 text-[#1B2623]/35" /> <PhoneLink phone={f.phone} /></div>
               </div>
-              {onFounderEmailDone && (
-                <button type="button" onClick={() => onFounderEmailDone(f.id)} className="shrink-0 rounded-full bg-[#42574E] px-3 py-2 text-[12px] font-bold text-white">Emailed ✓</button>
-              )}
+              {f.notes && <p className="mt-2 text-[11.5px] leading-relaxed text-[#1B2623]/55">{f.notes}</p>}
+
+              {/* CTAs — Open email (same Outlook compose as Send emails) + Emailed ✓ + call */}
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                {f.email && (
+                  <a href={outreachHref(f)} target="_blank" rel="noreferrer" className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-[#42574E] px-4 py-2.5 text-[13px] font-semibold text-[#EAF0EC] transition hover:bg-[#374A42]">
+                    <Mail className="h-4 w-4" /> Open email
+                  </a>
+                )}
+                {onFounderEmailDone && (
+                  <button type="button" onClick={() => onFounderEmailDone(f.id)} className="inline-flex items-center justify-center gap-1.5 rounded-full border border-[#B7BCB2] px-4 py-2.5 text-[13px] font-semibold text-[#22262a] transition hover:border-[#8f958b]">
+                    <Check className="h-4 w-4" /> Emailed ✓
+                  </button>
+                )}
+                {f.phone && <a href={`tel:${digitsOf(f.phone)}`} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-600" aria-label={`Call ${f.name}`}><Phone className="h-4 w-4" /></a>}
+              </div>
             </div>
           ))}
         </div>
