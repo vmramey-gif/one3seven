@@ -26,6 +26,7 @@ import { IntakeSummaryScreen } from './screens/IntakeSummaryScreen';
 import { FilePreviewScreen } from './screens/FilePreviewScreen';
 import { HowItWorksScreen } from './screens/HowItWorksScreen';
 import { LawFirmDashboardScreen } from './screens/LawFirmDashboardScreen';
+import { FirmCaseIntakeScreen } from './screens/FirmCaseIntakeScreen';
 import { IntakeReviewScreen } from './screens/IntakeReviewScreen';
 import { IntakeReviewErrorBoundary } from './components/IntakeReviewErrorBoundary';
 import { FirmSettingsScreen } from './screens/FirmSettingsScreen';
@@ -182,6 +183,7 @@ export type Screen =
   | 'guidedIntake'
   | 'categoryQuestionnaire'
   | 'upload'
+  | 'firmCaseIntake'
   | 'processing'
   | 'summary'
   | 'filePreview'
@@ -3429,6 +3431,7 @@ export default function App() {
   // Attorney-side engine (increment 1): a firm creates and owns a case file, then uploads its own
   // documents into the same organizing pipeline. TEMP: alerts on failure so the RLS/ownership path
   // is visible during testing — replaced with in-app UI in a later increment.
+  const [firmCaseOrganizing, setFirmCaseOrganizing] = useState(false);
   const handleStartFirmCaseFile = async () => {
     if (!authUser?.id || !isSupabaseConfigured()) return;
     const draft = await intakeData.createDraftIntake(authUser.id);
@@ -3439,7 +3442,20 @@ export default function App() {
     }
     setCurrentIntakeId(draft.id);
     currentIntakeIdRef.current = draft.id;
-    setCurrentScreen('upload');
+    setUploadedFiles([]);
+    setCurrentScreen('firmCaseIntake');
+  };
+
+  // Firm organizes its uploaded case documents: persist through the same engine, then process.
+  const handleFirmOrganize = async () => {
+    if (!uploadedFiles.length || !currentIntakeId) return;
+    setFirmCaseOrganizing(true);
+    try {
+      await persistNewFiles(uploadedFiles);
+      setCurrentScreen('processing');
+    } finally {
+      setFirmCaseOrganizing(false);
+    }
   };
 
   const handleFirmRequestAdditionalDocuments = async (payload: {
@@ -4510,6 +4526,17 @@ export default function App() {
                 }
                 storyFollowUp={storyFollowUpForActiveIntake}
                 onStoryFollowUpChange={handleStoryFollowUpChange}
+              />
+            </motion.div>
+          )}
+          {currentScreen === 'firmCaseIntake' && (
+            <motion.div key="firmCaseIntake" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              <FirmCaseIntakeScreen
+                uploadedFiles={uploadedFiles}
+                setUploadedFiles={setUploadedFiles}
+                onOrganize={() => void handleFirmOrganize()}
+                onBack={() => setCurrentScreen('firmDashboard')}
+                organizing={firmCaseOrganizing}
               />
             </motion.div>
           )}
