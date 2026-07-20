@@ -559,10 +559,21 @@ function isEmbeddableSource(s: PdfSourceDoc): boolean {
 }
 
 /** Index supplied source docs by file name so facts can link by their stored sourceFile. */
+/** Canonicalize a file name so a humanized display name ("Rosa PayStub Feb2026") matches the raw
+ *  upload ("Rosa_PayStub_Feb2026.pdf") — strip extension, underscores → spaces, lowercase. */
+export function normSourceName(name: string | null | undefined): string {
+  return (name ?? '')
+    .toLowerCase()
+    .replace(/\.(pdf|png|jpe?g|docx?|txt|heic)$/i, '')
+    .replace(/_/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 function buildSourceIndex(sources: PdfSourceDoc[]): Map<string, SourceIndexEntry> {
   const idx = new Map<string, SourceIndexEntry>();
   for (const s of sources) {
-    const key = (s.fileName || '').trim().toLowerCase();
+    const key = normSourceName(s.fileName);
     if (key) idx.set(key, { docId: s.docId, embeddable: isEmbeddableSource(s) });
   }
   return idx;
@@ -574,7 +585,7 @@ function factProvenance(
 ): { state: 'linked' | 'on_file' | 'worker'; docId?: string; label: string } {
   const name = (sourceFile || '').trim();
   if (!name) return { state: 'worker', label: 'Worker-stated' };
-  const hit = srcIndex.get(name.toLowerCase());
+  const hit = srcIndex.get(normSourceName(name));
   if (hit && hit.embeddable) return { state: 'linked', docId: hit.docId, label: name };
   return { state: 'on_file', label: name };
 }

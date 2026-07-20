@@ -1231,20 +1231,51 @@ export function buildFirmIntakePacketModel(view: FirmLiveIntakeView): FirmPacket
  * any file that can't be resolved or downloaded is silently skipped (the citation
  * then renders as plain text).
  */
+/** Canonicalize a file name (kept in sync with normSourceName in the renderer) so a humanized
+ *  display name matches the raw upload. */
+function normCitedName(name: string | null | undefined): string {
+  return (name ?? '')
+    .toLowerCase()
+    .replace(/\.(pdf|png|jpe?g|docx?|txt|heic)$/i, '')
+    .replace(/_/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 async function loadCitedSourceDocs(view: FirmLiveIntakeView, model: FirmPacketModel): Promise<PdfSourceDoc[]> {
-  const report = model.wageExposure?.report;
-  if (!report) return [];
+  // Doc IDs cited by the wage-exposure report (when present).
   const citedIds = new Set<string>();
-  for (const li of [report.baseHourlyRate, report.overtimeHoursUnderpaid, report.mealBreaksMissed]) {
-    const docId = li?.citation?.docId;
-    if (docId) citedIds.add(docId);
+  const report = model.wageExposure?.report;
+  if (report) {
+    for (const li of [report.baseHourlyRate, report.overtimeHoursUnderpaid, report.mealBreaksMissed]) {
+      const docId = li?.citation?.docId;
+      if (docId) citedIds.add(docId);
+    }
   }
-  if (!citedIds.size) return [];
+  // File NAMES cited by the sequence events and key quotes — this is what makes the general facts
+  // (not just wage-exposure) source-linked and traceable.
+  const citedNames = new Set<string>();
+  if (model.sequence.kind === 'events') {
+    for (const e of model.sequence.events) {
+      const n = normCitedName(e.sourceFile);
+      if (n) citedNames.add(n);
+    }
+  }
+  for (const q of model.extracted?.keyQuotes ?? []) {
+    const n = normCitedName(q.fileName);
+    if (n) citedNames.add(n);
+  }
+
+  if (!citedIds.size && !citedNames.size) return [];
 
   const out: PdfSourceDoc[] = [];
+  const seen = new Set<string>();
   for (const f of view.files ?? []) {
     const id = f.uploaded_file_id;
-    if (!id || !citedIds.has(id) || !f.file_path) continue;
+    if (!id || !f.file_path || seen.has(id)) continue;
+    const wanted = citedIds.has(id) || citedNames.has(normCitedName(f.file_name));
+    if (!wanted) continue;
+    seen.add(id);
     try {
       const { data: blob, error } = await supabase.storage.from('intake-files').download(f.file_path);
       if (error || !blob) continue;
