@@ -3099,6 +3099,15 @@ export default function App() {
     if (profile?.id) await refreshWorkerIntakesList(profile.id);
     setWorkerIntakeWorkflow('Under Firm Review');
     setFirmCodeShareCompleted(true);
+    // Worker-facing confirmation — the manual share previously only notified the FIRM,
+    // so the worker got no feedback that their intake was actually sent.
+    pushWorkerNotification({
+      id: `share-fc-${Date.now()}`,
+      title: 'Sent to your firm',
+      body: r.firmName
+        ? `Your organized intake was sent to ${r.firmName}. They'll review it and follow up with you.`
+        : `Your organized intake was sent to the firm. They'll review it and follow up with you.`,
+    });
     setFirmNotifications((prev) =>
       [
         {

@@ -751,6 +751,76 @@ function drawTraceabilityLegend(c: Cursor, coverage: { linked: number; total: nu
 }
 
 // ── Main render ──────────────────────────────────────────────────────────────
+// Decision Card — the one-page verdict, placed FIRST so an attorney can decide in ~2 minutes.
+// Pure re-layout: every value is pulled from the existing model (no new data). The full case
+// file (sections 1-11) follows below. Guardrails: describe/surface, never conclude; dates are
+// surfaced for the attorney's own timeliness assessment, never a deadline determination; damages
+// are records-based arithmetic, not a valuation.
+function drawDecisionCard(c: Cursor, model: FirmPacketModel): void {
+  const { cover, reviewOptions } = model;
+  const ready = reviewOptions.unresolvedCount === 0;
+  sectionHeadingWithPill(c, 'Decision Card', ready ? 'ready · decide in ~2 min' : `${reviewOptions.unresolvedCount} to confirm`);
+
+  const snap = [cover.workerName, cover.employer, cover.employmentPeriod].filter(Boolean).join('   ·   ');
+  c.text(snap || 'Worker intake', { size: 11, font: c.bold, color: INK });
+  c.gap(5);
+
+  const field = (label: string, value: string, valueColor = SOFT): void => {
+    c.text(label, { size: 8, font: c.bold, color: MUTED });
+    c.gap(1);
+    c.text(value, { size: 9.5, color: valueColor });
+    c.gap(5);
+  };
+
+  const claim = model.whyReview.match(/^[^.]*\./)?.[0] ?? model.whyReview;
+  field('WHAT THE RECORDS SHOW', claim);
+
+  const events = model.sequence.kind === 'events' ? model.sequence.events : [];
+  if (events.length) {
+    c.text('THE SEQUENCE', { size: 8, font: c.bold, color: MUTED });
+    c.gap(2);
+    for (const e of events.slice(0, 4)) {
+      bullet(c, `${e.date} — ${e.title}${e.interval ? `   (${e.interval})` : ''}`);
+    }
+    c.gap(4);
+  }
+
+  if (model.wageExposure && model.wageExposure.report.baseHourlyRate) {
+    field(
+      'DAMAGES SIGNAL',
+      `${fmtMoney(model.wageExposure.report.combinedEstimate)} estimated wage exposure — arithmetic from records, not a valuation (see 8B below).`,
+      INK,
+    );
+  }
+
+  const term = events.find((e) => /terminat/i.test(e.title));
+  const prot = events.find((e) => /complaint|hr|report|raised|warning/i.test(e.title));
+  if (term || prot) {
+    const parts: string[] = [];
+    if (term) parts.push(`termination ${term.date}`);
+    if (prot) parts.push(`protected activity ${prot.date}`);
+    field('KEY DATES FOR YOUR REVIEW', `${parts.join('   ·   ')} — surfaced for your timeliness assessment, not a deadline determination.`);
+  }
+
+  const confirmed = model.extracted?.confirmedFacts.length ?? 0;
+  field(
+    'EVIDENCE',
+    `${confirmed} fact${confirmed === 1 ? '' : 's'} confirmed from documents · ${cover.recordCount} record${cover.recordCount === 1 ? '' : 's'} on file${cover.employer ? `   ·   Employer: ${cover.employer}` : ''}`,
+  );
+
+  field(
+    'FOR REVIEW',
+    ready
+      ? 'Organized and ready — worth a review.'
+      : `${reviewOptions.unresolvedCount} item(s) to confirm before full review · ${reviewOptions.priorityCount} of ${reviewOptions.totalRecords} priority records available.`,
+  );
+
+  rule(c, BRAND_LINE, 0.75);
+  c.gap(2);
+  c.text('Full case file (sections 1-11) follows below.', { size: 8, color: MUTED });
+  c.gap(8);
+}
+
 export async function renderFirmIntakePacketPdf(
   model: FirmPacketModel,
   sources: PdfSourceDoc[] = [],
@@ -776,6 +846,9 @@ export async function renderFirmIntakePacketPdf(
 
   // Traceability legend — how to read the source states + a pure coverage count.
   drawTraceabilityLegend(c, countSourceCoverage(model, sources));
+
+  // Decision Card — the verdict first; the case file (sections 1-11) follows.
+  drawDecisionCard(c, model);
 
   // 1. Review Snapshot
   sectionHeading(c, '1.  Review Snapshot');

@@ -2,6 +2,7 @@ import { supabase } from '../lib/supabaseClient';
 import type { StoryFollowUpAnswers } from '../app/constants/workerStoryIntake';
 import {
   extractWorkerIntakeNotesFromOverview,
+  parseWorkerIntakeNotesContent,
   mergeWorkerIntakeNotesIntoOverview,
   stripWorkerIntakeNotesBlock,
 } from './intakeDataService';
@@ -149,7 +150,7 @@ export async function mergeStoryFollowUpIntoLatestIntakeSummary(
   if (!row) return {};
 
   const overview = (row.overview as string | null) ?? '';
-  const parsed = extractWorkerIntakeNotesFromOverview(overview);
+  const parsed = parseWorkerIntakeNotesContent(extractWorkerIntakeNotesFromOverview(overview));
   const combinedNotes = mergeStoryFollowUpIntoWorkerNotesBody(
     [
       parsed.guidedSummary,

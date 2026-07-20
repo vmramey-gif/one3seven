@@ -1142,6 +1142,19 @@ export function IntakeReviewScreen({
                       </div>
                     ))}
                   </div>
+                  {timelineForDisplay.length > 0 && (
+                    <div className="mt-4 border-t border-white/10 pt-3">
+                      <p className="text-[10px] uppercase tracking-wider text-white/40 mb-2">The sequence</p>
+                      <div className="flex flex-col gap-1.5">
+                        {timelineForDisplay.slice(0, 4).map((e, i) => (
+                          <div key={i} className="flex gap-3 text-sm">
+                            <span className="w-28 shrink-0 font-medium text-[#7C8B6F]">{e.date}</span>
+                            <span className="text-white/85">{e.event}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </motion.div>
               );
             })() : null}
@@ -1197,7 +1210,7 @@ export function IntakeReviewScreen({
                   </div>
 
                   {/* Headline stats — the numbers land the moment the packet opens */}
-                  {(recordCount > 0 || eventCount > 0 || gapCount > 0) ? (
+                  {(recordCount > 0 || eventCount > 0 || gapCount > 0 || wageExposure) ? (
                     <div className="flex flex-wrap gap-2.5">
                       {recordCount > 0 ? (
                         <div className="min-w-[104px] flex-1 rounded-[14px] border border-[#E4E5DE] bg-[#FAF9F6] p-3 text-center">
@@ -1215,6 +1228,12 @@ export function IntakeReviewScreen({
                         <div className="min-w-[104px] flex-1 rounded-[14px] border border-amber-200 bg-amber-50 p-3 text-center">
                           <div className="text-[26px] font-black leading-none text-amber-600">{gapCount}</div>
                           <div className="mt-1 text-[11px] font-semibold text-amber-700/80">Clarifications surfaced</div>
+                        </div>
+                      ) : null}
+                      {wageExposure ? (
+                        <div className="min-w-[104px] flex-1 rounded-[14px] border border-[#E4E5DE] bg-[#F2F4EC] p-3 text-center">
+                          <div className="text-[22px] font-black leading-none text-[#42574E]">${Math.round(wageExposure.report.combinedEstimate).toLocaleString()}</div>
+                          <div className="mt-1 text-[11px] font-semibold text-[#1B2623]/55">Wage exposure · from records</div>
                         </div>
                       ) : null}
                     </div>

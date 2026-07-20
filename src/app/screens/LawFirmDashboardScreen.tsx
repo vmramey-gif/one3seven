@@ -220,6 +220,13 @@ export function LawFirmDashboardScreen({
   const liveFirmMode = Boolean(firmBanner);
   const allIntakes = liveFirmMode ? intakesFromDb : [...intakesFromDb, ...intakesFromWorkspaces];
   const noRealFirmIntakes = intakesFromDb.length === 0 && intakesFromWorkspaces.length === 0;
+
+  // Firm-facing "time saved" moment: the value claim, made visible. Estimated from the firm's own
+  // organized-intake count × the per-intake time-saved figure used across our materials (~90 min).
+  const MINUTES_SAVED_PER_INTAKE = 90;
+  const minutesSavedTotal = allIntakes.length * MINUTES_SAVED_PER_INTAKE;
+  const hoursSaved = Math.floor(minutesSavedTotal / 60); // floor so a value claim never overstates
+  const timeSavedLabel = hoursSaved >= 1 ? `${hoursSaved} hour${hoursSaved === 1 ? '' : 's'}` : `${minutesSavedTotal} min`;
   const firmGreetingName = firmBanner?.firmName?.trim();
 
   const timeGreeting = (() => {
@@ -410,6 +417,17 @@ export function LawFirmDashboardScreen({
                       ? '1 intake is organized and ready — open and decide in minutes.'
                       : `${allIntakes.length} intakes are organized and ready — open and decide in minutes.`}
                   </p>
+                  <div className="mx-auto mt-5 inline-flex flex-col items-center rounded-2xl border border-[#E4E5DE] bg-[#F2F4EC] px-7 py-4">
+                    <p className="text-[2rem] font-semibold leading-none text-[#42574E]" style={{ fontFamily: "'Fraunces', Georgia, serif" }}>
+                      ≈ {timeSavedLabel}
+                    </p>
+                    <p className="mt-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-[#42574E]/70">
+                      of intake time saved
+                    </p>
+                    <p className="mt-1 text-[11px] text-[#1B2623]/45">
+                      across {allIntakes.length} organized {allIntakes.length === 1 ? 'intake' : 'intakes'} · ~90 min each (estimated)
+                    </p>
+                  </div>
                   {firmIntakeLink ? (
                     <p className="mt-3 text-sm text-[#1B2623]/45">
                       Your intake link is in{' '}

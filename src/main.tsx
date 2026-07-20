@@ -28,6 +28,20 @@ const rootEl = document.getElementById('root')!;
 pageview();
 startHeartbeat();
 
+// Auto-refresh to the newest build the moment an updated service worker takes control.
+// Guarded so it fires only on an UPDATE (page already controlled), never on first install,
+// and only once — this removes the "old version renders after sign-in/out" stale-shell bug.
+if ('serviceWorker' in navigator) {
+  const hadController = Boolean(navigator.serviceWorker.controller);
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!hadController) return; // skip first install
+    // Reload at most ONCE per browser session — makes a reload loop impossible.
+    if (sessionStorage.getItem('sw-refreshed') === '1') return;
+    sessionStorage.setItem('sw-refreshed', '1');
+    window.location.reload();
+  });
+}
+
 // Public demo route — no login required.
 // Triggered by /?demo, /demo, or #demo in the URL.
 const url = new URL(window.location.href);

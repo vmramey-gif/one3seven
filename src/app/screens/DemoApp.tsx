@@ -217,8 +217,8 @@ export function DemoApp() {
             firmBellNotifications={[]}
             demoMode
             onRequestFullAccess={undefined}
-            onAcceptIntake={undefined}
-            onDeclineIntake={undefined}
+            onAcceptIntake={async () => ({})}
+            onDeclineIntake={async () => ({})}
             onRequestAdditionalDocuments={undefined}
             onReloadFirmLiveView={undefined}
           />
