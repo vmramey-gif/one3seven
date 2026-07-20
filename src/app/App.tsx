@@ -3426,6 +3426,22 @@ export default function App() {
     }
   };
 
+  // Attorney-side engine (increment 1): a firm creates and owns a case file, then uploads its own
+  // documents into the same organizing pipeline. TEMP: alerts on failure so the RLS/ownership path
+  // is visible during testing — replaced with in-app UI in a later increment.
+  const handleStartFirmCaseFile = async () => {
+    if (!authUser?.id || !isSupabaseConfigured()) return;
+    const draft = await intakeData.createDraftIntake(authUser.id);
+    if (draft.error || !draft.id) {
+      // eslint-disable-next-line no-alert
+      window.alert(`Could not start a case file: ${draft.error ?? 'unknown error'}`);
+      return;
+    }
+    setCurrentIntakeId(draft.id);
+    currentIntakeIdRef.current = draft.id;
+    setCurrentScreen('upload');
+  };
+
   const handleFirmRequestAdditionalDocuments = async (payload: {
     intakeId: string;
     categories: string[];
@@ -4750,6 +4766,7 @@ export default function App() {
                 submittedIntakes={SHOW_DEV_GALLERY ? submittedIntakes : []}
                 dbIntakes={firmDashboardRows}
                 onViewSampleIntakeFlow={SHOW_SAMPLE_INTAKE ? openFirmSampleIntakeFlow : undefined}
+                onStartFirmCaseFile={handleStartFirmCaseFile}
                 firmBellNotifications={displayFirmBellNotifications}
                 firmBanner={
                   firmProfile && intakeData.isFirmProfileComplete(firmProfile)
@@ -4967,6 +4984,7 @@ export default function App() {
                           submittedIntakes={SHOW_DEV_GALLERY ? submittedIntakes : []}
                           dbIntakes={undefined}
                           onViewSampleIntakeFlow={SHOW_SAMPLE_INTAKE ? openFirmSampleIntakeFlow : undefined}
+                onStartFirmCaseFile={handleStartFirmCaseFile}
                           firmBellNotifications={[]}
                           firmBanner={{
                             firmName: 'Sample Firm',

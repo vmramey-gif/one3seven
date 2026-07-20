@@ -30,6 +30,8 @@ interface LawFirmDashboardScreenProps {
   submittedIntakes: IntakeWorkspace[];
   dbIntakes?: FirmDashboardRow[];
   onViewSampleIntakeFlow?: () => void;
+  /** Attorney-side engine: start a firm-owned case file to organize the firm's own documents. */
+  onStartFirmCaseFile?: () => void;
   firmBellNotifications?: AppNotificationItem[];
   firmBanner?: { firmName: string; firmCode: string; activeCount: number };
   onSignOut?: () => void;
@@ -118,6 +120,7 @@ export function LawFirmDashboardScreen({
   submittedIntakes,
   dbIntakes,
   onViewSampleIntakeFlow,
+  onStartFirmCaseFile,
   firmBellNotifications = [],
   firmBanner,
   onSignOut,
@@ -361,6 +364,18 @@ export function LawFirmDashboardScreen({
               <h2 className="font-display text-[clamp(1.75rem,5.8vw,2.25rem)] font-medium leading-[1.12] tracking-[-0.02em] text-transparent bg-[linear-gradient(110deg,#1B2623_0%,#42574E_42%,#1B2623_78%)] bg-[length:220%_100%] bg-clip-text animate-[pulse_3s_ease-in-out_infinite]">
                 {firmGreetingName ? `${timeGreeting}, ${firmGreetingName}.` : `${timeGreeting}.`}
               </h2>
+
+              {onStartFirmCaseFile ? (
+                <div className="mt-6 flex justify-center">
+                  <button
+                    type="button"
+                    onClick={onStartFirmCaseFile}
+                    className="inline-flex min-h-11 items-center gap-2 rounded-full bg-[#42574E] px-6 py-2.5 text-[14px] font-semibold text-white shadow-sm transition hover:bg-[#374A42]"
+                  >
+                    + New case file — organize your own documents
+                  </button>
+                </div>
+              ) : null}
 
               {allIntakes.length === 0 ? (
                 /* ── Zero state: guide firm to their intake link ── */
