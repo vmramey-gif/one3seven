@@ -135,7 +135,9 @@ export function LawFirmDashboardScreen({
   const [selectedCriteria, setSelectedCriteria] = useState<FirmCriteriaFilter>('all');
   const [showFilters, setShowFilters] = useState(false);
   const [activeTab, setActiveTab] = useState<FirmTab>('all');
-  const [dashboardView, setDashboardView] = useState<FirmDashboardView>('firmHome');
+  // Single-screen dashboard: land directly on the list (the old 'firmHome' hero is no longer used).
+  const [dashboardView, setDashboardView] = useState<FirmDashboardView>('continueReviews');
+  void setDashboardView;
   const [newIntakeSourceTab, setNewIntakeSourceTab] = useState<NewIntakeSourceTab>('connected');
 
   useEffect(() => {
@@ -267,15 +269,10 @@ export function LawFirmDashboardScreen({
     intake.workflowStatusLabel === 'Worker Uploaded Requested Documents' ||
     Boolean(intake.requestedDocumentsStatus) ||
     Boolean(intake.workerDocumentResponse);
-  const viewSource = allIntakes.filter((intake) => {
-    if (dashboardView === 'reviewNew') {
-      return newIntakeSourceTab === 'connected'
-        ? intake.submissionType === 'Firm Code'
-        : intake.submissionType === 'Participating Firm Review';
-    }
-    if (dashboardView === 'continueReviews') return isActiveReview(intake);
-    return true;
-  });
+  // Single-screen dashboard: no more view modes — show all client intakes, filtered by the
+  // status pills + search + refine below. (isActiveReview kept for potential future filters.)
+  void isActiveReview;
+  const viewSource = allIntakes;
   const tabSource = viewSource.filter((intake) => {
     if (activeTab === 'all') return true;
     if (activeTab === 'new') return isNewIntakeRoute(intake.routeStatus);
@@ -524,42 +521,60 @@ export function LawFirmDashboardScreen({
         {dashboardView !== 'firmHome' ? (
           <>
             <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
-              <div>
+              <div className="min-w-0">
+                <h2 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="text-2xl font-medium tracking-[-0.01em] text-[#1B2623] sm:text-3xl">
+                  {firmGreetingName ? `${timeGreeting}, ${firmGreetingName}.` : `${timeGreeting}.`}
+                </h2>
+                {firmIntakeLink ? (
+                  <div className="mt-3 flex items-center gap-2">
+                    <span className="max-w-[240px] truncate font-mono text-xs text-[#1B2623]/55 sm:max-w-none">{firmIntakeLink}</span>
+                    <button
+                      type="button"
+                      onClick={copyIntakeLink}
+                      className="shrink-0 rounded-full bg-[#42574E] px-3 py-1 text-xs font-semibold text-white transition-colors hover:bg-[#374A42]"
+                    >
+                      {intakeLinkCopied ? 'Copied ✓' : 'Copy link'}
+                    </button>
+                  </div>
+                ) : null}
+              </div>
+              {onStartFirmCaseFile ? (
                 <button
                   type="button"
-                  onClick={() => setDashboardView('firmHome')}
-                  className="mb-5 rounded-full border border-[#E4E5DE] bg-white px-4 py-2 text-sm text-[#1B2623]/70 shadow-[0_10px_28px_rgba(20,17,46,0.08)] hover:border-[#7C8B6F] hover:text-[#1B2623]"
+                  onClick={onStartFirmCaseFile}
+                  className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full bg-[#42574E] px-5 py-2.5 text-[14px] font-semibold text-white shadow-sm transition hover:bg-[#374A42]"
                 >
-                  Back to Firm Home
+                  + New case file
                 </button>
-                <p className="text-xs uppercase tracking-[0.22em] text-[#42574E]">Review Workspace</p>
-                <h2 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="mt-2 text-3xl font-medium tracking-[-0.01em] text-[#1B2623]">
-                  {dashboardView === 'continueReviews' ? 'Continue My Reviews' : 'Review New Intakes'}
-                </h2>
-              </div>
-              {dashboardView === 'reviewNew' ? (
-                <div className="flex rounded-full border border-[#E4E5DE] bg-white p-1 shadow-[0_14px_34px_rgba(20,17,46,0.10)]">
-                  {(
-                    [
-                      ['connected', 'Connected Intakes'],
-                      ['participating', 'Participating Pool'],
-                    ] as Array<[NewIntakeSourceTab, string]>
-                  ).map(([tab, label]) => (
-                    <button
-                      key={tab}
-                      type="button"
-                      onClick={() => setNewIntakeSourceTab(tab)}
-                      className={`rounded-full px-4 py-2 text-sm transition-colors ${
-                        newIntakeSourceTab === tab
-                          ? 'bg-[#42574E] text-white shadow-[0_10px_24px_rgba(66,87,78,0.22)]'
-                          : 'text-[#1B2623]/64 hover:bg-[#F2F4EC] hover:text-[#1B2623]'
-                      }`}
-                    >
-                      {label}
-                    </button>
-                  ))}
-                </div>
               ) : null}
+            </div>
+
+            {firmOwnCaseFiles && firmOwnCaseFiles.length > 0 ? (
+              <section className="mb-10">
+                <div className="mb-3 flex items-center gap-2">
+                  <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#42574E]">Your case files</p>
+                  <span className="text-[11px] text-[#1B2623]/45">— organized by your firm</span>
+                </div>
+                <ul className="flex flex-col gap-2">
+                  {firmOwnCaseFiles.map((cf) => (
+                    <li key={cf.id}>
+                      <button
+                        type="button"
+                        onClick={() => onOpenCaseFile?.(cf.id)}
+                        className="flex w-full items-center gap-3 rounded-xl border border-[#E4E5DE] bg-white px-4 py-3 text-left transition hover:border-[#7C8B6F] hover:bg-[#F2F4EC]"
+                      >
+                        <span className="flex-1 truncate text-sm font-medium text-[#1B2623]">{cf.intake_number || 'Case file'}</span>
+                        <span className="shrink-0 text-[11px] font-medium text-[#42574E]">{cf.has_summary ? 'Organized' : 'Draft'}</span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ) : null}
+
+            <div className="mb-4 flex items-center gap-2">
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#42574E]">Client intakes</p>
+              <span className="text-[11px] text-[#1B2623]/45">— submitted by workers{allIntakes.length ? ` · ${allIntakes.length}` : ''}</span>
             </div>
 
             <section className="rounded-[24px] border border-[#E4E5DE] bg-white/95 p-5 shadow-[0_16px_50px_rgba(20,17,46,0.07)] sm:p-7">
