@@ -517,6 +517,37 @@ export function LandingScreen({
 
   const renderMissionControlHome = () => (
     <section className="px-4 sm:px-8 pt-5 pb-6 scroll-mt-4 max-w-3xl">
+      {/* First-time onboarding — only for a logged-in worker who hasn't started yet. Additive and
+          self-dismissing (disappears once they have an intake); does not affect any other flow. */}
+      {!hasSavedIntakes ? (
+        <div className="mb-5 rounded-2xl border border-[#CBD6CF] bg-white/90 p-5 shadow-[0_10px_28px_rgba(20,17,46,0.06)]">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#42574E]">Getting started</p>
+          <h3 className="mt-1.5 text-base font-semibold text-[#1B2623]">Here&rsquo;s how one3seven works</h3>
+          <ol className="mt-3 flex flex-col gap-2.5">
+            {[
+              'Tell your story and add any records you have — no sorting or labeling needed.',
+              'one3seven organizes everything into a clear, dated timeline you can review.',
+              'When you’re ready, you choose which firm to share it with. You stay in control.',
+            ].map((step, i) => (
+              <li key={i} className="flex items-start gap-3 text-sm leading-relaxed text-[#1B2623]/75">
+                <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#42574E] text-[11px] font-semibold text-white">
+                  {i + 1}
+                </span>
+                {step}
+              </li>
+            ))}
+          </ol>
+          {onStartOrganizing ? (
+            <button
+              type="button"
+              onClick={onStartOrganizing}
+              className="mt-4 inline-flex min-h-11 items-center justify-center rounded-full bg-[#42574E] px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-[#374A42]"
+            >
+              Start organizing
+            </button>
+          ) : null}
+        </div>
+      ) : null}
       <WorkerMissionControlHome
         greetingName={workerGreetingName}
       />
