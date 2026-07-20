@@ -139,6 +139,8 @@ function hasMeaningfulWorkerStory(text: string | null | undefined): boolean {
 
 interface IntakeSummaryScreenProps {
   onNavigate: (screen: Screen) => void;
+  /** Firm organizing its OWN case documents — swaps worker-facing framing for firm framing. */
+  firmCaseMode?: boolean;
   uploadedFiles: File[];
   onLogoClick: () => void;
   intakeWorkspace: IntakeWorkspace;
@@ -272,6 +274,7 @@ function TruncatedNameButton({ fullName, display }: { fullName: string; display:
 
 export function IntakeSummaryScreen({
   onNavigate,
+  firmCaseMode = false,
   uploadedFiles,
   onLogoClick,
   intakeWorkspace,
@@ -1127,11 +1130,11 @@ export function IntakeSummaryScreen({
               <h1 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className={sx.pageTitle}>
                 {shellMode ? (
                   <>
-                    <span className="sm:hidden">Your summary</span>
-                    <span className="hidden sm:inline">Your summary</span>
+                    <span className="sm:hidden">{firmCaseMode ? 'Case file organized' : 'Your summary'}</span>
+                    <span className="hidden sm:inline">{firmCaseMode ? 'Case file organized' : 'Your summary'}</span>
                   </>
                 ) : (
-                  'Your summary'
+                  firmCaseMode ? 'Case file organized' : 'Your summary'
                 )}
               </h1>
               {intakeNumber ? (

@@ -316,6 +316,9 @@ export default function App() {
   const [currentIntakeId, setCurrentIntakeId] = useState<string | null>(null);
   const [currentIntakeNumber, setCurrentIntakeNumber] = useState<string | null>(null);
   const [firmDashboardRows, setFirmDashboardRows] = useState<FirmDashboardRow[]>([]);
+  // The firm's OWN case files (documents the firm uploaded and organized itself) — kept separate
+  // from worker-submitted intakes so the dashboard clearly divides "your case files" from "client intakes".
+  const [firmOwnCaseFiles, setFirmOwnCaseFiles] = useState<WorkerIntakeListEntry[]>([]);
   const [firmLiveView, setFirmLiveView] = useState<FirmLiveIntakeView | null>(null);
   const [firmLiveViewLoading, setFirmLiveViewLoading] = useState(false);
   /** Worker upload: firm gate behavior after "Start organizing" law-firm choice modal */
@@ -515,6 +518,15 @@ export default function App() {
     });
     const rows = await intakeData.loadFirmDashboardRows(fp.id);
     setFirmDashboardRows(rows);
+    // Also load the firm's OWN case files (intakes it created + organized itself). Kept separate
+    // from the worker-routed rows above so the dashboard can divide the two clearly.
+    if (authUser?.id) {
+      try {
+        setFirmOwnCaseFiles(await intakeData.listWorkerIntakes(authUser.id));
+      } catch (e) {
+        console.error('[o3s-firm-dashboard] own case files load failed', e);
+      }
+    }
     return rows;
   }
 
@@ -3432,6 +3444,7 @@ export default function App() {
   // documents into the same organizing pipeline. TEMP: alerts on failure so the RLS/ownership path
   // is visible during testing — replaced with in-app UI in a later increment.
   const [firmCaseOrganizing, setFirmCaseOrganizing] = useState(false);
+  const [firmCaseMode, setFirmCaseMode] = useState(false);
   const handleStartFirmCaseFile = async () => {
     if (!authUser?.id || !isSupabaseConfigured()) return;
     const draft = await intakeData.createDraftIntake(authUser.id);
@@ -3443,7 +3456,16 @@ export default function App() {
     setCurrentIntakeId(draft.id);
     currentIntakeIdRef.current = draft.id;
     setUploadedFiles([]);
+    setFirmCaseMode(true);
     setCurrentScreen('firmCaseIntake');
+  };
+
+  // Open a firm-owned case file to view/download its packet (firm-framed).
+  const handleOpenFirmCaseFile = (intakeId: string) => {
+    setCurrentIntakeId(intakeId);
+    currentIntakeIdRef.current = intakeId;
+    setFirmCaseMode(true);
+    setCurrentScreen('summary');
   };
 
   // Firm organizes its uploaded case documents: persist through the same engine, then process.
@@ -4580,6 +4602,7 @@ export default function App() {
             >
               <IntakeSummaryScreen
                 onNavigate={navigateToScreen}
+                firmCaseMode={firmCaseMode}
                 uploadedFiles={uploadedFiles}
                 onLogoClick={
                   profile?.role === 'worker' || userRole === 'worker' ? () => setCurrentScreen('landing') : handleLogoClick
@@ -4794,6 +4817,8 @@ export default function App() {
                 dbIntakes={firmDashboardRows}
                 onViewSampleIntakeFlow={SHOW_SAMPLE_INTAKE ? openFirmSampleIntakeFlow : undefined}
                 onStartFirmCaseFile={handleStartFirmCaseFile}
+                firmOwnCaseFiles={firmOwnCaseFiles}
+                onOpenCaseFile={handleOpenFirmCaseFile}
                 firmBellNotifications={displayFirmBellNotifications}
                 firmBanner={
                   firmProfile && intakeData.isFirmProfileComplete(firmProfile)
@@ -5012,6 +5037,8 @@ export default function App() {
                           dbIntakes={undefined}
                           onViewSampleIntakeFlow={SHOW_SAMPLE_INTAKE ? openFirmSampleIntakeFlow : undefined}
                 onStartFirmCaseFile={handleStartFirmCaseFile}
+                firmOwnCaseFiles={firmOwnCaseFiles}
+                onOpenCaseFile={handleOpenFirmCaseFile}
                           firmBellNotifications={[]}
                           firmBanner={{
                             firmName: 'Sample Firm',

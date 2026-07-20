@@ -32,6 +32,9 @@ interface LawFirmDashboardScreenProps {
   onViewSampleIntakeFlow?: () => void;
   /** Attorney-side engine: start a firm-owned case file to organize the firm's own documents. */
   onStartFirmCaseFile?: () => void;
+  /** The firm's OWN organized case files — shown separately from worker-submitted intakes. */
+  firmOwnCaseFiles?: Array<{ id: string; intake_number: string; created_at?: string | null; has_summary?: boolean }>;
+  onOpenCaseFile?: (intakeId: string) => void;
   firmBellNotifications?: AppNotificationItem[];
   firmBanner?: { firmName: string; firmCode: string; activeCount: number };
   onSignOut?: () => void;
@@ -121,6 +124,8 @@ export function LawFirmDashboardScreen({
   dbIntakes,
   onViewSampleIntakeFlow,
   onStartFirmCaseFile,
+  firmOwnCaseFiles,
+  onOpenCaseFile,
   firmBellNotifications = [],
   firmBanner,
   onSignOut,
@@ -374,6 +379,38 @@ export function LawFirmDashboardScreen({
                   >
                     + New case file — organize your own documents
                   </button>
+                </div>
+              ) : null}
+
+              {firmOwnCaseFiles && firmOwnCaseFiles.length > 0 ? (
+                <div className="mt-8 text-left">
+                  <div className="flex items-center justify-between border-b border-[#E4E5DE] pb-2">
+                    <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#42574E]">
+                      Your case files
+                    </p>
+                    <span className="text-[11px] text-[#1B2623]/45">organized by your firm</span>
+                  </div>
+                  <ul className="mt-3 flex flex-col gap-2">
+                    {firmOwnCaseFiles.map((cf) => (
+                      <li key={cf.id}>
+                        <button
+                          type="button"
+                          onClick={() => onOpenCaseFile?.(cf.id)}
+                          className="flex w-full items-center gap-3 rounded-xl border border-[#E4E5DE] bg-white px-4 py-3 text-left transition hover:border-[#7C8B6F] hover:bg-[#F2F4EC]"
+                        >
+                          <span className="flex-1 truncate text-sm font-medium text-[#1B2623]">
+                            {cf.intake_number || 'Case file'}
+                          </span>
+                          <span className="shrink-0 text-[11px] font-medium text-[#42574E]">
+                            {cf.has_summary ? 'Organized' : 'Draft'}
+                          </span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                  <p className="mt-6 text-center text-[11px] font-semibold uppercase tracking-[0.16em] text-[#1B2623]/35">
+                    — Client intakes (from workers) below —
+                  </p>
                 </div>
               ) : null}
 
