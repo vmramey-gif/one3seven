@@ -57,6 +57,7 @@ import {
   polishFirmFacingProse,
   polishHumanReadableDisplayText,
   polishMissingContextLine,
+  polishNameForDisplay,
   polishTimelineEventSummary,
   polishTimelineEventTitle,
   resolveEventDisplayCategory,
@@ -1075,16 +1076,16 @@ export function IntakeReviewScreen({
                 }
                 return '';
               };
-              const workerName = extract([
+              const workerName = polishNameForDisplay(extract([
                 /full name used during employment[:\s]+([^\n]+)/i,
                 /worker name[:\s]+([^\n]+)/i,
                 /name[:\s]+([^\n]+)/i,
-              ]);
-              const employer = extract([
+              ]));
+              const employer = polishNameForDisplay(extract([
                 /employer\s*\/?\s*organization[:\s]+([^\n]+)/i,
                 /employer[:\s]+([^\n]+)/i,
                 /organization[:\s]+([^\n]+)/i,
-              ]);
+              ]));
               const employmentDates = extract([
                 /employment dates?[:\s]+([^\n]+)/i,
                 /dates? of employment[:\s]+([^\n]+)/i,

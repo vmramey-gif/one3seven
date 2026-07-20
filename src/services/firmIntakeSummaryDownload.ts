@@ -58,6 +58,7 @@ import {
   polishFirmFacingProse,
   polishFirmFacingText,
   polishMissingContextLine,
+  polishNameForDisplay,
   polishTimelineEventSummary,
   polishTimelineEventTitle,
 } from './firmIntakeDisplay';
@@ -592,9 +593,9 @@ function buildReviewSnapshot(
   events: Array<{ date: string; title: string }>,
   files: ResolvedFile[]
 ): string[] {
-  const employer = overviewFields.find((f) => /^employer/i.test(f.label))?.value ?? '';
+  const employer = polishNameForDisplay(overviewFields.find((f) => /^employer/i.test(f.label))?.value ?? '');
   const dates = overviewFields.find((f) => /employment date/i.test(f.label))?.value ?? '';
-  const workerName = view.workerFollowUp?.employmentName?.trim() || '';
+  const workerName = polishNameForDisplay(view.workerFollowUp?.employmentName?.trim() || '');
   const nameLabel = workerName ? `${workerName} reports` : 'The worker reports';
 
   const lines: string[] = [];
@@ -1170,7 +1171,7 @@ export function buildFirmIntakePacketModel(view: FirmLiveIntakeView): FirmPacket
     ? [{ heading: 'Supplement — Document Request and Worker Response', lines: docWorkflowLines.filter((l) => !/^Supplement/i.test(l)) }]
     : [];
 
-  const employer = overviewFields.find((f) => /^employer/i.test(f.label))?.value ?? null;
+  const employer = polishNameForDisplay(overviewFields.find((f) => /^employer/i.test(f.label))?.value ?? '') || null;
   const employmentPeriod = overviewFields.find((f) => /employment date/i.test(f.label))?.value ?? null;
 
   return {
@@ -1179,9 +1180,11 @@ export function buildFirmIntakePacketModel(view: FirmLiveIntakeView): FirmPacket
       // Decision Card match the body; fall back to the shared profile/contact name. (Contact name +
       // phone are still shown separately via workerPhone.)
       workerName:
-        view.workerFollowUp?.employmentName?.trim() ||
-        view.workerContact?.name?.trim() ||
-        null,
+        polishNameForDisplay(
+          view.workerFollowUp?.employmentName?.trim() ||
+            view.workerContact?.name?.trim() ||
+            '',
+        ) || null,
       // Present only once the worker shared with this firm (consent-gated in loadFirmLiveIntakeView).
       workerPhone: view.workerContact?.phone?.trim() || null,
       employer: employer && employer.trim() ? employer : null,

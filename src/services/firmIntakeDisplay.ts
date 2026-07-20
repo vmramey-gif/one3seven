@@ -228,6 +228,26 @@ function capitalizeKnownValue(label: string, value: string): string {
     .replace(/\s*-\s*(?=[A-Z][a-z]+\s+\d{4}\b|\d{1,2}\/\d{4}\b|\d{4}\b)/g, ' - ');
 }
 
+/**
+ * Polish a person or organization name for firm-facing display. Fixes the two things people forget:
+ * a name typed in all-lowercase ("rosa delgado") or ALL-CAPS ("ROSA DELGADO") → Title Case
+ * ("Rosa Delgado"). Respects intentional mixed-case (e.g. "McDonald", "eBay", "DeShawn") by leaving
+ * it untouched, so we polish sloppy entry without mangling correct entry.
+ */
+export function polishNameForDisplay(value: string | null | undefined): string {
+  const trimmed = (value ?? '').replace(/\s+/g, ' ').trim();
+  if (!trimmed) return '';
+  const letters = trimmed.replace(/[^A-Za-z]/g, '');
+  const needsFix =
+    letters.length > 0 && (letters === letters.toLowerCase() || letters === letters.toUpperCase());
+  if (!needsFix) return trimmed;
+  return trimmed.replace(/\b([a-z])([a-z']*)\b/gi, (word, first, rest) => {
+    const upper = word.toUpperCase();
+    if (['HR', 'PTO', 'FMLA', 'PDF', 'EEOC', 'ADA'].includes(upper)) return upper;
+    return `${String(first).toUpperCase()}${String(rest).toLowerCase()}`;
+  });
+}
+
 function splitInlineFieldPairs(text: string): string {
   const patterns = [...INTERNAL_FIELD_KEYS]
     .flatMap((key) => [key, key.replace(/_/g, ' ')])
