@@ -1134,7 +1134,14 @@ export function IntakeReviewScreen({
                   animate={{ opacity: 1, y: 0 }}
                   className="rounded-[20px] border border-[#E4E5DE] bg-[#1B2623] p-5 shadow-[0_14px_38px_rgba(31,27,75,0.18)]"
                 >
-                  <p className="text-xs uppercase tracking-[0.2em] text-[#7C8B6F] mb-3">Intake Snapshot</p>
+                  <div className="mb-3 flex flex-wrap items-center gap-2">
+                    <p className="text-xs uppercase tracking-[0.2em] text-[#7C8B6F]">Intake Snapshot</p>
+                    {reconstructedRecordCount === 0 ? (
+                      <span className="inline-flex items-center rounded-full bg-[#C9A24B]/25 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[#E4C97A]">
+                        Records pending
+                      </span>
+                    ) : null}
+                  </div>
                   <div className="flex flex-wrap gap-x-8 gap-y-3">
                     {snapshotItems.map(item => (
                       <div key={item.label}>

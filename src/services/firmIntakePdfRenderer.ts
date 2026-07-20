@@ -769,12 +769,28 @@ function drawTraceabilityLegend(c: Cursor, coverage: { linked: number; total: nu
 // are records-based arithmetic, not a valuation.
 function drawDecisionCard(c: Cursor, model: FirmPacketModel): void {
   const { cover, reviewOptions } = model;
+  // "Records pending" = organized from the worker's account with no supporting documents yet.
+  // A neutral DATA-STATE (never a merit judgment) — describes completeness, not case strength.
+  const recordsPending = cover.recordCount === 0;
   const ready = reviewOptions.unresolvedCount === 0;
-  sectionHeadingWithPill(c, 'Decision Card', ready ? 'ready · decide in ~2 min' : `${reviewOptions.unresolvedCount} to confirm`);
+  const pill = recordsPending
+    ? 'records pending'
+    : ready
+      ? 'ready · decide in ~2 min'
+      : `${reviewOptions.unresolvedCount} to confirm`;
+  sectionHeadingWithPill(c, 'Decision Card', pill);
 
   const snap = [cover.workerName, cover.employer, cover.employmentPeriod].filter(Boolean).join('   ·   ');
   c.text(snap || 'Worker intake', { size: 11, font: c.bold, color: INK });
   c.gap(5);
+
+  if (recordsPending) {
+    c.text(
+      'Preliminary — organized from the worker’s own account. No supporting documents uploaded yet; records pending. Facts below are worker-stated until documents are added.',
+      { size: 9, color: AMBER_INK },
+    );
+    c.gap(5);
+  }
 
   const field = (label: string, value: string, valueColor = SOFT): void => {
     c.text(label, { size: 8, font: c.bold, color: MUTED });
