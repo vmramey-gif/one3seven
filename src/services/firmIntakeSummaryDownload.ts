@@ -1175,10 +1175,12 @@ export function buildFirmIntakePacketModel(view: FirmLiveIntakeView): FirmPacket
 
   return {
     cover: {
-      // Prefer the worker's shared profile name; fall back to the name they gave during follow-up.
+      // Use the name the worker gave for THIS intake (their employment name) first, so the cover +
+      // Decision Card match the body; fall back to the shared profile/contact name. (Contact name +
+      // phone are still shown separately via workerPhone.)
       workerName:
-        view.workerContact?.name?.trim() ||
         view.workerFollowUp?.employmentName?.trim() ||
+        view.workerContact?.name?.trim() ||
         null,
       // Present only once the worker shared with this firm (consent-gated in loadFirmLiveIntakeView).
       workerPhone: view.workerContact?.phone?.trim() || null,
