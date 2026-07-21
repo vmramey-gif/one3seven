@@ -347,6 +347,34 @@ export function SageMarketingPage({ onWorkerStart, onSignIn, onForFirms, firmDir
         </p>
       </section>
 
+      {/* economics — money & time saved */}
+      <section className="mx-auto max-w-6xl px-6 py-20 md:py-24">
+        <div style={MONO} className="text-[11px] uppercase tracking-[0.16em] text-[#42574E]">{t('econ.eyebrow')}</div>
+        <h2 style={SERIF} className="mt-3 max-w-[22ch] text-balance text-[clamp(26px,4vw,44px)] font-semibold leading-[1.05] tracking-[-0.02em] text-[#17181C]">
+          {t('econ.head')}
+        </h2>
+        <div className="mt-10 grid gap-4 md:grid-cols-2">
+          <motion.div
+            initial={reduce ? false : { opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-80px' }} transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            className="rounded-2xl bg-[#F4EEE6] p-6"
+          >
+            <div className="text-[12px] font-semibold text-[#946a3a]">{t('econ.cost_label')}</div>
+            <p className="mt-2 text-[15px] leading-[1.7] text-[#6f5636]">{t('econ.cost')}</p>
+          </motion.div>
+          <motion.div
+            initial={reduce ? false : { opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-80px' }} transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
+            className="rounded-2xl bg-[#EAF1EA] p-6"
+          >
+            <div className="text-[12px] font-semibold text-[#3c5049]">{t('econ.file_label')}</div>
+            <p className="mt-2 text-[15px] leading-[1.7] text-[#2f4a41]">{t('econ.file')}</p>
+          </motion.div>
+        </div>
+        <div className="mt-4 rounded-2xl border border-[#E4E5DE] bg-[#FBFBFA] p-6">
+          <p className="text-[clamp(16px,2vw,18px)] leading-[1.6] text-[#20242a]">{t('econ.payback')}</p>
+          <p className="mt-2.5 text-[12px] text-[#8a938c]">{t('econ.note')}</p>
+        </div>
+      </section>
+
       {/* how it works */}
       <section className="border-y border-[#E1E4DD] bg-[#ECEFEA]">
         <div className="mx-auto grid max-w-6xl gap-8 px-6 py-16 sm:grid-cols-3">
@@ -361,6 +389,21 @@ export function SageMarketingPage({ onWorkerStart, onSignIn, onForFirms, firmDir
               <p className="mt-2 text-[14px] leading-[1.6] text-[#454a44]">{body}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* ai-trust — AI makes mistakes, so we built around it */}
+      <section className="border-y border-[#E1E4DD] bg-[#F1F3EF]">
+        <div className="mx-auto max-w-3xl px-6 py-20 text-center md:py-24">
+          <div style={MONO} className="text-[11px] uppercase tracking-[0.16em] text-[#42574E]">{t('ait.eyebrow')}</div>
+          <h2 style={SERIF} className="mt-3 text-balance text-[clamp(26px,4vw,42px)] font-semibold leading-[1.06] tracking-[-0.02em] text-[#17181C]">
+            {t('ait.head')}
+          </h2>
+          <p className="mx-auto mt-5 max-w-[60ch] text-[clamp(15px,2vw,17px)] leading-[1.75] text-[#40433f]">{t('ait.body')}</p>
+          <div style={MONO} className="mt-6 inline-flex items-center gap-2 rounded-[7px] border border-[#D3DED6] bg-[#E7EDE8] px-3 py-1.5 text-[11px] text-[#3c5049]">
+            <span className="h-[11px] w-[7px] flex-none rounded-[1px] bg-[#42574E]" />
+            Rivera_HR_Complaint.pdf · p.1 <ArrowRight className="h-3 w-3" /> {t('ait.chip')}
+          </div>
         </div>
       </section>
 

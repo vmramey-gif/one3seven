@@ -128,6 +128,29 @@ export const STRINGS: Dict = {
   'prob.c5':         { en: 'Termination letter',                 es: 'Carta de despido' },
   'prob.c6':         { en: 'Doctor’s note',                  es: 'Nota médica' },
 
+  // ── Economics band (money / time saved) ──
+  'econ.eyebrow':    { en: 'The economics',                     es: 'La economía' },
+  'econ.head':       { en: 'The most expensive hour in your week is the one you can’t bill.',
+                       es: 'La hora más cara de tu semana es la que no puedes facturar.' },
+  'econ.cost_label': { en: 'Today — the pile',                  es: 'Hoy — el montón' },
+  'econ.cost':       { en: 'Every new matter lands as a pile someone has to sort through before anyone can weigh the merits, and not one of those hours is billable. All the while, the filing deadline keeps ticking down.',
+                       es: 'Cada nuevo asunto llega como un montón que alguien debe ordenar antes de que se puedan sopesar los méritos, y ninguna de esas horas es facturable. Mientras tanto, el plazo de presentación sigue corriendo.' },
+  'econ.file_label': { en: 'With one3seven — the file',         es: 'Con one3seven — el expediente' },
+  'econ.file':       { en: 'Now the file is already organized the moment you open it. You spend your time reviewing the matter instead of assembling it, and the hours you’d have lost to sorting go straight back into billable work.',
+                       es: 'Ahora el expediente ya está organizado en el momento en que lo abres. Dedicas tu tiempo a revisar el asunto en lugar de armarlo, y las horas que habrías perdido ordenando vuelven directo al trabajo facturable.' },
+  'econ.payback':    { en: 'At your firm’s rate, the very first intake you don’t build by hand already covers a month of one3seven, and everything you organize after that is time you simply keep.',
+                       es: 'A la tarifa de tu firma, la primera admisión que no armas a mano ya cubre un mes de one3seven, y todo lo que organizas después es tiempo que simplemente conservas.' },
+  'econ.note':       { en: 'one3seven organizes records; it doesn’t evaluate claims or predict outcomes. The judgment stays with your team.',
+                       es: 'one3seven organiza documentos; no evalúa reclamos ni predice resultados. El criterio permanece con tu equipo.' },
+
+  // ── AI-trust band (source-linking / human touch) ──
+  'ait.eyebrow':     { en: 'Why you can trust it',              es: 'Por qué puedes confiar' },
+  'ait.head':        { en: 'AI makes mistakes, so we built around it.',
+                       es: 'La IA comete errores, así que construimos en torno a eso.' },
+  'ait.body':        { en: 'Because AI makes mistakes, everything one3seven organizes traces straight back to the document it came from, so confirming any fact is a glance rather than a hunt. Checking the work was always your job, and now it’s the easy part. one3seven doesn’t replace the human touch. It makes it a little more super-human.',
+                       es: 'Como la IA comete errores, todo lo que one3seven organiza remite directamente al documento del que proviene, de modo que confirmar cualquier dato es un vistazo y no una búsqueda. Revisar el trabajo siempre fue tu labor, y ahora es la parte fácil. one3seven no reemplaza el toque humano. Lo hace un poco más sobrehumano.' },
+  'ait.chip':        { en: 'opens the exact page',              es: 'abre la página exacta' },
+
   // ── Source-linked extraction card (hero right) ──
   'ext.header':      { en: 'Source-linked facts',               es: 'Datos con enlace a la fuente' },
   'ext.from_hr':     { en: 'From the HR complaint',             es: 'De la queja a RR. HH.' },
