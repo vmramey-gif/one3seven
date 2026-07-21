@@ -37,8 +37,8 @@ export default defineConfig({
         short_name: 'one3seven',
         description:
           'Organize your employment records into a structured intake packet — ready to bring to any attorney consultation.',
-        theme_color: '#5B21B6',
-        background_color: '#FAFAFF',
+        theme_color: '#42574E',
+        background_color: '#F5F7F4',
         display: 'standalone',
         start_url: '/',
         scope: '/',

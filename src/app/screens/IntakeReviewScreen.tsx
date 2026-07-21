@@ -1135,7 +1135,7 @@ export function IntakeReviewScreen({
                   className="rounded-[20px] border border-[#E4E5DE] bg-[#1B2623] p-5 shadow-[0_14px_38px_rgba(31,27,75,0.18)]"
                 >
                   <div className="mb-3 flex flex-wrap items-center gap-2">
-                    <p className="text-xs uppercase tracking-[0.2em] text-[#7C8B6F]">Intake Snapshot</p>
+                    <p className="text-xs uppercase tracking-[0.2em] text-[#7C8B6F]">Decision Card</p>
                     {reconstructedRecordCount === 0 ? (
                       <span className="inline-flex items-center rounded-full bg-[#C9A24B]/25 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[#E4C97A]">
                         Records pending
@@ -1201,7 +1201,7 @@ export function IntakeReviewScreen({
                   transition={{ delay: 0.03 }}
                   className="rounded-[20px] border border-[#E4E5DE] bg-white/95 p-5 shadow-[0_14px_38px_rgba(31,27,75,0.08)]"
                 >
-                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#42574E] mb-4">Processing Summary</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#42574E] mb-4">At a glance</p>
 
                   {/* Worker narrative — status chip */}
                   <div className="mb-3 flex flex-wrap gap-2">
