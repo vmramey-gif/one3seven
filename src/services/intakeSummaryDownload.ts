@@ -25,6 +25,12 @@ export type UploadedFileInventoryRow = { fileName: string; category: string };
 
 export type IntakeSummaryDownloadPayload = {
   intakeNumber: string;
+  /**
+   * Firm-side "organize your own files" mode. When true the download is the attorney's own
+   * organized CASE FILE — neutral "matter/records" framing and a Decision Card up top — not the
+   * worker-facing "Your Organized Intake" packet.
+   */
+  firmCaseMode?: boolean;
   /** Optional packet header fields (worker export / firm review). */
   workerName?: string;
   /** Worker's own callback number — shown on their own packet only. */
@@ -954,7 +960,7 @@ export async function downloadIntakeSummaryDocument(payload: IntakeSummaryDownlo
     const model = buildWorkerSummaryModel(payload);
     // Lazy-load the pdf-lib renderer so pdf-lib stays out of the initial bundle.
     const { renderWorkerSummaryPdf } = await import('./firmIntakePdfRenderer');
-    const bytes = await renderWorkerSummaryPdf(model);
+    const bytes = await renderWorkerSummaryPdf(model, { firmCaseMode: payload.firmCaseMode });
     triggerPdfDownload(bytes, INTAKE_SUMMARY_PDF_FILENAME);
   } catch {
     renderIntakeSummaryPdfDownload(payload);

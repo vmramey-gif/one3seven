@@ -1065,29 +1065,109 @@ export type WorkerPacketModel = {
   disclaimer: string[];
 };
 
-export async function renderWorkerSummaryPdf(model: WorkerPacketModel): Promise<Uint8Array> {
+/**
+ * Firm-side "organize your own files" Decision Card — the verdict-first opener for the attorney's
+ * OWN organized case file. Built from the WorkerPacketModel (the firm-case flow reuses the worker
+ * engine), reframed to neutral "records/matter" language. Never a merit judgment: "records pending"
+ * describes completeness only. Mirrors the worker→firm Decision Card, minus the two-sided fields.
+ */
+function drawFirmCaseDecisionCard(c: Cursor, model: WorkerPacketModel): void {
+  const snap = model.caseSnapshot;
+  const recordsPending = snap.recordsOrganized === 0;
+  const pill = recordsPending ? 'records pending' : 'organized · review in ~2 min';
+  sectionHeadingWithPill(c, 'Decision Card', pill);
+
+  const matter = [model.cover.workerName, model.cover.employer, snap.employmentPeriod]
+    .filter(Boolean)
+    .join('   ·   ');
+  c.text(matter || 'Matter file', { size: 11, font: c.bold, color: INK });
+  c.gap(5);
+
+  if (recordsPending) {
+    c.text(
+      'Preliminary — organized from notes with no supporting documents on file yet; records pending. Facts below are as-stated until documents are added.',
+      { size: 9, color: AMBER_INK },
+    );
+    c.gap(5);
+  }
+
+  const field = (label: string, value: string, valueColor = SOFT): void => {
+    c.text(label, { size: 8, font: c.bold, color: MUTED });
+    c.gap(1);
+    c.text(value, { size: 9.5, color: valueColor });
+    c.gap(5);
+  };
+
+  const claim = (model.currentUnderstanding.match(/^[^.]*\./)?.[0] ?? model.currentUnderstanding).trim();
+  if (claim) field('WHAT THE RECORDS SHOW', claim);
+
+  if (model.chronology.length) {
+    c.text('THE SEQUENCE', { size: 8, font: c.bold, color: MUTED });
+    c.gap(2);
+    for (const line of model.chronology.slice(0, 4)) bullet(c, line);
+    c.gap(4);
+  }
+
+  if (snap.primaryConcerns.length) {
+    field('AREAS TO REVIEW', snap.primaryConcerns.slice(0, 4).join('   ·   '));
+  }
+
+  field(
+    'ON FILE',
+    `${snap.recordsOrganized} record${snap.recordsOrganized === 1 ? '' : 's'} organized · ${snap.timelineEvents} timeline event${snap.timelineEvents === 1 ? '' : 's'} · ${snap.namedIndividuals} named individual${snap.namedIndividuals === 1 ? '' : 's'}`,
+  );
+
+  rule(c, BRAND_LINE, 0.75);
+  c.gap(2);
+  c.text('Full organized case file follows below.', { size: 8, color: MUTED });
+  c.gap(8);
+}
+
+export async function renderWorkerSummaryPdf(
+  model: WorkerPacketModel,
+  opts?: { firmCaseMode?: boolean },
+): Promise<Uint8Array> {
+  const firmCaseMode = opts?.firmCaseMode === true;
   const doc = await PDFDocument.create();
-  doc.setTitle('one3seven — Your Organized Intake');
+  doc.setTitle(firmCaseMode ? 'one3seven — Organized Case File' : 'one3seven — Your Organized Intake');
   doc.setCreator('one3seven');
   const font = await doc.embedFont(StandardFonts.Helvetica);
   const bold = await doc.embedFont(StandardFonts.HelveticaBold);
   const c = new Cursor(doc, font, bold);
 
-  drawCover(
-    c,
-    model.cover,
-    'YOUR ORGANIZED INTAKE',
-    'Organized for your review',
-    'one3seven organizes your uploaded records. It is not legal advice. You control what you share.',
-  );
+  if (firmCaseMode) {
+    drawCover(
+      c,
+      model.cover,
+      'ORGANIZED CASE FILE',
+      'Organized for attorney review',
+      'one3seven organizes the documents you uploaded into a source-linked file. It is not legal advice, a theory of the case, or an outcome prediction. Attorney work product — privileged & confidential.',
+    );
+  } else {
+    drawCover(
+      c,
+      model.cover,
+      'YOUR ORGANIZED INTAKE',
+      'Organized for your review',
+      'one3seven organizes your uploaded records. It is not legal advice. You control what you share.',
+    );
+  }
   c.newPage();
 
+  if (firmCaseMode) drawFirmCaseDecisionCard(c, model);
+
   if (model.intakeNumber) {
-    c.text(`Intake reference: ${model.intakeNumber}`, { size: 9, color: MUTED });
+    c.text(`${firmCaseMode ? 'Case file reference' : 'Intake reference'}: ${model.intakeNumber}`, { size: 9, color: MUTED });
   }
 
   sectionHeading(c, 'Current Understanding');
-  c.text(model.currentUnderstanding || 'Your organized summary will appear as records are added.', { size: 10, color: SOFT });
+  c.text(
+    model.currentUnderstanding ||
+      (firmCaseMode
+        ? 'The organized summary will appear as records are added.'
+        : 'Your organized summary will appear as records are added.'),
+    { size: 10, color: SOFT },
+  );
 
   sectionHeading(c, 'Case Snapshot');
   const snap = model.caseSnapshot;
@@ -1109,7 +1189,7 @@ export async function renderWorkerSummaryPdf(model: WorkerPacketModel): Promise<
   snapRow('Named Individuals', String(snap.namedIndividuals));
 
   if (model.workerStory.length) {
-    sectionHeading(c, 'Your Story');
+    sectionHeading(c, firmCaseMode ? 'Matter Notes' : 'Your Story');
     for (const s of model.workerStory) {
       c.text(s.heading, { size: 9.5, font: bold, color: INK });
       c.gap(2);
@@ -1130,7 +1210,7 @@ export async function renderWorkerSummaryPdf(model: WorkerPacketModel): Promise<
   if (model.supportingDocuments.length) for (const r of model.supportingDocuments) bullet(c, r);
   else c.text('No related records found yet.', { size: 10, color: MUTED });
 
-  sectionHeading(c, 'Additional Information That May Help');
+  sectionHeading(c, firmCaseMode ? 'Records That May Strengthen the File' : 'Additional Information That May Help');
   if (model.missingInformation.length) for (const m of model.missingInformation) bullet(c, m);
   else c.text('No additional records listed yet.', { size: 10, color: MUTED });
 

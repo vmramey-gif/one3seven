@@ -578,6 +578,7 @@ export function IntakeSummaryScreen({
     });
     return {
       intakeNumber: n,
+      firmCaseMode,
       workerName: (workerFullName ?? '').trim() || undefined,
       workerPhone: (workerPhone ?? '').trim() || undefined,
       employerName: undefined,

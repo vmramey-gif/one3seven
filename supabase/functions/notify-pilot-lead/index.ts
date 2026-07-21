@@ -5,10 +5,12 @@
  *
  * Triggers (two Supabase DATABASE WEBHOOKS → this one function; Dashboard: Database → Webhooks):
  *   1. INSERT into public.pilot_interest  → firm pilot request email  (existing)
- *   2. INSERT into public.profiles        → new-worker email, but ONLY for a plain worker signup
- *      (role='worker', not a founder/rep). Firm/founder/rep profiles are ignored.
+ *   2. INSERT + UPDATE into public.profiles → new-worker email, but ONLY for a plain worker
+ *      (role='worker', not a founder/rep) and only on the moment the row BECOMES a worker.
+ *      Workers usually pick their role AFTER signup (an UPDATE), so this webhook must listen to
+ *      BOTH events; the function dedupes via old_record so it fires exactly once per worker.
  * Both webhooks POST the standard payload:
- *   { type: 'INSERT', table: 'pilot_interest' | 'profiles', schema: 'public', record: {...} }
+ *   { type, table: 'pilot_interest' | 'profiles', schema: 'public', record: {...}, old_record: {...} }
  *
  * Email is sent via Resend. No inbound Supabase session auth — a shared-secret header (set on
  * BOTH webhooks) is what proves it's our own webhook calling.
@@ -46,7 +48,7 @@ Deno.serve(async (req: Request) => {
     return json({ error: 'Email not configured (RESEND_API_KEY / PILOT_NOTIFY_FROM / PILOT_NOTIFY_TO)' }, 500);
   }
 
-  let payload: { table?: string; record?: Record<string, unknown> };
+  let payload: { table?: string; record?: Record<string, unknown>; old_record?: Record<string, unknown> };
   try {
     payload = await req.json();
   } catch {
@@ -55,6 +57,7 @@ Deno.serve(async (req: Request) => {
 
   const table = payload.table ?? 'pilot_interest';
   const r = payload.record ?? {};
+  const old = payload.old_record ?? {};
   const when = (r.created_at as string) ?? new Date().toISOString();
 
   let subject: string;
@@ -70,6 +73,13 @@ Deno.serve(async (req: Request) => {
     const crmRole = (r.crm_role as string) ?? '';
     if (role !== 'worker' || isFounder || crmRole) {
       return json({ ok: true, skipped: 'not a plain worker profile' });
+    }
+    // Fire exactly once — on the moment the profile BECOMES a worker. On INSERT there is no
+    // old_record (undefined), so old role !== 'worker' → fires. On UPDATE it fires only on the
+    // transition (e.g. when the worker picks their role after signup), never on later edits.
+    const oldRole = (old.role as string) ?? '';
+    if (oldRole === 'worker') {
+      return json({ ok: true, skipped: 'already a worker — not a new signup' });
     }
     const first = (r.first_name as string) ?? '';
     const last = (r.last_name as string) ?? '';
