@@ -140,18 +140,19 @@ function DecisionCard({ t }: { t: (k: string) => string }) {
       transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.15 }}
       className="min-w-0 rounded-2xl border border-[#E4E5DE] bg-[#FBFBFA] p-6 shadow-[0_30px_70px_-26px_rgba(46,64,56,0.35)]"
     >
-      <div className="mb-3.5 flex items-center justify-between">
+      <div className="mb-1 flex items-center justify-between">
         <span style={MONO} className="text-[10.5px] uppercase tracking-[0.1em] text-[#7c857f]">Decision Card</span>
-        <span style={MONO} className="rounded-full border border-[#C6D0C8] bg-[#E7EDE8] px-2.5 py-1 text-[10px] text-[#5B21B6]">ready · decide in ~2 min</span>
+        <span style={MONO} className="rounded-full border border-[#C6D0C8] bg-[#E7EDE8] px-2.5 py-1 text-[10px] text-[#5B21B6]">organized · review in ~2 min</span>
       </div>
+      <div style={MONO} className="mb-3 text-[9px] uppercase tracking-[0.1em] text-[#a2aaa2]">Illustrative example</div>
 
       {/* matter line */}
       <div className="text-[15px] font-semibold tracking-[-0.01em] text-[#17181C]">M. Rivera · Lumina Foods · 2022&ndash;2026</div>
 
-      {/* what the records show */}
+      {/* what the records show — factual contents only, no characterization */}
       <div className="mt-3.5">
-        <div style={MONO} className="text-[9.5px] uppercase tracking-[0.12em] text-[#8a938c]">What the records show</div>
-        <p className="mt-1 text-[13.5px] leading-snug text-[#20242a]">Payroll audit requested in writing &mdash; termination followed 41 days later.</p>
+        <div style={MONO} className="text-[9.5px] uppercase tracking-[0.12em] text-[#8a938c]">What&rsquo;s in the file</div>
+        <p className="mt-1 text-[13.5px] leading-snug text-[#20242a]">A written payroll-audit request and a termination letter &mdash; both dated and source-linked.</p>
       </div>
 
       {/* the sequence */}
@@ -180,23 +181,23 @@ function DecisionCard({ t }: { t: (k: string) => string }) {
         </div>
       </div>
 
-      {/* signals */}
+      {/* signals — organization only; no valuation, no merit signal */}
       <div className="mt-4 flex gap-2.5">
-        <div className="min-w-0 flex-1 rounded-[12px] border border-[#E4E5DE] bg-[#F2F4EC] p-2.5 text-center">
-          <div className="text-[17px] font-black leading-none text-[#42574E]">$48,200</div>
-          <div style={MONO} className="mt-1 text-[9px] uppercase tracking-[0.06em] text-[#6a6d66]">Wage exposure · from records</div>
+        <div className="min-w-0 flex-1 rounded-[12px] border border-[#E4E5DE] bg-[#FAF9F6] p-2.5 text-center">
+          <div className="text-[17px] font-black leading-none text-[#42574E]">12</div>
+          <div style={MONO} className="mt-1 text-[9px] uppercase tracking-[0.06em] text-[#6a6d66]">Records organized</div>
         </div>
         <div className="min-w-0 flex-1 rounded-[12px] border border-[#E4E5DE] bg-[#FAF9F6] p-2.5 text-center">
-          <div className="text-[17px] font-black leading-none text-[#42574E]">12 · 9</div>
-          <div style={MONO} className="mt-1 text-[9px] uppercase tracking-[0.06em] text-[#6a6d66]">Records · facts confirmed</div>
+          <div className="text-[17px] font-black leading-none text-[#42574E]">9</div>
+          <div style={MONO} className="mt-1 text-[9px] uppercase tracking-[0.06em] text-[#6a6d66]">Facts source-linked</div>
         </div>
       </div>
 
-      {/* verdict */}
-      <div className="mt-3.5 flex items-center gap-2 rounded-[10px] border border-emerald-200 bg-emerald-50 px-3 py-2 text-[12px] font-semibold text-emerald-800">
-        <CheckCircle2 className="h-3.5 w-3.5 flex-none" /> Organized and ready &mdash; worth a review.
+      {/* state, not merit — describes completeness, never case value */}
+      <div className="mt-3.5 flex items-center gap-2 rounded-[10px] border border-[#D3DED6] bg-[#EFF3ED] px-3 py-2 text-[12px] font-semibold text-[#3c5049]">
+        <CheckCircle2 className="h-3.5 w-3.5 flex-none" /> Organized and ready to review.
       </div>
-      <p className="mt-3 text-[10.5px] leading-relaxed text-[#8a938c]">Arithmetic from records &mdash; not a valuation or legal advice. The attorney decides.</p>
+      <p className="mt-3 text-[10.5px] leading-relaxed text-[#8a938c]">Organized from records &mdash; not legal advice, a case valuation, or an outcome prediction. The attorney decides.</p>
     </motion.div>
   );
 }
