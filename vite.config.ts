@@ -29,14 +29,18 @@ export default defineConfig({
     // Tailwind is not being actively used – do not remove them
     react(),
     tailwindcss(),
+    // Self-destroying service worker. The app previously precached its shell, which caused
+    // the site to serve OLD builds after a deploy ("opens old versions"). selfDestroying ships
+    // a worker whose only job is to unregister itself and delete all caches — so every visitor
+    // (including anyone currently stuck on a stale build) gets cleaned up, and the site then
+    // behaves like a normal always-fresh website served straight from Vercel's CDN.
+    // Re-enable the PWA later by restoring the manifest/workbox config and removing selfDestroying.
     VitePWA({
+      selfDestroying: true,
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'icons/apple-touch-icon.png'],
       manifest: {
         name: 'one3seven — Employment Intake Organization',
         short_name: 'one3seven',
-        description:
-          'Organize your employment records into a structured intake packet — ready to bring to any attorney consultation.',
         theme_color: '#42574E',
         background_color: '#F5F7F4',
         display: 'standalone',
@@ -47,16 +51,6 @@ export default defineConfig({
           { src: '/icons/pwa-512.png', sizes: '512x512', type: 'image/png' },
           { src: '/icons/maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
-      },
-      workbox: {
-        // Precache the app shell only. Supabase API calls are cross-origin and pass
-        // through to the network — we never cache intake data. Maps excluded.
-        globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
-        maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
-        navigateFallback: '/index.html',
-        cleanupOutdatedCaches: true,
-        clientsClaim: true,
-        skipWaiting: true,
       },
     }),
   ],
