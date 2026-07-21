@@ -776,7 +776,7 @@ function drawDecisionCard(c: Cursor, model: FirmPacketModel): void {
   const pill = recordsPending
     ? 'records pending'
     : ready
-      ? 'ready · decide in ~2 min'
+      ? 'ready · review in ~2 min'
       : `${reviewOptions.unresolvedCount} to confirm`;
   sectionHeadingWithPill(c, 'Decision Card', pill);
 
@@ -812,13 +812,10 @@ function drawDecisionCard(c: Cursor, model: FirmPacketModel): void {
     c.gap(4);
   }
 
-  if (model.wageExposure && model.wageExposure.report.baseHourlyRate) {
-    field(
-      'DAMAGES SIGNAL',
-      `${fmtMoney(model.wageExposure.report.combinedEstimate)} estimated wage exposure — arithmetic from records, not a valuation (see 8B below).`,
-      INK,
-    );
-  }
+  // DAMAGES SIGNAL pulled from the Decision Card pending counsel sign-off on displaying a wage-
+  // exposure figure (advertising-accuracy + valuation exposure). The card shows organization only.
+  // Restore this block once counsel clears. The full 8B wage-exposure section remains counsel-gated
+  // separately. See [[feedback_public_surface_no_conclude]].
 
   const term = events.find((e) => /terminat/i.test(e.title));
   const prot = events.find((e) => /complaint|hr|report|raised|warning/i.test(e.title));
@@ -838,7 +835,7 @@ function drawDecisionCard(c: Cursor, model: FirmPacketModel): void {
   field(
     'FOR REVIEW',
     ready
-      ? 'Organized and ready — worth a review.'
+      ? 'Organized and ready to review.'
       : `${reviewOptions.unresolvedCount} item(s) to confirm before full review · ${reviewOptions.priorityCount} of ${reviewOptions.totalRecords} priority records available.`,
   );
 

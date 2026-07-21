@@ -1238,7 +1238,10 @@ export function IntakeReviewScreen({
                           <div className="mt-1 text-[11px] font-semibold text-amber-700/80">Clarifications surfaced</div>
                         </div>
                       ) : null}
-                      {wageExposure ? (
+                      {/* Wage-exposure $ tile pulled pending counsel sign-off (valuation/advertising
+                          exposure) — organization-only display for now. Restore by flipping to
+                          `wageExposure ?` once cleared. See feedback_public_surface_no_conclude. */}
+                      {false && wageExposure ? (
                         <div className="min-w-[104px] flex-1 rounded-[14px] border border-[#E4E5DE] bg-[#F2F4EC] p-3 text-center">
                           <div className="text-[22px] font-black leading-none text-[#42574E]">${Math.round(wageExposure.report.combinedEstimate).toLocaleString()}</div>
                           <div className="mt-1 text-[11px] font-semibold text-[#1B2623]/55">Wage exposure · from records</div>

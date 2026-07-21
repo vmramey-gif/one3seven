@@ -142,7 +142,7 @@ function DecisionCard({ t }: { t: (k: string) => string }) {
     >
       <div className="mb-1 flex items-center justify-between">
         <span style={MONO} className="text-[10.5px] uppercase tracking-[0.1em] text-[#7c857f]">Decision Card</span>
-        <span style={MONO} className="rounded-full border border-[#C6D0C8] bg-[#E7EDE8] px-2.5 py-1 text-[10px] text-[#5B21B6]">organized · review in ~2 min</span>
+        <span style={MONO} className="rounded-full border border-[#C6D0C8] bg-[#E7EDE8] px-2.5 py-1 text-[10px] text-[#5B21B6]">ready · review in ~2 min</span>
       </div>
       <div style={MONO} className="mb-3 text-[9px] uppercase tracking-[0.1em] text-[#a2aaa2]">Illustrative example</div>
 
@@ -151,7 +151,7 @@ function DecisionCard({ t }: { t: (k: string) => string }) {
 
       {/* what the records show — factual contents only, no characterization */}
       <div className="mt-3.5">
-        <div style={MONO} className="text-[9.5px] uppercase tracking-[0.12em] text-[#8a938c]">What&rsquo;s in the file</div>
+        <div style={MONO} className="text-[9.5px] uppercase tracking-[0.12em] text-[#8a938c]">What the records show</div>
         <p className="mt-1 text-[13.5px] leading-snug text-[#20242a]">A written payroll-audit request and a termination letter &mdash; both dated and source-linked.</p>
       </div>
 
