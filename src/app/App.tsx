@@ -198,6 +198,12 @@ export type Screen =
 
 const AUTH_FLOW_SCREENS: Screen[] = ['publicMarketing', 'authWelcome', 'signIn', 'createAccount', 'roleSelection', 'workerDetails'];
 
+// Beta account-approval gate. OFF = anyone who signs up can use the product immediately.
+// Flip to `true` to re-enable the "pending approval" waitlist screen (accounts then need
+// `profiles.approved = true` before they can enter). Kept as a one-line toggle so a better
+// safety mechanism can replace it later without hunting through the render logic.
+const ACCOUNT_APPROVAL_GATE = false;
+
 /** Defer post-auth Supabase work until after the auth callback releases the client lock. */
 const POST_AUTH_DEFER_MS = 500;
 
@@ -3996,6 +4002,7 @@ export default function App() {
   // (so people can still sign up + we capture the lead); the gate only blocks entry into the
   // product itself. Approve an account: update public.profiles set approved = true where email = '…'.
   const accountGated =
+    ACCOUNT_APPROVAL_GATE &&
     !!profile &&
     profile.approved !== true &&
     profile.is_founder !== true &&
