@@ -6,7 +6,7 @@
  * App's routing (worker/firm/sign-in/firm-directed intake) is unchanged.
  * Bilingual via i18n t().
  */
-import { ArrowRight, FileText } from 'lucide-react';
+import { ArrowRight, FileText, CheckCircle2 } from 'lucide-react';
 import { useLang, LangToggle } from '../../i18n/i18n';
 import { track } from '../../lib/analytics';
 import { motion, useReducedMotion } from 'motion/react';
@@ -122,6 +122,85 @@ function ExtractionCard({ t }: { t: (k: string) => string }) {
   );
 }
 
+// Hero-right feature card: the DECISION CARD — the verdict-first opener the attorney reads first.
+// Mirrors the product's Decision Card (and the PDF): matter line, what the records show, the
+// sequence, a damages signal, and a ready-to-review verdict. Never a merit judgment — the numbers
+// are arithmetic from records; the attorney decides.
+function DecisionCard({ t }: { t: (k: string) => string }) {
+  const reduce = useReducedMotion();
+  const sequence = [
+    { date: 'Nov 2025', title: t('tl.e1') },
+    { date: 'Dec 2025', title: t('tl.e2') },
+    { date: 'Jan 2026', title: t('tl.e3') },
+  ];
+  return (
+    <motion.div
+      initial={reduce ? false : { opacity: 0, y: 26, scale: 0.985 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.15 }}
+      className="min-w-0 rounded-2xl border border-[#E4E5DE] bg-[#FBFBFA] p-6 shadow-[0_30px_70px_-26px_rgba(46,64,56,0.35)]"
+    >
+      <div className="mb-3.5 flex items-center justify-between">
+        <span style={MONO} className="text-[10.5px] uppercase tracking-[0.1em] text-[#7c857f]">Decision Card</span>
+        <span style={MONO} className="rounded-full border border-[#C6D0C8] bg-[#E7EDE8] px-2.5 py-1 text-[10px] text-[#5B21B6]">ready · decide in ~2 min</span>
+      </div>
+
+      {/* matter line */}
+      <div className="text-[15px] font-semibold tracking-[-0.01em] text-[#17181C]">M. Rivera · Lumina Foods · 2022&ndash;2026</div>
+
+      {/* what the records show */}
+      <div className="mt-3.5">
+        <div style={MONO} className="text-[9.5px] uppercase tracking-[0.12em] text-[#8a938c]">What the records show</div>
+        <p className="mt-1 text-[13.5px] leading-snug text-[#20242a]">Payroll audit requested in writing &mdash; termination followed 41 days later.</p>
+      </div>
+
+      {/* the sequence */}
+      <div className="mt-4">
+        <div style={MONO} className="mb-2 text-[9.5px] uppercase tracking-[0.12em] text-[#8a938c]">The sequence</div>
+        <div className="relative">
+          <motion.span aria-hidden
+            initial={reduce ? false : { scaleY: 0 }} animate={{ scaleY: 1 }}
+            transition={{ duration: 0.8, ease: 'easeInOut', delay: 0.45 }}
+            style={{ transformOrigin: 'top' }}
+            className="absolute left-[5px] top-[4px] bottom-[8px] w-[2px] bg-[#CBD6CF]"
+          />
+          {sequence.map((e, i) => (
+            <motion.div key={e.title}
+              initial={reduce ? false : { opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, ease: 'easeOut', delay: 0.55 + i * 0.18 }}
+              className="flex gap-3"
+            >
+              <div className="relative w-3 flex-none"><span className="absolute left-[1px] top-[4px] h-2.5 w-2.5 rounded-full bg-[#42574E]" /></div>
+              <div className={i < sequence.length - 1 ? 'pb-2.5' : ''}>
+                <div style={MONO} className="text-[10.5px] text-[#7c857f]">{e.date}</div>
+                <div className="text-[13px] font-medium text-[#20242a]">{e.title}</div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+
+      {/* signals */}
+      <div className="mt-4 flex gap-2.5">
+        <div className="min-w-0 flex-1 rounded-[12px] border border-[#E4E5DE] bg-[#F2F4EC] p-2.5 text-center">
+          <div className="text-[17px] font-black leading-none text-[#42574E]">$48,200</div>
+          <div style={MONO} className="mt-1 text-[9px] uppercase tracking-[0.06em] text-[#6a6d66]">Wage exposure · from records</div>
+        </div>
+        <div className="min-w-0 flex-1 rounded-[12px] border border-[#E4E5DE] bg-[#FAF9F6] p-2.5 text-center">
+          <div className="text-[17px] font-black leading-none text-[#42574E]">12 · 9</div>
+          <div style={MONO} className="mt-1 text-[9px] uppercase tracking-[0.06em] text-[#6a6d66]">Records · facts confirmed</div>
+        </div>
+      </div>
+
+      {/* verdict */}
+      <div className="mt-3.5 flex items-center gap-2 rounded-[10px] border border-emerald-200 bg-emerald-50 px-3 py-2 text-[12px] font-semibold text-emerald-800">
+        <CheckCircle2 className="h-3.5 w-3.5 flex-none" /> Organized and ready &mdash; worth a review.
+      </div>
+      <p className="mt-3 text-[10.5px] leading-relaxed text-[#8a938c]">Arithmetic from records &mdash; not a valuation or legal advice. The attorney decides.</p>
+    </motion.div>
+  );
+}
+
 export function SageMarketingPage({ onWorkerStart, onSignIn, onForFirms, firmDirectedContext = null }: SageMarketingPageProps) {
   const { t } = useLang();
   const reduce = useReducedMotion();
@@ -191,7 +270,7 @@ export function SageMarketingPage({ onWorkerStart, onSignIn, onForFirms, firmDir
               <span>Free 7-day pilot</span>
             </motion.div>
           </div>
-          <ExtractionCard t={t} />
+          <DecisionCard t={t} />
         </motion.div>
       </section>
 
