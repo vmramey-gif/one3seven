@@ -35,12 +35,11 @@ const PARTICIPATING_STEPS = [
   'They asked for a few more records',
   'You added the records',
   'They’re reviewing your new records',
-  'A firm wants to meet',
-  'Review complete',
 ] as const;
 
-/** Steps with no backend signal yet — shown muted, never completed or current. */
-const PARTICIPATING_FUTURE_ONLY_FROM = 9;
+// The later "meeting requested / review complete" steps had no backend signal yet, so we no
+// longer show them — a worker should never see a firm pipeline that doesn't actually run.
+const PARTICIPATING_FUTURE_ONLY_FROM = null;
 
 const FIRM_CODE_STEPS = [
   'You got started',
