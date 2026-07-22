@@ -655,9 +655,9 @@ export function LandingScreen({
                       onClearDeleteIntakeError?.();
                       setPendingDeleteIntakeId(card.intakeId);
                     }}
-                    className="text-xs text-red-400/90 hover:text-red-300 disabled:opacity-50 px-1 py-2"
+                    className="text-xs text-[#9AA39B] hover:text-[#6A6D66] disabled:opacity-50 px-1 py-2"
                   >
-                    {deleteIntakeBusyId === card.intakeId ? 'Deleting…' : 'Delete'}
+                    {deleteIntakeBusyId === card.intakeId ? 'Removing…' : 'Remove'}
                   </button>
                 ) : null}
               </div>
@@ -841,16 +841,16 @@ export function LandingScreen({
                   />
                 ) : null}
                 <div className="mb-4">
-                  <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#42574E]">Intakes</h2>
+                  <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#42574E]">Your cases</h2>
                   <p className="text-xs leading-relaxed text-[#1B2623]/64">
-                    All saved and created intakes remain available here. Tap + to start a new intake.
+                    Every case you start is saved here. To begin a new one, go to Home.
                   </p>
                 </div>
                 {sortedIntakeCards.length > 0 ? (
                   renderCompactIntakeList()
                 ) : (
                   <p className="py-6 text-center text-sm leading-relaxed text-[#1B2623]/64">
-                    No saved intakes yet. Tap + to start a new intake.
+                    No cases yet — start one from Home.
                   </p>
                 )}
               </section>
@@ -922,7 +922,7 @@ export function LandingScreen({
               Intakes
             </p>
             <p className="mt-1 text-xs leading-relaxed text-[#1B2623]/64">
-              All saved intakes remain available here. Tap + to start a new intake.
+              Every case you start is saved here. To begin a new one, go to Home.
             </p>
           </div>
           {sortedIntakeCards.length > 0 ? (
@@ -1040,7 +1040,7 @@ export function LandingScreen({
             )
           ) : (
             <p className="py-6 text-center text-sm leading-relaxed text-[#1B2623]/64">
-              No saved intakes yet. Tap + to start a new intake.
+              No cases yet — start one from Home.
             </p>
           )}
         </section>

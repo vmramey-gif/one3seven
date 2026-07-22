@@ -1,7 +1,10 @@
 import type { ReactNode } from 'react';
+import { ChevronRight } from 'lucide-react';
 
 type WorkerIntakeCompactRowProps = {
   intakeNumber: string;
+  /** Worker-facing title for this case. Defaults to a warm, plain label. */
+  title?: string;
   statusLabel: string | null;
   lastActivity: string | null;
   highlighted?: boolean;
@@ -12,6 +15,7 @@ type WorkerIntakeCompactRowProps = {
 
 export function WorkerIntakeCompactRow({
   intakeNumber,
+  title = 'Your employment records',
   statusLabel,
   lastActivity,
   highlighted = false,
@@ -40,22 +44,23 @@ export function WorkerIntakeCompactRow({
       <HeaderElement
         type={onOpenWorkspace ? 'button' : undefined}
         onClick={onOpenWorkspace}
-        className={`flex w-full items-start justify-between gap-3 rounded-[14px] px-1 py-1.5 text-left ${
+        className={`flex w-full items-center justify-between gap-3 rounded-[14px] px-1 py-1.5 text-left ${
           onOpenWorkspace ? 'cursor-pointer hover:bg-[#F7F9F5] focus:outline-none focus:ring-2 focus:ring-[#CBD6CF]' : ''
         }`}
       >
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-medium tracking-tight text-[#1B2623]">
-            Employment Records Intake
-          </p>
-          <p className="mt-0.5 truncate text-[10px] text-[#1B2623]/48">Reference: {intakeNumber}</p>
+          <p className="truncate text-sm font-semibold tracking-tight text-[#1B2623]">{title}</p>
           {statusLabel ? (
-            <p className="mt-0.5 truncate text-xs text-[#1B2623]/64">{statusLabel}</p>
+            <p className="mt-0.5 truncate text-xs text-[#1B2623]/70">{statusLabel}</p>
           ) : null}
           {lastActivity ? (
-            <p className="mt-0.5 text-[10px] text-[#1B2623]/48">{lastActivity}</p>
+            <p className="mt-0.5 text-[11px] text-[#1B2623]/50">{lastActivity}</p>
           ) : null}
+          <p className="mt-1 truncate text-[10px] text-[#1B2623]/38">{intakeNumber}</p>
         </div>
+        {onOpenWorkspace ? (
+          <ChevronRight className="h-4 w-4 flex-none text-[#9AA39B]" aria-hidden />
+        ) : null}
       </HeaderElement>
       {children ? (
         <div className="mt-3 space-y-2 border-t border-[#E7EDE8] pt-3">{children}</div>
