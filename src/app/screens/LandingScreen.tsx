@@ -564,7 +564,7 @@ export function LandingScreen({
           <div className="mx-auto flex w-full max-w-xl flex-col items-center gap-3">
             <div className="min-w-0">
               <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#42574E]">
-                Status Journey
+                Where things stand
               </p>
               <h2 className="mt-2 break-words text-lg font-semibold text-[#1B2623]">
                 {selectedStatusJourney.title}
@@ -575,7 +575,7 @@ export function LandingScreen({
             </div>
             {statusJourneyOptions.length > 1 ? (
               <label className="flex w-full max-w-md flex-col gap-1 text-left text-xs font-medium text-[#1B2623]/70">
-                Choose intake
+                Choose a case
                 <select
                   value={selectedStatusJourney.intakeId}
                   onChange={(event) => setSelectedStatusIntakeId(event.target.value)}

@@ -17,38 +17,38 @@ export type WorkerStatusJourneyCardProps = {
 };
 
 const FALLBACK_MESSAGE =
-  'Your intake progress will appear here as you organize and share records.';
+  'Your progress will show up here as you organize and share your file.';
 
 const PRE_SHARE_STEPS = [
-  'Intake created',
-  'Records organized',
-  'Ready to share',
+  'You got started',
+  'We organized your records',
+  'Ready whenever you are',
 ] as const;
 
 const PARTICIPATING_STEPS = [
-  'Intake created',
-  'Records organized',
-  'Intake sent to participating firms',
-  'Intake opened by a participating firm',
-  'Full access requested',
-  'Full access approved',
-  'Additional documents requested',
-  'Additional documents received',
-  'Participating firm reviewing additional documents',
-  'Meeting requested',
-  'Review completed',
+  'You got started',
+  'We organized your records',
+  'You shared it with firms',
+  'A firm opened your file',
+  'A firm asked to see the full file',
+  'You gave them access',
+  'They asked for a few more records',
+  'You added the records',
+  'They’re reviewing your new records',
+  'A firm wants to meet',
+  'Review complete',
 ] as const;
 
 /** Steps with no backend signal yet — shown muted, never completed or current. */
 const PARTICIPATING_FUTURE_ONLY_FROM = 9;
 
 const FIRM_CODE_STEPS = [
-  'Intake created',
-  'Records organized',
-  'Sent to your firm',
-  'Firm reviewing',
-  'Additional documents requested',
-  'Additional documents under review',
+  'You got started',
+  'We organized your records',
+  'You sent it to your firm',
+  'Your firm is reviewing it',
+  'They asked for a few more records',
+  'They’re reviewing your new records',
 ] as const;
 
 type JourneyMode = 'pre-share' | 'participating' | 'firm-code';
@@ -164,26 +164,26 @@ function resolveJourneySubtitle(
   const w = workflow.trim();
 
   if (w === WORKFLOW_ADDITIONAL_DOCUMENTS_REQUESTED) {
-    return 'Additional records have been requested. We\'ll guide you through the next steps.';
+    return 'They’ve asked for a few more records. We’ll walk you through it.';
   }
   if (w === WORKFLOW_WORKER_UPLOADED_REQUESTED_DOCUMENTS) {
-    return 'Your additional records are under review. We\'ll keep you informed here.';
+    return 'Your new records are under review. We’ll keep you posted here.';
   }
 
   if (mode === 'pre-share') {
-    if (activeIndex <= 0) return 'Your intake is taking shape.';
-    if (activeIndex >= 2) return 'Your intake is ready when you choose to share it.';
-    return "Your records are organized. We'll update you here.";
+    if (activeIndex <= 0) return 'Your file is taking shape.';
+    if (activeIndex >= 2) return 'Your file is ready whenever you choose to share it.';
+    return 'Your records are organized. We’ll keep you posted here.';
   }
 
   if (mode === 'participating') {
     if (activeIndex >= 8) {
-      return 'A participating firm is reviewing your additional records.';
+      return 'A firm is reviewing your new records.';
     }
-    return "A participating firm is reviewing your intake. We'll keep you informed here.";
+    return 'A firm is reviewing your file. We’ll keep you posted here.';
   }
 
-  return "Your firm is reviewing your intake. We'll keep you informed here.";
+  return 'Your firm is reviewing your file. We’ll keep you posted here.';
 }
 
 function hasTrackerData(workflow: string | null | undefined): boolean {
@@ -203,8 +203,8 @@ export function resolveWorkerStatusJourney(
   const futureOnlyFrom = getFutureOnlyFrom(mode);
   const subtitle = showTracker
     ? resolveJourneySubtitle(mode, workflowTrimmed, activeIndex)
-    : 'Your intake is taking shape.';
-  const currentLabel = steps[Math.min(Math.max(activeIndex, 0), steps.length - 1)] ?? 'Intake created';
+    : 'Your file is taking shape.';
+  const currentLabel = steps[Math.min(Math.max(activeIndex, 0), steps.length - 1)] ?? 'You got started';
 
   return { mode, steps, activeIndex, subtitle, currentLabel, futureOnlyFrom };
 }
@@ -267,7 +267,7 @@ export function WorkerStatusJourneyCard({
           })}
         </div>
         <p className="mt-3 text-xs leading-relaxed text-[#6A6D66]">
-          Open <span className="font-medium text-[#40433F]">Status Journey</span> for the full progress path.
+          Open <span className="font-medium text-[#40433F]">Status</span> to see the full path.
         </p>
       </div>
     );
@@ -287,7 +287,7 @@ export function WorkerStatusJourneyCard({
       className={`rounded-xl border border-[#C6D0C8] bg-white shadow-[0_8px_24px_rgba(107,78,255,0.08)] ${
         isRail ? 'p-6 sm:p-7' : 'p-4'
       } ${className}`}
-      aria-label="Status journey"
+      aria-label="Where things stand"
     >
       <div className={`${showSubtitle ? 'border-b border-[#E7EDE8] pb-4 mb-5' : 'mb-4'}`}>
         <h2
@@ -295,7 +295,7 @@ export function WorkerStatusJourneyCard({
             isRail ? 'text-lg' : 'text-sm'
           }`}
         >
-          Status Journey
+          Where things stand
         </h2>
         {showSubtitle ? (
           <p className={`mt-2 leading-relaxed text-[#6A6D66] ${isRail ? 'text-sm' : 'text-xs'}`}>
@@ -372,7 +372,7 @@ export function WorkerStatusJourneyCard({
 
       {isRail && futureOnlyFrom !== null ? (
         <p className="mt-6 border-t border-[#E7EDE8] pt-4 text-xs leading-relaxed text-[#6A6D66]">
-          When a review concludes, your organized records remain available in Intakes.
+          When a review wraps up, your organized file stays here in “My cases.”
         </p>
       ) : null}
     </div>
