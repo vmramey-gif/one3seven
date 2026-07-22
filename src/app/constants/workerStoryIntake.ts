@@ -63,7 +63,7 @@ export const WORKER_UPLOAD_SOURCING_GUIDANCE = {
     'Emails and termination letters — check your email inbox and saved messages.',
     'Text messages — most phones can save or print a conversation as a PDF.',
   ],
-  pdfNote: 'Uploads need to be PDFs. A screenshot, photo, or email can be saved or printed as a PDF from your phone or computer before uploading.',
+  pdfNote: 'You can upload PDFs or photos (JPG, PNG, HEIC) — snap a picture of a document, or add a file from your phone or computer. No need to convert anything.',
 } as const;
 
 /**

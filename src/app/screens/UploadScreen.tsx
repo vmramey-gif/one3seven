@@ -526,17 +526,20 @@ export function UploadScreen({
   };
 
   const handleFileUpload = async (incomingFiles: File[], source: 'picker' | 'drop' | 'camera') => {
-    // PDF-only guard. The accept attribute restricts the file picker, but drag-and-drop
-    // ignores it — and we do not yet extract images or Word documents, so a non-PDF would
-    // upload and then silently contribute nothing to the packet. Reject non-PDFs here with a
-    // clear inline message; let any valid PDFs in the same batch proceed unaffected.
-    const isPdf = (f: File) => f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf');
-    const filesToUpload = incomingFiles.filter(isPdf);
+    // Accept PDFs and phone photos/images. Images aren't text-extracted yet (OCR is coming), but
+    // they're the worker's actual evidence — we save them as records so the worker is never blocked,
+    // and text extraction skips them gracefully (fileTextExtractionService returns early on non-PDF).
+    // The accept attribute restricts the picker, but drag-and-drop bypasses it, so we re-check here;
+    // only truly unsupported types (Word/Excel/etc.) are rejected.
+    const SUPPORTED_EXT = /\.(pdf|jpe?g|png|heic|heif|webp)$/i;
+    const isSupported = (f: File) =>
+      f.type === 'application/pdf' || f.type.startsWith('image/') || SUPPORTED_EXT.test(f.name);
+    const filesToUpload = incomingFiles.filter(isSupported);
     const rejectedCount = incomingFiles.length - filesToUpload.length;
 
     if (filesToUpload.length === 0) {
       if (rejectedCount > 0) {
-        setUploadError("This file type isn't supported yet. Please upload a PDF version of this document.");
+        setUploadError("That file type isn't supported yet. You can add a PDF or a photo (JPG, PNG, or HEIC).");
       } else {
         console.warn('[o3s-upload-ui] handleFileUpload skipped: empty selection', { source });
       }
@@ -556,7 +559,7 @@ export function UploadScreen({
 
     setUploadError(
       rejectedCount > 0
-        ? `Only PDFs are supported right now, so ${rejectedCount === 1 ? 'one file was' : `${rejectedCount} files were`} skipped. Your PDF ${filesToUpload.length === 1 ? 'file was' : 'files were'} added — please upload a PDF version of the rest.`
+        ? `${rejectedCount === 1 ? 'One file was' : `${rejectedCount} files were`} skipped — we support PDFs and photos (JPG, PNG, HEIC) right now. Your other ${filesToUpload.length === 1 ? 'file was' : 'files were'} added.`
         : null,
     );
     setIsUploading(true);
@@ -932,7 +935,7 @@ export function UploadScreen({
               ref={fileInputRef}
               type="file"
               multiple
-              accept=".pdf,application/pdf"
+              accept=".pdf,application/pdf,image/*,.jpg,.jpeg,.png,.heic,.heif,.webp"
               onChange={(e) => handleFileInputChange(e, 'picker')}
               className="hidden"
             />
@@ -970,7 +973,7 @@ export function UploadScreen({
                     Browse files
                   </div>
                   <div className="mt-6 text-xs text-[#7C857F]">
-                    PDF files only
+                    PDFs or photos (JPG, PNG, HEIC) — no need to convert
                   </div>
                 </>
               ) : (
@@ -1005,7 +1008,7 @@ export function UploadScreen({
 
             <div className="mt-3 flex flex-col items-center gap-2">
               <p className="text-[11px] text-[#7C857F] text-center leading-relaxed max-w-md">
-                Upload PDF documents — paystubs, letters, and records as PDF files work best right now. We&apos;re working on photo support.
+                Add paystubs, letters, texts, and records — as PDFs or photos from your phone. Snap a picture or upload a file; we&apos;ll keep it with your case either way.
               </p>
             </div>
           </div>
