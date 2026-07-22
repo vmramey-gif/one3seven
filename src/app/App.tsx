@@ -16,6 +16,7 @@ import type { WorkerDetailsPayload } from './screens/WorkerDetailsScreen';
 import { LandingScreen } from './screens/LandingScreen';
 import { EmploymentMatterScreen } from './screens/EmploymentMatterScreen';
 import { GuidedIntakeScreen } from './screens/GuidedIntakeScreen';
+import { RecordsRequestScreen } from './screens/RecordsRequestScreen';
 import {
   CategoryQuestionnaireScreen,
   type CategoryQuestionnaireAnswers,
@@ -178,6 +179,7 @@ export type Screen =
   | 'roleSelection'
   | 'workerDetails'
   | 'landing'
+  | 'recordsRequest'
   | 'workerSettings'
   | 'caseCategory'
   | 'guidedIntake'
@@ -4398,6 +4400,20 @@ export default function App() {
                   abandonPendingWorkerOnboarding();
                   setCurrentScreen('landing');
                 }}
+              />
+            </motion.div>
+          )}
+          {currentScreen === 'recordsRequest' && (
+            <motion.div
+              key="recordsRequest"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+            >
+              <RecordsRequestScreen
+                workerName={profile?.full_name ?? null}
+                onBackToLanding={() => setCurrentScreen('landing')}
               />
             </motion.div>
           )}

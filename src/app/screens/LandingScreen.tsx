@@ -551,6 +551,21 @@ export function LandingScreen({
       <WorkerMissionControlHome
         greetingName={workerGreetingName}
       />
+      {/* Worker self-help tool — get your own employment records (CA Labor Code). Additive entry
+          point; routes to the records-request letter generator. */}
+      <button
+        type="button"
+        onClick={() => onNavigate('recordsRequest')}
+        className="mt-4 flex w-full items-center gap-4 rounded-2xl border border-[#CBD6CF] bg-white/90 p-4 text-left shadow-[0_10px_28px_rgba(20,17,46,0.06)] transition hover:border-[#7C8B6F]"
+      >
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#EFF3ED] text-lg">📄</span>
+        <span className="min-w-0">
+          <span className="block text-sm font-semibold text-[#1B2623]">Get your employment records</span>
+          <span className="block text-[13px] leading-snug text-[#6A6D66]">
+            California law gives you the right to your pay records, personnel file, and signed documents. We&rsquo;ll write the request letter for you to send.
+          </span>
+        </span>
+      </button>
     </section>
   );
 
