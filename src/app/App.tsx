@@ -198,7 +198,7 @@ export type Screen =
   | 'forFirms'
   | 'forWorkers';
 
-const AUTH_FLOW_SCREENS: Screen[] = ['publicMarketing', 'authWelcome', 'signIn', 'createAccount', 'roleSelection', 'workerDetails'];
+const AUTH_FLOW_SCREENS: Screen[] = ['publicMarketing', 'forWorkers', 'authWelcome', 'signIn', 'createAccount', 'roleSelection', 'workerDetails'];
 
 // Beta account-approval gate. OFF = anyone who signs up can use the product immediately.
 // Flip to `true` to re-enable the "pending approval" waitlist screen (accounts then need
@@ -258,7 +258,9 @@ export default function App() {
       if (workerCta) return workerCta === 'signin' ? 'signIn' : 'createAccount';
       if (sessionStorage.getItem('o3s_prefill_fc')) return 'firmDirectedIntake';
     } catch { /* ignore */ }
-    return 'publicMarketing';
+    // Worker-first: the worker landing is the default front door. Firms reach their marketing
+    // via the "For firms" link. (Firm-code deep links above bypass the landing entirely.)
+    return 'forWorkers';
   });
   const [comparisonView, setComparisonView] = useState<'landing' | 'dashboard' | 'both'>('both');
 
@@ -266,9 +268,9 @@ export default function App() {
   // change window.location, so without this only the initial load is captured).
   useEffect(() => {
     const SCREEN_PATHS: Partial<Record<Screen, string>> = {
-      publicMarketing: '/',
+      forWorkers: '/',
+      publicMarketing: '/firms',
       forFirms: '/for-firms',
-      forWorkers: '/for-workers',
       firmDirectedIntake: '/intake',
       upload: '/intake/upload',
       intakeSummary: '/intake/summary',
@@ -687,7 +689,7 @@ export default function App() {
         setHasCompletedIntake(false);
         setWorkerUploadFirmIntent('default');
         setFirmLiveViewLoading(false);
-        setCurrentScreen(workerCtaScreen ?? 'publicMarketing');
+        setCurrentScreen(workerCtaScreen ?? 'forWorkers');
         firmSignInIntentRef.current = false;
         try {
           sessionStorage.removeItem('o3s_offline_role');
@@ -4122,7 +4124,8 @@ export default function App() {
               transition={{ duration: 0.35, ease: 'easeOut' }}
             >
               <WorkerLandingPage
-                onBack={() => setCurrentScreen('publicMarketing')}
+                onBack={() => setCurrentScreen('forWorkers')}
+                onForFirms={() => { firmSignInIntentRef.current = true; setCurrentScreen('publicMarketing'); }}
                 onSignIn={() => { firmSignInIntentRef.current = false; setCurrentScreen('signIn'); }}
                 onStart={() => {
                   // Low-friction: straight to worker Create Account (matches the page's calm promise).

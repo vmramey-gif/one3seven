@@ -18,6 +18,7 @@ interface WorkerLandingPageProps {
   onStart: () => void;   // "Start organizing — free" → low-friction worker sign-up
   onSignIn: () => void;
   onBack?: () => void;
+  onForFirms?: () => void;  // subtle link to the firm-facing marketing page
 }
 
 const STEPS: [string, string, string][] = [
@@ -33,7 +34,7 @@ const YOURS: [string, string][] = [
   ['You can delete it', 'Change your mind? Request deletion at any time — it’s your account and your decision.'],
 ];
 
-export function WorkerLandingPage({ onStart, onSignIn, onBack }: WorkerLandingPageProps) {
+export function WorkerLandingPage({ onStart, onSignIn, onBack, onForFirms }: WorkerLandingPageProps) {
   return (
     <div style={BODY} className="min-h-screen bg-[#F1F3EF] text-[#17181C] antialiased">
       {/* Nav */}
@@ -42,9 +43,16 @@ export function WorkerLandingPage({ onStart, onSignIn, onBack }: WorkerLandingPa
           <button type="button" onClick={onBack} style={SERIF} className="text-[19px] font-semibold tracking-[-0.01em] text-[#17181C]">
             one3seven
           </button>
-          <button type="button" onClick={onSignIn} className="text-sm font-medium text-[#3f4a44] transition hover:text-[#17181C]">
-            Sign in
-          </button>
+          <div className="flex items-center gap-4 sm:gap-6">
+            {onForFirms ? (
+              <button type="button" onClick={onForFirms} className="text-sm font-medium text-[#6a6d66] transition hover:text-[#17181C]">
+                For firms
+              </button>
+            ) : null}
+            <button type="button" onClick={onSignIn} className="text-sm font-medium text-[#3f4a44] transition hover:text-[#17181C]">
+              Sign in
+            </button>
+          </div>
         </div>
       </nav>
 
