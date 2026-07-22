@@ -477,8 +477,8 @@ export function LandingScreen({
       <WorkerExpandableSection
         key={key}
         title={WORKER_INTAKE_SECTIONS.firmActivity}
-        meta={noFirmConnected ? 'No firm connected — tap to add a firm code' : peek}
-        defaultOpen={noFirmConnected}
+        meta={noFirmConnected ? 'Not shared with a firm yet — tap to add a firm code' : peek}
+        defaultOpen={false}
         size={size}
         className={workerDashboardCompact ? 'bg-white/80' : 'bg-[#F1F3EF]'}
       >
@@ -919,7 +919,7 @@ export function LandingScreen({
           ) : null}
           <div className="mb-3">
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#42574E]">
-              Intakes
+              Your cases
             </p>
             <p className="mt-1 text-xs leading-relaxed text-[#1B2623]/64">
               Every case you start is saved here. To begin a new one, go to Home.
