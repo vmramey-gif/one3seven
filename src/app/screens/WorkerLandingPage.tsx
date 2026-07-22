@@ -84,6 +84,24 @@ export function WorkerLandingPage({ onStart, onSignIn, onBack, onForFirms }: Wor
           </div>
         </section>
 
+        {/* Does any of this sound like you? — recognition hook (questions only, no law stated) */}
+        <section className="py-6">
+          <div style={MONO} className="mb-2 text-[11px] uppercase tracking-[0.16em] text-[#42574E]">{t('wl.sly.eyebrow')}</div>
+          <h2 style={SERIF} className="mb-6 max-w-[22ch] text-[clamp(24px,4vw,32px)] font-semibold tracking-[-0.01em]">{t('wl.sly.h')}</h2>
+          <div className="flex flex-col gap-2.5">
+            {['wl.sly.q1', 'wl.sly.q2', 'wl.sly.q3', 'wl.sly.q4', 'wl.sly.q5'].map((k) => (
+              <div key={k} className="flex items-start gap-3 rounded-[16px] border border-[#E4E5DE] bg-[#FBFBFA] px-4 py-3.5 text-[15.5px] font-medium leading-snug text-[#20242a]">
+                <span className="mt-[7px] h-2 w-2 flex-none rounded-full bg-[#95AB9B]" />
+                {t(k)}
+              </div>
+            ))}
+          </div>
+          <div className="mt-3.5 rounded-[18px] bg-[#42574E] px-6 py-5 text-[#EAF0EC]">
+            <p style={SERIF} className="text-[clamp(16px,2.4vw,18px)] font-medium leading-snug text-white">{t('wl.sly.bridge1')}</p>
+            <p className="mt-2 text-[14.5px] leading-relaxed text-[#D3DED6]">{t('wl.sly.bridge2')}</p>
+          </div>
+        </section>
+
         {/* How it works */}
         <section id="how" className="py-16">
           <div className="text-center">
