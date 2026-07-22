@@ -1,5 +1,12 @@
+import { ArrowRight, FileText } from 'lucide-react';
+
 type WorkerMissionControlHomeProps = {
   greetingName?: string | null;
+  hasSavedIntakes?: boolean;
+  /** Start (or continue) the organize flow — the primary worker action. */
+  onStart?: () => void;
+  /** Open the "Get your employment records" self-help tool. */
+  onGetRecords?: () => void;
 };
 
 function resolvePacificGreeting(name: string | null | undefined): string {
@@ -28,16 +35,60 @@ function resolvePacificGreeting(name: string | null | undefined): string {
 
 export function WorkerMissionControlHome({
   greetingName,
+  hasSavedIntakes = false,
+  onStart,
+  onGetRecords,
 }: WorkerMissionControlHomeProps) {
   const headline = resolvePacificGreeting(greetingName);
 
   return (
-    <div className="mx-auto flex min-h-[min(680px,calc(100vh-8.5rem))] w-full max-w-[680px] flex-col rounded-[32px] border border-[#D3DED6] bg-white/95 px-6 py-8 text-center shadow-[0_28px_90px_rgba(31,27,75,0.12)] sm:px-10 sm:py-10">
-      <header className="mx-auto flex w-full max-w-xl flex-1 items-center justify-center py-16 sm:py-20">
-        <h1 className="font-display text-[clamp(1.75rem,5.8vw,2.25rem)] font-medium leading-[1.12] tracking-[-0.02em] text-transparent bg-[linear-gradient(110deg,#1B2623_0%,#374A42_42%,#1B2623_78%)] bg-[length:220%_100%] bg-clip-text animate-[pulse_3s_ease-in-out_infinite]">
-          {headline}
-        </h1>
-      </header>
+    <div className="mx-auto w-full max-w-[680px] rounded-[28px] border border-[#D3DED6] bg-white/95 px-6 py-7 shadow-[0_24px_80px_rgba(31,27,75,0.10)] sm:px-9 sm:py-9">
+      <h1 className="font-display text-[clamp(1.6rem,5.5vw,2rem)] font-medium leading-[1.1] tracking-[-0.02em] text-[#1B2623]">
+        {headline}
+      </h1>
+      <p className="mt-2 max-w-[42ch] text-[15px] leading-relaxed text-[#5E6B62]">
+        {hasSavedIntakes
+          ? 'Pick up where you left off — or start something new.'
+          : 'Let’s get what happened to you into one clear, organized place. Free, private, and yours to keep.'}
+      </p>
+
+      <div className="mt-6 flex flex-col gap-3">
+        {onStart ? (
+          <button
+            type="button"
+            onClick={onStart}
+            className="flex w-full items-center justify-between gap-3 rounded-2xl bg-[#42574E] px-5 py-4 text-left text-white transition hover:bg-[#374A42]"
+          >
+            <span className="min-w-0">
+              <span className="block text-[15px] font-semibold">
+                {hasSavedIntakes ? 'Continue organizing' : 'Start organizing'}
+              </span>
+              <span className="block text-[13px] leading-snug text-white/75">
+                Tell your story and add what you have — no forms, no legal terms.
+              </span>
+            </span>
+            <ArrowRight className="h-5 w-5 flex-none" />
+          </button>
+        ) : null}
+
+        {onGetRecords ? (
+          <button
+            type="button"
+            onClick={onGetRecords}
+            className="flex w-full items-center gap-3.5 rounded-2xl border border-[#CBD6CF] bg-[#FBFBFA] px-4 py-3.5 text-left transition hover:border-[#7C8B6F]"
+          >
+            <span className="flex h-9 w-9 flex-none items-center justify-center rounded-full bg-[#EFF3ED] text-[#42574E]">
+              <FileText className="h-[18px] w-[18px]" />
+            </span>
+            <span className="min-w-0">
+              <span className="block text-[14px] font-semibold text-[#1B2623]">Get your employment records</span>
+              <span className="block text-[12.5px] leading-snug text-[#6A6D66]">
+                California law entitles you to them — we’ll write the request letter.
+              </span>
+            </span>
+          </button>
+        ) : null}
+      </div>
     </div>
   );
 }
