@@ -3708,7 +3708,8 @@ export default function App() {
   };
 
   const isFirmView = currentScreen === 'firmDashboard' || currentScreen === 'intakeReview' || currentScreen === 'firmSettings';
-  const isMarketingView = currentScreen === 'publicMarketing' || currentScreen === 'forFirms';
+  const isMarketingView =
+    currentScreen === 'publicMarketing' || currentScreen === 'forFirms' || currentScreen === 'forWorkers';
   const isComparisonView = currentScreen === 'comparison';
   const isAuthView =
     currentScreen === 'authWelcome' ||
