@@ -552,6 +552,7 @@ export function LandingScreen({
         greetingName={workerGreetingName}
         hasSavedIntakes={hasSavedIntakes}
         onStart={openOrganizeFlow}
+        onStartNew={onCreateNewIntake ? handleFreshIntakeAdd : undefined}
         onGetRecords={() => onNavigate('recordsRequest')}
       />
     </section>

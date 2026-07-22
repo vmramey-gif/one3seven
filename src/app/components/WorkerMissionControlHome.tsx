@@ -1,10 +1,12 @@
-import { ArrowRight, FileText } from 'lucide-react';
+import { ArrowRight, FileText, Plus } from 'lucide-react';
 
 type WorkerMissionControlHomeProps = {
   greetingName?: string | null;
   hasSavedIntakes?: boolean;
-  /** Start (or continue) the organize flow — the primary worker action. */
+  /** Continue the most recent case (or, for a first-time worker, start their first). */
   onStart?: () => void;
+  /** Always creates a brand-new case (a different job or a new issue). */
+  onStartNew?: () => void;
   /** Open the "Get your employment records" self-help tool. */
   onGetRecords?: () => void;
 };
@@ -37,6 +39,7 @@ export function WorkerMissionControlHome({
   greetingName,
   hasSavedIntakes = false,
   onStart,
+  onStartNew,
   onGetRecords,
 }: WorkerMissionControlHomeProps) {
   const headline = resolvePacificGreeting(greetingName);
@@ -64,10 +67,30 @@ export function WorkerMissionControlHome({
                 {hasSavedIntakes ? 'Continue organizing' : 'Start organizing'}
               </span>
               <span className="block text-[13px] leading-snug text-white/75">
-                Tell your story and add what you have — no forms, no legal terms.
+                {hasSavedIntakes
+                  ? 'Pick up your most recent case.'
+                  : 'Tell your story and add what you have — no forms, no legal terms.'}
               </span>
             </span>
             <ArrowRight className="h-5 w-5 flex-none" />
+          </button>
+        ) : null}
+
+        {hasSavedIntakes && onStartNew ? (
+          <button
+            type="button"
+            onClick={onStartNew}
+            className="flex w-full items-center gap-3.5 rounded-2xl border border-[#CBD6CF] bg-[#FBFBFA] px-4 py-3.5 text-left transition hover:border-[#7C8B6F]"
+          >
+            <span className="flex h-9 w-9 flex-none items-center justify-center rounded-full bg-[#EFF3ED] text-[#42574E]">
+              <Plus className="h-[18px] w-[18px]" />
+            </span>
+            <span className="min-w-0">
+              <span className="block text-[14px] font-semibold text-[#1B2623]">Start a new case</span>
+              <span className="block text-[12.5px] leading-snug text-[#6A6D66]">
+                A different job or a new issue? Begin a fresh file.
+              </span>
+            </span>
           </button>
         ) : null}
 
