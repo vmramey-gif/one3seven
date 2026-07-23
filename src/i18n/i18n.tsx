@@ -213,6 +213,8 @@ export const STRINGS: Dict = {
                        es: 'Tuyo para enviarlo al abogado que tú elijas.' },
   'wl.hero.g3':      { en: 'So they can review all of your records — not just what you remembered to bring.',
                        es: 'Para que puedan revisar todos tus documentos, no solo lo que recordaste llevar.' },
+  'wl.hero.g4':      { en: 'Free — you’re never charged to organize your own records.',
+                       es: 'Gratis: nunca te cobramos por organizar tus propios documentos.' },
   'wl.hero.c1':      { en: 'A text message',                    es: 'Un mensaje de texto' },
   'wl.hero.c2':      { en: 'Pay stubs',                         es: 'Recibos de pago' },
   'wl.hero.c3':      { en: 'A photo of a schedule',             es: 'Una foto de un horario' },

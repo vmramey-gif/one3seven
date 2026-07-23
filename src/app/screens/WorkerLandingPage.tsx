@@ -37,7 +37,7 @@ const HERO_CHIP_SKEW = [
 ] as const;
 
 /** What the worker actually gets — stated as actions, not as a feature list. */
-const HERO_GET_KEYS = ['wl.hero.g1', 'wl.hero.g2', 'wl.hero.g3'] as const;
+const HERO_GET_KEYS = ['wl.hero.g1', 'wl.hero.g2', 'wl.hero.g3', 'wl.hero.g4'] as const;
 
 const YOURS_KEYS = [
   ['wl.yours1.t', 'wl.yours1.b'],
@@ -138,14 +138,26 @@ export function WorkerLandingPage({ onStart, onSignIn, onBack, onForFirms }: Wor
                 {/* Contained, calm panel — the visual relief against the scattered pile above.
                     Stated as what the worker gets to DO, not as product features. */}
                 <div className="mt-2.5 flex flex-col gap-3 rounded-[16px] border border-[#CBD6CF] bg-[#F7F9F5] p-4">
-                  {HERO_GET_KEYS.map((k) => (
-                    <div key={k} className="flex items-start gap-2.5">
-                      <span className="mt-[1px] flex h-[18px] w-[18px] flex-none items-center justify-center rounded-full bg-[#E7EDE8] text-[#42574E]">
-                        <Check className="h-3 w-3" strokeWidth={2.75} />
-                      </span>
-                      <p className="text-[13px] leading-relaxed text-[#20242a]">{t(k)}</p>
-                    </div>
-                  ))}
+                  {HERO_GET_KEYS.map((k) => {
+                    const isFree = k === 'wl.hero.g4';
+                    return (
+                      <div
+                        key={k}
+                        className={`flex items-start gap-2.5${isFree ? ' border-t border-[#CBD6CF] pt-3' : ''}`}
+                      >
+                        <span
+                          className={`mt-[1px] flex h-[18px] w-[18px] flex-none items-center justify-center rounded-full ${
+                            isFree ? 'bg-[#42574E] text-white' : 'bg-[#E7EDE8] text-[#42574E]'
+                          }`}
+                        >
+                          <Check className="h-3 w-3" strokeWidth={2.75} />
+                        </span>
+                        <p className={`text-[13px] leading-relaxed ${isFree ? 'font-semibold text-[#42574E]' : 'text-[#20242a]'}`}>
+                          {t(k)}
+                        </p>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>
