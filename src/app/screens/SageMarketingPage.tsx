@@ -7,11 +7,13 @@
  * Bilingual via i18n t().
  */
 import { ArrowRight, FileText, CheckCircle2 } from 'lucide-react';
+import { WordMark } from '../components/WordMark';
 import { useLang, LangToggle } from '../../i18n/i18n';
 import { track } from '../../lib/analytics';
 import { motion, useReducedMotion } from 'motion/react';
 
 interface SageMarketingPageProps {
+  onHome?: () => void;
   onWorkerStart: () => void;
   onFirmStart: () => void;
   onSignIn: () => void;
@@ -202,7 +204,7 @@ function DecisionCard({ t }: { t: (k: string) => string }) {
   );
 }
 
-export function SageMarketingPage({ onWorkerStart, onSignIn, onForFirms, firmDirectedContext = null }: SageMarketingPageProps) {
+export function SageMarketingPage({ onHome, onWorkerStart, onSignIn, onForFirms, firmDirectedContext = null }: SageMarketingPageProps) {
   const { t } = useLang();
   const reduce = useReducedMotion();
   const directed = !!firmDirectedContext;
@@ -211,7 +213,9 @@ export function SageMarketingPage({ onWorkerStart, onSignIn, onForFirms, firmDir
     <div style={BODY} className="min-h-screen bg-[#F1F3EF] text-[#17181C]">
       {/* nav */}
       <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
-        <span style={SERIF} className="text-[19px] font-semibold tracking-[-0.01em]">one3seven</span>
+        <button type="button" onClick={onHome} style={SERIF} className="text-[19px] font-semibold tracking-[-0.01em] transition hover:opacity-70">
+          <WordMark />
+        </button>
         <div className="flex items-center gap-3 sm:gap-5">
           <a href="/hq" className="text-[12px] font-medium text-[#9aa39b] transition hover:text-[#42574E]">HQ</a>
           <LangToggle tone="light" />

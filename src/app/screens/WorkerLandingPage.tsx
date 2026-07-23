@@ -1,4 +1,5 @@
 import { ArrowRight } from 'lucide-react';
+import { WordMark } from '../components/WordMark';
 import { useLang, LangToggle } from '../../i18n/i18n';
 
 /**
@@ -39,8 +40,8 @@ export function WorkerLandingPage({ onStart, onSignIn, onBack, onForFirms }: Wor
       {/* Nav */}
       <nav className="sticky top-0 z-50 border-b border-[#E1E4DD] bg-[#F1F3EF]/90 backdrop-blur-sm">
         <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-5 sm:h-16 sm:px-8">
-          <button type="button" onClick={onBack} style={SERIF} className="text-[19px] font-semibold tracking-[-0.01em] text-[#17181C]">
-            one3seven
+          <button type="button" onClick={onBack} style={SERIF} className="text-[19px] font-semibold tracking-[-0.01em] text-[#17181C] transition hover:opacity-70">
+            <WordMark />
           </button>
           <div className="flex items-center gap-3 sm:gap-5">
             <LangToggle tone="light" />

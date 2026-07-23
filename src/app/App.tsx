@@ -3752,6 +3752,26 @@ export default function App() {
     }
   };
 
+  // Canonical "brand logo → home" rule for every corner wordmark:
+  //   • logged-in worker → their case-list dashboard (via handleLogoClick, which preserves the
+  //     unsaved-progress exit modal)
+  //   • logged-in firm   → the firm dashboard
+  //   • everyone else (logged out / marketing) → the worker home landing page (forWorkers)
+  // Fixes the old behavior where corner logos routed to the firm marketing page.
+  const handleBrandHomeClick = () => {
+    const isWorker = userRole === 'worker' || profile?.role === 'worker';
+    const isFirm = userRole === 'firm' || profile?.role === 'firm';
+    if (isWorker) {
+      handleLogoClick();
+      return;
+    }
+    if (isFirm) {
+      setCurrentScreen('firmDashboard');
+      return;
+    }
+    setCurrentScreen('forWorkers');
+  };
+
   const handleConfirmExit = () => {
     setShowExitModal(false);
     if (isSupabaseConfigured() && !currentIntakeIdRef.current && getPendingOnboarding()) {
@@ -4123,6 +4143,7 @@ export default function App() {
               transition={{ duration: 0.35, ease: 'easeOut' }}
             >
               <SageMarketingPage
+                onHome={handleBrandHomeClick}
                 onWorkerStart={
                   firmDirectedContext
                     ? () => void startFirmDirectedGuestIntake()
@@ -4155,7 +4176,7 @@ export default function App() {
               transition={{ duration: 0.35, ease: 'easeOut' }}
             >
               <ForFirmsPage
-                onBack={() => setCurrentScreen('publicMarketing')}
+                onBack={handleBrandHomeClick}
                 onStartWorker={() => {
                   firmSignInIntentRef.current = false;
                   setCurrentScreen('authWelcome');

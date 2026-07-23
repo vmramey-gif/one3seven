@@ -326,7 +326,9 @@ export function LawFirmDashboardScreen({
         <div className="px-6 py-5">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
-              <h1 className="text-xl font-semibold text-[#1B2623]"><WordMark /></h1>
+              <button type="button" onClick={() => onNavigate('firmDashboard')} className="text-xl font-semibold text-[#1B2623] transition hover:opacity-70">
+                <WordMark />
+              </button>
             </div>
             <div className="flex flex-wrap items-center gap-2">
               <NotificationsBell items={firmBellNotifications} />

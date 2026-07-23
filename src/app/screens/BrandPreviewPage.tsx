@@ -5,6 +5,7 @@
  * AI-only moments; the source-linked vertical timeline is the signature visual.
  * Self-contained (no auth/Supabase) so it renders like the demo routes.
  */
+import { WordMark } from '../components/WordMark';
 
 const SERIF = { fontFamily: '"Fraunces", Georgia, "Times New Roman", serif' } as const;
 const BODY = { fontFamily: '"Inter Tight", ui-sans-serif, system-ui, -apple-system, sans-serif' } as const;
@@ -52,7 +53,7 @@ export function BrandPreviewPage() {
     <div style={BODY} className="min-h-screen bg-[#F1F3EF] text-[#17181C]">
       {/* nav */}
       <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
-        <span style={SERIF} className="text-[19px] font-semibold tracking-[-0.01em]">one3seven</span>
+        <span style={SERIF} className="text-[19px] font-semibold tracking-[-0.01em]"><WordMark /></span>
         <div className="flex items-center gap-6">
           <a href="/demo" className="hidden text-[13.5px] font-medium text-[#3f4a44] hover:text-[#17181C] sm:block">See a sample</a>
           <a href="#pilot" className="rounded-full bg-[#42574E] px-5 py-2.5 text-[13.5px] font-semibold text-[#EAF0EC] transition hover:bg-[#374a42]">Request a pilot</a>

@@ -1,4 +1,5 @@
 import { CheckCircle2 } from 'lucide-react';
+import { WordMark } from '../components/WordMark';
 import { useLang, LangToggle } from '../../i18n/i18n';
 
 /**
@@ -18,7 +19,7 @@ export function PendingApprovalScreen({ onSignOut }: { onSignOut: () => void }) 
       <div className="pointer-events-none absolute -right-40 top-40 h-[440px] w-[440px] rounded-full bg-[#728179]/8 blur-3xl" />
 
       <header className="relative flex items-center justify-between">
-        <div style={SERIF} className="text-[19px] font-semibold tracking-[-0.01em] text-[#17181C]">one3seven</div>
+        <div style={SERIF} className="text-[19px] font-semibold tracking-[-0.01em] text-[#17181C]"><WordMark /></div>
         <LangToggle tone="light" />
       </header>
 

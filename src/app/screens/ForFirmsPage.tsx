@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { ArrowRight, ArrowLeft, ShieldCheck, FileText, Check } from 'lucide-react';
 import { submitPilotInterest } from '../../services/pilotInterestService';
+import { WordMark } from '../components/WordMark';
 import { track } from '../../lib/analytics';
 
 interface ForFirmsPageProps {
@@ -46,8 +47,8 @@ export function ForFirmsPage({ onBack, onStartWorker }: ForFirmsPageProps) {
       {/* Nav */}
       <nav className="sticky top-0 z-50 border-b border-[#E1E4DD] bg-[#F1F3EF]/90 backdrop-blur-sm">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-5 sm:h-16 sm:px-8">
-          <button type="button" onClick={onBack} style={SERIF} className="text-[19px] font-semibold tracking-[-0.01em] text-[#17181C]">
-            one3seven
+          <button type="button" onClick={onBack} style={SERIF} className="text-[19px] font-semibold tracking-[-0.01em] text-[#17181C] transition hover:opacity-70">
+            <WordMark />
           </button>
           <button type="button" onClick={onStartWorker} className="text-sm font-medium text-[#3f4a44] transition hover:text-[#17181C]">
             For workers
