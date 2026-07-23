@@ -36,8 +36,8 @@ const FILENAME_CATEGORY_RULES: Array<{ pattern: RegExp; category: string; weight
   { pattern: /complaint_to_supervisor|complaint.?supervisor|supervisor.?complaint/i, category: 'Workplace Communications', weight: 92 },
   { pattern: /complaint_to_hr|complaint.?hr|hr.?complaint|grievance/i, category: 'Workplace Communications', weight: 92 },
   { pattern: /safety.?concern|safety.?complaint|safety.?email|safety.?report/i, category: 'Workplace Communications', weight: 88 },
-  { pattern: /witness_statement|witness.?statement/i, category: 'Workplace Communications', weight: 88 },
-  { pattern: /written_warning|write_?up|disciplinary/i, category: 'Performance Reviews', weight: 88 },
+  { pattern: /witness[_\s]?statement|(?:^|[_\s])statement(?:[_\s.]|$)/i, category: 'Workplace Communications', weight: 85 },
+  { pattern: /written[_\s]?warning|write[_\s]?up|disciplin/i, category: 'Performance Reviews', weight: 88 },
   { pattern: /termination_letter|terminat/i, category: 'HR Documents', weight: 90 },
   { pattern: /separation|severance|final_pay/i, category: 'HR Documents', weight: 86 },
   { pattern: /project_removal|removed_from_project/i, category: 'HR Documents', weight: 84 },
@@ -179,16 +179,21 @@ function inventoryRowForName(inventory: InventoryRow[], name: string): Inventory
 /** Infer storage category from filename when Uncategorized or empty. */
 export function inferInventoryCategory(fileName: string, storedCategory: string): string {
   const stored = (storedCategory ?? '').trim();
-  if (stored && stored !== 'Uncategorized') return stored;
 
   const base = fileName.toLowerCase();
-  let best = { category: stored || 'Uncategorized', weight: 0 };
+  let best = { category: '', weight: 0 };
   for (const rule of FILENAME_CATEGORY_RULES) {
     if (rule.pattern.test(base) && rule.weight > best.weight) {
       best = { category: rule.category, weight: rule.weight };
     }
   }
-  return best.weight >= 80 ? best.category : stored || 'Uncategorized';
+  // A high-confidence filename ("WrittenWarning", "TerminationLetter", "PayStub") is more reliable
+  // than the extraction engine's stored guess — let it OVERRIDE even a stored category. (Previously
+  // the stored category always won, so mislabels like a written warning filed as "Reimbursement"
+  // stuck.) Below that bar, trust a real stored category; only fall back to weaker filename hints.
+  if (best.weight >= 85) return best.category;
+  if (stored && stored !== 'Uncategorized') return stored;
+  return best.weight >= 78 ? best.category : stored || 'Uncategorized';
 }
 
 /** Normalize inventory with inferred categories for chronology scoring. */
