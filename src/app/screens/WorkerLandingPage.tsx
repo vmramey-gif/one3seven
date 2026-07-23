@@ -1,4 +1,4 @@
-import { ArrowRight, ShieldCheck } from 'lucide-react';
+import { ArrowRight, Check, ShieldCheck } from 'lucide-react';
 import { WordMark } from '../components/WordMark';
 import { useLang, LangToggle } from '../../i18n/i18n';
 
@@ -28,11 +28,16 @@ const STEP_KEYS = [
 
 const HERO_CHIP_KEYS = ['wl.hero.c1', 'wl.hero.c2', 'wl.hero.c3', 'wl.hero.c4'] as const;
 
-const HERO_ROW_KEYS = [
-  ['wl.hero.r1d', 'wl.hero.r1t'],
-  ['wl.hero.r2d', 'wl.hero.r2t'],
-  ['wl.hero.r3d', 'wl.hero.r3t'],
+/** Slight tilt/offset per chip so the "before" state reads as a scattered pile, not a tidy list. */
+const HERO_CHIP_SKEW = [
+  { rotate: -3.5, y: 0 },
+  { rotate: 2.5, y: 3 },
+  { rotate: -2, y: -2 },
+  { rotate: 3, y: 2 },
 ] as const;
+
+/** What the worker actually gets — stated as actions, not as a feature list. */
+const HERO_GET_KEYS = ['wl.hero.g1', 'wl.hero.g2', 'wl.hero.g3'] as const;
 
 const YOURS_KEYS = [
   ['wl.yours1.t', 'wl.yours1.b'],
@@ -106,13 +111,18 @@ export function WorkerLandingPage({ onStart, onSignIn, onBack, onForFirms }: Wor
                 <div className="mt-4 text-[11px] font-semibold uppercase tracking-wide text-[#6a6d66]">
                   {t('wl.hero.card.before')}
                 </div>
-                <div className="mt-2 flex flex-wrap gap-1.5">
-                  {HERO_CHIP_KEYS.map((k) => (
-                    <span key={k} className="rounded-full border border-[#E4E5DE] bg-[#FBFBFA] px-2.5 py-1 text-[11.5px] text-[#6a6d66]">
+                <div className="mt-2.5 flex flex-wrap gap-x-1.5 gap-y-1.5">
+                  {HERO_CHIP_KEYS.map((k, i) => (
+                    <span
+                      key={k}
+                      style={{ transform: `rotate(${HERO_CHIP_SKEW[i].rotate}deg) translateY(${HERO_CHIP_SKEW[i].y}px)` }}
+                      className="rounded-[10px] border border-[#E4E5DE] bg-[#F6F6F4] px-2.5 py-1 text-[11.5px] text-[#8a938c] shadow-[0_2px_6px_rgba(31,27,75,0.06)]"
+                    >
                       {t(k)}
                     </span>
                   ))}
                 </div>
+                <p className="mt-3 text-[11.5px] leading-relaxed text-[#8a938c]">{t('wl.hero.card.pain')}</p>
 
                 <div className="my-4 flex items-center gap-2">
                   <span className="h-px flex-1 bg-[#E4E5DE]" />
@@ -125,21 +135,18 @@ export function WorkerLandingPage({ onStart, onSignIn, onBack, onForFirms }: Wor
                 <div className="text-[11px] font-semibold uppercase tracking-wide text-[#6a6d66]">
                   {t('wl.hero.card.after')}
                 </div>
-                <div className="mt-2.5 flex flex-col gap-2.5">
-                  {HERO_ROW_KEYS.map(([dateKey, labelKey]) => (
-                    <div key={labelKey} className="flex items-start gap-2.5">
-                      <span className="mt-[7px] h-2 w-2 flex-none rounded-full bg-[#7C8B6F]" />
-                      <div className="min-w-0">
-                        <div style={MONO} className="text-[10.5px] tracking-[0.08em] text-[#8a938c]">{t(dateKey)}</div>
-                        <div className="text-[13.5px] font-medium leading-snug text-[#20242a]">{t(labelKey)}</div>
-                      </div>
+                {/* Contained, calm panel — the visual relief against the scattered pile above.
+                    Stated as what the worker gets to DO, not as product features. */}
+                <div className="mt-2.5 flex flex-col gap-3 rounded-[16px] border border-[#CBD6CF] bg-[#F7F9F5] p-4">
+                  {HERO_GET_KEYS.map((k) => (
+                    <div key={k} className="flex items-start gap-2.5">
+                      <span className="mt-[1px] flex h-[18px] w-[18px] flex-none items-center justify-center rounded-full bg-[#E7EDE8] text-[#42574E]">
+                        <Check className="h-3 w-3" strokeWidth={2.75} />
+                      </span>
+                      <p className="text-[13px] leading-relaxed text-[#20242a]">{t(k)}</p>
                     </div>
                   ))}
                 </div>
-
-                <p className="mt-4 border-t border-[#E4E5DE] pt-3 text-[11.5px] leading-relaxed text-[#6a6d66]">
-                  {t('wl.hero.card.foot')}
-                </p>
               </div>
             </div>
           </div>
