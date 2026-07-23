@@ -108,7 +108,8 @@ export function WorkerLandingPage({ onStart, onSignIn, onBack, onForFirms }: Wor
                   {t('wl.hero.card.tag')}
                 </div>
 
-                <div className="mt-4 text-[11px] font-semibold uppercase tracking-wide text-[#6a6d66]">
+                {/* Burnt orange marks the problem state; sage marks everything organized. */}
+                <div className="mt-4 text-[11px] font-semibold uppercase tracking-wide text-[#A8512B]">
                   {t('wl.hero.card.before')}
                 </div>
                 <div className="mt-2.5 flex flex-wrap gap-x-1.5 gap-y-1.5">
@@ -116,13 +117,13 @@ export function WorkerLandingPage({ onStart, onSignIn, onBack, onForFirms }: Wor
                     <span
                       key={k}
                       style={{ transform: `rotate(${HERO_CHIP_SKEW[i].rotate}deg) translateY(${HERO_CHIP_SKEW[i].y}px)` }}
-                      className="rounded-[10px] border border-[#E4E5DE] bg-[#F6F6F4] px-2.5 py-1 text-[11.5px] text-[#8a938c] shadow-[0_2px_6px_rgba(31,27,75,0.06)]"
+                      className="rounded-[10px] border border-[#EBD9CD] bg-[#FBF4EF] px-2.5 py-1 text-[11.5px] text-[#95644A] shadow-[0_2px_6px_rgba(168,81,43,0.08)]"
                     >
                       {t(k)}
                     </span>
                   ))}
                 </div>
-                <p className="mt-3 text-[11.5px] leading-relaxed text-[#8a938c]">{t('wl.hero.card.pain')}</p>
+                <p className="mt-3 text-[11.5px] leading-relaxed text-[#8B7166]">{t('wl.hero.card.pain')}</p>
 
                 <div className="my-4 flex items-center gap-2">
                   <span className="h-px flex-1 bg-[#E4E5DE]" />
@@ -166,12 +167,12 @@ export function WorkerLandingPage({ onStart, onSignIn, onBack, onForFirms }: Wor
 
         {/* Does any of this sound like you? — recognition hook (questions only, no law stated) */}
         <section className="py-6">
-          <div style={MONO} className="mb-2 text-[11px] uppercase tracking-[0.16em] text-[#42574E]">{t('wl.sly.eyebrow')}</div>
+          <div style={MONO} className="mb-2 text-[11px] uppercase tracking-[0.16em] text-[#A8512B]">{t('wl.sly.eyebrow')}</div>
           <h2 style={SERIF} className="mb-6 max-w-[22ch] text-[clamp(24px,4vw,32px)] font-semibold tracking-[-0.01em]">{t('wl.sly.h')}</h2>
           <div className="flex flex-col gap-2.5">
             {['wl.sly.q1', 'wl.sly.q2', 'wl.sly.q3', 'wl.sly.q4', 'wl.sly.q5'].map((k) => (
               <div key={k} className="flex items-start gap-3 rounded-[16px] border border-[#E4E5DE] bg-[#FBFBFA] px-4 py-3.5 text-[15.5px] font-medium leading-snug text-[#20242a]">
-                <span className="mt-[7px] h-2 w-2 flex-none rounded-full bg-[#95AB9B]" />
+                <span className="mt-[7px] h-2 w-2 flex-none rounded-full bg-[#C2703F]" />
                 {t(k)}
               </div>
             ))}
