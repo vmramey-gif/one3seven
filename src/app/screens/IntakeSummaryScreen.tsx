@@ -365,7 +365,11 @@ export function IntakeSummaryScreen({
   const [docDraftSaveMessage, setDocDraftSaveMessage] = useState<string | null>(null);
   const [docDraftSaveError, setDocDraftSaveError] = useState<string | null>(null);
   const [docDraftSaving, setDocDraftSaving] = useState(false);
-  const [fullReviewMode, setFullReviewMode] = useState(false);
+  // Worker-first: the worker's own file always shows the full organized view. The old
+  // "What Firms See" preview toggle framed their file around firms — removed.
+  const [fullReviewMode] = useState(true);
+  // The floating download bar is now just a dismissible "download your file" bar.
+  const [showDownloadBar, setShowDownloadBar] = useState(true);
   const [showAllUploadedFiles, setShowAllUploadedFiles] = useState(false);
 
   const sx = workerMobileSummarySkin(shellMode);
@@ -1149,38 +1153,11 @@ export function IntakeSummaryScreen({
             ) : null}
           </div>
 
-          <div className="mb-4 rounded-[18px] border border-[#CBD6CF] bg-white/90 p-3 shadow-[0_14px_36px_rgba(91,53,213,0.08)]">
-            <p className="mb-3 text-sm leading-relaxed text-[#1B2623]/72">
-              This is the organized summary one3seven created from your story and records.
-            </p>
-            <div className="grid grid-cols-2 gap-2 rounded-[14px] bg-[#F7F9F5] p-1">
-              <button
-                type="button"
-                onClick={() => setFullReviewMode(false)}
-                className={`rounded-[12px] px-3 py-2.5 text-xs font-semibold transition ${
-                  !fullReviewMode
-                    ? 'bg-white text-[#374A42] shadow-sm'
-                    : 'text-[#40433F] hover:bg-white/60'
-                }`}
-              >
-                What Firms See
-              </button>
-              <button
-                type="button"
-                onClick={() => setFullReviewMode(true)}
-                className={`rounded-[12px] px-3 py-2.5 text-xs font-semibold transition ${
-                  fullReviewMode
-                    ? 'bg-white text-[#374A42] shadow-sm'
-                    : 'text-[#40433F] hover:bg-white/60'
-                }`}
-              >
-                Full Review Version
-              </button>
-            </div>
-            <p className="mt-3 text-xs leading-relaxed text-[#40433F]">
-              {fullReviewMode
-                ? 'This view shows the fuller organized packet available after expanded review access is approved.'
-                : 'This view reflects the limited preview a firm can review before expanded access is approved.'}
+          <div className="mb-4 rounded-[18px] border border-[#CBD6CF] bg-white/90 p-3.5 shadow-[0_14px_36px_rgba(91,53,213,0.08)]">
+            <p className="text-sm leading-relaxed text-[#1B2623]/80">
+              {firmCaseMode
+                ? 'This is your organized case file, built from the documents you added.'
+                : 'This is your organized file — built from your story and the records you added. It’s yours to review, download, and share whenever you choose.'}
             </p>
           </div>
 
@@ -2521,12 +2498,9 @@ export function IntakeSummaryScreen({
         )}
       </AnimatePresence>
 
-      {fullReviewMode ? (
+      {showDownloadBar ? (
         <WorkerFullReviewBar
-          onExit={() => {
-            setFullReviewMode(false);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }}
+          onExit={() => setShowDownloadBar(false)}
           onDownload={() => void handleDownloadIntakeSummary()}
         />
       ) : null}
