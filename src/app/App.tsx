@@ -65,6 +65,7 @@ import {
   type PendingWorkerOnboarding,
 } from '../services/guidedIntakePersistence';
 import { uploadedFileKey } from '../services/employmentTimelineOrganization';
+import { polishNameForDisplay } from '../services/firmIntakeDisplay';
 import * as notifications from '../services/notificationService';
 import type {
   FirmDashboardRow,
@@ -3905,14 +3906,11 @@ export default function App() {
     isSupabaseConfigured() && isAuthRestoring && !isAuthenticated;
 
   const isWorkerRole = profile?.role === 'worker' || userRole === 'worker';
-  const workerFirstOrganizeGateActive =
-    isWorkerRole &&
-    isAuthenticated &&
-    isSupabaseConfigured() &&
-    !workerIntakesLoading &&
-    workerIntakesList.length === 0 &&
-    !lawFirmGateCompleted &&
-    !firmDirectedContext; // firm-directed workers skip the modal — firm is already known
+  // Worker-first: never force a firm decision before the worker has organized anything. They
+  // organize first and choose sharing later, from their file. (Was: a "share with a firm / keep my
+  // file" modal popped on the very first "Start organizing" — a firm choice before the win.)
+  const workerFirstOrganizeGateActive = false;
+  void lawFirmGateCompleted;
   const workerHasOrganizingActivity =
     workerIntakesList.length > 0 ||
     uploadedFiles.length > 0 ||
@@ -4322,7 +4320,7 @@ export default function App() {
                     : undefined
                 }
                 showWorkerHub={(profile?.role === 'worker' || userRole === 'worker') && isAuthenticated}
-                workerGreetingName={profile?.full_name ?? null}
+                workerGreetingName={profile?.full_name ? polishNameForDisplay(profile.full_name) : null}
                 mobileHubView={workerLandingInitialHubView}
                 onGoWorkerSummary={
                   (profile?.role === 'worker' || userRole === 'worker') && isAuthenticated

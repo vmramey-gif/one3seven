@@ -1392,50 +1392,21 @@ export function LandingScreen({
             </div>
           </details>
         ) : (
-        <div className="space-y-5">
-          <div className="bg-slate-50 rounded-[16px] p-7 border border-slate-200">
-            <h3 className="text-base font-semibold text-slate-900 mb-5">For individuals</h3>
-            <ul className="space-y-4">
-              <li className="flex items-start gap-3">
-                <CheckCircle2 className="w-4 h-4 text-slate-400 flex-shrink-0 mt-0.5" />
-                <span className="text-sm text-slate-600 leading-relaxed">Keep related records in one organized place</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <CheckCircle2 className="w-4 h-4 text-slate-400 flex-shrink-0 mt-0.5" />
-                <span className="text-sm text-slate-600 leading-relaxed">Create a clearer timeline of your records</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <CheckCircle2 className="w-4 h-4 text-slate-400 flex-shrink-0 mt-0.5" />
-                <span className="text-sm text-slate-600 leading-relaxed">Review categorized documents more clearly</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <CheckCircle2 className="w-4 h-4 text-slate-400 flex-shrink-0 mt-0.5" />
-                <span className="text-sm text-slate-600 leading-relaxed">Prepare cleaner intake materials for future conversations</span>
-              </li>
-            </ul>
-          </div>
-
-          <div className="rounded-[16px] border border-[#D3DED6] bg-white p-7 text-[#1B2623] shadow-[0_14px_38px_rgba(31,27,75,0.08)]">
-            <h3 className="mb-5 text-base font-semibold">For Participating Firms</h3>
-            <ul className="space-y-4">
-              <li className="flex items-start gap-3">
+        <div className="mx-auto max-w-md rounded-[16px] border border-[#D3DED6] bg-white p-7 shadow-[0_14px_38px_rgba(31,27,75,0.06)]">
+          <h3 className="mb-4 text-base font-semibold text-[#1B2623]">What you get</h3>
+          <ul className="space-y-3.5">
+            {[
+              'Everything you have, kept in one organized place',
+              'A clear, dated timeline of what happened',
+              'Your documents grouped and easy to review',
+              'A file you own — ready to bring to any attorney you choose',
+            ].map((t) => (
+              <li key={t} className="flex items-start gap-3">
                 <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#42574E]" />
-                <span className="text-sm leading-relaxed text-[#1B2623]/64">Receive more organized intake submissions</span>
+                <span className="text-sm leading-relaxed text-[#1B2623]/72">{t}</span>
               </li>
-              <li className="flex items-start gap-3">
-                <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#42574E]" />
-                <span className="text-sm leading-relaxed text-[#1B2623]/64">Reduce manual document sorting</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#42574E]" />
-                <span className="text-sm leading-relaxed text-[#1B2623]/64">Review structured timelines and categorized records</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#42574E]" />
-                <span className="text-sm leading-relaxed text-[#1B2623]/64">Improve intake workflow efficiency</span>
-              </li>
-            </ul>
-          </div>
+            ))}
+          </ul>
         </div>
         )}
       </section>
