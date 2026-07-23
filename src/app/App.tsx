@@ -216,6 +216,26 @@ const O3S_SS_WORKER_PENDING_DETAILS = 'o3s_worker_pending_worker_details_v1';
 const O3S_SS_WORKER_GOOGLE_SIGNUP = 'o3s_worker_google_oauth_signup_v1';
 /** Phone captured on the Create Account form; applied to the profile row once post-auth creates it. */
 const O3S_SS_SIGNUP_PHONE = 'o3s_worker_signup_phone_v1';
+/**
+ * Last meaningful worker view, so a browser refresh restores where the worker was instead of
+ * dropping them back to the case list / marketing page. Only 'summary' (their file, with its
+ * intake) and 'landing' (case list) are persisted; any other in-flow screen falls back to
+ * 'landing' — their draft is saved server-side, so no work is lost.
+ */
+const O3S_SS_LAST_WORKER_VIEW = 'o3s_last_worker_view_v1';
+type LastWorkerView = { screen: 'summary'; intakeId: string } | { screen: 'landing' };
+function readLastWorkerView(): LastWorkerView | null {
+  try {
+    const raw = sessionStorage.getItem(O3S_SS_LAST_WORKER_VIEW);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as LastWorkerView;
+    if (parsed?.screen === 'summary' && typeof parsed.intakeId === 'string' && parsed.intakeId) return parsed;
+    if (parsed?.screen === 'landing') return parsed;
+    return null;
+  } catch {
+    return null;
+  }
+}
 
 function o3sWorkerContactLocalKey(userId: string) {
   return `o3s_worker_contact_local_v1_${userId}`;
@@ -327,6 +347,21 @@ export default function App() {
   const [firmProfile, setFirmProfile] = useState<FirmProfileRow | null>(null);
   const [currentIntakeId, setCurrentIntakeId] = useState<string | null>(null);
   const [currentIntakeNumber, setCurrentIntakeNumber] = useState<string | null>(null);
+
+  // Persist the worker's last meaningful view so a browser refresh restores it (see
+  // O3S_SS_LAST_WORKER_VIEW). Only workers get this; firm routing is unaffected.
+  useEffect(() => {
+    if (userRole !== 'worker') return;
+    try {
+      const next: LastWorkerView =
+        currentScreen === 'summary' && currentIntakeId
+          ? { screen: 'summary', intakeId: currentIntakeId }
+          : { screen: 'landing' }; // any other worker screen falls back to the case list on refresh
+      sessionStorage.setItem(O3S_SS_LAST_WORKER_VIEW, JSON.stringify(next));
+    } catch {
+      /* ignore */
+    }
+  }, [userRole, currentScreen, currentIntakeId]);
   const [firmDashboardRows, setFirmDashboardRows] = useState<FirmDashboardRow[]>([]);
   // The firm's OWN case files (documents the firm uploaded and organized itself) — kept separate
   // from worker-submitted intakes so the dashboard clearly divides "your case files" from "client intakes".
@@ -700,6 +735,7 @@ export default function App() {
           sessionStorage.removeItem(O3S_SS_WORKER_PENDING_DETAILS);
           sessionStorage.removeItem(O3S_SS_WORKER_GOOGLE_SIGNUP);
           sessionStorage.removeItem(O3S_SS_SIGNUP_PHONE);
+          sessionStorage.removeItem(O3S_SS_LAST_WORKER_VIEW);
         } catch {
           /* ignore */
         }
@@ -849,6 +885,7 @@ export default function App() {
             }
 
             let firmProfileForRouting: FirmProfileRow | null = null;
+            let workerRowsForRouting: WorkerIntakeListEntry[] = [];
             if (routingProfile?.role === 'firm') {
               setUserRole('firm');
               firmProfileForRouting = await intakeData.ensureFirmProfile(
@@ -862,7 +899,7 @@ export default function App() {
             } else if (routingProfile?.role === 'worker') {
               setUserRole('worker');
               await refreshWorkerAccessRows(signedInUser.id);
-              await refreshWorkerIntakesList(signedInUser.id);
+              workerRowsForRouting = await refreshWorkerIntakesList(signedInUser.id);
             } else {
               setUserRole(null);
             }
@@ -946,7 +983,17 @@ export default function App() {
                 setCurrentScreen(firmScreen);
               } else if (routingProfile?.role === 'worker') {
                 firmSignInIntentRef.current = false;
-                setCurrentScreen(firmIntent ? 'firmDashboard' : 'landing');
+                // Restore where the worker was before a refresh. Only 'summary' (their file) is
+                // deep-restored, and only if that intake still exists; everything else → case list.
+                const lastView = firmIntent ? null : readLastWorkerView();
+                if (
+                  lastView?.screen === 'summary' &&
+                  workerRowsForRouting.some((r) => r.id === lastView.intakeId)
+                ) {
+                  void openWorkerSummaryForIntake(lastView.intakeId);
+                } else {
+                  setCurrentScreen(firmIntent ? 'firmDashboard' : 'landing');
+                }
               } else {
                 setUserRole(null);
                 firmSignInIntentRef.current = false;
