@@ -628,11 +628,15 @@ export function LandingScreen({
               highlighted={highlighted}
               actionNeeded={actionNeeded}
               onOpenWorkspace={
-                onOpenWorkerIntakeWorkspaceForIntake
-                  ? () => onOpenWorkerIntakeWorkspaceForIntake(card.intakeId)
-                  : isActive
-                    ? openOrganizeFlow
-                    : undefined
+                // A finished case opens the worker's file (their summary), not the editor.
+                // An in-progress case opens the workspace so they can keep organizing.
+                card.hasSummary && onOpenWorkerSummaryForIntake
+                  ? () => onOpenWorkerSummaryForIntake(card.intakeId)
+                  : onOpenWorkerIntakeWorkspaceForIntake
+                    ? () => onOpenWorkerIntakeWorkspaceForIntake(card.intakeId)
+                    : isActive
+                      ? openOrganizeFlow
+                      : undefined
               }
             >
               {card.hasSummary ? (
