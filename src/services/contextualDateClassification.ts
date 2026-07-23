@@ -12,6 +12,25 @@ export type DateContextCategory =
 
 export const DATE_UNCLEAR_LABEL = 'Date unclear — review source document';
 
+/**
+ * Guards against fabricated precision. The AI extraction sometimes stamps an unknown or year-only
+ * date as January 1 ("January 1, 2022", "01/01/2025", "2022-01-01"). A real employment event on
+ * New Year's Day is rare; a Jan-1 stamp is almost always a default. Downgrade it to the year alone
+ * so we never present a false-precise date the source doesn't actually support. Non-Jan-1 dates
+ * (and real partial dates like "March 2025") pass through untouched.
+ */
+export function normalizeEventDisplayDate(date: string | null | undefined): string {
+  const d = (date ?? '').trim();
+  if (!d) return d;
+  const janName = d.match(/^jan(?:uary)?\.?\s+0?1(?:st)?,?\s+((?:19|20)\d{2})$/i);
+  if (janName) return janName[1];
+  const janNum = d.match(/^0?1[/-]0?1[/-]((?:19|20)\d{2})$/);
+  if (janNum) return janNum[1];
+  const janIso = d.match(/^((?:19|20)\d{2})-01-01$/);
+  if (janIso) return janIso[1];
+  return d;
+}
+
 export type ClassifiedDateHit = {
   token: string;
   index: number;

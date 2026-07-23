@@ -9,6 +9,7 @@ import {
 import { SourceRecordChips } from './SourceRecordChips';
 import { O3S_CYAN_TEXT, O3S_GOLD_DOT } from '../constants/visualTheme';
 import { polishHumanReadableDisplayText } from '../../services/firmIntakeDisplay';
+import { normalizeEventDisplayDate } from '../../services/contextualDateClassification';
 
 export type WorkerTimelineEventCardProps = {
   event: WorkerTimelineItem;
@@ -28,7 +29,7 @@ export function WorkerTimelineEventCard({
   const [sourcesOpen, setSourcesOpen] = useState(false);
   const expanded = forceExpanded || open;
 
-  const dateLabel = polishHumanReadableDisplayText(event.date ?? '') || 'Date being confirmed';
+  const dateLabel = polishHumanReadableDisplayText(normalizeEventDisplayDate(event.date)) || 'Date being confirmed';
   const sources = event.sourceFileNames ?? [];
   const { title: rawTitle, summary: rawSummary, sourceCount } = presentWorkerTimelineRow(event);
   const title = polishHumanReadableDisplayText(rawTitle) || rawTitle;

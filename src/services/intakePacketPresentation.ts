@@ -15,6 +15,7 @@ import {
   type PacketCaseSnapshot,
 } from './packetStoryPresentation';
 import { buildPacketChronologyPresentation } from './packetStoryPresentation';
+import { normalizeEventDisplayDate } from './contextualDateClassification';
 import type { WorkerPacketModel } from './firmIntakePdfRenderer';
 import {
   filterEmploymentDateTokens,
@@ -1167,7 +1168,7 @@ export function buildWorkerSummaryModel(payload: IntakeSummaryDownloadPayload): 
     chronology: sections?.chronology?.length
       ? sections.chronology.map(polishChronologyLine)
       : (payload.timelineEvents ?? [])
-          .map((e) => [e.date, e.title].filter(Boolean).join(' — ') || e.summary || e.category)
+          .map((e) => [normalizeEventDisplayDate(e.date), e.title].filter(Boolean).join(' — ') || e.summary || e.category)
           .filter((s): s is string => Boolean(s && s.trim())),
     supportingDocuments: sections?.supporting_records?.length
       ? sections.supporting_records.map((r) => r.file_name)
