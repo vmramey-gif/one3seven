@@ -1622,16 +1622,9 @@ export function IntakeSummaryScreen({
                   </ul>
                 </div>
               ) : null}
-              {readinessPresentation.supplementalBrief.length > 0 ? (
-                <div className="mb-3">
-                  <div className="text-sm font-medium text-[#1B2623] mb-1.5">Notes for review</div>
-                  <ul className="list-disc pl-5 text-sm text-[#384039] space-y-1">
-                    {readinessPresentation.supplementalBrief.map((x, i) => (
-                      <li key={`rb-${i}`}>{softenWorkerReviewLine(x)}</li>
-                    ))}
-                  </ul>
-                </div>
-              ) : null}
+              {/* "Notes for review" removed from the worker view — it surfaced raw extraction
+                  ("pay period... Rate: $18.00/hour... Regular hours paid: 80.0..."), which is
+                  internal technical text, not something a worker should see on their own file. */}
             </WorkerExpandableSection>
           </section>
         ) : null}

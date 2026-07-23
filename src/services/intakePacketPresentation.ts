@@ -16,6 +16,7 @@ import {
 } from './packetStoryPresentation';
 import { buildPacketChronologyPresentation } from './packetStoryPresentation';
 import { normalizeEventDisplayDate } from './contextualDateClassification';
+import { polishNameForDisplay } from './firmIntakeDisplay';
 import type { WorkerPacketModel } from './firmIntakePdfRenderer';
 import {
   filterEmploymentDateTokens,
@@ -407,8 +408,9 @@ function inferEmployer(payload: IntakeSummaryDownloadPayload): string {
 
 function inferWorkerName(payload: IntakeSummaryDownloadPayload): string {
   const followUp = extractStoryFollowUpFromOverview(payload.workerContext ?? '');
-  if (followUp?.employmentName?.trim()) return formatPacketMetadataValue(followUp.employmentName.trim());
-  return formatPacketMetadataValue(payload.workerName);
+  const raw = (followUp?.employmentName?.trim() || payload.workerName || '').trim();
+  // Capitalize the worker's name so the summary/packet reads "Victoria Ramey", never "victoria ramey".
+  return formatPacketMetadataValue(raw ? polishNameForDisplay(raw) : raw);
 }
 
 function inferWorkerPhone(payload: IntakeSummaryDownloadPayload): string | null {
