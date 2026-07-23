@@ -1161,8 +1161,19 @@ export function buildWorkerSummaryModel(payload: IntakeSummaryDownloadPayload): 
     },
     workerStory: account.narrative ? account.sections.map((s) => ({ heading: s.heading, body: s.body })) : [],
     questionsForReview: buildReviewTopicBullets(payload),
-    chronology: (sections?.chronology ?? []).map(polishChronologyLine),
-    supportingDocuments: (sections?.supporting_records ?? []).map((r) => r.file_name),
+    // Prefer the org-engine chronology; otherwise fall back to the live timeline events the worker
+    // actually sees on screen (payload.timelineEvents). Without this the PDF printed "No timeline
+    // entries are available yet" even when 15+ events existed. Same fallback for supporting records.
+    chronology: sections?.chronology?.length
+      ? sections.chronology.map(polishChronologyLine)
+      : (payload.timelineEvents ?? [])
+          .map((e) => [e.date, e.title].filter(Boolean).join(' — ') || e.summary || e.category)
+          .filter((s): s is string => Boolean(s && s.trim())),
+    supportingDocuments: sections?.supporting_records?.length
+      ? sections.supporting_records.map((r) => r.file_name)
+      : (payload.uploadedFileInventory ?? [])
+          .map((f) => f.fileName)
+          .filter((s): s is string => Boolean(s && s.trim())),
     missingInformation,
     disclaimer: [sections?.disclaimer || payload.disclaimer].filter((d): d is string => Boolean(d && d.trim())),
   };
