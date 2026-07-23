@@ -117,7 +117,7 @@ export function WorkerLandingPage({ onStart, onSignIn, onBack, onForFirms }: Wor
                     <span
                       key={k}
                       style={{ transform: `rotate(${HERO_CHIP_SKEW[i].rotate}deg) translateY(${HERO_CHIP_SKEW[i].y}px)` }}
-                      className="rounded-[10px] border border-[#EBD9CD] bg-[#FBF4EF] px-2.5 py-1 text-[11.5px] text-[#95644A] shadow-[0_2px_6px_rgba(168,81,43,0.08)]"
+                      className="rounded-[10px] border border-[#EBD9CD] bg-[#FBF4EF] px-2.5 py-1 text-[11.5px] text-[#A8512B] shadow-[0_2px_6px_rgba(168,81,43,0.08)]"
                     >
                       {t(k)}
                     </span>
@@ -172,7 +172,7 @@ export function WorkerLandingPage({ onStart, onSignIn, onBack, onForFirms }: Wor
           <div className="flex flex-col gap-2.5">
             {['wl.sly.q1', 'wl.sly.q2', 'wl.sly.q3', 'wl.sly.q4', 'wl.sly.q5'].map((k) => (
               <div key={k} className="flex items-start gap-3 rounded-[16px] border border-[#E4E5DE] bg-[#FBFBFA] px-4 py-3.5 text-[15.5px] font-medium leading-snug text-[#20242a]">
-                <span className="mt-[7px] h-2 w-2 flex-none rounded-full bg-[#C2703F]" />
+                <span className="mt-[7px] h-2 w-2 flex-none rounded-full bg-[#A8512B]" />
                 {t(k)}
               </div>
             ))}
@@ -191,7 +191,7 @@ export function WorkerLandingPage({ onStart, onSignIn, onBack, onForFirms }: Wor
               &ldquo;{t('wl.founder.quote')}&rdquo;
             </blockquote>
             <div className="mt-6 flex items-center gap-3">
-              <span className="flex h-11 w-11 flex-none items-center justify-center rounded-full bg-[#42574E] text-[15px] font-semibold text-[#EAF0EC]">VR</span>
+              <span className="flex h-11 w-11 flex-none items-center justify-center rounded-full bg-[#42574E] text-[15px] font-semibold text-[#EAF0EC]">V</span>
               <div className="min-w-0">
                 <div className="text-[15px] font-semibold text-[#1B2623]">{t('wl.founder.name')}</div>
                 <div className="text-[13px] leading-snug text-[#6a6d66]">{t('wl.founder.title')}</div>

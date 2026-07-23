@@ -184,7 +184,8 @@ export const STRINGS: Dict = {
   'wl.founder.eyebrow': { en: 'Why I built this',                es: 'Por qué lo creé' },
   'wl.founder.quote':{ en: 'I was a worker too. When things went wrong at my job, I had a pile of pay stubs, texts, and emails — and no idea what mattered or where to start. So I organized it all myself, until my story was clear enough to stand on its own. That’s when I stopped feeling powerless. I built one3seven so you don’t have to figure it out alone the way I did.',
                        es: 'Yo también fui trabajadora. Cuando las cosas salieron mal en mi empleo, tenía un montón de recibos de pago, mensajes y correos — y ninguna idea de qué importaba ni por dónde empezar. Así que lo organicé todo yo misma, hasta que mi historia fue lo bastante clara para sostenerse por sí sola. Ahí dejé de sentirme sin poder. Creé one3seven para que no tengas que resolverlo sola como yo lo hice.' },
-  'wl.founder.name': { en: 'Victoria Ramey',                     es: 'Victoria Ramey' },
+  // First name only — the founder's surname is deliberately kept off public surfaces.
+  'wl.founder.name': { en: 'Victoria',                           es: 'Victoria' },
   'wl.founder.title':{ en: 'Founder of one3seven — and a California worker who’s been where you are.',
                        es: 'Fundadora de one3seven — y una trabajadora de California que estuvo donde tú estás.' },
   'wl.how.eyebrow':  { en: 'How it works',                       es: 'Cómo funciona' },

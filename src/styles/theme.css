@@ -13,6 +13,11 @@
   --o3s-primary: #42574E;
   --o3s-primary-hover: #374A42;
   --o3s-primary-soft: #E7EDE8;
+  /* Burnt orange marks the PROBLEM state (the pile, the pain, what's unorganized).
+     Sage marks organized/trust; violet (#5B21B6) is reserved for AI. Keep these three jobs distinct. */
+  --o3s-problem: #A8512B;
+  --o3s-problem-soft: #FBF4EF;
+  --o3s-problem-border: #EBD9CD;
   --o3s-orbit: #95AB9B;
   --o3s-orbit-soft: rgba(66,87,78, 0.12);
   --o3s-border: #D3DED6;

@@ -281,7 +281,8 @@ export function SageMarketingPage({ onHome, onWorkerStart, onSignIn, onForFirms,
 
       {/* problem — the pain, shown as before → after */}
       <section className="mx-auto max-w-6xl px-6 py-20 md:py-24">
-        <div style={MONO} className="text-[11px] uppercase tracking-[0.16em] text-[#42574E]">{t('prob.eyebrow')}</div>
+        {/* Burnt orange marks the problem state site-wide (sage = organized, violet = AI). */}
+        <div style={MONO} className="text-[11px] uppercase tracking-[0.16em] text-[#A8512B]">{t('prob.eyebrow')}</div>
         <h2 style={SERIF} className="mt-3 max-w-[20ch] text-balance text-[clamp(26px,4vw,44px)] font-semibold leading-[1.05] tracking-[-0.02em] text-[#17181C]">
           {t('prob.head')}
         </h2>
@@ -292,7 +293,7 @@ export function SageMarketingPage({ onHome, onWorkerStart, onSignIn, onForFirms,
             initial={reduce ? false : { opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-80px' }} transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
             className="rounded-2xl border border-[#E1E4DD] bg-[#ECEFEA] p-6"
           >
-            <div style={MONO} className="text-[10.5px] uppercase tracking-[0.1em] text-[#7c857f]">{t('prob.before')}</div>
+            <div style={MONO} className="text-[10.5px] uppercase tracking-[0.1em] text-[#A8512B]">{t('prob.before')}</div>
             <div className="relative mt-4 h-[196px]">
               {[
                 { k: 'prob.c1', top: '2%', left: '2%', rot: '-6deg' },
@@ -303,8 +304,8 @@ export function SageMarketingPage({ onHome, onWorkerStart, onSignIn, onForFirms,
                 { k: 'prob.c6', top: '60%', left: '56%', rot: '6deg' },
               ].map((c) => (
                 <div key={c.k} style={{ top: c.top, left: c.left, rotate: c.rot }}
-                  className="absolute inline-flex items-center gap-1.5 rounded-lg border border-[#D8D3C8] bg-white px-2.5 py-1.5 text-[11px] font-medium text-[#5c5c55] shadow-[0_6px_16px_-8px_rgba(46,64,56,0.4)]">
-                  <FileText className="h-3 w-3 text-[#9aa39b]" /> {t(c.k)}
+                  className="absolute inline-flex items-center gap-1.5 rounded-lg border border-[#EBD9CD] bg-white px-2.5 py-1.5 text-[11px] font-medium text-[#8B7166] shadow-[0_6px_16px_-8px_rgba(168,81,43,0.35)]">
+                  <FileText className="h-3 w-3 text-[#A8512B]" /> {t(c.k)}
                 </div>
               ))}
             </div>
