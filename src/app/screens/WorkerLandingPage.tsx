@@ -1,4 +1,4 @@
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, ShieldCheck } from 'lucide-react';
 import { WordMark } from '../components/WordMark';
 import { useLang, LangToggle } from '../../i18n/i18n';
 
@@ -137,6 +137,28 @@ export function WorkerLandingPage({ onStart, onSignIn, onBack, onForFirms }: Wor
                 <p className="text-[14.5px] leading-relaxed text-[#40433f]">{t(bodyKey)}</p>
               </div>
             ))}
+          </div>
+        </section>
+
+        {/* How the AI helps — worker-facing AI awareness. Transparent + verify-first (reinforces
+            organize-never-conclude). Deep violet #5B21B6 is the brand's AI-only accent. */}
+        <section className="py-8">
+          <div className="rounded-[24px] border border-[#E0DBEF] bg-white p-7 shadow-[0_18px_45px_rgba(91,33,182,0.06)] sm:p-9">
+            <div className="flex items-center gap-2">
+              <span style={MONO} className="text-[11px] uppercase tracking-[0.16em] text-[#5B21B6]">{t('wl.ai.eyebrow')}</span>
+              <span className="rounded-full bg-[#5B21B6]/10 px-2 py-0.5 text-[10px] font-bold tracking-wide text-[#5B21B6]">AI</span>
+            </div>
+            <h2 style={SERIF} className="mt-3 max-w-[24ch] text-[clamp(22px,3.4vw,30px)] font-semibold tracking-[-0.01em] text-[#20242a]">
+              {t('wl.ai.h')}
+            </h2>
+            <p className="mt-3 max-w-[60ch] text-[15.5px] leading-relaxed text-[#40433f]">{t('wl.ai.body')}</p>
+            <div className="mt-4 flex items-start gap-3 rounded-[16px] border border-[#E0DBEF] bg-[#F8F6FD] px-4 py-3.5">
+              <span className="mt-[2px] flex h-6 w-6 flex-none items-center justify-center rounded-full bg-[#5B21B6]/12 text-[#5B21B6]">
+                <ShieldCheck className="h-3.5 w-3.5" />
+              </span>
+              <p className="text-[14.5px] leading-relaxed text-[#3a2f52]">{t('wl.ai.trust')}</p>
+            </div>
+            <p className="mt-3.5 text-[12.5px] font-medium text-[#6a6d66]">{t('wl.ai.builton')}</p>
           </div>
         </section>
 
