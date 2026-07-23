@@ -26,6 +26,14 @@ const STEP_KEYS = [
   ['03', 'wl.step3.t', 'wl.step3.b'],
 ] as const;
 
+const HERO_CHIP_KEYS = ['wl.hero.c1', 'wl.hero.c2', 'wl.hero.c3', 'wl.hero.c4'] as const;
+
+const HERO_ROW_KEYS = [
+  ['wl.hero.r1d', 'wl.hero.r1t'],
+  ['wl.hero.r2d', 'wl.hero.r2t'],
+  ['wl.hero.r3d', 'wl.hero.r3t'],
+] as const;
+
 const YOURS_KEYS = [
   ['wl.yours1.t', 'wl.yours1.b'],
   ['wl.yours2.t', 'wl.yours2.b'],
@@ -60,6 +68,8 @@ export function WorkerLandingPage({ onStart, onSignIn, onBack, onForFirms }: Wor
       <div className="mx-auto max-w-5xl px-5 sm:px-8">
         {/* Hero */}
         <section className="pb-8 pt-14 sm:pt-20">
+          <div className="grid items-center gap-10 md:grid-cols-[1.05fr_.95fr]">
+            <div className="min-w-0">
           <div style={MONO} className="mb-4 text-[11px] uppercase tracking-[0.16em] text-[#42574E]">{t('wl.eyebrow')}</div>
           <h1 style={SERIF} className="mb-4 max-w-[15ch] text-balance text-[clamp(34px,7vw,58px)] font-semibold leading-[1.02] tracking-[-0.02em]">
             {t('wl.h1a')} <span className="text-[#5E7268]">{t('wl.h1b')}</span>
@@ -82,6 +92,56 @@ export function WorkerLandingPage({ onStart, onSignIn, onBack, onForFirms }: Wor
             {['wl.chip.free', 'wl.chip.notified', 'wl.chip.keep', 'wl.chip.choose'].map((k) => (
               <span key={k} className="inline-flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-[#95AB9B]" />{t(k)}</span>
             ))}
+          </div>
+            </div>
+
+            {/* Hero illustration — scattered files becoming a dated, source-linked list.
+                Shows organization only: no case narrative, no sequencing, no merit or value. */}
+            <div className="min-w-0">
+              <div className="rounded-[26px] border border-[#CBD6CF] bg-white p-6 shadow-[0_24px_60px_-26px_rgba(66,87,78,0.38)] sm:p-7">
+                <div style={MONO} className="text-[10px] uppercase tracking-[0.16em] text-[#8a938c]">
+                  {t('wl.hero.card.tag')}
+                </div>
+
+                <div className="mt-4 text-[11px] font-semibold uppercase tracking-wide text-[#6a6d66]">
+                  {t('wl.hero.card.before')}
+                </div>
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {HERO_CHIP_KEYS.map((k) => (
+                    <span key={k} className="rounded-full border border-[#E4E5DE] bg-[#FBFBFA] px-2.5 py-1 text-[11.5px] text-[#6a6d66]">
+                      {t(k)}
+                    </span>
+                  ))}
+                </div>
+
+                <div className="my-4 flex items-center gap-2">
+                  <span className="h-px flex-1 bg-[#E4E5DE]" />
+                  <span style={MONO} className="text-[10px] uppercase tracking-[0.14em] text-[#42574E]">
+                    {t('wl.hero.card.arrow')}
+                  </span>
+                  <span className="h-px flex-1 bg-[#E4E5DE]" />
+                </div>
+
+                <div className="text-[11px] font-semibold uppercase tracking-wide text-[#6a6d66]">
+                  {t('wl.hero.card.after')}
+                </div>
+                <div className="mt-2.5 flex flex-col gap-2.5">
+                  {HERO_ROW_KEYS.map(([dateKey, labelKey]) => (
+                    <div key={labelKey} className="flex items-start gap-2.5">
+                      <span className="mt-[7px] h-2 w-2 flex-none rounded-full bg-[#7C8B6F]" />
+                      <div className="min-w-0">
+                        <div style={MONO} className="text-[10.5px] tracking-[0.08em] text-[#8a938c]">{t(dateKey)}</div>
+                        <div className="text-[13.5px] font-medium leading-snug text-[#20242a]">{t(labelKey)}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <p className="mt-4 border-t border-[#E4E5DE] pt-3 text-[11.5px] leading-relaxed text-[#6a6d66]">
+                  {t('wl.hero.card.foot')}
+                </p>
+              </div>
+            </div>
           </div>
         </section>
 
