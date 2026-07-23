@@ -1,5 +1,55 @@
 import type { WorkerTimelineItem } from '../types/workerTimeline';
 import { softenWorkerReviewLine } from './workerIntakePresentationUtils';
+import { normalizeEventDisplayDate } from '../../services/contextualDateClassification';
+
+const PAYROLL_EVENT_RE = /employment activity documented through payroll|payroll record/i;
+// Events a worker has at most once — keep a single row even if the engine dated copies differently.
+const SINGULAR_EVENT_RE = /terminat|separat|employment (begins|began|start)|\bhired\b|\bfired\b|resign/i;
+
+function baseTimelineKey(title: string): string {
+  return (title ?? '').trim().toLowerCase().replace(/\s+\([^)]*\)\s*$/, '');
+}
+
+/**
+ * Removes timeline noise before display: (1) collapses the one-event-per-paystub spam into a single
+ * "Payroll records on file" row (a real timeline has a few meaningful moments, not ten identical
+ * payroll rows), and (2) de-dupes exact-duplicate events by title+date (e.g. two "Termination
+ * documented" rows). Order is preserved.
+ */
+export function collapseWorkerTimelineNoise(events: WorkerTimelineItem[]): WorkerTimelineItem[] {
+  if (!events?.length) return events ?? [];
+  const payrollEvents = events.filter((e) => PAYROLL_EVENT_RE.test(e.event ?? ''));
+  const payrollCount = payrollEvents.length;
+  const payrollSources = Array.from(
+    new Set(payrollEvents.flatMap((e) => e.sourceFileNames ?? []))
+  );
+
+  const seen = new Set<string>();
+  let payrollEmitted = false;
+  const out: WorkerTimelineItem[] = [];
+  for (const e of events) {
+    if (PAYROLL_EVENT_RE.test(e.event ?? '') && payrollCount >= 2) {
+      if (payrollEmitted) continue;
+      payrollEmitted = true;
+      out.push({
+        ...e,
+        event: 'Payroll records on file',
+        summary: `${payrollCount} pay periods documented across your payroll records.`,
+        relatedDocs: payrollSources.length || payrollCount,
+        sourceFileNames: payrollSources,
+      });
+      continue;
+    }
+    const base = baseTimelineKey(e.event ?? '');
+    const key = SINGULAR_EVENT_RE.test(e.event ?? '')
+      ? `singular|${base}`
+      : `${base}|${normalizeEventDisplayDate(e.date).toLowerCase()}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(e);
+  }
+  return out;
+}
 
 const EXACT_TITLE_NARRATIVES: Record<string, string> = {
   'pay period record materials': 'Regular payroll activity',

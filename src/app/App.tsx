@@ -95,6 +95,7 @@ import {
   stripTimelineSourceTraceBlock,
 } from '../services/timelineSourceTraceCodec';
 import { enrichWorkerTimelineWithSources } from './utils/workerIntakePresentationUtils';
+import { collapseWorkerTimelineNoise } from './utils/workerTimelineNarrative';
 import { WordMark } from './components/WordMark';
 import { FIRM_ROUTING_COPY, SAMPLE_INTAKE_NUMBER, SAMPLE_INTAKE_SUMMARY_PREVIEW } from './constants/one3sevenProduct';
 import {
@@ -613,7 +614,9 @@ export default function App() {
         sourceExcerpt: trace?.sourceExcerpt ?? null,
       };
     });
-    const enrichedTimeline = enrichWorkerTimelineWithSources(timeline, fileInventory);
+    const enrichedTimeline = collapseWorkerTimelineNoise(
+      enrichWorkerTimelineWithSources(timeline, fileInventory)
+    );
     setWorkerLiveSummary({
       overview: s?.overview ?? '',
       timelineSummary: s?.timeline_summary ?? '',
