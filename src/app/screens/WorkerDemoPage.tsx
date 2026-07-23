@@ -579,7 +579,6 @@ function PostSummary({ onNext }: { onNext: () => void }) {
 function PostDashboard({ onNext }: { onNext: () => void }) {
   useEffect(() => { window.scrollTo({ top: 0, behavior: 'instant' }); }, []);
 
-  const [view, setView] = useState<'firm' | 'full'>('firm');
   const [concernsConfirmed, setConcernsConfirmed] = useState(false);
   const [timelineOpen, setTimelineOpen] = useState(false);
   const [docsOpen, setDocsOpen] = useState(false);
@@ -610,14 +609,13 @@ function PostDashboard({ onNext }: { onNext: () => void }) {
         <div className="shrink-0 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-[10px] font-bold text-emerald-700">Organized</div>
       </div>
 
-      {/* View toggle */}
-      <div className="mb-5 flex rounded-[12px] border border-[#E4E5DE] bg-white p-1">
-        {([['firm', 'What Firms See'], ['full', 'Full Review']] as const).map(([key, label]) => (
-          <button key={key} type="button" onClick={() => setView(key)}
-            className={`flex-1 rounded-[9px] py-2 text-[13px] font-semibold transition ${view === key ? 'bg-[#42574E] text-white shadow-sm' : 'text-[#1B2623]/55 hover:text-[#1B2623]'}`}>
-            {label}
-          </button>
-        ))}
+      {/* Worker-owned file — the old "What Firms See / Full Review" toggle was removed in-product
+          (the file is the worker's, always shown in full). Mirrors IntakeSummaryScreen's ownership intro. */}
+      <div className="mb-5 rounded-[14px] border border-[#CBD6CF] bg-white p-4">
+        <p className="text-[13px] leading-relaxed text-[#1B2623]/80">
+          This is your organized file — built from your story and the records you added. It’s yours to
+          review, download, and share whenever you choose.
+        </p>
       </div>
 
       {/* Status grid */}
@@ -665,10 +663,8 @@ function PostDashboard({ onNext }: { onNext: () => void }) {
         )}
       </div>
 
-      {/* Full review expandable sections */}
-      <AnimatePresence>
-        {view === 'full' && (
-          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.3 }}>
+      {/* The full organized file — timeline, document groups, and suggestions (always shown; worker owns it) */}
+      <div>
             {/* Timeline */}
             <div className="mb-4 rounded-[16px] border border-[#E4E5DE] bg-white overflow-hidden">
               <button type="button" onClick={() => setTimelineOpen(o => !o)} className="flex w-full items-center justify-between px-5 py-4">
@@ -733,9 +729,7 @@ function PostDashboard({ onNext }: { onNext: () => void }) {
                 {SUGGESTIONS.map(s => <li key={s} className="text-[12px] leading-relaxed text-amber-800/75">· {s}</li>)}
               </ul>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      </div>
 
       <div className="mt-5">
         <NextButton onClick={onNext} label="Review worker controls" />
@@ -750,9 +744,9 @@ function PostControl({ onSignUp }: { onSignUp: () => void }) {
   useEffect(() => { window.scrollTo({ top: 0, behavior: 'instant' }); }, []);
 
   const actions = [
-    { icon: Download, label: 'Download Intake Packet', sub: 'A clean PDF: story, timeline, and records.', primary: true },
-    { icon: Eye, label: 'Preview Firm View', sub: 'See exactly what a firm sees before you approve access.', primary: false },
-    { icon: Shield, label: 'Approve Firm Access', sub: 'Grant a connected firm access to your organized intake.', primary: false },
+    { icon: Download, label: 'Download your file', sub: 'A clean PDF — your story, timeline, and records — to bring to a consultation.', primary: true },
+    { icon: Shield, label: 'Share it with a firm — your choice', sub: 'When you’re ready, share your organized file with a firm you choose. Nothing is shared until you say so.', primary: false },
+    { icon: Eye, label: 'Keep adding records anytime', sub: 'Your file stays yours — add or update records whenever you like.', primary: false },
   ];
 
   return (
@@ -827,14 +821,14 @@ function PostControl({ onSignUp }: { onSignUp: () => void }) {
       <div className="flex flex-col gap-3 sm:flex-row">
         <button type="button" onClick={onSignUp}
           className="flex items-center justify-center gap-2 rounded-full bg-[#42574E] px-7 py-3.5 text-[15px] font-semibold text-white shadow-[0_12px_32px_rgba(66,87,78,0.25)] transition hover:bg-[#42574E] hover:-translate-y-0.5">
-          Request beta access <ArrowRight className="h-4 w-4" />
+          Start organizing — free <ArrowRight className="h-4 w-4" />
         </button>
         <button type="button" onClick={() => { window.location.href = '/'; }}
           className="flex items-center justify-center gap-2 rounded-full border border-[#E4E5DE] bg-white px-7 py-3.5 text-[15px] font-semibold text-[#1B2623] transition hover:bg-[#F2F4EC]">
           Back to home
         </button>
       </div>
-      <p className="mt-3 text-xs text-[#1B2623]/35">Free to submit · No account required to start · Records stay private until you approve sharing</p>
+      <p className="mt-3 text-xs text-[#1B2623]/35">Free · Private until you choose to share · Yours to keep</p>
     </motion.div>
   );
 }
