@@ -102,6 +102,23 @@ export function WorkerLandingPage({ onStart, onSignIn, onBack, onForFirms }: Wor
           </div>
         </section>
 
+        {/* Founder testimony — someone who was where the worker is built this */}
+        <section className="py-8">
+          <div className="rounded-[24px] border border-[#CBD6CF] bg-[#FBFBFA] p-7 shadow-[0_18px_45px_rgba(66,87,78,0.08)] sm:p-9">
+            <div style={MONO} className="text-[11px] uppercase tracking-[0.16em] text-[#42574E]">{t('wl.founder.eyebrow')}</div>
+            <blockquote style={SERIF} className="mt-4 max-w-[62ch] text-[clamp(18px,2.6vw,23px)] font-medium leading-[1.42] text-[#20242a]">
+              &ldquo;{t('wl.founder.quote')}&rdquo;
+            </blockquote>
+            <div className="mt-6 flex items-center gap-3">
+              <span className="flex h-11 w-11 flex-none items-center justify-center rounded-full bg-[#42574E] text-[15px] font-semibold text-[#EAF0EC]">VR</span>
+              <div className="min-w-0">
+                <div className="text-[15px] font-semibold text-[#1B2623]">{t('wl.founder.name')}</div>
+                <div className="text-[13px] leading-snug text-[#6a6d66]">{t('wl.founder.title')}</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* How it works */}
         <section id="how" className="py-16">
           <div className="text-center">
