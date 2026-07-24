@@ -231,6 +231,29 @@ export function parseEmploymentDateRange(raw: string | null | undefined): {
   return { start: parseOneDate(startStr, false), end: parseOneDate(endStr, true) };
 }
 
+/**
+ * Parse a SINGLE loose date string into a Date, for the varied formats timeline/source dates come
+ * in ("October 2025", "Oct 15, 2025", "2025-10-15", "10/15/2025", "2025"). Returns null if it can't.
+ * Used to turn a worker's dated payroll records into inputs for detectPayPeriodGaps.
+ */
+export function parseLooseDate(raw: string | null | undefined): Date | null {
+  if (!raw || !raw.trim()) return null;
+  const t = raw.trim();
+  // ISO YYYY-MM-DD, parsed locally to avoid a UTC day-shift.
+  let m = t.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+  if (m) return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+  // "October 15, 2025" | "Oct 15 2025"
+  m = t.match(/^([a-z]+)\.?\s+(\d{1,2}),?\s+(\d{4})$/i);
+  if (m && MONTHS[m[1].toLowerCase()] !== undefined) {
+    return new Date(Number(m[3]), MONTHS[m[1].toLowerCase()], Number(m[2]));
+  }
+  // Month YYYY, M/YYYY, M/D/YYYY, YYYY-MM, bare YYYY.
+  const viaMonthYear = parseOneDate(t.toLowerCase().replace(/,/g, ''), false);
+  if (viaMonthYear) return viaMonthYear;
+  const native = new Date(t);
+  return Number.isNaN(native.getTime()) ? null : startOfDay(native);
+}
+
 const MONTHS: Record<string, number> = {
   jan: 0, january: 0, feb: 1, february: 1, mar: 2, march: 2, apr: 3, april: 3,
   may: 4, jun: 5, june: 5, jul: 6, july: 6, aug: 7, august: 7, sep: 8, sept: 8,

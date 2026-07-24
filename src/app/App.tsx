@@ -378,6 +378,8 @@ export default function App() {
     timeline: WorkerTimelineItem[];
     readiness: string[];
     missing: string[];
+    /** Dated payroll/wage records (raw strings) for Gap Detection — from the pre-collapse timeline. */
+    payrollDates: string[];
   } | null>(null);
   const [workerAccessRequests, setWorkerAccessRequests] = useState<
     Array<{ routeId: string; firmName: string; intakeNumber: string; intakeId: string; barNumber: string | null; barState: string | null }>
@@ -653,12 +655,21 @@ export default function App() {
     const enrichedTimeline = collapseWorkerTimelineNoise(
       enrichWorkerTimelineWithSources(timeline, fileInventory)
     );
+    // Gap Detection: collect dated payroll/wage records from the PRE-collapse timeline (collapse
+    // merges them into one row and drops the per-stub dates). Each event's own date plus any
+    // source-document dates are candidates; gapDetection parses + de-dupes them.
+    const PAYROLL_DATE_RE = /payroll|wage|pay period|pay stub|paystub|final pay|compensation/i;
+    const payrollDates = timeline
+      .filter((e) => PAYROLL_DATE_RE.test(e.category ?? '') || PAYROLL_DATE_RE.test(e.event ?? ''))
+      .flatMap((e) => [e.date, ...(e.sourceDates ?? [])])
+      .filter((d): d is string => Boolean(d && String(d).trim()));
     setWorkerLiveSummary({
       overview: s?.overview ?? '',
       timelineSummary: s?.timeline_summary ?? '',
       readiness: s?.readiness_indicators ?? [],
       missing: s?.missing_document_alerts ?? [],
       timeline: enrichedTimeline,
+      payrollDates,
     });
     await refreshWorkerRoutingFromIntake(intakeId);
   }
@@ -4729,6 +4740,7 @@ export default function App() {
                 }}
                 uploadedFilePersistMeta={uploadedFilePersistMeta}
                 liveOverview={workerLiveSummary?.overview}
+                livePayrollDates={workerLiveSummary?.payrollDates}
                 liveTimelineSummary={workerLiveSummary?.timelineSummary}
                 liveTimelineEvents={workerLiveSummary?.timeline}
                 liveReadiness={workerLiveSummary?.readiness}

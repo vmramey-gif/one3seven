@@ -99,6 +99,15 @@ import {
 import { inferInventoryCategory } from '../../services/packetChronologyIntelligence';
 import { polishHumanReadableDisplayText } from '../../services/firmIntakeDisplay';
 import { extractStoryFollowUpFromOverview } from '../../services/storyFollowUpPersistence';
+import { GapCoverageRail } from '../components/GapCoverageRail';
+import {
+  detectPayPeriodGaps,
+  parseEmploymentDateRange,
+  parseLooseDate,
+  inferPayFrequency,
+  DEFAULT_PAY_FREQUENCY,
+  type PayFrequency,
+} from '../../services/gapDetection';
 import { extractRecordStoryFromOverview, parseTimelineSourceTrace } from '../../services/timelineSourceTraceCodec';
 import type { WorkerTimelineItem } from '../types/workerTimeline';
 import { workerMobileSummarySkin } from '../utils/workerMobileSummaryPresentation';
@@ -152,6 +161,8 @@ interface IntakeSummaryScreenProps {
   liveAccessRequests?: Array<{ routeId: string; firmName: string; barNumber?: string | null; barState?: string | null }>;
   /** Timeline rows from Supabase `timeline_events` (worker summary bundle). */
   liveTimelineEvents?: WorkerTimelineItem[];
+  /** Dated payroll/wage record strings for Gap Detection (from the pre-collapse timeline). */
+  livePayrollDates?: string[];
   onApproveAccess?: (routeId: string) => Promise<{ error?: string }>;
   onShareFirmCode?: (code: string) => Promise<{ error?: string; firmName?: string }>;
   onShareParticipating?: () => Promise<{ error?: string; count?: number }>;
@@ -295,6 +306,7 @@ export function IntakeSummaryScreen({
   exportIntakeId,
   liveTimelineSummary,
   liveTimelineEvents = [],
+  livePayrollDates = [],
   preferLiveDataOnly,
   submissionChannel,
   connectedFirmName,
@@ -432,6 +444,32 @@ export function IntakeSummaryScreen({
   const storyFollowUpDetails = useMemo(
     () => extractStoryFollowUpFromOverview(liveOverview ?? ''),
     [liveOverview]
+  );
+
+  // ── Gap Detection (Layer 1) ────────────────────────────────────────────────
+  // Pay-record coverage from the employment dates + the dated payroll records. Frequency is derived
+  // from the stub spacing; a manual override is offered. Worker-facing, describe-the-record only.
+  const gapPayrollDates = useMemo(
+    () => livePayrollDates.map((d) => parseLooseDate(d)).filter((d): d is Date => d !== null),
+    [livePayrollDates]
+  );
+  const [gapFreqOverride, setGapFreqOverride] = useState<PayFrequency | null>(null);
+  const gapEmployment = useMemo(() => {
+    const { start, end } = parseEmploymentDateRange(storyFollowUpDetails?.employmentDates);
+    const stillEmployed = storyFollowUpDetails?.employmentStatus === 'still_employed';
+    return { start, end: stillEmployed ? new Date() : end };
+  }, [storyFollowUpDetails?.employmentDates, storyFollowUpDetails?.employmentStatus]);
+  const gapFreq: PayFrequency =
+    gapFreqOverride ?? inferPayFrequency(gapPayrollDates) ?? DEFAULT_PAY_FREQUENCY;
+  const gapResult = useMemo(
+    () =>
+      detectPayPeriodGaps({
+        employmentStart: gapEmployment.start,
+        employmentEnd: gapEmployment.end,
+        payFrequency: gapFreq,
+        payrollRecordDates: gapPayrollDates,
+      }),
+    [gapEmployment.start, gapEmployment.end, gapFreq, gapPayrollDates]
   );
   const savedAdditionalNotesRaw = parsedWorkerNotes.additionalNotes ?? '';
   const savedAdditionalNotesDisplay = polishHumanReadableDisplayText(savedAdditionalNotesRaw);
@@ -1250,6 +1288,18 @@ export function IntakeSummaryScreen({
               </div>
             </div>
           </section>
+
+          {/* Gap Detection — pay-record coverage (only when employment dates are known) */}
+          {gapResult.computable ? (
+            <div className="mb-4">
+              <GapCoverageRail
+                result={gapResult}
+                payFrequency={gapFreq}
+                onFrequencyChange={setGapFreqOverride}
+                onRequestRecords={() => onNavigate('recordsRequest')}
+              />
+            </div>
+          ) : null}
 
           {employmentMatterTags.length > 0 ? (
             <section className="mb-4 rounded-[14px] border border-[#F2F4EC] bg-white px-4 py-3.5 shadow-sm">
