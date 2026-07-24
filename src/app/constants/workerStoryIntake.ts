@@ -28,7 +28,7 @@ export const WORKER_STORY_EXAMPLES = [
 export const STORY_FIRST_UPLOAD_HEADING = 'Add records';
 
 export const STORY_FIRST_UPLOAD_INTRO =
-  'Drag and drop files here or browse from your device. You do not need to sort or label them — one3seven infers document types automatically.';
+  'You don’t need to sort or label anything — one3seven figures out the document types for you.';
 
 export const STORY_FIRST_UPLOAD_NOTICE =
   'By uploading documents, you confirm that you are choosing to share these records with one3seven for organization and intake-preparation purposes. Upload only records you feel comfortable sharing. Sensitive information such as Social Security numbers, banking information, account numbers, medical record numbers, or unrelated personal information may be removed or redacted before upload at your discretion.';

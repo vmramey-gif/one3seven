@@ -1001,11 +1001,6 @@ export function UploadScreen({
               )}
             </motion.div>
 
-            <div className="mt-3 flex flex-col items-center gap-2">
-              <p className="text-[11px] text-[#7C857F] text-center leading-relaxed max-w-md">
-                Add paystubs, letters, texts, and records — as PDFs or photos from your phone. Snap a picture or upload a file; we&apos;ll keep it with your case either way.
-              </p>
-            </div>
           </div>
 
           {/* Uploading State */}

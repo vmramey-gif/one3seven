@@ -12,12 +12,12 @@ import { WORKER_STORY_REASSURANCE } from '../constants/workerStoryIntake';
 import { One3SevenDisclaimer } from '../components/One3SevenDisclaimer';
 
 const STEP_CONTEXT_EXAMPLES = [
-  'important conversations',
+  'important conversations or messages',
   'notices, complaints, or warnings',
-  'changes at work, home, or in your health',
   'significant dates or events',
-  'meetings, inspections, repairs, or appointments',
-  'anything else that helps provide context',
+  'changes in your situation',
+  'meetings or appointments',
+  'anything else that adds context',
 ];
 
 const STEP_SECTION_LABELS: Record<number, string> = {
@@ -666,10 +666,10 @@ export function GuidedIntakeScreen({
             >
               <div className="space-y-2">
                 <h1 className="text-xl font-semibold text-[var(--o3s-text)] leading-snug">
-                  Is there anything important that would help explain the records you&apos;re uploading?
+                  In your own words — what happened?
                 </h1>
                 <p className="text-sm text-[var(--o3s-text-muted)] leading-relaxed">
-                  Optional — A few sentences is enough. You can add or edit details later.
+                  There&apos;s no wrong way to start. A few sentences is plenty — you can add or edit anytime.
                 </p>
                 <p className="text-sm text-[var(--o3s-text-muted)] leading-relaxed">
                   {WORKER_STORY_REASSURANCE}
@@ -685,7 +685,7 @@ export function GuidedIntakeScreen({
               </div>
               <div>
                 <label className="sr-only" htmlFor="guided-intake-context">
-                  Your context
+                  Your story
                 </label>
                 <div className="mb-4 rounded-[14px] border border-[var(--o3s-border)] bg-[var(--o3s-surface)] px-4 py-4">
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
