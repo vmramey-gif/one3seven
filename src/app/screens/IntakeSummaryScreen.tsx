@@ -110,6 +110,7 @@ import {
   DEFAULT_PAY_FREQUENCY,
   type PayFrequency,
 } from '../../services/gapDetection';
+import { checkDateConsistency } from '../../services/dateConsistency';
 import { extractRecordStoryFromOverview, parseTimelineSourceTrace } from '../../services/timelineSourceTraceCodec';
 import type { WorkerTimelineItem } from '../types/workerTimeline';
 import { workerMobileSummarySkin } from '../utils/workerMobileSummaryPresentation';
@@ -473,6 +474,22 @@ export function IntakeSummaryScreen({
       }),
     [gapEmployment.start, gapEmployment.end, gapFreq, gapPayrollDates]
   );
+
+  // Date-consistency — flag when the worker's form-entered dates conflict with the document dates.
+  const dateConsistency = useMemo(() => {
+    const { start, end } = parseEmploymentDateRange(storyFollowUpDetails?.employmentDates);
+    const stillEmployed = storyFollowUpDetails?.employmentStatus === 'still_employed';
+    const documentDates = [
+      ...gapPayrollDates,
+      ...liveTimelineEvents.map((t) => parseLooseDate(t.date)),
+    ];
+    return checkDateConsistency({ statedStart: start, statedEnd: stillEmployed ? null : end, documentDates });
+  }, [
+    storyFollowUpDetails?.employmentDates,
+    storyFollowUpDetails?.employmentStatus,
+    gapPayrollDates,
+    liveTimelineEvents,
+  ]);
 
   // Record-requirements coverage — what CA requires an employer to keep vs. what's in the file.
   const recordCoverage = useMemo(
@@ -1306,6 +1323,20 @@ export function IntakeSummaryScreen({
               </div>
             </div>
           </section>
+
+          {/* Date-consistency — surface a conflict between entered dates and the records */}
+          {dateConsistency.hasConflict ? (
+            <div className="mb-4 rounded-[16px] border border-[#EBD9CD] bg-[#FBF4EF] p-4">
+              <div className="text-[11px] font-semibold uppercase tracking-wide text-[#A8512B]">
+                Please confirm
+              </div>
+              {dateConsistency.issues.map((iss, i) => (
+                <p key={i} className="mt-1.5 text-[13.5px] leading-relaxed text-[#20242a]">
+                  {iss.message}
+                </p>
+              ))}
+            </div>
+          ) : null}
 
           {/* Gap Detection — pay-record coverage (only when employment dates are known) */}
           {gapResult.computable ? (
