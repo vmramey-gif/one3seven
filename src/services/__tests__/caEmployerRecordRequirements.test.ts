@@ -14,6 +14,15 @@ describe('assessEmployerRecordCoverage', () => {
     expect(r.onFileCount).toBeGreaterThanOrEqual(1);
   });
 
+  it('matches across underscore/hyphen/dot separators in filenames', () => {
+    const r = assessEmployerRecordCoverage([
+      { fileName: 'Final_Paycheck.pdf', category: '' },
+      { fileName: 'offer-letter-2022.pdf', category: '' },
+    ]);
+    expect(r.items.find((i) => i.key === 'final_pay')?.state).toBe('on_file');
+    expect(r.items.find((i) => i.key === 'offer_or_agreement')?.state).toBe('on_file');
+  });
+
   it('matches on category alone when the filename is opaque', () => {
     const r = assessEmployerRecordCoverage([{ fileName: 'IMG_4821.jpg', category: 'Time Records' }]);
     expect(r.items.find((i) => i.key === 'time_records')?.state).toBe('on_file');

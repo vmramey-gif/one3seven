@@ -137,8 +137,13 @@ export function assessEmployerRecordCoverage(
   opts: { stillEmployed?: boolean; workerStatedMissingKeys?: string[] } = {}
 ): EmployerRecordCoverage {
   const stated = new Set(opts.workerStatedMissingKeys ?? []);
+  // Normalize separators so "Final_Paycheck.pdf" / "offer-letter" match space-delimited patterns
+  // (real filenames use _ . - freely).
   const haystacks = fileInventory.map((f) =>
-    `${f.fileName ?? ''} ${f.category ?? ''}`.toLowerCase()
+    `${f.fileName ?? ''} ${f.category ?? ''}`
+      .toLowerCase()
+      .replace(/[_\-.]+/g, ' ')
+      .replace(/\s+/g, ' ')
   );
 
   const items: AssessedRequirement[] = CA_EMPLOYER_RECORD_REQUIREMENTS

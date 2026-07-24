@@ -7,6 +7,7 @@ import { AppErrorBoundary } from './app/components/AppErrorBoundary.tsx';
 import { DemoApp } from './app/screens/DemoApp.tsx';
 import { WorkerDemoPage } from './app/screens/WorkerDemoPage.tsx';
 import { FireWorkerDemoPage } from './app/screens/FireWorkerDemoPage.tsx';
+import { CaseFactsDemoPage } from './app/screens/CaseFactsDemoPage.tsx';
 import { TexasCriminalDemoPage } from './app/screens/TexasCriminalDemoPage.tsx';
 import { FounderHQ } from './app/screens/FounderHQ.tsx';
 import { CompanyDemoGuide } from './app/screens/CompanyDemoGuide.tsx';
@@ -57,6 +58,10 @@ const isWorkerDemo =
 const isFireDemo =
   url.searchParams.has('fire-demo') ||
   url.pathname === '/fire-demo';
+
+const isCaseDemo =
+  url.searchParams.has('case-demo') ||
+  url.pathname === '/case-demo';
 
 const isTxDemo =
   url.searchParams.has('tx-demo') ||
@@ -112,6 +117,7 @@ const routeTitle =
   : url.pathname === '/company-demo' ? 'Company Demo Guide — one3seven'
   : isHQ ? 'Founder HQ — one3seven'
   : isFireDemo ? 'Fire Demo — one3seven'
+  : isCaseDemo ? 'Case Facts, Assembled — one3seven'
   : isTxDemo ? 'Texas Demo — one3seven'
   : isWorkerDemo ? 'Worker Demo — one3seven'
   : isDemo ? 'Sample Intake Demo — one3seven'
@@ -140,6 +146,10 @@ if (url.pathname === '/terms') {
 } else if (isFireDemo) {
   createRoot(rootEl).render(
     <AppErrorBoundary><FireWorkerDemoPage /></AppErrorBoundary>
+  );
+} else if (isCaseDemo) {
+  createRoot(rootEl).render(
+    <AppErrorBoundary><CaseFactsDemoPage /></AppErrorBoundary>
   );
 } else if (isTxDemo) {
   createRoot(rootEl).render(
