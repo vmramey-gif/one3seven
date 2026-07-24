@@ -221,14 +221,27 @@ export function parseEmploymentDateRange(raw: string | null | undefined): {
   end: Date | null;
 } {
   if (!raw || !raw.trim()) return { start: null, end: null };
-  // Split on common range separators (en/em dash, hyphen with spaces, "to", "through", "until").
-  const parts = raw
-    .split(/\s*(?:–|—|\bto\b|\bthrough\b|\buntil\b|(?<=\d)\s*-\s*(?=[A-Za-z\d]))\s*/i)
-    .map((s) => s.trim())
-    .filter(Boolean);
+  // Strip leading filler a worker naturally types ("worked here since…", "from…").
+  const cleaned = raw
+    .trim()
+    .replace(/^\s*(?:since|from|started(?:\s+in)?|beginning(?:\s+in)?|start\s*[:-]?)\s+/i, '');
+  // Range separators: en/em dash, "to/through/until/thru", or a hyphen ONLY when spaced
+  // ("Mar 2022 - Jan 2026") — never a bare ISO hyphen ("2022-03").
+  const RANGE = /\s*(?:\u2013|\u2014)\s*|\s+\b(?:to|through|until|thru)\b\s+|\s+-\s+/gi;
+  let parts = cleaned.replace(RANGE, '||').split('||').map((x) => x.trim()).filter(Boolean);
+  // Bare year range with no spaces ("2022-2024") that did not split above.
+  if (parts.length === 1) {
+    const yr = parts[0].match(/^(\d{4})\s*-\s*(\d{4})$/);
+    if (yr) parts = [yr[1], yr[2]];
+  }
   const startStr = parts[0] ?? '';
   const endStr = parts.length > 1 ? parts[parts.length - 1] : '';
-  return { start: parseOneDate(startStr, false), end: parseOneDate(endStr, true) };
+  // "present" / "current" / "ongoing" as the end → today (still-employed shorthand).
+  const endIsNow = /^(?:present|current|ongoing|now|today|to\s*date)\.?$/i.test(endStr.trim());
+  return {
+    start: parseOneDate(startStr, false),
+    end: endIsNow ? new Date() : parseOneDate(endStr, true),
+  };
 }
 
 /**
