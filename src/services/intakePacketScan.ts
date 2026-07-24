@@ -4,6 +4,7 @@
  */
 
 import { inferCategoryFromFileName } from './intakeDataService';
+import { normalizeFilenameForMatching } from './filenameMatching';
 import { truncateFileLabel, uploadedFileKey } from './employmentTimelineOrganization';
 
 export const INTAKE_TOP_LEVEL_CATEGORIES = [
@@ -66,15 +67,17 @@ function normalizeSpace(s: string): string {
 }
 
 function mapLegacyToTopLevel(legacy: string, fileName: string): IntakeTopLevelCategory {
-  const n = fileName.toLowerCase();
+  // Normalize CamelCase + separators so the \b word patterns match "SafetyComplaint.pdf"
+  // (previously "complaint" sat mid-word with no boundary and silently missed).
+  const n = normalizeFilenameForMatching(fileName);
   if (
-    /\b(incident|accident|injury|safety|osha|grievance|complaint)\b/i.test(fileName) ||
-    /\b(investigation|witness)\b/i.test(fileName)
+    /\b(incident|accident|injury|safety|osha|grievance|complaint)\b/i.test(n) ||
+    /\b(investigation|witness)\b/i.test(n)
   ) {
     return 'Incident & Workplace Evidence';
   }
   if (
-    /\b(passport|driver|license|i-?9|identity|badge|certification|credential)\b/i.test(n) ||
+    /\b(passport|driver|license|i[\s-]?9|identity|badge|certification|credential)\b/i.test(n) ||
     /\bcpa\b|\bpe\b|professional license/i.test(n)
   ) {
     return 'Identity & Professional Verification';

@@ -30,6 +30,7 @@ import {
   type FirmSubmissionTypeDisplay,
 } from '../app/constants/one3sevenProduct';
 import { inferInventoryCategory } from './packetChronologyIntelligence';
+import { normalizeFilenameForMatching } from './filenameMatching';
 import { attorneyCategoryLabel } from './packetStoryPresentation';
 import type { IntakeOrganizationSections, PlaceholderOrganizationResult } from './intakeOrganizationTypes';
 import { refreshSectionsReviewNotes } from './intakeOrganizationSectionsService';
@@ -190,24 +191,27 @@ export function resolveAttorneyFacingUploadCategory(
 }
 
 export function inferCategoryFromFileName(fileName: string): string {
-  const name = fileName.toLowerCase();
+  const rawLower = fileName.toLowerCase();
+  // Normalize CamelCase + separators to a SPACE-delimited canonical form so tokens like
+  // "final_pay" / "written_warning" also match "FinalPay.pdf" / "WrittenWarning.pdf"
+  // (which previously fell through to a weaker/wrong category). Keep a raw lowercase copy
+  // for the W-2 checks, whose patterns depend on the literal hyphen.
+  const name = normalizeFilenameForMatching(fileName);
   const w2ish =
     /\bw[-\s]?2\b/i.test(fileName) ||
-    /(^|[^a-z0-9])w2([^a-z0-9]|$)/i.test(name) ||
-    name.includes('w-2');
+    /(^|[^a-z0-9])w2([^a-z0-9]|$)/i.test(rawLower) ||
+    rawLower.includes('w-2') ||
+    name.includes('w 2');
 
   // Separation / termination — check before pay to avoid "final pay" grabbing termination letters
   if (
     name.includes('termination') ||
     name.includes('separation') ||
-    name.includes('final_paystub') ||
     name.includes('final paystub') ||
-    name.includes('final_pay') ||
     name.includes('final pay') ||
-    name.includes('last_day') ||
     name.includes('last day') ||
-    name.includes('letter_of_separation') ||
-    name.includes('end_of_employment')
+    name.includes('letter of separation') ||
+    name.includes('end of employment')
   ) {
     return 'Separation Records';
   }
@@ -215,14 +219,13 @@ export function inferCategoryFromFileName(fileName: string): string {
   // Discipline / warnings
   if (
     name.includes('warning') ||
-    name.includes('written_warning') ||
-    name.includes('write_up') ||
-    name.includes('write-up') ||
+    name.includes('written warning') ||
+    name.includes('write up') ||
     name.includes('writeup') ||
     name.includes('corrective') ||
     name.includes('disciplin') ||
     name.includes('pip') ||
-    name.includes('performance_improvement')
+    name.includes('performance improvement')
   ) {
     return 'Performance / discipline records';
   }
@@ -234,7 +237,7 @@ export function inferCategoryFromFileName(fileName: string): string {
     name.includes('declaration') ||
     name.includes('affidavit') ||
     name.includes('coworker') ||
-    name.includes('co_worker') ||
+    name.includes('co worker') ||
     name.includes('colleague')
   ) {
     return 'Witness Statement';
@@ -243,9 +246,7 @@ export function inferCategoryFromFileName(fileName: string): string {
   // Meal & rest period records
   if (
     name.includes('meal') ||
-    name.includes('break_log') ||
     name.includes('break log') ||
-    name.includes('rest_period') ||
     name.includes('rest period') ||
     name.includes('lunch')
   ) {
@@ -266,10 +267,9 @@ export function inferCategoryFromFileName(fileName: string): string {
   if (
     name.includes('complaint') ||
     name.includes('grievance') ||
-    name.includes('report_to_hr') ||
-    name.includes('hr_complaint') ||
-    name.includes('text_message') ||
-    name.includes('text_messages')
+    name.includes('report to hr') ||
+    name.includes('hr complaint') ||
+    name.includes('text message')
   ) {
     return 'Workplace Communications';
   }
@@ -302,7 +302,9 @@ export function inferCategoryFromFileName(fileName: string): string {
 
 /** Strong title cues — used only when deciding whether a rename may change stored category. */
 function fileNameHasStrongCategorySignal(fileName: string, category: string): boolean {
-  const n = fileName.toLowerCase();
+  // Space-normalized (CamelCase split, separators collapsed) so the \s-based patterns below
+  // match "OfferLetter.pdf" / "PerformanceReview.pdf" as well as "offer_letter" / "offer letter".
+  const n = normalizeFilenameForMatching(fileName);
   switch (category) {
     case 'Pay Records / Payroll':
       return /\b(pay\s*stub|paystub|payroll|paycheck|pay\s*record|final\s*pay|w[-\s]?2|wage\s+statement)\b/i.test(

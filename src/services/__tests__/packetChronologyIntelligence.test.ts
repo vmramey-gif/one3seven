@@ -26,6 +26,17 @@ describe('packetChronologyIntelligence', () => {
     expect(inferInventoryCategory('Offer_Letter.pdf', 'Uncategorized')).toBe('Offer Letters');
   });
 
+  test('infers categories from CamelCase filenames with no separator (regression)', () => {
+    // Real uploads arrive CamelCase — these used to fall through to Uncategorized because
+    // the patterns expected an underscore/space that CamelCase does not have.
+    expect(inferInventoryCategory('OfferLetter2022.pdf', 'Uncategorized')).toBe('Offer Letters');
+    expect(inferInventoryCategory('Rosa_WrittenWarning_2026-03-13.pdf', 'Uncategorized')).toBe('Performance Reviews');
+    expect(inferInventoryCategory('PerformanceReview.pdf', 'Uncategorized')).toBe('Performance Reviews');
+    expect(inferInventoryCategory('ProjectRemoval.pdf', 'Uncategorized')).toBe('HR Documents');
+    expect(inferInventoryCategory('ComplaintToHR.pdf', 'Uncategorized')).toBe('Workplace Communications');
+    expect(inferInventoryCategory('WageStatement.pdf', 'Uncategorized')).toBe('Pay Records');
+  });
+
   test('resolves specific event titles and avoids generic labels', () => {
     expect(
       resolveChronologyEventTitle(

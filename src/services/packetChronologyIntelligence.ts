@@ -4,6 +4,7 @@
  */
 
 import { formatPacketFileName, sanitizePacketDateLabel } from './intakePacketFormatting';
+import { normalizeFilenameForMatching } from './filenameMatching';
 
 export type PacketTimelineEventInput = {
   date: string;
@@ -32,21 +33,25 @@ const GENERIC_TITLE_RE =
   /^(event documented in uploaded records|message exchanged at work|workplace communication documented|general workplace event|timeline event noted|record added to chronology|payroll period documented|hr record documented|workplace record documented)$/i;
 
 /** Internal storage categories inferred from filenames when Uncategorized. */
+// Patterns are matched against a filename normalized by normalizeFilenameForMatching
+// (CamelCase split + every separator collapsed to a single space), so they are written
+// in SPACE-delimited form. That is what lets "OfferLetter.pdf" / "PerformanceReview.pdf" /
+// "ProjectRemoval.pdf" match the same rule as "offer_letter" / "performance review".
 const FILENAME_CATEGORY_RULES: Array<{ pattern: RegExp; category: string; weight: number }> = [
-  { pattern: /complaint_to_supervisor|complaint.?supervisor|supervisor.?complaint/i, category: 'Workplace Communications', weight: 92 },
-  { pattern: /complaint_to_hr|complaint.?hr|hr.?complaint|grievance/i, category: 'Workplace Communications', weight: 92 },
+  { pattern: /complaint to supervisor|complaint.?supervisor|supervisor.?complaint/i, category: 'Workplace Communications', weight: 92 },
+  { pattern: /complaint to hr|complaint.?hr|hr.?complaint|grievance/i, category: 'Workplace Communications', weight: 92 },
   { pattern: /safety.?concern|safety.?complaint|safety.?email|safety.?report/i, category: 'Workplace Communications', weight: 88 },
-  { pattern: /witness[_\s]?statement|(?:^|[_\s])statement(?:[_\s.]|$)/i, category: 'Workplace Communications', weight: 85 },
-  { pattern: /written[_\s]?warning|write[_\s]?up|disciplin/i, category: 'Performance Reviews', weight: 88 },
-  { pattern: /termination_letter|terminat/i, category: 'HR Documents', weight: 90 },
-  { pattern: /separation|severance|final_pay/i, category: 'HR Documents', weight: 86 },
-  { pattern: /project_removal|removed_from_project/i, category: 'HR Documents', weight: 84 },
-  { pattern: /coaching_memo|coaching.?memo/i, category: 'Performance Reviews', weight: 82 },
-  { pattern: /separation_benefits|separation.?benefits/i, category: 'HR Documents', weight: 88 },
-  { pattern: /offer_letter|employment_agreement|offer letter/i, category: 'Offer Letters', weight: 90 },
-  { pattern: /paystub|pay_stub|payroll|wage_statement/i, category: 'Pay Records', weight: 86 },
-  { pattern: /timesheet|time_sheet|schedule|attendance/i, category: 'Time Records', weight: 84 },
-  { pattern: /performance_review|performance review|pip|performance_improvement/i, category: 'Performance Reviews', weight: 86 },
+  { pattern: /witness[\s]?statement|(?:^|[\s])statement(?:[\s.]|$)/i, category: 'Workplace Communications', weight: 85 },
+  { pattern: /written[\s]?warning|write[\s]?up|disciplin/i, category: 'Performance Reviews', weight: 88 },
+  { pattern: /termination letter|terminat/i, category: 'HR Documents', weight: 90 },
+  { pattern: /separation|severance|final pay/i, category: 'HR Documents', weight: 86 },
+  { pattern: /project removal|removed from project/i, category: 'HR Documents', weight: 84 },
+  { pattern: /coaching memo|coaching.?memo/i, category: 'Performance Reviews', weight: 82 },
+  { pattern: /separation benefits|separation.?benefits/i, category: 'HR Documents', weight: 88 },
+  { pattern: /offer letter|employment agreement/i, category: 'Offer Letters', weight: 90 },
+  { pattern: /paystub|pay stub|payroll|wage statement/i, category: 'Pay Records', weight: 86 },
+  { pattern: /timesheet|time sheet|schedule|attendance/i, category: 'Time Records', weight: 84 },
+  { pattern: /performance review|pip|performance improvement/i, category: 'Performance Reviews', weight: 86 },
   { pattern: /recognition|award|commendation/i, category: 'HR Documents', weight: 80 },
 ];
 
@@ -180,7 +185,7 @@ function inventoryRowForName(inventory: InventoryRow[], name: string): Inventory
 export function inferInventoryCategory(fileName: string, storedCategory: string): string {
   const stored = (storedCategory ?? '').trim();
 
-  const base = fileName.toLowerCase();
+  const base = normalizeFilenameForMatching(fileName);
   let best = { category: '', weight: 0 };
   for (const rule of FILENAME_CATEGORY_RULES) {
     if (rule.pattern.test(base) && rule.weight > best.weight) {

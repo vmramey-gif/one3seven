@@ -10,6 +10,7 @@ import {
   takenTogetherPhrase,
 } from './intakeGenerationVoice';
 import { safeTrim, trimAssemblyValue } from './summarySaveDiagnostics';
+import { normalizeFilenameForMatching } from './filenameMatching';
 
 export type FactSource = {
   uploadedFileId: string;
@@ -989,7 +990,9 @@ function categoryTitleFromNameAndText(category: string, fileName: string, text: 
   const cat = category.trim().toLowerCase();
   const date = dateHintFromFileName(fileName);
   const lowerText = text.toLowerCase();
-  const lowerName = fileName.toLowerCase();
+  // Space-normalized (CamelCase split, separators collapsed) so "FinalPay.pdf" matches
+  // the `final\s+pay` pattern below instead of silently reading as a generic pay stub.
+  const lowerName = normalizeFilenameForMatching(fileName);
 
   if (cat.includes('pay') || /\bpay\s*stub|payroll|paycheck\b/i.test(lowerText) || /\bpay\s*stub|payroll\b/i.test(lowerName)) {
     if (
