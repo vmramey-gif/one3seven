@@ -3,7 +3,31 @@ import {
   detectPayPeriodGaps,
   parseEmploymentDateRange,
   formatCoverageRange,
+  inferPayFrequency,
 } from '../gapDetection';
+
+describe('inferPayFrequency', () => {
+  it('reads biweekly off 14-day spacing', () => {
+    const d = [new Date(2024, 0, 5), new Date(2024, 0, 19), new Date(2024, 1, 2)];
+    expect(inferPayFrequency(d)).toBe('biweekly');
+  });
+  it('reads weekly off 7-day spacing', () => {
+    const d = [new Date(2024, 0, 5), new Date(2024, 0, 12), new Date(2024, 0, 19)];
+    expect(inferPayFrequency(d)).toBe('weekly');
+  });
+  it('reads monthly off ~30-day spacing', () => {
+    const d = [new Date(2024, 0, 15), new Date(2024, 1, 15), new Date(2024, 2, 15)];
+    expect(inferPayFrequency(d)).toBe('monthly');
+  });
+  it('reads semimonthly off 1st/16th spacing', () => {
+    const d = [new Date(2024, 0, 1), new Date(2024, 0, 16), new Date(2024, 1, 1), new Date(2024, 1, 16)];
+    expect(inferPayFrequency(d)).toBe('semimonthly');
+  });
+  it('returns null with fewer than two dated stubs — caller falls back', () => {
+    expect(inferPayFrequency([new Date(2024, 0, 5)])).toBeNull();
+    expect(inferPayFrequency([])).toBeNull();
+  });
+});
 
 describe('parseEmploymentDateRange', () => {
   it('parses "Month YYYY – Month YYYY"', () => {
@@ -63,6 +87,17 @@ describe('detectPayPeriodGaps', () => {
     });
     expect(r.documentedPeriods).toBe(2);
     expect(r.undocumentedPeriods).toBe(r.estimatedPeriods - 2);
+  });
+
+  it('reports undocumented time in months for the human headline', () => {
+    const r = detectPayPeriodGaps({
+      employmentStart: new Date(2022, 2, 1), // Mar 2022
+      employmentEnd: new Date(2026, 0, 31), // Jan 2026 (~47 months)
+      payFrequency: 'biweekly',
+      payrollRecordDates: [new Date(2025, 9, 15), new Date(2025, 10, 15), new Date(2025, 11, 15)],
+    });
+    // Almost the entire span is undocumented — should read as ~40+ months.
+    expect(r.undocumentedMonths).toBeGreaterThan(40);
   });
 
   it('groups contiguous gaps into a labeled segment', () => {

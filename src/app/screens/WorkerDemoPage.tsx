@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { OneThreeSevenLoader } from '../components/ui/OneThreeSevenLoader';
 import { GapCoverageRail } from '../components/GapCoverageRail';
-import { detectPayPeriodGaps, parseEmploymentDateRange, type PayFrequency } from '../../services/gapDetection';
+import { detectPayPeriodGaps, parseEmploymentDateRange, inferPayFrequency, DEFAULT_PAY_FREQUENCY, type PayFrequency } from '../../services/gapDetection';
 
 // ── Phase tracking ─────────────────────────────────────────────────────────────
 // phase: 'intake' (steps 1-3) → 'processing' → 'summary' → 'dashboard' → 'control'
@@ -582,20 +582,24 @@ function PostDashboard({ onNext }: { onNext: () => void }) {
   useEffect(() => { window.scrollTo({ top: 0, behavior: 'instant' }); }, []);
 
   // Gap Detection (Layer 1) — Marcus worked Mar 2022–Jan 2026 but only a handful of pay stubs
-  // are on file, so most pay periods are undocumented. The correction control is live.
-  const [gapFreq, setGapFreq] = useState<PayFrequency>('biweekly');
+  // are on file, so most pay periods are undocumented. Frequency is DERIVED from the stub spacing
+  // (not asked); the manual control below stays as an override.
+  const gapStubDates = [
+    new Date(2025, 9, 3), // Oct 2025 stub
+    new Date(2025, 9, 17), // Oct 2025 stub (biweekly spacing → inferred biweekly)
+    new Date(2025, 10, 14), // Nov 2025 stub
+    new Date(2025, 11, 12), // Dec 2025 stub
+  ];
+  const [gapFreq, setGapFreq] = useState<PayFrequency>(
+    () => inferPayFrequency(gapStubDates) ?? DEFAULT_PAY_FREQUENCY
+  );
   const gapResult = (() => {
     const { start, end } = parseEmploymentDateRange('March 2022 – January 2026');
     return detectPayPeriodGaps({
       employmentStart: start,
       employmentEnd: end,
       payFrequency: gapFreq,
-      payrollRecordDates: [
-        new Date(2025, 9, 15), // Oct 2025 stub
-        new Date(2025, 10, 15), // Nov 2025 stub
-        new Date(2025, 11, 15), // Dec 2025 stub
-        new Date(2026, 0, 5), // final paycheck stub
-      ],
+      payrollRecordDates: gapStubDates,
     });
   })();
 

@@ -24,8 +24,30 @@ export const PAY_FREQUENCY_LABELS: Record<PayFrequency, string> = {
   monthly: 'Monthly',
 };
 
-/** Most common private-sector schedule in the US — the sensible default when none is stated. */
+/** Fallback only — used when we can't read the cadence off the records. */
 export const DEFAULT_PAY_FREQUENCY: PayFrequency = 'biweekly';
+
+/**
+ * Read the pay cadence off the records instead of asking the worker. The spacing between pay-stub
+ * dates IS the frequency (14 days apart = biweekly). Returns null when there aren't enough dated
+ * stubs to infer (<2) — the caller then falls back to DEFAULT_PAY_FREQUENCY + the manual control.
+ */
+export function inferPayFrequency(payrollRecordDates: Date[]): PayFrequency | null {
+  const days = payrollRecordDates
+    .filter((d) => d instanceof Date && !Number.isNaN(d.getTime()))
+    .map((d) => startOfDay(d).getTime())
+    .sort((a, b) => a - b);
+  const unique = days.filter((t, i) => i === 0 || t !== days[i - 1]);
+  if (unique.length < 2) return null;
+  const gaps: number[] = [];
+  for (let i = 1; i < unique.length; i++) gaps.push((unique[i] - unique[i - 1]) / MS_DAY);
+  gaps.sort((a, b) => a - b);
+  const median = gaps[Math.floor(gaps.length / 2)];
+  if (median <= 11) return 'weekly';
+  if (median <= 14.5) return 'biweekly'; // biweekly is a clean 14; semimonthly medians ~15–16
+  if (median <= 20) return 'semimonthly';
+  return 'monthly';
+}
 
 export type GapDetectionInput = {
   employmentStart: Date | null;
@@ -58,6 +80,8 @@ export type GapDetectionResult = {
   estimatedPeriods: number;
   documentedPeriods: number;
   undocumentedPeriods: number;
+  /** Approx. months of pay record not represented — the human-facing unit for the headline. */
+  undocumentedMonths: number;
   payFrequency: PayFrequency;
   periods: CoveragePeriod[];
   segments: CoverageSegment[];
@@ -112,6 +136,7 @@ export function detectPayPeriodGaps(input: GapDetectionInput): GapDetectionResul
     estimatedPeriods: 0,
     documentedPeriods: 0,
     undocumentedPeriods: 0,
+    undocumentedMonths: 0,
     payFrequency: input.payFrequency,
     periods: [],
     segments: [],
@@ -168,15 +193,22 @@ export function detectPayPeriodGaps(input: GapDetectionInput): GapDetectionResul
   }
 
   const documentedPeriods = periods.filter((p) => p.covered).length;
+  const gapSegments = segments.filter((s) => !s.covered);
+  // Sum the gap spans as calendar months (inclusive of the period end day).
+  const gapDays = gapSegments.reduce(
+    (sum, s) => sum + (s.end.getTime() - s.start.getTime()) / MS_DAY + 1,
+    0
+  );
   return {
     computable: true,
     estimatedPeriods: periods.length,
     documentedPeriods,
     undocumentedPeriods: periods.length - documentedPeriods,
+    undocumentedMonths: Math.round(gapDays / 30.44),
     payFrequency,
     periods,
     segments,
-    gapSegments: segments.filter((s) => !s.covered),
+    gapSegments,
   };
 }
 

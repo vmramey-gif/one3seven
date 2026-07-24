@@ -49,8 +49,10 @@ export function GapCoverageRail({
     );
   }
 
-  const { estimatedPeriods, documentedPeriods, undocumentedPeriods, segments, gapSegments } = result;
+  const { estimatedPeriods, documentedPeriods, undocumentedPeriods, undocumentedMonths, segments, gapSegments } =
+    result;
   const totalPeriods = segments.reduce((n, s) => n + s.periodCount, 0) || 1;
+  const monthWord = undocumentedMonths === 1 ? 'month' : 'months';
 
   return (
     <div className={`rounded-[20px] border border-[#CBD6CF] bg-white/95 p-5 shadow-[0_16px_42px_rgba(91,53,213,0.07)] ${className}`}>
@@ -59,21 +61,22 @@ export function GapCoverageRail({
         <EstimatedChip />
       </div>
 
-      {/* The reveal — calculated expectation, observed coverage, stated separately. */}
-      <p className="mt-3 text-[15px] leading-relaxed text-[#20242a]">
-        About{' '}
-        <span className="font-semibold text-[#1B2623]">{estimatedPeriods} pay periods</span> fall
-        within the dates you entered. Records covering{' '}
-        <span className="font-semibold text-[#42574E]">{documentedPeriods}</span> are in your file.
-      </p>
+      {/* The reveal — lead with TIME (the unit a human feels); periods are the secondary detail. */}
       {undocumentedPeriods > 0 ? (
-        <p className="mt-1.5 text-[14px] leading-relaxed text-[#8B4A2B]">
-          <span className="font-semibold text-[#A8512B]">{undocumentedPeriods}</span> aren’t
-          represented yet.
-        </p>
+        <>
+          <p className="mt-3 text-[18px] font-semibold leading-snug text-[#20242a]">
+            About <span className="text-[#A8512B]">{undocumentedMonths} {monthWord}</span> of pay
+            records aren’t in your file yet.
+          </p>
+          <p className="mt-1.5 text-[13px] leading-relaxed text-[#6A6D66]">
+            Records covering <span className="font-semibold text-[#42574E]">{documentedPeriods}</span>{' '}
+            of an estimated <span className="font-semibold text-[#40433f]">{estimatedPeriods}</span>{' '}
+            pay periods are here.
+          </p>
+        </>
       ) : (
-        <p className="mt-1.5 text-[14px] font-medium leading-relaxed text-[#42574E]">
-          Every estimated period is represented. 🌱
+        <p className="mt-3 text-[16px] font-medium leading-snug text-[#42574E]">
+          Every estimated pay period is represented. 🌱
         </p>
       )}
 

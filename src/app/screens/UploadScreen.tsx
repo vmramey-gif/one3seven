@@ -19,15 +19,10 @@ import {
 } from 'lucide-react';
 import { Screen } from '../App';
 import {
-  AGENCY_FILING_OPTIONS,
-  ARBITRATION_OPTIONS,
   EMPLOYMENT_STATUS_OPTIONS,
   US_STATES,
-  STORY_FOLLOWUP_REIMBURSEMENT_OPTIONS,
-  STORY_FOLLOWUP_REMOTE_OPTIONS,
   STORY_FIRST_FOLLOWUP_HEADING,
   STORY_FIRST_FOLLOWUP_SUBLINE,
-  STORY_FIRST_REMOTE_EXPENSES_QUESTION,
   STORY_FIRST_STEP_LABELS,
   STORY_FIRST_UPLOAD_EXAMPLES,
   STORY_FIRST_UPLOAD_HEADING,
@@ -1261,36 +1256,14 @@ export function UploadScreen({
                     </div>
                     <span className="shrink-0 rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold text-[#42574E] ring-1 ring-[#CBD6CF]">
                       {[
-                        followUp.employmentName,
                         followUp.employer,
                         followUp.employmentDates,
-                        followUp.keyPeople,
-                        followUp.workedRemotely,
-                        followUp.remoteExpenses,
-                        followUp.reimbursed,
                         followUp.complainedOrReported,
                         followUp.changedAfterward,
-                        ...(isEmploymentIntake ? [followUp.workState, followUp.employmentStatus, followUp.arbitrationAgreement, followUp.priorAgencyFiling] : []),
-                      ].filter((v) => Boolean(String(v ?? '').trim())).length} of {isEmploymentIntake ? 13 : 9}
+                        ...(isEmploymentIntake ? [followUp.workState, followUp.employmentStatus] : []),
+                      ].filter((v) => Boolean(String(v ?? '').trim())).length} of {isEmploymentIntake ? 6 : 4}
                     </span>
                   </div>
-                </div>
-
-                {/* Card: Full name */}
-                <div className="rounded-[14px] border border-[#D3DED6] bg-white px-4 py-3.5 shadow-sm">
-                  <label className="text-sm font-semibold text-[#1B2623]" htmlFor="followup-employment-name">
-                    Full Name Used During Employment
-                  </label>
-                  <p className="mt-1 text-xs leading-relaxed text-[#7C857F]">
-                    The name that appears on your pay stubs, workplace emails, or employment documents.
-                  </p>
-                  <input
-                    id="followup-employment-name"
-                    value={followUp.employmentName ?? ''}
-                    onChange={(e) => updateFollowUp({ employmentName: e.target.value })}
-                    className="mt-2.5 w-full rounded-[10px] border border-[#CBD6CF] bg-white px-3 py-2.5 text-sm text-[#1B2623] placeholder:text-[#9AA39B] focus:border-[#5E7268] focus:outline-none focus:ring-2 focus:ring-[#D3DED6]"
-                    placeholder="Name shown on employment records"
-                  />
                 </div>
 
                 {/* Card: Employer */}
@@ -1319,80 +1292,6 @@ export function UploadScreen({
                     className="mt-2.5 w-full rounded-[10px] border border-[#CBD6CF] bg-white px-3 py-2.5 text-sm text-[#1B2623] placeholder:text-[#9AA39B] focus:border-[#5E7268] focus:outline-none focus:ring-2 focus:ring-[#D3DED6]"
                     placeholder="e.g. March 2021 – January 2024"
                   />
-                </div>
-
-                {/* Card: Key people */}
-                <div className="rounded-[14px] border border-[#D3DED6] bg-white px-4 py-3.5 shadow-sm">
-                  <label className="text-sm font-semibold text-[#1B2623]" htmlFor="followup-people">
-                    Are there key people involved?
-                  </label>
-                  <p className="mt-1 text-xs leading-relaxed text-[#7C857F]">
-                    Supervisors, HR contacts, coworkers — anyone relevant to what happened.
-                  </p>
-                  <input
-                    id="followup-people"
-                    value={followUp.keyPeople ?? ''}
-                    onChange={(e) => updateFollowUp({ keyPeople: e.target.value })}
-                    className="mt-2.5 w-full rounded-[10px] border border-[#CBD6CF] bg-white px-3 py-2.5 text-sm text-[#1B2623] placeholder:text-[#9AA39B] focus:border-[#5E7268] focus:outline-none focus:ring-2 focus:ring-[#D3DED6]"
-                    placeholder="Manager, HR contact, coworkers, etc."
-                  />
-                </div>
-
-                {/* Card: Remote work */}
-                <div className="rounded-[14px] border border-[#D3DED6] bg-white px-4 py-3.5 shadow-sm">
-                  <p className="text-sm font-semibold text-[#1B2623] mb-2.5">Were you working remotely at any point?</p>
-                  <div className="flex flex-wrap gap-2">
-                    {STORY_FOLLOWUP_REMOTE_OPTIONS.map((opt) => (
-                      <button
-                        key={opt.value}
-                        type="button"
-                        onClick={() => updateFollowUp({ workedRemotely: opt.value })}
-                        className={`rounded-full px-3 py-1.5 text-xs font-medium border transition-colors ${
-                          followUp.workedRemotely === opt.value
-                            ? 'border-[#42574E] bg-[#42574E] text-white'
-                            : 'border-[#D3DED6] bg-white text-[#384039] hover:border-[#CBD6CF] hover:bg-[#EEF2EE]'
-                        }`}
-                      >
-                        {opt.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Card: Remote expenses */}
-                <div className="rounded-[14px] border border-[#D3DED6] bg-white px-4 py-3.5 shadow-sm">
-                  <label className="text-sm font-semibold text-[#1B2623]" htmlFor="followup-remote-expenses">
-                    {STORY_FIRST_REMOTE_EXPENSES_QUESTION}
-                  </label>
-                  <textarea
-                    id="followup-remote-expenses"
-                    value={followUp.remoteExpenses ?? ''}
-                    onChange={(e) => updateFollowUp({ remoteExpenses: e.target.value })}
-                    rows={2}
-                    className="mt-2.5 w-full rounded-[10px] border border-[#CBD6CF] bg-white px-3 py-2.5 text-sm text-[#1B2623] placeholder:text-[#9AA39B] focus:border-[#5E7268] focus:outline-none focus:ring-2 focus:ring-[#D3DED6] resize-none"
-                    placeholder="Briefly describe what you paid for out of pocket, if anything"
-                  />
-                </div>
-
-                {/* Card: Reimbursed */}
-                <div className="rounded-[14px] border border-[#D3DED6] bg-white px-4 py-3.5 shadow-sm">
-                  <p className="text-sm font-semibold text-[#1B2623] mb-2.5">Were you reimbursed?</p>
-                  <div className="flex flex-wrap gap-2">
-                    {STORY_FOLLOWUP_REIMBURSEMENT_OPTIONS.map((opt) => (
-                      <button
-                        key={opt.value}
-                        type="button"
-                        onClick={() => updateFollowUp({ reimbursed: opt.value })}
-                        className={`rounded-full px-3 py-1.5 text-xs font-medium border transition-colors ${
-                          followUp.reimbursed === opt.value
-                            ? 'border-[#42574E] bg-[#42574E] text-white'
-                            : 'border-[#D3DED6] bg-white text-[#384039] hover:border-[#CBD6CF] hover:bg-[#EEF2EE]'
-                        }`}
-                      >
-                        {opt.label}
-                      </button>
-                    ))}
-                  </div>
                 </div>
 
                 {/* Card: Complained or reported */}
@@ -1472,57 +1371,6 @@ export function UploadScreen({
                       </div>
                     </div>
 
-                    {/* Card: Arbitration */}
-                    <div className="rounded-[14px] border border-[#D3DED6] bg-white px-4 py-3.5 shadow-sm">
-                      <p className="text-sm font-semibold text-[#1B2623] mb-1">Do you recall signing an arbitration agreement?</p>
-                      <p className="text-xs text-[#7C857F] mb-2.5 leading-relaxed">This may have been part of your offer letter or onboarding paperwork.</p>
-                      <div className="flex flex-wrap gap-2">
-                        {ARBITRATION_OPTIONS.map((opt) => (
-                          <button
-                            key={opt.value}
-                            type="button"
-                            onClick={() => updateFollowUp({ arbitrationAgreement: opt.value })}
-                            className={`rounded-full px-3 py-1.5 text-xs font-medium border transition-colors ${
-                              followUp.arbitrationAgreement === opt.value
-                                ? 'border-[#42574E] bg-[#42574E] text-white'
-                                : 'border-[#D3DED6] bg-white text-[#384039] hover:border-[#CBD6CF] hover:bg-[#EEF2EE]'
-                            }`}
-                          >
-                            {opt.label}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Card: Agency filing */}
-                    <div className="rounded-[14px] border border-[#D3DED6] bg-white px-4 py-3.5 shadow-sm">
-                      <p className="text-sm font-semibold text-[#1B2623] mb-1">Have you filed a complaint with any agency?</p>
-                      <p className="text-xs text-[#7C857F] mb-2.5 leading-relaxed">For example: EEOC, California Civil Rights Department (CRD / former DFEH), DLSE, or the Labor Commissioner.</p>
-                      <div className="flex flex-wrap gap-2 mb-2">
-                        {AGENCY_FILING_OPTIONS.map((opt) => (
-                          <button
-                            key={opt.value}
-                            type="button"
-                            onClick={() => updateFollowUp({ priorAgencyFiling: opt.value })}
-                            className={`rounded-full px-3 py-1.5 text-xs font-medium border transition-colors ${
-                              followUp.priorAgencyFiling === opt.value
-                                ? 'border-[#42574E] bg-[#42574E] text-white'
-                                : 'border-[#D3DED6] bg-white text-[#384039] hover:border-[#CBD6CF] hover:bg-[#EEF2EE]'
-                            }`}
-                          >
-                            {opt.label}
-                          </button>
-                        ))}
-                      </div>
-                      {followUp.priorAgencyFiling === 'yes' ? (
-                        <input
-                          value={followUp.priorAgencyFilingDetails ?? ''}
-                          onChange={(e) => updateFollowUp({ priorAgencyFilingDetails: e.target.value })}
-                          className="mt-1 w-full rounded-[10px] border border-[#CBD6CF] bg-white px-3 py-2.5 text-sm text-[#1B2623] placeholder:text-[#9AA39B] focus:border-[#5E7268] focus:outline-none focus:ring-2 focus:ring-[#D3DED6]"
-                          placeholder="Which agency, if you remember"
-                        />
-                      ) : null}
-                    </div>
                   </>
                 ) : null}
               </div>
