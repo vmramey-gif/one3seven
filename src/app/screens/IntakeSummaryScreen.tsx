@@ -100,6 +100,8 @@ import { inferInventoryCategory } from '../../services/packetChronologyIntellige
 import { polishHumanReadableDisplayText } from '../../services/firmIntakeDisplay';
 import { extractStoryFollowUpFromOverview } from '../../services/storyFollowUpPersistence';
 import { GapCoverageRail } from '../components/GapCoverageRail';
+import { RecordRequirementsCard } from '../components/RecordRequirementsCard';
+import { assessEmployerRecordCoverage } from '../../services/caEmployerRecordRequirements';
 import {
   detectPayPeriodGaps,
   parseEmploymentDateRange,
@@ -470,6 +472,22 @@ export function IntakeSummaryScreen({
         payrollRecordDates: gapPayrollDates,
       }),
     [gapEmployment.start, gapEmployment.end, gapFreq, gapPayrollDates]
+  );
+
+  // Record-requirements coverage — what CA requires an employer to keep vs. what's in the file.
+  const recordCoverage = useMemo(
+    () =>
+      assessEmployerRecordCoverage(
+        uploadedFiles.map((f, i) => ({
+          fileName: f.name,
+          category: inferInventoryCategory(
+            f.name,
+            resolveUploadedFileDisplayCategory(f, { persistedCategory: uploadedFilePersistMeta[i]?.category })
+          ),
+        })),
+        { stillEmployed: storyFollowUpDetails?.employmentStatus === 'still_employed' }
+      ),
+    [uploadedFiles, uploadedFilePersistMeta, storyFollowUpDetails?.employmentStatus]
   );
   const savedAdditionalNotesRaw = parsedWorkerNotes.additionalNotes ?? '';
   const savedAdditionalNotesDisplay = polishHumanReadableDisplayText(savedAdditionalNotesRaw);
@@ -1296,6 +1314,16 @@ export function IntakeSummaryScreen({
                 result={gapResult}
                 payFrequency={gapFreq}
                 onFrequencyChange={setGapFreqOverride}
+                onRequestRecords={() => onNavigate('recordsRequest')}
+              />
+            </div>
+          ) : null}
+
+          {/* Record-requirements coverage (only once records have been added) */}
+          {uploadedFiles.length > 0 ? (
+            <div className="mb-4">
+              <RecordRequirementsCard
+                coverage={recordCoverage}
                 onRequestRecords={() => onNavigate('recordsRequest')}
               />
             </div>
