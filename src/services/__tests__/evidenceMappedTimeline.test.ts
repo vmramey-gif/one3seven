@@ -97,6 +97,30 @@ describe('evidence-mapped timeline engine', () => {
     );
   });
 
+  test('titles a CamelCase written-warning filename correctly (Rosa regression — was "Schedule change")', () => {
+    const events = buildEvidenceMappedTimelineEvents({
+      fileRecords: [
+        sampleFileRecord({
+          source_file_id: 'warning-1',
+          // CamelCase, no underscore between Written+Warning — the exact real filename that broke.
+          file_name: 'Rosa_WrittenWarning_2026-03-13.pdf',
+          document_type: 'Performance / discipline records',
+          legacy_upload_category: 'Performance / discipline records',
+          likely_date: 'March 13, 2026',
+          // Include scheduling-ish topics to prove the warning still wins over "Schedule change".
+          employment_topics: ['Discipline', 'Scheduling and timekeeping'],
+          possible_timeline_event: {
+            title: 'Workplace incident or discipline materials',
+            date: 'March 13, 2026',
+            neutral_summary: 'Materials may reflect a disciplinary action.',
+          },
+        }),
+      ],
+    });
+    expect(events[0]?.title).toBe('Written warning issued');
+    expect(events[0]?.title).not.toBe('Schedule change documented');
+  });
+
   test('uses workplace-event labels for safety concerns, performance actions, and scheduling records', () => {
     const events = buildEvidenceMappedTimelineEvents({
       fileRecords: [

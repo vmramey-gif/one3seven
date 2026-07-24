@@ -80,7 +80,14 @@ function candidate(title: string, rank: number): EventCandidate {
 }
 
 function eventCandidateFromFilename(record: IntakeFileOrganizationRecord): EventCandidate | null {
-  const name = record.file_name.toLowerCase();
+  // Normalize CamelCase + separators to the underscore form the patterns below expect, so
+  // "Rosa_WrittenWarning_2026-03-13.pdf" matches /written_warning/ (it did not before — the
+  // warning fell through to "Schedule change"). Splits camelCase, then collapses spaces/dots/
+  // hyphens to underscores.
+  const name = record.file_name
+    .replace(/([a-z0-9])([A-Z])/g, '$1_$2')
+    .toLowerCase()
+    .replace(/[\s.\-]+/g, '_');
   if (/safety_concern|safety.?complaint|unsafe|hazard/.test(name)) {
     return candidate('Worker raises safety concerns', 104);
   }
