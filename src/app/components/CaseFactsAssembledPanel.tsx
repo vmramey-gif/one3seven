@@ -22,6 +22,8 @@ type CaseFactsAssembledPanelProps = {
   coverage: EmployerRecordCoverage;
   gaps: GapDetectionResult;
   damages: DamagesReport | null;
+  /** Raw uploaded documents, for the category-organized "case folder" view. */
+  documents?: Array<{ fileName?: string; category?: string }>;
   illustrative?: boolean;
 };
 
@@ -79,15 +81,31 @@ export function CaseFactsAssembledPanel({
   coverage,
   gaps,
   damages,
+  documents = [],
   illustrative = false,
 }: CaseFactsAssembledPanelProps) {
   const currency = (n: number) =>
     n.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+  const shortDate = (d: Date) => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
   const tightest = proximity.closestIntervalDays;
   const sequenceEvents = proximity.events
     .filter((e) => e.role !== 'neutral' && e.parsedDate)
     .sort((a, b) => a.parsedDate!.getTime() - b.parsedDate!.getTime());
+
+  // The attorney's 5-second screen: adverse action? · nexus (proximity)? · SOL (most recent date)?
+  const mostRecentDate = proximity.events
+    .map((e) => e.parsedDate)
+    .filter((d): d is Date => d !== null)
+    .sort((a, b) => b.getTime() - a.getTime())[0] ?? null;
+
+  // Case folder — group documents by category ("organize by category, not chronology").
+  const folders = documents.reduce<Record<string, string[]>>((acc, d) => {
+    const cat = (d.category ?? 'Uncategorized').trim() || 'Uncategorized';
+    (acc[cat] ??= []).push(d.fileName ?? 'Document');
+    return acc;
+  }, {});
+  const folderEntries = Object.entries(folders).sort((a, b) => b[1].length - a[1].length);
 
   return (
     <div className="mx-auto max-w-[820px] rounded-[22px] border border-[#CBD6CF] bg-white p-6 shadow-[0_24px_70px_-30px_rgba(66,87,78,0.4)] sm:p-8">
@@ -111,11 +129,26 @@ export function CaseFactsAssembledPanel({
         ) : null}
       </div>
 
-      {/* AT-A-GLANCE — triage in 5 seconds. Facts as numbers, no score. */}
-      <div className="mt-5 flex flex-wrap gap-2.5">
-        {tightest !== null ? (
-          <Tile value={`${tightest}d`} label="between protected activity & adverse action" tone="orange" />
-        ) : null}
+      {/* THE INTAKE SCREEN — mirrors the attorney's own 5-second triage: adverse action? · nexus? ·
+          statute-of-limitations date? Facts only — the screen is the attorney's to run, not ours. */}
+      <div style={MONO} className="mt-5 mb-2 text-[10px] uppercase tracking-[0.14em] text-[#8a938c]">
+        The intake screen
+      </div>
+      <div className="flex flex-wrap gap-2.5">
+        <Tile value={`${proximity.adverseActions.length}`} label="adverse actions in the record" tone="orange" />
+        <Tile
+          value={tightest !== null ? `${tightest}d` : '—'}
+          label="closest protected-activity → adverse-action gap"
+          tone="orange"
+        />
+        <Tile
+          value={mostRecentDate ? shortDate(mostRecentDate) : '—'}
+          label="most recent dated event (for SOL review)"
+          tone="ink"
+        />
+      </div>
+      {/* Secondary row — supporting facts */}
+      <div className="mt-2.5 flex flex-wrap gap-2.5">
         <Tile value={`${coverage.onFileCount}/${coverage.items.length}`} label="required records on file" tone="sage" />
         {gaps.computable ? (
           <Tile value={`${gaps.undocumentedMonths}mo`} label="pay records not represented" tone="orange" />
@@ -161,6 +194,26 @@ export function CaseFactsAssembledPanel({
 
       {/* COLLAPSED DETAIL — drill on demand, never a dump */}
       <div className="mt-5">
+        {folderEntries.length > 0 ? (
+          <Collapsible summary="Case folder — organized by category" count={`${documents.length} documents`} tone="sage">
+            <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+              {folderEntries.map(([cat, files]) => (
+                <div key={cat} className="rounded-[12px] border border-[#E3E7DF] bg-[#F7F9F5] p-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[12.5px] font-semibold text-[#42574E]">{cat}</span>
+                    <span style={MONO} className="text-[11px] text-[#8a938c]">{files.length}</span>
+                  </div>
+                  <ul className="mt-1.5 space-y-0.5">
+                    {files.map((f, i) => (
+                      <li key={i} className="truncate text-[11.5px] text-[#5E6B62]">{f}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </Collapsible>
+        ) : null}
+
         <Collapsible
           summary="Records to request in discovery"
           count={`${coverage.toObtain.length} missing`}

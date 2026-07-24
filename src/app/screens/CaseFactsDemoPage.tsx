@@ -85,6 +85,7 @@ export function CaseFactsDemoPage() {
           coverage={coverage}
           gaps={gaps}
           damages={damages}
+          documents={FILE_INVENTORY}
           illustrative
         />
       </div>
