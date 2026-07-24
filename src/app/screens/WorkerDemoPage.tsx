@@ -13,6 +13,8 @@ import {
   Lock, Eye, Mic, ChevronDown, ChevronUp, Upload,
 } from 'lucide-react';
 import { OneThreeSevenLoader } from '../components/ui/OneThreeSevenLoader';
+import { GapCoverageRail } from '../components/GapCoverageRail';
+import { detectPayPeriodGaps, parseEmploymentDateRange, type PayFrequency } from '../../services/gapDetection';
 
 // ── Phase tracking ─────────────────────────────────────────────────────────────
 // phase: 'intake' (steps 1-3) → 'processing' → 'summary' → 'dashboard' → 'control'
@@ -579,6 +581,24 @@ function PostSummary({ onNext }: { onNext: () => void }) {
 function PostDashboard({ onNext }: { onNext: () => void }) {
   useEffect(() => { window.scrollTo({ top: 0, behavior: 'instant' }); }, []);
 
+  // Gap Detection (Layer 1) — Marcus worked Mar 2022–Jan 2026 but only a handful of pay stubs
+  // are on file, so most pay periods are undocumented. The correction control is live.
+  const [gapFreq, setGapFreq] = useState<PayFrequency>('biweekly');
+  const gapResult = (() => {
+    const { start, end } = parseEmploymentDateRange('March 2022 – January 2026');
+    return detectPayPeriodGaps({
+      employmentStart: start,
+      employmentEnd: end,
+      payFrequency: gapFreq,
+      payrollRecordDates: [
+        new Date(2025, 9, 15), // Oct 2025 stub
+        new Date(2025, 10, 15), // Nov 2025 stub
+        new Date(2025, 11, 15), // Dec 2025 stub
+        new Date(2026, 0, 5), // final paycheck stub
+      ],
+    });
+  })();
+
   const [concernsConfirmed, setConcernsConfirmed] = useState(false);
   const [timelineOpen, setTimelineOpen] = useState(false);
   const [docsOpen, setDocsOpen] = useState(false);
@@ -633,6 +653,15 @@ function PostDashboard({ onNext }: { onNext: () => void }) {
         <div className="mb-2 text-[10px] font-bold uppercase tracking-wider text-[#42574E]">Organized Summary</div>
         <p className="text-[13px] leading-relaxed text-[#1B2623]/80">{ORGANIZED_SUMMARY}</p>
       </div>
+
+      {/* Gap Detection — the "what's missing from your file" reveal + request loop */}
+      <GapCoverageRail
+        className="mb-4"
+        result={gapResult}
+        payFrequency={gapFreq}
+        onFrequencyChange={setGapFreq}
+        onRequestRecords={() => {}}
+      />
 
       {/* Possible review areas */}
       <div className="mb-4 rounded-[16px] border border-[#E4E5DE] bg-white p-5">
