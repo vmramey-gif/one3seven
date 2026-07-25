@@ -356,7 +356,6 @@ export function IntakeSummaryScreen({
   // uploads (owner storage RLS), so signing their own file_path works with no extra policy.
   const [openCitation, setOpenCitation] = useState<SourceCitation | null>(null);
   const [sourceUrl, setSourceUrl] = useState<string | null>(null);
-  const [sourceLoadError, setSourceLoadError] = useState<string | null>(null);
   const workerFileByName = useMemo(() => {
     const m = new Map<string, { docId: string; path: string }>();
     uploadedFiles.forEach((f, i) => {
@@ -370,16 +369,15 @@ export function IntakeSummaryScreen({
   const openWorkerSource = async (fileName: string) => {
     const hit = workerFileByName.get(normalizeFilenameForMatching(fileName));
     if (!hit) return;
-    setSourceLoadError(null);
     setSourceUrl(null);
     // Open immediately so the click is never dead; the file loads once the URL resolves.
     setOpenCitation({ docId: hit.docId, docName: fileName, page: 1, charStart: 0, charEnd: 0, sourceText: '' });
     try {
       const res = await createFirmIntakeFileSignedUrl(hit.path, 3600);
       if (res.url) setSourceUrl(res.url);
-      else setSourceLoadError(`${res.error ?? 'no URL returned'} · path: ${hit.path}`);
+      else console.warn('[citation] could not sign worker source', { error: res.error, path: hit.path });
     } catch (e) {
-      setSourceLoadError(`${e instanceof Error ? e.message : String(e)} · path: ${hit.path}`);
+      console.warn('[citation] error signing worker source', e);
     }
   };
   // Worker-directed model: firm-code / direct routing (worker sends to a firm they choose)
@@ -2645,11 +2643,9 @@ export function IntakeSummaryScreen({
       <CitationPanel
         citation={openCitation}
         signedUrl={sourceUrl}
-        loadError={sourceLoadError}
         onClose={() => {
           setOpenCitation(null);
           setSourceUrl(null);
-          setSourceLoadError(null);
         }}
       />
     </div>

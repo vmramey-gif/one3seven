@@ -293,8 +293,6 @@ export function IntakeReviewScreen({
   // wage-exposure effect owns and resets on firmLiveView changes) so an on-demand quote URL can't be
   // clobbered out from under an open panel.
   const [quoteCitationUrl, setQuoteCitationUrl] = useState<string | null>(null);
-  // Surfaced only when a quote's file link can't be created, to diagnose signing failures in the wild.
-  const [quoteCitationError, setQuoteCitationError] = useState<string | null>(null);
 
   // Pre-generate 3600s signed URLs for the documents cited by the wage estimate, so the
   // CitationPanel opens with no round-trip. Full-access only (storage RLS enforces it too).
@@ -353,7 +351,6 @@ export function IntakeReviewScreen({
     // Open the panel IMMEDIATELY so the click is never dead — it shows the quote right away, then the
     // PDF loads once the signed URL resolves (or a graceful "highlight unavailable" fallback if it
     // can't). Signing is wrapped so a failure/throw can't prevent the panel from opening.
-    setQuoteCitationError(null);
     setQuoteCitationUrl(citationUrls[hit.docId] ?? null);
     setOpenCitation({
       docId: hit.docId,
@@ -370,10 +367,10 @@ export function IntakeReviewScreen({
         setQuoteCitationUrl(res.url);
         setCitationUrls((prev) => ({ ...prev, [hit.docId]: res.url as string }));
       } else {
-        setQuoteCitationError(`${res.error ?? 'no URL returned'} · path: ${hit.path}`);
+        console.warn('[citation] could not sign firm source', { error: res.error, path: hit.path });
       }
     } catch (e) {
-      setQuoteCitationError(`${e instanceof Error ? e.message : String(e)} · path: ${hit.path}`);
+      console.warn('[citation] error signing firm source', e);
     }
   };
 
@@ -3206,11 +3203,9 @@ export function IntakeReviewScreen({
       <CitationPanel
         citation={openCitation}
         signedUrl={openCitation ? citationUrls[openCitation.docId] ?? quoteCitationUrl : null}
-        loadError={quoteCitationError}
         onClose={() => {
           setOpenCitation(null);
           setQuoteCitationUrl(null);
-          setQuoteCitationError(null);
         }}
       />
     </div>

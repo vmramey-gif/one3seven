@@ -27,13 +27,10 @@ export function CitationPanel({
   citation,
   signedUrl,
   onClose,
-  loadError = null,
 }: {
   citation: SourceCitation | null;
   signedUrl: string | null;
   onClose: () => void;
-  /** Optional diagnostic surfaced when a file link couldn't be created. */
-  loadError?: string | null;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [status, setStatus] = useState<PanelStatus>('loading');
@@ -188,12 +185,7 @@ export function CitationPanel({
                 </a>
               </>
             ) : (
-              <>
-                <p>Source text shown above for manual verification. The file link isn’t available for this record.</p>
-                {loadError ? (
-                  <p className="mt-1.5 break-words font-mono text-[10px] opacity-70">Debug: {loadError}</p>
-                ) : null}
-              </>
+              <p>Source text shown above for manual verification. The file link isn’t available for this record.</p>
             )}
           </div>
         ) : null}
