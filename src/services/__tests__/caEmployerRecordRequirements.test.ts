@@ -66,6 +66,21 @@ describe('assessEmployerRecordCoverage', () => {
     expect(r.toObtain.length).toBe(r.items.filter((i) => i.workerObtainable).length);
   });
 
+  it('detects §2802 expense-reimbursement records (the remote-worker gap)', () => {
+    // Present in various real filename shapes, incl. CamelCase.
+    for (const f of ['ExpenseReport_Q1.pdf', 'Reimbursement-form.pdf', 'work-stipend.pdf']) {
+      const r = assessEmployerRecordCoverage([{ fileName: f, category: '' }]);
+      expect(r.items.find((i) => i.key === 'expense_reimbursement')?.state).toBe('on_file');
+    }
+    // Absent → in the discovery list, described (never accusatory), and worker-obtainable.
+    const none = assessEmployerRecordCoverage([{ fileName: 'PayStub.pdf', category: 'Wage Records' }]);
+    const item = none.items.find((i) => i.key === 'expense_reimbursement');
+    expect(item?.state).toBe('not_in_record');
+    expect(item?.describeMissing).toMatch(/2802/);
+    expect(item?.describeMissing).not.toMatch(/violat|owed|illegal/i);
+    expect(none.toObtain.find((i) => i.key === 'expense_reimbursement')).toBeDefined();
+  });
+
   it('never emits accusatory language in any requirement', () => {
     for (const req of CA_EMPLOYER_RECORD_REQUIREMENTS) {
       expect(req.describeMissing).not.toMatch(/violat|illegal|broke the law|unlawful|failed to comply/i);

@@ -95,6 +95,18 @@ export const CA_EMPLOYER_RECORD_REQUIREMENTS: EmployerRecordRequirement[] = [
       'Final wages are due on a specific timeline after employment ends (Labor Code §§ 201–203). A final paycheck record is not in your file yet.',
   },
   {
+    key: 'expense_reimbursement',
+    label: 'Business-expense reimbursement records',
+    citation: 'Labor Code § 2802',
+    scope: 'all',
+    // Single-token stems so CamelCase filenames (ExpenseReport.pdf, Reimbursement.pdf) still match —
+    // this engine collapses separators but does not split CamelCase.
+    match: [/reimburs|expense|\b2802\b|home ?office|stipend/i],
+    workerObtainable: true,
+    describeMissing:
+      'California requires employers to reimburse necessary business expenses — including a reasonable share of home internet and personal cell phone used for work (Labor Code § 2802). No expense-reimbursement records are in your file yet.',
+  },
+  {
     key: 'harassment_policy',
     label: 'Anti-harassment policy acknowledgment',
     citation: 'Gov. Code § 12950 / SB 1343',
