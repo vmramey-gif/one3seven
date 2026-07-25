@@ -17,6 +17,8 @@ export type WorkerTimelineEventCardProps = {
   forceExpanded?: boolean;
   /** First row or high-salience titles get a gold marker */
   isKeyEvent?: boolean;
+  /** When provided, supporting-record chips become buttons that open the source file. */
+  onOpenSource?: (fileName: string) => void;
 };
 
 export function WorkerTimelineEventCard({
@@ -24,6 +26,7 @@ export function WorkerTimelineEventCard({
   defaultOpen = false,
   forceExpanded = false,
   isKeyEvent = false,
+  onOpenSource,
 }: WorkerTimelineEventCardProps) {
   const [open, setOpen] = useState(defaultOpen || forceExpanded);
   const [sourcesOpen, setSourcesOpen] = useState(false);
@@ -113,7 +116,7 @@ export function WorkerTimelineEventCard({
                 Supporting records
               </p>
               {sourcesOpen || forceExpanded || sources.length <= 3 ? (
-                <SourceRecordChips fileNames={sources} />
+                <SourceRecordChips fileNames={sources} onOpenSource={onOpenSource} />
               ) : (
                 <SourceRecordChips
                   fileNames={sources}
