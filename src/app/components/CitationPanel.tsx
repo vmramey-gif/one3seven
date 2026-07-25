@@ -163,12 +163,27 @@ export function CitationPanel({
         ) : null}
 
         {status === 'fallback' ? (
-          <p
+          <div
             className="mb-3 rounded-md border px-3 py-2 text-xs leading-relaxed"
             style={{ borderColor: 'var(--o3s-border, #d3ded6)', color: 'var(--o3s-muted, #6b7280)' }}
           >
-            Highlight unavailable — source text shown above for manual verification.
-          </p>
+            {signedUrl ? (
+              <>
+                <p>Couldn’t auto-highlight this line — open the full file to see it in context.</p>
+                <a
+                  href={signedUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-1.5 inline-block font-semibold underline underline-offset-2"
+                  style={{ color: BRAND }}
+                >
+                  Open the full PDF ↗
+                </a>
+              </>
+            ) : (
+              <p>Source text shown above for manual verification. The file link isn’t available for this record.</p>
+            )}
+          </div>
         ) : null}
 
         {/* Canvas is always present; it holds the rendered page when one is available. */}

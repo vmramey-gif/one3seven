@@ -289,6 +289,10 @@ export function IntakeReviewScreen({
   );
   const [openCitation, setOpenCitation] = useState<SourceCitation | null>(null);
   const [citationUrls, setCitationUrls] = useState<Record<string, string>>({});
+  // Dedicated URL for the currently-open QUOTE citation. Kept separate from citationUrls (which the
+  // wage-exposure effect owns and resets on firmLiveView changes) so an on-demand quote URL can't be
+  // clobbered out from under an open panel.
+  const [quoteCitationUrl, setQuoteCitationUrl] = useState<string | null>(null);
 
   // Pre-generate 3600s signed URLs for the documents cited by the wage estimate, so the
   // CitationPanel opens with no round-trip. Full-access only (storage RLS enforces it too).
@@ -347,6 +351,7 @@ export function IntakeReviewScreen({
     // Open the panel IMMEDIATELY so the click is never dead — it shows the quote right away, then the
     // PDF loads once the signed URL resolves (or a graceful "highlight unavailable" fallback if it
     // can't). Signing is wrapped so a failure/throw can't prevent the panel from opening.
+    setQuoteCitationUrl(citationUrls[hit.docId] ?? null);
     setOpenCitation({
       docId: hit.docId,
       docName: fileName,
@@ -358,7 +363,10 @@ export function IntakeReviewScreen({
     if (citationUrls[hit.docId]) return;
     try {
       const res = await createFirmIntakeFileSignedUrl(hit.path, 3600);
-      if (res.url) setCitationUrls((prev) => ({ ...prev, [hit.docId]: res.url as string }));
+      if (res.url) {
+        setQuoteCitationUrl(res.url);
+        setCitationUrls((prev) => ({ ...prev, [hit.docId]: res.url as string }));
+      }
     } catch {
       /* leave signedUrl null — CitationPanel falls back to showing the quote for manual review */
     }
@@ -3192,8 +3200,11 @@ export function IntakeReviewScreen({
       </AnimatePresence>
       <CitationPanel
         citation={openCitation}
-        signedUrl={openCitation ? citationUrls[openCitation.docId] ?? null : null}
-        onClose={() => setOpenCitation(null)}
+        signedUrl={openCitation ? citationUrls[openCitation.docId] ?? quoteCitationUrl : null}
+        onClose={() => {
+          setOpenCitation(null);
+          setQuoteCitationUrl(null);
+        }}
       />
     </div>
   );
