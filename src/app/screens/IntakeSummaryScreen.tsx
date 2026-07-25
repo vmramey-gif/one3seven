@@ -2343,10 +2343,10 @@ export function IntakeSummaryScreen({
 
         {/* Footer Disclaimer */}
         <footer className={sx.footer}>
-          <div className="bg-[#FAF9F6] rounded-[16px] p-6 border border-[#E4E5DE]">
-            <h3 className="text-sm font-semibold text-[#1B2623] mb-4">About one3seven</h3>
-            <p className="text-xs text-[#6A6D66] leading-relaxed mb-3">{ONE3SEVEN_NOTICES.positioning}</p>
-            <p className="text-xs text-[#6A6D66] leading-relaxed">
+          <div className="rounded-[16px] p-6 border border-white/12 bg-white/[0.05] backdrop-blur">
+            <h3 className="text-sm font-semibold text-[#ECF3ED] mb-4">About one3seven</h3>
+            <p className="text-xs text-white/60 leading-relaxed mb-3">{ONE3SEVEN_NOTICES.positioning}</p>
+            <p className="text-xs text-white/60 leading-relaxed">
               Intake summaries, timeline snapshots, category tags, and readiness notes are organizational aids for review preparation only.
             </p>
           </div>

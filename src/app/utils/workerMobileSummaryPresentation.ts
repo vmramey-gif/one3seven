@@ -19,8 +19,8 @@ export function workerMobileSummarySkin(shellMode: boolean) {
         'w-full bg-slate-900 text-white py-4 px-6 rounded-[14px] hover:bg-slate-800 transition-colors font-medium flex items-center justify-center gap-2 disabled:opacity-50',
       fullReviewBtn:
         'w-full mb-3 text-sm font-medium px-4 py-2.5 rounded-[12px] border border-slate-200 text-slate-800 hover:bg-slate-50',
-      footer: 'px-6 py-10 bg-white border-t border-slate-100',
-      betaSection: 'px-6 pb-10 bg-slate-50 py-10',
+      footer: 'px-6 py-10',
+      betaSection: 'px-6 pb-10 py-10',
       intakeMeta: 'text-[11px] text-[var(--o3s-subtle)] font-mono mt-0.5',
       statusWrap: '',
       timelineHero: '',
