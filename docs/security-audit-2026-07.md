@@ -17,7 +17,19 @@ ships.
 
 ## Findings & remediation
 
-### #1 — HIGH — "full-access-only" hardening is a no-op (dead policy names) → FIX WRITTEN
+### #1 — HIGH → ✅ VERIFIED CLOSED IN PRODUCTION (2026-07-25) — was a file-vs-prod false alarm
+**Resolution:** Verified against the live DB. Production has NO `intake_summaries_select_firm` /
+`timeline_events_select_firm` (loose) policies. The only firm-read policies are
+`summary_firm_preview_or_full` / `timeline_firm_preview_or_full`, and the migration that created them
+(20260618...) restricts them with `r.route_status = 'full_access'` (confirmed live via
+`position('full_access' in qual) > 0 = true` and reading the migration). Firms can read a worker's
+summary/timeline ONLY on a full-access route; a preview firm gets nothing. The concern below was the
+audit reasoning from migration files; production diverged in the SAFE direction. The
+20260725 migration's DROPs are a harmless no-op (they target names that don't exist in prod).
+No action needed. Original analysis kept below for the record.
+
+---
+_Original (file-based) analysis — superseded by the verification above:_
 A 2026-06-18 migration meant to restrict firm reads of `intake_summaries` / `timeline_events` to
 full-access routes DROP-ed policy names that don't exist, leaving the loose 2026-06-07 policies
 (`intake_summaries_select_firm` / `timeline_events_select_firm`, which allow a read on ANY route)

@@ -1,5 +1,11 @@
 -- Security-audit hardening (2026-07-25).
 --
+-- ✅ VERIFIED 2026-07-25: production already enforces full-access-only firm reads via
+-- `summary_firm_preview_or_full` / `timeline_firm_preview_or_full` (created with
+-- `route_status = 'full_access'` by 20260618...). The loose `*_select_firm` policies targeted below
+-- DO NOT EXIST in production, so the DROPs are a harmless no-op. Kept for repo/history consistency.
+-- Finding #1 is CLOSED — no live hole. See docs/security-audit-2026-07.md.
+--
 -- FINDING #1 (HIGH): the 2026-06-18 "firm summary/timeline full-access-only" migration tried to
 -- replace the loose firm-read policies but DROP-ed policy names that were never created
 -- (`summary_firm_preview_or_full` / `timeline_firm_preview_or_full`). The actual permissive
