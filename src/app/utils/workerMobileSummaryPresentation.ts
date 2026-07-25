@@ -2,7 +2,7 @@
 export function workerMobileSummarySkin(shellMode: boolean) {
   if (!shellMode) {
     return {
-      root: 'min-h-screen bg-white',
+      root: 'min-h-screen o3s-worker-sky',
       content: (fullReview: boolean) => (fullReview ? 'pb-28' : 'pb-16'),
       skin: '',
       back: 'flex items-center gap-1.5 text-xs uppercase tracking-wide text-slate-500 hover:text-slate-700 transition-colors duration-200 font-normal',

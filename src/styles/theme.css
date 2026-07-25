@@ -257,6 +257,15 @@
     line-height: 1.5;
   }
 
+  /* Worker "sunset" sky — the summary page background ripens warm-light → sage as the worker
+     scrolls their file toward completion. Pure CSS gradient over the full page height (no JS, no
+     stacking tricks); the white content cards float on it and stay stable. See project_ui_direction_july2026. */
+  .o3s-worker-sky {
+    background-image: linear-gradient(180deg,
+      #FBF7EF 0%, #F4EFE1 18%, #EBEBD9 36%, #D3E1C8 54%, #B4D0AB 70%, #8FBE97 84%, #6BA783 100%);
+    background-attachment: scroll;
+  }
+
   .bg-grid-slate-200 {
     background-image: linear-gradient(to right, rgb(226 232 240 / 0.3) 1px, transparent 1px),
       linear-gradient(to bottom, rgb(226 232 240 / 0.3) 1px, transparent 1px);

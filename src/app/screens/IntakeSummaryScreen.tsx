@@ -64,6 +64,7 @@ import {
 import { normalizeFilenameForMatching } from '../../services/filenameMatching';
 import { CitationPanel } from '../components/CitationPanel';
 import type { SourceCitation } from '../../services/damagesCalculator';
+import { WorkerSkyProgress } from '../components/WorkerSkyProgress';
 import type { IntakeSummaryDownloadPayload } from '../../services/intakeSummaryDownload';
 import { extractOrgEngineFromOverview } from '../../services/intakeOrgEngineCodec';
 import { partitionReadinessForDisplay } from '../../services/readinessDiagnosticsPresentation';
@@ -1199,6 +1200,7 @@ export function IntakeSummaryScreen({
 
   return (
     <div className={sx.root}>
+      {!shellMode ? <WorkerSkyProgress /> : null}
       {(showDemoSampleWatermark || intakeNumber === SAMPLE_INTAKE_NUMBER) && (
         <div className="bg-amber-50 border-b border-amber-100 px-6 py-2.5 text-center text-xs text-amber-950">
           <strong>{SAMPLE_INTAKE_SUMMARY_LABEL}</strong> · {SAMPLE_DEMO_LABEL} · Sample initials: V.R.

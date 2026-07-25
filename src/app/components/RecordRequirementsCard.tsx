@@ -75,7 +75,7 @@ export function RecordRequirementsCard({
         <button
           type="button"
           onClick={onRequestRecords}
-          className="mt-4 flex w-full items-center justify-between gap-3 rounded-2xl bg-[#42574E] px-4 py-3.5 text-left text-white transition hover:bg-[#374A42]"
+          className="mt-4 flex w-full items-center justify-between gap-3 rounded-2xl bg-[var(--o3s-action)] px-4 py-3.5 text-left text-white transition hover:brightness-95"
         >
           <span className="flex items-center gap-3">
             <FileText className="h-5 w-5 flex-none" />
