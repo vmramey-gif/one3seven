@@ -13,6 +13,8 @@ type PanelStatus = 'loading' | 'located' | 'fallback';
 type Highlight = { left: number; top: number; width: number; height: number };
 
 const normalize = (s: string): string => s.replace(/\s+/g, ' ').trim().toLowerCase();
+// Whitespace-free, lowercase form for robust snippet matching against PDF text runs.
+const squash = (s: string): string => s.toLowerCase().replace(/\s+/g, '');
 
 /**
  * Attorney-side source viewer. Given a citation + a pre-signed PDF URL, loads the PDF with
@@ -51,29 +53,33 @@ export function CitationPanel({
           return;
         }
         const pdf = await pdfjsLib.getDocument({ url: signedUrl }).promise;
-        const target = normalize(citation.sourceText);
-        const probe = target.length > 40 ? target.slice(0, 40) : target;
+        // Compare with ALL whitespace removed: PDFs frequently split a word across text runs
+        // ("employ" + "ment") or insert stray spaces, which broke a space-preserving match.
+        const targetSquashed = squash(citation.sourceText);
+        const probe = targetSquashed.length > 40 ? targetSquashed.slice(0, 40) : targetSquashed;
 
         let matchPage = 0;
         let matchItem: { transform: number[]; width: number; height: number } | null = null;
 
-        for (let p = 1; p <= pdf.numPages; p += 1) {
-          if (cancelled) return;
-          const page = await pdf.getPage(p);
-          const tc = await page.getTextContent();
-          const items = tc.items.filter(
-            (i): i is { str: string; transform: number[]; width: number; height: number } => 'str' in i,
-          );
-          const joined = normalize(items.map((i) => i.str).join(' '));
-          if (joined.includes(probe)) {
-            matchPage = p;
-            // Best-effort: highlight the first non-trivial text run that overlaps the snippet.
-            matchItem =
-              items.find((i) => {
-                const s = normalize(i.str);
-                return s.length > 3 && target.includes(s);
-              }) ?? null;
-            break;
+        if (probe.length >= 8) {
+          for (let p = 1; p <= pdf.numPages; p += 1) {
+            if (cancelled) return;
+            const page = await pdf.getPage(p);
+            const tc = await page.getTextContent();
+            const items = tc.items.filter(
+              (i): i is { str: string; transform: number[]; width: number; height: number } => 'str' in i,
+            );
+            const joined = squash(items.map((i) => i.str).join(' '));
+            if (joined.includes(probe)) {
+              matchPage = p;
+              // Best-effort: highlight the first non-trivial text run that overlaps the snippet.
+              matchItem =
+                items.find((i) => {
+                  const s = squash(i.str);
+                  return s.length > 3 && targetSquashed.includes(s);
+                }) ?? null;
+              break;
+            }
           }
         }
 
@@ -169,11 +175,25 @@ export function CitationPanel({
             className="mb-3 rounded-md border px-3 py-2 text-xs leading-relaxed"
             style={{ borderColor: 'var(--o3s-border, #d3ded6)', color: 'var(--o3s-muted, #6b7280)' }}
           >
-            {signedUrl ? (
-              <>
-                {citation.sourceText.trim() ? (
-                  <p>Couldn’t auto-highlight this line — open the full file to see it in context.</p>
+            {pageNum ? (
+              // The page rendered — the source is right below. Keep it calm; offer a full-size view.
+              <p>
+                Showing the source page.{' '}
+                {signedUrl ? (
+                  <a
+                    href={signedUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="font-semibold underline underline-offset-2"
+                    style={{ color: BRAND }}
+                  >
+                    Open full size ↗
+                  </a>
                 ) : null}
+              </p>
+            ) : signedUrl ? (
+              <>
+                <p>Couldn’t render the file inline.</p>
                 <a
                   href={signedUrl}
                   target="_blank"
