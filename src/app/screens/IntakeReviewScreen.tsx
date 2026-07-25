@@ -28,6 +28,7 @@ import type { FirmLiveIntakeView } from '../../services/intakeDataService';
 import { downloadFirmIntakeReviewDocument, resolveWageExposure } from '../../services/firmIntakeSummaryDownload';
 import { triggerIntakeFactExtraction } from '../../services/documentFactsService';
 import type { SourceCitation } from '../../services/damagesCalculator';
+import { normalizeFilenameForMatching } from '../../services/filenameMatching';
 import { CitationPanel } from '../components/CitationPanel';
 import { WageExposureReviewSection } from '../components/WageExposureReviewSection';
 import {
@@ -324,6 +325,41 @@ export function IntakeReviewScreen({
       cancelled = true;
     };
   }, [wageExposure, firmLiveView]);
+
+  // Clickable extraction quotes: map a quote's file name -> { docId, storage path } so any key quote
+  // can open to its exact spot. The CitationPanel is snippet-anchored (it searches the PDF text for
+  // the verbatim quote), so a quote needs no extraction provenance — just its source file. Full-access
+  // only; previewOnly can't sign URLs (storage RLS enforces it too).
+  const quoteSourceByFileName = useMemo(() => {
+    const m = new Map<string, { docId: string; path: string }>();
+    if (!firmLiveView || firmLiveView.previewOnly) return m;
+    for (const f of firmLiveView.files) {
+      if (f.uploaded_file_id && f.file_path) {
+        m.set(normalizeFilenameForMatching(f.file_name), { docId: f.uploaded_file_id, path: f.file_path });
+      }
+    }
+    return m;
+  }, [firmLiveView]);
+
+  const openQuoteCitation = async (fileName: string, quote: string) => {
+    const hit = quoteSourceByFileName.get(normalizeFilenameForMatching(fileName));
+    if (!hit || !quote.trim()) return;
+    let url = citationUrls[hit.docId];
+    if (!url) {
+      const res = await createFirmIntakeFileSignedUrl(hit.path, 3600);
+      if (!res.url) return;
+      url = res.url;
+      setCitationUrls((prev) => ({ ...prev, [hit.docId]: url as string }));
+    }
+    setOpenCitation({
+      docId: hit.docId,
+      docName: fileName,
+      page: 1,
+      charStart: 0,
+      charEnd: quote.length,
+      sourceText: quote,
+    });
+  };
 
   // Scroll to top when component mounts — wrapped defensively for iOS Safari
   useEffect(() => {
@@ -2014,8 +2050,29 @@ export function IntakeReviewScreen({
                               : conf === 'low'
                               ? 'bg-rose-50 text-rose-600 border-rose-100'
                               : 'bg-amber-50 text-amber-700 border-amber-100';
+                          const canOpenSource = quoteSourceByFileName.has(normalizeFilenameForMatching(q.file_name));
                           return (
-                            <div key={q.file_name} className="rounded-lg bg-[#F2F4EC] border border-[#E4E5DE] px-3 py-2">
+                            <div
+                              key={q.file_name}
+                              role={canOpenSource ? 'button' : undefined}
+                              tabIndex={canOpenSource ? 0 : undefined}
+                              onClick={canOpenSource ? () => void openQuoteCitation(q.file_name, q.quote) : undefined}
+                              onKeyDown={
+                                canOpenSource
+                                  ? (e) => {
+                                      if (e.key === 'Enter' || e.key === ' ') {
+                                        e.preventDefault();
+                                        void openQuoteCitation(q.file_name, q.quote);
+                                      }
+                                    }
+                                  : undefined
+                              }
+                              className={`rounded-lg bg-[#F2F4EC] border border-[#E4E5DE] px-3 py-2 ${
+                                canOpenSource
+                                  ? 'cursor-pointer transition-colors hover:border-[#42574E] hover:bg-[#EAEFE1] focus:outline-none focus:ring-2 focus:ring-[#D3DED6]'
+                                  : ''
+                              }`}
+                            >
                               <div className="mb-1 flex items-center justify-between gap-2">
                                 <p className="text-[10px] text-[#42574E]">{q.category.replace(/_/g, ' ')} — {q.file_name.replace(/_/g, ' ').replace(/\.[^.]+$/, '')}</p>
                                 {conf && (
@@ -2025,6 +2082,9 @@ export function IntakeReviewScreen({
                                 )}
                               </div>
                               <p className="text-xs text-[#1B2623]/75 italic leading-relaxed">"{q.quote}"</p>
+                              {canOpenSource && (
+                                <p className="mt-1.5 text-[10px] font-medium text-[#42574E]">↳ Open source — jumps to this line in the file</p>
+                              )}
                             </div>
                           );
                         })}
