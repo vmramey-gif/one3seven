@@ -18,6 +18,23 @@
   --o3s-problem: #A8512B;
   --o3s-problem-soft: #FBF4EF;
   --o3s-problem-border: #EBD9CD;
+  /* LOCKED COLOR-ROLE SYSTEM (2026-07-25 — see memory project_ui_direction_july2026).
+     A color is a language. Enforce strictly across the product:
+       VIOLET = the AI, and ONLY the AI (source-links, extractions, organized-by-AI).
+       ORANGE = the user + their actions + attention (CTAs, controls, gaps, timing heat).
+       SAGE   = organized / on file / done / safe.
+       AMBER  = gentle "please confirm".
+     These are the single source of truth — screens reference the role, never a raw hex. */
+  --o3s-ai: #5B21B6;
+  --o3s-ai-strong: #7C5CFF;
+  --o3s-ai-soft: #F0E9FA;
+  --o3s-action: #B5531F;
+  --o3s-action-accent: #D97A45;
+  --o3s-action-soft: #FBF0E9;
+  --o3s-done: #2F6B47;
+  --o3s-done-soft: #E9F2EB;
+  --o3s-confirm: #9A6714;
+  --o3s-confirm-soft: #FAF0DC;
   --o3s-orbit: #95AB9B;
   --o3s-orbit-soft: rgba(66,87,78, 0.12);
   --o3s-border: #D3DED6;
@@ -89,6 +106,17 @@
   --o3s-timeline-glow: rgba(44,58,52, 0.24);
   --o3s-ivory: #e8e6e3;
   --o3s-ivory-muted: rgba(232, 230, 227, 0.72);
+  /* Color-role system on dark (firm "cockpit") — brighter for contrast on green-black. */
+  --o3s-ai: #A78BFA;
+  --o3s-ai-strong: #7C5CFF;
+  --o3s-ai-soft: rgba(124, 92, 255, 0.14);
+  --o3s-action: #F3A268;
+  --o3s-action-accent: #E07B3E;
+  --o3s-action-soft: rgba(224, 123, 62, 0.12);
+  --o3s-done: #8FD3A6;
+  --o3s-done-soft: rgba(143, 211, 166, 0.12);
+  --o3s-confirm: #F3C775;
+  --o3s-confirm-soft: rgba(243, 199, 117, 0.12);
 
   --background: var(--o3s-obsidian);
   --foreground: var(--o3s-fg);
@@ -165,8 +193,8 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-  --font-display: 'Playfair Display', 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
-  --font-editorial: 'Cormorant Garamond', 'Playfair Display', Georgia, 'Times New Roman', serif;
+  --font-display: 'Fraunces', 'Iowan Old Style', Georgia, 'Times New Roman', serif;
+  --font-editorial: 'Fraunces', 'Iowan Old Style', Georgia, 'Times New Roman', serif;
 }
 
 @layer base {
