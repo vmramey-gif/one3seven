@@ -12,6 +12,7 @@ import {
   PACKET_METADATA_FALLBACK,
 } from './intakePacketFormatting';
 import { extractStoryFollowUpFromOverview } from './storyFollowUpPersistence';
+import { normalizeFilenameForMatching } from './filenameMatching';
 import {
   inferInventoryCategory,
   pickSupportingRecordsForEvent,
@@ -47,7 +48,11 @@ export const ATTORNEY_BUCKET_CATEGORY_LABELS: Record<string, string> = {
   'Scheduling, Attendance & Leave': 'Timekeeping & Scheduling Records',
   'Incident & Workplace Evidence': 'Disciplinary Materials',
   'Identity & Professional Verification': 'Employment Documents',
-  'Additional Supporting Records': 'Reimbursement-Related Records',
+  // Generic catch-all bucket. Must NOT imply reimbursement — a witness statement or misc. record
+  // fell into this default and was mislabeled "Reimbursement-Related Records", inventing a §2802
+  // signal that no document supported. Reimbursement is surfaced ONLY from actual reimbursement
+  // records ('Reimbursement Records' above).
+  'Additional Supporting Records': 'Additional Supporting Records',
 };
 
 const AI_NARRATION_RE =
@@ -126,15 +131,20 @@ function legacyCategoryToBucket(name: string): string {
 }
 
 export function attorneyCategoryLabel(category: string, fileName?: string): string {
-  const file = (fileName ?? '').toLowerCase();
-  if (/witness_statement|witness.?statement/i.test(file)) return 'Witness Statements';
-  if (/written_warning|write_?up|disciplinary/i.test(file)) return 'Disciplinary Materials';
-  if (/termination_letter|terminat/i.test(file) && !/terminat.*review/i.test(file)) return 'Separation Documents';
-  if (/complaint_to_hr|complaint.?hr|\bhr.?complaint/i.test(file)) return 'HR Complaints & Responses';
-  if (/complaint_to_supervisor|complaint.?supervisor/i.test(file)) return 'HR Complaints & Responses';
-  if (/project_removal/i.test(file)) return 'Disciplinary Materials';
-  if (/coaching_memo|coaching.?memo/i.test(file)) return 'Disciplinary Materials';
-  if (/separation_benefits|separation.?benefits/i.test(file)) return 'Separation Documents';
+  // Normalize to a space-delimited canonical form (CamelCase split, separators collapsed) so these
+  // cues match "Rosa_WrittenWarning_2026-03-13.pdf" (→ "rosa written warning …"), not just
+  // underscore filenames. Without this, a written warning fell through to "Performance Reviews" —
+  // softening the single most decision-relevant adverse action. Same filename-matching class the
+  // codebase-wide normalization audit fixed elsewhere; this call site had been missed.
+  const file = normalizeFilenameForMatching(fileName ?? '');
+  if (/witness statement/i.test(file)) return 'Witness Statements';
+  if (/written warning|write ?up|disciplin/i.test(file)) return 'Disciplinary Materials';
+  if (/terminat/i.test(file) && !/terminat.*review/i.test(file)) return 'Separation Documents';
+  if (/complaint to hr|hr complaint|complaint hr/i.test(file)) return 'HR Complaints & Responses';
+  if (/complaint to supervisor|complaint supervisor/i.test(file)) return 'HR Complaints & Responses';
+  if (/project removal/i.test(file)) return 'Disciplinary Materials';
+  if (/coaching memo/i.test(file)) return 'Disciplinary Materials';
+  if (/separation benefits/i.test(file)) return 'Separation Documents';
 
   const raw = inferInventoryCategory(fileName ?? '', category ?? '').trim();
   if (!raw) return 'Employment Documents';
