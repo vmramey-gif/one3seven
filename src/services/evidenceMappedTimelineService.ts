@@ -124,6 +124,16 @@ function eventCandidateFromFilename(record: IntakeFileOrganizationRecord): Event
   if (/witness_statement|witness.?statement/.test(name)) {
     return candidate('Witness statement provided', 86);
   }
+  // A worker's OWN statement / narrative account. A narrative touches many topics; without this the
+  // topic inference promoted one of them into a fabricated "documented" event — Rosa's statement was
+  // titled "Schedule change documented" though no schedule change is documented. Title it for what
+  // the record IS. Excludes wage/earnings/pay/bank statements (real financial records).
+  if (
+    /(^|_)(statement|declaration|affidavit)(_|$)/.test(name) &&
+    !/wage|earnings|pay|bank|financial|income|witness/.test(name)
+  ) {
+    return candidate('Worker statement provided', 85);
+  }
   if (/offer_letter|employment_agreement|onboard|hire/.test(name)) {
     return candidate('Employment begins', 84);
   }
@@ -458,6 +468,12 @@ function specificTitleFromRecord(
 
   const name = record.file_name.toLowerCase();
   const topics = record.employment_topics.join(' ').toLowerCase();
+  // Defense in depth: a worker's own statement is a narrative, not a specific documented event —
+  // never let its topics infer one (e.g. "Schedule change documented"). Matches the filename guard
+  // in eventCandidateFromFilename.
+  if (/(^|_|\s)(statement|declaration|affidavit)(_|\s|\.|$)/.test(name) && !/wage|earnings|pay|bank|financial|income|witness/.test(name)) {
+    return 'Worker statement provided';
+  }
   const hay = `${name} ${topics} ${commFact?.subjectOrTopic ?? ''} ${commFact?.workerConcernExcerpt ?? ''}`.toLowerCase();
 
   if (/safety|unsafe|hazard/.test(hay)) {

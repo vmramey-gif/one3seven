@@ -121,6 +121,30 @@ describe('evidence-mapped timeline engine', () => {
     expect(events[0]?.title).not.toBe('Schedule change documented');
   });
 
+  test('titles a worker statement as a statement, not a fabricated event (Rosa regression — was "Schedule change")', () => {
+    const events = buildEvidenceMappedTimelineEvents({
+      fileRecords: [
+        sampleFileRecord({
+          source_file_id: 'statement-1',
+          // Rosa's own first-person account. Its topics mention scheduling/overtime, which used to
+          // promote it into a fabricated "Schedule change documented" event.
+          file_name: 'Rosa_Statement.pdf',
+          document_type: 'Witness Statement',
+          legacy_upload_category: 'Witness Statement',
+          likely_date: 'Date not yet clear',
+          employment_topics: ['Scheduling and timekeeping', 'Overtime', 'Meal and rest breaks'],
+          possible_timeline_event: {
+            title: 'Worker account',
+            date: 'Date not yet clear',
+            neutral_summary: 'The worker describes what happened in their own words.',
+          },
+        }),
+      ],
+    });
+    expect(events[0]?.title).toBe('Worker statement provided');
+    expect(events[0]?.title).not.toBe('Schedule change documented');
+  });
+
   test('uses workplace-event labels for safety concerns, performance actions, and scheduling records', () => {
     const events = buildEvidenceMappedTimelineEvents({
       fileRecords: [
