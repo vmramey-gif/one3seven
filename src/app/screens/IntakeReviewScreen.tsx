@@ -344,13 +344,9 @@ export function IntakeReviewScreen({
   const openQuoteCitation = async (fileName: string, quote: string) => {
     const hit = quoteSourceByFileName.get(normalizeFilenameForMatching(fileName));
     if (!hit || !quote.trim()) return;
-    let url = citationUrls[hit.docId];
-    if (!url) {
-      const res = await createFirmIntakeFileSignedUrl(hit.path, 3600);
-      if (!res.url) return;
-      url = res.url;
-      setCitationUrls((prev) => ({ ...prev, [hit.docId]: url as string }));
-    }
+    // Open the panel IMMEDIATELY so the click is never dead — it shows the quote right away, then the
+    // PDF loads once the signed URL resolves (or a graceful "highlight unavailable" fallback if it
+    // can't). Signing is wrapped so a failure/throw can't prevent the panel from opening.
     setOpenCitation({
       docId: hit.docId,
       docName: fileName,
@@ -359,6 +355,13 @@ export function IntakeReviewScreen({
       charEnd: quote.length,
       sourceText: quote,
     });
+    if (citationUrls[hit.docId]) return;
+    try {
+      const res = await createFirmIntakeFileSignedUrl(hit.path, 3600);
+      if (res.url) setCitationUrls((prev) => ({ ...prev, [hit.docId]: res.url as string }));
+    } catch {
+      /* leave signedUrl null — CitationPanel falls back to showing the quote for manual review */
+    }
   };
 
   // Scroll to top when component mounts — wrapped defensively for iOS Safari
