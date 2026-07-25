@@ -115,13 +115,18 @@ export function CitationPanel({
         setPageNum(renderPage);
 
         if (matchPage && matchItems.length) {
+          // Store boxes as FRACTIONS of the page. The canvas is rendered at `scale` but CSS-shrunk to
+          // fit the panel (max-w-full), so absolute pixel coords would land off the displayed page.
+          // Percentages scale with the canvas.
+          const vw = viewport.width || 1;
+          const vh = viewport.height || 1;
           const boxes: Highlight[] = [];
           for (const it of matchItems) {
             try {
               const m = pdfjsLib.Util.transform(viewport.transform, it.transform);
               const fontH = Math.hypot(m[2], m[3]) || it.height * scale;
-              const width = (it.width || 0) * scale;
-              boxes.push({ left: m[4], top: m[5] - fontH, width: Math.max(width, 6), height: fontH });
+              const width = Math.max((it.width || 0) * scale, 6);
+              boxes.push({ left: m[4] / vw, top: (m[5] - fontH) / vh, width: width / vw, height: fontH / vh });
             } catch {
               /* skip a run whose transform math failed */
             }
@@ -129,10 +134,11 @@ export function CitationPanel({
           if (!cancelled) {
             setHighlights(boxes);
             setStatus('located');
-            // Bring the first highlighted line into view within the scroll container.
-            if (boxes.length && scrollRef.current) {
-              const top = Math.min(...boxes.map((b) => b.top));
-              scrollRef.current.scrollTo({ top: Math.max(0, top - 80), behavior: 'smooth' });
+            // Bring the first highlighted line into view (fraction → displayed canvas pixels).
+            if (boxes.length && scrollRef.current && canvasRef.current) {
+              const topFrac = Math.min(...boxes.map((b) => b.top));
+              const displayH = canvasRef.current.clientHeight || vh;
+              scrollRef.current.scrollTo({ top: Math.max(0, topFrac * displayH - 80), behavior: 'smooth' });
             }
           }
         } else {
@@ -242,10 +248,10 @@ export function CitationPanel({
               key={i}
               className="pointer-events-none absolute rounded-[2px]"
               style={{
-                left: h.left - 1,
-                top: h.top - 1,
-                width: h.width + 2,
-                height: h.height + 2,
+                left: `${h.left * 100}%`,
+                top: `${h.top * 100}%`,
+                width: `${h.width * 100}%`,
+                height: `${h.height * 100}%`,
                 background: `${VIOLET}2e`,
                 outline: `1.5px solid ${VIOLET}`,
               }}
