@@ -99,7 +99,9 @@ export function CitationPanel({
 
         const renderPage = matchPage || 1;
         const page = await pdf.getPage(renderPage);
-        const scale = 1.4;
+        // Render at high resolution and let CSS (max-w-full) downscale it — crisp text on the panel.
+        // Highlight math uses fractions of the page, so scale doesn't affect placement.
+        const scale = window.devicePixelRatio > 1 ? 3.5 : 3;
         const viewport = page.getViewport({ scale });
         const canvas = canvasRef.current;
         if (!canvas || cancelled) return;
@@ -273,11 +275,10 @@ export function CitationPanel({
                 top: `${h.top * 100}%`,
                 width: `${h.width * 100}%`,
                 height: `${h.height * 100}%`,
-                // Highlighter look: translucent violet the text reads through (multiply), with a soft
-                // violet glow instead of a hard outline.
-                background: `${VIOLET}33`,
+                // Soft highlighter: a light violet wash the text reads straight through (multiply),
+                // no glow or outline — just a gentle marker tint.
+                background: `${VIOLET}1f`,
                 mixBlendMode: 'multiply',
-                boxShadow: `0 0 0 1px ${VIOLET}40, 0 1px 4px ${VIOLET}33`,
               }}
             />
           ))}
