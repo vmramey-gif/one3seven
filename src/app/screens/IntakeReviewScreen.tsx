@@ -1139,7 +1139,10 @@ export function IntakeReviewScreen({
                 /employment dates?[:\s]+([^\n]+)/i,
                 /dates? of employment[:\s]+([^\n]+)/i,
               ]);
-              if (!workerName && !employer) return null;
+              // Show the Decision Card whenever there's ANY decision content — it leads with the
+              // records count, the sequence, and key dates even when a name/employer couldn't be
+              // parsed from the worker's free text. Only bail when there is genuinely nothing.
+              if (!workerName && !employer && reconstructedRecordCount === 0 && timelineForDisplay.length === 0) return null;
 
               // Last employment event — latest event that is part of employment (not a post-separation record)
               const lastDocumentedEvent = (() => {
