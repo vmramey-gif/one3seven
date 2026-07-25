@@ -15,20 +15,21 @@ type RecordsRequestScreenProps = {
   onBackToLanding: () => void;
 };
 
-type RecordKey = 'payroll' | 'personnel' | 'signed' | 'timekeeping';
+type RecordKey = 'payroll' | 'personnel' | 'signed' | 'timekeeping' | 'reimbursement';
 
 const RECORD_OPTIONS: { key: RecordKey; label: string; cite: string }[] = [
   { key: 'payroll', label: 'Pay & wage records', cite: 'Labor Code § 226 — 21 days' },
   { key: 'personnel', label: 'Personnel file', cite: 'Labor Code § 1198.5 — 30 days' },
   { key: 'signed', label: 'Documents I signed', cite: 'Labor Code § 432' },
   { key: 'timekeeping', label: 'Timekeeping records', cite: 'timecards, breaks, edits' },
+  { key: 'reimbursement', label: 'Expense-reimbursement records', cite: 'Labor Code § 2802 — phone, internet, equipment' },
 ];
 
 function fmtDate(d: Date): string {
   return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
-function buildLetter(opts: {
+export function buildLetter(opts: {
   workerName: string;
   employerName: string;
   employerAddress: string;
@@ -67,6 +68,10 @@ function buildLetter(opts: {
   if (opts.records.timekeeping)
     items.push(
       'Timekeeping records, including all timecards, clock-in and clock-out records, meal- and rest-period records, and any edits or adjustments made to my recorded time.',
+    );
+  if (opts.records.reimbursement)
+    items.push(
+      'Records of business-expense reimbursements paid to me and any expense-reimbursement policy, including reimbursements for work-related use of a personal phone, internet, vehicle, equipment, or supplies (California Labor Code § 2802).',
     );
   if (items.length === 0)
     items.push('My payroll records, personnel file, signed documents, and timekeeping records.');
@@ -112,6 +117,7 @@ export function RecordsRequestScreen({ workerName, onBackToLanding }: RecordsReq
     personnel: true,
     signed: true,
     timekeeping: true,
+    reimbursement: true,
   });
   const [copied, setCopied] = useState(false);
 
