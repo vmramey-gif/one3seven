@@ -120,15 +120,36 @@ export function CitationPanel({
           // Percentages scale with the canvas.
           const vw = viewport.width || 1;
           const vh = viewport.height || 1;
-          const boxes: Highlight[] = [];
+          const raw: Highlight[] = [];
           for (const it of matchItems) {
             try {
               const m = pdfjsLib.Util.transform(viewport.transform, it.transform);
               const fontH = Math.hypot(m[2], m[3]) || it.height * scale;
               const width = Math.max((it.width || 0) * scale, 6);
-              boxes.push({ left: m[4] / vw, top: (m[5] - fontH) / vh, width: width / vw, height: fontH / vh });
+              // Pad a touch vertically so the marker covers ascenders/descenders like a real highlighter.
+              const padY = fontH * 0.18;
+              raw.push({
+                left: m[4] / vw,
+                top: (m[5] - fontH - padY) / vh,
+                width: width / vw,
+                height: (fontH + padY * 2) / vh,
+              });
             } catch {
               /* skip a run whose transform math failed */
+            }
+          }
+          // Merge runs that share a line into ONE continuous bar (no segmented boxes).
+          const boxes: Highlight[] = [];
+          for (const b of raw.sort((a, z) => a.top - z.top || a.left - z.left)) {
+            const last = boxes[boxes.length - 1];
+            if (last && Math.abs(last.top - b.top) < last.height * 0.6) {
+              const right = Math.max(last.left + last.width, b.left + b.width);
+              last.left = Math.min(last.left, b.left);
+              last.width = right - last.left;
+              last.top = Math.min(last.top, b.top);
+              last.height = Math.max(last.height, b.height);
+            } else {
+              boxes.push({ ...b });
             }
           }
           if (!cancelled) {
@@ -246,14 +267,17 @@ export function CitationPanel({
           {highlights.map((h, i) => (
             <div
               key={i}
-              className="pointer-events-none absolute rounded-[2px]"
+              className="pointer-events-none absolute rounded-[3px]"
               style={{
                 left: `${h.left * 100}%`,
                 top: `${h.top * 100}%`,
                 width: `${h.width * 100}%`,
                 height: `${h.height * 100}%`,
-                background: `${VIOLET}2e`,
-                outline: `1.5px solid ${VIOLET}`,
+                // Highlighter look: translucent violet the text reads through (multiply), with a soft
+                // violet glow instead of a hard outline.
+                background: `${VIOLET}33`,
+                mixBlendMode: 'multiply',
+                boxShadow: `0 0 0 1px ${VIOLET}40, 0 1px 4px ${VIOLET}33`,
               }}
             />
           ))}
