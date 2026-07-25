@@ -144,7 +144,14 @@ export function attorneyCategoryLabel(category: string, fileName?: string): stri
   if (/complaint to supervisor|complaint supervisor/i.test(file)) return 'HR Complaints & Responses';
   if (/project removal/i.test(file)) return 'Disciplinary Materials';
   if (/coaching memo/i.test(file)) return 'Disciplinary Materials';
-  if (/separation benefits/i.test(file)) return 'Separation Documents';
+  // Separation family — without these, severance / final-pay / resignation filenames fell through
+  // the inferInventoryCategory fallback and landed in "HR Complaints & Responses" (a final paycheck
+  // filed under HR complaints). Keep separation BEFORE payroll so "final paycheck" reads as separation.
+  if (/severance|separation|layoff|laid off|resignation|resign|final pay|final paycheck/i.test(file))
+    return 'Separation Documents';
+  // Pay family — earnings/wage statements and paystubs are payroll, never HR complaints.
+  if (/pay ?stub|paycheck|payroll|wage statement|earnings statement|wage record|pay record/i.test(file))
+    return 'Payroll & Compensation Records';
 
   const raw = inferInventoryCategory(fileName ?? '', category ?? '').trim();
   if (!raw) return 'Employment Documents';

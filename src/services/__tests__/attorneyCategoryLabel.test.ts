@@ -19,6 +19,19 @@ describe('attorneyCategoryLabel — Rosa Delgado real filenames', () => {
   });
 });
 
+describe('separation & pay records never land in HR Complaints (stress-test regression)', () => {
+  it('labels the separation family as Separation Documents', () => {
+    for (const f of ['separation_agreement.pdf', 'severance.pdf', 'final_pay.pdf', 'FinalPaycheck.pdf', 'LayoffNotice.pdf', 'ResignationEmail.pdf']) {
+      expect(attorneyCategoryLabel('', f)).toBe('Separation Documents');
+    }
+  });
+  it('labels pay statements as Payroll, not HR complaints or witness statements', () => {
+    for (const f of ['EarningsStatement.pdf', 'WageStatement.pdf', 'PayStub_Feb2026.pdf']) {
+      expect(attorneyCategoryLabel('', f)).toBe('Payroll & Compensation Records');
+    }
+  });
+});
+
 describe('generic supporting-records bucket', () => {
   it('does NOT invent a reimbursement signal for miscellaneous records', () => {
     // Regression: the catch-all bucket used to map to "Reimbursement-Related Records", inventing a

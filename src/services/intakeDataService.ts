@@ -230,9 +230,12 @@ export function inferCategoryFromFileName(fileName: string): string {
     return 'Performance / discipline records';
   }
 
-  // Witness / coworker statements
+  // Witness / coworker statements. Guard against financial "statements" (wage/earnings/pay/bank/
+  // income statements) — those are pay records, not witness statements, and the bare "statement"
+  // check used to swallow "EarningsStatement.pdf" before the pay branch below could catch it.
+  const financialStatement = /\b(wage|earnings|pay|bank|income|financial|account)\b/.test(name);
   if (
-    name.includes('statement') ||
+    (name.includes('statement') && !financialStatement) ||
     name.includes('witness') ||
     name.includes('declaration') ||
     name.includes('affidavit') ||
