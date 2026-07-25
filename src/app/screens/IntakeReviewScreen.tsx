@@ -117,7 +117,7 @@ interface DocumentCategory {
   documents: FirmDocumentEntry[];
 }
 
-const FIRM_REVIEW_PAGE = 'min-h-screen bg-[#FAF9F6] text-[#1B2623]';
+const FIRM_REVIEW_PAGE = 'min-h-screen o3s-firm-cockpit o3s-firm-review-skin';
 const FIRM_REVIEW_NAV = 'sticky top-0 z-50 border-b border-[#E4E5DE] bg-white/90 backdrop-blur';
 const FIRM_REVIEW_PROMINENT_CARD =
   'rounded-[28px] border border-[#E4E5DE] bg-white/95 p-6 shadow-[0_28px_90px_rgba(31,27,75,0.12)] sm:p-8';
