@@ -32,6 +32,18 @@ describe('separation & pay records never land in HR Complaints (stress-test regr
   });
 });
 
+describe('worker/coworker statements are not HR complaints', () => {
+  it('labels a bare statement/declaration as Witness Statements, not HR Complaints', () => {
+    expect(attorneyCategoryLabel('', 'Rosa_Statement.pdf')).toBe('Witness Statements');
+    expect(attorneyCategoryLabel('', 'CoworkerDeclaration.pdf')).toBe('Witness Statements');
+    expect(attorneyCategoryLabel('', 'WitnessStatement_John.pdf')).toBe('Witness Statements');
+  });
+  it('does not mistake pay statements for witness statements', () => {
+    expect(attorneyCategoryLabel('', 'EarningsStatement.pdf')).toBe('Payroll & Compensation Records');
+    expect(attorneyCategoryLabel('', 'WageStatement.pdf')).toBe('Payroll & Compensation Records');
+  });
+});
+
 describe('generic supporting-records bucket', () => {
   it('does NOT invent a reimbursement signal for miscellaneous records', () => {
     // Regression: the catch-all bucket used to map to "Reimbursement-Related Records", inventing a

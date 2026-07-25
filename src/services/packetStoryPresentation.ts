@@ -152,6 +152,11 @@ export function attorneyCategoryLabel(category: string, fileName?: string): stri
   // Pay family — earnings/wage statements and paystubs are payroll, never HR complaints.
   if (/pay ?stub|paycheck|payroll|wage statement|earnings statement|wage record|pay record/i.test(file))
     return 'Payroll & Compensation Records';
+  // A bare "statement"/declaration/affidavit that isn't a pay statement (handled above) or a bank/
+  // income statement is the worker's or a coworker's own written account — not an HR complaint. Rosa's
+  // own statement was inflating the "HR Complaints & Responses" count to 2.
+  if (/(^| )(statement|declaration|affidavit)( |$)/i.test(file) && !/bank|income|financial|account/i.test(file))
+    return 'Witness Statements';
 
   const raw = inferInventoryCategory(fileName ?? '', category ?? '').trim();
   if (!raw) return 'Employment Documents';
