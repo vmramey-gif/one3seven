@@ -20,6 +20,7 @@ import { NotificationsBell } from '../components/NotificationsBell';
 import type { AppNotificationItem } from '../components/NotificationsBell';
 import { BETA_HIDE_FIRM_ARCHIVED_TAB } from '../constants/flags';
 import { WordMark } from '../components/WordMark';
+import { sortIntakesForTriage, TRIAGE_SORT_OPTIONS, type TriageSort } from '../utils/firmIntakeTriage';
 
 interface LawFirmDashboardScreenProps {
   onNavigate: (screen: Screen) => void;
@@ -134,6 +135,7 @@ export function LawFirmDashboardScreen({
   const [selectedReadiness, setSelectedReadiness] = useState<IntakeReadiness | 'all'>('all');
   const [selectedCriteria, setSelectedCriteria] = useState<FirmCriteriaFilter>('all');
   const [showFilters, setShowFilters] = useState(false);
+  const [triageSort, setTriageSort] = useState<TriageSort>('recent');
   const [activeTab, setActiveTab] = useState<FirmTab>('all');
   // Single-screen dashboard: land directly on the list (the old 'firmHome' hero is no longer used).
   const [dashboardView, setDashboardView] = useState<FirmDashboardView>('continueReviews');
@@ -314,6 +316,10 @@ export function LawFirmDashboardScreen({
     if (!searchQuery.trim()) return true;
     return intakeSearchText(intake).includes(searchQuery.toLowerCase().trim());
   });
+
+  // Triage order — sort the firm's OWN queue by factual signals (recency / completeness). Pure
+  // pipeline hygiene, not case evaluation. See utils/firmIntakeTriage.
+  const sortedIntakes = sortIntakesForTriage(filteredIntakes, triageSort);
 
   const filterPillClass = (active: boolean) =>
     active
@@ -679,6 +685,30 @@ export function LawFirmDashboardScreen({
               ))}
             </div>
 
+            {activeTab !== 'archived' && sortedIntakes.length > 1 ? (
+              <div className="mb-4 flex flex-wrap items-center gap-2">
+                <span className="mr-1 flex items-center gap-1.5 text-xs font-medium text-[#1B2623]/55">
+                  <Clock className="h-3.5 w-3.5" /> Sort
+                </span>
+                {TRIAGE_SORT_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    onClick={() => setTriageSort(opt.id)}
+                    title={opt.hint}
+                    aria-pressed={triageSort === opt.id}
+                    className={`rounded-full border px-3 py-1.5 text-xs transition-colors ${
+                      triageSort === opt.id
+                        ? 'border-[#42574E] bg-[#42574E] text-white'
+                        : 'border-[#E4E5DE] bg-white text-[#1B2623]/60 hover:border-[#7C8B6F] hover:bg-[#F2F4EC]'
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            ) : null}
+
             <div className="space-y-6">
               {activeTab === 'archived' && !BETA_HIDE_FIRM_ARCHIVED_TAB ? (
                 <div className="rounded-2xl border border-dashed border-[#E4E5DE] bg-[#FAF9F6] p-8 text-sm text-[#1B2623]/62">
@@ -687,7 +717,7 @@ export function LawFirmDashboardScreen({
               ) : null}
 
               {activeTab !== 'archived' &&
-                filteredIntakes.map((intake, index) => {
+                sortedIntakes.map((intake, index) => {
               const gapCount = chronologyGapCount(intake);
               const summary =
                 polishFirmFacingProse(intake.timelineSummary || intake.summary) ||
