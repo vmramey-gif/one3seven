@@ -262,8 +262,19 @@
      stacking tricks); the white content cards float on it and stay stable. See project_ui_direction_july2026. */
   .o3s-worker-sky {
     background-image: linear-gradient(180deg,
-      #FBF7EF 0%, #F4EFE1 18%, #EBEBD9 36%, #D3E1C8 54%, #B4D0AB 70%, #8FBE97 84%, #6BA783 100%);
+      #FBF7EF 0%, #F4EFE1 14%, #EBEBD9 28%, #D3E1C8 42%, #A9CBA0 56%,
+      #6FA487 68%, #3E6B50 79%, #234C39 87%, #123024 93%, #0A150E 100%);
     background-attachment: scroll;
+  }
+
+  /* Firm "cockpit" ground — deep green-black with faint violet (AI) + sage auras. Focused pro
+     instrument for attorney review. See project_ui_direction_july2026. */
+  .o3s-firm-cockpit {
+    background-image:
+      radial-gradient(820px 460px at 88% -10%, rgba(124, 92, 255, 0.12), transparent 60%),
+      radial-gradient(680px 420px at -8% 4%, rgba(143, 211, 166, 0.08), transparent 55%),
+      linear-gradient(180deg, #0A0F0C 0%, #0C120E 100%);
+    color: #ECF3ED;
   }
 
   .bg-grid-slate-200 {
