@@ -123,18 +123,22 @@ function wageModelWithCitation(): FirmPacketModel {
   } as Partial<FirmPacketModel>);
 }
 
-function countLinkAnnotations(doc: PDFDocument): number {
+type PdfPage = ReturnType<PDFDocument['getPages']>[number];
+
+function linkAnnotationsOnPage(page: PdfPage): number {
+  const annots = page.node.Annots();
+  if (!annots) return 0;
   let links = 0;
-  for (const page of doc.getPages()) {
-    const annots = page.node.Annots();
-    if (!annots) continue;
-    for (let i = 0; i < annots.size(); i++) {
-      const a = annots.lookup(i) as { get?: (n: PDFName) => unknown } | undefined;
-      const sub = a?.get?.(PDFName.of('Subtype'));
-      if (sub?.toString() === '/Link') links += 1;
-    }
+  for (let i = 0; i < annots.size(); i++) {
+    const a = annots.lookup(i) as { get?: (n: PDFName) => unknown } | undefined;
+    const sub = a?.get?.(PDFName.of('Subtype'));
+    if (sub?.toString() === '/Link') links += 1;
   }
   return links;
+}
+
+function countLinkAnnotations(doc: PDFDocument): number {
+  return doc.getPages().reduce((sum, page) => sum + linkAnnotationsOnPage(page), 0);
 }
 
 describe('source-linked citations', () => {
@@ -167,6 +171,21 @@ describe('source-linked citations', () => {
     // No sources → chronology renders as plain text, no link annotations.
     const withoutSources = await PDFDocument.load(await renderFirmIntakePacketPdf(model));
     expect(countLinkAnnotations(withoutSources)).toBe(0);
+  });
+
+  test('Decision Card spine links a source-backed event on the card page', async () => {
+    // Page 1 is the cover; the Decision Card renders on page 2 (index 1). Its spine was plain
+    // text — a spine event whose sourceFile matches a supplied document should now add a clickable
+    // link ON THE CARD PAGE itself, distinct from the chronology links on later pages.
+    const model = sampleModel();
+    const sources: PdfSourceDoc[] = [
+      { docId: 'evt-1', fileName: 'Rivera HR Complaint Nov2025', mime: 'application/pdf', bytes: await makeSourcePdf() },
+    ];
+    const withSources = await PDFDocument.load(await renderFirmIntakePacketPdf(model, sources));
+    expect(linkAnnotationsOnPage(withSources.getPages()[1])).toBeGreaterThan(0);
+    // No sources → the spine stays plain text, the card page has no link annotations.
+    const withoutSources = await PDFDocument.load(await renderFirmIntakePacketPdf(model));
+    expect(linkAnnotationsOnPage(withoutSources.getPages()[1])).toBe(0);
   });
 
   test('links a key quote to its source document by file name', async () => {

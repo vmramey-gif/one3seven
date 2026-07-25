@@ -767,7 +767,7 @@ function drawTraceabilityLegend(c: Cursor, coverage: { linked: number; total: nu
 // file (sections 1-11) follows below. Guardrails: describe/surface, never conclude; dates are
 // surfaced for the attorney's own timeliness assessment, never a deadline determination; damages
 // are records-based arithmetic, not a valuation.
-function drawDecisionCard(c: Cursor, model: FirmPacketModel): void {
+function drawDecisionCard(c: Cursor, model: FirmPacketModel, srcIndex: Map<string, SourceIndexEntry>): void {
   const { cover, reviewOptions } = model;
   // "Records pending" = organized from the worker's account with no supporting documents yet.
   // A neutral DATA-STATE (never a merit judgment) — describes completeness, not case strength.
@@ -808,6 +808,22 @@ function drawDecisionCard(c: Cursor, model: FirmPacketModel): void {
     c.gap(2);
     for (const e of events.slice(0, 4)) {
       bullet(c, `${e.date} — ${e.title}${e.interval ? `   (${e.interval})` : ''}`);
+      // Stage 1 source-link: a spine event backed by an embedded document gets a clickable
+      // "» source" tag that jumps to its page — the same provenance the chronology table uses,
+      // surfaced right on the Decision Card. Describe-the-record: it points to the source, never
+      // characterizes it. Non-linked events stay plain here (full provenance lives in the chronology).
+      const prov = factProvenance(e.sourceFile, srcIndex);
+      if (prov.state === 'linked' && prov.docId) {
+        c.ensure(11);
+        const tag = `» source: ${prov.label}`;
+        const size = 7.5;
+        const tw = c.bold.widthOfTextAtSize(tag, size);
+        const tx = MARGIN + 16;
+        const ty = c.y - 8;
+        c.page.drawText(tag, { x: tx, y: ty, size, font: c.bold, color: BRAND });
+        c.linkRect([tx - 2, ty - 2, tx + tw + 2, ty + size + 1], prov.docId);
+        c.gap(9);
+      }
     }
     c.gap(4);
   }
@@ -872,7 +888,7 @@ export async function renderFirmIntakePacketPdf(
   drawTraceabilityLegend(c, countSourceCoverage(model, sources));
 
   // Decision Card — the verdict first; the case file (sections 1-11) follows.
-  drawDecisionCard(c, model);
+  drawDecisionCard(c, model, srcIndex);
 
   // 1. Review Snapshot
   sectionHeading(c, '1.  Review Snapshot');
