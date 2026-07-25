@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest';
 import type { WorkerTimelineItem } from '../../types/workerTimeline';
 import {
+  presentWorkerTimelineDetailSummary,
   presentWorkerTimelineRow,
   presentWorkerTimelineStorySummary,
   presentWorkerTimelineStoryTitle,
@@ -34,6 +35,29 @@ describe('workerTimelineNarrative', () => {
     expect(presentWorkerTimelineStoryTitle(event({ event: 'Separation notice materials' }))).toBe(
       'Employment separation'
     );
+  });
+
+  test('detail summary never renders an orphan filename fragment ("pdf.")', () => {
+    // The strip patterns stop at the first period inside a filename, orphaning the extension.
+    // The fragment guard must catch that and fall back to a clean story summary.
+    const one = presentWorkerTimelineDetailSummary(
+      event({ event: 'Employment activity documented through payroll records', category: 'Payroll',
+        summary: 'Available records show supporting uploads include Rosa_PayStub_Feb2026.pdf' })
+    );
+    expect(one).not.toMatch(/^pdf/i);
+    expect(one).not.toMatch(/\.pdf/i);
+
+    const two = presentWorkerTimelineDetailSummary(
+      event({ event: 'Complaint submitted to Human Resources', category: 'HR',
+        summary: 'supporting uploads include Rosa_HR_Complaint_2026-03-04.pdf, Rosa_Statement.pdf' })
+    );
+    expect(two).not.toMatch(/pdf/i);
+
+    // A genuine narrative sentence is still preserved.
+    const good = presentWorkerTimelineDetailSummary(
+      event({ summary: 'The worker raised a pay concern with management in January.' })
+    );
+    expect(good).toBe('The worker raised a pay concern with management in January.');
   });
 
   test('preserves already human titles', () => {

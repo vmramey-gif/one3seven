@@ -247,7 +247,10 @@ export function presentWorkerTimelineDetailSummary(
 ): string {
   const title = storyTitle ?? presentWorkerTimelineStoryTitle(event);
   const softened = stripFilenameReferences(softenWorkerReviewLine(event.summary ?? ''));
-  if (softened && !isMechanicalSummary(softened)) {
+  // Guard against filename fragments the strip leaves behind — its patterns stop at the first period
+  // inside a filename ("…Feb2026." ) and orphan the extension, so a summary could render as "pdf." or
+  // "pdf, Rosa_Statement.pdf." Match the guard the sibling presentWorkerTimelineStorySummary uses.
+  if (softened && !isMechanicalSummary(softened) && !looksLikeFilenameFragment(softened)) {
     return softened.endsWith('.') ? softened : `${softened}.`;
   }
   return presentWorkerTimelineStorySummary(event, title);
