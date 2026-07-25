@@ -458,14 +458,31 @@ Deno.serve(async (req: Request) => {
   // ------------------------------------------------------------------
   // SINGLE FILE MODE
   // ------------------------------------------------------------------
+  // SECURITY (audit #2): authorize the SPECIFIC file, not just the intake. The owner check above
+  // resolves the caller-supplied intake_id to its worker, but the file actually processed is
+  // body.uploaded_file_id — which must itself belong to the caller. Look the file up by id, confirm
+  // ownership, and use the STORED path/name/category (never the caller-supplied ones) so a caller
+  // can't point extraction at another worker's stored object.
+  const { data: fileRow, error: fileErr } = await supabase
+    .from('uploaded_files')
+    .select('id, worker_id, intake_id, file_name, file_path, category')
+    .eq('id', body.uploaded_file_id!)
+    .maybeSingle();
+  if (fileErr || !fileRow) {
+    return new Response(JSON.stringify({ error: 'File not found' }), { status: 404 });
+  }
+  if (fileRow.worker_id !== user.id) {
+    return new Response(JSON.stringify({ error: 'Forbidden' }), { status: 403 });
+  }
+
   const singleResult = await processSingleFile({
     supabase,
     apiKey: ANTHROPIC_API_KEY,
-    uploadedFileId: body.uploaded_file_id!,
-    intakeId: intake_id,
-    category: normalizeCategory(body.category || ''),
-    fileName: body.file_name || '',
-    filePath: body.file_path,
+    uploadedFileId: fileRow.id as string,
+    intakeId: (fileRow.intake_id as string) ?? intake_id,
+    category: normalizeCategory((fileRow.category as string) || body.category || ''),
+    fileName: (fileRow.file_name as string) || body.file_name || '',
+    filePath: (fileRow.file_path as string) || body.file_path,
   });
 
   if (!singleResult.ok) {
