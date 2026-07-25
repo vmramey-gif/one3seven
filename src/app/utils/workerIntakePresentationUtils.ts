@@ -1,6 +1,5 @@
 import type { ComposedIntakeNarrative } from '../../services/intakeNarrativeComposer';
 import type { WorkerTimelineItem } from '../types/workerTimeline';
-import { truncateFileLabel } from '../../services/employmentTimelineOrganization';
 
 /** Worker-safe display cleanup for readiness / gap lines. */
 export function softenWorkerReviewLine(line: string): string {
@@ -128,5 +127,19 @@ export function enrichWorkerTimelineWithSources(
 }
 
 export function formatSourceFileChipLabel(name: string): string {
-  return truncateFileLabel(name, 28);
+  // Humanize for display instead of a hard character slice. The old truncate cut mid-filename and
+  // appended a lone "." — "Rosa_WrittenWarning_2026-03-13.pdf" became "Rosa_WrittenWarning_2026-03.",
+  // dropping the day + extension and reading like a broken date. Drop the extension, split CamelCase,
+  // turn underscores into spaces (keep date hyphens), and only ellipsize (real "…") if still long.
+  // The chip keeps the full filename in its title attribute, and CSS handles overflow.
+  const raw = (name ?? '').trim();
+  if (!raw) return '';
+  const humanized = raw
+    .replace(/\.[a-z0-9]{1,5}$/i, '')
+    .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+    .replace(/_+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  const MAX = 40;
+  return humanized.length <= MAX ? humanized : `${humanized.slice(0, MAX - 1).trimEnd()}…`;
 }
