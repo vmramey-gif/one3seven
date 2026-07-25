@@ -1128,6 +1128,16 @@ export function IntakeReviewScreen({
               if (employmentDates) snapshotItems.push({ label: 'Employment Period', value: employmentDates });
               snapshotItems.push({ label: 'Records', value: `${reconstructedRecordCount} document${reconstructedRecordCount === 1 ? '' : 's'}` });
               if (lastDocumentedEvent) snapshotItems.push({ label: lastDocumentedEvent.label, value: lastDocumentedEvent.value });
+
+              // Key dates — parity with the PDF Decision Card. Surfaces the termination date and the
+              // earliest protected-activity date for the attorney's timeliness read. Doctrine: these
+              // are DATES, never a deadline determination — we surface, counsel decides.
+              const termEvt = timelineForDisplay.find((e) => /terminat|separation/i.test(e.event));
+              const protEvt = timelineForDisplay.find((e) => /complaint|hr|report|raised|warning/i.test(e.event));
+              const keyDates: Array<{ label: string; value: string }> = [];
+              if (protEvt) keyDates.push({ label: 'Protected activity', value: protEvt.date });
+              if (termEvt) keyDates.push({ label: 'Termination', value: termEvt.date });
+
               return (
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
@@ -1161,6 +1171,22 @@ export function IntakeReviewScreen({
                           </div>
                         ))}
                       </div>
+                    </div>
+                  )}
+                  {keyDates.length > 0 && (
+                    <div className="mt-4 border-t border-white/10 pt-3">
+                      <p className="text-[10px] uppercase tracking-wider text-white/40 mb-2">Key dates for your review</p>
+                      <div className="flex flex-wrap gap-x-8 gap-y-2">
+                        {keyDates.map((d) => (
+                          <div key={d.label}>
+                            <p className="text-[10px] uppercase tracking-wider text-white/40 mb-0.5">{d.label}</p>
+                            <p className="text-sm font-medium text-white">{d.value}</p>
+                          </div>
+                        ))}
+                      </div>
+                      <p className="mt-2 text-[10px] leading-relaxed text-white/35">
+                        Surfaced for your timeliness assessment — not a deadline determination.
+                      </p>
                     </div>
                   )}
                 </motion.div>
