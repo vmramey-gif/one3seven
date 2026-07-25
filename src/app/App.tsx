@@ -3095,6 +3095,21 @@ export default function App() {
     return { ok: true };
   }, [profile?.id, workerIntakeWorkflow, syncWorkerIntakeUiToListRow]);
 
+  // Re-run organization on an EXISTING intake with the current code, then reload the summary. Lets a
+  // worker refresh a file that was organized before a fix shipped (the raw extractions are unchanged;
+  // only the organized output is regenerated). Worker owns the intake, so the timeline_events /
+  // intake_summaries writes are RLS-clean.
+  const handleReorganizeIntake = useCallback(async () => {
+    const intakeId = currentIntakeIdRef.current;
+    if (!intakeId || !isSupabaseConfigured()) return;
+    const matterTags = employmentMatterByIntakeIdRef.current[intakeId];
+    const err = await intakeData.persistPlaceholderOrganizationForIntake(intakeId, {
+      employmentMatterTags: matterTags,
+    });
+    if (err.error) console.error('[o3s-reorg] re-organize failed', err.error);
+    await refreshWorkerSummaryLive(intakeId);
+  }, []);
+
   const handleUploadProcessingStart = (detail?: { uploadContext?: string }) => {
     const intakeId = currentIntakeIdRef.current;
     const intakeRow = intakeId ? workerIntakesList.find((r) => r.id === intakeId) : undefined;
@@ -4710,6 +4725,7 @@ export default function App() {
               <IntakeSummaryScreen
                 onNavigate={navigateToScreen}
                 firmCaseMode={firmCaseMode}
+                onReorganize={isSupabaseConfigured() ? handleReorganizeIntake : undefined}
                 uploadedFiles={uploadedFiles}
                 onLogoClick={
                   profile?.role === 'worker' || userRole === 'worker' ? () => setCurrentScreen('landing') : handleLogoClick

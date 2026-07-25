@@ -157,6 +157,8 @@ interface IntakeSummaryScreenProps {
   onNavigate: (screen: Screen) => void;
   /** Firm organizing its OWN case documents — swaps worker-facing framing for firm framing. */
   firmCaseMode?: boolean;
+  /** Re-run organization on this existing intake with the current code, then refresh the view. */
+  onReorganize?: () => Promise<void> | void;
   uploadedFiles: File[];
   onLogoClick: () => void;
   intakeWorkspace: IntakeWorkspace;
@@ -296,6 +298,7 @@ export function IntakeSummaryScreen({
   uploadedFiles,
   onLogoClick,
   intakeWorkspace,
+  onReorganize,
   onSaveIntake,
   onSubmitToFirms,
   liveOverview,
@@ -356,6 +359,16 @@ export function IntakeSummaryScreen({
   // uploads (owner storage RLS), so signing their own file_path works with no extra policy.
   const [openCitation, setOpenCitation] = useState<SourceCitation | null>(null);
   const [sourceUrl, setSourceUrl] = useState<string | null>(null);
+  const [reorganizing, setReorganizing] = useState(false);
+  const handleReorganizeClick = async () => {
+    if (!onReorganize || reorganizing) return;
+    setReorganizing(true);
+    try {
+      await onReorganize();
+    } finally {
+      setReorganizing(false);
+    }
+  };
   const workerFileByName = useMemo(() => {
     const m = new Map<string, { docId: string; path: string }>();
     uploadedFiles.forEach((f, i) => {
@@ -1265,6 +1278,19 @@ export function IntakeSummaryScreen({
                 ? 'This is your organized case file, built from the documents you added.'
                 : 'This is your organized file — built from your story and the records you added. It’s yours to review, download, and share whenever you choose.'}
             </p>
+            {onReorganize ? (
+              <div className="mt-3 flex items-center gap-2 border-t border-[#EFF1EC] pt-3">
+                <button
+                  type="button"
+                  onClick={() => void handleReorganizeClick()}
+                  disabled={reorganizing}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-[#CBD6CF] bg-white px-3 py-1.5 text-xs font-medium text-[#42574E] transition-colors hover:bg-[#F2F4EC] disabled:opacity-60"
+                >
+                  {reorganizing ? 'Re-organizing…' : 'Re-organize file'}
+                </button>
+                <span className="text-[11px] text-[#7C857F]">Rebuilds the organization from your uploaded records.</span>
+              </div>
+            ) : null}
           </div>
 
           <section className="mb-4 rounded-[20px] border border-[#CBD6CF] bg-white/95 p-4 shadow-[0_16px_42px_rgba(91,53,213,0.09)]">
