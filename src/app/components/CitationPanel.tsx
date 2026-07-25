@@ -150,12 +150,14 @@ export function CitationPanel({
             <X className="h-5 w-5" />
           </button>
         </div>
-        <p
-          className="mt-2 rounded-md px-2 py-1.5 text-xs leading-relaxed"
-          style={{ background: 'var(--o3s-primary-soft, #E7EDE8)', color: 'var(--o3s-text, #1B2623)' }}
-        >
-          “{citation.sourceText}”
-        </p>
+        {citation.sourceText.trim() ? (
+          <p
+            className="mt-2 rounded-md px-2 py-1.5 text-xs leading-relaxed"
+            style={{ background: 'var(--o3s-primary-soft, #E7EDE8)', color: 'var(--o3s-text, #1B2623)' }}
+          >
+            “{citation.sourceText}”
+          </p>
+        ) : null}
       </header>
 
       <div className="relative flex-1 overflow-auto p-4">
@@ -172,12 +174,14 @@ export function CitationPanel({
           >
             {signedUrl ? (
               <>
-                <p>Couldn’t auto-highlight this line — open the full file to see it in context.</p>
+                {citation.sourceText.trim() ? (
+                  <p>Couldn’t auto-highlight this line — open the full file to see it in context.</p>
+                ) : null}
                 <a
                   href={signedUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="mt-1.5 inline-block font-semibold underline underline-offset-2"
+                  className="inline-block font-semibold underline underline-offset-2"
                   style={{ color: BRAND }}
                 >
                   Open the full PDF ↗
