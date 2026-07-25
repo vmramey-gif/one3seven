@@ -38,8 +38,9 @@ const PROTECTED_ACTIVITY_PATTERNS: RegExp[] = [
   /\btook\b.*\bleave/i,
   /\brequested\b.*\b(leave|accommodation)/i,
   /\breported/i,
-  /\braised\b.*\bconcern/i,
+  /\brais\w*\b.*concern/i, // raise / raises / raised ... concern(s)
   /\bconcern raised/i,
+  /\bsafety (concern|complaint|issue|violation)/i, // safety reporting is protected (e.g. Lab. Code 6310)
   /\brefused/i,
   /\bobjected/i,
   /\bprotested/i,
@@ -64,8 +65,14 @@ const ADVERSE_ACTION_PATTERNS: RegExp[] = [
   /\bperformance improvement/i,
   /\bcut\b.*\b(hours|pay)/i,
   /\breduced\b.*\b(hours|pay|schedule)/i,
+  /\b(hours|pay)\b[^.]*\b(reduc|cut)/i, // reverse order: "hours reduced", "pay cut applied"
   /\bpay cut/i,
   /\bhours cut/i,
+  /\bwritten up\b/i, // "written up" (the /write[- ]?up/ pattern misses the past tense)
+  /\bremoved from\b/i, // removed from project/team/role — a materially adverse action
+  /\bproject removal/i,
+  /\b(denied|passed over)\b[^.]*promot/i, // failure to promote
+  /\bpromot\w*\b[^.]*(denied|passed over)/i,
   /\bforced\b.*\bresign/i,
   /\bconstructive discharge/i,
 ];
