@@ -48,17 +48,23 @@ knows a victim's random file UUID (not enumerable), but the authz was bound to t
   caller-supplied) before any service-role read.
 - **Operator:** redeploy the `extract-document-facts` edge function.
 
-### #3 — LOW/MEDIUM — worker can directly INSERT a full_access route → recommended hardening (NOT auto-applied)
+### #3 — LOW/MEDIUM — worker can directly INSERT a full_access route → DO NOT quick-fix (would break firm-code direct access)
 A worker can `insert` a route row `{intake_id: own, firm_id: any, route_status:'full_access'}`
 directly, bypassing `route_intake_to_firm_code`. Only over-shares the worker's OWN data to a chosen
-firm (no cross-tenant read); firms cannot do this. Deferred because it needs the exact production
-INSERT policy definition. Recommended change (confirm the real policy name/def first):
-```sql
--- inspect first:
-select policyname, cmd, qual, with_check from pg_policies where tablename = 'intake_routes';
--- then recreate the worker INSERT policy adding: and route_status <> 'full_access'
--- so full-access grants must go through the SECURITY DEFINER RPC (matches the UPDATE guard).
-```
+firm (no cross-tenant read); firms cannot do this.
+
+⚠ **The obvious fix is unsafe.** Adding `and route_status <> 'full_access'` to the worker INSERT
+policy would break a LEGITIMATE, core flow: `intakeDataService.ts` `ensureLinkedFirmPreviewRoute`
+(~line 2686) inserts a `full_access` route **directly from the client** for the firm-code
+"Direct full review access" path. Blocking full_access on INSERT would make firm-code direct
+access fail. So this is NOT a drop-in migration.
+
+**Proper fix (deferred — low value vs. cost):** move that client-side full_access insert into a
+`SECURITY DEFINER` RPC (mirroring `route_intake_to_firm_code`) that validates the firm-code linkage
+server-side, THEN harden the INSERT policy to forbid client-set full_access. Given the issue is
+LOW severity (worker's OWN data only, no cross-tenant read) and the fix is a real refactor that
+risks a working flow, recommend leaving as-is for now and revisiting when the routing layer is
+next touched. Do not ship the naive policy change.
 
 ### #4 — INFO — verify base `intake_routes` policies against the live DB
 The `intake_routes` table DDL / some policies live partly outside the repo. Confirm no
