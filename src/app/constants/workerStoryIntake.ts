@@ -142,6 +142,12 @@ export type StoryFollowUpAnswers = {
    * activate unless this is set, and only for jurisdictions that have a wage-rules layer.
    */
   workState?: string;
+  /**
+   * State where the employer is based (2-letter postal code). Recorded alongside workState so the
+   * file notes when work-state differs from employer-state — a FACT an attorney weighs. one3seven
+   * records both; it never concludes which state's law applies. See project_ca_remote_worker_nexus.
+   */
+  employerState?: string;
 };
 
 /** US states + DC for the "where did you primarily work?" selector. */
@@ -211,6 +217,7 @@ export const EMPTY_STORY_FOLLOWUP: StoryFollowUpAnswers = {
   priorAgencyFiling: '',
   priorAgencyFilingDetails: '',
   workState: '',
+  employerState: '',
 };
 
 export function hasStoryFollowUpContent(answers: StoryFollowUpAnswers | null | undefined): boolean {

@@ -1345,6 +1345,28 @@ export function UploadScreen({
                       </select>
                     </div>
 
+                    {/* Card: Employer state — recorded alongside work state; when they differ it's a
+                        fact an attorney weighs. We record both, never conclude which law applies. */}
+                    <div className="rounded-[14px] border border-[#D3DED6] bg-white px-4 py-3.5 shadow-sm">
+                      <label className="text-sm font-semibold text-[#1B2623]" htmlFor="followup-employer-state">
+                        In what state is your employer based?
+                      </label>
+                      <p className="mt-1 text-xs leading-relaxed text-[#7C857F]">
+                        Where the company or its headquarters is located — this can differ from where you worked.
+                      </p>
+                      <select
+                        id="followup-employer-state"
+                        value={followUp.employerState ?? ''}
+                        onChange={(e) => updateFollowUp({ employerState: e.target.value })}
+                        className="mt-2.5 w-full rounded-[10px] border border-[#CBD6CF] bg-white px-3 py-2.5 text-sm text-[#1B2623] focus:border-[#5E7268] focus:outline-none focus:ring-2 focus:ring-[#D3DED6]"
+                      >
+                        <option value="">Select a state…</option>
+                        {US_STATES.map((s) => (
+                          <option key={`emp-${s.code}`} value={s.code}>{s.name}</option>
+                        ))}
+                      </select>
+                    </div>
+
                     {/* Card: Employment status */}
                     <div className="rounded-[14px] border border-[#D3DED6] bg-white px-4 py-3.5 shadow-sm">
                       <p className="text-sm font-semibold text-[#1B2623] mb-2.5">Are you currently employed there, or has employment ended?</p>

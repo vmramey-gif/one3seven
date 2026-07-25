@@ -35,6 +35,7 @@ export function extractStoryFollowUpFromOverview(
   const priorAgencyFiling = parseFollowUpLine(body, 'prior_agency_filing') as StoryFollowUpAnswers['priorAgencyFiling'];
   const priorAgencyFilingDetails = parseFollowUpLine(body, 'prior_agency_filing_details');
   const workState = parseFollowUpLine(body, 'work_state');
+  const employerState = parseFollowUpLine(body, 'employer_state');
   const hasContent = [
     employmentName,
     employer,
@@ -49,6 +50,7 @@ export function extractStoryFollowUpFromOverview(
     arbitrationAgreement,
     priorAgencyFiling,
     workState,
+    employerState,
   ].some((v) => Boolean(String(v ?? '').trim()));
   if (!hasContent) return null;
   return {
@@ -66,6 +68,7 @@ export function extractStoryFollowUpFromOverview(
     priorAgencyFiling,
     priorAgencyFilingDetails,
     workState,
+    employerState,
   };
 }
 
@@ -89,6 +92,7 @@ function buildStoryFollowUpBlock(answers: StoryFollowUpAnswers): string {
   if (answers.priorAgencyFiling) lines.push(`prior_agency_filing:${answers.priorAgencyFiling}`);
   if (answers.priorAgencyFilingDetails?.trim()) lines.push(`prior_agency_filing_details:${answers.priorAgencyFilingDetails.trim()}`);
   if (answers.workState?.trim()) lines.push(`work_state:${answers.workState.trim()}`);
+  if (answers.employerState?.trim()) lines.push(`employer_state:${answers.employerState.trim()}`);
   if (!lines.length) return '';
   return `--- O3S_STORY_FOLLOWUP ---\n${lines.join('\n')}\n--- O3S_STORY_FOLLOWUP_END ---`;
 }
@@ -118,6 +122,7 @@ export function formatStoryFollowUpForDisplay(answers: StoryFollowUpAnswers): st
     rows.push(`Prior agency filing: ${label}${details ? ` — ${details}` : ''}`);
   }
   if (answers.workState?.trim()) rows.push(`State where work was performed: ${answers.workState.trim()}`);
+  if (answers.employerState?.trim()) rows.push(`State where employer is based: ${answers.employerState.trim()}`);
   return rows.join('\n');
 }
 
