@@ -580,10 +580,14 @@ export function LawFirmDashboardScreen({
               </section>
             ) : null}
 
-            <div className="mb-4 flex items-center gap-2">
+            <div className="mb-2 flex items-center gap-2">
               <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#8FD3A6]">Client intakes</p>
               <span className="text-[11px] text-white/45">— submitted by workers{allIntakes.length ? ` · ${allIntakes.length}` : ''}</span>
             </div>
+            <p className="mb-5 flex items-center gap-2 text-[12.5px] text-white/55">
+              <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: '#A78BFA', boxShadow: '0 0 8px #A78BFA' }} />
+              Every fact is <span className="font-medium text-[#A78BFA]">source-linked</span> — open a case to jump to the record behind it.
+            </p>
 
             <section className="rounded-[24px] border border-white/10 bg-white/[0.02] p-5 shadow-[0_18px_50px_-30px_rgba(0,0,0,0.7)] sm:p-7">
             <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -752,9 +756,22 @@ export function LawFirmDashboardScreen({
                     <div className="min-w-0">
                       <p className="text-xs uppercase tracking-[0.2em] text-white/38">Case file {intake.intakeNumber}</p>
                       <h3 style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="mt-2 text-2xl font-medium tracking-[-0.01em] text-[#ECF3ED]">{workerLabel}</h3>
-                      <p className="mt-3 text-sm font-medium text-[#8FD3A6]">{timelineState}</p>
-                      <p className="mt-2 text-sm leading-relaxed text-white/72">{recordLine}</p>
-                      <p className="mt-1 text-sm leading-relaxed text-[#F3A268]/85">{gapLine}</p>
+                      <div className="mt-4 flex flex-wrap items-center gap-x-7 gap-y-2.5">
+                        <span className="flex items-baseline gap-1.5">
+                          <span style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="text-2xl leading-none text-[#8FD3A6]" title={recordLine}>{intake.documentCount || '—'}</span>
+                          <span className="text-[11px] uppercase tracking-wide text-white/45">records</span>
+                        </span>
+                        {gapCount > 0 ? (
+                          <span className="flex items-baseline gap-1.5">
+                            <span style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="text-2xl leading-none text-[#F3A268]" title={gapLine}>{gapCount}</span>
+                            <span className="text-[11px] uppercase tracking-wide text-white/45">gaps to review</span>
+                          </span>
+                        ) : null}
+                        <span className="flex items-center gap-2 text-[13px]">
+                          <span className={intake.timelineComplete ? 'text-[#8FD3A6]' : 'text-white/40'}>{intake.timelineComplete ? '●' : '○'}</span>
+                          <span className="text-[11px] uppercase tracking-wide text-white/45">{timelineState}</span>
+                        </span>
+                      </div>
                     </div>
                     <div className="flex items-center gap-2 text-sm font-medium text-[#F3A268]">
                       Review Timeline
