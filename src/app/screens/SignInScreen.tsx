@@ -38,7 +38,7 @@ export function SignInScreen({ onNavigate, onSignIn, onGoogleAuth }: SignInScree
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF9F6] text-[#1B2623]">
+    <div className="min-h-screen o3s-warm-page text-[#1B2623]">
       {/* Back Navigation */}
       <div className="px-6 pt-6">
         <button
@@ -111,7 +111,7 @@ export function SignInScreen({ onNavigate, onSignIn, onGoogleAuth }: SignInScree
               <button
                 type="submit"
                 disabled={submitting}
-                className="flex w-full items-center justify-center gap-2 rounded-full bg-[#42574E] px-6 py-4 font-medium text-white shadow-[0_18px_48px_rgba(66,87,78,0.26)] transition hover:-translate-y-0.5 hover:bg-[#42574E] disabled:translate-y-0 disabled:opacity-60"
+                className="flex w-full items-center justify-center gap-2 rounded-full bg-[var(--o3s-action)] px-6 py-4 font-medium text-white shadow-[0_18px_48px_rgba(181,83,31,0.28)] transition hover:-translate-y-0.5 hover:brightness-95 disabled:translate-y-0 disabled:opacity-60"
               >
                 Continue
                 <ArrowRight className="w-5 h-5" />

@@ -48,7 +48,7 @@ export function AuthWelcomeScreen({
   ];
 
   return (
-    <div style={BODY} className="relative min-h-screen overflow-hidden bg-[#F1F3EF] px-5 py-4 text-[#17181C] antialiased sm:px-6 sm:py-8">
+    <div style={BODY} className="relative min-h-screen overflow-hidden o3s-warm-page px-5 py-4 text-[#17181C] antialiased sm:px-6 sm:py-8">
       {/* Ambient sage wash */}
       <div className="pointer-events-none absolute -left-32 -top-32 h-[500px] w-[500px] rounded-full bg-[#42574E]/8 blur-3xl" />
       <div className="pointer-events-none absolute -right-40 top-40 h-[440px] w-[440px] rounded-full bg-[#728179]/8 blur-3xl" />
@@ -137,7 +137,7 @@ export function AuthWelcomeScreen({
                 type="button"
                 onClick={startOrganizing}
                 disabled={isOrganizingStack}
-                className="flex w-full items-center justify-center gap-2 rounded-full bg-[#42574E] px-6 py-3.5 text-base font-semibold text-[#EAF0EC] shadow-[0_16px_44px_rgba(66,87,78,0.30)] transition hover:-translate-y-0.5 hover:bg-[#374a42] disabled:translate-y-0 disabled:opacity-80 sm:py-4"
+                className="flex w-full items-center justify-center gap-2 rounded-full bg-[var(--o3s-action)] px-6 py-3.5 text-base font-semibold text-white shadow-[0_16px_44px_rgba(181,83,31,0.30)] transition hover:-translate-y-0.5 hover:brightness-95 disabled:translate-y-0 disabled:opacity-80 sm:py-4"
               >
                 {isOrganizingStack ? t('aw.organizing') : t('aw.start')}
                 <ArrowRight className="h-5 w-5" />

@@ -541,7 +541,7 @@ export function LandingScreen({
             <button
               type="button"
               onClick={onStartOrganizing}
-              className="mt-4 inline-flex min-h-11 items-center justify-center rounded-full bg-[#42574E] px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-[#374A42]"
+              className="mt-4 inline-flex min-h-11 items-center justify-center rounded-full bg-[var(--o3s-action)] px-6 py-2.5 text-sm font-semibold text-white transition hover:brightness-95"
             >
               Start organizing
             </button>
@@ -746,7 +746,7 @@ export function LandingScreen({
                       }
                     }}
                     disabled={!onOpenWorkerSummaryForIntake && activeIntakeHub?.intakeId !== card.intakeId}
-                    className="w-full rounded-[14px] border border-[#42574E] bg-[#42574E] px-4 py-2 text-sm font-bold text-white shadow-[0_12px_28px_rgba(66,87,78,0.18)] transition-colors hover:bg-[#374A42] disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+                    className="w-full rounded-[14px] border border-[var(--o3s-action)] bg-[var(--o3s-action)] px-4 py-2 text-sm font-bold text-white shadow-[0_12px_28px_rgba(181,83,31,0.22)] transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
                   >
                     View Summary
                   </button>
@@ -764,7 +764,7 @@ export function LandingScreen({
   );
 
   return (
-    <div className={`min-h-screen bg-[#F2F4EC] text-[#1B2623]${showWorkerHub ? ' pb-24 sm:pb-0' : ''}`}>
+    <div className={`min-h-screen o3s-warm-page text-[#1B2623]${showWorkerHub ? ' pb-24 sm:pb-0' : ''}`}>
       {/* Top Navigation */}
       {!shellMode ? (
       <nav className={`sticky top-0 z-50 border-b backdrop-blur-md ${

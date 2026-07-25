@@ -49,9 +49,9 @@ const YOURS_KEYS = [
 export function WorkerLandingPage({ onStart, onSignIn, onBack, onForFirms }: WorkerLandingPageProps) {
   const { t } = useLang();
   return (
-    <div style={BODY} className="min-h-screen bg-[#F1F3EF] text-[#17181C] antialiased">
+    <div style={BODY} className="min-h-screen o3s-warm-page text-[#17181C] antialiased">
       {/* Nav */}
-      <nav className="sticky top-0 z-50 border-b border-[#E1E4DD] bg-[#F1F3EF]/90 backdrop-blur-sm">
+      <nav className="sticky top-0 z-50 border-b border-[#E1E4DD] bg-[#FBF7EF]/90 backdrop-blur-sm">
         <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-5 sm:h-16 sm:px-8">
           <button type="button" onClick={onBack} style={SERIF} className="text-[19px] font-semibold tracking-[-0.01em] text-[#17181C] transition hover:opacity-70">
             <WordMark />
@@ -86,7 +86,7 @@ export function WorkerLandingPage({ onStart, onSignIn, onBack, onForFirms }: Wor
             {t('wl.lede')}
           </p>
           <div className="flex flex-col gap-3 sm:flex-row">
-            <button type="button" onClick={onStart} className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#42574E] px-7 py-3.5 text-[16px] font-semibold text-[#EAF0EC] shadow-[0_14px_30px_-12px_rgba(66,87,78,0.55)] transition hover:-translate-y-0.5 hover:bg-[#374a42] sm:w-auto">
+            <button type="button" onClick={onStart} className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[var(--o3s-action)] px-7 py-3.5 text-[16px] font-semibold text-white shadow-[0_14px_30px_-12px_rgba(181,83,31,0.55)] transition hover:-translate-y-0.5 hover:brightness-95 sm:w-auto">
               {t('wl.cta')} <ArrowRight className="h-4 w-4" />
             </button>
             <a href="#how" className="inline-flex w-full items-center justify-center rounded-full border border-[#B7BCB2] bg-white/60 px-6 py-3.5 text-[16px] font-semibold text-[#22262a] transition hover:border-[#8f958b] hover:bg-white sm:w-auto">
@@ -279,7 +279,7 @@ export function WorkerLandingPage({ onStart, onSignIn, onBack, onForFirms }: Wor
           <h2 style={SERIF} className="text-[clamp(24px,4vw,32px)] font-semibold tracking-[-0.01em]">{t('wl.final.h2')}</h2>
           <p className="mx-auto mt-3 max-w-[52ch] text-[15.5px] leading-relaxed text-[#40433f]">{t('wl.final.sub')}</p>
           <div className="mt-6 flex justify-center">
-            <button type="button" onClick={onStart} className="inline-flex w-full max-w-sm items-center justify-center gap-2 rounded-full bg-[#42574E] px-7 py-3.5 text-[16px] font-semibold text-[#EAF0EC] shadow-[0_14px_30px_-12px_rgba(66,87,78,0.55)] transition hover:-translate-y-0.5 hover:bg-[#374a42] sm:w-auto">
+            <button type="button" onClick={onStart} className="inline-flex w-full max-w-sm items-center justify-center gap-2 rounded-full bg-[var(--o3s-action)] px-7 py-3.5 text-[16px] font-semibold text-white shadow-[0_14px_30px_-12px_rgba(181,83,31,0.55)] transition hover:-translate-y-0.5 hover:brightness-95 sm:w-auto">
               {t('wl.cta')} <ArrowRight className="h-4 w-4" />
             </button>
           </div>

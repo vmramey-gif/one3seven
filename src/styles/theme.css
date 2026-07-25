@@ -292,6 +292,13 @@
   .o3s-firm-review-skin [class*="bg-[#FAF9F6]"],
   .o3s-firm-review-skin [class*="bg-[#F2F4EC]"] { background-color: rgba(255, 255, 255, 0.05); }
 
+  /* Warm entry-page ground (landing / sign-in / welcome) — sunset bone with a faint warm aura, so
+     the front door reads warm and inviting like the worker side. Light per the marketing brand. */
+  .o3s-warm-page {
+    background-image: radial-gradient(900px 500px at 88% -8%, #F4EEDF, transparent 60%);
+    background-color: #FBF7EF;
+  }
+
   .bg-grid-slate-200 {
     background-image: linear-gradient(to right, rgb(226 232 240 / 0.3) 1px, transparent 1px),
       linear-gradient(to bottom, rgb(226 232 240 / 0.3) 1px, transparent 1px);
