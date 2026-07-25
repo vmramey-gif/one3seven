@@ -4,6 +4,7 @@ import { type CaseTimelinePatternResult, describeSequence } from '../../services
 import type { EmployerRecordCoverage } from '../../services/caEmployerRecordRequirements';
 import type { GapDetectionResult } from '../../services/gapDetection';
 import type { DamagesReport } from '../../services/damagesCalculator';
+import type { WorkLocationNexusResult } from '../../services/workLocationNexus';
 
 /**
  * Case Facts, Assembled — the firm-facing canvas, designed for TRIAGE not a data dump.
@@ -24,6 +25,8 @@ type CaseFactsAssembledPanelProps = {
   damages: DamagesReport | null;
   /** Raw uploaded documents, for the category-organized "case folder" view. */
   documents?: Array<{ fileName?: string; category?: string }>;
+  /** Work-location vs. employer-location facts; a cross-state note surfaces when they differ. */
+  nexus?: WorkLocationNexusResult;
   illustrative?: boolean;
 };
 
@@ -82,6 +85,7 @@ export function CaseFactsAssembledPanel({
   gaps,
   damages,
   documents = [],
+  nexus,
   illustrative = false,
 }: CaseFactsAssembledPanelProps) {
   const currency = (n: number) =>
@@ -157,6 +161,17 @@ export function CaseFactsAssembledPanel({
           <Tile value={currency(damages.combinedEstimate)} label="wage exposure (arithmetic)" tone="ink" />
         ) : null}
       </div>
+
+      {/* Recorded fact — work location vs. employer location. Two facts stated side by side; the
+          legal consequence (which state's law applies) is the attorney's to draw, never ours. */}
+      {nexus?.crossState && nexus.note ? (
+        <div className="mt-2.5 rounded-[12px] border border-[#E3E7DF] bg-[#FBFBFA] px-3.5 py-2.5">
+          <div style={MONO} className="text-[10px] uppercase tracking-[0.14em] text-[#8a938c]">
+            Recorded fact
+          </div>
+          <p className="mt-1 text-[13px] leading-snug text-[#20242a]">{nexus.note}</p>
+        </div>
+      ) : null}
 
       {/* THE SEQUENCE — the hero. The story of the case is the four dates. */}
       <section className="mt-6">

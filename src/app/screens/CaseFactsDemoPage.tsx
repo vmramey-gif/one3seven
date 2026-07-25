@@ -3,6 +3,7 @@ import { detectCaseTimelinePatterns } from '../../services/caseTimelinePatterns'
 import { assessEmployerRecordCoverage } from '../../services/caEmployerRecordRequirements';
 import { detectPayPeriodGaps, parseEmploymentDateRange, inferPayFrequency } from '../../services/gapDetection';
 import { calculateDamages } from '../../services/damagesCalculator';
+import { assessWorkLocationNexus } from '../../services/workLocationNexus';
 import { WordMark } from '../components/WordMark';
 
 /**
@@ -44,6 +45,8 @@ export function CaseFactsDemoPage() {
     payFrequency: inferPayFrequency(PAYROLL_DATES) ?? 'biweekly',
     payrollRecordDates: PAYROLL_DATES,
   });
+  // Illustrative: worker performed the work in CA; employer is based out of state.
+  const nexus = assessWorkLocationNexus({ workState: 'California', employerState: 'Texas' });
   const damages = calculateDamages({
     regularHourlyRate: { value: 22, citation: null },
     overtimeRateApplied: { value: null, citation: null }, // records show no OT premium applied
@@ -86,6 +89,7 @@ export function CaseFactsDemoPage() {
           gaps={gaps}
           damages={damages}
           documents={FILE_INVENTORY}
+          nexus={nexus}
           illustrative
         />
       </div>
