@@ -7,6 +7,8 @@ import type { SourceCitation } from '../../services/damagesCalculator';
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerSrc;
 
 const BRAND = '#42574E';
+// The extracted quote is the AI layer — highlight it in the AI/violet brand color.
+const VIOLET = '#5B21B6';
 
 type PanelStatus = 'loading' | 'located' | 'fallback';
 
@@ -35,16 +37,19 @@ export function CitationPanel({
   onClose: () => void;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const [status, setStatus] = useState<PanelStatus>('loading');
   const [pageNum, setPageNum] = useState<number | null>(null);
-  const [highlight, setHighlight] = useState<Highlight | null>(null);
+  const [highlights, setHighlights] = useState<Highlight[]>([]);
 
   useEffect(() => {
     if (!citation) return;
     let cancelled = false;
     setStatus('loading');
-    setHighlight(null);
+    setHighlights([]);
     setPageNum(null);
+
+    type TextRun = { str: string; transform: number[]; width: number; height: number };
 
     void (async () => {
       try {
@@ -59,25 +64,34 @@ export function CitationPanel({
         const probe = targetSquashed.length > 40 ? targetSquashed.slice(0, 40) : targetSquashed;
 
         let matchPage = 0;
-        let matchItem: { transform: number[]; width: number; height: number } | null = null;
+        let matchItems: TextRun[] = [];
 
         if (probe.length >= 8) {
           for (let p = 1; p <= pdf.numPages; p += 1) {
             if (cancelled) return;
             const page = await pdf.getPage(p);
             const tc = await page.getTextContent();
-            const items = tc.items.filter(
-              (i): i is { str: string; transform: number[]; width: number; height: number } => 'str' in i,
+            const loose = tc.items as Array<{ str?: unknown; transform?: unknown; width?: unknown; height?: unknown }>;
+            const items = loose.filter(
+              (i): i is TextRun => typeof i.str === 'string' && Array.isArray(i.transform),
             );
-            const joined = squash(items.map((i) => i.str).join(' '));
-            if (joined.includes(probe)) {
+            // Build a per-item span map over the squashed concatenation, then locate the FULL quote
+            // range and collect every item that overlaps it — so the whole line (across runs and
+            // wrapped lines) gets highlighted, not just one word.
+            let concat = '';
+            const spans: Array<{ start: number; end: number; item: TextRun }> = [];
+            for (const it of items) {
+              const s = squash(it.str);
+              if (!s) continue;
+              spans.push({ start: concat.length, end: concat.length + s.length, item: it });
+              concat += s;
+            }
+            const at = concat.indexOf(probe);
+            if (at >= 0) {
               matchPage = p;
-              // Best-effort: highlight the first non-trivial text run that overlaps the snippet.
-              matchItem =
-                items.find((i) => {
-                  const s = squash(i.str);
-                  return s.length > 3 && targetSquashed.includes(s);
-                }) ?? null;
+              const qStart = at;
+              const qEnd = Math.min(concat.length, at + targetSquashed.length);
+              matchItems = spans.filter((sp) => sp.end > qStart && sp.start < qEnd).map((sp) => sp.item);
               break;
             }
           }
@@ -100,17 +114,27 @@ export function CitationPanel({
         if (cancelled) return;
         setPageNum(renderPage);
 
-        if (matchPage && matchItem) {
-          try {
-            const m = pdfjsLib.Util.transform(viewport.transform, matchItem.transform);
-            const fontH = Math.hypot(m[2], m[3]) || matchItem.height * scale;
-            const width = (matchItem.width || 0) * scale;
-            setHighlight({ left: m[4], top: m[5] - fontH, width: Math.max(width, 12), height: fontH });
-          } catch {
-            // position math failed — page still rendered; treat as located without box
-            setHighlight(null);
+        if (matchPage && matchItems.length) {
+          const boxes: Highlight[] = [];
+          for (const it of matchItems) {
+            try {
+              const m = pdfjsLib.Util.transform(viewport.transform, it.transform);
+              const fontH = Math.hypot(m[2], m[3]) || it.height * scale;
+              const width = (it.width || 0) * scale;
+              boxes.push({ left: m[4], top: m[5] - fontH, width: Math.max(width, 6), height: fontH });
+            } catch {
+              /* skip a run whose transform math failed */
+            }
           }
-          setStatus('located');
+          if (!cancelled) {
+            setHighlights(boxes);
+            setStatus('located');
+            // Bring the first highlighted line into view within the scroll container.
+            if (boxes.length && scrollRef.current) {
+              const top = Math.min(...boxes.map((b) => b.top));
+              scrollRef.current.scrollTo({ top: Math.max(0, top - 80), behavior: 'smooth' });
+            }
+          }
         } else {
           setStatus('fallback');
         }
@@ -163,7 +187,7 @@ export function CitationPanel({
         ) : null}
       </header>
 
-      <div className="relative flex-1 overflow-auto p-4">
+      <div ref={scrollRef} className="relative flex-1 overflow-auto p-4">
         {status === 'loading' ? (
           <p className="text-sm" style={{ color: 'var(--o3s-muted, #6b7280)' }}>
             Loading source document…
@@ -213,19 +237,20 @@ export function CitationPanel({
         {/* Canvas is always present; it holds the rendered page when one is available. */}
         <div className="relative inline-block">
           <canvas ref={canvasRef} className="max-w-full rounded-md" />
-          {highlight ? (
+          {highlights.map((h, i) => (
             <div
-              className="pointer-events-none absolute rounded-sm"
+              key={i}
+              className="pointer-events-none absolute rounded-[2px]"
               style={{
-                left: highlight.left,
-                top: highlight.top,
-                width: highlight.width,
-                height: highlight.height,
-                background: `${BRAND}33`,
-                outline: `1.5px solid ${BRAND}`,
+                left: h.left - 1,
+                top: h.top - 1,
+                width: h.width + 2,
+                height: h.height + 2,
+                background: `${VIOLET}2e`,
+                outline: `1.5px solid ${VIOLET}`,
               }}
             />
-          ) : null}
+          ))}
         </div>
       </div>
     </aside>
