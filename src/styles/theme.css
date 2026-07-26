@@ -299,6 +299,21 @@
     background-color: #FBF7EF;
   }
 
+  /* Landing "sky" — holds warm/light through the readable content, then ripens to deep elite
+     green over the last stretch so the page finishes dark at the very bottom (final CTA + footer
+     sit in the green with inverted text). Gentler + later-breaking than o3s-worker-sky, whose
+     mid-scroll greens would swallow the landing's plain-on-background headings. Maps to full page
+     height (background-attachment: scroll) so the bottom is always green regardless of length. */
+  .o3s-warm-sky {
+    background-image:
+      radial-gradient(900px 500px at 88% -8%, #F4EEDF, transparent 60%),
+      linear-gradient(180deg,
+        #FDFAF4 0%, #FBF7EF 36%, #F6F0E3 62%, #EEE6D5 78%, #E0D7C4 84%,
+        #B4C3A8 89%, #6C866C 93%, #3B5444 97%, #1E2C25 100%);
+    background-color: #FBF7EF;
+    background-attachment: scroll;
+  }
+
   .bg-grid-slate-200 {
     background-image: linear-gradient(to right, rgb(226 232 240 / 0.3) 1px, transparent 1px),
       linear-gradient(to bottom, rgb(226 232 240 / 0.3) 1px, transparent 1px);

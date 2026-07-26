@@ -65,7 +65,7 @@ export function WorkerLandingPage({ onStart, onSignIn, onBack, onForFirms }: Wor
     return () => io.disconnect();
   }, []);
   return (
-    <div style={BODY} className="min-h-screen o3s-warm-page text-[#17181C] antialiased">
+    <div style={BODY} className="min-h-screen o3s-warm-sky text-[#17181C] antialiased">
       {/* Nav */}
       <nav className="sticky top-0 z-50 border-b border-[#E1E4DD] bg-[#FBF7EF]/90 backdrop-blur-sm">
         <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-5 sm:h-16 sm:px-8">
@@ -306,38 +306,33 @@ export function WorkerLandingPage({ onStart, onSignIn, onBack, onForFirms }: Wor
           </div>
         </section>
 
-        {/* Final CTA — the "sunset completion" band: warm-to-deep-green, inverted text,
-            echoing the worker intake's light→dark arc. Amber glow for warmth. */}
-        <section className="py-10">
+        {/* Final CTA — sits directly in the page's ripened deep-green bottom (the "sunset
+            completion"), inverted text, amber glow for warmth. No card: the page IS the band. */}
+        <section className="relative py-20 text-center">
           <div
-            className="relative overflow-hidden rounded-[28px] px-6 py-14 text-center sm:px-10"
-            style={{ background: 'linear-gradient(180deg,#5E7268 0%,#354A3D 55%,#1E2C25 100%)' }}
-          >
-            <div
-              aria-hidden
-              className="pointer-events-none absolute left-1/2 top-[-32%] h-[420px] w-[420px] -translate-x-1/2 rounded-full"
-              style={{ background: 'radial-gradient(circle, rgba(233,169,78,0.26), rgba(233,169,78,0) 62%)' }}
-            />
-            <div className="relative">
-              <h2 style={SERIF} className="mx-auto max-w-[16ch] text-balance text-[clamp(26px,5vw,36px)] font-semibold tracking-[-0.02em] text-white">
-                {t('wl.final.h2')}
-              </h2>
-              <p className="mx-auto mt-3 max-w-[46ch] text-[15px] leading-relaxed text-[#D8E0CF]">{t('wl.final.sub')}</p>
-              <div className="mt-7 flex justify-center">
-                <button type="button" onClick={onStart} className="inline-flex w-full max-w-sm items-center justify-center gap-2 rounded-full bg-[var(--o3s-action)] px-7 py-3.5 text-[16px] font-semibold text-white shadow-[0_14px_34px_-10px_rgba(0,0,0,0.5)] transition hover:-translate-y-0.5 hover:brightness-105 sm:w-auto">
-                  {t('wl.cta')} <ArrowRight className="h-4 w-4" />
-                </button>
-              </div>
+            aria-hidden
+            className="pointer-events-none absolute left-1/2 top-0 h-[420px] w-[420px] -translate-x-1/2 rounded-full"
+            style={{ background: 'radial-gradient(circle, rgba(233,169,78,0.22), rgba(233,169,78,0) 62%)' }}
+          />
+          <div className="relative">
+            <h2 style={SERIF} className="mx-auto max-w-[16ch] text-balance text-[clamp(26px,5vw,36px)] font-semibold tracking-[-0.02em] text-white">
+              {t('wl.final.h2')}
+            </h2>
+            <p className="mx-auto mt-3 max-w-[46ch] text-[15px] leading-relaxed text-[#D8E0CF]">{t('wl.final.sub')}</p>
+            <div className="mt-7 flex justify-center">
+              <button type="button" onClick={onStart} className="inline-flex w-full max-w-sm items-center justify-center gap-2 rounded-full bg-[var(--o3s-action)] px-7 py-3.5 text-[16px] font-semibold text-white shadow-[0_14px_34px_-10px_rgba(0,0,0,0.5)] transition hover:-translate-y-0.5 hover:brightness-105 sm:w-auto">
+                {t('wl.cta')} <ArrowRight className="h-4 w-4" />
+              </button>
             </div>
           </div>
         </section>
       </div>
 
-      {/* Footer */}
-      <footer className="border-t border-[#E1E4DD] px-5 py-9 sm:px-8">
+      {/* Footer — rests in the deepest green; light-inverted to stay readable. */}
+      <footer className="border-t border-white/10 px-5 pb-12 pt-9 sm:px-8">
         <div className="mx-auto flex max-w-3xl flex-col items-center gap-2 text-center">
-          <div style={MONO} className="text-[11px] uppercase tracking-[0.14em] text-[#6a6d66]">one3seven</div>
-          <p className="max-w-[640px] text-[11.5px] leading-relaxed text-[#6a6d66]">
+          <div style={MONO} className="text-[11px] uppercase tracking-[0.14em] text-[#AEBEA6]">one3seven</div>
+          <p className="max-w-[640px] text-[11.5px] leading-relaxed text-[#9DB097]">
             {t('wl.footer.disc')}
           </p>
         </div>
