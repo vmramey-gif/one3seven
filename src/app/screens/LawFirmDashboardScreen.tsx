@@ -588,14 +588,7 @@ export function LawFirmDashboardScreen({
               <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: '#A78BFA', boxShadow: '0 0 8px #A78BFA' }} />
               Every fact is <span className="font-medium text-[#A78BFA]">source-linked</span> — open a case to jump to the record behind it.
             </p>
-            <button
-              type="button"
-              onClick={() => window.open('/claim-lens-demo', '_blank', 'noopener')}
-              className="mb-5 inline-flex items-center gap-2 rounded-full border border-[rgba(167,139,250,0.45)] bg-[rgba(124,92,255,0.12)] px-4 py-2 text-[12.5px] font-medium text-[#C4B3F5] transition-colors hover:bg-[rgba(124,92,255,0.2)]"
-            >
-              Claim Lens — pick a theory, the record re-sorts by its elements
-              <span className="text-[#A78BFA]">↗ preview</span>
-            </button>
+            <p className="mb-5 text-[11.5px] text-white/40">Open a case to run the Claim Lens on its own facts.</p>
 
             <section className="rounded-[24px] border border-white/10 bg-white/[0.02] p-5 shadow-[0_18px_50px_-30px_rgba(0,0,0,0.7)] sm:p-7">
             <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center">

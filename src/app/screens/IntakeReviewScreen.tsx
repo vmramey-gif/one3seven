@@ -30,6 +30,7 @@ import { triggerIntakeFactExtraction } from '../../services/documentFactsService
 import type { SourceCitation } from '../../services/damagesCalculator';
 import { normalizeFilenameForMatching } from '../../services/filenameMatching';
 import { CitationPanel } from '../components/CitationPanel';
+import { ClaimLensPanel } from '../components/ClaimLensPanel';
 import { WageExposureReviewSection } from '../components/WageExposureReviewSection';
 import {
   createFirmIntakeFileSignedUrl,
@@ -1244,6 +1245,32 @@ export function IntakeReviewScreen({
                 </motion.div>
               );
             })() : null}
+
+            {/* Claim Lens — real element-coverage map on THIS intake's facts. Firm-access-gated;
+                counsel-gated before any real firm is given the feature. Organizes, never concludes. */}
+            {useConnectedFirmLayout && firmLiveView ? (
+              <ClaimLensPanel
+                input={{
+                  events: (firmLiveView.events ?? []).map((e) => ({
+                    title: polishTimelineEventTitle(e.title),
+                    date: e.event_date,
+                    category: e.category,
+                  })),
+                  quotes: (firmLiveView.intelligence?.keyQuotes ?? []).map((q) => ({
+                    quote: q.quote,
+                    fileName: q.file_name,
+                    category: q.category,
+                  })),
+                  intervals: (firmLiveView.intelligence?.timingIntervals ?? []).map((iv) => ({
+                    label: iv.label,
+                    days: iv.days,
+                    description: iv.description,
+                  })),
+                  workerContext: firmLiveView.workerProvidedContext ?? firmWorkerStoryDisplay ?? '',
+                  files: (firmLiveView.files ?? []).map((f) => ({ fileName: f.file_name, category: f.category })),
+                }}
+              />
+            ) : null}
 
             {/* 3-Minute Review Layer — fast triage signal for attorneys */}
             {useConnectedFirmLayout && firmLiveView ? (() => {
