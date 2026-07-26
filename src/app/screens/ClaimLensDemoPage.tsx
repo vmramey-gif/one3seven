@@ -173,6 +173,12 @@ const CSS = `
 .cl .lensTitle em{font-style:normal;color:#8FA495;font-weight:400}
 .cl .tally{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;font-size:11.5px;color:#8FA495}
 .cl .tally b{color:#ECF3ED;font-weight:600}.cl .tally .g{color:#F3A268}.cl .tally .lk{color:#A78BFA}
+.cl .cov{display:flex;align-items:center;gap:16px;margin:14px 0 2px;padding:15px 17px;border:1px solid #243029;border-radius:14px;background:#0f1713}
+.cl .cov .ck{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#8FA495;margin-bottom:5px}
+.cl .cov .big{font-family:'Fraunces',Georgia,serif;font-size:36px;line-height:.9;color:#8FD3A6;font-weight:600}
+.cl .cov .bar{height:7px;border-radius:999px;background:#1b2620;overflow:hidden;margin-bottom:8px}
+.cl .cov .bar i{display:block;height:100%;background:#8FD3A6;border-radius:999px;transition:width .5s ease}
+.cl .cov .sub{font-size:11.5px;line-height:1.45;color:#8FA495}
 .cl .fade{animation:clfade .25s ease both}@keyframes clfade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
 .cl .el{border-bottom:1px solid #243029;padding:22px 0 20px}
 .cl .elIdx{font-size:11px;color:#61756A}
@@ -211,6 +217,10 @@ export function ClaimLensDemoPage() {
       else if (it.state === 'counted') counted += 1;
     }
   }
+  // Coverage Rate: share of this claim's elements with any material on file — a record fact, not merit.
+  const totalEls = lens.elements.length;
+  const withMaterial = totalEls - gaps;
+  const covPct = totalEls ? Math.round((withMaterial / totalEls) * 100) : 0;
 
   return (
     <div className="cl">
@@ -252,6 +262,16 @@ export function ClaimLensDemoPage() {
 
         <div className="lensHead">
           <div className="lensTitle serif">{lens.title} <em>— Elements &amp; Available Material</em></div>
+          <div className="cov">
+            <div>
+              <div className="ck">Element coverage</div>
+              <div className="big">{covPct}%</div>
+            </div>
+            <div style={{ flex: 1 }}>
+              <div className="bar"><i style={{ width: `${covPct}%` }} /></div>
+              <div className="sub">{withMaterial} of {totalEls} elements have material on file. A structural fact about the record — not an assessment of the case.</div>
+            </div>
+          </div>
           <div className="tally mono">
             <span><b>{linked + named + worker + counted}</b> items</span>
             <span className="lk"><b>{linked}</b> source-linked</span>
