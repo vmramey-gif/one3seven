@@ -63,15 +63,17 @@ export function ForFirmsPage({ onBack, onStartWorker }: ForFirmsPageProps) {
             For law firms
           </div>
           <h1 style={SERIF} className="mb-5 text-balance text-[32px] font-semibold leading-[1.05] tracking-[-0.015em] text-[#17181C] sm:text-[46px]">
-            Your intake organization partner — <span className="text-[#5E7268]">shaped around your firm.</span>
+            Screen the case, <span className="text-[#5E7268]">not the chaos.</span>
           </h1>
           <p className="mx-auto mb-5 max-w-[620px] text-[16px] leading-relaxed text-[#40433f] sm:text-[17px]">
-            A worker uploads scattered employment records. Your firm opens a clean, source-linked intake
-            file — with the worker's story, timeline, documents, and key dates organized from the records
-            provided, before your first call.
+            A worker arrives with their whole story already organized — texts, pay stubs, emails, key
+            dates — every fact linked back to the document behind it. Your firm opens a review-ready file
+            and screens it in minutes, instead of spending a week of intake building it.
           </p>
           <p className="mx-auto mb-8 max-w-[560px] text-[14px] font-medium leading-relaxed text-[#42574E]">
-            For intake review, you don't have to prompt a chatbot. You open the organized file.
+            Intake used to eat hours of your team's time per matter — much of it on matters you'll
+            ultimately pass on. one3seven moves that work off your clock: the worker assembles the file
+            themselves, before they ever reach you.
           </p>
           <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
             <a
