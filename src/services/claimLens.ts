@@ -21,6 +21,8 @@ export type ClaimLensInput = {
   events: Array<{ title: string; date?: string | null; category?: string | null; sourceFile?: string | null }>;
   quotes: Array<{ quote: string; fileName?: string | null; category?: string | null }>;
   intervals: Array<{ label: string; days: number; description: string }>;
+  /** Structured facts extracted from documents (label + value), e.g. "HR complaint topic". High signal. */
+  confirmed?: Array<{ label: string; value: string }>;
   workerContext: string;
   files: Array<{ fileName: string; category?: string | null }>;
 };
@@ -48,7 +50,9 @@ export const CLAIM_LENSES: LensDef[] = [
     elements: [
       {
         name: 'Protected activity — a disclosure or complaint',
-        patterns: p('complain', 'grievance', 'report(ed|ing)?', 'raised', 'disclos', 'whistle', 'safety', 'unsafe', 'hazard', '\\bhr\\b', 'human resources', 'wage', 'overtime', 'unpaid', 'refus', 'objected'),
+        // Requires the worker DOING something protected — not merely an HR document existing. Bare
+        // "hr"/"human resources" were removed; they matched handbooks and generic HR files.
+        patterns: p('complain', 'grievance', 'reported\\b', 'reporting', 'rais(e|ed|ing)\\b', 'disclos', 'whistle', 'safety concern', 'unsafe', 'hazard', 'unpaid (wage|overtime)', 'wage theft', 'refus', 'objected', 'protested'),
         absence: 'Nothing in the record identifies a protected activity — a complaint, report, or disclosure by the worker.',
       },
       {
@@ -141,13 +145,27 @@ function workerStatements(ctx: string): string[] {
     .slice(0, 40);
 }
 
-/** Collect every fact in the record, tagged with its source state. */
+// A "cluster" event is a category placeholder like "HR Documents (2 files)" — not a substantive
+// fact. These pollute element matching (a category name isn't a disclosure), so they're skipped.
+const isClusterEvent = (title: string): boolean => /\(\s*\d+\s*files?\s*\)/i.test(title);
+
+/**
+ * Collect the SUBSTANTIVE facts, tagged with source state. Deliberately leans on real content —
+ * extracted structured facts, verbatim quotes, dated events, worker verbatim — and NOT on raw file
+ * inventory or category placeholders, which only add noise (a handbook existing is not a complaint).
+ * The file inventory still powers the existence-check strip; it just doesn't get matched into elements.
+ */
 function collectFacts(input: ClaimLensInput): LensItem[] {
   const out: LensItem[] = [];
+  // Structured extracted facts carry their own label ("HR complaint topic — …") so the label itself
+  // drives element assignment. Highest signal; treat as document-derived.
+  for (const c of input.confirmed ?? []) {
+    if (!c.value?.trim()) continue;
+    out.push({ state: 'linked', text: `${c.label} — ${c.value}`, meta: 'extracted from documents' });
+  }
   for (const e of input.events) {
+    if (!e.title?.trim() || isClusterEvent(e.title)) continue;
     const meta = [e.date, e.sourceFile].filter(Boolean).join(' · ');
-    // Firm timeline events are record-grounded — 'linked' when a source file is known, otherwise
-    // 'named' (document on file), never silently 'worker-stated'.
     out.push({ state: e.sourceFile ? 'linked' : 'named', text: e.title, meta: meta || 'timeline event' });
   }
   for (const q of input.quotes) {
@@ -159,15 +177,13 @@ function collectFacts(input: ClaimLensInput): LensItem[] {
   for (const s of workerStatements(input.workerContext)) {
     out.push({ state: 'worker', text: s, meta: 'worker narrative' });
   }
-  for (const f of input.files) {
-    out.push({ state: 'named', text: f.fileName.replace(/_/g, ' ').replace(/\.[^.]+$/, ''), meta: f.category || 'on file' });
-  }
   return out;
 }
 
+// Match element assignment on the fact's TEXT only — never its category/meta. Matching on the
+// category ("HR Documents") is what pulled a handbook into "protected activity."
 function matchesElement(item: LensItem, el: ElementDef): boolean {
-  const hay = `${item.text} ${item.meta}`;
-  return el.patterns.some((re) => re.test(hay));
+  return el.patterns.some((re) => re.test(item.text));
 }
 
 export function buildClaimLensView(lensId: string, input: ClaimLensInput): ClaimLensView {

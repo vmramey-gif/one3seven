@@ -1266,6 +1266,17 @@ export function IntakeReviewScreen({
                     days: iv.days,
                     description: iv.description,
                   })),
+                  confirmed: (() => {
+                    const it = firmLiveView.intelligence;
+                    if (!it) return [];
+                    const c: Array<{ label: string; value: string }> = [];
+                    if (it.confirmedComplaintTopic) c.push({ label: 'HR complaint topic', value: it.confirmedComplaintTopic });
+                    if (it.confirmedComplaintDate) c.push({ label: 'Complaint date', value: it.confirmedComplaintDate });
+                    if (it.confirmedHrResponseSummary) c.push({ label: 'HR response', value: it.confirmedHrResponseSummary });
+                    if (it.confirmedWarningReason) c.push({ label: 'Written warning states', value: it.confirmedWarningReason });
+                    if (it.confirmedTerminationReason) c.push({ label: 'Termination states', value: it.confirmedTerminationReason });
+                    return c;
+                  })(),
                   workerContext: firmLiveView.workerProvidedContext ?? firmWorkerStoryDisplay ?? '',
                   files: (firmLiveView.files ?? []).map((f) => ({ fileName: f.file_name, category: f.category })),
                 }}

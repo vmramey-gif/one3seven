@@ -42,15 +42,34 @@ describe('buildClaimLensView', () => {
     expect(v.tally.total).toBe(0);
   });
 
-  it('never omits: a document that cuts against the theory still appears', () => {
+  it('never omits: a fact that cuts against the theory still appears', () => {
     const withCounter: ClaimLensInput = {
       ...rosa,
-      files: [...rosa.files, { fileName: 'Prior_Attendance_Writeup_Jan.pdf', category: 'Discipline' }],
+      events: [
+        ...rosa.events,
+        { title: 'Written warning for attendance predating the complaint', date: 'Jan 2026', category: 'Discipline', sourceFile: 'attendance_writeup.pdf' },
+      ],
     };
     const v = buildClaimLensView('retaliation', withCounter);
     const adv = v.elements.find((e) => /adverse/i.test(e.name));
-    // the earlier write-up (a discipline doc predating the complaint) is surfaced, not hidden
-    expect(adv?.items.some((i) => /attendance writeup/i.test(i.text))).toBe(true);
+    // the earlier write-up (predating the complaint — cuts against the theory) is surfaced, not hidden
+    expect(adv?.items.some((i) => /attendance/i.test(i.text))).toBe(true);
+  });
+
+  it('does not pull a handbook or generic HR file into protected activity (mis-sort fix)', () => {
+    const noisy: ClaimLensInput = {
+      events: [{ title: 'HR Documents (2 files)', date: '2023', category: 'HR Documents' }],
+      quotes: [],
+      intervals: [],
+      confirmed: [],
+      workerContext: '',
+      files: [{ fileName: 'Employee Handbook Revised 2023.pdf', category: 'HR Documents' }],
+    };
+    const v = buildClaimLensView('retaliation', noisy);
+    const prot = v.elements.find((e) => /protected activity/i.test(e.name));
+    // cluster event + handbook file must NOT count as a protected activity
+    expect(prot?.items ?? []).toHaveLength(0);
+    expect(prot?.empty).toBeTruthy();
   });
 
   it('re-sorts: the same record produces different element maps per lens', () => {
