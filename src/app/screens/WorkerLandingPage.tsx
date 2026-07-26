@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowRight, Check, ShieldCheck } from 'lucide-react';
 import { WordMark } from '../components/WordMark';
 import { useLang, LangToggle } from '../../i18n/i18n';
@@ -29,14 +29,6 @@ const STEP_KEYS = [
 
 const HERO_CHIP_KEYS = ['wl.hero.c1', 'wl.hero.c2', 'wl.hero.c3', 'wl.hero.c4'] as const;
 
-/** Slight tilt/offset per chip so the "before" state reads as a scattered pile, not a tidy list. */
-const HERO_CHIP_SKEW = [
-  { rotate: -3.5, y: 0 },
-  { rotate: 2.5, y: 3 },
-  { rotate: -2, y: -2 },
-  { rotate: 3, y: 2 },
-] as const;
-
 /** What the worker actually gets — stated as actions, not as a feature list. */
 const HERO_GET_KEYS = ['wl.hero.g1', 'wl.hero.g2', 'wl.hero.g3', 'wl.hero.g4'] as const;
 
@@ -49,21 +41,10 @@ const YOURS_KEYS = [
 
 export function WorkerLandingPage({ onStart, onSignIn, onBack, onForFirms }: WorkerLandingPageProps) {
   const { t } = useLang();
-  // The hero card "assembles" when it scrolls into view: scattered chips settle, the record
-  // panel rises in. Motion only — organizes-never-concludes holds (no sequencing/merit implied).
-  const cardRef = useRef<HTMLDivElement | null>(null);
-  const [assembled, setAssembled] = useState(false);
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) { setAssembled(true); return; }
-    const el = cardRef.current;
-    if (!el || !('IntersectionObserver' in window)) { setAssembled(true); return; }
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach((e) => { if (e.isIntersecting) { setAssembled(true); io.disconnect(); } });
-    }, { threshold: 0.3 });
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
+  // Hero card animates in when scrolled into view (framer-motion, in-view once): the "have"
+  // chips settle in a clean straight row, then the "get" panel rises. Motion only —
+  // organizes-never-concludes holds. Straight chips read as organized, not sloppy.
+  const reduce = useReducedMotion();
   return (
     <div style={BODY} className="min-h-screen o3s-warm-sky text-[#17181C] antialiased">
       {/* Nav */}
@@ -125,7 +106,7 @@ export function WorkerLandingPage({ onStart, onSignIn, onBack, onForFirms }: Wor
             {/* Hero illustration — scattered files becoming a dated, source-linked list.
                 Shows organization only: no case narrative, no sequencing, no merit or value. */}
             <div className="min-w-0">
-              <div ref={cardRef} className="rounded-[26px] border border-[#CBD6CF] bg-white p-6 shadow-[0_24px_60px_-26px_rgba(66,87,78,0.38)] sm:p-7">
+              <div className="rounded-[26px] border border-[#CBD6CF] bg-white p-6 shadow-[0_24px_60px_-26px_rgba(66,87,78,0.38)] sm:p-7">
                 <div style={MONO} className="text-[10px] uppercase tracking-[0.16em] text-[#8a938c]">
                   {t('wl.hero.card.tag')}
                 </div>
@@ -134,24 +115,24 @@ export function WorkerLandingPage({ onStart, onSignIn, onBack, onForFirms }: Wor
                 <div className="mt-4 text-[11px] font-semibold uppercase tracking-wide text-[#A8512B]">
                   {t('wl.hero.card.before')}
                 </div>
-                <div className="mt-2.5 flex flex-wrap gap-x-1.5 gap-y-1.5">
-                  {HERO_CHIP_KEYS.map((k, i) => {
-                    const s = HERO_CHIP_SKEW[i];
-                    // Scattered "before" → settles to its resting skew once the card is in view.
-                    const transform = assembled
-                      ? `rotate(${s.rotate}deg) translateY(${s.y}px)`
-                      : `rotate(${s.rotate * 2.4}deg) translate(${i % 2 ? 10 : -10}px, ${s.y - 10}px)`;
-                    return (
-                      <span
-                        key={k}
-                        style={{ transform, transitionDelay: `${i * 70}ms`, opacity: assembled ? 1 : 0 }}
-                        className="rounded-[10px] border border-[#EBD9CD] bg-[#FBF4EF] px-2.5 py-1 text-[11.5px] text-[#A8512B] shadow-[0_2px_6px_rgba(168,81,43,0.08)] transition-all duration-700 ease-out"
-                      >
-                        {t(k)}
-                      </span>
-                    );
-                  })}
-                </div>
+                <motion.div
+                  className="mt-2.5 flex flex-wrap gap-x-1.5 gap-y-1.5"
+                  initial={reduce ? false : 'hidden'}
+                  whileInView="show"
+                  viewport={{ once: true, amount: 0.4 }}
+                  variants={{ show: { transition: { staggerChildren: 0.07 } } }}
+                >
+                  {HERO_CHIP_KEYS.map((k) => (
+                    <motion.span
+                      key={k}
+                      variants={{ hidden: { opacity: 0, y: -6, scale: 0.96 }, show: { opacity: 1, y: 0, scale: 1 } }}
+                      transition={{ type: 'spring', stiffness: 420, damping: 28 }}
+                      className="rounded-[10px] border border-[#EBD9CD] bg-[#FBF4EF] px-2.5 py-1 text-[11.5px] text-[#A8512B] shadow-[0_2px_6px_rgba(168,81,43,0.08)]"
+                    >
+                      {t(k)}
+                    </motion.span>
+                  ))}
+                </motion.div>
                 <p className="mt-3 text-[11.5px] leading-relaxed text-[#8B7166]">{t('wl.hero.card.pain')}</p>
 
                 <div className="my-4 flex items-center gap-2">
@@ -167,9 +148,12 @@ export function WorkerLandingPage({ onStart, onSignIn, onBack, onForFirms }: Wor
                 </div>
                 {/* Contained, calm panel — the visual relief against the scattered pile above.
                     Stated as what the worker gets to DO, not as product features. */}
-                <div
-                  style={{ transitionDelay: '260ms', opacity: assembled ? 1 : 0, transform: assembled ? 'translateY(0)' : 'translateY(10px)' }}
-                  className="mt-2.5 flex flex-col gap-3 rounded-[16px] border border-[#CBD6CF] bg-[#F7F9F5] p-4 transition-all duration-700 ease-out"
+                <motion.div
+                  initial={reduce ? false : { opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.4 }}
+                  transition={{ delay: 0.22, type: 'spring', stiffness: 320, damping: 30 }}
+                  className="mt-2.5 flex flex-col gap-3 rounded-[16px] border border-[#CBD6CF] bg-[#F7F9F5] p-4"
                 >
                   {HERO_GET_KEYS.map((k) => {
                     const isFree = k === 'wl.hero.g4';
@@ -191,7 +175,7 @@ export function WorkerLandingPage({ onStart, onSignIn, onBack, onForFirms }: Wor
                       </div>
                     );
                   })}
-                </div>
+                </motion.div>
               </div>
             </div>
           </div>
