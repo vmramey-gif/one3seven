@@ -230,7 +230,11 @@ export function buildExistenceChecks(input: ClaimLensInput): ExistenceCheck[] {
   const fileCount = (re: RegExp) => input.files.filter((f) => re.test(f.fileName)).length;
 
   const wageCount = fileCount(/pay ?stub|paystub|wage|earnings/i);
-  const hasDates = has('employment dates', 'start date', 'offer', 'hire') || input.events.length > 0;
+  // "On file" requires actual date evidence — an offer letter or a stated start/hire date — NOT
+  // merely that some events exist (events can be undated, which is why the intake may still flag the
+  // start date as unconfirmed).
+  const hasDates = has('employment dates', 'start date', 'date of hire', 'offer letter', 'hire date') ||
+    fileCount(/offer[_\s-]?letter/i) > 0;
   const hasSeparation = has('terminat', 'separation', 'final pay') || fileCount(/terminat|separation/i) > 0;
 
   return [
