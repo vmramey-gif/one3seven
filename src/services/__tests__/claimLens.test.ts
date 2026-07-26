@@ -34,6 +34,18 @@ describe('buildClaimLensView', () => {
     expect(v.tally.total).toBeGreaterThan(0);
   });
 
+  it('computes Coverage Rate as a structural fact (elements with material / total)', () => {
+    const v = buildClaimLensView('retaliation', rosa);
+    // rosa has protected activity, adverse action, and the relating interval, but nothing on
+    // "what the worker understood/intended" → 3 of 4 elements have material.
+    expect(v.coverage.total).toBe(v.elements.length);
+    expect(v.coverage.withMaterial).toBe(v.elements.length - v.tally.gaps);
+    expect(v.coverage.pct).toBe(Math.round((v.coverage.withMaterial / v.coverage.total) * 100));
+    // an empty record is 0% coverage, never NaN
+    const empty = buildClaimLensView('feha', { events: [], quotes: [], intervals: [], workerContext: '', files: [] });
+    expect(empty.coverage.pct).toBe(0);
+  });
+
   it('renders a loud absence when an element has no material', () => {
     const empty: ClaimLensInput = { events: [], quotes: [], intervals: [], workerContext: '', files: [] };
     const v = buildClaimLensView('feha', empty);

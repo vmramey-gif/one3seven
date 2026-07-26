@@ -32,6 +32,10 @@ export type LensElementView = { name: string; note?: string; items: LensItem[]; 
 export type ClaimLensView = {
   title: string;
   tally: { total: number; linked: number; named: number; worker: number; counted: number; gaps: number };
+  // Coverage Rate: the share of this claim's elements that have ANY material on file.
+  // A structural fact about the RECORD (presence/absence), NOT a judgment of the case's merit.
+  // withMaterial = elements with at least one item; total = element count; pct = rounded %.
+  coverage: { withMaterial: number; total: number; pct: number };
   elements: LensElementView[];
 };
 
@@ -213,7 +217,15 @@ export function buildClaimLensView(lensId: string, input: ClaimLensInput): Claim
     return { name: el.name, note: el.note, items };
   });
 
-  return { title: lens.title, tally, elements };
+  const totalElements = elements.length;
+  const withMaterial = totalElements - tally.gaps;
+  const coverage = {
+    withMaterial,
+    total: totalElements,
+    pct: totalElements ? Math.round((withMaterial / totalElements) * 100) : 0,
+  };
+
+  return { title: lens.title, tally, coverage, elements };
 }
 
 /** The lens-independent case-killer strip. Pure existence facts — no legal judgment. */

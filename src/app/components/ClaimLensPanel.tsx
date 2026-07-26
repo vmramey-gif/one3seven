@@ -62,6 +62,12 @@ const CSS = `
 .clp .gapText{font-size:12.5px;line-height:1.5;margin-top:8px;max-width:62ch}
 .clp .foot{font-size:11px;color:#8FA495;line-height:1.5;background:#0e1512;border-top:1px solid #243029;padding:14px 22px}
 .clp .foot b{color:#8FD3A6;font-weight:500}
+.clp .cov{display:flex;align-items:center;gap:16px;margin:16px 0 2px;padding:15px 17px;border:1px solid #243029;border-radius:14px;background:#0f1713}
+.clp .cov .ck{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#8FA495;margin-bottom:5px}
+.clp .cov .big{font-family:'Fraunces',Georgia,serif;font-size:36px;line-height:.9;color:#8FD3A6;font-weight:600}
+.clp .cov .bar{height:7px;border-radius:999px;background:#1b2620;overflow:hidden;margin-bottom:8px}
+.clp .cov .bar i{display:block;height:100%;background:#8FD3A6;border-radius:999px;transition:width .5s ease}
+.clp .cov .sub{font-size:11.5px;line-height:1.45;color:#8FA495}
 `;
 
 export function ClaimLensPanel({ input }: { input: ClaimLensInput }) {
@@ -97,6 +103,20 @@ export function ClaimLensPanel({ input }: { input: ClaimLensInput }) {
 
         <div className="lensHead">
           <div className="lensTitle">{view.title} <em>— Elements &amp; Available Material</em></div>
+
+          <div className="cov">
+            <div>
+              <div className="ck">Element coverage</div>
+              <div className="big">{view.coverage.pct}%</div>
+            </div>
+            <div style={{ flex: 1 }}>
+              <div className="bar"><i style={{ width: `${view.coverage.pct}%` }} /></div>
+              <div className="sub">
+                {view.coverage.withMaterial} of {view.coverage.total} elements have material on file. A structural fact about the record — not an assessment of the case.
+              </div>
+            </div>
+          </div>
+
           <div className="tally">
             <span><b>{view.tally.total}</b> items</span>
             <span className="lk"><b>{view.tally.linked}</b> source-linked</span>
