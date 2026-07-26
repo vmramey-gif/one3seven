@@ -156,7 +156,7 @@ export const STRINGS: Dict = {
   'wl.eyebrow':      { en: 'For California workers',             es: 'Para trabajadores de California' },
   'wl.h1a':          { en: 'Wronged at work?',                   es: '¿Te trataron mal en el trabajo?' },
   'wl.h1b':          { en: 'Get your records in order.',         es: 'Pon tus documentos en orden.' },
-  'wl.belief':       { en: 'You were heard — not processed.',    es: 'Te escuchamos — no te procesamos.' },
+  'wl.belief':       { en: 'Your words first. The record follows.', es: 'Primero tus palabras. Después, el registro.' },
   'wl.lede':         { en: 'Fired unfairly, shorted on pay, or pushed out? Before you talk to a lawyer, one3seven helps you tell your story and organize your scattered records — texts, pay stubs, emails, photos — into one clear, dated file you can bring to any attorney you choose. Free, private, and yours to keep.',
                        es: '¿Te despidieron injustamente, te pagaron de menos o te forzaron a renunciar? Antes de hablar con un abogado, one3seven te ayuda a contar tu historia y a organizar tus documentos dispersos —mensajes, recibos de pago, correos, fotos— en un expediente claro y fechado que puedes llevar al abogado que tú elijas. Gratis, privado y tuyo para siempre.' },
   'wl.cta':          { en: 'Start organizing — free',            es: 'Empieza a organizar — gratis' },

@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react';
 import { ArrowRight, Check, ShieldCheck } from 'lucide-react';
 import { WordMark } from '../components/WordMark';
 import { useLang, LangToggle } from '../../i18n/i18n';
@@ -48,6 +49,21 @@ const YOURS_KEYS = [
 
 export function WorkerLandingPage({ onStart, onSignIn, onBack, onForFirms }: WorkerLandingPageProps) {
   const { t } = useLang();
+  // The hero card "assembles" when it scrolls into view: scattered chips settle, the record
+  // panel rises in. Motion only — organizes-never-concludes holds (no sequencing/merit implied).
+  const cardRef = useRef<HTMLDivElement | null>(null);
+  const [assembled, setAssembled] = useState(false);
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) { setAssembled(true); return; }
+    const el = cardRef.current;
+    if (!el || !('IntersectionObserver' in window)) { setAssembled(true); return; }
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => { if (e.isIntersecting) { setAssembled(true); io.disconnect(); } });
+    }, { threshold: 0.3 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
   return (
     <div style={BODY} className="min-h-screen o3s-warm-page text-[#17181C] antialiased">
       {/* Nav */}
@@ -72,8 +88,14 @@ export function WorkerLandingPage({ onStart, onSignIn, onBack, onForFirms }: Wor
 
       <div className="mx-auto max-w-5xl px-5 sm:px-8">
         {/* Hero */}
-        <section className="pb-8 pt-14 sm:pt-20">
-          <div className="grid items-center gap-10 md:grid-cols-[1.05fr_.95fr]">
+        <section className="relative pb-8 pt-14 sm:pt-20">
+          {/* Sunset glow — warm depth behind the hero, no interaction */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -top-6 right-[-12%] h-[340px] w-[340px] rounded-full sm:right-[-4%]"
+            style={{ background: 'radial-gradient(circle, rgba(233,169,78,0.28), rgba(233,169,78,0) 62%)' }}
+          />
+          <div className="relative grid items-center gap-10 md:grid-cols-[1.05fr_.95fr]">
             <div className="min-w-0">
           <div style={MONO} className="mb-4 text-[11px] uppercase tracking-[0.16em] text-[#42574E]">{t('wl.eyebrow')}</div>
           <h1 style={SERIF} className="mb-4 max-w-[15ch] text-balance text-[clamp(34px,7vw,58px)] font-semibold leading-[1.02] tracking-[-0.02em]">
@@ -103,7 +125,7 @@ export function WorkerLandingPage({ onStart, onSignIn, onBack, onForFirms }: Wor
             {/* Hero illustration — scattered files becoming a dated, source-linked list.
                 Shows organization only: no case narrative, no sequencing, no merit or value. */}
             <div className="min-w-0">
-              <div className="rounded-[26px] border border-[#CBD6CF] bg-white p-6 shadow-[0_24px_60px_-26px_rgba(66,87,78,0.38)] sm:p-7">
+              <div ref={cardRef} className="rounded-[26px] border border-[#CBD6CF] bg-white p-6 shadow-[0_24px_60px_-26px_rgba(66,87,78,0.38)] sm:p-7">
                 <div style={MONO} className="text-[10px] uppercase tracking-[0.16em] text-[#8a938c]">
                   {t('wl.hero.card.tag')}
                 </div>
@@ -113,15 +135,22 @@ export function WorkerLandingPage({ onStart, onSignIn, onBack, onForFirms }: Wor
                   {t('wl.hero.card.before')}
                 </div>
                 <div className="mt-2.5 flex flex-wrap gap-x-1.5 gap-y-1.5">
-                  {HERO_CHIP_KEYS.map((k, i) => (
-                    <span
-                      key={k}
-                      style={{ transform: `rotate(${HERO_CHIP_SKEW[i].rotate}deg) translateY(${HERO_CHIP_SKEW[i].y}px)` }}
-                      className="rounded-[10px] border border-[#EBD9CD] bg-[#FBF4EF] px-2.5 py-1 text-[11.5px] text-[#A8512B] shadow-[0_2px_6px_rgba(168,81,43,0.08)]"
-                    >
-                      {t(k)}
-                    </span>
-                  ))}
+                  {HERO_CHIP_KEYS.map((k, i) => {
+                    const s = HERO_CHIP_SKEW[i];
+                    // Scattered "before" → settles to its resting skew once the card is in view.
+                    const transform = assembled
+                      ? `rotate(${s.rotate}deg) translateY(${s.y}px)`
+                      : `rotate(${s.rotate * 2.4}deg) translate(${i % 2 ? 10 : -10}px, ${s.y - 10}px)`;
+                    return (
+                      <span
+                        key={k}
+                        style={{ transform, transitionDelay: `${i * 70}ms`, opacity: assembled ? 1 : 0 }}
+                        className="rounded-[10px] border border-[#EBD9CD] bg-[#FBF4EF] px-2.5 py-1 text-[11.5px] text-[#A8512B] shadow-[0_2px_6px_rgba(168,81,43,0.08)] transition-all duration-700 ease-out"
+                      >
+                        {t(k)}
+                      </span>
+                    );
+                  })}
                 </div>
                 <p className="mt-3 text-[11.5px] leading-relaxed text-[#8B7166]">{t('wl.hero.card.pain')}</p>
 
@@ -138,7 +167,10 @@ export function WorkerLandingPage({ onStart, onSignIn, onBack, onForFirms }: Wor
                 </div>
                 {/* Contained, calm panel — the visual relief against the scattered pile above.
                     Stated as what the worker gets to DO, not as product features. */}
-                <div className="mt-2.5 flex flex-col gap-3 rounded-[16px] border border-[#CBD6CF] bg-[#F7F9F5] p-4">
+                <div
+                  style={{ transitionDelay: '260ms', opacity: assembled ? 1 : 0, transform: assembled ? 'translateY(0)' : 'translateY(10px)' }}
+                  className="mt-2.5 flex flex-col gap-3 rounded-[16px] border border-[#CBD6CF] bg-[#F7F9F5] p-4 transition-all duration-700 ease-out"
+                >
                   {HERO_GET_KEYS.map((k) => {
                     const isFree = k === 'wl.hero.g4';
                     return (
@@ -274,14 +306,29 @@ export function WorkerLandingPage({ onStart, onSignIn, onBack, onForFirms }: Wor
           </div>
         </section>
 
-        {/* Final CTA */}
-        <section className="py-10 text-center">
-          <h2 style={SERIF} className="text-[clamp(24px,4vw,32px)] font-semibold tracking-[-0.01em]">{t('wl.final.h2')}</h2>
-          <p className="mx-auto mt-3 max-w-[52ch] text-[15.5px] leading-relaxed text-[#40433f]">{t('wl.final.sub')}</p>
-          <div className="mt-6 flex justify-center">
-            <button type="button" onClick={onStart} className="inline-flex w-full max-w-sm items-center justify-center gap-2 rounded-full bg-[var(--o3s-action)] px-7 py-3.5 text-[16px] font-semibold text-white shadow-[0_14px_30px_-12px_rgba(181,83,31,0.55)] transition hover:-translate-y-0.5 hover:brightness-95 sm:w-auto">
-              {t('wl.cta')} <ArrowRight className="h-4 w-4" />
-            </button>
+        {/* Final CTA — the "sunset completion" band: warm-to-deep-green, inverted text,
+            echoing the worker intake's light→dark arc. Amber glow for warmth. */}
+        <section className="py-10">
+          <div
+            className="relative overflow-hidden rounded-[28px] px-6 py-14 text-center sm:px-10"
+            style={{ background: 'linear-gradient(180deg,#5E7268 0%,#354A3D 55%,#1E2C25 100%)' }}
+          >
+            <div
+              aria-hidden
+              className="pointer-events-none absolute left-1/2 top-[-32%] h-[420px] w-[420px] -translate-x-1/2 rounded-full"
+              style={{ background: 'radial-gradient(circle, rgba(233,169,78,0.26), rgba(233,169,78,0) 62%)' }}
+            />
+            <div className="relative">
+              <h2 style={SERIF} className="mx-auto max-w-[16ch] text-balance text-[clamp(26px,5vw,36px)] font-semibold tracking-[-0.02em] text-white">
+                {t('wl.final.h2')}
+              </h2>
+              <p className="mx-auto mt-3 max-w-[46ch] text-[15px] leading-relaxed text-[#D8E0CF]">{t('wl.final.sub')}</p>
+              <div className="mt-7 flex justify-center">
+                <button type="button" onClick={onStart} className="inline-flex w-full max-w-sm items-center justify-center gap-2 rounded-full bg-[var(--o3s-action)] px-7 py-3.5 text-[16px] font-semibold text-white shadow-[0_14px_34px_-10px_rgba(0,0,0,0.5)] transition hover:-translate-y-0.5 hover:brightness-105 sm:w-auto">
+                  {t('wl.cta')} <ArrowRight className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
           </div>
         </section>
       </div>
