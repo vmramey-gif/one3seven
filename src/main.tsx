@@ -8,6 +8,7 @@ import { DemoApp } from './app/screens/DemoApp.tsx';
 import { WorkerDemoPage } from './app/screens/WorkerDemoPage.tsx';
 import { FireWorkerDemoPage } from './app/screens/FireWorkerDemoPage.tsx';
 import { CaseFactsDemoPage } from './app/screens/CaseFactsDemoPage.tsx';
+import { ClaimLensDemoPage } from './app/screens/ClaimLensDemoPage.tsx';
 import { TexasCriminalDemoPage } from './app/screens/TexasCriminalDemoPage.tsx';
 import { FounderHQ } from './app/screens/FounderHQ.tsx';
 import { CompanyDemoGuide } from './app/screens/CompanyDemoGuide.tsx';
@@ -62,6 +63,10 @@ const isFireDemo =
 const isCaseDemo =
   url.searchParams.has('case-demo') ||
   url.pathname === '/case-demo';
+
+const isClaimLensDemo =
+  url.searchParams.has('claim-lens-demo') ||
+  url.pathname === '/claim-lens-demo';
 
 const isTxDemo =
   url.searchParams.has('tx-demo') ||
@@ -118,6 +123,7 @@ const routeTitle =
   : isHQ ? 'Founder HQ — one3seven'
   : isFireDemo ? 'Fire Demo — one3seven'
   : isCaseDemo ? 'Case Facts, Assembled — one3seven'
+  : isClaimLensDemo ? 'Claim Lens — one3seven'
   : isTxDemo ? 'Texas Demo — one3seven'
   : isWorkerDemo ? 'Worker Demo — one3seven'
   : isDemo ? 'Sample Intake Demo — one3seven'
@@ -150,6 +156,10 @@ if (url.pathname === '/terms') {
 } else if (isCaseDemo) {
   createRoot(rootEl).render(
     <AppErrorBoundary><CaseFactsDemoPage /></AppErrorBoundary>
+  );
+} else if (isClaimLensDemo) {
+  createRoot(rootEl).render(
+    <AppErrorBoundary><ClaimLensDemoPage /></AppErrorBoundary>
   );
 } else if (isTxDemo) {
   createRoot(rootEl).render(
