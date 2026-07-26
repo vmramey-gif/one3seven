@@ -141,6 +141,49 @@ export function ForFirmsPage({ onBack, onStartWorker }: ForFirmsPageProps) {
         </div>
       </section>
 
+      {/* What your firm gets — capabilities framed as record-organization (never scoring/conclusions).
+          Pulled up directly under the product preview (Clio-style "sell it up front").
+          Counsel-gate: the Claim Lens + Coverage Rate naming should get a counsel glance before go-live. */}
+      <section className="px-5 pb-4 pt-8 sm:px-8">
+        <div className="mx-auto max-w-5xl">
+          <div style={MONO} className="mb-3 text-[11px] uppercase tracking-[0.16em] text-[#42574E]">What your firm gets</div>
+          <h2 style={SERIF} className="mb-8 max-w-[22ch] text-[clamp(24px,4vw,34px)] font-semibold tracking-[-0.015em] text-[#17181C]">
+            Read the record faster — <span className="text-[#5E7268]">without reading everything.</span>
+          </h2>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div className="rounded-[20px] border border-[#CBD6CF] bg-[#FBFBFA] p-6">
+              <div style={MONO} className="mb-2 text-[10.5px] uppercase tracking-[0.14em] text-[#5B21B6]">Claim Lens</div>
+              <h3 style={SERIF} className="mb-2 text-[19px] font-semibold text-[#17181C]">The record, re-sorted by the elements.</h3>
+              <p className="text-[14px] leading-relaxed text-[#40433f]">
+                Pick a claim theory and the intake re-sorts around that claim's statutory elements — showing
+                what's on file for each, and, loudly, what isn't. It organizes; it never concludes.
+              </p>
+            </div>
+            <div className="rounded-[20px] border border-[#CBD6CF] bg-[#FBFBFA] p-6">
+              <div style={MONO} className="mb-2 text-[10.5px] uppercase tracking-[0.14em] text-[#42574E]">Coverage Rate</div>
+              <h3 style={SERIF} className="mb-2 text-[19px] font-semibold text-[#17181C]">One number: what's on file.</h3>
+              <p className="text-[14px] leading-relaxed text-[#40433f]">
+                The share of a claim's elements with material on file. A structural fact about the record —
+                never a verdict on the case. The number a drafting tool can't compute, because it can't see
+                what's missing.
+              </p>
+            </div>
+            <div className="rounded-[20px] border border-[#CBD6CF] bg-[#FBFBFA] p-6">
+              <div style={MONO} className="mb-2 text-[10.5px] uppercase tracking-[0.14em] text-[#42574E]">Source-linked</div>
+              <h3 style={SERIF} className="mb-2 text-[19px] font-semibold text-[#17181C]">Every fact opens its page.</h3>
+              <p className="text-[14px] leading-relaxed text-[#40433f]">
+                Each item links back to the exact document and page it came from. Verify in a click —
+                nothing to take on faith, nothing to un-hallucinate.
+              </p>
+            </div>
+          </div>
+          <p className="mt-4 max-w-[70ch] text-[12px] leading-relaxed text-[#6a6d66]">
+            Illustrative of how one3seven organizes a record. one3seven draws no conclusions, scores no
+            cases, and recommends no outcomes. Attorneys independently evaluate everything.
+          </p>
+        </div>
+      </section>
+
       {/* The change is here — why now (firm-page only; kept off the homepage) */}
       <section className="px-5 pb-4 pt-2 sm:px-8">
         <div className="mx-auto max-w-3xl">
@@ -190,48 +233,6 @@ export function ForFirmsPage({ onBack, onStartWorker }: ForFirmsPageProps) {
               <span key={tt} className="rounded-full border border-[#CBD6CF] px-3 py-1.5 text-[12px] font-medium text-[#42574E]">{tt}</span>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* What your firm gets — capabilities framed as record-organization (never scoring/conclusions).
-          Counsel-gate: the Claim Lens + Coverage Rate naming should get a counsel glance before go-live. */}
-      <section className="px-5 py-14 sm:px-8">
-        <div className="mx-auto max-w-5xl">
-          <div style={MONO} className="mb-3 text-[11px] uppercase tracking-[0.16em] text-[#42574E]">What your firm gets</div>
-          <h2 style={SERIF} className="mb-8 max-w-[22ch] text-[clamp(24px,4vw,34px)] font-semibold tracking-[-0.015em] text-[#17181C]">
-            Read the record faster — <span className="text-[#5E7268]">without reading everything.</span>
-          </h2>
-          <div className="grid gap-4 sm:grid-cols-3">
-            <div className="rounded-[20px] border border-[#CBD6CF] bg-[#FBFBFA] p-6">
-              <div style={MONO} className="mb-2 text-[10.5px] uppercase tracking-[0.14em] text-[#5B21B6]">Claim Lens</div>
-              <h3 style={SERIF} className="mb-2 text-[19px] font-semibold text-[#17181C]">The record, re-sorted by the elements.</h3>
-              <p className="text-[14px] leading-relaxed text-[#40433f]">
-                Pick a claim theory and the intake re-sorts around that claim's statutory elements — showing
-                what's on file for each, and, loudly, what isn't. It organizes; it never concludes.
-              </p>
-            </div>
-            <div className="rounded-[20px] border border-[#CBD6CF] bg-[#FBFBFA] p-6">
-              <div style={MONO} className="mb-2 text-[10.5px] uppercase tracking-[0.14em] text-[#42574E]">Coverage Rate</div>
-              <h3 style={SERIF} className="mb-2 text-[19px] font-semibold text-[#17181C]">One number: what's on file.</h3>
-              <p className="text-[14px] leading-relaxed text-[#40433f]">
-                The share of a claim's elements with material on file. A structural fact about the record —
-                never a verdict on the case. The number a drafting tool can't compute, because it can't see
-                what's missing.
-              </p>
-            </div>
-            <div className="rounded-[20px] border border-[#CBD6CF] bg-[#FBFBFA] p-6">
-              <div style={MONO} className="mb-2 text-[10.5px] uppercase tracking-[0.14em] text-[#42574E]">Source-linked</div>
-              <h3 style={SERIF} className="mb-2 text-[19px] font-semibold text-[#17181C]">Every fact opens its page.</h3>
-              <p className="text-[14px] leading-relaxed text-[#40433f]">
-                Each item links back to the exact document and page it came from. Verify in a click —
-                nothing to take on faith, nothing to un-hallucinate.
-              </p>
-            </div>
-          </div>
-          <p className="mt-4 max-w-[70ch] text-[12px] leading-relaxed text-[#6a6d66]">
-            Illustrative of how one3seven organizes a record. one3seven draws no conclusions, scores no
-            cases, and recommends no outcomes. Attorneys independently evaluate everything.
-          </p>
         </div>
       </section>
 
