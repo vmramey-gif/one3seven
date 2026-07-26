@@ -98,6 +98,49 @@ export function ForFirmsPage({ onBack, onStartWorker }: ForFirmsPageProps) {
         </div>
       </section>
 
+      {/* Product preview — sell it up front (Clio-style): show the Claim Lens + Coverage Rate as a
+          dark "screenshot" card against the light page. Illustrative; counsel-gate before go-live. */}
+      <section className="px-5 pb-6 pt-2 sm:px-8">
+        <div className="mx-auto max-w-3xl">
+          <div className="overflow-hidden rounded-[22px] border border-[#243029] bg-[#0e1512] p-6 shadow-[0_34px_80px_-34px_rgba(20,45,32,0.55)] sm:p-7" style={{ color: '#ECF3ED' }}>
+            <div className="flex items-center justify-between">
+              <div style={MONO} className="text-[10px] uppercase tracking-[0.16em] text-[#8FA495]">one3seven · firm workspace</div>
+              <div style={MONO} className="rounded-full border border-[#243029] px-2.5 py-1 text-[9px] uppercase tracking-[0.12em] text-[#8FA495]">Illustrative</div>
+            </div>
+            <div className="mt-4 flex flex-wrap items-baseline gap-x-2">
+              <span style={SERIF} className="text-[20px] font-semibold">Retaliation</span>
+              <span className="text-[13px] text-[#8FA495]">— elements &amp; available material</span>
+            </div>
+
+            <div className="mt-4 flex items-center gap-4 rounded-[14px] border border-[#243029] bg-[#131c17] p-4">
+              <div className="flex-none">
+                <div style={MONO} className="text-[9.5px] uppercase tracking-[0.14em] text-[#8FA495]">Element coverage</div>
+                <div style={SERIF} className="text-[36px] font-semibold leading-none text-[#8FD3A6]">75%</div>
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="h-[7px] overflow-hidden rounded-full bg-[#1b2620]"><div className="h-full rounded-full bg-[#8FD3A6]" style={{ width: '75%' }} /></div>
+                <div className="mt-2 text-[11.5px] leading-snug text-[#8FA495]">3 of 4 elements have material on file. A structural fact about the record — not a verdict on the case.</div>
+              </div>
+            </div>
+
+            <div className="mt-4 border-t border-[#243029] pt-3">
+              <div className="flex items-start gap-3 py-1.5">
+                <span style={{ ...MONO, background: 'rgba(124,92,255,0.15)', borderColor: 'rgba(167,139,250,0.4)', color: '#A78BFA' }} className="flex-none rounded-md border px-2 py-1 text-[9.5px]">Source-linked »</span>
+                <div className="min-w-0">
+                  <div className="text-[13.5px] leading-snug">Written complaint to HR about unpaid overtime.</div>
+                  <div style={MONO} className="mt-0.5 text-[10px] text-[#61756A]">Rosa_HR_Complaint.pdf · p.1</div>
+                </div>
+              </div>
+              <div className="mt-2 rounded-[12px] border px-4 py-3" style={{ borderColor: 'rgba(224,123,62,0.45)', background: 'rgba(224,123,62,0.08)' }}>
+                <div style={MONO} className="text-[10px] uppercase tracking-[0.1em] text-[#F3A268]">No material on file for this element</div>
+                <div className="mt-1.5 text-[12.5px] leading-snug text-[#d7b7a4]">Nothing in the record speaks to the timing between the complaint and the action.</div>
+              </div>
+            </div>
+          </div>
+          <p className="mt-3 text-center text-[11.5px] text-[#6a6d66]">A live view from the firm workspace. Illustrative — one3seven organizes and reflects; it draws no conclusions.</p>
+        </div>
+      </section>
+
       {/* The change is here — why now (firm-page only; kept off the homepage) */}
       <section className="px-5 pb-4 pt-2 sm:px-8">
         <div className="mx-auto max-w-3xl">
