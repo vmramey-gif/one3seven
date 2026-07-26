@@ -308,8 +308,8 @@
     background-image:
       radial-gradient(900px 500px at 88% -8%, #F4EEDF, transparent 60%),
       linear-gradient(180deg,
-        #FDFAF4 0%, #FBF7EF 36%, #F6F0E3 62%, #EEE6D5 78%, #E0D7C4 84%,
-        #B4C3A8 89%, #6C866C 93%, #3B5444 97%, #1E2C25 100%);
+        #FDFAF4 0%, #F7F1E5 26%, #ECEBD9 44%, #DCE3CC 58%, #C6D4B8 70%,
+        #A5BE9E 80%, #6E8B6D 89%, #3E5747 96%, #1E2C25 100%);
     background-color: #FBF7EF;
     background-attachment: scroll;
   }

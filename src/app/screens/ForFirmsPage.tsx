@@ -154,9 +154,9 @@ export function ForFirmsPage({ onBack, onStartWorker }: ForFirmsPageProps) {
       <section className="px-5 py-16 sm:px-8 sm:py-20">
         <div className="mx-auto max-w-5xl">
           <div className="mb-10 text-center">
-            <div style={MONO} className="mb-3 text-[11px] uppercase tracking-[0.16em] text-[#42574E]">How it arrives</div>
+            <div style={MONO} className="mb-3 text-[11px] uppercase tracking-[0.16em] text-[#42574E]">What lands on your desk</div>
             <h2 style={SERIF} className="text-[26px] font-semibold tracking-[-0.01em] text-[#17181C] sm:text-[32px]">
-              You see the mechanism, not a feature list.
+              Nothing to assemble. You open the file and screen it.
             </h2>
           </div>
 
