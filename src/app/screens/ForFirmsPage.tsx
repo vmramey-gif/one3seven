@@ -43,9 +43,9 @@ export function ForFirmsPage({ onBack, onStartWorker }: ForFirmsPageProps) {
     'w-full rounded-xl border border-[#D3DED6] bg-white px-4 py-3 text-sm text-[#17181C] placeholder:text-[#9aa39b] focus:border-[#42574E] focus:outline-none focus:ring-4 focus:ring-[#42574E]/15';
 
   return (
-    <div style={BODY} className="min-h-screen bg-[#F1F3EF] text-[#17181C] antialiased">
+    <div style={BODY} className="min-h-screen o3s-warm-sky text-[#17181C] antialiased">
       {/* Nav */}
-      <nav className="sticky top-0 z-50 border-b border-[#E1E4DD] bg-[#F1F3EF]/90 backdrop-blur-sm">
+      <nav className="sticky top-0 z-50 border-b border-[#E1E4DD] bg-[#FBF7EF]/85 backdrop-blur-sm">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-5 sm:h-16 sm:px-8">
           <button type="button" onClick={onBack} style={SERIF} className="text-[19px] font-semibold tracking-[-0.01em] text-[#17181C] transition hover:opacity-70">
             <WordMark />
@@ -306,23 +306,23 @@ export function ForFirmsPage({ onBack, onStartWorker }: ForFirmsPageProps) {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-[#E1E4DD] px-5 py-8 sm:px-8">
+      {/* Footer — rests in the ripened deep-green bottom; light-inverted for readability. */}
+      <footer className="border-t border-white/10 px-5 pb-12 pt-9 sm:px-8">
         <div className="mx-auto flex max-w-6xl flex-col items-center gap-2 text-center">
-          <button type="button" onClick={onBack} className="inline-flex items-center gap-1.5 text-sm font-medium text-[#42574E] transition hover:text-[#2c332e]">
+          <button type="button" onClick={onBack} className="inline-flex items-center gap-1.5 text-sm font-medium text-[#CBD8C4] transition hover:text-white">
             <ArrowLeft className="h-3.5 w-3.5" /> Back to one3seven
           </button>
-          <p className="text-[12px] text-[#6a6d66]">
-            Contact: <a href="mailto:info@one3seven.com" className="font-semibold text-[#42574E] hover:underline">info@one3seven.com</a>
+          <p className="text-[12px] text-[#9DB097]">
+            Contact: <a href="mailto:info@one3seven.com" className="font-semibold text-[#CBD8C4] hover:underline">info@one3seven.com</a>
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[12px] text-[#6a6d66]">
-            <a href="/terms" className="font-medium text-[#42574E] hover:underline">Terms</a>
-            <span aria-hidden className="text-[#c3c7bd]">·</span>
-            <a href="/privacy" className="font-medium text-[#42574E] hover:underline">Privacy</a>
-            <span aria-hidden className="text-[#c3c7bd]">·</span>
-            <a href="/privacy#california-privacy-rights" className="font-medium text-[#42574E] hover:underline">Your Privacy Choices</a>
+          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[12px] text-[#9DB097]">
+            <a href="/terms" className="font-medium text-[#CBD8C4] hover:underline">Terms</a>
+            <span aria-hidden className="text-white/25">·</span>
+            <a href="/privacy" className="font-medium text-[#CBD8C4] hover:underline">Privacy</a>
+            <span aria-hidden className="text-white/25">·</span>
+            <a href="/privacy#california-privacy-rights" className="font-medium text-[#CBD8C4] hover:underline">Your Privacy Choices</a>
           </div>
-          <p className="max-w-[640px] text-[11px] leading-relaxed text-[#6a6d66]">
+          <p className="max-w-[640px] text-[11px] leading-relaxed text-[#9DB097]">
             one3seven is not a law firm and does not provide legal advice. one3seven is not a lawyer referral
             service and does not recommend, rank, or select attorneys for workers. It organizes records and
             surfaces information for review preparation. Attorneys independently evaluate all information.
