@@ -290,6 +290,24 @@ export function WorkerLandingPage({ onStart, onSignIn, onBack, onForFirms }: Wor
           </div>
         </section>
 
+        {/* Yours, start to finish — the ownership/journey formula. Worker surface: NO metrics,
+            no merit, no scoring. Just the ownership flip stated plainly. */}
+        <section className="py-14">
+          <div className="rounded-[24px] border border-[#CBD6CF] bg-white/70 p-8 sm:p-10">
+            <div style={MONO} className="mb-3 text-[11px] uppercase tracking-[0.16em] text-[#42574E]">{t('wl.own.eyebrow')}</div>
+            <h2 style={SERIF} className="mb-3 max-w-[24ch] text-[clamp(24px,4vw,32px)] font-semibold tracking-[-0.015em] text-[#17181C]">{t('wl.own.h')}</h2>
+            <p className="mb-6 max-w-[58ch] text-[16px] leading-[1.65] text-[#40433f]">{t('wl.own.body')}</p>
+            <div className="flex flex-wrap gap-x-6 gap-y-3">
+              {['wl.own.s1', 'wl.own.s2', 'wl.own.s3'].map((k, i) => (
+                <div key={k} className="flex items-center gap-2.5">
+                  <span className="flex h-7 w-7 flex-none items-center justify-center rounded-full bg-[#42574E] text-[12px] font-bold text-white">{i + 1}</span>
+                  <span className="text-[15px] font-semibold text-[#20242a]">{t(k)}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* Final CTA — sits directly in the page's ripened deep-green bottom (the "sunset
             completion"), inverted text, amber glow for warmth. No card: the page IS the band. */}
         <section className="relative py-20 text-center">
