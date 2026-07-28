@@ -110,6 +110,16 @@ describe('buildClaimLensView', () => {
     expect(paga.coverage.total).toBe(paga.elements.length);
     expect(warn.coverage.total).toBe(warn.elements.length);
   });
+
+  it('Tier 2 wave 1: leave cluster + pay equity + records lenses build distinctly', () => {
+    const ids = ['cfra', 'fmla', 'pdl', 'lactation', 'sick_leave', 'other_leave', 'equal_pay', 'records_requests', 'wage_theft_notice'];
+    const titles = ids.map((id) => buildClaimLensView(id, rosa).title);
+    expect(new Set(titles).size).toBe(9);
+    for (const id of ids) {
+      const v = buildClaimLensView(id, rosa);
+      expect(v.coverage.total).toBe(v.elements.length);
+    }
+  });
 });
 
 describe('buildExistenceChecks (Layer 0 flag row)', () => {
