@@ -94,8 +94,13 @@ export const CLAIM_LENSES: LensDef[] = [
         patterns: p('harass', 'discriminat', 'accommodat', '\\brace\\b', '\\bsex\\b', 'gender', '\\bage\\b', 'disab', 'religio', 'national origin', 'hostile'),
         absence: 'Nothing describes a complaint about harassment, discrimination, or accommodation.' },
       { name: 'Reports and complaints made, and in what words',
-        patterns: p('complain', 'reported\\b', 'grievance', 'rais(e|ed|ing)\\b', 'objected', 'told (hr|human resources)', 'wrote to'),
-        absence: 'Nothing in the record identifies a complaint by the worker.' },
+        // Scoped to the FEHA subject: a wage/hour or safety complaint is not a §12940(h) report.
+        // Require a protected-characteristic term near the report verb so the lens actually filters.
+        patterns: p(
+          '(harass|discriminat|accommodat|hostile|\\brace\\b|\\bsex\\b|gender|\\bage\\b|disab|religio|national origin|retaliat)[\\s\\S]{0,60}(complain|report|grievance|objected|told (hr|human resources)|wrote to)',
+          '(complain|report|grievance|objected|told (hr|human resources)|wrote to)[\\s\\S]{0,60}(harass|discriminat|accommodat|hostile|\\brace\\b|\\bsex\\b|gender|\\bage\\b|disab|religio|national origin|retaliat)'
+        ),
+        absence: 'Nothing in the record identifies a FEHA-related complaint by the worker.' },
       { name: 'Internal HR / EEO channel used',
         patterns: p('hr complaint', 'human resources', '\\beeo\\b', 'ethics (line|hotline)', 'reported to', 'filed (a|an) (complaint|grievance)'),
         absence: 'Nothing identifies the internal channel the worker used.' },
@@ -197,8 +202,12 @@ export const CLAIM_LENSES: LensDef[] = [
         patterns: p('coworker', 'supervisor', 'manager', 'witness', 'in front of', 'others (saw|heard|present)'),
         absence: 'No participants or witnesses are identified.' },
       { name: 'Reports made, and to whom',
-        patterns: p('complain', 'reported\\b', 'told (hr|human resources|my (manager|supervisor))', 'grievance'),
-        absence: 'No report of the conduct appears in the record.' },
+        // Scoped to the harassing conduct: a wage/hour complaint is not a report of harassment.
+        patterns: p(
+          '(harass|hostile|slur|inappropriate|comment|remark|touch|conduct)[\\s\\S]{0,60}(complain|report|grievance|told (hr|human resources|my (manager|supervisor)))',
+          '(complain|report|grievance|told (hr|human resources|my (manager|supervisor)))[\\s\\S]{0,60}(harass|hostile|slur|inappropriate|comment|remark|touch|conduct)'
+        ),
+        absence: 'No report of the harassing conduct appears in the record.' },
       { name: 'Employer’s response after each report',
         patterns: p('responded', 'investigat', 'did nothing', 'no (action|response)', 'ignored', 'looking into'),
         absence: 'Nothing addresses the employer’s response.' },

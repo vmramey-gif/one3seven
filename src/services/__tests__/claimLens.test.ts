@@ -87,6 +87,20 @@ describe('buildClaimLensView', () => {
     expect(ret.elements.map((e) => e.name)).not.toEqual(wage.elements.map((e) => e.name));
   });
 
+  it('scopes report elements to the lens subject — a wage complaint is not a FEHA harassment report', () => {
+    // rosa's complaint is about unpaid overtime: a §1102.5 report, NOT a harassment report.
+    // The lens must actually filter — the same record produces different item sets per theory.
+    const ret = buildClaimLensView('retaliation_1102_5', rosa);
+    const harass = buildClaimLensView('feha_harassment', rosa);
+
+    const retReports = ret.elements.find((e) => REPORTS.test(e.name));
+    expect(retReports?.items.length).toBeGreaterThan(0); // wage complaint IS a §1102.5 report
+
+    const harassReports = harass.elements.find((e) => /reports made/i.test(e.name));
+    expect(harassReports?.items ?? []).toHaveLength(0); // ...but NOT a harassment report → absence
+    expect(harassReports?.empty).toBeTruthy();
+  });
+
   it('keeps the retaliation statutes separate (no single merged retaliation lens)', () => {
     const ids = ['retaliation_1102_5', 'feha_retaliation', 'lc_98_6', 'lc_6310'];
     const titles = ids.map((id) => buildClaimLensView(id, rosa).title);
