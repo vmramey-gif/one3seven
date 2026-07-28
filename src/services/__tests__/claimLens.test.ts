@@ -92,6 +92,17 @@ describe('buildClaimLensView', () => {
     const titles = ids.map((id) => buildClaimLensView(id, rosa).title);
     expect(new Set(titles).size).toBe(4);
   });
+
+  it('PAGA + CalWARN build as distinct aggregate lenses', () => {
+    const paga = buildClaimLensView('paga', rosa);
+    const warn = buildClaimLensView('calwarn', rosa);
+    expect(paga.title).toMatch(/PAGA/);
+    expect(warn.title).toMatch(/CalWARN/);
+    // PAGA surfaces this worker's own violation material by section (rosa has overtime/wage material)
+    expect(paga.elements.find((e) => /by Labor Code section/i.test(e.name))?.items.length).toBeGreaterThan(0);
+    expect(paga.coverage.total).toBe(paga.elements.length);
+    expect(warn.coverage.total).toBe(warn.elements.length);
+  });
 });
 
 describe('buildExistenceChecks (Layer 0 flag row)', () => {

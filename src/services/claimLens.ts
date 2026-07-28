@@ -326,6 +326,56 @@ export const CLAIM_LENSES: LensDef[] = [
         absence: 'Nothing addresses the timing between the conditions and the resignation.' },
     ],
   },
+  {
+    id: 'paga',
+    tab: 'PAGA',
+    title: 'PAGA — Aggregate Coverage',
+    // Structurally different: aggregate, not single-worker. This single-intake v1 surfaces THIS
+    // worker's violation material by section + whether any workforce-wide material is on file. True
+    // cross-worker aggregate coverage ("nothing on file for anyone else at this facility") needs
+    // multi-intake data — a later slice.
+    elements: [
+      { name: 'This worker’s own violation material, by Labor Code section',
+        patterns: p('wage statement', 'pay ?stub', '\\b226\\b', '\\bmeal', 'rest (period|break)', 'overtime', '\\b510\\b', 'reimburs', '\\b2802\\b', 'final pay', 'waiting time', 'minimum wage', 'off the clock'),
+        absence: 'No Labor Code violation material for this worker appears in the record.' },
+      { name: 'Workforce-wide material',
+        patterns: p('other (employee|worker)s?', 'all (employees|staff|workers)', 'everyone', 'company (policy|wide)', 'same (policy|practice)', 'facility', 'across the'),
+        absence: 'No material applying to other workers or the workforce as a whole appears in the record.' },
+      { name: 'LWDA notice — submission, date, sections, 65-day status',
+        patterns: p('\\blwda\\b', 'paga notice', '65[- ]day', 'letter of intent'),
+        absence: 'No LWDA/PAGA notice appears in the record.' },
+      { name: 'Cure-eligible items',
+        patterns: p('\\bcure\\b', 'wage statement', '\\b226\\b', '2810.5', 'notice at hire'),
+        absence: 'No material addresses cure-eligible categories.' },
+      { name: 'Pay periods documented, per worker',
+        patterns: p('pay period', 'pay ?stub', 'wage statement', 'bi[- ]?weekly', 'semi[- ]?monthly'),
+        absence: 'No pay-period span is documented in the record.' },
+    ],
+  },
+  {
+    id: 'calwarn',
+    tab: 'CalWARN',
+    title: 'CalWARN — Mass Layoff / Facility Closure',
+    // Serves the fire-displaced surge: a 50-worker flood is a CalWARN fact pattern before it is 50
+    // individual claims. Single-intake v1; cross-worker separation-date aggregation is a later slice.
+    elements: [
+      { name: 'Facility and address',
+        patterns: p('facility', 'plant\\b', 'warehouse', 'location', 'address', 'site\\b', 'branch'),
+        absence: 'No facility or address material appears in the record.' },
+      { name: 'Headcount material',
+        patterns: p('employees', 'headcount', 'staff of', 'workers (were|at)', '\\d{2,}\\s+(employees|workers)'),
+        absence: 'No headcount material appears in the record.' },
+      { name: 'Separation dates across workers',
+        patterns: p('laid off', 'layoff', 'let go', 'terminat', 'separation', 'same (day|date)', 'all (on|let go)', '\\bmass\\b', 'reduction in force'),
+        absence: 'No separation-date material across workers appears in the record.' },
+      { name: 'Notice received — date, form, content — or its absence',
+        patterns: p('60[- ]?day', 'warn notice', 'notice (received|given)', 'advance notice', 'no notice', 'without (notice|warning)'),
+        absence: 'No layoff-notice material appears in the record.' },
+      { name: 'Relocation or cessation material',
+        patterns: p('closing', 'closure', 'shut(ting)? down', 'relocat', 'moving', 'ceased', 'went out of business'),
+        absence: 'No relocation or cessation material appears in the record.' },
+    ],
+  },
 ];
 
 const norm = (s: string): string => s.replace(/\s+/g, ' ').trim().toLowerCase();
