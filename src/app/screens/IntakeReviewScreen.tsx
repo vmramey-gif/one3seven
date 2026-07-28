@@ -1275,11 +1275,20 @@ export function IntakeReviewScreen({
             {useConnectedFirmLayout && firmLiveView ? (
               <ClaimLensPanel
                 input={{
-                  events: (firmLiveView.events ?? []).map((e) => ({
-                    title: polishTimelineEventTitle(e.title),
-                    date: e.event_date,
-                    category: e.category,
-                  })),
+                  events: (firmLiveView.events ?? []).map((e) => {
+                    // Restore source-linking inside the lens: pull the supporting file the event's
+                    // summary names ("Supported by X.pdf") so the item renders source-linked, not
+                    // just "on file". Without this the three-state model collapsed to two.
+                    const supported = (e.ai_summary ?? '').match(
+                      /[Ss]upported by\s+([^.,]+\.(?:pdf|docx?|png|jpe?g))/i
+                    );
+                    return {
+                      title: polishTimelineEventTitle(e.title),
+                      date: e.event_date,
+                      category: e.category,
+                      sourceFile: supported?.[1]?.trim() ?? null,
+                    };
+                  }),
                   quotes: (firmLiveView.intelligence?.keyQuotes ?? []).map((q) => ({
                     quote: q.quote,
                     fileName: q.file_name,

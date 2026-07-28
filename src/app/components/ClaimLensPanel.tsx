@@ -71,7 +71,22 @@ const CSS = `
 `;
 
 export function ClaimLensPanel({ input }: { input: ClaimLensInput }) {
-  const [activeId, setActiveId] = useState(CLAIM_LENSES[0].id);
+  // Open on the theory where the material actually lives (highest element coverage), not always the
+  // first lens in the list — so the strongest-covered claim leads. A manual pick overrides it.
+  const defaultId = useMemo(() => {
+    let best = CLAIM_LENSES[0].id;
+    let bestScore = -1;
+    for (const l of CLAIM_LENSES) {
+      const withMaterial = buildClaimLensView(l.id, input).coverage.withMaterial;
+      if (withMaterial > bestScore) {
+        bestScore = withMaterial;
+        best = l.id;
+      }
+    }
+    return best;
+  }, [input]);
+  const [picked, setPicked] = useState<string | null>(null);
+  const activeId = picked ?? defaultId;
   const view = useMemo(() => buildClaimLensView(activeId, input), [activeId, input]);
   const checks = useMemo(() => buildExistenceChecks(input), [input]);
 
@@ -95,7 +110,7 @@ export function ClaimLensPanel({ input }: { input: ClaimLensInput }) {
 
         <div className="tabs">
           {CLAIM_LENSES.map((l) => (
-            <button key={l.id} type="button" className="tab" aria-pressed={l.id === activeId} onClick={() => setActiveId(l.id)}>
+            <button key={l.id} type="button" className="tab" aria-pressed={l.id === activeId} onClick={() => setPicked(l.id)}>
               {l.tab}
             </button>
           ))}
@@ -150,6 +165,33 @@ export function ClaimLensPanel({ input }: { input: ClaimLensInput }) {
             )}
           </section>
         ))}
+
+        {/* Clarifications derived from THIS theory's empty elements — absence becomes a targeted
+            document request, scoped to the selected lens (not a generic global missing-records list).
+            Doctrine-safe: it names what isn't on file, never what the record proves. */}
+        {(() => {
+          const gaps = view.elements.filter((e) => e.empty);
+          if (!gaps.length) return null;
+          return (
+            <section className="el">
+              <div className="elIdx">To confirm · derived from this theory&rsquo;s gaps</div>
+              <h4 className="elName">
+                {gaps.length} element{gaps.length === 1 ? '' : 's'} with no material on file — a starting point for a document request
+              </h4>
+              <ul className="items">
+                {gaps.map((g) => (
+                  <li className="item" key={g.name}>
+                    <span className="st st--worker">request</span>
+                    <div>
+                      <div className="itemText">{g.name}</div>
+                      <div className="itemMeta">{g.empty}</div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          );
+        })()}
       </div>
       <div className="foot">
         <b>one3seven organizes and reflects. It draws no conclusions.</b> Element sets are a starting rubric, configurable by the firm. Every matching item is shown with its source, whichever way it points. Nothing is ranked, weighted, or left out.
