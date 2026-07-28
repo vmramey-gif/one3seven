@@ -139,10 +139,10 @@ export function CaseFactsAssembledPanel({
         The intake screen
       </div>
       <div className="flex flex-wrap gap-2.5">
-        <Tile value={`${proximity.adverseActions.length}`} label="adverse actions in the record" tone="orange" />
+        <Tile value={`${proximity.adverseActions.length}`} label="employer actions in the record" tone="orange" />
         <Tile
           value={tightest !== null ? `${tightest}d` : '—'}
-          label="closest protected-activity → adverse-action gap"
+          label="shortest gap: worker report → next employer action"
           tone="orange"
         />
         <Tile
