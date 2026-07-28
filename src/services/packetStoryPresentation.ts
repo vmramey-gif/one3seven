@@ -556,15 +556,24 @@ export function buildCaseSnapshot(payload: IntakeSummaryDownloadPayload): Packet
     followUp?.changedAfterward ?? ''
   );
   const primaryConcerns = concerns.length ? concerns : ['Workplace concerns noted in worker account'];
+  const rawDates = followUp?.employmentDates ?? '';
+  const periodConflict = hasEmploymentDateConflict(payload, rawDates);
   if (
-    hasEmploymentDateConflict(payload, followUp?.employmentDates ?? '') &&
+    periodConflict &&
     !primaryConcerns.some((concern) => /date details may require confirmation/i.test(concern))
   ) {
     primaryConcerns.push('Date details may require confirmation');
   }
 
+  // Doctrine: never assert the free-text worker-stated period as fact when the source-linked
+  // documents contradict it. Attribute it to the worker and flag that records do not confirm it.
+  const employmentPeriod =
+    rawDates && periodConflict
+      ? `${formatEmploymentPeriod(rawDates)} (worker-stated; not confirmed by records)`
+      : formatEmploymentPeriod(rawDates);
+
   return {
-    employmentPeriod: formatEmploymentPeriod(followUp?.employmentDates ?? ''),
+    employmentPeriod,
     primaryConcerns,
     recordsOrganized: documentCount(payload),
     timelineEvents: payload.timelineEvents?.length ?? 0,

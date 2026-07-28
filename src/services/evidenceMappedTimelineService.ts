@@ -468,6 +468,11 @@ function specificTitleFromRecord(
 
   const name = record.file_name.toLowerCase();
   const topics = record.employment_topics.join(' ').toLowerCase();
+  // A witness/coworker statement is a third party's account, not the worker's own and not an HR
+  // complaint. Guard it first so it is never mislabeled by the complaint/HR branch below.
+  if (/(^|_|\s)witness(es)?(_|\s|\.|$)/.test(name) || /\bwitness\b/.test(topics)) {
+    return 'Witness statement provided';
+  }
   // Defense in depth: a worker's own statement is a narrative, not a specific documented event —
   // never let its topics infer one (e.g. "Schedule change documented"). Matches the filename guard
   // in eventCandidateFromFilename.

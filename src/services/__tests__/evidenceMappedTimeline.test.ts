@@ -145,6 +145,30 @@ describe('evidence-mapped timeline engine', () => {
     expect(events[0]?.title).not.toBe('Schedule change documented');
   });
 
+  test('titles a witness statement as a witness statement, not an HR complaint (Elena Marquez regression)', () => {
+    const events = buildEvidenceMappedTimelineEvents({
+      fileRecords: [
+        sampleFileRecord({
+          source_file_id: 'witness-1',
+          // A coworker's witness statement. Extraction tagged it with complaint/HR topics, which
+          // used to route it through the complaint branch -> "Complaint submitted to Human Resources".
+          file_name: 'Marquez_Witness_Statement.pdf',
+          document_type: 'Witness Statement',
+          legacy_upload_category: 'Witness Statement',
+          likely_date: 'February 2026',
+          employment_topics: ['Complaint', 'Human Resources communications', 'Workplace communications'],
+          possible_timeline_event: {
+            title: 'Witness account materials',
+            date: 'February 2026',
+            neutral_summary: 'A coworker describes what they observed.',
+          },
+        }),
+      ],
+    });
+    expect(events[0]?.title).toBe('Witness statement provided');
+    expect(events[0]?.title).not.toBe('Complaint submitted to Human Resources');
+  });
+
   test('uses workplace-event labels for safety concerns, performance actions, and scheduling records', () => {
     const events = buildEvidenceMappedTimelineEvents({
       fileRecords: [

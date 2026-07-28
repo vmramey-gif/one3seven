@@ -4,6 +4,7 @@ import { DATE_UNCLEAR_LABEL } from '../contextualDateClassification';
 import { buildIntakePacketHtml, buildIntakePacketViewModel } from '../intakePacketPresentation';
 import {
   attorneyCategoryLabel,
+  buildCaseSnapshot,
   buildPacketChronologyPresentation,
   mapWorkerDashboardTimelineRows,
 } from '../packetStoryPresentation';
@@ -77,6 +78,34 @@ describe('Sarah Martinez packet presentation regression', () => {
     expect(html).toContain(ATTORNEY_PACKET_SECTIONS.caseSnapshot);
     expect(html).toContain(ATTORNEY_PACKET_SECTIONS.workerStory);
     expect(html).toContain(ATTORNEY_PACKET_SECTIONS.chronology);
+  });
+
+  test('snapshot does not assert a worker-stated period the documents contradict (Elena Marquez regression)', () => {
+    // Worker free-text follow-up says employment ended August 2021, but the source-linked
+    // documents run to April 2026. The snapshot must flag the divergence, never assert the
+    // conflicting worker-stated period as fact.
+    const conflicting: IntakeSummaryDownloadPayload = {
+      ...SARAH_MARTINEZ_FIXTURE,
+      workerContext: `--- O3S_WORKER_STORY ---
+I was terminated after raising concerns.
+--- O3S_WORKER_STORY_END ---
+
+--- O3S_STORY_FOLLOWUP ---
+employer:Acme Co
+employment_dates:March 2021 through August 2021
+--- O3S_STORY_FOLLOWUP_END ---`,
+      timelineEvents: [
+        { date: 'March 2021', title: 'Offer letter materials', category: 'Offer Letters', summary: '' },
+        { date: 'April 2026', title: 'Separation notice materials', category: 'HR Documents', summary: '' },
+      ],
+    };
+    const snapshot = buildCaseSnapshot(conflicting);
+    expect(snapshot.employmentPeriod).toMatch(/worker-stated; not confirmed by records/i);
+    expect(snapshot.primaryConcerns.some((c) => /date details may require confirmation/i.test(c))).toBe(true);
+
+    // The clean case (Sarah — dates align) stays a bare, asserted period with no qualifier.
+    const clean = buildCaseSnapshot(SARAH_MARTINEZ_FIXTURE);
+    expect(clean.employmentPeriod).not.toMatch(/not confirmed by records/i);
   });
 
   test('employment start uses Employment begins with offer letter only', () => {
