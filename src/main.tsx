@@ -12,6 +12,7 @@ import { ClaimLensDemoPage } from './app/screens/ClaimLensDemoPage.tsx';
 import { TexasCriminalDemoPage } from './app/screens/TexasCriminalDemoPage.tsx';
 import { FounderHQ } from './app/screens/FounderHQ.tsx';
 import { CompanyDemoGuide } from './app/screens/CompanyDemoGuide.tsx';
+import { LearnScreen } from './app/screens/LearnScreen.tsx';
 import { CompanyDemoDebrief } from './app/screens/CompanyDemoDebrief.tsx';
 import { CrmAccessGate } from './app/components/CrmAccessGate.tsx';
 import { TermsPage } from './app/screens/TermsPage.tsx';
@@ -89,6 +90,8 @@ const isBrand =
   url.searchParams.has('brand') ||
   url.pathname === '/brand';
 
+const isLearn = url.pathname === '/learn';
+
 // Stripe billing return — ?billing=success|canceled|portal_return
 // Store in sessionStorage so App.tsx can surface a notification, then strip from URL.
 const billingResult = url.searchParams.get('billing');
@@ -130,6 +133,7 @@ const routeTitle =
   : isForFirms ? 'one3seven for Firms — Organized Employment Intake'
   : isForWorkers ? 'one3seven for Workers — Organize Your Employment Records'
   : isBrand ? 'one3seven — Brand Preview'
+  : isLearn ? 'Learn — one3seven'
   : null;
 if (routeTitle) document.title = routeTitle;
 
@@ -176,6 +180,10 @@ if (url.pathname === '/terms') {
 } else if (isBrand) {
   createRoot(rootEl).render(
     <AppErrorBoundary><BrandPreviewPage /></AppErrorBoundary>
+  );
+} else if (isLearn) {
+  createRoot(rootEl).render(
+    <AppErrorBoundary><LearnScreen /></AppErrorBoundary>
   );
 } else if (isForWorkers) {
   // Direct/ad hits to /for-workers render the worker landing standalone. The CTAs set a
