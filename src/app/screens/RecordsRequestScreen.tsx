@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { ArrowLeft, Copy, Download, Check } from 'lucide-react';
+import { ArrowLeft, Copy, Download, Check, Mail } from 'lucide-react';
 import { track } from '../../lib/analytics';
 
 /**
@@ -136,6 +136,14 @@ export function RecordsRequestScreen({ workerName, onBackToLanding }: RecordsReq
     [name, employer, employerAddress, status, startDate, endDate, contactBack, records],
   );
 
+  // Worker sends from their OWN mail client — one3seven composes but never sends. Recipient
+  // auto-fills only when the HR field is an email; otherwise the worker fills it in their client.
+  const mailtoHref = useMemo(() => {
+    const recipient = employerAddress.includes('@') ? employerAddress.trim() : '';
+    const subject = `Request for Employment Records — ${name.trim() || 'Employee'}`;
+    return `mailto:${encodeURIComponent(recipient)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(letter)}`;
+  }, [employerAddress, name, letter]);
+
   const toggle = (k: RecordKey) => setRecords((r) => ({ ...r, [k]: !r[k] }));
 
   const handleCopy = async () => {
@@ -263,9 +271,12 @@ export function RecordsRequestScreen({ workerName, onBackToLanding }: RecordsReq
               <button type="button" onClick={handleCopy} className="inline-flex items-center gap-1.5 rounded-[10px] border border-[#E4E5DE] bg-white px-3 py-2 text-xs font-semibold text-[#384039] hover:border-[#7C8B6F]">
                 {copied ? <Check className="h-3.5 w-3.5 text-[#42574E]" /> : <Copy className="h-3.5 w-3.5" />} {copied ? 'Copied' : 'Copy'}
               </button>
-              <button type="button" onClick={handleDownload} className="inline-flex items-center gap-1.5 rounded-[10px] bg-[#42574E] px-3 py-2 text-xs font-semibold text-white hover:bg-[#374a42]">
+              <button type="button" onClick={handleDownload} className="inline-flex items-center gap-1.5 rounded-[10px] border border-[#E4E5DE] bg-white px-3 py-2 text-xs font-semibold text-[#384039] hover:border-[#7C8B6F]">
                 <Download className="h-3.5 w-3.5" /> Download
               </button>
+              <a href={mailtoHref} onClick={() => track('records_request_email')} className="inline-flex items-center gap-1.5 rounded-[10px] bg-[#42574E] px-3 py-2 text-xs font-semibold text-white hover:bg-[#374a42]">
+                <Mail className="h-3.5 w-3.5" /> Send from your email
+              </a>
             </div>
           </div>
           <pre className="max-h-[420px] overflow-auto whitespace-pre-wrap rounded-[14px] border border-[#E4E5DE] bg-white px-5 py-4 text-[13px] leading-relaxed text-[#1B2623]" style={{ fontFamily: "'IBM Plex Mono', ui-monospace, Menlo, monospace" }}>
