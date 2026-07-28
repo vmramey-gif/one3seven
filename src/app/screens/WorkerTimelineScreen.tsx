@@ -13,6 +13,7 @@ import { SHOW_SAMPLE_INTAKE } from '../constants/flags';
 import { SAMPLE_INTAKE_SUMMARY_PREVIEW, SAMPLE_DEMO_LABEL } from '../constants/one3sevenProduct';
 import { WordMark } from '../components/WordMark';
 import { MitigationLogCard } from '../components/MitigationLogCard';
+import { RecordsRequestCard } from '../components/RecordsRequestCard';
 
 interface WorkerTimelineScreenProps {
   intakeId: string | null;
@@ -233,9 +234,10 @@ export function WorkerTimelineScreen({
           </div>
         )}
 
-        {/* Worker-owned job-search (mitigation) log — records, never scores. */}
+        {/* Worker-owned tools — records-request log + job-search (mitigation) log. */}
         {intakeId ? (
-          <div className="mt-8">
+          <div className="mt-8 flex flex-col gap-6">
+            <RecordsRequestCard intakeId={intakeId} />
             <MitigationLogCard intakeId={intakeId} />
           </div>
         ) : null}
