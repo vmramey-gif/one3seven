@@ -363,6 +363,7 @@ export default function App() {
     }
   }, [userRole, currentScreen, currentIntakeId]);
   const [firmDashboardRows, setFirmDashboardRows] = useState<FirmDashboardRow[]>([]);
+  const [firmDashboardError, setFirmDashboardError] = useState<string | null>(null);
   // The firm's OWN case files (documents the firm uploaded and organized itself) — kept separate
   // from worker-submitted intakes so the dashboard clearly divides "your case files" from "client intakes".
   const [firmOwnCaseFiles, setFirmOwnCaseFiles] = useState<WorkerIntakeListEntry[]>([]);
@@ -565,8 +566,15 @@ export default function App() {
       firmProfileId: fp.id,
       profileUserId: fp.profile_id,
     });
-    const rows = await intakeData.loadFirmDashboardRows(fp.id);
-    setFirmDashboardRows(rows);
+    const { rows, error: dashError } = await intakeData.loadFirmDashboardRows(fp.id);
+    // Preserve the prior list on failure so a transient error doesn't blank the firm's queue
+    // (which reads as "no intakes"). Surface the error instead.
+    if (dashError) {
+      setFirmDashboardError(dashError);
+    } else {
+      setFirmDashboardRows(rows);
+      setFirmDashboardError(null);
+    }
     // Also load the firm's OWN case files (intakes it created + organized itself). Kept separate
     // from the worker-routed rows above so the dashboard can divide the two clearly.
     if (authUser?.id) {
@@ -4939,6 +4947,7 @@ export default function App() {
                 }}
                 submittedIntakes={SHOW_DEV_GALLERY ? submittedIntakes : []}
                 dbIntakes={firmDashboardRows}
+                dashboardError={firmDashboardError}
                 onViewSampleIntakeFlow={SHOW_SAMPLE_INTAKE ? openFirmSampleIntakeFlow : undefined}
                 onStartFirmCaseFile={handleStartFirmCaseFile}
                 firmOwnCaseFiles={firmOwnCaseFiles}

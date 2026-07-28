@@ -30,6 +30,8 @@ interface LawFirmDashboardScreenProps {
   ) => void;
   submittedIntakes: IntakeWorkspace[];
   dbIntakes?: FirmDashboardRow[];
+  /** Set when the routed-intake load FAILED (vs a genuinely empty queue) — shows a retry banner. */
+  dashboardError?: string | null;
   onViewSampleIntakeFlow?: () => void;
   /** Attorney-side engine: start a firm-owned case file to organize the firm's own documents. */
   onStartFirmCaseFile?: () => void;
@@ -123,6 +125,7 @@ export function LawFirmDashboardScreen({
   onSelectIntake,
   submittedIntakes,
   dbIntakes,
+  dashboardError,
   onViewSampleIntakeFlow,
   onStartFirmCaseFile,
   firmOwnCaseFiles,
@@ -813,7 +816,15 @@ export function LawFirmDashboardScreen({
                 })}
             </div>
 
-            {activeTab !== 'archived' && noRealFirmIntakes ? (
+            {dashboardError ? (
+              <div className="max-w-2xl rounded-3xl border border-[#E4B4A0] bg-[#FBF1EC] p-6 shadow-[0_16px_44px_rgba(20,17,46,0.09)]">
+                <h3 className="text-base font-semibold text-[#8A3B1E]">Couldn&rsquo;t load your intake list</h3>
+                <p className="mt-2 text-sm leading-relaxed text-[#7A4B39]">{dashboardError}</p>
+                <p className="mt-1 text-xs text-[#7A4B39]/70">
+                  Your intakes are safe — this is a connection or access error, not an empty queue. Reload the page to retry.
+                </p>
+              </div>
+            ) : activeTab !== 'archived' && noRealFirmIntakes ? (
               <div className="max-w-2xl rounded-3xl border border-[#E4E5DE] bg-white p-8 shadow-[0_16px_44px_rgba(20,17,46,0.09)]">
                 <FileText className="mb-4 h-7 w-7 text-[#42574E]" />
                 <h3 className="text-lg font-semibold text-[#1B2623]">No intakes yet</h3>

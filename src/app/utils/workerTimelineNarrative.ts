@@ -1,6 +1,7 @@
 import type { WorkerTimelineItem } from '../types/workerTimeline';
 import { softenWorkerReviewLine } from './workerIntakePresentationUtils';
 import { normalizeEventDisplayDate } from '../../services/contextualDateClassification';
+import { stripFilenameReferences } from '../../services/filenameScrub';
 
 const PAYROLL_EVENT_RE = /employment activity documented through payroll|payroll record/i;
 // Events a worker has at most once — keep a single row even if the engine dated copies differently.
@@ -174,18 +175,8 @@ export function presentWorkerTimelineStoryTitle(event: WorkerTimelineItem): stri
   return raw;
 }
 
-function stripFilenameReferences(text: string): string {
-  return text
-    .replace(/Available records show supporting uploads include [^.!?]+[.!?]?/gi, '')
-    .replace(/supporting uploads include [^.!?]+[.!?]?/gi, '')
-    .replace(/Uploaded records show [^.!?]+[.!?]?/gi, '')
-    .replace(/References?:\s*[^.!?]+[.!?]?/gi, '')
-    .replace(/\b\d+\s+file\(s\):\s*[^.!?]+[.!?]?/gi, '')
-    .replace(/From uploaded records:\s*[^.!?]+[.!?]?/gi, '')
-    .replace(/Indexed excerpt[^.!?]+[.!?]?/gi, '')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
+// Shared, tested implementation lives in services/filenameScrub — worker surface only.
+
 
 function looksLikeFilenameFragment(text: string): boolean {
   const t = text.trim();

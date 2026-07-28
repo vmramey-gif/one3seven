@@ -24,13 +24,23 @@ export type FirmPlanId = 'beta_pilot' | 'practice' | 'firm' | 'surge' | 'enterpr
 
 /**
  * Single source of truth for which tiers include the wage-exposure estimate (section 8B)
- * + live source citations. Practice+, Firm+, and Enterprise only. Checked at the
- * data-assembly layer (resolveWageExposure) so the feature never reaches an ineligible
- * firm — not a client-side-only restriction. Compares plan-id strings directly so it does
- * not depend on the FirmPlanId union (the new paid tiers are not yet wired into pricing).
+ * + live source citations. Firm and above (Firm $549, Surge $1,490, Enterprise) — NOT
+ * Practice ($249). Checked at the data-assembly layer (resolveWageExposure) so the feature
+ * never reaches an ineligible firm — not a client-side-only restriction.
+ *
+ * The legacy names (practice_plus / firm_plus) are still accepted so any firm_profiles row
+ * or Stripe metadata written before the tier rename keeps its entitlement; new sales use
+ * the current tier ids only.
  */
 export function firmTierIncludesDamagesFeature(planId: string | null | undefined): boolean {
-  return planId === 'practice_plus' || planId === 'firm_plus' || planId === 'enterprise';
+  return (
+    planId === 'firm' ||
+    planId === 'surge' ||
+    planId === 'enterprise' ||
+    // legacy tier ids (pre-rename) — kept so existing subscribers don't lose the feature
+    planId === 'firm_plus' ||
+    planId === 'practice_plus'
+  );
 }
 
 export interface FirmPlan {

@@ -31,15 +31,18 @@ function makeView(planId: string, workState: string = 'CA'): FirmLiveIntakeView 
 }
 
 describe('firmTierIncludesDamagesFeature', () => {
-  it('includes Practice+, Firm+, Enterprise only', () => {
-    expect(firmTierIncludesDamagesFeature('practice_plus')).toBe(true);
-    expect(firmTierIncludesDamagesFeature('firm_plus')).toBe(true);
+  it('includes Firm, Surge, Enterprise (Firm and above)', () => {
+    expect(firmTierIncludesDamagesFeature('firm')).toBe(true);
+    expect(firmTierIncludesDamagesFeature('surge')).toBe(true);
     expect(firmTierIncludesDamagesFeature('enterprise')).toBe(true);
   });
-  it('excludes Solo, Practice, Firm, beta_pilot, null', () => {
-    expect(firmTierIncludesDamagesFeature('solo')).toBe(false);
+  it('still honors legacy tier ids so pre-rename subscribers keep the feature', () => {
+    expect(firmTierIncludesDamagesFeature('firm_plus')).toBe(true);
+    expect(firmTierIncludesDamagesFeature('practice_plus')).toBe(true);
+  });
+  it('excludes Practice, Solo, beta_pilot, null', () => {
     expect(firmTierIncludesDamagesFeature('practice')).toBe(false);
-    expect(firmTierIncludesDamagesFeature('firm')).toBe(false);
+    expect(firmTierIncludesDamagesFeature('solo')).toBe(false);
     expect(firmTierIncludesDamagesFeature('beta_pilot')).toBe(false);
     expect(firmTierIncludesDamagesFeature(null)).toBe(false);
     expect(firmTierIncludesDamagesFeature(undefined)).toBe(false);
@@ -50,28 +53,28 @@ describe('resolveWageExposure tier gate', () => {
   it('Practice tier with valid wage facts + unambiguous base rate → null (gate blocks)', () => {
     expect(resolveWageExposure(makeView('practice'))).toBeNull();
   });
-  it('Firm tier (non-plus) → null', () => {
-    expect(resolveWageExposure(makeView('firm'))).toBeNull();
+  it('beta_pilot → null', () => {
+    expect(resolveWageExposure(makeView('beta_pilot'))).toBeNull();
   });
-  it('Practice+ tier with the same data → populated wageExposure', () => {
-    const result = resolveWageExposure(makeView('practice_plus'));
+  it('Firm tier with the same data → populated wageExposure', () => {
+    const result = resolveWageExposure(makeView('firm'));
     expect(result).not.toBeNull();
     expect(result?.report.baseHourlyRate?.value).toBe(22);
     expect(result?.disclaimer.length).toBeGreaterThan(0);
   });
-  it('Firm+ tier → populated', () => {
-    expect(resolveWageExposure(makeView('firm_plus'))).not.toBeNull();
+  it('Surge tier → populated', () => {
+    expect(resolveWageExposure(makeView('surge'))).not.toBeNull();
   });
 });
 
 describe('resolveWageExposure jurisdiction gate', () => {
-  it('California work state + Practice+ + valid facts → populated', () => {
-    expect(resolveWageExposure(makeView('practice_plus', 'CA'))).not.toBeNull();
+  it('California work state + Firm + valid facts → populated', () => {
+    expect(resolveWageExposure(makeView('firm', 'CA'))).not.toBeNull();
   });
-  it('Texas work state → null even with Practice+ and valid facts (organize-only)', () => {
-    expect(resolveWageExposure(makeView('practice_plus', 'TX'))).toBeNull();
+  it('Texas work state → null even with Firm and valid facts (organize-only)', () => {
+    expect(resolveWageExposure(makeView('firm', 'TX'))).toBeNull();
   });
   it('unset work state → null (no jurisdiction-gated feature activates without it set)', () => {
-    expect(resolveWageExposure(makeView('practice_plus', ''))).toBeNull();
+    expect(resolveWageExposure(makeView('firm', ''))).toBeNull();
   });
 });

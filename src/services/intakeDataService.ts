@@ -1140,6 +1140,10 @@ export async function uploadIntakeFile(
   });
   console.info('[o3s-upload] record creation succeeded', { uploadedFileId: uploadedFileId ?? null, path });
   if (uploadedFileId) {
+    // Fire-and-forget so the upload returns fast. runPhase2AFileTextExtraction records its own
+    // failures in-band (extraction_status='failed' via its outer catch), so a normal extraction
+    // error is NOT silent — it is persisted per file. This catch only fires if the dynamic import
+    // itself fails; log with enough context to trace which file/intake was affected.
     void import('./fileTextExtractionService')
       .then(({ runPhase2AFileTextExtraction }) =>
         runPhase2AFileTextExtraction({
@@ -1152,7 +1156,14 @@ export async function uploadIntakeFile(
           fileSizeBytes: file.size,
         })
       )
-      .catch((e) => console.error('Phase 2A file text extraction', e));
+      .catch((e) =>
+        console.error('[o3s-upload] Phase 2A extraction failed to start', {
+          uploadedFileId,
+          intakeId,
+          fileName: file.name,
+          error: e instanceof Error ? e.message : String(e),
+        })
+      );
   }
   return { path, uploadedFileId, contentHash };
 }
@@ -3704,12 +3715,22 @@ export async function recoverInterruptedOrganizationIntakes(
   return { recoveredCount, resetCount, affectedIntakeIds, message };
 }
 
-export async function loadFirmDashboardRows(firmTableId: string): Promise<FirmDashboardRow[]> {
+/**
+ * Load a firm's routed intakes. Returns a result so the caller can tell a genuine empty
+ * queue apart from a load FAILURE — previously a network/RLS error returned [] and rendered
+ * identically to "no intakes", which is a firm-trust hazard (their queue appears to vanish).
+ */
+export async function loadFirmDashboardRows(
+  firmTableId: string
+): Promise<{ rows: FirmDashboardRow[]; error: string | null }> {
   try {
-    return await loadFirmDashboardRowsInner(firmTableId);
+    return { rows: await loadFirmDashboardRowsInner(firmTableId), error: null };
   } catch (e) {
     console.error('[o3s-firm-dashboard] loadFirmDashboardRows failed', e);
-    return [];
+    return {
+      rows: [],
+      error: 'We could not load your intake list just now. This is a connection or access error, not an empty queue — please retry.',
+    };
   }
 }
 
