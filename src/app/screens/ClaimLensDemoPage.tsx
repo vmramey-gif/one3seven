@@ -30,16 +30,20 @@ const CHECKS = [
   { label: 'CRD right-to-sue letter', value: 'Not on file', present: false, note: 'not addressed in intake' },
   { label: 'Wage statements', value: '4 on file', present: true, note: 'Apr 30 – Jun 15, 2026' },
   { label: 'Separation date', value: 'On file', present: true, note: 'Jun 12, 2026' },
+  { label: 'EEOC charge', value: 'Not on file', present: false, note: 'not addressed in intake' },
+  { label: 'LWDA / PAGA notice', value: 'Not on file', present: false, note: 'not addressed in intake' },
+  { label: 'Damages material', value: 'Not on file', present: false, note: 'not addressed in intake' },
+  { label: 'Prior claims / agreements', value: 'Not on file', present: false, note: 'not addressed in intake' },
 ];
 
 const LENSES: Lens[] = [
   {
     id: 'retaliation',
     tab: '§1102.5 Retaliation',
-    title: 'Retaliation',
+    title: 'Labor Code §1102.5 — Retaliation',
     elements: [
       {
-        name: 'Disclosure of information to a person with authority or a government agency',
+        name: 'Reports and complaints made, and to whom',
         items: [
           { state: 'worker', text: 'Reported blocked exit doors at Loading Dock 3 to shift supervisor Dana Whitfield.', meta: 'Approx. May 28, 2026' },
           { state: 'linked', text: 'Text thread with coworker R. Alcaraz referencing the dock door report.', meta: 'May 28, 2026 · texts_alcaraz.pdf, p.3' },
@@ -52,7 +56,7 @@ const LENSES: Lens[] = [
         empty: 'Nothing in the record addresses what Marcus was told or understood about the exit-door rule before he reported it.',
       },
       {
-        name: 'Adverse employment action',
+        name: 'Employment actions taken, with dates',
         items: [
           { state: 'linked', text: 'Termination letter citing attendance.', meta: 'Jun 12, 2026 · termination_letter.pdf, p.1' },
           { state: 'linked', text: 'Final wage statement.', meta: 'Pay date Jun 15, 2026 · ws_0615.pdf' },
@@ -60,7 +64,7 @@ const LENSES: Lens[] = [
         ],
       },
       {
-        name: 'Material relating disclosure to action',
+        name: 'Sequence and interval',
         note: 'Includes material pointing in both directions. one3seven does not omit items that cut against a theory.',
         items: [
           { state: 'counted', text: '15 days between the reported disclosure and the separation date.', meta: 'May 28, 2026 → Jun 12, 2026' },
@@ -77,7 +81,7 @@ const LENSES: Lens[] = [
     title: 'Wage statements & final pay',
     elements: [
       {
-        name: 'Employment relationship and dates',
+        name: 'Employment relationship and dates on file',
         items: [
           { state: 'linked', text: 'Offer letter listing position and start date.', meta: 'Aug 15, 2022 · offer_letter.pdf, p.1' },
           { state: 'linked', text: 'Termination letter listing separation date.', meta: 'Jun 12, 2026 · termination_letter.pdf, p.1' },
@@ -106,11 +110,11 @@ const LENSES: Lens[] = [
   },
   {
     id: 'feha',
-    tab: 'FEHA disability',
-    title: 'FEHA disability & interactive process',
+    tab: 'Disability Accommodation §12940(m)',
+    title: 'Disability Accommodation — §12940(m)',
     elements: [
       {
-        name: 'Condition disclosed to the employer',
+        name: 'Medical condition material',
         empty: 'No medical documentation on file. The worker narrative does not describe what was disclosed to the employer, or to whom.',
       },
       {
@@ -120,11 +124,11 @@ const LENSES: Lens[] = [
         ],
       },
       {
-        name: 'Employer response and interactive process',
+        name: 'Employer response',
         empty: 'Nothing in the record addresses whether the employer responded, met, or offered anything in reply.',
       },
       {
-        name: 'Adverse employment action',
+        name: 'Employment actions taken, with dates',
         note: 'Same items as the retaliation lens, re-sorted under this element.',
         items: [
           { state: 'linked', text: 'Termination letter citing attendance.', meta: 'Jun 12, 2026 · termination_letter.pdf, p.1' },
