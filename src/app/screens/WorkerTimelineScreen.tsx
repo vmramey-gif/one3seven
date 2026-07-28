@@ -12,6 +12,7 @@ import type { WorkerTimelineItem } from '../types/workerTimeline';
 import { SHOW_SAMPLE_INTAKE } from '../constants/flags';
 import { SAMPLE_INTAKE_SUMMARY_PREVIEW, SAMPLE_DEMO_LABEL } from '../constants/one3sevenProduct';
 import { WordMark } from '../components/WordMark';
+import { MitigationLogCard } from '../components/MitigationLogCard';
 
 interface WorkerTimelineScreenProps {
   intakeId: string | null;
@@ -231,6 +232,13 @@ export function WorkerTimelineScreen({
             </button>
           </div>
         )}
+
+        {/* Worker-owned job-search (mitigation) log — records, never scores. */}
+        {intakeId ? (
+          <div className="mt-8">
+            <MitigationLogCard intakeId={intakeId} />
+          </div>
+        ) : null}
 
         {/* Contact / help */}
         <div className="mt-10 border-t border-[#E4E5DE] pt-5 text-center">
