@@ -14,6 +14,7 @@ import { SAMPLE_INTAKE_SUMMARY_PREVIEW, SAMPLE_DEMO_LABEL } from '../constants/o
 import { WordMark } from '../components/WordMark';
 import { MitigationLogCard } from '../components/MitigationLogCard';
 import { RecordsRequestCard } from '../components/RecordsRequestCard';
+import { RemindersCard } from '../components/RemindersCard';
 
 interface WorkerTimelineScreenProps {
   intakeId: string | null;
@@ -234,9 +235,10 @@ export function WorkerTimelineScreen({
           </div>
         )}
 
-        {/* Worker-owned tools — records-request log + job-search (mitigation) log. */}
+        {/* Worker-owned tools — reminders + records-request log + job-search (mitigation) log. */}
         {intakeId ? (
           <div className="mt-8 flex flex-col gap-6">
+            <RemindersCard intakeId={intakeId} />
             <RecordsRequestCard intakeId={intakeId} />
             <MitigationLogCard intakeId={intakeId} />
           </div>
