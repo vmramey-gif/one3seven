@@ -668,6 +668,42 @@ export const CLAIM_LENSES: LensDef[] = [
         absence: 'No relocation or cessation material appears in the record.' },
     ],
   },
+  {
+    id: 'tech_displacement_sb951',
+    tab: 'Tech Displacement §SB 951',
+    title: 'SB 951 — Worker Technological Displacement (60-day notice)',
+    // First-to-market pack for the AI/automation displacement wave the CA Worker Technological
+    // Displacement Act legislated (60-day notice; the AI analog of CalWARN). Labels LOCATE material,
+    // they do not CHARACTERIZE — element 2 finds material tying the separation to technology, it does
+    // NOT conclude the separation WAS caused by it. COUNSEL-GATED: verify the actual SB 951 elements +
+    // coverage threshold against the enacted bill text before this surfaces to any real firm.
+    elements: [
+      { name: 'Separation records, and the employer’s stated reason',
+        patterns: p('terminat', 'laid off', 'layoff', 'let go', 'separation', 'position (eliminated|cut)', 'reduction in force', '\\bRIF\\b', 'displaced'),
+        absence: 'No record of the separation or the employer’s stated reason appears in the file.' },
+      { name: 'Material describing automation, AI, or technology as a factor',
+        note: 'Locates material tying the separation to technology. It does not conclude the separation was caused by it.',
+        patterns: p('automat', 'artificial intelligence', '\\bA\\.?I\\.?\\b', 'algorithm', 'machine learning', 'technolog', 'robot', 'software (replaced|took over)', 'replaced by (a |an )?(system|software|machine|bot|program|tool)'),
+        absence: 'Nothing in the record ties the separation to automation, AI, or technological change.' },
+      { name: 'Employer size or headcount material',
+        patterns: p('\\d{2,}\\s+(employees|workers)', 'headcount', 'workforce of', 'staff of', 'number of employees', 'company (size|of \\d)'),
+        absence: 'No material establishes the employer’s size relative to the statute’s coverage threshold.' },
+      { name: 'Advance notice given — its date and form — or its absence',
+        patterns: p('60[- ]?day', 'sixty[- ]?day', 'advance notice', 'notice (given|received|provided)', 'notified', 'no notice', 'without (notice|warning)', 'notice (letter|email)'),
+        absence: 'No advance-notice material appears in the record.' },
+      { name: 'What the notice stated',
+        patterns: p('notice (stated|said|explained|cited|reads)', 'reason (given|stated) in (the )?notice', 'letter (stated|said|explained)', 'told (us|me|workers) (that|the)'),
+        absence: 'Nothing shows the content of any notice provided.' },
+      { name: 'Timing between notice and separation',
+        note: 'Includes material pointing in both directions. one3seven does not omit items that cut against a theory.',
+        patterns: p('day(s)? (before|after)', 'week(s)? (before|after)', '60[- ]?day', 'same (day|week)', 'notice[\\s\\S]{0,60}(terminat|layoff|separation)', '(terminat|layoff|separation)[\\s\\S]{0,60}notice'),
+        absence: 'No material speaks to how many days separated any notice from the separation.' },
+      { name: 'Pay and benefits for the notice period',
+        note: 'Locates pay/benefit material on file. one3seven does not compute an amount owed.',
+        patterns: p('back pay', 'wages', 'benefits', 'pay period', 'severance', 'final pay', 'compensation for', '60 days (of )?pay'),
+        absence: 'No material addresses pay or benefits for the notice period.' },
+    ],
+  },
 ];
 
 const norm = (s: string): string => s.replace(/\s+/g, ' ').trim().toLowerCase();

@@ -125,6 +125,23 @@ describe('buildClaimLensView', () => {
     expect(warn.coverage.total).toBe(warn.elements.length);
   });
 
+  it('SB 951 tech-displacement lens builds, is element-scoped, and locates (never characterizes)', () => {
+    const v = buildClaimLensView('tech_displacement_sb951', rosa);
+    expect(v.title).toMatch(/SB 951/);
+    expect(v.coverage.total).toBe(v.elements.length);
+    // Labels LOCATE material — none may CHARACTERIZE (verb test): no "protected", "adverse",
+    // "wrongful", "pretext", "severity", "strong".
+    for (const el of v.elements) {
+      expect(el.name).not.toMatch(/\b(protected|adverse|wrongful|pretext|severity|strong|liable|valid)\b/i);
+    }
+    // The "technology as a factor" element exists and renders as absence for a wage-only record
+    // (rosa's overtime complaint says nothing about automation/AI) — it locates, doesn't assume.
+    const tech = v.elements.find((e) => /automation, AI, or technology/i.test(e.name));
+    expect(tech).toBeDefined();
+    expect(tech?.items ?? []).toHaveLength(0);
+    expect(tech?.empty).toBeTruthy();
+  });
+
   it('Tier 2 wave 1: leave cluster + pay equity + records lenses build distinctly', () => {
     const ids = ['cfra', 'fmla', 'pdl', 'lactation', 'sick_leave', 'other_leave', 'equal_pay', 'records_requests', 'wage_theft_notice'];
     const titles = ids.map((id) => buildClaimLensView(id, rosa).title);
