@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { buildClaimLensView, buildExistenceChecks, type ClaimLensInput } from '../claimLens';
+import { buildClaimLensView, buildExistenceChecks, CLAIM_LENSES, type ClaimLensInput } from '../claimLens';
 
 const rosa: ClaimLensInput = {
   events: [
@@ -82,7 +82,7 @@ describe('buildClaimLensView', () => {
 
   it('re-sorts: the same record produces different element maps per lens', () => {
     const ret = buildClaimLensView('retaliation_1102_5', rosa);
-    const wage = buildClaimLensView('wage', rosa);
+    const wage = buildClaimLensView('wage_statements', rosa);
     expect(ret.title).not.toBe(wage.title);
     expect(ret.elements.map((e) => e.name)).not.toEqual(wage.elements.map((e) => e.name));
   });
@@ -91,6 +91,13 @@ describe('buildClaimLensView', () => {
     const ids = ['retaliation_1102_5', 'feha_retaliation', 'lc_98_6', 'lc_6310'];
     const titles = ids.map((id) => buildClaimLensView(id, rosa).title);
     expect(new Set(titles).size).toBe(4);
+  });
+
+  it('wage cluster is split into five separate statutory lenses (no merged wage lens)', () => {
+    const ids = ['overtime', 'meal_rest', 'wage_statements', 'final_pay', 'expense_2802'];
+    const titles = ids.map((id) => buildClaimLensView(id, rosa).title);
+    expect(new Set(titles).size).toBe(5);
+    expect(CLAIM_LENSES.some((l) => l.id === 'wage')).toBe(false);
   });
 
   it('PAGA + CalWARN build as distinct aggregate lenses', () => {
