@@ -75,12 +75,13 @@ const el = (v: ReturnType<typeof buildClaimLensView>, re: RegExp) => v.elements.
 
 describe('TEST PACK — run through the real engine', () => {
   it('T1 Rosa — clean retaliation fully populates, 9-day is counted, no gaps, dates ON FILE', () => {
-    const v = buildClaimLensView('retaliation', T1);
-    expect(el(v, /protected/i)?.items.length).toBeGreaterThan(0);
-    expect(el(v, /adverse/i)?.items.some((i) => /terminat/i.test(i.text))).toBe(true);
-    expect(el(v, /relating/i)?.items.some((i) => i.state === 'counted')).toBe(true);
-    // element 04 ("what the worker understood/intended") is honestly empty → 1 gap, by design
-    expect(v.tally.gaps).toBe(1);
+    const v = buildClaimLensView('retaliation_1102_5',T1);
+    expect(el(v, /reports and complaints/i)?.items.length).toBeGreaterThan(0);
+    expect(el(v, /employment actions after/i)?.items.some((i) => /terminat/i.test(i.text))).toBe(true);
+    expect(el(v, /sequence and interval/i)?.items.some((i) => i.state === 'counted')).toBe(true);
+    // §1102.5 now has 7 elements; some (employer awareness, treatment of others) are honestly empty.
+    expect(v.coverage.total).toBe(v.elements.length);
+    expect(v.tally.gaps).toBeGreaterThanOrEqual(1);
     const ck = buildExistenceChecks(T1);
     expect(ck.find((c) => /arbitration/i.test(c.label))?.present).toBe(false);
     expect(ck.find((c) => /separation/i.test(c.label))?.present).toBe(true);
@@ -88,17 +89,17 @@ describe('TEST PACK — run through the real engine', () => {
   });
 
   it('T2 Huseby — Element 01 filled, 02-04 loud absence, dates NOT on file, no separation', () => {
-    const v = buildClaimLensView('retaliation', T2);
-    expect(el(v, /protected/i)?.items.length).toBeGreaterThan(0);
-    expect(el(v, /adverse/i)?.empty).toBeTruthy();
+    const v = buildClaimLensView('retaliation_1102_5',T2);
+    expect(el(v, /reports and complaints/i)?.items.length).toBeGreaterThan(0);
+    expect(el(v, /employment actions after/i)?.empty).toBeTruthy();
     const ck = buildExistenceChecks(T2);
     expect(ck.find((c) => /separation/i.test(c.label))?.present).toBe(false);
     expect(ck.find((c) => /date/i.test(c.label))?.present).toBe(false);
   });
 
   it('T3 Priya — no FILE/cluster noise mis-sorts in (handbook, benefits, onboarding, cluster stay out)', () => {
-    const v = buildClaimLensView('retaliation', T3);
-    const prot = el(v, /protected/i);
+    const v = buildClaimLensView('retaliation_1102_5',T3);
+    const prot = el(v, /reports and complaints/i);
     const noise = /handbook|benefit|onboarding|hr documents|\(\s*\d+\s*files?\s*\)/i;
     // the real mis-sort defense: none of the routine files or the cluster placeholder appear
     expect(prot?.items.some((i) => noise.test(i.text) || noise.test(i.meta ?? ''))).toBeFalsy();
@@ -108,8 +109,8 @@ describe('TEST PACK — run through the real engine', () => {
   });
 
   it('T4 Marcus — inconvenient facts are surfaced, not hidden', () => {
-    const v = buildClaimLensView('retaliation', T4);
-    const adv = el(v, /adverse/i);
+    const v = buildClaimLensView('retaliation_1102_5',T4);
+    const adv = el(v, /employment actions after/i);
     expect(adv?.items.some((i) => /attendance/i.test(i.text))).toBe(true); // predates complaint, still shown
     expect(adv?.items.some((i) => /terminat/i.test(i.text))).toBe(true);
   });
@@ -121,7 +122,7 @@ describe('TEST PACK — run through the real engine', () => {
     if (rts) expect(rts.present).toBe(false);
     expect(ck.find((c) => /wage|statement/i.test(c.label))?.present).toBe(true);
     // lens re-sorts the SAME record differently
-    expect(buildClaimLensView('retaliation', T5).elements.map((e) => e.name))
-      .not.toEqual(buildClaimLensView('feha', T5).elements.map((e) => e.name));
+    expect(buildClaimLensView('retaliation_1102_5',T5).elements.map((e) => e.name))
+      .not.toEqual(buildClaimLensView('feha_disability',T5).elements.map((e) => e.name));
   });
 });
