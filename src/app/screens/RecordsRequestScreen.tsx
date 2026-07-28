@@ -136,15 +136,36 @@ export function RecordsRequestScreen({ workerName, onBackToLanding }: RecordsReq
     [name, employer, employerAddress, status, startDate, endDate, contactBack, records],
   );
 
+  const toggle = (k: RecordKey) => setRecords((r) => ({ ...r, [k]: !r[k] }));
+
   // Worker sends from their OWN mail client — one3seven composes but never sends. Recipient
   // auto-fills only when the HR field is an email; otherwise the worker fills it in their client.
-  const mailtoHref = useMemo(() => {
+  // Mail clients silently drop mailto links whose URL exceeds ~2,000 chars, so a full-letter body
+  // makes the link "dead" (clicking does nothing). Guard on length: short letters open pre-filled;
+  // long ones copy the letter to the clipboard and open a short email telling the worker to paste.
+  const handleSendEmail = async () => {
     const recipient = employerAddress.includes('@') ? employerAddress.trim() : '';
     const subject = `Request for Employment Records — ${name.trim() || 'Employee'}`;
-    return `mailto:${encodeURIComponent(recipient)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(letter)}`;
-  }, [employerAddress, name, letter]);
-
-  const toggle = (k: RecordKey) => setRecords((r) => ({ ...r, [k]: !r[k] }));
+    const fullHref = `mailto:${encodeURIComponent(recipient)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(letter)}`;
+    track('records_request_email');
+    if (fullHref.length <= 1800) {
+      window.location.href = fullHref;
+      return;
+    }
+    let clipboardOk = false;
+    try {
+      await navigator.clipboard.writeText(letter);
+      clipboardOk = true;
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      /* clipboard blocked — the letter is still selectable on screen */
+    }
+    const shortBody = clipboardOk
+      ? 'Your request letter has been copied to your clipboard — paste it here (Ctrl/Cmd + V) before sending.'
+      : 'Paste your records request letter here before sending. You can copy it from the one3seven screen.';
+    window.location.href = `mailto:${encodeURIComponent(recipient)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(shortBody)}`;
+  };
 
   const handleCopy = async () => {
     try {
@@ -274,9 +295,9 @@ export function RecordsRequestScreen({ workerName, onBackToLanding }: RecordsReq
               <button type="button" onClick={handleDownload} className="inline-flex items-center gap-1.5 rounded-[10px] border border-[#E4E5DE] bg-white px-3 py-2 text-xs font-semibold text-[#384039] hover:border-[#7C8B6F]">
                 <Download className="h-3.5 w-3.5" /> Download
               </button>
-              <a href={mailtoHref} onClick={() => track('records_request_email')} className="inline-flex items-center gap-1.5 rounded-[10px] bg-[#42574E] px-3 py-2 text-xs font-semibold text-white hover:bg-[#374a42]">
+              <button type="button" onClick={() => void handleSendEmail()} className="inline-flex items-center gap-1.5 rounded-[10px] bg-[#42574E] px-3 py-2 text-xs font-semibold text-white hover:bg-[#374a42]">
                 <Mail className="h-3.5 w-3.5" /> Send from your email
-              </a>
+              </button>
             </div>
           </div>
           <pre className="max-h-[420px] overflow-auto whitespace-pre-wrap rounded-[14px] border border-[#E4E5DE] bg-white px-5 py-4 text-[13px] leading-relaxed text-[#1B2623]" style={{ fontFamily: "'IBM Plex Mono', ui-monospace, Menlo, monospace" }}>

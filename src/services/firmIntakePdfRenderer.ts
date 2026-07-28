@@ -833,12 +833,27 @@ function drawDecisionCard(c: Cursor, model: FirmPacketModel, srcIndex: Map<strin
   // Restore this block once counsel clears. The full 8B wage-exposure section remains counsel-gated
   // separately. See [[feedback_public_surface_no_conclude]].
 
-  const term = events.find((e) => /terminat/i.test(e.title));
-  const prot = events.find((e) => /complaint|hr|report|raised|warning/i.test(e.title));
-  if (term || prot) {
+  // Doctrine + correctness: sort chronologically, surface EVERY dated report plus the termination,
+  // never a single inferred "protected activity" anchor (that characterization is the attorney's
+  // call). Reports match complaint/grievance/concern only — not warnings (adverse) or witness
+  // statements, which previously mis-anchored the timing display.
+  const sortedEvents = [...events]
+    .map((e, i) => ({ e, i, ms: new Date(e.date).getTime() }))
+    .sort((a, b) => {
+      const aBad = Number.isNaN(a.ms);
+      const bBad = Number.isNaN(b.ms);
+      if (aBad && bBad) return a.i - b.i;
+      if (aBad) return 1;
+      if (bBad) return -1;
+      return a.ms - b.ms || a.i - b.i;
+    })
+    .map((x) => x.e);
+  const term = sortedEvents.find((e) => /terminat|separation/i.test(e.title));
+  const reports = sortedEvents.filter((e) => /\bcomplaint\b|grievance|concern/i.test(e.title));
+  if (term || reports.length) {
     const parts: string[] = [];
+    if (reports.length) parts.push(`reports & complaints on file ${reports.map((r) => r.date).join(', ')}`);
     if (term) parts.push(`termination ${term.date}`);
-    if (prot) parts.push(`protected activity ${prot.date}`);
     field('KEY DATES FOR YOUR REVIEW', `${parts.join('   ·   ')} — surfaced for your timeliness assessment, not a deadline determination.`);
   }
 

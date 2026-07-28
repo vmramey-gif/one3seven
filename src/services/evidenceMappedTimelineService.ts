@@ -468,9 +468,11 @@ function specificTitleFromRecord(
 
   const name = record.file_name.toLowerCase();
   const topics = record.employment_topics.join(' ').toLowerCase();
+  const docType = `${record.document_type ?? ''} ${record.legacy_upload_category ?? ''}`.toLowerCase();
   // A witness/coworker statement is a third party's account, not the worker's own and not an HR
-  // complaint. Guard it first so it is never mislabeled by the complaint/HR branch below.
-  if (/(^|_|\s)witness(es)?(_|\s|\.|$)/.test(name) || /\bwitness\b/.test(topics)) {
+  // complaint. Title it from its document TYPE/category first (the most reliable signal), then
+  // filename/topics — guarded before the complaint/HR branch so it is never mislabeled.
+  if (/witness/.test(docType) || /(^|_|\s)witness(es)?(_|\s|\.|$)/.test(name) || /\bwitness\b/.test(topics)) {
     return 'Witness statement provided';
   }
   // Defense in depth: a worker's own statement is a narrative, not a specific documented event —

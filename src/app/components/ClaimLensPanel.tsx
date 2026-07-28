@@ -106,13 +106,12 @@ export function ClaimLensPanel({ input }: { input: ClaimLensInput }) {
 
           <div className="cov">
             <div>
-              <div className="ck">Element coverage</div>
-              <div className="big">{view.coverage.pct}%</div>
+              <div className="ck">Elements with material</div>
+              <div className="big">{view.coverage.withMaterial} of {view.coverage.total}</div>
             </div>
             <div style={{ flex: 1 }}>
-              <div className="bar"><i style={{ width: `${view.coverage.pct}%` }} /></div>
               <div className="sub">
-                {view.coverage.withMaterial} of {view.coverage.total} elements have material on file. A structural fact about the record — not an assessment of the case.
+                {view.coverage.withMaterial} of {view.coverage.total} elements have material on file; the rest show as absence. A structural fact about the record — not a score, and not an assessment of the case.
               </div>
             </div>
           </div>

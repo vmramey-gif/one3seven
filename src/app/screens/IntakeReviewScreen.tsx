@@ -505,15 +505,32 @@ export function IntakeReviewScreen({
   };
 
   const timelineForDisplay: TimelineEvent[] = (() => {
-    if (preferConnectedLiveIntake) {
-      if (firmLiveViewLoading) return [];
+    const base: TimelineEvent[] = (() => {
+      if (preferConnectedLiveIntake) {
+        if (firmLiveViewLoading) return [];
+        if (firmLiveView?.events?.length) return mapEventsToTimeline(firmLiveView);
+        return [];
+      }
       if (firmLiveView?.events?.length) return mapEventsToTimeline(firmLiveView);
-      return [];
-    }
-    if (firmLiveView?.events?.length) return mapEventsToTimeline(firmLiveView);
-    const wsTimeline = mapWorkspaceTimelineForReview(intakeWorkspace);
-    if (wsTimeline.length) return wsTimeline;
-    return mockTimelineEvents;
+      const wsTimeline = mapWorkspaceTimelineForReview(intakeWorkspace);
+      if (wsTimeline.length) return wsTimeline;
+      return mockTimelineEvents;
+    })();
+    // Chronological order is load-bearing: "The sequence", the chronology, and the key-date
+    // anchors all read top-to-bottom. An unsorted feed put a May-2026 record above a March-2021
+    // start and mis-anchored the timing display. Sort ascending; undated events sink to the end
+    // (stable), never jumping ahead of dated ones.
+    return [...base]
+      .map((e, i) => ({ e, i, ms: new Date(e.date).getTime() }))
+      .sort((a, b) => {
+        const aBad = Number.isNaN(a.ms);
+        const bBad = Number.isNaN(b.ms);
+        if (aBad && bBad) return a.i - b.i;
+        if (aBad) return 1;
+        if (bBad) return -1;
+        return a.ms - b.ms || a.i - b.i;
+      })
+      .map((x) => x.e);
   })();
 
   const documentCategoriesForDisplay = (() => {
@@ -1182,14 +1199,13 @@ export function IntakeReviewScreen({
               snapshotItems.push({ label: 'Records', value: `${reconstructedRecordCount} document${reconstructedRecordCount === 1 ? '' : 's'}` });
               if (lastDocumentedEvent) snapshotItems.push({ label: lastDocumentedEvent.label, value: lastDocumentedEvent.value });
 
-              // Key dates — parity with the PDF Decision Card. Surfaces the termination date and the
-              // earliest protected-activity date for the attorney's timeliness read. Doctrine: these
-              // are DATES, never a deadline determination — we surface, counsel decides.
+              // Key dates — parity with the PDF Decision Card. Doctrine: surface EVERY dated report
+              // and the termination, never a single inferred "protected activity" anchor. Which report
+              // (if any) starts a limitations clock is a legal characterization — the attorney's call,
+              // not ours. We show dated facts; counsel decides. "Reports & complaints" matches actual
+              // complaint/grievance/concern events only — not warnings (adverse) or witness statements.
+              const reportEvts = timelineForDisplay.filter((e) => /\bcomplaint\b|grievance|concern/i.test(e.event));
               const termEvt = timelineForDisplay.find((e) => /terminat|separation/i.test(e.event));
-              const protEvt = timelineForDisplay.find((e) => /complaint|hr|report|raised|warning/i.test(e.event));
-              const keyDates: Array<{ label: string; value: string }> = [];
-              if (protEvt) keyDates.push({ label: 'Protected activity', value: protEvt.date });
-              if (termEvt) keyDates.push({ label: 'Termination', value: termEvt.date });
 
               return (
                 <motion.div
@@ -1226,16 +1242,24 @@ export function IntakeReviewScreen({
                       </div>
                     </div>
                   )}
-                  {keyDates.length > 0 && (
+                  {(reportEvts.length > 0 || termEvt) && (
                     <div className="mt-4 border-t border-white/10 pt-3">
                       <p className="text-[10px] uppercase tracking-wider text-white/40 mb-2">Key dates for your review</p>
                       <div className="flex flex-wrap gap-x-8 gap-y-2">
-                        {keyDates.map((d) => (
-                          <div key={d.label}>
-                            <p className="text-[10px] uppercase tracking-wider text-white/40 mb-0.5">{d.label}</p>
-                            <p className="text-sm font-medium text-white">{d.value}</p>
+                        {reportEvts.length > 0 && (
+                          <div>
+                            <p className="text-[10px] uppercase tracking-wider text-white/40 mb-0.5">Reports &amp; complaints on file</p>
+                            {reportEvts.map((e, i) => (
+                              <p key={i} className="text-sm font-medium text-white">{e.date}</p>
+                            ))}
                           </div>
-                        ))}
+                        )}
+                        {termEvt && (
+                          <div>
+                            <p className="text-[10px] uppercase tracking-wider text-white/40 mb-0.5">Termination</p>
+                            <p className="text-sm font-medium text-white">{termEvt.date}</p>
+                          </div>
+                        )}
                       </div>
                       <p className="mt-2 text-[10px] leading-relaxed text-white/35">
                         Surfaced for your timeliness assessment — not a deadline determination.
