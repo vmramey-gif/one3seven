@@ -100,6 +100,9 @@ const SITE_LINK_GROUPS: { group: string; items: { path: string; label: string; d
     { path: '/company-demo', label: 'Demo coach', desc: 'Rep demo guide (Coach / Present)' },
     { path: '/company-demo/debrief', label: 'Demo debrief', desc: 'Post-demo debrief form' },
   ]},
+  { group: 'Pitch & strategy', items: [
+    { path: '/pitch-film.html', label: 'The Pitch — narrated', desc: 'Voiced strategy film (arithmetic, Claim Lens, why now) — plays on your phone' },
+  ]},
   { group: 'Legal', items: [
     { path: '/terms', label: 'Terms of Service', desc: 'Legal terms' },
     { path: '/privacy', label: 'Privacy Policy', desc: 'Privacy policy' },

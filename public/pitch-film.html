@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>one3seven — The Pitch, Narrated (voiced)</title>
+<style>
+  :root {
+    --bg:#0E1512; --bg2:#0A100D; --panel:#16201B;
+    --ink:#ECF0E8; --soft:#9DA99F; --faint:#6B776E;
+    --sage:#8FB8A2; --sage-deep:#B7D2C4; --orange:#E08A4E; --violet:#B69AE6;
+    --line:#263029; --muted:#3A463E;
+    --serif:'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;
+    --sans:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+    --mono:ui-monospace,'SF Mono','Cascadia Mono',Menlo,monospace;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  body{background:radial-gradient(120% 90% at 50% 0%,#16201B 0%,var(--bg) 46%,var(--bg2) 100%);
+    color:var(--ink);font-family:var(--sans);min-height:100%;-webkit-font-smoothing:antialiased;}
+  .app{max-width:1120px;margin:0 auto;padding:22px 22px 44px;}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;}
+  .brand{font-family:var(--serif);font-weight:600;font-size:18px;} .brand b{color:var(--orange);}
+  .topmeta{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);}
+  .stage{position:relative;margin-top:16px;border:1px solid var(--line);border-radius:20px;
+    background:linear-gradient(160deg,#17211C 0%,#101713 100%);aspect-ratio:16/9;overflow:hidden;
+    box-shadow:0 30px 80px rgba(0,0,0,.45);}
+  .slide{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;
+    padding:clamp(22px,4.4vw,56px);opacity:0;transform:translateY(12px);transition:opacity .5s,transform .5s;pointer-events:none;overflow:auto;}
+  .slide.active{opacity:1;transform:none;pointer-events:auto;}
+  @media (prefers-reduced-motion:reduce){.slide{transition:none;}}
+  .kick{font-family:var(--mono);font-size:clamp(9px,1.2vw,12px);letter-spacing:.2em;text-transform:uppercase;color:var(--sage);margin-bottom:14px;}
+  h2{font-family:var(--serif);font-weight:600;letter-spacing:-.015em;font-size:clamp(23px,4.4vw,50px);line-height:1.04;margin:0 0 14px;text-wrap:balance;max-width:22ch;}
+  h2 em{color:var(--orange);font-style:italic;}
+  .body{font-size:clamp(13px,1.7vw,19px);color:var(--soft);max-width:48ch;line-height:1.5;}
+  .body strong{color:var(--ink);font-weight:600;} .body .v{color:var(--violet);}
+  .assume{margin-top:14px;font-family:var(--mono);font-size:10.5px;color:var(--faint);letter-spacing:.03em;max-width:60ch;}
+  .callout{display:inline-block;margin-top:14px;border:1px solid color-mix(in srgb,var(--orange) 45%,var(--line));
+    color:var(--orange);border-radius:999px;padding:6px 14px;font-family:var(--mono);font-size:12px;letter-spacing:.04em;}
+
+  /* frames */
+  .frames{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:52ch;}
+  .frame{border:1px solid var(--line);border-radius:12px;padding:14px 16px;}
+  .frame .l{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px;}
+  .frame.firm .l{color:var(--orange);} .frame.vision .l{color:var(--sage);}
+  .frame p{margin:0;font-size:clamp(12px,1.5vw,15px);color:var(--soft);}
+
+  /* bar chart */
+  .bars{display:flex;flex-direction:column;gap:14px;max-width:60ch;margin-top:6px;}
+  .bar{display:grid;grid-template-columns:130px 1fr auto;align-items:center;gap:14px;}
+  .bar .lab{font-size:13px;color:var(--soft);} .bar .lab b{color:var(--ink);display:block;font-weight:600;}
+  .bar .track{height:22px;background:#0E1512;border:1px solid var(--line);border-radius:6px;overflow:hidden;}
+  .bar .fill{height:100%;width:0;border-radius:5px;transition:width 1.1s cubic-bezier(.2,.7,.2,1);}
+  .bar.t .fill{background:var(--muted);} .bar.g .fill{background:var(--orange);} .bar.o .fill{background:var(--sage);}
+  .bar .val{font-family:var(--mono);font-size:14px;color:var(--ink);min-width:78px;text-align:right;font-variant-numeric:tabular-nums;}
+  .big-x{font-family:var(--serif);font-size:clamp(22px,4vw,40px);color:var(--sage-deep);margin-top:12px;}
+
+  /* wash math */
+  .wash{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px 22px;margin-top:6px;font-variant-numeric:tabular-nums;}
+  .wash .item{display:flex;flex-direction:column;}
+  .wash .n{font-family:var(--serif);font-size:clamp(26px,5vw,52px);line-height:1;}
+  .wash .n.save{color:var(--sage);} .wash .n.cost{color:var(--orange);} .wash .n.net{color:var(--sage-deep);}
+  .wash .c{font-family:var(--mono);font-size:11px;color:var(--faint);letter-spacing:.06em;text-transform:uppercase;margin-top:6px;}
+  .wash .op{font-family:var(--serif);font-size:clamp(24px,4vw,44px);color:var(--faint);}
+
+  /* claim lens mini */
+  .lens{display:flex;flex-direction:column;gap:9px;max-width:56ch;margin-top:4px;}
+  .elrow{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:10px;padding:9px 13px;}
+  .elrow .en{font-size:13.5px;color:var(--ink);flex:1;}
+  .elrow .dots{display:inline-flex;gap:4px;} .elrow .dots i{width:8px;height:8px;border-radius:50%;}
+  .elrow .dots i.on{background:var(--sage);} .elrow .dots i.off{border:1.4px solid var(--muted);}
+  .elrow.gap{border-color:color-mix(in srgb,var(--orange) 40%,var(--line));}
+  .elrow.gap .en{color:var(--orange);}
+  .elrow .st{font-family:var(--mono);font-size:10px;color:var(--faint);letter-spacing:.06em;}
+
+  /* matrix */
+  .matrix{width:100%;border-collapse:collapse;font-size:clamp(11px,1.4vw,14px);margin-top:4px;}
+  .matrix th,.matrix td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);}
+  .matrix thead th{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);font-weight:400;}
+  .matrix thead th.o{color:var(--sage);}
+  .matrix td.f{color:var(--soft);}
+  .matrix td.c{text-align:center;font-family:var(--mono);}
+  .yes{color:var(--sage);} .no{color:var(--muted);} .part{color:var(--orange);}
+  .matrix td.o{color:var(--ink);font-weight:600;}
+  .matrix-wrap{overflow-x:auto;}
+
+  /* eco / compound flow */
+  .chain{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap;margin-top:6px;}
+  .chip{border:1px solid var(--line);border-radius:12px;padding:12px 16px;min-width:150px;}
+  .chip .h{font-family:var(--serif);font-size:16px;} .chip .d{font-size:12px;color:var(--soft);margin-top:3px;}
+  .chip.win{border-color:color-mix(in srgb,var(--sage) 40%,var(--line));}
+  .arrow{align-self:center;color:var(--faint);font-size:20px;}
+  .lanes3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:60ch;margin-top:4px;}
+  .lane3{border:1px solid var(--line);border-radius:12px;padding:12px 14px;}
+  .lane3 .t{font-family:var(--serif);font-size:clamp(14px,1.8vw,18px);} .lane3 .d{font-size:12px;color:var(--soft);margin-top:4px;}
+
+  .counter{position:absolute;top:15px;right:19px;font-family:var(--mono);font-size:12px;color:var(--faint);}
+  .ticks{position:absolute;left:19px;right:19px;bottom:14px;display:flex;gap:4px;}
+  .ticks span{height:3px;flex:1;border-radius:2px;background:var(--line);} .ticks span.done{background:var(--sage);}
+
+  .controls{margin-top:16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  button.ctl{font-family:var(--sans);font-size:14px;color:var(--ink);background:var(--panel);border:1px solid var(--line);
+    border-radius:999px;padding:10px 16px;cursor:pointer;} button.ctl:hover{border-color:var(--sage);}
+  button.play{background:var(--sage);color:#0E1512;border-color:var(--sage);font-weight:700;padding:10px 22px;}
+  .spacer{flex:1;} .rate{font-family:var(--mono);font-size:11px;color:var(--faint);display:flex;gap:8px;align-items:center;}
+  .rate input{accent-color:var(--sage);}
+  .caption{margin-top:14px;min-height:46px;border-left:2px solid var(--sage);padding:4px 0 4px 16px;font-size:15px;color:var(--soft);font-style:italic;}
+  .caption b{color:var(--ink);font-style:normal;}
+  details{margin-top:22px;border-top:1px solid var(--line);padding-top:16px;}
+  summary{cursor:pointer;font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--sage);}
+  .beat{display:grid;grid-template-columns:48px 1fr;gap:14px;padding:12px 0;border-top:1px solid var(--line);}
+  .beat:first-of-type{border-top:none;} .beat .n{font-family:var(--mono);font-size:12px;color:var(--faint);}
+  .beat p{margin:0;font-size:14px;color:var(--soft);line-height:1.55;} .beat .st{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--sage);}
+  .note{margin-top:16px;font-size:12.5px;color:var(--faint);line-height:1.6;} .note code{font-family:var(--mono);color:var(--soft);}
+  @media (max-width:720px){ .frames,.lanes3{grid-template-columns:1fr;} .bar{grid-template-columns:96px 1fr auto;} }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar"><div class="brand">one3<b>seven</b></div><div class="topmeta">The pitch · narrated in the intake voice</div></div>
+
+  <div class="stage" id="stage">
+    <div class="counter" id="counter">01 / 15</div>
+    <div id="film"></div>
+    <div class="ticks" id="ticks"></div>
+  </div>
+
+  <div class="controls">
+    <button class="ctl play" id="play">▶ Play film</button>
+    <button class="ctl" id="prev">‹ Prev</button>
+    <button class="ctl" id="next">Next ›</button>
+    <button class="ctl" id="restart">↺ Restart</button>
+    <div class="spacer"></div>
+    <label class="rate">speed <input id="rate" type="range" min="0.85" max="1.25" step="0.05" value="1"></label>
+  </div>
+  <div class="caption" id="caption"><b>Press Play.</b> Narrated in your intake's ElevenLabs voice. Each slide plays its clip and advances on its own.</div>
+
+  <audio id="audio" preload="auto"></audio>
+
+  <details>
+    <summary>Full narration script — read &amp; study</summary>
+    <div id="scriptOut"></div>
+    <p class="note">Voiced with the same ElevenLabs voice as the intake (<code>scripts/gen-voice.mjs</code> → <code>voice/pitch/*.mp3</code>). To capture a real <code>.mp4</code>, screen-record this tab while it plays (Win+G / Cmd+Shift+5). Every figure is an <strong>illustrative, firm-editable assumption</strong> shown on screen — not a proven benchmark, and litigation leverage is framed as removed rework, never a guaranteed faster verdict.</p>
+  </details>
+</div>
+
+<script>
+(function(){
+  var S = [
+    {k:"one3seven · internal", html:'<h2>We’ve been selling the wrong thing.</h2><div class="body">We pitched <strong>intake software for firms</strong>. We built something with no name yet — and the arithmetic makes the case for a hesitant firm all by itself.</div>'},
+    {k:"The enemy", html:'<h2>Every case starts the same <em>broken</em> way.</h2><div class="body">A worker with pay stubs in a drawer. Then a lawyer burns <strong>90 minutes</strong> cold-reading a stranger’s mess to decide if it’s worth taking.</div><span class="callout">that 90 minutes is unbillable — pure cost</span>'},
+    {k:"The scar", html:'<h2>We didn’t guess. We <em>lived</em> it.</h2><div class="body">Victoria ran this exact method on her <strong>own</strong> insurance claim — organized the record herself, handed it to the lawyers, and <strong>settled at the cap</strong>.</div>'},
+    {k:"Positioning discipline", html:'<h2>Say it their way. Think it ours.</h2><div class="frames"><div class="frame firm"><div class="l">To a firm</div><p>“The fastest, most compliant way to screen a case.”</p></div><div class="frame vision"><div class="l">To an investor</div><p>“The worker-owned system of record.” The category.</p></div></div>'},
+    {k:"The math · minutes per intake", html:'<h2>18 minutes, not <em>90</em>.</h2><div class="bars">'+
+      '<div class="bar t"><div class="lab">Traditional<b>cold read</b></div><div class="track"><div class="fill" data-w="100"></div></div><div class="val">90 min</div></div>'+
+      '<div class="bar g"><div class="lab">Top AI intake<b>summary, unverified</b></div><div class="track"><div class="fill" data-w="61"></div></div><div class="val">55 min</div></div>'+
+      '<div class="bar o"><div class="lab">one3seven<b>source-linked + Coverage</b></div><div class="track"><div class="fill" data-w="20"></div></div><div class="val">18 min</div></div>'+
+      '</div><div class="assume">Illustrative, firm-editable. Time to a screening decision on one new intake.</div>'},
+    {k:"Throughput · 10 hrs/week on screening", html:'<h2>Same hours. <em>5×</em> the cases.</h2><div class="bars">'+
+      '<div class="bar t"><div class="lab">Traditional</div><div class="track"><div class="fill" data-w="21"></div></div><div class="val">~7 / wk</div></div>'+
+      '<div class="bar g"><div class="lab">Top AI intake</div><div class="track"><div class="fill" data-w="33"></div></div><div class="val">~11 / wk</div></div>'+
+      '<div class="bar o"><div class="lab">one3seven</div><div class="track"><div class="fill" data-w="100"></div></div><div class="val">~33 / wk</div></div>'+
+      '</div><div class="big-x">≈ 5× traditional · 3× the best AI tool</div>'},
+    {k:"The wash-out · unbillable hours recovered", html:'<h2>A wash at worst. Usually <em>4–5×</em>.</h2><div class="wash">'+
+      '<div class="item"><div class="n save">+$2,700</div><div class="c">saved / month</div></div><div class="op">−</div>'+
+      '<div class="item"><div class="n cost">$549</div><div class="c">Firm tier</div></div><div class="op">=</div>'+
+      '<div class="item"><div class="n net">+$2,151</div><div class="c">net / month</div></div></div>'+
+      '<div class="assume">25 intakes/mo × ~72 min saved × $90/hr blended, unbillable time recovered. Stingy assumptions → a wash; realistic → 4–5× the price — before one extra case is signed.</div>'},
+    {k:"What earns the 18 minutes", html:'<h2>Claim Lens.</h2><div class="lens">'+
+      '<div class="elrow"><span class="en">Reports &amp; complaints on file</span><span class="dots"><i class="on"></i><i class="on"></i><i class="on"></i></span><span class="st">3 on file</span></div>'+
+      '<div class="elrow"><span class="en">Employment actions after, with dates</span><span class="dots"><i class="on"></i><i class="on"></i></span><span class="st">2 on file</span></div>'+
+      '<div class="elrow gap"><span class="en">Employer awareness material</span><span class="st">no material on file</span></div>'+
+      '</div><div class="body" style="margin-top:12px">Pick a theory → the record re-sorts by that claim’s <strong>statutory elements</strong>. Shows what’s on file, and — loudly — what’s <span class="v">missing</span>. A coverage map, never a verdict.</div>'},
+    {k:"Why we’re safe", html:'<h2>You’ll fact-check anyway. <em>One click.</em></h2><div class="body">Every fact links to the exact page it came from — no hunting through a PDF. one3seven <strong>organizes and cites; it never concludes.</strong> The attorney decides. That’s the pattern <span class="v">AB 316</span> rewards: burden on the lawyer, everything auditable to a source.</div>'},
+    {k:"The full picture", html:'<h2>More than an intake tool.</h2><div class="matrix-wrap"><table class="matrix"><thead><tr><th>&nbsp;</th><th>Traditional</th><th>Top AI intake</th><th class="o">one3seven</th></tr></thead><tbody>'+
+      '<tr><td class="f">Source-linked facts</td><td class="c no">✗</td><td class="c part">partial</td><td class="c o yes">✓</td></tr>'+
+      '<tr><td class="f">Never concludes (UPL-safe)</td><td class="c">—</td><td class="c part">risky</td><td class="c o yes">provable</td></tr>'+
+      '<tr><td class="f">Coverage Rate metric</td><td class="c no">✗</td><td class="c no">✗</td><td class="c o yes">✓</td></tr>'+
+      '<tr><td class="f">Worker owns &amp; maintains record</td><td class="c no">✗</td><td class="c no">✗</td><td class="c o yes">✓</td></tr>'+
+      '<tr><td class="f">Fact-check speed</td><td class="c no">slow</td><td class="c part">medium</td><td class="c o yes">one-click</td></tr>'+
+      '<tr><td class="f">Intakes / 10-hr week</td><td class="c">~7</td><td class="c">~11</td><td class="c o yes">~33</td></tr>'+
+      '<tr><td class="f">Reused downstream</td><td class="c no">✗</td><td class="c no">✗</td><td class="c o yes">✓</td></tr>'+
+      '</tbody></table></div>'},
+    {k:"The deepest difference", html:'<h2>A worker who <em>owns</em> it cooperates.</h2><div class="chain"><div class="chip"><div class="h">Generic AI</div><div class="d">a form filled once, then abandoned</div></div><div class="arrow">vs</div><div class="chip win"><div class="h">one3seven</div><div class="d">a free journey the worker owns &amp; maintains — reminders, records requests, mitigation log</div></div></div><div class="body" style="margin-top:12px">Better inputs, automatically, across <strong>18–36 months</strong> — fewer follow-up cycles, a more complete file.</div>'},
+    {k:"The work compounds", html:'<h2>Screen it once. <em>Reuse</em> it everywhere.</h2><div class="chain"><div class="chip win"><div class="h">Intake</div><div class="d">18-min screen</div></div><div class="arrow">→</div><div class="chip"><div class="h">Demand letter</div><div class="d">same source-linked spine</div></div><div class="arrow">→</div><div class="chip"><div class="h">Mediation brief</div><div class="d">no rework</div></div></div><div class="body" style="margin-top:12px">Not a promise of a faster verdict — the <strong>rework between stages</strong> is removed.</div>'},
+    {k:"Why now", html:'<h2>The window is <em>open</em>.</h2><div class="body"><strong>$2.1B</strong> in legal-AI in H1 2026. Attorney AI-fear peaking — a two-quarter teacher window. <span class="v">AB 316</span> rewards our auditable pattern. Nobody owns the compliant, California, worker-first niche.</div>'},
+    {k:"What each of you owns", html:'<h2>Three functions. One position.</h2><div class="lanes3"><div class="lane3"><div class="t">Revenue</div><div class="d">Rails + the AP packet that unblocks the first check.</div></div><div class="lane3"><div class="t">Sales</div><div class="d">The beachhead via the 15-min Intake Review — value anchor.</div></div><div class="lane3"><div class="t">Ops</div><div class="d">Instrument now · hygiene · the Rule-1.6 privacy wall.</div></div></div><div class="body" style="margin-top:14px">North Star: <strong>intakes routed-and-actioned per firm, per week.</strong></div>'}
+  ];
+  var SCRIPT = ["For months we have pitched one3seven as intake software for law firms…","Start with the enemy… that ninety minutes is unbillable.","We are not guessing this works — Victoria settled at the maximum.","Firms buy a better version of a thing they understand. Same product, two frames.","On conservative assumptions: 90 minutes traditional, 55 with a generic AI tool, 18 with one3seven.","Ten hours a week: about seven intakes, versus eleven, versus thirty-three — five times traditional.","Unbillable time recovered: ~$2,700 saved vs a $549 tier. Wash at worst, 4–5× typical.","Claim Lens re-sorts the record by a claim’s statutory elements — shows what’s on file and what’s missing. Never a verdict.","You fact-check anyway — we make it one click. Organizes and cites, never concludes. AB 316-aligned.","Source-linked facts, a Coverage Rate no one computes, provably non-concluding — a review-ready file, not a form.","A worker who owns their record cooperates — better inputs automatically over 18–36 months.","The same record screens the case, then seeds the demand and the brief — rework removed.","Legal-AI is white-hot, fear is peaking, AB 316 is a tailwind, and the niche is open.","Revenue owns the rails, Sales the beachhead, Ops the machine and the privacy wall. One North Star.","Three gates before a paying firm. We go big and hold the gates. We built the record the system was missing."];
+  var STAGE = S.map(function(s){return s.k;});
+
+  var film=document.getElementById('film'),ticks=document.getElementById('ticks'),counter=document.getElementById('counter'),
+      caption=document.getElementById('caption'),scriptOut=document.getElementById('scriptOut'),
+      playBtn=document.getElementById('play'),rateEl=document.getElementById('rate'),audio=document.getElementById('audio');
+  var i=0,playing=false;
+
+  S.forEach(function(s,idx){
+    var d=document.createElement('div');d.className='slide';d.innerHTML='<div class="kick">'+s.k+'</div>'+s.html;film.appendChild(d);
+    var t=document.createElement('span');ticks.appendChild(t);
+    var b=document.createElement('div');b.className='beat';
+    b.innerHTML='<div class="n">'+String(idx+1).padStart(2,'0')+'</div><div><div class="st">'+STAGE[idx]+'</div><p>'+SCRIPT[idx]+'</p></div>';
+    scriptOut.appendChild(b);
+  });
+  var slides=film.querySelectorAll('.slide'),tickEls=ticks.querySelectorAll('span');
+
+  function animateBars(){ slides[i].querySelectorAll('.fill').forEach(function(f){ f.style.width='0'; requestAnimationFrame(function(){ setTimeout(function(){ f.style.width=(f.dataset.w||0)+'%'; },60); }); }); }
+  function paint(){
+    slides.forEach(function(el,idx){el.classList.toggle('active',idx===i);});
+    tickEls.forEach(function(el,idx){el.classList.toggle('done',idx<=i);});
+    counter.textContent=String(i+1).padStart(2,'0')+' / '+String(S.length).padStart(2,'0');
+    caption.innerHTML=(playing?'<b>▶</b> ':'')+SCRIPT[i];
+    animateBars();
+  }
+  function src(n){return 'voice/pitch/pitch_'+String(n+1).padStart(2,'0')+'.mp3';}
+  function playCurrent(){
+    audio.src=src(i); audio.playbackRate=parseFloat(rateEl.value)||1;
+    var p=audio.play();
+    if(p&&p.catch)p.catch(function(){ caption.innerHTML='<b>Tap Play once more</b> — the browser blocked autoplay until you interact.'; });
+  }
+  audio.addEventListener('ended',function(){ if(!playing)return; if(i<S.length-1){i++;paint();playCurrent();} else {playing=false;setLabel();caption.innerHTML='<b>Fin.</b> Replay any beat, or open the script to study it.'; } });
+  function setLabel(){playBtn.textContent=playing?'❙❙ Pause':'▶ Play film';}
+
+  playBtn.addEventListener('click',function(){ playing=!playing;setLabel(); if(playing){paint();playCurrent();} else audio.pause(); });
+  document.getElementById('next').addEventListener('click',function(){ if(i<S.length-1){i++;paint(); if(playing)playCurrent();} });
+  document.getElementById('prev').addEventListener('click',function(){ if(i>0){i--;paint(); if(playing)playCurrent();} });
+  document.getElementById('restart').addEventListener('click',function(){ i=0;paint(); if(playing)playCurrent(); else audio.pause(); });
+  rateEl.addEventListener('input',function(){ audio.playbackRate=parseFloat(rateEl.value)||1; });
+
+  paint();
+})();
+</script>
+</body>
+</html>
