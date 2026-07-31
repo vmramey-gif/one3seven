@@ -13,7 +13,11 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
-const MODEL = 'claude-sonnet-4-6';
+// Model is an ENV VAR so it can be changed via `supabase secrets set EXTRACTION_MODEL=...` WITHOUT a
+// code redeploy. Fallbacks are tried in order if the primary is rejected (renamed / removed / access).
+const MODEL = Deno.env.get('EXTRACTION_MODEL')?.trim() || 'claude-sonnet-5';
+const MODEL_FALLBACKS = (Deno.env.get('EXTRACTION_MODEL_FALLBACKS')?.trim() || 'claude-sonnet-4-5')
+  .split(',').map((m) => m.trim()).filter(Boolean);
 const BUCKET = 'intake-files';
 const MAX_TEXT_CHARS = 12_000;
 const MAX_TOKENS = 3000;
@@ -279,56 +283,69 @@ async function callClaude(
   apiKey: string
 ): Promise<DocumentFacts | null> {
   const MAX_ATTEMPTS = 3;
+  const models = [MODEL, ...MODEL_FALLBACKS];
+  // Optional tuning params Anthropic MAY deprecate over time (this is how `temperature` broke us).
+  // Kept here so a 400 that names one auto-strips it and retries, instead of failing the whole call.
+  const tuning: Record<string, unknown> = {};
   let lastError = '';
 
-  for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
-    const response = await fetch(ANTHROPIC_API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-beta': 'pdfs-2024-09-25',
-      },
-      body: JSON.stringify({
-        model: MODEL,
-        max_tokens: MAX_TOKENS,
-        temperature: 0, // deterministic extraction — reproducible for legal review
-        // cache_control bills repeat calls within the cache window at the cheaper cached-read rate.
-        system: [{ type: 'text', text: SYSTEM_PROMPT, cache_control: { type: 'ephemeral' } }],
-        messages,
-      }),
-    });
+  for (const model of models) {
+    for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+      const response = await fetch(ANTHROPIC_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-beta': 'pdfs-2024-09-25',
+        },
+        body: JSON.stringify({
+          model,
+          max_tokens: MAX_TOKENS,
+          system: [{ type: 'text', text: SYSTEM_PROMPT, cache_control: { type: 'ephemeral' } }],
+          messages,
+          ...tuning,
+        }),
+      });
 
-    // Transient errors (rate limit / overloaded) — back off and retry.
-    if (response.status === 429 || response.status === 503 || response.status === 529) {
-      lastError = `Anthropic API ${response.status} (transient)`;
-      await new Promise((r) => setTimeout(r, 800 * (attempt + 1)));
-      continue;
+      // Transient (rate limit / overloaded) — back off and retry the SAME model.
+      if (response.status === 429 || response.status === 503 || response.status === 529) {
+        lastError = `Anthropic API ${response.status} (transient)`;
+        await new Promise((r) => setTimeout(r, 800 * (attempt + 1)));
+        continue;
+      }
+
+      if (!response.ok) {
+        const errText = await response.text();
+        // Always log the real error to Supabase function logs — never let it hide again.
+        console.error(`[extract] Anthropic ${response.status} (model=${model}): ${errText}`);
+        if (response.status === 400) {
+          // SELF-HEAL: if the 400 names a tuning param we sent, drop it and retry the same model.
+          const field = errText.match(/`([a-zA-Z_]+)`/)?.[1];
+          if (field && field in tuning) { delete tuning[field]; attempt--; continue; }
+          // A model-specific 400 → try the next fallback model.
+          if (/\bmodel\b/i.test(errText)) { lastError = errText; break; }
+        }
+        // Model not found → try the next fallback model.
+        if (response.status === 404) { lastError = errText; break; }
+        // Anything else is a genuine error — surface it (auth, overloaded content, etc.).
+        throw new Error(`Anthropic API error ${response.status}: ${errText}`);
+      }
+
+      const data = await response.json();
+      const content = data?.content?.[0]?.text ?? '';
+      return parseFacts(content); // may be null; a deterministic retry would be identical
     }
-
-    if (!response.ok) {
-      const err = await response.text();
-      throw new Error(`Anthropic API error ${response.status}: ${err}`);
-    }
-
-    const data = await response.json();
-    const content = data?.content?.[0]?.text ?? '';
-    const parsed = parseFacts(content);
-    if (parsed) return parsed;
-
-    // Parse failed — at temperature 0 a retry would be identical, so stop here.
-    return null;
   }
 
-  throw new Error(lastError || 'Anthropic API call failed after retries');
+  throw new Error(lastError || 'Anthropic API call failed after all models/retries');
 }
 
 // ---------------------------------------------------------------------------
 // Main handler
 // ---------------------------------------------------------------------------
 
-Deno.serve(async (req: Request) => {
+async function handle(req: Request): Promise<Response> {
   if (req.method === 'OPTIONS') {
     return new Response(null, {
       headers: {
@@ -388,13 +405,33 @@ Deno.serve(async (req: Request) => {
   if (authErr || !user) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
   }
+  // Allow the intake OWNER (worker) OR a firm reviewer whose firm holds a full_access route to this
+  // intake. (Previously owner-only, which 403'd every firm reviewer — firms couldn't run extraction.)
   const { data: ownerRows } = await supabase
     .from('uploaded_files')
     .select('worker_id')
     .eq('intake_id', intake_id)
     .limit(1);
   const ownerId = ownerRows?.[0]?.worker_id ?? null;
-  if (ownerId && ownerId !== user.id) {
+  const isOwner = !!ownerId && ownerId === user.id;
+  let firmHasAccess = false;
+  if (!isOwner) {
+    const { data: route } = await supabase
+      .from('intake_routes')
+      .select('id')
+      .eq('intake_id', intake_id)
+      .eq('route_status', 'full_access')
+      .in('firm_id', (
+        await supabase
+          .from('firm_profiles')
+          .select('id')
+          .eq('profile_id', user.id)
+          .then(({ data }) => (data ?? []).map((r: any) => r.id as string))
+      ))
+      .maybeSingle();
+    firmHasAccess = !!route;
+  }
+  if (!isOwner && !firmHasAccess) {
     return new Response(JSON.stringify({ error: 'Forbidden' }), { status: 403 });
   }
 
@@ -440,7 +477,7 @@ Deno.serve(async (req: Request) => {
         uploadedFileId: file.id,
         intakeId: intake_id,
         workerId: file.worker_id || undefined,
-        category: normalizeCategory(file.category || ''),
+        category: normalizeCategory(file.category || '', file.file_name || ''),
         fileName: file.file_name,
         filePath: file.file_path || undefined,
       });
@@ -480,7 +517,7 @@ Deno.serve(async (req: Request) => {
     apiKey: ANTHROPIC_API_KEY,
     uploadedFileId: fileRow.id as string,
     intakeId: (fileRow.intake_id as string) ?? intake_id,
-    category: normalizeCategory((fileRow.category as string) || body.category || ''),
+    category: normalizeCategory((fileRow.category as string) || body.category || '', (fileRow.file_name as string) || body.file_name || ''),
     fileName: (fileRow.file_name as string) || body.file_name || '',
     filePath: (fileRow.file_path as string) || body.file_path,
   });
@@ -492,6 +529,25 @@ Deno.serve(async (req: Request) => {
   return new Response(JSON.stringify({ ok: true, facts: singleResult.facts }), {
     headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
   });
+}
+
+// Wrap the handler so EVERY response — including all error paths and uncaught throws — carries CORS
+// headers. Without this the browser blocks reading error responses and the supabase-js client only
+// surfaces the opaque "Failed to send a request to the Edge Function", hiding the real error.
+Deno.serve(async (req: Request): Promise<Response> => {
+  try {
+    const res = await handle(req);
+    const headers = new Headers(res.headers);
+    headers.set('Access-Control-Allow-Origin', '*');
+    headers.set('Access-Control-Allow-Headers', 'authorization, x-client-info, apikey, content-type');
+    if (!headers.has('Content-Type') && res.body) headers.set('Content-Type', 'application/json');
+    return new Response(res.body, { status: res.status, headers });
+  } catch (e) {
+    return new Response(JSON.stringify({ error: (e as Error)?.message ?? 'Unhandled edge error' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+    });
+  }
 });
 
 // ---------------------------------------------------------------------------
@@ -713,7 +769,28 @@ function sanitizeCommunicationParties(raw: unknown): Array<{ name: string; role:
 // ---------------------------------------------------------------------------
 // Category normalizer — maps DB category values to CATEGORY_GUIDANCE keys
 // ---------------------------------------------------------------------------
-function normalizeCategory(raw: string): string {
+function normalizeCategory(raw: string, fileName = ''): string {
+  // FILENAME-FIRST classification. Mirrors the client's attorneyCategoryLabel
+  // (locked by documentClassificationContract.test.ts) so the extraction guidance
+  // the server picks can't drift from the attorney-facing label. The stored DB
+  // `category` is only a fallback — a descriptive filename is the stronger signal
+  // and was previously ignored here, which is the root of the mislabel family
+  // (a written warning guided as payroll, a paycheck as an HR complaint, etc.).
+  // CamelCase is split BEFORE lowercasing ("WrittenWarning" -> "written warning"),
+  // separators collapsed, and the string padded so the ( |$) word-boundary checks fire.
+  const f = ' ' + fileName.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/[_\-.]+/g, ' ').toLowerCase() + ' ';
+  if (/witness statement/.test(f)) return 'Witness Statement';
+  if (/written warning|write ?up|disciplin/.test(f)) return 'Performance / discipline records';
+  if (/terminat/.test(f) && !/terminat.*review/.test(f)) return 'Separation Records';
+  if (/complaint to hr|hr complaint|complaint hr|complaint to supervisor|complaint supervisor/.test(f)) return 'Workplace Communications';
+  if (/project removal|coaching memo/.test(f)) return 'Performance / discipline records';
+  // Separation BEFORE payroll so "final paycheck" reads as separation, not pay.
+  if (/severance|separation|layoff|laid off|resignation|resign|final pay|final paycheck/.test(f)) return 'Separation Records';
+  if (/pay ?stub|paycheck|payroll|wage statement|earnings statement|wage record|pay record/.test(f)) return 'Pay Records / Payroll';
+  // A bare statement/declaration/affidavit (not a bank/income/pay statement) is a worker/coworker account.
+  if (/(^| )(statement|declaration|affidavit)( |$)/.test(f) && !/bank|income|financial|account/.test(f)) return 'Witness Statement';
+
+  // Fallback: the stored DB category string (previous behavior).
   const c = raw.trim().toLowerCase();
   if (c.includes('workplace') || c.includes('communication') || c.includes('hr complaint') || c.includes('email')) return 'Workplace Communications';
   if (c.includes('discipline') || c.includes('disciplinary') || c.includes('performance') || c.includes('warning')) return 'Performance / discipline records';
