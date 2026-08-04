@@ -138,7 +138,10 @@ export function attorneyCategoryLabel(category: string, fileName?: string): stri
   // codebase-wide normalization audit fixed elsewhere; this call site had been missed.
   const file = normalizeFilenameForMatching(fileName ?? '');
   if (/witness statement/i.test(file)) return 'Witness Statements';
-  if (/written warning|write ?up|disciplin/i.test(file)) return 'Disciplinary Materials';
+  // "final warning" — the live Francis intake's Final Warning landed in "Additional Supporting
+  // Records" because only "written warning" matched. Keep BEFORE the separation family so
+  // "final warning" never reads as "final pay".
+  if (/written warning|final warning|write ?up|disciplin/i.test(file)) return 'Disciplinary Materials';
   if (/terminat/i.test(file) && !/terminat.*review/i.test(file)) return 'Separation Documents';
   if (/complaint to hr|hr complaint|complaint hr/i.test(file)) return 'HR Complaints & Responses';
   if (/complaint to supervisor|complaint supervisor/i.test(file)) return 'HR Complaints & Responses';

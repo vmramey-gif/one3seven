@@ -133,6 +133,25 @@ interface UploadScreenProps {
   shellMode?: boolean;
 }
 
+/**
+ * Backup name extraction — used to pre-fill the required "full name" field so the worker
+ * confirms rather than retypes. Searches whatever intake text we already have (their story,
+ * any generated overview) for a labeled name first, then a prose "NAME was employed" pattern.
+ * Deliberately conservative: returns '' rather than guess wrong.
+ */
+function guessWorkerName(...sources: Array<string | null | undefined>): string {
+  const text = sources.filter(Boolean).join('\n');
+  if (!text.trim()) return '';
+  const labeled =
+    text.match(/full name used during employment[:\s]+([^\n]+)/i) ||
+    text.match(/\bmy (?:full )?name is\s+([A-Z][a-z]+(?:\s+[A-Z][a-z'’.-]+){1,2})/) ||
+    text.match(/\bI(?:['’]| a)m\s+([A-Z][a-z]+(?:\s+[A-Z][a-z'’.-]+){1,2})\b/);
+  if (labeled?.[1]?.trim()) return labeled[1].trim().replace(/[.,;:]+$/, '');
+  const prose = text.match(/\b([A-Z][a-z]+(?:\s+[A-Z][a-z'’.-]+){1,2})\s+(?:was|is|were)\s+employed\b/);
+  if (prose?.[1]?.trim()) return prose[1].trim();
+  return '';
+}
+
 export function UploadScreen({
   onNavigate,
   uploadedFiles,
@@ -242,6 +261,20 @@ export function UploadScreen({
       return next;
     });
   };
+
+  // Pre-fill the required name from the backup extraction (their story / any generated overview),
+  // once, and only when still empty — so the worker confirms a name instead of typing it cold.
+  const namePrefillDone = useRef(false);
+  useEffect(() => {
+    if (namePrefillDone.current) return;
+    if (followUp.employmentName?.trim()) { namePrefillDone.current = true; return; }
+    const guess = guessWorkerName(workerStoryPreview, liveOverview);
+    if (guess) {
+      namePrefillDone.current = true;
+      updateFollowUp({ employmentName: guess });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [followUp.employmentName, workerStoryPreview, liveOverview]);
 
   const UPLOAD_CONSENT_NOTICE = STORY_FIRST_UPLOAD_NOTICE;
 
@@ -442,7 +475,9 @@ export function UploadScreen({
     hasMeaningfulStoryInput(workerStoryPreview) ||
     hasMeaningfulStoryInput(followUp.complainedOrReported) ||
     hasMeaningfulStoryInput(followUp.changedAfterward);
-  const canBeginOrganization = uploadedFiles.length > 0 || hasMeaningfulStoryContext;
+  const employmentNameProvided = Boolean(followUp.employmentName?.trim());
+  const canBeginOrganization =
+    (uploadedFiles.length > 0 || hasMeaningfulStoryContext) && employmentNameProvided;
 
   const handleBeginOrganization = () => {
     if (!canBeginOrganization) return;
@@ -526,15 +561,17 @@ export function UploadScreen({
     // and text extraction skips them gracefully (fileTextExtractionService returns early on non-PDF).
     // The accept attribute restricts the picker, but drag-and-drop bypasses it, so we re-check here;
     // only truly unsupported types (Word/Excel/etc.) are rejected.
-    const SUPPORTED_EXT = /\.(pdf|jpe?g|png|heic|heif|webp)$/i;
+    // .txt is included because Phase 2A text extraction fully supports it (isPhase2ASupportedUpload)
+    // — the picker was the only thing rejecting it (live Francis intake: OCR text companions).
+    const SUPPORTED_EXT = /\.(pdf|jpe?g|png|heic|heif|webp|txt)$/i;
     const isSupported = (f: File) =>
-      f.type === 'application/pdf' || f.type.startsWith('image/') || SUPPORTED_EXT.test(f.name);
+      f.type === 'application/pdf' || f.type === 'text/plain' || f.type.startsWith('image/') || SUPPORTED_EXT.test(f.name);
     const filesToUpload = incomingFiles.filter(isSupported);
     const rejectedCount = incomingFiles.length - filesToUpload.length;
 
     if (filesToUpload.length === 0) {
       if (rejectedCount > 0) {
-        setUploadError("That file type isn't supported yet. You can add a PDF or a photo (JPG, PNG, or HEIC).");
+        setUploadError("That file type isn't supported yet. You can add a PDF, a text file (.txt), or a photo (JPG, PNG, or HEIC).");
       } else {
         console.warn('[o3s-upload-ui] handleFileUpload skipped: empty selection', { source });
       }
@@ -554,7 +591,7 @@ export function UploadScreen({
 
     setUploadError(
       rejectedCount > 0
-        ? `${rejectedCount === 1 ? 'One file was' : `${rejectedCount} files were`} skipped — we support PDFs and photos (JPG, PNG, HEIC) right now. Your other ${filesToUpload.length === 1 ? 'file was' : 'files were'} added.`
+        ? `${rejectedCount === 1 ? 'One file was' : `${rejectedCount} files were`} skipped — we support PDFs, text files (.txt), and photos (JPG, PNG, HEIC) right now. Your other ${filesToUpload.length === 1 ? 'file was' : 'files were'} added.`
         : null,
     );
     setIsUploading(true);
@@ -930,7 +967,7 @@ export function UploadScreen({
               ref={fileInputRef}
               type="file"
               multiple
-              accept=".pdf,application/pdf,image/*,.jpg,.jpeg,.png,.heic,.heif,.webp"
+              accept=".pdf,application/pdf,.txt,text/plain,image/*,.jpg,.jpeg,.png,.heic,.heif,.webp"
               onChange={(e) => handleFileInputChange(e, 'picker')}
               className="hidden"
             />
@@ -1246,7 +1283,7 @@ export function UploadScreen({
                     <div>
                       <p className="text-sm font-semibold text-[#1B2623]">Intake Completeness</p>
                       <p className="mt-0.5 text-xs leading-relaxed text-[#6A6D66]">
-                        These optional details help one3seven connect your story to the records you upload.
+                        Your name is required; the rest are optional and help one3seven connect your story to the records you upload.
                       </p>
                     </div>
                     <span className="shrink-0 rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold text-[#42574E] ring-1 ring-[#CBD6CF]">
@@ -1259,6 +1296,32 @@ export function UploadScreen({
                       ].filter((v) => Boolean(String(v ?? '').trim())).length} of {isEmploymentIntake ? 6 : 4}
                     </span>
                   </div>
+                </div>
+
+                {/* Card: Full name — REQUIRED. Pre-filled from the backup name extraction when possible. */}
+                <div className={`rounded-[14px] border bg-white px-4 py-3.5 shadow-sm ${employmentNameProvided ? 'border-[#D3DED6]' : 'border-[#E0894A]/60'}`}>
+                  <div className="flex items-center justify-between gap-2">
+                    <label className="text-sm font-semibold text-[#1B2623]" htmlFor="followup-name">
+                      Your full name, as it appears on these records <span className="text-[#C2410C]">*</span>
+                    </label>
+                    <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold ${employmentNameProvided ? 'bg-[#EEF2EE] text-[#42574E]' : 'bg-[#FBE2D0] text-[#9A3412]'}`}>
+                      {employmentNameProvided ? 'Added' : 'Required'}
+                    </span>
+                  </div>
+                  <input
+                    id="followup-name"
+                    value={followUp.employmentName ?? ''}
+                    onChange={(e) => updateFollowUp({ employmentName: e.target.value })}
+                    required
+                    aria-required="true"
+                    aria-invalid={!employmentNameProvided}
+                    aria-describedby="followup-name-help"
+                    className="mt-2.5 w-full rounded-[10px] border border-[#CBD6CF] bg-white px-3 py-2.5 text-sm text-[#1B2623] placeholder:text-[#9AA39B] focus:border-[#5E7268] focus:outline-none focus:ring-2 focus:ring-[#D3DED6]"
+                    placeholder="First and last name"
+                  />
+                  <p id="followup-name-help" className="mt-2 text-xs leading-relaxed text-[#6A6D66]">
+                    This names the file so a firm knows whose records these are. It stays yours — private until you choose to share.
+                  </p>
                 </div>
 
                 {/* Card: Employer */}
@@ -1479,6 +1542,22 @@ export function UploadScreen({
             >
               {intakeHasGeneratedSummary ? 'Update Intake Summary' : 'Begin Organizing'}
             </motion.button>
+            {!employmentNameProvided && (uploadedFiles.length > 0 || hasMeaningfulStoryContext) ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setShowFollowUpDetails(true);
+                  window.setTimeout(() => {
+                    const el = document.getElementById('followup-name');
+                    el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    (el as HTMLInputElement | null)?.focus();
+                  }, 60);
+                }}
+                className="w-full rounded-[12px] border border-[#E0894A]/50 bg-[#FBE7D6]/60 px-3 py-2 text-left text-xs leading-relaxed text-[#9A3412]"
+              >
+                Add your full name above to continue — it labels the file so a firm knows whose records these are.
+              </button>
+            ) : null}
             {hasMeaningfulStoryContext && uploadedFiles.length === 0 ? (
               <p className="rounded-[12px] border border-[#D3DED6] bg-white px-3 py-2 text-xs leading-relaxed text-[#40433F]">
                 You can begin with your story now. Records can be added later to strengthen the timeline.

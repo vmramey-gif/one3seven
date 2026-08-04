@@ -21,6 +21,10 @@ const CATEGORY_CONTRACT: Array<[string, string]> = [
   // discipline
   ['Rosa_WrittenWarning_2026-03-13.pdf', 'Disciplinary Materials'],
   ['WrittenWarning.pdf', 'Disciplinary Materials'],
+  // "final warning" — live Francis intake regression: matched neither "written warning" nor
+  // "final pay", so the case's central adverse-action document fell to Additional Supporting Records.
+  ['Final Warning - Francis Alexia.pdf', 'Disciplinary Materials'],
+  ['FinalWarning.pdf', 'Disciplinary Materials'],
   ['write-up-2026.pdf', 'Disciplinary Materials'],
   ['CoachingMemo_2025.pdf', 'Disciplinary Materials'],
   ['ProjectRemoval.pdf', 'Disciplinary Materials'],

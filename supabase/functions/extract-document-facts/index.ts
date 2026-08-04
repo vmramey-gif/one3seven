@@ -11,6 +11,7 @@
  */
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { PDFDocument } from 'https://esm.sh/pdf-lib@1.17.1';
 
 const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
 // Model is an ENV VAR so it can be changed via `supabase secrets set EXTRACTION_MODEL=...` WITHOUT a
@@ -21,6 +22,19 @@ const MODEL_FALLBACKS = (Deno.env.get('EXTRACTION_MODEL_FALLBACKS')?.trim() || '
 const BUCKET = 'intake-files';
 const MAX_TEXT_CHARS = 12_000;
 const MAX_TOKENS = 3000;
+
+// Scanned-PDF chunking (live Francis intake: a 58-page image-only personnel file sent as ONE
+// Claude call inside a 17-file sequential batch blew the invocation wall-clock, so every scan —
+// including the case's Final Warning — silently produced no facts). A no-text-layer PDF larger
+// than SCAN_CHUNK_PAGES is split into page-range chunks, each extracted in its own Claude call,
+// and the chunk facts merged. SCAN_TIME_BUDGET_MS caps one file's chunk loop; if it trips we keep
+// the chunks we have and flag `partial_scan_extraction` (visible, precision-first) instead of
+// failing the whole file. BATCH_TIME_BUDGET_MS caps how long batch mode keeps STARTING new files;
+// leftovers are reported in `remaining` and the client re-invokes until none remain, so every
+// invocation gets a fresh edge-function wall-clock.
+const SCAN_CHUNK_PAGES = 10;
+const SCAN_TIME_BUDGET_MS = 75_000;
+const BATCH_TIME_BUDGET_MS = 45_000;
 
 // ---------------------------------------------------------------------------
 // System prompt — establishes role and non-negotiable legal guardrails.
@@ -220,7 +234,7 @@ ${body}
   return [{ role: 'user', content: prompt }];
 }
 
-function buildPdfPrompt(category: string, fileName: string, base64Pdf: string): { role: string; content: unknown }[] {
+function buildPdfPrompt(category: string, fileName: string, base64Pdf: string, pageNote = ''): { role: string; content: unknown }[] {
   const guidance = CATEGORY_GUIDANCE[category] ??
     `Extract: document date, people mentioned, employer name, and key_quote (most significant sentence).`;
 
@@ -240,7 +254,7 @@ function buildPdfPrompt(category: string, fileName: string, base64Pdf: string): 
         text: `Extract structured facts from the attached employment document.
 
 Document category: ${category}
-File name: ${fileName}
+File name: ${fileName}${pageNote}
 
 Reminders: quote verbatim for key_quote (under 200 characters); use null / [] for anything not explicitly present; no legal conclusions; raw JSON only.
 Capture EVERY date explicitly stated in the document in "document_dates", each as { "date": "<as written>", "context": "<short factual label, e.g. 'complaint filed', 'warning issued'>" }. Include only dates the text actually states; never infer a date. Keep context labels factual, never conclusory.
@@ -256,6 +270,77 @@ ${JSON_SCHEMA}`,
       },
     ],
   }];
+}
+
+// ---------------------------------------------------------------------------
+// Scanned-PDF chunk helpers
+// ---------------------------------------------------------------------------
+
+/** Chunked base64 — avoids call-stack overflow on large buffers. */
+function bytesToBase64(bytes: Uint8Array): string {
+  let binary = '';
+  const chunkSize = 8192;
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
+  }
+  return btoa(binary);
+}
+
+/** Split a PDF into ≤ SCAN_CHUNK_PAGES sub-PDFs. Returns null when the PDF can't be parsed
+ *  (corrupt/encrypted) — caller falls back to the whole-file single call. */
+async function splitPdfIntoChunks(
+  bytes: Uint8Array
+): Promise<Array<{ base64: string; firstPage: number; lastPage: number; totalPages: number }> | null> {
+  try {
+    const src = await PDFDocument.load(bytes, { ignoreEncryption: true });
+    const total = src.getPageCount();
+    if (total <= SCAN_CHUNK_PAGES) return null;
+    const chunks: Array<{ base64: string; firstPage: number; lastPage: number; totalPages: number }> = [];
+    for (let start = 0; start < total; start += SCAN_CHUNK_PAGES) {
+      const end = Math.min(start + SCAN_CHUNK_PAGES, total);
+      const sub = await PDFDocument.create();
+      const pages = await sub.copyPages(src, Array.from({ length: end - start }, (_, i) => start + i));
+      for (const p of pages) sub.addPage(p);
+      const saved = await sub.save();
+      chunks.push({ base64: bytesToBase64(saved), firstPage: start + 1, lastPage: end, totalPages: total });
+    }
+    return chunks;
+  } catch (e) {
+    console.error('[extract] splitPdfIntoChunks failed — falling back to whole-file call', e);
+    return null;
+  }
+}
+
+/** Merge per-chunk facts into one document_facts object: scalars first-non-empty (page order),
+ *  arrays concatenated + deduped, objects shallow-merged first-wins. The downstream sanitizers
+ *  still enforce their own caps and banned-vocabulary guards on the merged result. */
+function mergeChunkFacts(parts: DocumentFacts[]): DocumentFacts {
+  const merged: Record<string, unknown> = {};
+  const isEmpty = (v: unknown) =>
+    v === null || v === undefined || v === '' || (Array.isArray(v) && v.length === 0);
+  for (const part of parts) {
+    if (!part || typeof part !== 'object') continue;
+    for (const [k, v] of Object.entries(part)) {
+      if (isEmpty(v)) continue;
+      const cur = merged[k];
+      if (isEmpty(cur)) {
+        merged[k] = v;
+      } else if (Array.isArray(cur) && Array.isArray(v)) {
+        const seen = new Set(cur.map((x) => JSON.stringify(x)));
+        for (const item of v) {
+          const key = JSON.stringify(item);
+          if (!seen.has(key)) { seen.add(key); (cur as unknown[]).push(item); }
+        }
+      } else if (
+        typeof cur === 'object' && cur !== null && !Array.isArray(cur) &&
+        typeof v === 'object' && v !== null && !Array.isArray(v)
+      ) {
+        merged[k] = { ...(v as Record<string, unknown>), ...(cur as Record<string, unknown>) };
+      }
+      // scalar already set → first (earliest pages) wins
+    }
+  }
+  return merged as DocumentFacts;
 }
 
 // ---------------------------------------------------------------------------
@@ -466,9 +551,20 @@ async function handle(req: Request): Promise<Response> {
 
     const results: { file: string; ok: boolean; error?: string }[] = [];
 
+    // Resumable batch: stop STARTING new files once the budget is spent — the invocation
+    // wall-clock is finite, and one chunked scan can consume most of it. Whatever is left is
+    // returned in `remaining`; the client re-invokes batch mode until remaining is 0, giving
+    // every round a fresh wall-clock (the alreadyDone check makes re-invocation idempotent).
+    const batchStarted = Date.now();
+    let remaining = 0;
+
     for (const file of allFiles as Array<{ id: string; file_name: string; category: string | null; file_path: string | null; worker_id: string | null }>) {
       if (alreadyDone.has(file.id)) {
         results.push({ file: file.file_name, ok: true });
+        continue;
+      }
+      if (Date.now() - batchStarted > BATCH_TIME_BUDGET_MS) {
+        remaining++;
         continue;
       }
       const result = await processSingleFile({
@@ -487,7 +583,7 @@ async function handle(req: Request): Promise<Response> {
     const processed = results.filter((r) => r.ok).length;
     const failed = results.filter((r) => !r.ok).length;
     return new Response(
-      JSON.stringify({ ok: true, processed, failed, results }),
+      JSON.stringify({ ok: true, processed, failed, remaining, results }),
       { headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } }
     );
   }
@@ -589,15 +685,17 @@ async function processSingleFile(params: {
     await supabase.from('file_text_extractions').insert(insertData);
   }
 
-  let messages: unknown[];
+  let messages: unknown[] | null = null;
   let textTruncated = false;
+  let facts: DocumentFacts | null = null;
+  const scanFlags: string[] = [];
 
   if (existingRow?.extraction_status === 'completed' && existingRow?.extracted_text?.trim()) {
     // Phase 2A text is available — use it
     textTruncated = existingRow.extracted_text.length > MAX_TEXT_CHARS;
     messages = buildTextPrompt(category, fileName, existingRow.extracted_text);
   } else {
-    // No text layer — download file and send as PDF to Claude
+    // No text layer — download file and send as PDF to Claude (chunked when large)
     const storagePath = filePath || (await resolveFilePath(supabase, uploadedFileId));
     if (!storagePath) {
       await supabase.from('file_text_extractions')
@@ -614,28 +712,56 @@ async function processSingleFile(params: {
       return { ok: false, error: dlErr?.message ?? 'Download failed' };
     }
 
-    // Chunked base64 encoding — avoids call-stack overflow on large PDFs
-    const arrayBuf = await blob.arrayBuffer();
-    const bytes = new Uint8Array(arrayBuf);
-    let binary = '';
-    const chunkSize = 8192;
-    for (let i = 0; i < bytes.length; i += chunkSize) {
-      binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
+    const bytes = new Uint8Array(await blob.arrayBuffer());
+    const chunks = await splitPdfIntoChunks(bytes);
+
+    if (chunks) {
+      // Large scan: one Claude call per page-range chunk, merged. A single failed chunk is
+      // logged and skipped (partial facts, flagged) rather than failing the whole file.
+      const started = Date.now();
+      const parts: DocumentFacts[] = [];
+      let attempted = 0;
+      for (const chunk of chunks) {
+        if (Date.now() - started > SCAN_TIME_BUDGET_MS) {
+          scanFlags.push('partial_scan_extraction');
+          scanFlags.push(`scan_pages_extracted_${chunk.firstPage - 1}_of_${chunk.totalPages}`);
+          break;
+        }
+        attempted++;
+        const pageNote = `\nNote: this is pages ${chunk.firstPage}-${chunk.lastPage} of a ${chunk.totalPages}-page scanned file; extract only what these pages state.`;
+        try {
+          const part = await callClaude(buildPdfPrompt(category, fileName, chunk.base64, pageNote), apiKey);
+          if (part) parts.push(part);
+        } catch (e) {
+          console.error(`[extract] chunk ${chunk.firstPage}-${chunk.lastPage} of ${fileName} failed`, e);
+          scanFlags.push(`scan_chunk_error_pages_${chunk.firstPage}_${chunk.lastPage}`);
+        }
+      }
+      if (parts.length === 0) {
+        const msg = `All ${attempted} scan chunks failed for ${fileName}`;
+        await supabase.from('file_text_extractions').update({
+          fact_extraction_status: 'failed', fact_extraction_error: msg,
+        }).eq('uploaded_file_id', uploadedFileId);
+        return { ok: false, error: msg };
+      }
+      facts = mergeChunkFacts(parts);
+      scanFlags.push('multi_chunk_scan');
+    } else {
+      messages = buildPdfPrompt(category, fileName, bytesToBase64(bytes));
     }
-    const base64 = btoa(binary);
-    messages = buildPdfPrompt(category, fileName, base64);
   }
 
-  // Call Claude
-  let facts: DocumentFacts | null = null;
-  try {
-    facts = await callClaude(messages, apiKey);
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e);
-    await supabase.from('file_text_extractions').update({
-      fact_extraction_status: 'failed', fact_extraction_error: msg,
-    }).eq('uploaded_file_id', uploadedFileId);
-    return { ok: false, error: msg };
+  // Call Claude (single-call paths; chunked scans already populated `facts`)
+  if (!facts && messages) {
+    try {
+      facts = await callClaude(messages, apiKey);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      await supabase.from('file_text_extractions').update({
+        fact_extraction_status: 'failed', fact_extraction_error: msg,
+      }).eq('uploaded_file_id', uploadedFileId);
+      return { ok: false, error: msg };
+    }
   }
 
   if (!facts) {
@@ -645,8 +771,13 @@ async function processSingleFile(params: {
     return { ok: false, error: 'Parse failed' };
   }
 
+  const mergedFlags = Array.isArray((facts as { flags?: unknown }).flags)
+    ? [...new Set([...((facts as { flags: string[] }).flags), ...scanFlags])]
+    : scanFlags;
+
   const enriched = {
     ...facts,
+    flags: mergedFlags,
     category,
     file_name: fileName,
     extracted_at: new Date().toISOString(),
@@ -780,7 +911,7 @@ function normalizeCategory(raw: string, fileName = ''): string {
   // separators collapsed, and the string padded so the ( |$) word-boundary checks fire.
   const f = ' ' + fileName.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/[_\-.]+/g, ' ').toLowerCase() + ' ';
   if (/witness statement/.test(f)) return 'Witness Statement';
-  if (/written warning|write ?up|disciplin/.test(f)) return 'Performance / discipline records';
+  if (/written warning|final warning|write ?up|disciplin/.test(f)) return 'Performance / discipline records';
   if (/terminat/.test(f) && !/terminat.*review/.test(f)) return 'Separation Records';
   if (/complaint to hr|hr complaint|complaint hr|complaint to supervisor|complaint supervisor/.test(f)) return 'Workplace Communications';
   if (/project removal|coaching memo/.test(f)) return 'Performance / discipline records';

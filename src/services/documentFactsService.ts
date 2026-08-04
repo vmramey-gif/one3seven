@@ -101,22 +101,38 @@ export async function triggerIntakeFactExtraction(
   intakeId: string,
   _files?: unknown[] // kept for API compatibility, not used in batch mode
 ): Promise<{ triggered: number; skipped: number; errors: string[] }> {
-  const { data, error } = await supabase.functions.invoke('extract-document-facts', {
-    body: { intake_id: intakeId, batch: true },
-  });
+  // Resumable batch: the edge function stops starting new files when its per-invocation time
+  // budget is spent (one chunked scan can consume most of an invocation's wall-clock) and
+  // reports how many files it didn't reach in `remaining`. Re-invoke until remaining is 0 —
+  // completed files are skipped server-side, so each round only works on what's left.
+  const MAX_ROUNDS = 8;
+  let triggered = 0;
+  const errors: string[] = [];
 
+  for (let round = 0; round < MAX_ROUNDS; round++) {
+    const { data, error } = await supabase.functions.invoke('extract-document-facts', {
+      body: { intake_id: intakeId, batch: true },
+    });
 
-  if (error) return { triggered: 0, skipped: 0, errors: [error.message] };
-  if (data?.error) return { triggered: 0, skipped: 0, errors: [data.error] };
+    if (error) return { triggered, skipped: 0, errors: [...errors, error.message] };
+    if (data?.error) return { triggered, skipped: 0, errors: [...errors, data.error] };
 
-  const results = Array.isArray(data?.results) ? data.results : [];
-  return {
-    triggered: data?.processed ?? 0,
-    skipped: data?.skipped ?? 0,
-    errors: results
-      .filter((r: any) => r && !r.ok)
-      .map((r: any) => `${r.file ?? 'unknown'}: ${r.error ?? 'unknown error'}`),
-  };
+    const results = Array.isArray(data?.results) ? data.results : [];
+    triggered = data?.processed ?? triggered;
+    errors.push(
+      ...results
+        .filter((r: any) => r && !r.ok)
+        .map((r: any) => `${r.file ?? 'unknown'}: ${r.error ?? 'unknown error'}`)
+    );
+
+    const remaining = typeof data?.remaining === 'number' ? data.remaining : 0;
+    if (remaining <= 0) break;
+    console.info(`[o3s-extract] batch round ${round + 1} done, ${remaining} file(s) remaining — continuing`);
+  }
+
+  // A file that fails is re-attempted on later rounds (only 'completed' rows are skipped),
+  // so the same error message can accumulate — report each distinct failure once.
+  return { triggered, skipped: 0, errors: [...new Set(errors)] };
 }
 
 // ---------------------------------------------------------------------------
