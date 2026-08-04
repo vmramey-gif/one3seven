@@ -5,7 +5,6 @@ import { GalleryScreen } from './screens/GalleryScreen';
 import { DevNavMapScreen } from './screens/DevNavMapScreen';
 import { AuthWelcomeScreen } from './screens/AuthWelcomeScreen';
 import { PendingApprovalScreen } from './screens/PendingApprovalScreen';
-import { SageMarketingPage } from './screens/SageMarketingPage';
 import { ForFirmsPage } from './screens/ForFirmsPage';
 import { WorkerLandingPage } from './screens/WorkerLandingPage';
 import { SignInScreen } from './screens/SignInScreen';
@@ -38,12 +37,10 @@ import {
   createEmptyIntakeWorkspace,
   updateIntakeWorkspace,
   markIntakeAsSaved,
-  submitIntakeToFirms,
-  routeIntakeToFirms,
 } from './types/IntakeWorkspace';
-import { routeIntakeToEligibleFirms, mockFirmPreferences } from './types/FirmRouting';
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 import * as intakeData from '../services/intakeDataService';
+import { triggerIntakeFactExtraction } from '../services/documentFactsService';
 import {
   clearPendingOnboardingSession,
   hasMeaningfulPendingOnboardingForDraft,
@@ -174,7 +171,6 @@ function isSafeSessionNotification(n: AppNotificationItem): boolean {
 export type Screen =
   | 'gallery'
   | 'devNavMap'
-  | 'publicMarketing'
   | 'authWelcome'
   | 'signIn'
   | 'createAccount'
@@ -200,7 +196,7 @@ export type Screen =
   | 'forFirms'
   | 'forWorkers';
 
-const AUTH_FLOW_SCREENS: Screen[] = ['publicMarketing', 'forWorkers', 'authWelcome', 'signIn', 'createAccount', 'roleSelection', 'workerDetails'];
+const AUTH_FLOW_SCREENS: Screen[] = ['forWorkers', 'authWelcome', 'signIn', 'createAccount', 'roleSelection', 'workerDetails'];
 
 // Beta account-approval gate. OFF = anyone who signs up can use the product immediately.
 // Flip to `true` to re-enable the "pending approval" waitlist screen (accounts then need
@@ -291,7 +287,6 @@ export default function App() {
   useEffect(() => {
     const SCREEN_PATHS: Partial<Record<Screen, string>> = {
       forWorkers: '/',
-      publicMarketing: '/firms',
       forFirms: '/for-firms',
       firmDirectedIntake: '/intake',
       upload: '/intake/upload',
@@ -317,7 +312,6 @@ export default function App() {
   const [currentIntakeWorkspace, setCurrentIntakeWorkspace] = useState<IntakeWorkspace>(createEmptyIntakeWorkspace());
 
   // Submitted intakes (simulates backend storage)
-  const [submittedIntakes, setSubmittedIntakes] = useState<IntakeWorkspace[]>([]);
 
   // Legacy state for backwards compatibility (will be migrated to workspace)
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
@@ -739,7 +733,6 @@ export default function App() {
         setPersistentNotificationsOk(false);
         setWorkerDocumentRequestPayload(null);
         setCurrentIntakeWorkspace(createEmptyIntakeWorkspace());
-        setSubmittedIntakes([]);
         setUploadedFiles([]);
         setUploadedFilePersistMeta([]);
         setSelectedFile(null);
@@ -1153,38 +1146,9 @@ export default function App() {
     void intakeData.updateIntakeWorkflowStatus(currentIntakeId, 'Awaiting Worker Approval');
   }, [workerAccessRequests, currentIntakeId]);
 
-  // Helper: Update the current intake workspace
-  const updateCurrentIntake = (updates: Partial<IntakeWorkspace>) => {
-    setCurrentIntakeWorkspace((prev) => updateIntakeWorkspace(prev, updates));
-  };
-
   // Helper: Save intake workspace
   const saveIntakeWorkspace = () => {
     setCurrentIntakeWorkspace((prev) => markIntakeAsSaved(prev));
-  };
-
-  // Helper: Submit intake to participating firms (prototype / offline)
-  const submitToFirms = () => {
-    let submittedIntake = submitIntakeToFirms(currentIntakeWorkspace);
-    const eligibleFirmIds = routeIntakeToEligibleFirms(submittedIntake, mockFirmPreferences);
-    submittedIntake = routeIntakeToFirms(submittedIntake, eligibleFirmIds);
-    setCurrentIntakeWorkspace(submittedIntake);
-    setSubmittedIntakes((prev) => [...prev, submittedIntake]);
-    setWorkerIntakeChannel('participating');
-    setWorkerIntakeWorkflow('Matching Participating Firms');
-    setParticipatingPreviewSent(true);
-  };
-
-  const updateSubmittedIntake = (intakeId: string, updates: Partial<IntakeWorkspace>) => {
-    setSubmittedIntakes((prev) =>
-      prev.map((intake) =>
-        intake.id === intakeId ? { ...intake, ...updates, lastModifiedAt: new Date().toISOString() } : intake
-      )
-    );
-  };
-
-  const getIntakeWorkspace = (intakeId: string): IntakeWorkspace | undefined => {
-    return submittedIntakes.find((intake) => intake.id === intakeId);
   };
 
   const startNewIntake = () => {
@@ -1824,14 +1788,6 @@ export default function App() {
     [getPendingOnboarding, workerIntakeRoutingCards, currentIntakeId, workerLiveSummary?.overview, workerIntakeMetadataTick]
   );
 
-  const resolveUploadConsentChecked = useCallback(
-    (intakeId: string | null): boolean => {
-      if (!intakeId) return false;
-      return Boolean(workerMetadataByIntakeIdRef.current[intakeId]?.uploadConsentAt);
-    },
-    [workerIntakeMetadataTick]
-  );
-
   const resolveDocumentResponseDraft = useCallback(
     (intakeId: string | null): WorkerDocumentResponseDraft | null => {
       if (!intakeId) return null;
@@ -1902,22 +1858,6 @@ export default function App() {
       });
     },
     [getPendingOnboarding, syncPendingOnboardingDraft]
-  );
-
-  const handleUploadConsentPersist = useCallback(
-    async (checked: boolean) => {
-      const intakeId = currentIntakeIdRef.current;
-      if (!intakeId || !isSupabaseConfigured()) {
-        throw new Error('No active intake to save upload consent.');
-      }
-      const patch = await patchWorkerIntakeMetadata(intakeId, {
-        uploadConsentAt: checked ? new Date().toISOString() : null,
-      });
-      if (patch.error) throw new Error(patch.error);
-      if (patch.metadata) workerMetadataByIntakeIdRef.current[intakeId] = patch.metadata;
-      setWorkerIntakeMetadataTick((t) => t + 1);
-    },
-    []
   );
 
   const handleDocumentResponseDraftChange = useCallback(
@@ -2679,7 +2619,7 @@ export default function App() {
         // Unresolvable or errored firm code — never leave the visitor on the infinite
         // firm-directed "Loading..." screen. Clear the stale code and fall back to marketing.
         try { sessionStorage.removeItem('o3s_prefill_fc'); } catch { /* ignore */ }
-        if (currentScreenRef.current === 'firmDirectedIntake') setCurrentScreen('publicMarketing');
+        if (currentScreenRef.current === 'firmDirectedIntake') setCurrentScreen('forFirms');
       }
     })();
   // Intentionally runs once on mount only.
@@ -3110,6 +3050,17 @@ export default function App() {
   const handleReorganizeIntake = useCallback(async () => {
     const intakeId = currentIntakeIdRef.current;
     if (!intakeId || !isSupabaseConfigured()) return;
+    // Re-run fact extraction BEFORE rebuilding, so the organization below reads fresh facts.
+    // Without this, "Re-organize file" only re-summarized whatever extraction had already stored —
+    // files whose extraction previously failed (e.g. scanned PDFs before the chunked path) never
+    // got another chance. Completed files are skipped server-side, so this is cheap when nothing
+    // changed; extraction errors are logged but never block the rebuild.
+    try {
+      const ext = await triggerIntakeFactExtraction(intakeId);
+      if (ext.errors.length) console.error('[o3s-reorg] fact extraction reported errors', ext.errors);
+    } catch (e) {
+      console.error('[o3s-reorg] fact extraction failed; rebuilding from stored facts', e);
+    }
     const matterTags = employmentMatterByIntakeIdRef.current[intakeId];
     const err = await intakeData.persistPlaceholderOrganizationForIntake(intakeId, {
       employmentMatterTags: matterTags,
@@ -3697,7 +3648,6 @@ export default function App() {
 
   const handleSignOut = async () => {
     setCurrentIntakeWorkspace(createEmptyIntakeWorkspace());
-    setSubmittedIntakes([]);
     setUploadedFiles([]);
     setUploadedFilePersistMeta([]);
     setSelectedFile(null);
@@ -3816,7 +3766,7 @@ export default function App() {
 
   const isFirmView = currentScreen === 'firmDashboard' || currentScreen === 'intakeReview' || currentScreen === 'firmSettings';
   const isMarketingView =
-    currentScreen === 'publicMarketing' || currentScreen === 'forFirms' || currentScreen === 'forWorkers';
+    currentScreen === 'forFirms' || currentScreen === 'forWorkers';
   const isComparisonView = currentScreen === 'comparison';
   const isAuthView =
     currentScreen === 'authWelcome' ||
@@ -3922,6 +3872,32 @@ export default function App() {
         routeSharedAt: workerLinkedRouteSharedAt,
       }
     : undefined;
+
+  // Worker Home "at a glance" data — derived from the already-loaded live summary so the Home hub
+  // (WorkerMissionControlHome tiles + timeline peek) has real numbers instead of defaulting to 0.
+  const hubTimelineForDisplay = workerLiveSummary?.timeline ?? [];
+  const hubEventCount = hubTimelineForDisplay.length;
+  const hubGapCount = workerLiveSummary?.missing.length ?? 0;
+  const hubRecordCount =
+    new Set(hubTimelineForDisplay.flatMap((t) => t.sourceFileNames ?? [])).size ||
+    hubTimelineForDisplay.reduce((n, t) => n + (t.relatedDocs || 0), 0) ||
+    hubEventCount;
+
+  // Auto-load the most-recent case's live summary on the worker Home so the "at a glance" tiles +
+  // timeline peek have data without the worker first opening the summary. Runs once per intake id,
+  // and only for a case that already has a summary to show.
+  const landingSummaryLoadedRef = useRef<string | null>(null);
+  const landingHubIntakeId = currentIntakeId ?? workerLandingIntakeRow?.id ?? null;
+  useEffect(() => {
+    if (currentScreen !== 'landing' || !isSupabaseConfigured()) return;
+    if (!((profile?.role === 'worker' || userRole === 'worker') && isAuthenticated)) return;
+    if (!landingHubIntakeId) return;
+    if (!workerIntakesList.find((r) => r.id === landingHubIntakeId)?.has_summary) return;
+    if (landingSummaryLoadedRef.current === landingHubIntakeId) return;
+    landingSummaryLoadedRef.current = landingHubIntakeId;
+    void refreshWorkerSummaryLive(landingHubIntakeId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentScreen, landingHubIntakeId, isAuthenticated, profile?.role, userRole, workerIntakesList]);
 
   const workerRoutingCardsForDisplay = workerIntakeRoutingCards.map((card) => {
         const caseCategory =
@@ -4165,40 +4141,7 @@ export default function App() {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3, ease: 'easeOut' }}
             >
-              <GalleryScreen onNavigate={navigateToScreen} submittedIntakes={submittedIntakes} />
-            </motion.div>
-          )}
-          {currentScreen === 'publicMarketing' && (
-            <motion.div
-              key="publicMarketing"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.35, ease: 'easeOut' }}
-            >
-              <SageMarketingPage
-                onHome={handleBrandHomeClick}
-                onWorkerStart={
-                  firmDirectedContext
-                    ? () => void startFirmDirectedGuestIntake()
-                    : () => setCurrentScreen('forWorkers')
-                }
-                onFirmStart={() => {
-                  firmSignInIntentRef.current = true;
-                  setCurrentScreen('signIn');
-                }}
-                onSignIn={() => {
-                  firmSignInIntentRef.current = false;
-                  setCurrentScreen('signIn');
-                }}
-                onSignUpFree={() => {
-                  // Free worker sign-up — straight to Create Account, no authWelcome detour.
-                  firmSignInIntentRef.current = false;
-                  setCurrentScreen('createAccount');
-                }}
-                onForFirms={() => setCurrentScreen('forFirms')}
-                firmDirectedContext={firmDirectedContext}
-              />
+              <GalleryScreen onNavigate={navigateToScreen} />
             </motion.div>
           )}
           {currentScreen === 'forFirms' && (
@@ -4228,7 +4171,7 @@ export default function App() {
             >
               <WorkerLandingPage
                 onBack={() => setCurrentScreen('forWorkers')}
-                onForFirms={() => { firmSignInIntentRef.current = true; setCurrentScreen('publicMarketing'); }}
+                onForFirms={() => { firmSignInIntentRef.current = true; setCurrentScreen('forFirms'); }}
                 onSignIn={() => { firmSignInIntentRef.current = false; setCurrentScreen('signIn'); }}
                 onStart={() => {
                   // Low-friction: straight to worker Create Account (matches the page's calm promise).
@@ -4454,6 +4397,10 @@ export default function App() {
                 workerActionNeededIntakeIds={workerActionNeededIntakeIds}
                 notificationsPanelNotice={workerBellPanelNotice}
                 activeIntakeHub={workerActiveHub}
+                hubTimelinePreview={hubTimelineForDisplay}
+                hubRecordCount={hubRecordCount}
+                hubEventCount={hubEventCount}
+                hubGapCount={hubGapCount}
                 workerIntakeRoutingCards={workerRoutingCardsForDisplay}
                 firmCodeActionBusy={firmCodeActionBusy}
                 firmCodeActionError={firmCodeActionError}
@@ -4670,12 +4617,6 @@ export default function App() {
                     : undefined
                 }
                 workerWorkflowStatus={workerIntakeWorkflow}
-                initialUploadConsentChecked={
-                  currentIntakeId ? resolveUploadConsentChecked(currentIntakeId) : false
-                }
-                onUploadConsentPersist={
-                  isSupabaseConfigured() && currentIntakeId ? handleUploadConsentPersist : undefined
-                }
                 storyFollowUp={storyFollowUpForActiveIntake}
                 onStoryFollowUpChange={handleStoryFollowUpChange}
               />
@@ -4740,7 +4681,6 @@ export default function App() {
                 }
                 intakeWorkspace={currentIntakeWorkspace}
                 onSaveIntake={saveIntakeWorkspace}
-                onSubmitToFirms={isSupabaseConfigured() ? submitToFirms : undefined}
                 uploadedFileLabels={uploadedFileLabels}
                 onUploadedFileLabelChange={(key, label) =>
                   setUploadedFileLabels((prev) => ({ ...prev, [key]: label.slice(0, 14) }))
@@ -4945,7 +4885,6 @@ export default function App() {
                   })();
                   setCurrentScreen('intakeReview');
                 }}
-                submittedIntakes={SHOW_DEV_GALLERY ? submittedIntakes : []}
                 dbIntakes={firmDashboardRows}
                 dashboardError={firmDashboardError}
                 onViewSampleIntakeFlow={SHOW_SAMPLE_INTAKE ? openFirmSampleIntakeFlow : undefined}
@@ -4978,8 +4917,6 @@ export default function App() {
               <IntakeReviewScreen
                 onNavigate={navigateToScreen}
                 intakeId={selectedIntakeId}
-                intakeWorkspace={getIntakeWorkspace(selectedIntakeId)}
-                onUpdateWorkspace={(updates) => updateSubmittedIntake(selectedIntakeId, updates)}
                 firmLiveView={firmLiveView}
                 firmLiveViewLoading={firmLiveViewLoading}
                 onRequestFullAccess={
@@ -5166,7 +5103,6 @@ export default function App() {
                             setSelectedRouteMeta(meta ?? null);
                             setCurrentScreen('intakeReview');
                           }}
-                          submittedIntakes={SHOW_DEV_GALLERY ? submittedIntakes : []}
                           dbIntakes={undefined}
                           onViewSampleIntakeFlow={SHOW_SAMPLE_INTAKE ? openFirmSampleIntakeFlow : undefined}
                 onStartFirmCaseFile={handleStartFirmCaseFile}
