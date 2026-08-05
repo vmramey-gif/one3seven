@@ -305,11 +305,16 @@
      mid-scroll greens would swallow the landing's plain-on-background headings. Maps to full page
      height (background-attachment: scroll) so the bottom is always green regardless of length. */
   .o3s-warm-sky {
+    /* Glass sky — soft luminous blooms (sunshine corner + cream light + a low sage/green bloom)
+       floated over a diagonal sunshine → cream → sage → green flow. The overlapping translucent
+       radials read like light through frosted glass; content cards sit on it with backdrop-blur. */
     background-image:
-      radial-gradient(900px 500px at 88% -8%, #F4EEDF, transparent 60%),
-      linear-gradient(180deg,
-        #FDFAF4 0%, #F7F1E5 26%, #ECEBD9 44%, #DCE3CC 58%, #C6D4B8 70%,
-        #A5BE9E 80%, #6E8B6D 89%, #3E5747 96%, #1E2C25 100%);
+      radial-gradient(720px 560px at 96% -4%, rgba(246, 199, 120, 0.60), rgba(246, 199, 120, 0) 56%),
+      radial-gradient(620px 520px at 6% 28%, rgba(255, 253, 247, 0.78), rgba(255, 253, 247, 0) 60%),
+      radial-gradient(1000px 820px at 28% 100%, rgba(94, 126, 99, 0.42), rgba(94, 126, 99, 0) 60%),
+      linear-gradient(158deg,
+        #FEF8EC 0%, #F7F0E0 22%, #EEEBD6 40%, #DCE2C9 56%, #C2D2B4 68%,
+        #97B58E 80%, #5C7E62 90%, #26402F 100%);
     background-color: #FBF7EF;
     background-attachment: scroll;
   }

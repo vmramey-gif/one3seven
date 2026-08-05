@@ -29,6 +29,8 @@ import type { EmploymentMatterTagId } from '../constants/employmentMatter';
 import { displayCaseCategoryLabel, isBetaEmploymentCategory } from '../constants/employmentMatter';
 import { WorkerMobileDocRequestCard } from '../components/WorkerMobileDocRequestCard';
 import { WorkerMissionControlHome } from '../components/WorkerMissionControlHome';
+import { RemindersCard } from '../components/RemindersCard';
+import { ImportantDatesCard } from '../components/ImportantDatesCard';
 import { WorkerMobileBottomNav, type WorkerMobileHubView, type WorkerMobileNavId } from '../components/WorkerMobileBottomNav';
 import { WorkerStatusJourneyCard } from '../components/WorkerStatusJourneyCard';
 import { WorkerDocumentRequestDashboardCard } from '../components/WorkerDocumentRequestDashboardCard';
@@ -554,7 +556,32 @@ export function LandingScreen({
         onStart={openOrganizeFlow}
         onStartNew={onCreateNewIntake ? handleFreshIntakeAdd : undefined}
         onGetRecords={() => onNavigate('recordsRequest')}
+        statusLabel={formatWorkerWorkflowStatusForDisplay(missionControlWorkflow, missionControlChannel)}
+        recordCount={hubRecordCount}
+        eventCount={hubEventCount}
+        gapCount={hubGapCount}
+        timelinePeek={hubTimelinePreview.map((t) => ({ date: t.date, event: t.event }))}
+        onViewTimeline={onGoWorkerSummary ? goSummary : undefined}
       />
+      {(() => {
+        // Resolve an intake even before the worker explicitly selects one, so "what's mine to do"
+        // and "important dates" appear on the Home for the most-recent case.
+        const homeIntakeId = activeIntakeHub?.intakeId ?? sortedIntakeCards[0]?.intakeId ?? null;
+        if (!homeIntakeId) return null;
+        return (
+          <>
+            <div className="mx-auto mt-4 w-full max-w-[680px]">
+              <RemindersCard intakeId={homeIntakeId} />
+            </div>
+            <div className="mx-auto mt-4 w-full max-w-[680px]">
+              <ImportantDatesCard
+                intakeId={homeIntakeId}
+                timeline={hubTimelinePreview.map((t) => ({ date: t.date, event: t.event }))}
+              />
+            </div>
+          </>
+        );
+      })()}
     </section>
   );
 

@@ -11,7 +11,9 @@ interface ForFirmsPageProps {
 }
 
 // Sage brand (2026-07-08): light off-white + ink + cool sage; violet reserved for AI only.
-const SERIF = { fontFamily: "'Fraunces', Georgia, serif" } as const;
+// SaaS-led type (2026-08-02): display is the tight sans, matching WorkerLandingPage — one brand
+// across both public pages. Name kept as SERIF to avoid churning every style={SERIF} usage.
+const SERIF = { fontFamily: '"Inter Tight", Inter, ui-sans-serif, system-ui, -apple-system, sans-serif', letterSpacing: '-0.03em', fontWeight: 680 } as const;
 const MONO = { fontFamily: '"IBM Plex Mono", ui-monospace, Menlo, monospace' } as const;
 const BODY = { fontFamily: '"Inter Tight", ui-sans-serif, system-ui, -apple-system, sans-serif' } as const;
 
@@ -45,7 +47,7 @@ export function ForFirmsPage({ onBack, onStartWorker }: ForFirmsPageProps) {
   return (
     <div style={BODY} className="min-h-screen o3s-warm-sky text-[#17181C] antialiased">
       {/* Nav */}
-      <nav className="sticky top-0 z-50 border-b border-[#E1E4DD] bg-[#FBF7EF]/85 backdrop-blur-sm">
+      <nav className="sticky top-0 z-50 border-b border-[#E1E4DD] bg-[#FBF7EF]/90 backdrop-blur-sm">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-5 sm:h-16 sm:px-8">
           <button type="button" onClick={onBack} style={SERIF} className="text-[19px] font-semibold tracking-[-0.01em] text-[#17181C] transition hover:opacity-70">
             <WordMark />
@@ -80,7 +82,7 @@ export function ForFirmsPage({ onBack, onStartWorker }: ForFirmsPageProps) {
               href="#pilot-interest"
               className="inline-flex items-center justify-center gap-2 rounded-full bg-[#42574E] px-7 py-3.5 text-[15px] font-semibold text-[#EAF0EC] transition hover:-translate-y-0.5 hover:bg-[#374a42]"
             >
-              Request a pilot
+              Apply to the founding cohort
               <ArrowRight className="h-4 w-4" />
             </a>
             <a
@@ -92,152 +94,86 @@ export function ForFirmsPage({ onBack, onStartWorker }: ForFirmsPageProps) {
             </a>
           </div>
           <p className="mx-auto mt-5 max-w-[600px] text-[12px] leading-relaxed text-[#6a6d66]">
-            No prompts required. No legal conclusions. No case scoring. one3seven organizes and reflects —
-            it does not advise. Key facts link back to source records, so your firm can verify and decide.
+            Every key fact links back to its source record — so your firm verifies in a click and decides for itself.
           </p>
         </div>
       </section>
 
-      {/* Product preview — sell it up front (Clio-style): show the Claim Lens + Coverage Rate as a
-          dark "screenshot" card against the light page. Illustrative; counsel-gate before go-live. */}
+      {/* Product preview — the firm mirror of the worker's "show up ready" glass section.
+          The hook: the prepared client every firm wishes for now walks in as a review-ready,
+          source-linked file. Dark "cockpit" glass tiles = one tile per statutory element.
+          Element count varies by theory (5–8); this lens shows 5. Illustrative; counsel-gate. */}
       <section className="px-5 pb-6 pt-2 sm:px-8">
         <div className="mx-auto max-w-3xl">
+          <div className="mb-5 text-center">
+            <div style={MONO} className="mb-3 inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.16em] text-[#42574E]">What the attorney gets</div>
+            <h2 style={SERIF} className="mx-auto max-w-[20ch] text-balance text-[26px] font-semibold leading-[1.06] tracking-[-0.015em] text-[#17181C] sm:text-[34px]">
+              The client everyone wishes they had <span className="text-[#5E7268]">now exists.</span>
+            </h2>
+            <p className="mx-auto mt-3 max-w-[52ch] text-[14.5px] leading-relaxed text-[#40433f]">
+              Not a stack of screenshots and a 90-minute retelling. A file already sorted by the claim's
+              statutory elements — each fact one click from the page it came from, each gap named out loud.
+            </p>
+          </div>
+
           <div className="overflow-hidden rounded-[22px] border border-[#243029] bg-[#0e1512] p-6 shadow-[0_34px_80px_-34px_rgba(20,45,32,0.55)] sm:p-7" style={{ color: '#ECF3ED' }}>
             <div className="flex items-center justify-between">
-              <div style={MONO} className="text-[10px] uppercase tracking-[0.16em] text-[#8FA495]">one3seven · firm workspace</div>
+              <div style={MONO} className="text-[10px] uppercase tracking-[0.16em] text-[#8FA495]">Element Lens · firm workspace</div>
               <div style={MONO} className="rounded-full border border-[#243029] px-2.5 py-1 text-[9px] uppercase tracking-[0.12em] text-[#8FA495]">Illustrative</div>
             </div>
             <div className="mt-4 flex flex-wrap items-baseline gap-x-2">
               <span style={SERIF} className="text-[20px] font-semibold">Retaliation</span>
-              <span className="text-[13px] text-[#8FA495]">— elements &amp; available material</span>
+              <span style={MONO} className="text-[11px] text-[#8FA495]">Labor Code §1102.5</span>
             </div>
 
             <div className="mt-4 flex items-center gap-4 rounded-[14px] border border-[#243029] bg-[#131c17] p-4">
               <div className="flex-none">
                 <div style={MONO} className="text-[9.5px] uppercase tracking-[0.14em] text-[#8FA495]">Element coverage</div>
-                <div style={SERIF} className="text-[36px] font-semibold leading-none text-[#8FD3A6]">75%</div>
+                <div style={SERIF} className="text-[34px] font-semibold leading-none text-[#8FD3A6]">4<span className="text-[20px] text-[#61756A]">/5</span></div>
               </div>
               <div className="min-w-0 flex-1">
-                <div className="h-[7px] overflow-hidden rounded-full bg-[#1b2620]"><div className="h-full rounded-full bg-[#8FD3A6]" style={{ width: '75%' }} /></div>
-                <div className="mt-2 text-[11.5px] leading-snug text-[#8FA495]">3 of 4 elements have material on file. A structural fact about the record — not a verdict on the case.</div>
+                {/* Discrete element segments — a locator ("4 of 5 elements located"), not a % gauge */}
+                <div className="flex gap-1">{[1, 1, 1, 1, 0].map((f, i) => (<div key={i} className={`h-[7px] flex-1 rounded-full ${f ? 'bg-[#8FD3A6]' : 'bg-[#1b2620]'}`} />))}</div>
+                <div className="mt-2 text-[11.5px] leading-snug text-[#8FA495]">Four of this claim's five elements have material on file. A structural fact about the record — not a verdict on the case.</div>
               </div>
             </div>
 
-            <div className="mt-4 border-t border-[#243029] pt-3">
-              <div className="flex items-start gap-3 py-1.5">
-                <span style={{ ...MONO, background: 'rgba(124,92,255,0.15)', borderColor: 'rgba(167,139,250,0.4)', color: '#A78BFA' }} className="flex-none rounded-md border px-2 py-1 text-[9.5px]">Source-linked »</span>
-                <div className="min-w-0">
-                  <div className="text-[13.5px] leading-snug">Written complaint to HR about unpaid overtime.</div>
-                  <div style={MONO} className="mt-0.5 text-[10px] text-[#61756A]">Rosa_HR_Complaint.pdf · p.1</div>
+            {/* One glass tile per statutory element */}
+            <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
+              {[
+                { el: 'Reports & complaints made', src: 'Rosa_HR_Complaint.pdf · p.1' },
+                { el: 'Recipient of the report', src: 'Email_to_Ramirez.pdf · p.1' },
+                { el: 'Employer awareness of the report', src: 'HR_Acknowledgment.pdf · p.2' },
+                { el: 'Employment actions after, with dates', src: 'Termination_Letter.pdf · p.1' },
+              ].map((t) => (
+                <div key={t.el} className="rounded-[13px] border border-white/10 bg-white/[0.04] p-3.5 backdrop-blur-md">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[13px] text-[#8FD3A6]">✓</span>
+                    <div className="text-[13px] font-medium leading-snug text-[#ECF3ED]">{t.el}</div>
+                  </div>
+                  <div className="mt-2 flex items-center gap-2">
+                    <span style={{ ...MONO, background: 'rgba(124,92,255,0.15)', borderColor: 'rgba(167,139,250,0.4)', color: '#A78BFA' }} className="flex-none rounded-md border px-1.5 py-0.5 text-[9px]">Source-linked »</span>
+                    <span style={MONO} className="truncate text-[9.5px] text-[#61756A]">{t.src}</span>
+                  </div>
                 </div>
+              ))}
+              {/* The gap — the fifth element, named out loud */}
+              <div className="rounded-[13px] border p-3.5 backdrop-blur-md sm:col-span-2" style={{ borderColor: 'rgba(224,123,62,0.45)', background: 'rgba(224,123,62,0.07)' }}>
+                <div className="flex items-center gap-2">
+                  <span className="text-[13px] text-[#F3A268]">!</span>
+                  <div className="text-[13px] font-medium leading-snug text-[#ECF3ED]">Sequence &amp; interval between report and action</div>
+                </div>
+                <div style={MONO} className="mt-1.5 text-[9.5px] uppercase tracking-[0.1em] text-[#F3A268]">No material on file — a question for the first call</div>
               </div>
-              <div className="mt-2 rounded-[12px] border px-4 py-3" style={{ borderColor: 'rgba(224,123,62,0.45)', background: 'rgba(224,123,62,0.08)' }}>
-                <div style={MONO} className="text-[10px] uppercase tracking-[0.1em] text-[#F3A268]">No material on file for this element</div>
-                <div className="mt-1.5 text-[12.5px] leading-snug text-[#d7b7a4]">Nothing in the record speaks to the timing between the complaint and the action.</div>
-              </div>
             </div>
           </div>
-          <p className="mt-3 text-center text-[11.5px] text-[#6a6d66]">A live view from the firm workspace. Illustrative — one3seven organizes and reflects; it draws no conclusions.</p>
+          <p className="mt-3 text-center text-[11.5px] text-[#6a6d66]">One lens; element counts vary by claim theory (five here).</p>
         </div>
       </section>
 
-      {/* What your firm gets — capabilities framed as record-organization (never scoring/conclusions).
-          Pulled up directly under the product preview (Clio-style "sell it up front").
-          Counsel-gate: the Claim Lens + Coverage Rate naming should get a counsel glance before go-live. */}
-      <section className="px-5 pb-4 pt-8 sm:px-8">
-        <div className="mx-auto max-w-5xl">
-          <div style={MONO} className="mb-3 text-[11px] uppercase tracking-[0.16em] text-[#42574E]">What your firm gets</div>
-          <h2 style={SERIF} className="mb-8 max-w-[22ch] text-[clamp(24px,4vw,34px)] font-semibold tracking-[-0.015em] text-[#17181C]">
-            Read the record faster — <span className="text-[#5E7268]">without reading everything.</span>
-          </h2>
-          <div className="grid gap-4 sm:grid-cols-3">
-            <div className="rounded-[20px] border border-[#CBD6CF] bg-[#FBFBFA] p-6">
-              <div style={MONO} className="mb-2 text-[10.5px] uppercase tracking-[0.14em] text-[#5B21B6]">Claim Lens</div>
-              <h3 style={SERIF} className="mb-2 text-[19px] font-semibold text-[#17181C]">The record, re-sorted by the elements.</h3>
-              <p className="text-[14px] leading-relaxed text-[#40433f]">
-                Pick a claim theory and the intake re-sorts around that claim's statutory elements — showing
-                what's on file for each, and, loudly, what isn't. It organizes; it never concludes.
-              </p>
-            </div>
-            <div className="rounded-[20px] border border-[#CBD6CF] bg-[#FBFBFA] p-6">
-              <div style={MONO} className="mb-2 text-[10.5px] uppercase tracking-[0.14em] text-[#42574E]">Coverage Rate</div>
-              <h3 style={SERIF} className="mb-2 text-[19px] font-semibold text-[#17181C]">One number: what's on file.</h3>
-              <p className="text-[14px] leading-relaxed text-[#40433f]">
-                The share of a claim's elements with material on file. A structural fact about the record —
-                never a verdict on the case. The number a drafting tool can't compute, because it can't see
-                what's missing.
-              </p>
-            </div>
-            <div className="rounded-[20px] border border-[#CBD6CF] bg-[#FBFBFA] p-6">
-              <div style={MONO} className="mb-2 text-[10.5px] uppercase tracking-[0.14em] text-[#42574E]">Source-linked</div>
-              <h3 style={SERIF} className="mb-2 text-[19px] font-semibold text-[#17181C]">Every fact opens its page.</h3>
-              <p className="text-[14px] leading-relaxed text-[#40433f]">
-                Each item links back to the exact document and page it came from. Verify in a click —
-                nothing to take on faith, nothing to un-hallucinate.
-              </p>
-            </div>
-          </div>
-          <p className="mt-4 max-w-[70ch] text-[12px] leading-relaxed text-[#6a6d66]">
-            Illustrative of how one3seven organizes a record. one3seven draws no conclusions, scores no
-            cases, and recommends no outcomes. Attorneys independently evaluate everything.
-          </p>
-        </div>
-      </section>
-
-      {/* The change is here — why now (firm-page only; kept off the homepage) */}
-      <section className="px-5 pb-4 pt-2 sm:px-8">
-        <div className="mx-auto max-w-3xl">
-          <div style={MONO} className="mb-4 text-[11px] uppercase tracking-[0.16em] text-[#42574E]">The change is here</div>
-          <h2 style={SERIF} className="text-[30px] font-semibold leading-[1.04] tracking-[-0.015em] text-[#17181C] sm:text-[44px]">
-            The tools are changing.
-            <span className="block text-[#5E7268]">Your judgment shouldn't.</span>
-          </h2>
-          <div className="mt-6 space-y-4 text-[15px] leading-relaxed text-[#40433f] sm:text-[16px]">
-            <p className="max-w-[62ch]">
-              Artificial intelligence is changing how records can be organized and reviewed. We built
-              one3seven to help firms adopt that change without changing how legal decisions are made.
-            </p>
-            <p className="max-w-[62ch]">
-              A worker uploads scattered employment records. one3seven organizes them into a review-ready,
-              source-linked intake. Every source document remains available. Every legal judgment remains yours.
-            </p>
-            <p className="max-w-[62ch] text-[16px] font-medium text-[#2c332e] sm:text-[17px]">
-              The technology changes how the record arrives. It doesn't change who evaluates it.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Metrics */}
-      <section className="px-5 pb-2 pt-12 sm:px-8 sm:pt-16">
-        <div className="mx-auto grid max-w-3xl grid-cols-2 gap-4 sm:grid-cols-4">
-          {([['0', 'Legal conclusions drawn'], ['100%', 'Source documents preserved for review'], ['1 link', 'Shared with your clients, on your terms'], ['Minutes', 'From upload to an organized packet']] as const).map(([n, l]) => (
-            <div key={l} className="text-center">
-              <div className="text-[28px] font-semibold text-[#17181C]" style={SERIF}>{n}</div>
-              <div className="mt-1 text-[11px] leading-snug text-[#6a6d66]">{l}</div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Built differently */}
-      <section className="px-5 py-14 sm:px-8">
-        <div className="mx-auto max-w-3xl rounded-[24px] border border-[#E4E5DE] bg-[#FBFBFA] p-7 sm:p-9">
-          <div style={MONO} className="mb-2 text-[11px] uppercase tracking-[0.16em] text-[#42574E]">Why one3seven</div>
-          <h2 style={SERIF} className="text-[24px] font-semibold text-[#17181C] sm:text-[28px]">Built differently from legal-drafting AI.</h2>
-          <p className="mt-3 text-[14px] leading-relaxed text-[#40433f]">
-            Most legal AI drafts, scores, or recommends — which invites hallucinated citations and blurred responsibility. one3seven is intentionally narrower.
-          </p>
-          <div className="mt-5 flex flex-wrap gap-2">
-            {['No drafting', 'No chatbot', 'No case scoring', 'No outcome estimates', 'No attorney recommendations', 'We organize the record'].map((tt) => (
-              <span key={tt} className="rounded-full border border-[#CBD6CF] px-3 py-1.5 text-[12px] font-medium text-[#42574E]">{tt}</span>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Proof of work */}
-      <section className="px-5 py-16 sm:px-8 sm:py-20">
+      {/* Proof of work — moved up directly under the glass preview: show what lands on the desk
+          before any boundary talk. Sell first, disclaim once (in "Built differently"). */}
+      <section className="px-5 py-14 sm:px-8 sm:py-16">
         <div className="mx-auto max-w-5xl">
           <div className="mb-10 text-center">
             <div style={MONO} className="mb-3 text-[11px] uppercase tracking-[0.16em] text-[#42574E]">What lands on your desk</div>
@@ -291,9 +227,60 @@ export function ForFirmsPage({ onBack, onStartWorker }: ForFirmsPageProps) {
                 </div>
               </div>
               <p className="mt-3 text-[12px] leading-relaxed text-[#6a6d66]">
-                Arithmetic from the records only. one3seven organizes and reflects — it does not draw legal conclusions.
+                Arithmetic from the records only — not a legal conclusion.
               </p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* What your firm gets — capabilities framed as record-organization (never scoring/conclusions).
+          Pulled up directly under the product preview (Clio-style "sell it up front").
+          Counsel-gate: the Element Lens + coverage naming should get a counsel glance before go-live. */}
+      <section className="px-5 pb-4 pt-8 sm:px-8">
+        <div className="mx-auto max-w-5xl">
+          <div style={MONO} className="mb-3 text-[11px] uppercase tracking-[0.16em] text-[#42574E]">What your firm gets</div>
+          <h2 style={SERIF} className="mb-8 max-w-[22ch] text-[clamp(24px,4vw,34px)] font-semibold tracking-[-0.015em] text-[#17181C]">
+            Read the record faster — <span className="text-[#5E7268]">without reading everything.</span>
+          </h2>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="rounded-[20px] border border-[#CBD6CF] bg-[#FBFBFA] p-6">
+              <div style={MONO} className="mb-2 text-[10.5px] uppercase tracking-[0.14em] text-[#42574E]">Element Lens</div>
+              <h3 style={SERIF} className="mb-2 text-[19px] font-semibold text-[#17181C]">The record, re-sorted by the elements.</h3>
+              <p className="text-[14px] leading-relaxed text-[#40433f]">
+                Pick a theory. Element Lens reorganizes the file around it in seconds — including what you
+                don&rsquo;t have yet.
+              </p>
+            </div>
+            <div className="rounded-[20px] border border-[#CBD6CF] bg-[#FBFBFA] p-6">
+              <div style={MONO} className="mb-2 text-[10.5px] uppercase tracking-[0.14em] text-[#42574E]">Source-linked</div>
+              <h3 style={SERIF} className="mb-2 text-[19px] font-semibold text-[#17181C]">Every fact opens its page.</h3>
+              <p className="text-[14px] leading-relaxed text-[#40433f]">
+                Each item links back to the exact document and page it came from. Verify in a click —
+                nothing to take on faith, nothing to un-hallucinate.
+              </p>
+            </div>
+          </div>
+          <p className="mt-4 max-w-[70ch] text-[12px] leading-relaxed text-[#6a6d66]">
+            one3seven organizes the record; attorneys independently evaluate everything.
+          </p>
+        </div>
+      </section>
+
+      {/* Built differently */}
+      <section className="px-5 py-14 sm:px-8">
+        <div className="mx-auto max-w-3xl rounded-[24px] border border-[#E4E5DE] bg-[#FBFBFA] p-7 sm:p-9">
+          <div style={MONO} className="mb-2 text-[11px] uppercase tracking-[0.16em] text-[#42574E]">Why one3seven</div>
+          <h2 style={SERIF} className="text-[24px] font-semibold text-[#17181C] sm:text-[28px]">Built differently from legal-drafting AI.</h2>
+          <p className="mt-3 text-[14px] leading-relaxed text-[#40433f]">
+            Most legal AI drafts, scores, or recommends — which invites hallucinated citations and blurred
+            responsibility. one3seven is intentionally narrower: the tools are changing, but who evaluates
+            the record shouldn't. We change how the record arrives, not who decides.
+          </p>
+          <div className="mt-5 flex flex-wrap gap-2">
+            {['No drafting', 'No chatbot', 'No case scoring', 'No outcome estimates', 'No attorney recommendations', 'We organize the record'].map((tt) => (
+              <span key={tt} className="rounded-full border border-[#CBD6CF] px-3 py-1.5 text-[12px] font-medium text-[#42574E]">{tt}</span>
+            ))}
           </div>
         </div>
       </section>
@@ -338,9 +325,8 @@ export function ForFirmsPage({ onBack, onStartWorker }: ForFirmsPageProps) {
             </p>
             <p className="mt-3 text-[14px] leading-relaxed text-[#40433f]">
               Founding firms receive hands-on onboarding, direct founder access, and founder pricing — with
-              the specific terms set out in a founding-firm agreement we&rsquo;ll walk you through. Your pilot
-              begins with your first real intake and runs 30 days from there — enough time to evaluate it on
-              real matters, not a rushed week.
+              the specific terms set out in a founding-firm agreement we&rsquo;ll walk you through. Pilots run
+              30 days from onboarding — enough time to evaluate it on real matters, not a rushed week.
             </p>
             <p className="mt-3 text-[13px] leading-relaxed text-[#6a6d66]">
               Your firm stays in control. Attorney judgment stays with your team. one3seven only organizes the intake file.
@@ -386,7 +372,7 @@ export function ForFirmsPage({ onBack, onStartWorker }: ForFirmsPageProps) {
               </div>
               <button type="submit" disabled={submitting}
                 className="flex w-full items-center justify-center gap-2 rounded-full bg-[#42574E] px-6 py-4 font-semibold text-[#EAF0EC] transition hover:-translate-y-0.5 hover:bg-[#374a42] disabled:translate-y-0 disabled:opacity-60">
-                {submitting ? 'Sending…' : 'Start free pilot'}
+                {submitting ? 'Sending…' : 'Apply to the founding cohort'}
                 {!submitting ? <ArrowRight className="h-4 w-4" /> : null}
               </button>
             </form>

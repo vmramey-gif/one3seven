@@ -10,7 +10,9 @@ import { useLang, LangToggle } from '../../i18n/i18n';
  * chooses; one3seven never routes/matches/selects).
  */
 
-const SERIF = { fontFamily: "'Fraunces', Georgia, serif" } as const;
+// SaaS-led type (2026-08-02): display is now the tight sans, not Fraunces — reads product, not
+// artisanal. Kept the name SERIF to avoid churning every style={SERIF} usage on this page.
+const SERIF = { fontFamily: '"Inter Tight", Inter, ui-sans-serif, system-ui, -apple-system, sans-serif', letterSpacing: '-0.03em', fontWeight: 680 } as const;
 const MONO = { fontFamily: '"IBM Plex Mono", ui-monospace, Menlo, monospace' } as const;
 const BODY = { fontFamily: '"Inter Tight", ui-sans-serif, system-ui, -apple-system, sans-serif' } as const;
 
@@ -29,18 +31,15 @@ const STEP_KEYS = [
 
 const HERO_CHIP_KEYS = ['wl.hero.c1', 'wl.hero.c2', 'wl.hero.c3', 'wl.hero.c4'] as const;
 
-/** What the worker actually gets — stated as actions, not as a feature list. */
-const HERO_GET_KEYS = ['wl.hero.g1', 'wl.hero.g2', 'wl.hero.g3', 'wl.hero.g4'] as const;
-
-const YOURS_KEYS = [
-  ['wl.yours1.t', 'wl.yours1.b'],
-  ['wl.yours2.t', 'wl.yours2.b'],
-  ['wl.yours3.t', 'wl.yours3.b'],
-  ['wl.yours4.t', 'wl.yours4.b'],
-] as const;
 
 export function WorkerLandingPage({ onStart, onSignIn, onBack, onForFirms }: WorkerLandingPageProps) {
   const { t } = useLang();
+  // Illustrative evidence rows for the hero card: [date, item (i18n), source-link chip].
+  const EVIDENCE: [string, string, string][] = [
+    ['Sep 09 2024', t('wl.ev1'), '» hr_complaint.pdf'],
+    ['Nov 12 2025', t('wl.ev2'), '» timecard.pdf'],
+    ['Mar 10 2026', t('wl.ev3'), '» paystub_9.pdf'],
+  ];
   // Hero card animates in when scrolled into view (framer-motion, in-view once): the "have"
   // chips settle in a clean straight row, then the "get" panel rises. Motion only —
   // organizes-never-concludes holds. Straight chips read as organized, not sloppy.
@@ -67,7 +66,16 @@ export function WorkerLandingPage({ onStart, onSignIn, onBack, onForFirms }: Wor
         </div>
       </nav>
 
-      <div className="mx-auto max-w-5xl px-5 sm:px-8">
+      <div className="relative mx-auto max-w-5xl px-5 sm:px-8">
+        {/* Journey spine — a thin rail down the left gutter that ripens warm → sage → green as the
+            record moves toward completion. Desktop only; decorative (pointer-events-none). */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute left-1.5 top-28 bottom-28 hidden w-px lg:block"
+          style={{ background: 'linear-gradient(180deg,#E7C9AE,#CDAF97 26%,#9FB08E 56%,#5E7268 82%,#3E5747 100%)', opacity: 0.55 }}
+        />
+        {/* node at the top of the spine */}
+        <div aria-hidden className="pointer-events-none absolute left-[1px] top-28 hidden h-2 w-2 -translate-y-1/2 rounded-full bg-[#A8512B] shadow-[0_0_0_4px_rgba(168,81,43,0.14)] lg:block" />
         {/* Hero */}
         <section className="relative pb-8 pt-14 sm:pt-20">
           {/* Sunset glow — warm depth behind the hero, no interaction */}
@@ -148,40 +156,31 @@ export function WorkerLandingPage({ onStart, onSignIn, onBack, onForFirms }: Wor
                 </div>
                 {/* Contained, calm panel — the visual relief against the scattered pile above.
                     Stated as what the worker gets to DO, not as product features. */}
+                {/* Evidence-instrument rows — mono date + item + violet source-link chip = the
+                    signature "serious record" texture. Organize-only labels; illustrative. */}
                 <motion.div
                   initial={reduce ? false : { opacity: 0, y: 10 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, amount: 0.4 }}
                   transition={{ delay: 0.22, type: 'spring', stiffness: 320, damping: 30 }}
-                  className="mt-2.5 flex flex-col gap-3 rounded-[16px] border border-[#CBD6CF] bg-[#F7F9F5] p-4"
+                  className="mt-2.5 rounded-[16px] border border-[#CBD6CF] bg-[#F7F9F5] px-4"
                 >
-                  {HERO_GET_KEYS.map((k) => {
-                    const isFree = k === 'wl.hero.g4';
-                    return (
-                      <div
-                        key={k}
-                        className={`flex items-start gap-2.5${isFree ? ' border-t border-[#CBD6CF] pt-3' : ''}`}
-                      >
-                        <span
-                          className={`mt-[1px] flex h-[18px] w-[18px] flex-none items-center justify-center rounded-full ${
-                            isFree ? 'bg-[#42574E] text-white' : 'bg-[#E7EDE8] text-[#42574E]'
-                          }`}
-                        >
-                          <Check className="h-3 w-3" strokeWidth={2.75} />
-                        </span>
-                        <p className={`text-[13px] leading-relaxed ${isFree ? 'font-semibold text-[#42574E]' : 'text-[#20242a]'}`}>
-                          {t(k)}
-                        </p>
-                      </div>
-                    );
-                  })}
+                  {EVIDENCE.map(([d, e, s]) => (
+                    <div key={s} className="grid grid-cols-[auto_1fr_auto] items-center gap-3 border-b border-[#E4E5DE] py-2.5 last:border-b-0">
+                      <span style={MONO} className="whitespace-nowrap text-[10.5px] tabular-nums text-[#42574E]">{d}</span>
+                      <span className="truncate text-[13px] text-[#20242a]">{e}</span>
+                      <span style={MONO} className="whitespace-nowrap rounded-md border border-[#5B21B6]/25 bg-[#5B21B6]/[0.07] px-1.5 py-0.5 text-[9px] text-[#5B21B6]">{s}</span>
+                    </div>
+                  ))}
                 </motion.div>
+                <div style={MONO} className="mt-2.5 text-[10.5px] leading-snug text-[#6a6d66]">{t('wl.ev.status')}</div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Does any of this sound like you? — recognition hook (questions only, no law stated) */}
+        {/* Does any of this sound like you? — recognition hook (questions only, no law stated).
+            Placed BEFORE the glass preview: name the pain first, then show the organized payoff. */}
         <section className="py-6">
           <div style={MONO} className="mb-2 text-[11px] uppercase tracking-[0.16em] text-[#A8512B]">{t('wl.sly.eyebrow')}</div>
           <h2 style={SERIF} className="mb-6 max-w-[22ch] text-[clamp(24px,4vw,32px)] font-semibold tracking-[-0.01em]">{t('wl.sly.h')}</h2>
@@ -199,6 +198,85 @@ export function WorkerLandingPage({ onStart, onSignIn, onBack, onForFirms }: Wor
           </div>
         </section>
 
+        {/* Your organized profile — glass preview of what the worker gets & owns (illustrative) */}
+        <section className="py-8">
+          <div className="relative overflow-hidden rounded-[28px] border border-[#EAD9BF] bg-gradient-to-br from-[#FCEEDA] via-[#FBF4E8] to-[#F1E7D5] p-6 sm:p-9">
+            <div aria-hidden className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full" style={{ background: 'radial-gradient(circle, rgba(233,169,78,0.35), rgba(233,169,78,0) 65%)' }} />
+            <div className="relative">
+              <div style={MONO} className="text-[11px] uppercase tracking-[0.16em] text-[#A8512B]">Show up ready</div>
+              <h2 style={SERIF} className="mt-2 max-w-[26ch] text-[clamp(24px,4vw,34px)] font-semibold leading-[1.1] tracking-[-0.01em] text-[#1B2623]">
+                Walk in already organized — the client every lawyer wishes they had.
+              </h2>
+              <p style={BODY} className="mt-2.5 max-w-[56ch] text-[15px] leading-relaxed text-[#5a5f58]">
+                Show up with a pile of screenshots and old texts, and the first meeting gets spent digging. Show up already organized, and it gets spent on you. one3seven is how you walk in the second way — your key dates, your reminders, and the records your employer is holding, all in one place you own.
+              </p>
+
+              <div className="mt-7 grid gap-4 md:grid-cols-3">
+                {/* Reminders */}
+                <div className="rounded-[20px] border border-white/60 bg-white/55 p-5 shadow-[0_18px_50px_-22px_rgba(66,87,78,0.4)] backdrop-blur-md">
+                  <div style={MONO} className="text-[10.5px] uppercase tracking-[0.12em] text-[#42574E]">Reminders · your key dates</div>
+                  <div className="mt-3 flex flex-col gap-2">
+                    <div className="flex items-center gap-2.5 rounded-[12px] bg-white/70 px-3 py-2.5">
+                      <span className="h-2 w-2 flex-none rounded-full bg-[#E08A4E]" />
+                      <span className="text-[13px] text-[#20242a]">Deposition</span>
+                      <span className="ml-auto text-[12px] text-[#8a8f88]">Sep 4</span>
+                    </div>
+                    <div className="flex items-center gap-2.5 rounded-[12px] bg-white/70 px-3 py-2.5">
+                      <span className="h-2 w-2 flex-none rounded-full bg-[#E08A4E]" />
+                      <span className="text-[13px] text-[#20242a]">Examination appointment</span>
+                      <span className="ml-auto text-[12px] text-[#8a8f88]">Sep 18</span>
+                    </div>
+                    <div className="flex items-center gap-2.5 rounded-[12px] bg-white/70 px-3 py-2.5">
+                      <span className="h-2 w-2 flex-none rounded-full bg-[#7C8B6F]" />
+                      <span className="text-[13px] text-[#20242a]">Records due from employer</span>
+                      <span className="ml-auto text-[12px] font-semibold text-[#7C8B6F]">✓ received</span>
+                    </div>
+                  </div>
+                  <div className="mt-3 text-[11px] leading-snug text-[#8a8f88]">Every date is one you or your attorney set — one3seven never calculates legal deadlines.</div>
+                </div>
+
+                {/* Important dates */}
+                <div className="rounded-[20px] border border-white/60 bg-white/55 p-5 shadow-[0_18px_50px_-22px_rgba(66,87,78,0.4)] backdrop-blur-md">
+                  <div style={MONO} className="text-[10.5px] uppercase tracking-[0.12em] text-[#42574E]">Important dates</div>
+                  <div className="mt-3 flex flex-col gap-2.5">
+                    {[
+                      ['Mar 3, 2025', 'Raised concern with manager'],
+                      ['Nov 12, 2025', 'Hours reduced'],
+                      ['Mar 10, 2026', 'Final paycheck received'],
+                    ].map(([d, e]) => (
+                      <div key={d}>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[12px] font-semibold tabular-nums text-[#42574E]">{d}</span>
+                          <span className="rounded-full bg-[#EAF0EC] px-2 py-0.5 text-[10px] font-semibold text-[#42574E]">On your record</span>
+                        </div>
+                        <div className="mt-0.5 text-[13px] text-[#20242a]">{e}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Get your records — the emphasized card */}
+                <div className="rounded-[20px] border-2 border-[#E08A4E]/60 bg-white/60 p-5 shadow-[0_20px_55px_-20px_rgba(224,138,78,0.5)] backdrop-blur-md">
+                  <div style={MONO} className="text-[10.5px] uppercase tracking-[0.12em] text-[#A8512B]">Get your records</div>
+                  <p className="mt-2 text-[13.5px] leading-snug text-[#20242a]">
+                    The records your employer is holding — demanded in one tap. California law says they&rsquo;re yours, with a deadline. We write the letter; you hit send.
+                  </p>
+                  <div className="mt-3 flex flex-wrap gap-1.5">
+                    {['Pay records', 'Personnel file', 'Timekeeping', 'Documents I signed'].map((c) => (
+                      <span key={c} className="rounded-full border border-[#E4E5DE] bg-white/70 px-2.5 py-1 text-[11px] font-medium text-[#3a3f38]">{c}</span>
+                    ))}
+                  </div>
+                  <button type="button" onClick={onStart} className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#E08A4E] px-5 py-2.5 text-[13.5px] font-semibold text-white transition hover:brightness-95">
+                    ✉ Start your records request →
+                  </button>
+                </div>
+              </div>
+
+              <div className="mt-4 text-[11px] italic text-[#9a8f7e]">Illustrative example — one3seven organizes and informs; the legal judgment stays with you and any attorney you choose.</div>
+            </div>
+          </div>
+        </section>
+
         {/* Founder testimony — someone who was where the worker is built this */}
         <section className="py-8">
           <div className="rounded-[24px] border border-[#CBD6CF] bg-[#FBFBFA] p-7 shadow-[0_18px_45px_rgba(66,87,78,0.08)] sm:p-9">
@@ -206,12 +284,8 @@ export function WorkerLandingPage({ onStart, onSignIn, onBack, onForFirms }: Wor
             <blockquote style={SERIF} className="mt-4 max-w-[62ch] text-[clamp(18px,2.6vw,23px)] font-medium leading-[1.42] text-[#20242a]">
               &ldquo;{t('wl.founder.quote')}&rdquo;
             </blockquote>
-            <div className="mt-6 flex items-center gap-3">
-              <span className="flex h-11 w-11 flex-none items-center justify-center rounded-full bg-[#42574E] text-[15px] font-semibold text-[#EAF0EC]">V</span>
-              <div className="min-w-0">
-                <div className="text-[15px] font-semibold text-[#1B2623]">{t('wl.founder.name')}</div>
-                <div className="text-[13px] leading-snug text-[#6a6d66]">{t('wl.founder.title')}</div>
-              </div>
+            <div className="mt-6">
+              <div className="text-[13px] leading-snug text-[#6a6d66]">{t('wl.founder.title')}</div>
             </div>
           </div>
         </section>
@@ -255,38 +329,6 @@ export function WorkerLandingPage({ onStart, onSignIn, onBack, onForFirms }: Wor
               <p className="text-[14.5px] leading-relaxed text-[#3a2f52]">{t('wl.ai.trust')}</p>
             </div>
             <p className="mt-3.5 text-[12.5px] font-medium text-[#6a6d66]">{t('wl.ai.builton')}</p>
-          </div>
-        </section>
-
-        {/* Straight with you */}
-        <section className="py-4">
-          <div className="rounded-[24px] bg-[#42574E] p-8 sm:p-10 text-[#EAF0EC]">
-            <div style={MONO} className="text-[11px] uppercase tracking-[0.16em] text-[#AFC3B4]">{t('wl.straight.eyebrow')}</div>
-            <p style={SERIF} className="mt-3 max-w-[26ch] text-[clamp(20px,3vw,26px)] font-medium text-white">
-              {t('wl.straight.h')}
-            </p>
-            <p className="mt-3.5 max-w-[56ch] text-[16px] leading-[1.65] text-[#D3DED6]">
-              {t('wl.straight.body')}
-            </p>
-          </div>
-        </section>
-
-        {/* Your record, your call */}
-        <section className="py-16">
-          <div className="mb-8 text-center">
-            <div style={MONO} className="mb-3 text-[11px] uppercase tracking-[0.16em] text-[#42574E]">{t('wl.yours.eyebrow')}</div>
-            <h2 style={SERIF} className="text-[clamp(24px,4vw,32px)] font-semibold tracking-[-0.01em]">{t('wl.yours.h2')}</h2>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {YOURS_KEYS.map(([hKey, bodyKey]) => (
-              <div key={hKey} className="rounded-[20px] border border-[#E4E5DE] bg-[#FBFBFA] p-6">
-                <div className="flex items-center gap-2 text-[16px] font-bold text-[#20242a]">
-                  <span className="flex h-[22px] w-[22px] items-center justify-center rounded-full bg-[#E7EDE8] text-[13px] font-extrabold text-[#42574E]">✓</span>
-                  {t(hKey)}
-                </div>
-                <p className="mt-2 text-[14.5px] leading-relaxed text-[#40433f]">{t(bodyKey)}</p>
-              </div>
-            ))}
           </div>
         </section>
 
