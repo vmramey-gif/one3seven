@@ -120,6 +120,7 @@ export function RecordsRequestScreen({ workerName, onBackToLanding }: RecordsReq
     reimbursement: true,
   });
   const [copied, setCopied] = useState(false);
+  const [showSend, setShowSend] = useState(false);
 
   const letter = useMemo(
     () =>
@@ -143,11 +144,34 @@ export function RecordsRequestScreen({ workerName, onBackToLanding }: RecordsReq
   // Mail clients silently drop mailto links whose URL exceeds ~2,000 chars, so a full-letter body
   // makes the link "dead" (clicking does nothing). Guard on length: short letters open pre-filled;
   // long ones copy the letter to the clipboard and open a short email telling the worker to paste.
-  const handleSendEmail = async () => {
+  // Compose the request in the worker's own email. mailto: only works if a desktop mail app is the
+  // registered handler — most people use webmail in a browser tab, where mailto silently does nothing.
+  // So we offer Gmail / Outlook web compose (which reliably open a pre-filled draft) plus a mailto
+  // fallback for desktop mail apps. one3seven composes; the worker reviews and sends.
+  const openCompose = async (kind: 'gmail' | 'outlook' | 'mailto') => {
     const recipient = employerAddress.includes('@') ? employerAddress.trim() : '';
     const subject = `Request for Employment Records — ${name.trim() || 'Employee'}`;
-    const fullHref = `mailto:${encodeURIComponent(recipient)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(letter)}`;
     track('records_request_email');
+    setShowSend(false);
+    if (kind === 'gmail') {
+      window.open(
+        `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(recipient)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(letter)}`,
+        '_blank',
+        'noopener',
+      );
+      return;
+    }
+    if (kind === 'outlook') {
+      window.open(
+        `https://outlook.office.com/mail/deeplink/compose?to=${encodeURIComponent(recipient)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(letter)}`,
+        '_blank',
+        'noopener',
+      );
+      return;
+    }
+    // mailto (desktop mail app). Mail clients drop mailto links over ~2,000 chars, so long letters
+    // go to the clipboard with a short "paste here" body instead of a dead link.
+    const fullHref = `mailto:${encodeURIComponent(recipient)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(letter)}`;
     if (fullHref.length <= 1800) {
       window.location.href = fullHref;
       return;
@@ -295,9 +319,22 @@ export function RecordsRequestScreen({ workerName, onBackToLanding }: RecordsReq
               <button type="button" onClick={handleDownload} className="inline-flex items-center gap-1.5 rounded-[10px] border border-[#E4E5DE] bg-white px-3 py-2 text-xs font-semibold text-[#384039] hover:border-[#7C8B6F]">
                 <Download className="h-3.5 w-3.5" /> Download
               </button>
-              <button type="button" onClick={() => void handleSendEmail()} className="inline-flex items-center gap-1.5 rounded-[10px] bg-[#42574E] px-3 py-2 text-xs font-semibold text-white hover:bg-[#374a42]">
-                <Mail className="h-3.5 w-3.5" /> Send from your email
-              </button>
+              <div className="relative">
+                <button type="button" onClick={() => setShowSend((s) => !s)} className="inline-flex items-center gap-1.5 rounded-[10px] bg-[#42574E] px-3 py-2 text-xs font-semibold text-white hover:bg-[#374a42]">
+                  <Mail className="h-3.5 w-3.5" /> Send from your email
+                </button>
+                {showSend && (
+                  <>
+                    <div className="fixed inset-0 z-10" onClick={() => setShowSend(false)} />
+                    <div className="absolute right-0 z-20 mt-1 w-60 rounded-[12px] border border-[#E4E5DE] bg-white p-1 shadow-lg">
+                      <button type="button" onClick={() => void openCompose('gmail')} className="block w-full rounded-[8px] px-3 py-2 text-left text-xs font-semibold text-[#384039] hover:bg-[#F2F4EC]">Open in Gmail</button>
+                      <button type="button" onClick={() => void openCompose('outlook')} className="block w-full rounded-[8px] px-3 py-2 text-left text-xs font-semibold text-[#384039] hover:bg-[#F2F4EC]">Open in Outlook</button>
+                      <button type="button" onClick={() => void openCompose('mailto')} className="block w-full rounded-[8px] px-3 py-2 text-left text-xs font-semibold text-[#384039] hover:bg-[#F2F4EC]">Use my desktop mail app</button>
+                      <div className="px-3 py-1.5 text-[11px] leading-snug text-[#8a8f88]">Opens a pre-filled draft in a new tab. Review it, then send it yourself.</div>
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
           </div>
           <pre className="max-h-[420px] overflow-auto whitespace-pre-wrap rounded-[14px] border border-[#E4E5DE] bg-white px-5 py-4 text-[13px] leading-relaxed text-[#1B2623]" style={{ fontFamily: "'IBM Plex Mono', ui-monospace, Menlo, monospace" }}>

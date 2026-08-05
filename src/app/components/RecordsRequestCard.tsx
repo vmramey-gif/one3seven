@@ -35,6 +35,7 @@ export function RecordsRequestCard({ intakeId }: { intakeId: string | null }) {
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [selected, setSelected] = useState<RecordType[]>([]);
+  const [showSend, setShowSend] = useState(false);
   const [recipient, setRecipient] = useState('');
   const [yourName, setYourName] = useState('');
   const [copied, setCopied] = useState(false);
@@ -75,6 +76,23 @@ export function RecordsRequestCard({ intakeId }: { intakeId: string | null }) {
     `mailto:${recipient.trim()}?subject=${encodeURIComponent(t('rr.subject'))}&body=${encodeURIComponent(requestBody)}`;
 
   const ready = selected.length > 0 && recipient.trim().length > 0;
+
+  // mailto: only opens if a desktop mail app is the default handler — dead for webmail users.
+  // Offer Gmail / Outlook web compose (which reliably open a pre-filled draft) plus the mailto fallback.
+  const openCompose = (kind: 'gmail' | 'outlook' | 'mailto') => {
+    const to = recipient.trim();
+    const subject = t('rr.subject');
+    setShowSend(false);
+    if (kind === 'gmail') {
+      window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(to)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(requestBody)}`, '_blank', 'noopener');
+      return;
+    }
+    if (kind === 'outlook') {
+      window.open(`https://outlook.office.com/mail/deeplink/compose?to=${encodeURIComponent(to)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(requestBody)}`, '_blank', 'noopener');
+      return;
+    }
+    window.location.href = mailtoHref;
+  };
 
   const copy = async () => {
     try {
@@ -148,13 +166,27 @@ export function RecordsRequestCard({ intakeId }: { intakeId: string | null }) {
           <div style={MONO} className="mb-2 text-[10.5px] uppercase tracking-[0.12em] text-[#6a6d66]">{t('rr.preview')}</div>
           <pre className="whitespace-pre-wrap font-sans text-[13px] leading-relaxed text-[#20242a]">{requestBody}</pre>
           <div className="mt-3 flex flex-wrap items-center gap-2">
-            <a
-              href={ready ? mailtoHref : undefined}
-              aria-disabled={!ready}
-              className={`inline-flex items-center gap-1.5 rounded-full px-5 py-2.5 text-[13.5px] font-semibold text-white transition ${ready ? 'bg-[var(--o3s-action)] hover:brightness-95' : 'pointer-events-none bg-[#c9c4bb]'}`}
-            >
-              <Mail className="h-4 w-4" /> {t('rr.openEmail')}
-            </a>
+            <div className="relative">
+              <button
+                type="button"
+                disabled={!ready}
+                onClick={() => setShowSend((s) => !s)}
+                className={`inline-flex items-center gap-1.5 rounded-full px-5 py-2.5 text-[13.5px] font-semibold text-white transition ${ready ? 'bg-[var(--o3s-action)] hover:brightness-95' : 'cursor-not-allowed bg-[#c9c4bb]'}`}
+              >
+                <Mail className="h-4 w-4" /> {t('rr.openEmail')}
+              </button>
+              {showSend && ready ? (
+                <>
+                  <div className="fixed inset-0 z-10" onClick={() => setShowSend(false)} />
+                  <div className="absolute left-0 z-20 mt-1 w-56 rounded-[12px] border border-[#E4E5DE] bg-white p-1 shadow-lg">
+                    <button type="button" onClick={() => openCompose('gmail')} className="block w-full rounded-[8px] px-3 py-2 text-left text-[13px] font-semibold text-[#22262a] hover:bg-[#F2F4EC]">Open in Gmail</button>
+                    <button type="button" onClick={() => openCompose('outlook')} className="block w-full rounded-[8px] px-3 py-2 text-left text-[13px] font-semibold text-[#22262a] hover:bg-[#F2F4EC]">Open in Outlook</button>
+                    <button type="button" onClick={() => openCompose('mailto')} className="block w-full rounded-[8px] px-3 py-2 text-left text-[13px] font-semibold text-[#22262a] hover:bg-[#F2F4EC]">Use my mail app</button>
+                    <div className="px-3 py-1.5 text-[11px] leading-snug text-[#8a8f88]">Opens a pre-filled draft. Review it, then send it yourself.</div>
+                  </div>
+                </>
+              ) : null}
+            </div>
             <button type="button" onClick={copy} className="inline-flex items-center gap-1.5 rounded-full border border-[#B7BCB2] bg-white px-4 py-2.5 text-[13.5px] font-medium text-[#22262a] transition hover:bg-[#F2F4EC]">
               {copied ? <Check className="h-4 w-4 text-[#42574E]" /> : <Copy className="h-4 w-4" />} {copied ? t('rr.copied') : t('rr.copy')}
             </button>

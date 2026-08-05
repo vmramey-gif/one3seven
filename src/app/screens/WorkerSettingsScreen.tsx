@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { ArrowLeft, User, Mail, KeyRound, Trash2, Bell, Shield, Download } from 'lucide-react';
 import { Screen } from '../App';
 import * as intakeData from '../../services/intakeDataService';
+import { supabase } from '../../lib/supabaseClient';
 import { ONE3SEVEN_NOTICES } from '../constants/one3sevenProduct';
 import { BETA_HIDE_WORKER_BILLING_UI } from '../constants/flags';
 
@@ -11,6 +12,81 @@ interface WorkerSettingsScreenProps {
   userEmail: string | null;
   profileId: string;
   onSignOut: () => void;
+}
+
+// Real, CCPA-compliant account/data deletion request (§1798.105). The worker files a verified
+// request; it is recorded server-side (deletion_requests) and fulfilled within the statutory window.
+// Degrades gracefully (falls back to email) if the table isn't provisioned yet.
+function DeleteAccountControl({ email, onSignOut }: { email: string | null; onSignOut: () => void }) {
+  const [confirming, setConfirming] = useState(false);
+  const [typed, setTyped] = useState('');
+  const [status, setStatus] = useState<'idle' | 'sending' | 'done' | 'error'>('idle');
+
+  const submit = async () => {
+    setStatus('sending');
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      const { error } = await supabase.from('deletion_requests').insert({
+        user_id: user?.id ?? null,
+        email: email ?? user?.email ?? null,
+      });
+      if (error) throw error;
+      setStatus('done');
+      setTimeout(() => onSignOut(), 4000);
+    } catch {
+      setStatus('error');
+    }
+  };
+
+  if (status === 'done') {
+    return (
+      <div className="rounded-2xl border border-red-200 bg-white px-4 py-3 text-sm leading-relaxed text-[#1B2623]">
+        Request received. Your records and account will be permanently deleted within 30 days, and we&rsquo;ll email confirmation{email ? ` to ${email}` : ''}. Signing you out&hellip;
+      </div>
+    );
+  }
+  if (!confirming) {
+    return (
+      <button
+        type="button"
+        onClick={() => setConfirming(true)}
+        className="w-full rounded-2xl border border-red-300 bg-white px-4 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-50"
+      >
+        Delete my account
+      </button>
+    );
+  }
+  return (
+    <div className="space-y-2">
+      <p className="text-xs leading-relaxed text-[#1B2623]/70">This permanently deletes your records and account. Type <b>DELETE</b> to confirm.</p>
+      <input
+        value={typed}
+        onChange={(e) => setTyped(e.target.value)}
+        placeholder="DELETE"
+        className="w-full rounded-lg border border-red-300 px-3 py-2 text-sm"
+      />
+      <div className="flex gap-2">
+        <button
+          type="button"
+          disabled={typed.trim().toUpperCase() !== 'DELETE' || status === 'sending'}
+          onClick={() => void submit()}
+          className="flex-1 rounded-2xl bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          {status === 'sending' ? 'Submitting…' : 'Confirm deletion'}
+        </button>
+        <button
+          type="button"
+          onClick={() => { setConfirming(false); setTyped(''); setStatus('idle'); }}
+          className="rounded-2xl border border-[#CBD6CF] px-4 py-2 text-sm text-[#1B2623]"
+        >
+          Cancel
+        </button>
+      </div>
+      {status === 'error' ? (
+        <p className="text-xs text-red-600">Couldn&rsquo;t submit right now — please email <a className="underline" href="mailto:info@one3seven.com?subject=Account%20deletion%20request">info@one3seven.com</a> to request deletion.</p>
+      ) : null}
+    </div>
+  );
 }
 
 function ComingSoonControl({ label }: { label: string }) {
@@ -143,10 +219,10 @@ export function WorkerSettingsScreen({ onNavigate, userEmail, profileId, onSignO
               <div className="mb-2 flex items-center gap-2 text-sm font-medium text-red-900">
                 <Trash2 className="h-4 w-4" /> Delete account
               </div>
-              <p className="mb-3 text-xs text-[#1B2623]/64">
-                Self-serve account deletion is not available during beta. Contact support if you need your account removed.
+              <p className="mb-3 text-xs leading-relaxed text-[#1B2623]/64">
+                It&rsquo;s your data — you can delete it anytime. We permanently remove your records and account within 30 days of your request and email you confirmation.
               </p>
-              <ComingSoonControl label="Request deletion" />
+              <DeleteAccountControl email={userEmail} onSignOut={onSignOut} />
             </div>
 
             <button

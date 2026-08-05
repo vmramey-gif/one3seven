@@ -153,7 +153,7 @@ export function RemindersCard({ intakeId }: { intakeId: string | null }) {
 
       <div className="mt-4">
         {loading ? (
-          <p className="text-[13px] text-[#8a938c]">{t('rem.loading')}</p>
+          <p className="text-[13px] text-[#6A6D66]">{t('rem.loading')}</p>
         ) : reminders.length === 0 ? (
           <p className="rounded-[14px] border border-dashed border-[#CBD6CF] bg-[#FBFBFA] px-4 py-5 text-center text-[13px] text-[#6a6d66]">
             {t('rem.empty')}
@@ -171,7 +171,7 @@ export function RemindersCard({ intakeId }: { intakeId: string | null }) {
                   {r.done ? <Check className="h-3 w-3" strokeWidth={3} /> : null}
                 </button>
                 <div className="min-w-0 flex-1">
-                  <div className={`text-[14px] ${r.done ? 'text-[#8a8f88] line-through' : 'font-medium text-[#20242a]'}`}>{r.text}</div>
+                  <div className={`text-[14px] ${r.done ? 'text-[#6A6D66] line-through' : 'font-medium text-[#20242a]'}`}>{r.text}</div>
                   <div className="mt-0.5 flex flex-wrap items-center gap-2">
                     {r.dueDate ? <span style={MONO} className="text-[11.5px] text-[#42574E]">{r.dueDate}</span> : null}
                     {r.source === 'firm' ? (
@@ -188,7 +188,7 @@ export function RemindersCard({ intakeId }: { intakeId: string | null }) {
         )}
       </div>
 
-      <p className="mt-4 border-t border-[#EEF0EA] pt-3 text-[11.5px] leading-relaxed text-[#8a8f88]">
+      <p className="mt-4 border-t border-[#EEF0EA] pt-3 text-[11.5px] leading-relaxed text-[#6A6D66]">
         {t('rem.disclaimer')}{saving ? ` · ${t('rem.saving')}` : ''}
       </p>
     </section>
