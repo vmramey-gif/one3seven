@@ -72,6 +72,8 @@ export type DocumentGroundedFileInput = {
   category: string | null;
   extractedText: string;
   qualityFlags?: Record<string, unknown> | null;
+  /** Structured facts the Claude extraction stored for this file (file_text_extractions.document_facts). */
+  documentFacts?: Record<string, unknown> | null;
 };
 
 export type TimelineSourceTrace = {

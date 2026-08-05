@@ -658,4 +658,106 @@ describe('evidence-mapped timeline engine', () => {
     expect(refreshed.review_notes).toContain(payDigestLine);
     expect(refreshed.executive_summary).toBe(org.sections.executive_summary);
   });
+
+  test('document_facts document_date overrides the text-mined candidate date (separation live bug)', () => {
+    // Live bug: extraction stored document_date "March 6, 2025" for a separation document,
+    // but the naive text-mined candidate still dated the termination event 01/01/2025.
+    const events = buildEvidenceMappedTimelineEvents({
+      fileRecords: [
+        sampleFileRecord({
+          source_file_id: 'sep-1',
+          file_name: 'Separation_Notice.pdf',
+          document_type: 'HR Documents',
+          legacy_upload_category: 'HR Documents',
+          likely_date: '01/01/2025',
+          employment_topics: ['Separation'],
+          possible_timeline_event: {
+            title: 'Separation notice materials',
+            date: '01/01/2025',
+            neutral_summary: 'Separation notice materials are available for review.',
+          },
+        }),
+      ],
+      documentDates: { 'sep-1': 'March 6, 2025' },
+    });
+
+    expect(events).toHaveLength(1);
+    expect(events[0]?.date).toBe('March 6, 2025');
+    expect(events[0]?.date).not.toMatch(/01\/01|january/i);
+    // Date sourcing only — the event title is exactly what the engine produced before the override.
+    expect(events[0]?.title).toBe('Employment ends');
+  });
+
+  test('a file with no document_facts date keeps the existing candidate date (fallback path)', () => {
+    const events = buildEvidenceMappedTimelineEvents({
+      fileRecords: [
+        sampleFileRecord({
+          source_file_id: 'term-nofacts',
+          file_name: 'Termination_Letter.pdf',
+          document_type: 'HR Documents',
+          legacy_upload_category: 'HR Documents',
+          likely_date: 'June 2024',
+          employment_topics: ['Separation'],
+          possible_timeline_event: {
+            title: 'Termination documented',
+            date: 'June 2024',
+            neutral_summary: 'Separation notice materials.',
+          },
+        }),
+      ],
+      // A date exists for a DIFFERENT file — must not leak onto this one.
+      documentDates: { 'some-other-file': 'March 6, 2025' },
+    });
+
+    expect(events[0]?.date).toBe('June 2024');
+  });
+
+  test('an unusable document_date falls back to the candidate date', () => {
+    const events = buildEvidenceMappedTimelineEvents({
+      fileRecords: [
+        sampleFileRecord({
+          source_file_id: 'term-badfacts',
+          file_name: 'Termination_Letter.pdf',
+          document_type: 'HR Documents',
+          legacy_upload_category: 'HR Documents',
+          likely_date: 'June 2024',
+          employment_topics: ['Separation'],
+          possible_timeline_event: {
+            title: 'Termination documented',
+            date: 'June 2024',
+            neutral_summary: 'Separation notice materials.',
+          },
+        }),
+      ],
+      documentDates: { 'term-badfacts': 'sometime last winter' },
+    });
+
+    expect(events[0]?.date).toBe('June 2024');
+  });
+
+  test('trims a time-of-day suffix off document_date for the event date (time report live bug)', () => {
+    // Live bug companion: a time report generated "12/02/2025 08:46:46 AM CST" produced an
+    // event dated "2023". The extracted date wins, without the time-of-day suffix.
+    const events = buildEvidenceMappedTimelineEvents({
+      fileRecords: [
+        sampleFileRecord({
+          source_file_id: 'time-1',
+          file_name: 'Time_Report.pdf',
+          document_type: 'Time Records',
+          legacy_upload_category: 'Time Records',
+          likely_date: '2023',
+          employment_topics: ['Scheduling and timekeeping'],
+          possible_timeline_event: {
+            title: 'Schedule change documented',
+            date: '2023',
+            neutral_summary: 'Timekeeping materials are available for review.',
+          },
+        }),
+      ],
+      documentDates: { 'time-1': '12/02/2025 08:46:46 AM CST' },
+    });
+
+    expect(events[0]?.date).toBe('12/02/2025');
+    expect(events[0]?.date).not.toMatch(/08:46|am|cst|2023/i);
+  });
 });

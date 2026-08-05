@@ -42,6 +42,12 @@ export type BuildEvidenceTimelineOpts = {
   fileRecords: IntakeFileOrganizationRecord[];
   payFacts?: PayRecordFacts[];
   commFacts?: CommunicationFacts[];
+  /**
+   * uploadedFileId → document_facts.document_date as stored by the Claude extraction
+   * (e.g. "March 6, 2025", "1/31/25", "12/02/2025 08:46:46 AM CST"). When usable, it is
+   * authoritative for that file's event date; otherwise the text-mined date stands.
+   */
+  documentDates?: Record<string, string | null | undefined>;
 };
 
 type TimelineCluster = {
@@ -61,6 +67,25 @@ function normalizeDateKey(likelyDate: string | null | undefined): string {
   const d = (likelyDate ?? '').trim();
   if (!d || d === DATE_UNCLEAR_LABEL) return 'undated';
   return d.toLowerCase();
+}
+
+/**
+ * Validates an extraction-stored document_facts.document_date before it may override a
+ * file's text-mined date. The value is treated as an opaque display string; a time-of-day
+ * suffix ("08:46:46 AM CST") is trimmed off for display, and the result must contain a
+ * 4-digit year or parse via Date.parse. Returns null when the value is not usable.
+ */
+function usableDocumentDateLabel(raw: string | null | undefined): string | null {
+  if (typeof raw !== 'string') return null;
+  let label = raw.trim();
+  if (!label || label === DATE_UNCLEAR_LABEL) return null;
+  // "12/02/2025 08:46:46 AM CST" → "12/02/2025"
+  label = label
+    .replace(/[,\s]+\d{1,2}:\d{2}(?::\d{2})?(?:\s*[ap]\.?m\.?)?(?:\s+[a-z]{2,5})?\s*$/i, '')
+    .trim();
+  if (!label) return null;
+  if (!/\b\d{4}\b/.test(label) && Number.isNaN(Date.parse(label))) return null;
+  return label;
 }
 
 function topicKeyForRecord(record: IntakeFileOrganizationRecord): string {
@@ -827,12 +852,22 @@ function clusterToEvent(
 export function buildEvidenceMappedTimelineEvents(
   opts: BuildEvidenceTimelineOpts
 ): EvidenceMappedTimelineEvent[] {
-  const { fileRecords, payFacts = [], commFacts = [] } = opts;
+  const { fileRecords, payFacts = [], commFacts = [], documentDates = {} } = opts;
   if (!fileRecords.length) return [];
 
-  const eventFirstClusters = buildEventFirstClusters(fileRecords, commFacts);
+  // Date sourcing only: when extraction stored a usable document_facts.document_date for a
+  // file, it overrides the text-mined likely_date (live bug: a separation letter whose
+  // extraction read "March 6, 2025" was still dated 01/01/2025 by the naive candidate).
+  // Titles, guards, and clustering logic are untouched; files without a usable extracted
+  // date keep the existing candidate-date behavior.
+  const records = fileRecords.map((record) => {
+    const docDate = usableDocumentDateLabel(documentDates[record.source_file_id]);
+    return docDate ? { ...record, likely_date: docDate } : record;
+  });
+
+  const eventFirstClusters = buildEventFirstClusters(records, commFacts);
   const clusteredIds = new Set(eventFirstClusters.flatMap((c) => c.files.map((f) => f.source_file_id)));
-  const fallbackRecords = fileRecords.filter((record) => !clusteredIds.has(record.source_file_id));
+  const fallbackRecords = records.filter((record) => !clusteredIds.has(record.source_file_id));
   const clusters = [...eventFirstClusters, ...clusterRecords(fallbackRecords)];
   const events = clusters.map((c) => clusterToEvent(c, payFacts, commFacts));
 

@@ -68,10 +68,26 @@ export function applyEvidenceMappedOrganization(
     )
     .filter((fact): fact is NonNullable<typeof fact> => Boolean(fact));
 
+  // uploadedFileId → document_facts.document_date. The extraction's stored date is
+  // authoritative for a file's event date; the timeline service validates each value
+  // and falls back to its text-mined candidate when unusable.
+  const documentDates: Record<string, string> = {};
+  for (const row of extractions) {
+    const facts = row.documentFacts;
+    const docDate =
+      facts && typeof facts === 'object'
+        ? (facts as { document_date?: unknown }).document_date
+        : null;
+    if (typeof docDate === 'string' && docDate.trim()) {
+      documentDates[row.uploadedFileId] = docDate;
+    }
+  }
+
   const evidenceTimeline = buildEvidenceMappedTimelineEvents({
     fileRecords: opts.fileRecords,
     payFacts,
     commFacts,
+    documentDates,
   });
   const timelineEvents = evidenceTimelineToOrganizationEvents(evidenceTimeline);
   const sections = buildIntakeOrganizationSections({

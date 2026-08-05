@@ -1257,6 +1257,7 @@ export type CompletedFileExtractionRow = {
   extracted_text: string;
   extraction_status: string;
   quality_flags: Record<string, unknown> | null;
+  document_facts: Record<string, unknown> | null;
   uploaded_files: {
     id: string;
     file_name: string;
@@ -1270,7 +1271,7 @@ export async function listCompletedExtractionsForIntake(
   const { data, error } = await supabase
     .from('file_text_extractions')
     .select(
-      'uploaded_file_id, intake_id, worker_id, extracted_text, extraction_status, quality_flags, uploaded_files!inner(id, file_name, category)'
+      'uploaded_file_id, intake_id, worker_id, extracted_text, extraction_status, quality_flags, document_facts, uploaded_files!inner(id, file_name, category)'
     )
     .eq('intake_id', intakeId)
     .eq('extraction_status', 'completed');
@@ -1290,6 +1291,7 @@ export async function listCompletedExtractionsForIntake(
         extracted_text: String(row.extracted_text ?? ''),
         extraction_status: String(row.extraction_status ?? ''),
         quality_flags: (row.quality_flags ?? null) as Record<string, unknown> | null,
+        document_facts: (row.document_facts ?? null) as Record<string, unknown> | null,
         uploaded_files: file
           ? {
               id: String(file.id ?? row.uploaded_file_id ?? ''),
@@ -2425,6 +2427,7 @@ export async function persistPlaceholderOrganizationForIntake(
     category: row.uploaded_files?.category ?? null,
     extractedText: String(row.extracted_text ?? ''),
     qualityFlags: row.quality_flags,
+    documentFacts: row.document_facts ?? null,
   }));
 
   let org: PlaceholderOrganizationResult;
