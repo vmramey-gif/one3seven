@@ -51,6 +51,17 @@ export function parseWorkerIntakeMetadata(raw: unknown): WorkerIntakeMetadata {
       reimbursed: typeof f.reimbursed === 'string' ? (f.reimbursed as StoryFollowUpAnswers['reimbursed']) : '',
       complainedOrReported: typeof f.complainedOrReported === 'string' ? f.complainedOrReported : '',
       changedAfterward: typeof f.changedAfterward === 'string' ? f.changedAfterward : '',
+      employmentStatus:
+        typeof f.employmentStatus === 'string' ? (f.employmentStatus as StoryFollowUpAnswers['employmentStatus']) : '',
+      arbitrationAgreement:
+        typeof f.arbitrationAgreement === 'string'
+          ? (f.arbitrationAgreement as StoryFollowUpAnswers['arbitrationAgreement'])
+          : '',
+      priorAgencyFiling:
+        typeof f.priorAgencyFiling === 'string' ? (f.priorAgencyFiling as StoryFollowUpAnswers['priorAgencyFiling']) : '',
+      priorAgencyFilingDetails: typeof f.priorAgencyFilingDetails === 'string' ? f.priorAgencyFilingDetails : '',
+      workState: typeof f.workState === 'string' ? f.workState : '',
+      employerState: typeof f.employerState === 'string' ? f.employerState : '',
     };
   }
   return {

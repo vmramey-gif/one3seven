@@ -3066,8 +3066,21 @@ export default function App() {
       employmentMatterTags: matterTags,
     });
     if (err.error) console.error('[o3s-reorg] re-organize failed', err.error);
+    if (!err.error) {
+      // Rebuild replaces the stored overview, so re-merge the worker contact block for
+      // linked/firm-code intakes the same way handleProcessingFinished does after a first
+      // organize — otherwise the firm packet header falls back to "Not yet identified".
+      const routing = await intakeData.fetchWorkerIntakeRoutingDisplay(intakeId);
+      if (routing.submissionChannel === 'firm_code' || routing.linkedFirmId) {
+        const contactErr = await mergeWorkerContactIntoLatestIntakeSummary(intakeId, {
+          name: (profile?.full_name ?? '').trim() || null,
+          phone: (profile?.phone ?? '').trim() || null,
+        });
+        if (contactErr.error) console.warn('[o3s-reorg] worker contact merge failed', contactErr.error);
+      }
+    }
     await refreshWorkerSummaryLive(intakeId);
-  }, []);
+  }, [profile?.full_name, profile?.phone]);
 
   const handleUploadProcessingStart = (detail?: { uploadContext?: string }) => {
     const intakeId = currentIntakeIdRef.current;

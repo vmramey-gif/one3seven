@@ -3,7 +3,7 @@ import {
   extractWorkerIntakeNotesFromOverview,
   extractWorkerStoryFromOverview,
   mergeWorkerIntakeNotesIntoOverview,
-  stripWorkerIntakeNotesBlock,
+  stripWorkerIntakeNotesBlockForStorage,
 } from './intakeDataService';
 import type { IntakeCaseCategory } from '../app/constants/caseCategories';
 import { BETA_WORKER_CASE_CATEGORY, isBetaEmploymentCategory } from '../app/constants/employmentMatter';
@@ -260,7 +260,7 @@ export async function mergeGuidedIntakeIntoLatestIntakeSummary(
   if (!guidedText) return {};
 
   const existing = extractWorkerIntakeNotesFromOverview(overview).trim();
-  const base = stripWorkerIntakeNotesBlock(overview).replace(/\s+$/u, '');
+  const base = stripWorkerIntakeNotesBlockForStorage(overview).replace(/\s+$/u, '');
   const combined = existing ? `${guidedText}\n\n${existing}` : guidedText;
   const next = mergeWorkerIntakeNotesIntoOverview(base, combined);
 

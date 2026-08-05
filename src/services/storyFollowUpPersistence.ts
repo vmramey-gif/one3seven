@@ -4,7 +4,8 @@ import {
   extractWorkerIntakeNotesFromOverview,
   parseWorkerIntakeNotesContent,
   mergeWorkerIntakeNotesIntoOverview,
-  stripWorkerIntakeNotesBlock,
+  rebuildWorkerIntakeNotesBody,
+  stripWorkerIntakeNotesBlockForStorage,
 } from './intakeDataService';
 
 const STORY_FOLLOWUP_BLOCK_RE =
@@ -157,16 +158,10 @@ export async function mergeStoryFollowUpIntoLatestIntakeSummary(
   const overview = (row.overview as string | null) ?? '';
   const parsed = parseWorkerIntakeNotesContent(extractWorkerIntakeNotesFromOverview(overview));
   const combinedNotes = mergeStoryFollowUpIntoWorkerNotesBody(
-    [
-      parsed.guidedSummary,
-      parsed.workerStory,
-      parsed.additionalNotes,
-    ]
-      .filter(Boolean)
-      .join('\n\n'),
+    rebuildWorkerIntakeNotesBody(parsed),
     answers
   );
-  const base = stripStoryFollowUpBlock(stripWorkerIntakeNotesBlock(overview)).replace(/\s+$/u, '');
+  const base = stripStoryFollowUpBlock(stripWorkerIntakeNotesBlockForStorage(overview)).replace(/\s+$/u, '');
   const next = mergeWorkerIntakeNotesIntoOverview(base, combinedNotes);
 
   const { error: up } = await supabase

@@ -12,7 +12,9 @@ import { polishFirmFacingProse, stripFirmFacingArtifacts } from './firmIntakeDis
 import {
   extractStoryFollowUpFromOverview,
   formatStoryFollowUpForDisplay,
+  mergeStoryFollowUpIntoWorkerNotesBody,
 } from './storyFollowUpPersistence';
+import { hasStoryFollowUpContent } from '../app/constants/workerStoryIntake';
 import { extractWorkerContactFromOverview } from './workerContactPersistence';
 import {
   buildCommunicationFactDigest,
@@ -1380,9 +1382,14 @@ export async function ensureTimelineEventsFromUploadedFiles(intakeId: string): P
   return persistPlaceholderOrganizationForIntake(intakeId);
 }
 
-/** Embedded worker intake notes inside `intake_summaries.overview` (no new rows). */
+/**
+ * Embedded worker intake notes inside `intake_summaries.overview` (no new rows).
+ * Newline-tolerant on both edges (`\n?`) — the stored overview is trimmed by safeTrim on
+ * save, so a strict leading/trailing `\n` requirement made the block unreadable after a
+ * rebuild and the notes were silently dropped on the next one.
+ */
 const WORKER_INTAKE_NOTES_PATTERN =
-  /\n--- O3S_WORKER_INTAKE_NOTES ---\n([\s\S]*?)\n--- O3S_WORKER_INTAKE_NOTES_END ---\n/;
+  /\n?---\s*O3S_WORKER_INTAKE_NOTES\s*---\n([\s\S]*?)\n---\s*O3S_WORKER_INTAKE_NOTES_END\s*---\n?/;
 
 const GUIDED_INTAKE_BLOCK_PATTERN =
   /--- O3S_GUIDED_INTAKE ---\n([\s\S]*?)\n--- O3S_GUIDED_INTAKE_END ---/;
@@ -1392,6 +1399,9 @@ const WORKER_STORY_BLOCK_PATTERN =
 
 const STORY_FOLLOWUP_BLOCK_PATTERN =
   /--- O3S_STORY_FOLLOWUP ---\n([\s\S]*?)\n--- O3S_STORY_FOLLOWUP_END ---/;
+
+const CATEGORY_SCAFFOLD_BLOCK_PATTERN =
+  /--- O3S_CATEGORY_SCAFFOLD ---\n([\s\S]*?)\n--- O3S_CATEGORY_SCAFFOLD_END ---/;
 
 const FIRM_INTERNAL_MARKERS_PATTERN =
   /---\s*O3S_WORKER_INTAKE_NOTES\s*---[\s\S]*?---\s*O3S_WORKER_INTAKE_NOTES_END\s*---/gi;
@@ -1532,6 +1542,16 @@ export function stripWorkerIntakeNotesBlock(overview: string): string {
   );
 }
 
+/**
+ * Storage-path strip: removes ONLY the worker-notes block. Never use the sanitizing
+ * `stripWorkerIntakeNotesBlock` on text that is written back to `intake_summaries.overview` —
+ * sanitizeFirmFacingText is a display polish that deletes every embedded O3S_ sidecar block
+ * (worker contact, org engine, mitigation log, …) from whatever it touches.
+ */
+export function stripWorkerIntakeNotesBlockForStorage(overview: string): string {
+  return overview.replace(WORKER_INTAKE_NOTES_PATTERN, '\n');
+}
+
 export function extractWorkerIntakeNotesFromOverview(overview: string | null | undefined): string {
   const m = (overview ?? '').match(WORKER_INTAKE_NOTES_PATTERN);
   return m?.[1]?.trim() ?? '';
@@ -1541,6 +1561,10 @@ export type ParsedWorkerIntakeNotes = {
   guidedSummary: string | null;
   workerStory: string | null;
   additionalNotes: string | null;
+  /** Raw body of the O3S_STORY_FOLLOWUP block, carried through rebuilds so notes edits never drop it. */
+  storyFollowUp?: string | null;
+  /** Raw body of the O3S_CATEGORY_SCAFFOLD block, carried through rebuilds. */
+  categoryScaffold?: string | null;
 };
 
 function stripEmbeddedWorkerNoteBlocks(notesBody: string): string {
@@ -1548,6 +1572,7 @@ function stripEmbeddedWorkerNoteBlocks(notesBody: string): string {
     .replace(GUIDED_INTAKE_BLOCK_PATTERN, '')
     .replace(WORKER_STORY_BLOCK_PATTERN, '')
     .replace(STORY_FOLLOWUP_BLOCK_PATTERN, '')
+    .replace(CATEGORY_SCAFFOLD_BLOCK_PATTERN, '')
     .replace(/\n{3,}/g, '\n\n')
     .trim();
 }
@@ -1556,11 +1581,20 @@ function stripEmbeddedWorkerNoteBlocks(notesBody: string): string {
 export function parseWorkerIntakeNotesContent(notesBody: string | null | undefined): ParsedWorkerIntakeNotes {
   const raw = (notesBody ?? '').trim();
   if (!raw) {
-    return { guidedSummary: null, workerStory: null, additionalNotes: null };
+    return {
+      guidedSummary: null,
+      workerStory: null,
+      additionalNotes: null,
+      storyFollowUp: null,
+      categoryScaffold: null,
+    };
   }
 
   const guidedMatch = raw.match(GUIDED_INTAKE_BLOCK_PATTERN);
   const guidedSummary = guidedMatch?.[1]?.trim() || null;
+
+  const storyFollowUp = raw.match(STORY_FOLLOWUP_BLOCK_PATTERN)?.[1]?.trim() || null;
+  const categoryScaffold = raw.match(CATEGORY_SCAFFOLD_BLOCK_PATTERN)?.[1]?.trim() || null;
 
   const storyMatch = raw.match(WORKER_STORY_BLOCK_PATTERN);
   let workerStory = storyMatch?.[1]?.trim() || null;
@@ -1585,6 +1619,8 @@ export function parseWorkerIntakeNotesContent(notesBody: string | null | undefin
     guidedSummary,
     workerStory,
     additionalNotes: additionalNotes || null,
+    storyFollowUp,
+    categoryScaffold,
   };
 }
 
@@ -1604,7 +1640,7 @@ export function extractWorkerAdditionalNotesFromOverview(
   return parseWorkerIntakeNotesFromOverview(overview).additionalNotes;
 }
 
-/** Rebuild embedded worker-notes body while preserving guided + story blocks. */
+/** Rebuild embedded worker-notes body while preserving guided + story + follow-up + scaffold blocks. */
 export function rebuildWorkerIntakeNotesBody(parsed: ParsedWorkerIntakeNotes): string {
   const parts: string[] = [];
   if (parsed.guidedSummary) {
@@ -1613,8 +1649,18 @@ export function rebuildWorkerIntakeNotesBody(parsed: ParsedWorkerIntakeNotes): s
   if (parsed.workerStory) {
     parts.push('--- O3S_WORKER_STORY ---', parsed.workerStory, '--- O3S_WORKER_STORY_END ---');
   }
+  if (parsed.categoryScaffold?.trim()) {
+    parts.push(
+      `--- O3S_CATEGORY_SCAFFOLD ---\n${parsed.categoryScaffold.trim()}\n--- O3S_CATEGORY_SCAFFOLD_END ---`
+    );
+  }
   if (parsed.additionalNotes?.trim()) {
     parts.push(parsed.additionalNotes.trim());
+  }
+  if (parsed.storyFollowUp?.trim()) {
+    parts.push(
+      `--- O3S_STORY_FOLLOWUP ---\n${parsed.storyFollowUp.trim()}\n--- O3S_STORY_FOLLOWUP_END ---`
+    );
   }
   return parts.join('\n\n');
 }
@@ -1655,10 +1701,47 @@ export function mergeWorkerIntakeNotesIntoOverview(
   overview: string | null | undefined,
   notes: string
 ): string {
-  const base = stripWorkerIntakeNotesBlock(overview ?? '').replace(/\s+$/u, '');
+  const base = stripWorkerIntakeNotesBlockForStorage(overview ?? '').replace(/\s+$/u, '');
   const t = safeTrim(notes, 'mergeWorkerIntakeNotesIntoOverview.notes');
   if (!t) return base;
   return `${base}\n--- O3S_WORKER_INTAKE_NOTES ---\n${t}\n--- O3S_WORKER_INTAKE_NOTES_END ---\n`;
+}
+
+/**
+ * Sidecar O3S blocks stored in `intake_summaries.overview` but owned by other feature
+ * codecs (contact share, category, employment matter, mitigation log, reminders, records
+ * requests). A rebuild regenerates the narrative from scratch, so any sidecar block the
+ * rebuilt overview lost is copied forward verbatim from the previous stored overview.
+ */
+const OVERVIEW_SIDECAR_BLOCK_NAMES = [
+  'O3S_WORKER_CONTACT',
+  'O3S_CASE_CATEGORY',
+  'O3S_EMPLOYMENT_MATTER',
+  'O3S_MITIGATION_LOG',
+  'O3S_WORKER_REMINDERS',
+  'O3S_RECORDS_REQUEST_LOG',
+] as const;
+
+function overviewSidecarBlockPattern(name: string): RegExp {
+  return new RegExp(`\\n?---\\s*${name}\\s*---\\n[\\s\\S]*?\\n---\\s*${name}_END\\s*---\\n?`);
+}
+
+export function preserveOverviewSidecarBlocks(
+  previousOverview: string | null | undefined,
+  nextOverview: string
+): string {
+  const previous = previousOverview ?? '';
+  if (!previous) return nextOverview;
+  let out = nextOverview;
+  for (const name of OVERVIEW_SIDECAR_BLOCK_NAMES) {
+    const pattern = overviewSidecarBlockPattern(name);
+    if (pattern.test(out)) continue;
+    const match = previous.match(pattern);
+    if (!match) continue;
+    const block = match[0].replace(/^\n+/u, '').replace(/\n+$/u, '');
+    out = `${out.replace(/\s+$/u, '')}\n${block}\n`;
+  }
+  return out;
 }
 
 function extractFirmDocumentRequestBlockFromOverview(overview: string | null | undefined): string {
@@ -1915,7 +1998,7 @@ export async function setWorkerIntakeNotesInLatestIntakeSummary(
     ...parsed,
     additionalNotes: notes.trim() || null,
   });
-  const next = mergeWorkerIntakeNotesIntoOverview(stripWorkerIntakeNotesBlock(overview), body);
+  const next = mergeWorkerIntakeNotesIntoOverview(stripWorkerIntakeNotesBlockForStorage(overview), body);
   const { error: up } = await supabase
     .from('intake_summaries')
     .update({ overview: next })
@@ -1948,7 +2031,7 @@ export async function mergeUploadContextIntoLatestIntakeSummary(
   const parsed = parseWorkerIntakeNotesFromOverview(overview);
   const priorAdditional = parsed.additionalNotes?.trim() ?? '';
   const combinedAdditional = priorAdditional ? `${trimmed}\n\n${priorAdditional}` : trimmed;
-  const base = stripWorkerIntakeNotesBlock(overview).replace(/\s+$/u, '');
+  const base = stripWorkerIntakeNotesBlockForStorage(overview).replace(/\s+$/u, '');
   const body = rebuildWorkerIntakeNotesBody({ ...parsed, additionalNotes: combinedAdditional });
   const next = mergeWorkerIntakeNotesIntoOverview(base, body);
 
@@ -2108,6 +2191,7 @@ function assembleEnrichedSummaryPayload(input: {
   intakeId: string;
   org: PlaceholderOrganizationResult;
   extractionRows: CompletedFileExtractionRow[];
+  previousOverview: string;
   preservedWorkerNotes: string;
   preservedFirmRequestBlock: string;
   preservedFirmRequestAlerts: string[];
@@ -2120,6 +2204,7 @@ function assembleEnrichedSummaryPayload(input: {
     intakeId,
     org,
     extractionRows,
+    previousOverview,
     preservedWorkerNotes,
     preservedFirmRequestBlock,
     preservedFirmRequestAlerts,
@@ -2201,6 +2286,10 @@ function assembleEnrichedSummaryPayload(input: {
       `${overviewToStore.replace(/\s+$/u, '')}${preservedWorkerResponseBlock}`
     );
   }
+
+  overviewToStore = runAssemblyStep('sidecar block preservation', intakeId, () =>
+    preserveOverviewSidecarBlocks(previousOverview, overviewToStore)
+  );
 
   const missingAlertsToStore = runAssemblyStep('missing alerts merge', intakeId, () =>
     mergeMissingDocumentAlertsPreservingRequestContext(
@@ -2386,7 +2475,45 @@ export async function persistPlaceholderOrganizationForIntake(
 
   const previousOverview = (previousSummary?.overview as string | null) ?? '';
   const previousAlerts = (previousSummary?.missing_document_alerts as string[] | null) ?? [];
-  const preservedWorkerNotes = extractWorkerIntakeNotesFromOverview(previousOverview);
+  let preservedWorkerNotes = extractWorkerIntakeNotesFromOverview(previousOverview);
+  // Recovery: earlier rebuilds could drop the story / follow-up blocks from the stored
+  // overview. `intakes.worker_metadata` keeps the worker-owned originals — reconstruct.
+  try {
+    const recoveryMetadata = parseWorkerIntakeMetadata(priorIntake?.worker_metadata);
+    const recoverStory =
+      !WORKER_STORY_BLOCK_PATTERN.test(preservedWorkerNotes) &&
+      Boolean(recoveryMetadata.workerStory?.trim());
+    const recoverFollowUp =
+      !STORY_FOLLOWUP_BLOCK_PATTERN.test(preservedWorkerNotes) &&
+      hasStoryFollowUpContent(recoveryMetadata.storyFollowUp);
+    if (recoverStory || recoverFollowUp) {
+      const parsedNotes = parseWorkerIntakeNotesContent(preservedWorkerNotes);
+      let recoveredNotes = rebuildWorkerIntakeNotesBody({
+        ...parsedNotes,
+        workerStory: recoverStory ? recoveryMetadata.workerStory ?? null : parsedNotes.workerStory,
+      });
+      if (recoverFollowUp && recoveryMetadata.storyFollowUp) {
+        recoveredNotes = mergeStoryFollowUpIntoWorkerNotesBody(
+          recoveredNotes,
+          recoveryMetadata.storyFollowUp
+        );
+      }
+      if (recoveredNotes.trim()) {
+        preservedWorkerNotes = recoveredNotes;
+        logOrgAudit('worker notes recovered from worker_metadata', {
+          intakeId,
+          activeStep: 'worker_notes_recovery',
+          recoveredStory: recoverStory,
+          recoveredFollowUp: recoverFollowUp,
+        });
+      }
+    }
+  } catch (recoveryError) {
+    logOrgAuditError('worker notes recovery failed (non-fatal)', recoveryError, {
+      intakeId,
+      activeStep: 'worker_notes_recovery',
+    });
+  }
   const workerContextForMining = buildWorkerContextForMining(
     preservedWorkerNotes,
     priorIntake?.worker_metadata
@@ -2559,6 +2686,7 @@ export async function persistPlaceholderOrganizationForIntake(
       intakeId,
       org,
       extractionRows: extractionRes.rows,
+      previousOverview,
       preservedWorkerNotes,
       preservedFirmRequestBlock,
       preservedFirmRequestAlerts,
