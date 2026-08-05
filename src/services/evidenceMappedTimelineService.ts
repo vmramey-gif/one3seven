@@ -265,6 +265,18 @@ function bestEventCandidateForRecord(
   record: IntakeFileOrganizationRecord,
   commFact: CommunicationFacts | null
 ): EventCandidate | null {
+  // HARD GUARD (dominates every candidate below): a witness/coworker statement is a THIRD PARTY'S
+  // account that RECOUNTS events — usually the worker's HR complaint. It must never be titled from
+  // that recounted content. Marquez production bug: the communication candidate scored its subject
+  // "complaint to HR" at 88, beating the witness filename's 86, so the witness statement was titled
+  // "Complaint submitted to Human Resources." A witness statement is always titled for what it IS.
+  // "witness" in the filename or topics is the reliable third-party signal (docType 'Witness Statement'
+  // alone is ambiguous — a worker's own statement is sometimes mis-tagged with it, so we don't key on it).
+  const wName = record.file_name.toLowerCase();
+  const wTopics = record.employment_topics.join(' ').toLowerCase();
+  if (/(^|_|\s)witness(es)?(_|\s|\.|$)/.test(wName) || /\bwitness\b/.test(wTopics)) {
+    return candidate('Witness statement provided', 200);
+  }
   const candidates = [
     eventCandidateFromFilename(record),
     eventCandidateFromCommunication(record, commFact),
@@ -488,18 +500,19 @@ function specificTitleFromRecord(
   record: IntakeFileOrganizationRecord,
   commFact: CommunicationFacts | null
 ): string | null {
-  const subjectTitle = titleFromCommunicationSubject(commFact?.subjectOrTopic);
-  if (subjectTitle && !isGenericTimelineTitle(subjectTitle)) return subjectTitle;
-
   const name = record.file_name.toLowerCase();
   const topics = record.employment_topics.join(' ').toLowerCase();
-  const docType = `${record.document_type ?? ''} ${record.legacy_upload_category ?? ''}`.toLowerCase();
-  // A witness/coworker statement is a third party's account, not the worker's own and not an HR
-  // complaint. Title it from its document TYPE/category first (the most reliable signal), then
-  // filename/topics — guarded before the complaint/HR branch so it is never mislabeled.
-  if (/witness/.test(docType) || /(^|_|\s)witness(es)?(_|\s|\.|$)/.test(name) || /\bwitness\b/.test(topics)) {
+
+  // HARD GUARD — must run BEFORE the communication-subject titler below. A witness/coworker statement
+  // is a THIRD PARTY'S account: it RECOUNTS the worker's complaint, it is not itself a complaint.
+  // Previously the subject-titler ran first and titled a witness statement "Complaint submitted to
+  // Human Resources" (real Marquez intake bug). Keyed on filename/topics (not the ambiguous docType).
+  if (/(^|_|\s)witness(es)?(_|\s|\.|$)/.test(name) || /\bwitness\b/.test(topics)) {
     return 'Witness statement provided';
   }
+
+  const subjectTitle = titleFromCommunicationSubject(commFact?.subjectOrTopic);
+  if (subjectTitle && !isGenericTimelineTitle(subjectTitle)) return subjectTitle;
   // Defense in depth: a worker's own statement is a narrative, not a specific documented event —
   // never let its topics infer one (e.g. "Schedule change documented"). Matches the filename guard
   // in eventCandidateFromFilename.

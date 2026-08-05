@@ -12,6 +12,7 @@ import { assertNeutralOrganizationOutput } from '../intakeOrganizationAssertions
 import { collectOrganizedSectionsPdfLines } from '../intakePacketPresentation';
 import { ATTORNEY_PACKET_SECTIONS } from '../../app/constants/workerStoryIntake';
 import type { IntakeFileOrganizationRecord } from '../intakeOrganizationTypes';
+import type { CommunicationFacts } from '../documentFactExtractionService';
 
 const PAY_TEXT = `
 PAY STUB
@@ -167,6 +168,45 @@ describe('evidence-mapped timeline engine', () => {
     });
     expect(events[0]?.title).toBe('Witness statement provided');
     expect(events[0]?.title).not.toBe('Complaint submitted to Human Resources');
+  });
+
+  test('a witness statement is NOT titled from its recounted communication subject (Marquez PRODUCTION regression)', () => {
+    // Reproduces the exact production path: extraction produced a CommunicationFact for the witness
+    // statement whose subject recounts the worker's HR complaint. That candidate scored 88 and beat
+    // the witness filename's 86 — so the May-4 witness statement was titled "Complaint submitted to HR".
+    const witnessCommFact: CommunicationFacts = {
+      kind: 'workplace_communications',
+      source: { uploadedFileId: 'witness-comm-1', fileName: 'Marquez_Witness_Statement.pdf', category: 'Witness Statement' },
+      messageDate: 'May 4, 2026',
+      sender: 'Marisol (coworker)',
+      recipient: null,
+      peopleMentioned: ['Marisol'],
+      employerOrCompany: 'Cedarline Foods',
+      subjectOrTopic: 'Complaint to Human Resources about unpaid overtime',
+      workerConcernExcerpt: 'We complained to HR about the unpaid overtime.',
+      employerOrHrResponseExcerpt: null,
+      confidence: 'medium',
+    };
+    const events = buildEvidenceMappedTimelineEvents({
+      fileRecords: [
+        sampleFileRecord({
+          source_file_id: 'witness-comm-1',
+          file_name: 'Marquez_Witness_Statement.pdf',
+          document_type: 'Witness Statement',
+          legacy_upload_category: 'Witness Statement',
+          likely_date: 'May 4, 2026',
+          employment_topics: ['Complaint', 'Human Resources communications'],
+          possible_timeline_event: {
+            title: 'Witness account',
+            date: 'May 4, 2026',
+            neutral_summary: 'A coworker describes what they observed.',
+          },
+        }),
+      ],
+      commFacts: [witnessCommFact],
+    });
+    expect(events[0]?.title).toBe('Witness statement provided');
+    expect(events[0]?.title).not.toMatch(/complaint/i);
   });
 
   test('uses workplace-event labels for safety concerns, performance actions, and scheduling records', () => {
