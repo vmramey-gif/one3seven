@@ -131,7 +131,7 @@ export function buildSequencePatternInsights(
   if (concernIndex >= 0 && hasEventAfter(events, concernIndex, hasLaterAction)) {
     pushUnique(
       insights.summaryLines,
-      'The chronology places worker-raised concerns before later workplace action records. Review against source files may help clarify timing and context.'
+      'Worker-raised concerns and later workplace action records both appear in the chronology. Review the timing between them against source files.'
     );
     pushUnique(
       insights.reviewNotes,

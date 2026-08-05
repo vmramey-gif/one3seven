@@ -174,7 +174,12 @@ changed_afterward:My schedule changed, I received a written warning, my performa
     expect(summary).toMatch(/performance-related records/i);
     expect(summary).toMatch(/witness statements/i);
     expect(summary).toMatch(/separation documents/i);
-    expect(summary).toMatch(/timeline currently places worker-raised concerns before later workplace action records/i);
+    // Doctrine (2026-08-05): the summary must DESCRIBE record presence, never assert
+    // sequence ("concerns before actions" invites a causation inference the record may
+    // not support). The old ordering sentence is prohibited on every surface.
+    expect(summary).toMatch(/file currently includes communications with management or Human Resources alongside workplace action records/i);
+    expect(summary).not.toMatch(/places worker-raised concerns before/i);
+    expect(summary).not.toMatch(/concerns before later workplace action/i);
     expect(summary).toMatch(/Ashley Kim .*Human Resources/i);
     expect(summary).toMatch(/What remains unclear:/i);
     expect(summary).toMatch(/Some date details may require confirmation/i);

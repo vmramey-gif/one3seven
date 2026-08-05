@@ -43,13 +43,16 @@ describe('sequence pattern reasoning', () => {
     expect(insights.summaryLines.join(' ')).not.toMatch(/retaliation|violation|liability|strong claim/i);
   });
 
-  test('identifies concern before later workplace action records', () => {
+  test('describes concern and later workplace action records without asserting sequence', () => {
     const insights = buildSequencePatternInsights([
       event({ title: 'Worker raises safety concerns', date: 'January 2024' }),
       event({ title: 'Written warning issued', date: 'February 2024' }),
     ]);
 
-    expect(insights.summaryLines.join(' ')).toMatch(/before later workplace action records/i);
+    // Doctrine (2026-08-05): presence + verify-the-timing framing only — never
+    // "concerns before actions", which invites a causation inference.
+    expect(insights.summaryLines.join(' ')).toMatch(/both appear in the chronology/i);
+    expect(insights.summaryLines.join(' ')).not.toMatch(/before later workplace action records/i);
     expect(insights.reviewNotes.join(' ')).toMatch(/timing between worker-raised concerns/i);
     expect(insights.potentialGaps).toContain(
       'The current file set does not yet clearly show what changed between the worker-raised concerns and later workplace action records.'

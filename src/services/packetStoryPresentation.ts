@@ -387,11 +387,15 @@ function buildDerivedSequenceSummary(payload: IntakeSummaryDownloadPayload): str
   add('performance-related documents', /\b(performance review|performance improvement plan|\bpip\b|coaching memo)\b/);
   add('separation documentation', /\b(termination|terminated|separation|employment ends|final pay)\b/);
 
+  // Doctrine: describe what record types are PRESENT — never assert their sequence.
+  // This function has no date information (keyword presence only), and even a
+  // date-grounded "concerns before actions" line invites a causation inference the
+  // record may not support (2026-08-04 Francis audit: the concern postdated the action).
   if (hasConcern && laterActions.length) {
-    return `The timeline currently places worker-raised concerns before later workplace action records, including ${englishList(laterActions.slice(0, 4))}. Some dates and employer-response details may need confirmation against the source files.`;
+    return `The file currently includes communications with management or Human Resources alongside workplace action records, including ${englishList(laterActions.slice(0, 4))}. Dates and sequence may need confirmation against the source files.`;
   }
   if (hasConcern) {
-    return "The records currently identify worker-raised concerns, but the file set does not yet clearly show the employer's response.";
+    return "The records currently include communications with management or Human Resources; the employer's response is not yet clearly shown in the file set.";
   }
   if (laterActions.length) {
     return `The timeline currently includes ${englishList(laterActions.slice(0, 4))}. Review against source files may help clarify timing and context.`;
