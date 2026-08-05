@@ -12,6 +12,8 @@ export type PacketTimelineEventInput = {
   category: string;
   summary: string;
   sourceDates?: string[];
+  /** The event's own source files (evidence-cluster members). Cited first — keyword matching never overrides them. */
+  sourceFileNames?: string[];
 };
 
 export type InventoryRow = { fileName: string; category: string };
@@ -438,15 +440,52 @@ export function resolveChronologyEventDate(
   return 'Date not yet clear';
 }
 
-/** Pick up to 2 directly relevant supporting records for a resolved event title. */
+/**
+ * A file's own year, from its filename: standard date tokens first, then compact
+ * scanner/export prefixes ("20251202084640_…") that the token extractor misses.
+ */
+function fileYearFromName(fileName: string): string | null {
+  // Separators collapse to spaces so "worker_2023_W2.pdf" exposes its year token
+  // (underscores are word characters — \b never fires between them and digits).
+  const normalized = fileName.replace(/[_\-.]+/g, ' ');
+  const token = extractFilenameDateToken(fileName) ?? extractFilenameDateToken(normalized);
+  const fromToken = token?.match(/\b(19|20)\d{2}\b/)?.[0];
+  if (fromToken) return fromToken;
+  const compact = fileName.match(/(?:^|[^0-9])((?:19|20)\d{2})(?:0[1-9]|1[0-2])(?:[0-2]\d|3[01])/);
+  return compact?.[1] ?? null;
+}
+
+/** The event's own source files, resolved for display. These are the truthful citations. */
+function ownSourceUploads(event: PacketTimelineEventInput, normalizedInventory: InventoryRow[]): string[] {
+  const out: string[] = [];
+  for (const name of event.sourceFileNames ?? []) {
+    if (!name?.trim()) continue;
+    const row = inventoryRowForName(normalizedInventory, name);
+    const display = formatPacketFileName(row ? row.fileName : name);
+    if (!out.includes(display)) out.push(display);
+  }
+  return out;
+}
+
+/**
+ * Pick up to 2 directly relevant supporting records for a resolved event title.
+ * The event's OWN source files always win (order-dependence bug: keyword scoring re-picked
+ * supports and could cite unrelated files depending on upload order). Keyword-based picks run
+ * only for events with no source trace, and may never introduce a file whose own filename year
+ * contradicts the event's year (the 2023 W2 must never support a 2025 event).
+ */
 export function pickSupportingRecordsForEvent(
   eventTitle: string,
   event: PacketTimelineEventInput,
   inventory: InventoryRow[]
 ): string[] {
+  const normalizedInventory = normalizeInventoryCategories(inventory);
+
+  const ownSources = ownSourceUploads(event, normalizedInventory);
+  if (ownSources.length) return ownSources.slice(0, 2);
+
   if (!inventory.length) return [];
 
-  const normalizedInventory = normalizeInventoryCategories(inventory);
   const parsedRefs = parseSourceNamesFromSummary(event.summary);
 
   if (parsedRefs.length) {
@@ -462,13 +501,18 @@ export function pickSupportingRecordsForEvent(
     if (validated.length) return [...new Set(validated)].slice(0, 2);
   }
 
+  const eventYear = event.date?.match(/\b(19|20)\d{2}\b/)?.[0] ?? null;
   const scored = normalizedInventory
     .map((row) => ({
       name: formatPacketFileName(row.fileName),
+      fileYear: fileYearFromName(row.fileName),
       score: scoreSupportingRecord(eventTitle, event, row),
     }))
     .filter((row) => row.score >= MIN_SUPPORT_SCORE)
-    .sort((a, b) => b.score - a.score);
+    // Never attach a file whose own year contradicts the event's year.
+    .filter((row) => !(eventYear && row.fileYear && row.fileYear !== eventYear))
+    // Deterministic ties: same intake must render the same packet regardless of upload order.
+    .sort((a, b) => b.score - a.score || a.name.localeCompare(b.name));
 
   let names = [...new Set(scored.map((r) => r.name))];
   if (eventTitle === 'Employment begins') {
@@ -478,9 +522,16 @@ export function pickSupportingRecordsForEvent(
   return names.slice(0, 2);
 }
 
-function validateEventAssociations(eventTitle: string, supportingUploads: string[], inventory: InventoryRow[]): string[] {
+function validateEventAssociations(
+  eventTitle: string,
+  supportingUploads: string[],
+  inventory: InventoryRow[],
+  ownSourceNames: ReadonlySet<string> = new Set()
+): string[] {
   const normalized = normalizeInventoryCategories(inventory);
   return supportingUploads.filter((displayName) => {
+    // The event's own source files are its evidence — never score them away.
+    if (ownSourceNames.has(displayName)) return true;
     const row = normalized.find((r) => formatPacketFileName(r.fileName) === displayName);
     if (!row) return false;
     return scoreSupportingRecord(eventTitle, { date: '', title: eventTitle, category: row.category, summary: '' }, row) >= MIN_SUPPORT_SCORE;
@@ -496,7 +547,8 @@ export function prepareChronologyPresentationEvent(
 ): PreparedChronologyEvent {
   const title = resolveChronologyEventTitle(event, index, ctx, inventory);
   let supportingUploads = pickSupportingRecordsForEvent(title, event, inventory);
-  supportingUploads = validateEventAssociations(title, supportingUploads, inventory);
+  const ownSources = new Set(ownSourceUploads(event, normalizeInventoryCategories(inventory)));
+  supportingUploads = validateEventAssociations(title, supportingUploads, inventory, ownSources);
   const sourceDates = (event.sourceDates ?? []).filter(Boolean);
   const date = resolveChronologyEventDate(event.date, event.summary, [...sourceDates, ...supportingUploads]);
 

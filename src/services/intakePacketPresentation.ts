@@ -509,6 +509,7 @@ function buildChronologyEvents(payload: IntakeSummaryDownloadPayload): Chronolog
       category: e.category || '',
       summary: cleanProse(e.summary || '', 200),
       sourceDates: e.sourceDates ?? [],
+      sourceFileNames: e.sourceFileNames ?? [],
     })),
     uploadedFileInventory: inv,
   };

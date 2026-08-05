@@ -1308,6 +1308,47 @@ export async function listCompletedExtractionsForIntake(
   return { rows };
 }
 
+/** Per-file facts + text snippet for the CA record-coverage rail (content-based presence signals). */
+export type CoverageExtractionFactsRow = {
+  fileName: string;
+  documentFacts: Record<string, unknown> | null;
+  textSnippet: string;
+};
+
+/**
+ * Facts + head-of-text snippets for coverage assessment. Unlike
+ * `listCompletedExtractionsForIntake`, rows with an EMPTY text layer are kept — a scanned
+ * employment agreement or personnel-file production often has no text but rich stored facts,
+ * and those facts are exactly what the coverage rail's content signals need.
+ */
+export async function listExtractionFactsForCoverage(
+  intakeId: string
+): Promise<{ rows: CoverageExtractionFactsRow[]; error?: string }> {
+  const { data, error } = await supabase
+    .from('file_text_extractions')
+    .select('extracted_text, document_facts, uploaded_files!inner(file_name)')
+    .eq('intake_id', intakeId)
+    .eq('extraction_status', 'completed');
+
+  if (error) {
+    if (isSchemaRelationUnavailable(error)) return { rows: [] };
+    return { rows: [], error: error.message };
+  }
+
+  const rows = (data ?? [])
+    .map((row: any) => {
+      const file = Array.isArray(row.uploaded_files) ? row.uploaded_files[0] : row.uploaded_files;
+      return {
+        fileName: String(file?.file_name ?? ''),
+        documentFacts: (row.document_facts ?? null) as Record<string, unknown> | null,
+        textSnippet: String(row.extracted_text ?? '').slice(0, 2000),
+      } satisfies CoverageExtractionFactsRow;
+    })
+    .filter((row: CoverageExtractionFactsRow) => row.fileName.length > 0);
+
+  return { rows };
+}
+
 export async function getExtractionStatusForIntake(intakeId: string): Promise<{
   total: number;
   completed: number;

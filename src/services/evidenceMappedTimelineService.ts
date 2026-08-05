@@ -619,25 +619,49 @@ function neutralClusterTitle(
   return normalizeMaterialTimelineTitle(docType, files, commFacts) ?? sanitizeGenerationPhrase(docType);
 }
 
-function clusterDateFromFilenames(files: IntakeFileOrganizationRecord[]): string {
-  for (const f of files) {
-    const token = extractFilenameDateToken(f.file_name);
-    if (!token) continue;
-    const label = sanitizePacketDateLabel(token);
-    if (label && label !== 'Date to confirm') return label;
-  }
-  return '';
+/** Deterministic pick: earliest parseable date first; comparator tie-breaks lexicographically. */
+function pickClusterDateLabel(labels: string[]): string {
+  return [...labels].sort(compareEmploymentChronologyDates)[0] ?? '';
 }
 
-function clusterDate(files: IntakeFileOrganizationRecord[]): string {
-  for (const f of files) {
+function clusterDateFromFilenames(files: IntakeFileOrganizationRecord[]): string {
+  const labels = files
+    .map((f) => extractFilenameDateToken(f.file_name))
+    .filter((token): token is string => Boolean(token))
+    .map((token) => sanitizePacketDateLabel(token))
+    .filter((label) => label && label !== 'Date to confirm');
+  return pickClusterDateLabel(labels);
+}
+
+/**
+ * Deterministic regardless of upload order (shuffle regression: first-file-wins let the
+ * W2 cluster's year flip with input order). Preference: any authoritative extraction-stored
+ * document date carried by a cluster member; otherwise the earliest parseable likely_date;
+ * then per-file event dates; then filename tokens. Ties break lexicographically.
+ */
+function clusterDate(
+  files: IntakeFileOrganizationRecord[],
+  authoritativeDateIds: ReadonlySet<string> = new Set()
+): string {
+  const validLikely = (f: IntakeFileOrganizationRecord) => {
     const d = (f.likely_date ?? '').trim();
-    if (d && d !== DATE_UNCLEAR_LABEL) return d;
-  }
-  for (const f of files) {
-    const d = f.possible_timeline_event?.date?.trim();
-    if (d && d !== DATE_UNCLEAR_LABEL) return d;
-  }
+    return d && d !== DATE_UNCLEAR_LABEL ? d : null;
+  };
+
+  const authoritative = files
+    .filter((f) => authoritativeDateIds.has(f.source_file_id))
+    .map(validLikely)
+    .filter((d): d is string => Boolean(d));
+  if (authoritative.length) return pickClusterDateLabel(authoritative);
+
+  const likely = files.map(validLikely).filter((d): d is string => Boolean(d));
+  if (likely.length) return pickClusterDateLabel(likely);
+
+  const eventDates = files
+    .map((f) => f.possible_timeline_event?.date?.trim())
+    .filter((d): d is string => Boolean(d && d !== DATE_UNCLEAR_LABEL));
+  if (eventDates.length) return pickClusterDateLabel(eventDates);
+
   return clusterDateFromFilenames(files);
 }
 
@@ -821,14 +845,50 @@ function roleAwareTitle(
   return title;
 }
 
+/**
+ * HARD GUARD (title-selection chokepoint — every cluster title flows through here): an event may
+ * be titled "Termination documented" / "Employment ends" ONLY when a source file in the cluster is
+ * itself separation-categorized (stored category, or a filename classified as a separation/
+ * termination document). Separation WORDING inside other documents — an EDD unemployment pamphlet,
+ * post-employment benefits info, a time report — must never produce a termination-titled row
+ * (real Francis bug: a phantom "Termination documented" appeared nine months off the true date,
+ * clustered from exactly those files). Fallback title is neutral and deliberately CONCRETE so the
+ * packet-presentation re-titler keeps it verbatim instead of re-deriving a termination title from
+ * summary keywords.
+ */
+const TERMINATION_FLAVORED_TITLE_RE = /^(termination documented|employment ends)$/i;
+const SEPARATION_SOURCE_CATEGORY_RE = /separation|terminat|severance/i;
+// Filenames that ARE a separation/termination document. Deliberately excludes separation-ADJACENT
+// material (EDD/unemployment pamphlets, "post-employment" benefits info, time reports).
+const SEPARATION_SOURCE_FILENAME_RE =
+  /terminat|separation|severance|resign|layoff|employment[ _-]?end|final[ _-]?day|offboard/i;
+const NEUTRAL_SEPARATION_FALLBACK_TITLE = 'Supporting employment documentation';
+
+function clusterHasSeparationCategorizedSource(files: IntakeFileOrganizationRecord[]): boolean {
+  return files.some(
+    (f) =>
+      SEPARATION_SOURCE_CATEGORY_RE.test(f.legacy_upload_category ?? '') ||
+      SEPARATION_SOURCE_FILENAME_RE.test(f.file_name)
+  );
+}
+
+function guardTerminationTitle(title: string, files: IntakeFileOrganizationRecord[]): string {
+  if (!TERMINATION_FLAVORED_TITLE_RE.test(title.trim())) return title;
+  return clusterHasSeparationCategorizedSource(files) ? title : NEUTRAL_SEPARATION_FALLBACK_TITLE;
+}
+
 function clusterToEvent(
   cluster: TimelineCluster,
   payFacts: PayRecordFacts[],
-  commFacts: CommunicationFacts[]
+  commFacts: CommunicationFacts[],
+  authoritativeDateIds: ReadonlySet<string> = new Set()
 ): EvidenceMappedTimelineEvent {
   const { files } = cluster;
-  const date = clusterDate(files);
-  const baseTitle = cluster.eventTitle ?? neutralClusterTitle(files, commFacts);
+  const date = clusterDate(files, authoritativeDateIds);
+  const baseTitle = guardTerminationTitle(
+    cluster.eventTitle ?? neutralClusterTitle(files, commFacts),
+    files
+  );
   const supportingReadable = readableSupportingFiles(files);
   const supportingAll = files;
   const supportingIds = supportingAll.map((f) => f.source_file_id).filter(Boolean);
@@ -872,17 +932,21 @@ export function buildEvidenceMappedTimelineEvents(
   // file, it overrides the text-mined likely_date (live bug: a separation letter whose
   // extraction read "March 6, 2025" was still dated 01/01/2025 by the naive candidate).
   // Titles, guards, and clustering logic are untouched; files without a usable extracted
-  // date keep the existing candidate-date behavior.
+  // date keep the existing candidate-date behavior. Overridden ids are remembered so
+  // clusterDate can prefer the authoritative date deterministically.
+  const authoritativeDateIds = new Set<string>();
   const records = fileRecords.map((record) => {
     const docDate = usableDocumentDateLabel(documentDates[record.source_file_id]);
-    return docDate ? { ...record, likely_date: docDate } : record;
+    if (!docDate) return record;
+    authoritativeDateIds.add(record.source_file_id);
+    return { ...record, likely_date: docDate };
   });
 
   const eventFirstClusters = buildEventFirstClusters(records, commFacts);
   const clusteredIds = new Set(eventFirstClusters.flatMap((c) => c.files.map((f) => f.source_file_id)));
   const fallbackRecords = records.filter((record) => !clusteredIds.has(record.source_file_id));
   const clusters = [...eventFirstClusters, ...clusterRecords(fallbackRecords)];
-  const events = clusters.map((c) => clusterToEvent(c, payFacts, commFacts));
+  const events = clusters.map((c) => clusterToEvent(c, payFacts, commFacts, authoritativeDateIds));
 
   events.sort((a, b) => compareEmploymentChronologyDates(a.date, b.date));
   return events.slice(0, 16);

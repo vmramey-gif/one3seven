@@ -125,6 +125,65 @@ function collectPeopleFromFacts(
   return [...people].slice(0, 8);
 }
 
+/** Generic role-parties: allowed only when a file names no real individual or entity. */
+const GENERIC_PARTY_RE =
+  /^(human resources|hr|hr department|payroll|management|manager|supervisor|legal|benefits|employer|employee|company|worker|staff|n\/?a|unknown|not specified|none)$/i;
+
+/**
+ * Names from the Claude extraction's stored facts (`document_facts.people_mentioned` +
+ * `document_facts.communication_parties`) — the authoritative people source for a file.
+ * Entries may be plain strings or `{ name, role }` objects; email addresses and URLs are
+ * contact data, not names, and are dropped.
+ */
+export function collectPeopleFromDocumentFacts(
+  facts: Record<string, unknown> | null | undefined
+): string[] {
+  if (!facts || typeof facts !== 'object') return [];
+  const out: string[] = [];
+  const seen = new Set<string>();
+  const push = (value: unknown) => {
+    const raw =
+      typeof value === 'string'
+        ? value
+        : value && typeof value === 'object'
+          ? String((value as { name?: unknown }).name ?? '')
+          : '';
+    const t = raw.replace(/\s+/g, ' ').trim();
+    if (t.length < 2 || t.length > 64) return;
+    if (t.includes('@') || /^https?:|^www\./i.test(t)) return;
+    const clean = sanitizeGenerationPhrase(t);
+    if (!clean) return;
+    const key = clean.toLowerCase();
+    if (seen.has(key)) return;
+    seen.add(key);
+    out.push(clean);
+  };
+  const mentioned = (facts as { people_mentioned?: unknown }).people_mentioned;
+  if (Array.isArray(mentioned)) mentioned.forEach(push);
+  const parties = (facts as { communication_parties?: unknown }).communication_parties;
+  if (Array.isArray(parties)) parties.forEach(push);
+  return out;
+}
+
+/**
+ * Merge extraction-fact names (preferred) with text-mined names; dedupe case-insensitively.
+ * Generic role-parties ("Human Resources") survive only when no named individual exists.
+ */
+function mergePeopleForFile(factPeople: string[], minedPeople: string[]): string[] {
+  const ordered = [...factPeople, ...minedPeople];
+  const hasRealName = ordered.some((p) => !GENERIC_PARTY_RE.test(p));
+  const seen = new Set<string>();
+  const merged: string[] = [];
+  for (const person of ordered) {
+    if (hasRealName && GENERIC_PARTY_RE.test(person)) continue;
+    const key = person.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    merged.push(person);
+  }
+  return merged.slice(0, 12);
+}
+
 function buildPossibleTimelineEvent(opts: {
   documentType: string;
   dates: string[];
@@ -196,7 +255,10 @@ function buildSingleFileRecord(
         })
       : null;
 
-  const people = collectPeopleFromFacts(payFacts, commFacts);
+  const people = mergePeopleForFile(
+    collectPeopleFromDocumentFacts(extraction?.documentFacts),
+    collectPeopleFromFacts(payFacts, commFacts)
+  );
   const employmentTopics =
     minedText.length > 0
       ? employmentTopicLabelsForText(lower, 1, 4)

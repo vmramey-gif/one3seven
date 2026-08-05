@@ -41,7 +41,7 @@ export type IntakeSummaryDownloadPayload = {
   overview: string;
   timelineSummary: string;
   /** Optional structured rows (e.g. Supabase `timeline_events`) when the client supplies them for export. */
-  timelineEvents?: Array<{ date: string; title: string; category: string; summary: string; sourceDates?: string[] }>;
+  timelineEvents?: Array<{ date: string; title: string; category: string; summary: string; sourceDates?: string[]; sourceFileNames?: string[] }>;
   workerContext?: string;
   categories: string[];
   /** Stored initial upload categories with counts (used for export tables). */

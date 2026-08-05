@@ -524,6 +524,7 @@ export function buildPacketChronologyPresentation(
     category: e.category || '',
     summary: e.summary || '',
     sourceDates: e.sourceDates ?? [],
+    sourceFileNames: e.sourceFileNames ?? [],
   }));
   const inventory = payload.uploadedFileInventory ?? [];
   return prepareChronologyPresentationEvents(events, inventory, buildChronologyPresentationContext(payload));

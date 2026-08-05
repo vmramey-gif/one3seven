@@ -60,6 +60,8 @@ import {
   fetchIntakeSummaryBundle,
   listUploadedFiles,
   createFirmIntakeFileSignedUrl,
+  listExtractionFactsForCoverage,
+  type CoverageExtractionFactsRow,
 } from '../../services/intakeDataService';
 import { normalizeFilenameForMatching } from '../../services/filenameMatching';
 import { CitationPanel } from '../components/CitationPanel';
@@ -539,20 +541,48 @@ export function IntakeSummaryScreen({
   ]);
 
   // Record-requirements coverage — what CA requires an employer to keep vs. what's in the file.
-  const recordCoverage = useMemo(
-    () =>
-      assessEmployerRecordCoverage(
-        uploadedFiles.map((f, i) => ({
+  // Extraction facts + text snippets feed conservative content signals (final paycheck, offer
+  // letter/agreement, personnel file). Coverage still works from filename/category alone while
+  // the facts load — content signals only ever ADD presence, never remove it.
+  const [coverageFactRows, setCoverageFactRows] = useState<CoverageExtractionFactsRow[]>([]);
+  useEffect(() => {
+    if (!exportIntakeId || !isSupabaseConfigured) {
+      setCoverageFactRows([]);
+      return;
+    }
+    let cancelled = false;
+    void (async () => {
+      try {
+        const { rows } = await listExtractionFactsForCoverage(exportIntakeId);
+        if (!cancelled) setCoverageFactRows(rows);
+      } catch {
+        /* non-fatal: coverage falls back to filename/category matching */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [exportIntakeId]);
+  const recordCoverage = useMemo(() => {
+    const factsByFile = new Map(
+      coverageFactRows.map((row) => [normalizeFilenameForMatching(row.fileName), row])
+    );
+    return assessEmployerRecordCoverage(
+      uploadedFiles.map((f, i) => {
+        const facts = factsByFile.get(normalizeFilenameForMatching(f.name));
+        return {
           fileName: f.name,
           category: inferInventoryCategory(
             f.name,
             resolveUploadedFileDisplayCategory(f, { persistedCategory: uploadedFilePersistMeta[i]?.category })
           ),
-        })),
-        { stillEmployed: storyFollowUpDetails?.employmentStatus === 'still_employed' }
-      ),
-    [uploadedFiles, uploadedFilePersistMeta, storyFollowUpDetails?.employmentStatus]
-  );
+          documentFacts: facts?.documentFacts ?? null,
+          textSnippet: facts?.textSnippet ?? '',
+        };
+      }),
+      { stillEmployed: storyFollowUpDetails?.employmentStatus === 'still_employed' }
+    );
+  }, [uploadedFiles, uploadedFilePersistMeta, storyFollowUpDetails?.employmentStatus, coverageFactRows]);
   const savedAdditionalNotesRaw = parsedWorkerNotes.additionalNotes ?? '';
   const savedAdditionalNotesDisplay = polishHumanReadableDisplayText(savedAdditionalNotesRaw);
 
@@ -716,6 +746,7 @@ export function IntakeSummaryScreen({
         category: t.category,
         summary: t.summary,
         sourceDates: t.sourceDates,
+        sourceFileNames: t.sourceFileNames ?? [],
       })),
       workerContext: workerCtx,
       categories: categories.length ? categories : ['—'],
@@ -759,6 +790,7 @@ export function IntakeSummaryScreen({
         category: e.category,
         summary: e.ai_summary,
         sourceDates: trace?.sourceDates ?? [],
+        sourceFileNames: trace?.sourceFileNames ?? [],
       };
     });
     const uploadedFileInventory = fileRows.map((row) => {

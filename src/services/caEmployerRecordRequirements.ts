@@ -139,13 +139,200 @@ export type EmployerRecordCoverage = {
 };
 
 /**
+ * Optional per-file content for coverage assessment. `documentFacts` is the structured facts the
+ * extraction stored (file_text_extractions.document_facts); `textSnippet` is the first ~2,000
+ * characters of extracted text. Both are optional — filename/category matching still works alone.
+ */
+export type CoverageFileInput = {
+  fileName?: string;
+  category?: string;
+  documentFacts?: Record<string, unknown> | null;
+  textSnippet?: string;
+};
+
+/** Cap content signals to the head of the document (title/header wording, not deep boilerplate). */
+const COVERAGE_SNIPPET_LIMIT = 2000;
+
+function coverageSnippet(f: CoverageFileInput): string {
+  return (f.textSnippet ?? '').slice(0, COVERAGE_SNIPPET_LIMIT);
+}
+
+function factString(facts: Record<string, unknown> | null | undefined, key: string): string {
+  if (!facts || typeof facts !== 'object') return '';
+  const v = (facts as Record<string, unknown>)[key];
+  return typeof v === 'string' ? v.trim() : '';
+}
+
+function factStringArray(facts: Record<string, unknown> | null | undefined, key: string): string[] {
+  if (!facts || typeof facts !== 'object') return [];
+  const v = (facts as Record<string, unknown>)[key];
+  return Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string') : [];
+}
+
+/** Loose date parse for extraction-stored labels ("March 6, 2025", "03/14/2025", "1/31/25"). */
+function parseCoverageDate(raw: string | null | undefined): number | null {
+  const t = (raw ?? '').trim();
+  if (!t) return null;
+  const mdy = t.match(/\b(\d{1,2})[/-](\d{1,2})[/-](\d{2,4})\b/);
+  if (mdy) {
+    let year = parseInt(mdy[3], 10);
+    if (mdy[3].length === 2) year += 2000;
+    const month = parseInt(mdy[1], 10);
+    const day = parseInt(mdy[2], 10);
+    if (month >= 1 && month <= 12 && day >= 1 && day <= 31) {
+      return new Date(year, month - 1, day).getTime();
+    }
+    return null;
+  }
+  const parsed = Date.parse(t);
+  return Number.isNaN(parsed) ? null : parsed;
+}
+
+const SEPARATION_DOC_RE = /separation|terminat|severance/i;
+
+function isSeparationDoc(f: CoverageFileInput): boolean {
+  return (
+    SEPARATION_DOC_RE.test(f.category ?? '') ||
+    SEPARATION_DOC_RE.test(factString(f.documentFacts, 'category')) ||
+    SEPARATION_DOC_RE.test(f.fileName ?? '')
+  );
+}
+
+/** Latest separation date carried by a separation-categorized document's stored facts. */
+function latestSeparationDate(files: CoverageFileInput[]): number | null {
+  let latest: number | null = null;
+  for (const f of files) {
+    if (!isSeparationDoc(f)) continue;
+    const t =
+      parseCoverageDate(factString(f.documentFacts, 'effective_date')) ??
+      parseCoverageDate(factString(f.documentFacts, 'document_date'));
+    if (t != null && (latest == null || t > latest)) latest = t;
+  }
+  return latest;
+}
+
+const PAY_RECORD_CONTENT_RE = /earnings statement|pay ?stub|paystub|wage statement|itemized/i;
+
+function isPayRecordFile(f: CoverageFileInput): boolean {
+  const nameAndCategory = `${f.fileName ?? ''} ${f.category ?? ''}`
+    .toLowerCase()
+    .replace(/[_\-.]+/g, ' ');
+  const wageReq = CA_EMPLOYER_RECORD_REQUIREMENTS.find((r) => r.key === 'wage_statements');
+  if (wageReq?.match.some((re) => re.test(nameAndCategory))) return true;
+  if (PAY_RECORD_CONTENT_RE.test(coverageSnippet(f))) return true;
+  return Boolean(
+    factString(f.documentFacts, 'gross_pay') || factString(f.documentFacts, 'net_pay')
+  );
+}
+
+const FINAL_PAY_WORDING_RE =
+  /\bfinal\s+(?:pay(?:check)?|wages|pay\s?stub|payout)\b|\blast\s+paycheck\b/i;
+const MANUAL_CHECK_WORDING_RE = /\bmanual\s+check\b/i;
+
+/**
+ * Final paycheck present: a PAY RECORD whose text says final-pay wording, whose text says
+ * "manual check" while a separation document exists in the record set, or whose own pay date
+ * (facts document_date / pay_period_end) falls on or after a separation date the record set
+ * itself establishes. Conservative: a signal must be specific wording or a dated comparison —
+ * a false "present" here suppresses a records-request line, which is worse than a false gap.
+ */
+function finalPaycheckContentSignal(files: CoverageFileInput[]): boolean {
+  const separationDate = latestSeparationDate(files);
+  const hasSeparationDoc = files.some(isSeparationDoc);
+  return files.some((f) => {
+    if (!isPayRecordFile(f)) return false;
+    const snippet = coverageSnippet(f);
+    if (FINAL_PAY_WORDING_RE.test(snippet)) return true;
+    if (hasSeparationDoc && MANUAL_CHECK_WORDING_RE.test(snippet)) return true;
+    if (separationDate == null) return false;
+    const payDate =
+      parseCoverageDate(factString(f.documentFacts, 'document_date')) ??
+      parseCoverageDate(factString(f.documentFacts, 'pay_period_end'));
+    return payDate != null && payDate >= separationDate;
+  });
+}
+
+/** Body wording of an actual offer/agreement — never a mere mention of one in another document. */
+const OFFER_BODY_WORDING_RE =
+  /pleased\s+to\s+offer\s+you|offer\s+of\s+employment|this\s+(?:employment\s+)?(?:agreement|contract)\s+is\s+(?:made|entered)|your\s+employment\s+(?:with\s+\S+\s+)?(?:will\s+)?(?:begin|commence)s?\b/i;
+
+/**
+ * Offer letter / employment agreement present: agreement body wording in the file's own text,
+ * a document executed between parties whose stated roles are exactly Employee and Employer,
+ * or stored facts carrying the full offer-terms triple (position title + start date + pay rate).
+ */
+function offerOrAgreementContentSignal(files: CoverageFileInput[]): boolean {
+  return files.some((f) => {
+    if (OFFER_BODY_WORDING_RE.test(coverageSnippet(f))) return true;
+    const facts = f.documentFacts;
+    if (!facts || typeof facts !== 'object') return false;
+    const parties = (facts as { communication_parties?: unknown }).communication_parties;
+    if (Array.isArray(parties)) {
+      const roles = parties.map((p) =>
+        p && typeof p === 'object' ? String((p as { role?: unknown }).role ?? '').trim().toLowerCase() : ''
+      );
+      if (roles.includes('employee') && roles.includes('employer')) return true;
+    }
+    return Boolean(
+      factString(facts, 'position_title') &&
+        factString(facts, 'start_date') &&
+        factString(facts, 'pay_rate')
+    );
+  });
+}
+
+const PERSONNEL_WORDING_RE = /personnel\s+file|personnel\s+record/i;
+
+/** Distinct employment-file document markers; ≥3 in ONE file = a multi-document employment-file production. */
+const EMPLOYMENT_FILE_MARKERS: RegExp[] = [
+  /\bW-?4\b/i,
+  /\bI-?9\b/i,
+  /handbook\s+acknowledg/i,
+  /background\s+check/i,
+  /benefit(?:s)?\s+(?:election|enrollment)|enrollment\s*&\s*waiver/i,
+  /non-?disclosure|\bNDA\b/,
+  /payroll\s+form/i,
+  /offer\s+letter/i,
+  /new\s+hire|onboarding/i,
+  /tax\s+form/i,
+];
+
+/**
+ * Personnel file present: explicit "personnel file/record" wording, or a single upload whose
+ * text/facts show at least three distinct employment-file document types combined (W-4, I-9,
+ * handbook acknowledgment, background check, …) — the shape of a personnel-file production.
+ */
+function personnelFileContentSignal(files: CoverageFileInput[]): boolean {
+  return files.some((f) => {
+    const hay = [
+      coverageSnippet(f),
+      ...factStringArray(f.documentFacts, 'flags'),
+      ...factStringArray(f.documentFacts, 'referenced_documents'),
+    ].join('\n');
+    if (!hay.trim()) return false;
+    if (PERSONNEL_WORDING_RE.test(hay)) return true;
+    const markerCount = EMPLOYMENT_FILE_MARKERS.filter((re) => re.test(hay)).length;
+    return markerCount >= 3;
+  });
+}
+
+/** Conservative content-based presence signals, keyed by requirement. Absence of a signal never flips a match off. */
+const CONTENT_SIGNALS: Record<string, (files: CoverageFileInput[]) => boolean> = {
+  final_pay: finalPaycheckContentSignal,
+  offer_or_agreement: offerOrAgreementContentSignal,
+  personnel_file: personnelFileContentSignal,
+};
+
+/**
  * Assess a worker's file against the CA requirement list. Pure + factual: present / worker-stated
  * missing / not in record. `stillEmployed` drops separation-only items (a final paycheck isn't
  * "missing" for someone still on the job). `workerStatedMissingKeys` = requirement keys the worker
- * has told us they never received.
+ * has told us they never received. Rows may optionally carry `documentFacts` + `textSnippet` for
+ * conservative content signals (final paycheck, offer/agreement, personnel file); when in doubt a
+ * requirement stays `not_in_record` — this rail feeds a records-request letter.
  */
 export function assessEmployerRecordCoverage(
-  fileInventory: Array<{ fileName?: string; category?: string }>,
+  fileInventory: CoverageFileInput[],
   opts: { stillEmployed?: boolean; workerStatedMissingKeys?: string[] } = {}
 ): EmployerRecordCoverage {
   const stated = new Set(opts.workerStatedMissingKeys ?? []);
@@ -161,7 +348,9 @@ export function assessEmployerRecordCoverage(
   const items: AssessedRequirement[] = CA_EMPLOYER_RECORD_REQUIREMENTS
     .filter((r) => !(opts.stillEmployed && r.scope === 'on_separation'))
     .map((r) => {
-      const present = haystacks.some((h) => r.match.some((re) => re.test(h)));
+      const present =
+        haystacks.some((h) => r.match.some((re) => re.test(h))) ||
+        Boolean(CONTENT_SIGNALS[r.key]?.(fileInventory));
       const state: RecordState = present
         ? 'on_file'
         : stated.has(r.key)
