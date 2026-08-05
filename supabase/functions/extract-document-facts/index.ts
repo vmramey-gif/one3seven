@@ -371,7 +371,10 @@ async function callClaude(
   const models = [MODEL, ...MODEL_FALLBACKS];
   // Optional tuning params Anthropic MAY deprecate over time (this is how `temperature` broke us).
   // Kept here so a 400 that names one auto-strips it and retries, instead of failing the whole call.
-  const tuning: Record<string, unknown> = {};
+  // `thinking: disabled` — Claude 5 models think adaptively by default; extraction needs a fast
+  // deterministic JSON reply, and thinking tokens would eat the MAX_TOKENS budget. In `tuning`
+  // (not the body) so the 400 self-heal strips it for models that reject the param.
+  const tuning: Record<string, unknown> = { thinking: { type: 'disabled' } };
   let lastError = '';
 
   for (const model of models) {
@@ -418,8 +421,20 @@ async function callClaude(
       }
 
       const data = await response.json();
-      const content = data?.content?.[0]?.text ?? '';
-      return parseFacts(content); // may be null; a deterministic retry would be identical
+      // Join ALL text blocks — models with thinking enabled put a thinking block first,
+      // so content[0].text is undefined and the old read produced '' → "Unparseable".
+      const blocks: { type?: string; text?: string }[] = Array.isArray(data?.content) ? data.content : [];
+      const content = blocks.filter((b) => b?.type === 'text').map((b) => b.text ?? '').join('\n');
+      if (data?.stop_reason === 'max_tokens') {
+        console.error(`[extract] response truncated at max_tokens (model=${model}) — JSON likely cut off`);
+      }
+      const parsed = parseFacts(content);
+      if (!parsed) {
+        console.error(
+          `[extract] unparseable response (model=${model}, stop=${data?.stop_reason}, blocks=${blocks.map((b) => b?.type).join(',')}): ${content.slice(0, 300)}`
+        );
+      }
+      return parsed;
     }
   }
 
