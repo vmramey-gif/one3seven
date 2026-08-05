@@ -168,3 +168,61 @@ describe('buildExistenceChecks (Layer 0 flag row)', () => {
     expect(labels).toMatch(/Prior claims/);
   });
 });
+
+// Element-precision regression — the "does-not-prove" gate. Locks the two false positives seen in a
+// real disability-accommodation intake (Marquez/Cedarline): a REQUEST / doctor's restriction must not
+// count as an accommodation PROVIDED, and a request FOR leave must not count as leave USED.
+describe('element precision — does-not-prove exclusions (Marquez regression)', () => {
+  const marquez: ClaimLensInput = {
+    events: [
+      { title: 'Worker requests leave or accommodation', date: 'February 3, 2026', sourceFile: '4_Marquez_DoctorNote_2026-02-03.pdf' },
+    ],
+    quotes: [],
+    intervals: [],
+    confirmed: [],
+    workerContext:
+      'my doctor gave me a lifting restriction (no lifting over 15 pounds) and I sent HR an accommodation request on February 5 asking for lighter duty. I took about a week of sick leave later that month.',
+    files: [],
+  };
+
+  it('a REQUEST / doctor restriction does NOT satisfy "Accommodations provided"', () => {
+    const v = buildClaimLensView('feha_disability', marquez);
+    const provided = v.elements.find((e) => /Accommodations provided/i.test(e.name));
+    expect(provided?.items ?? []).toHaveLength(0);
+    expect(provided?.empty).toBeTruthy();
+  });
+
+  it('a request FOR leave does NOT satisfy "Leave used as accommodation"', () => {
+    const v = buildClaimLensView('feha_disability', marquez);
+    const leaveUsed = v.elements.find((e) => /Leave used as accommodation/i.test(e.name));
+    // the source-linked "requests leave or accommodation" event must not be counted as leave USED
+    expect((leaveUsed?.items ?? []).some((i) => /request/i.test(i.text))).toBe(false);
+  });
+
+  it('the request STILL satisfies "Accommodation requested" (precision, not suppression)', () => {
+    const v = buildClaimLensView('feha_disability', marquez);
+    const requested = v.elements.find((e) => /Accommodation requested/i.test(e.name));
+    expect((requested?.items ?? []).length).toBeGreaterThan(0);
+  });
+
+  it('coverage is no longer inflated — "provided" reads as a genuine gap', () => {
+    const v = buildClaimLensView('feha_disability', marquez);
+    expect(v.coverage.withMaterial).toBeLessThan(v.coverage.total);
+  });
+
+  it('a REQUEST does not satisfy disability "Employer response"', () => {
+    const v = buildClaimLensView('feha_disability', marquez);
+    const resp = v.elements.find((e) => /Employer response/i.test(e.name));
+    expect(resp?.items ?? []).toHaveLength(0);
+    expect(resp?.empty).toBeTruthy();
+  });
+
+  it('a complaint is NOT counted as an employer "employment action" (§1102.5) — but real actions are', () => {
+    const v = buildClaimLensView('retaliation_1102_5', rosa);
+    const actions = v.elements.find((e) => /Employment actions after the report/i.test(e.name));
+    // rosa's HR complaint EVENT must not appear as an adverse ACTION against her…
+    expect((actions?.items ?? []).some((i) => /complaint submitted/i.test(i.text))).toBe(false);
+    // …while the genuine actions (termination) still do.
+    expect((actions?.items ?? []).some((i) => /terminat/i.test(i.text))).toBe(true);
+  });
+});

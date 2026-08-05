@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { buildCartOutput, type ClientStatus, type GapItem } from '../../services/claimLensGapActions';
 
 /**
  * /?claim-lens-demo — the pilot-closer demo. The attorney SELECTS a lens (never asks a question);
@@ -202,6 +203,24 @@ const CSS = `
 .cl .gapText{font-size:13.5px;line-height:1.5;margin-top:9px;max-width:62ch}
 .cl .gapAct{margin-top:12px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;background:transparent;border:1px solid rgba(224,123,62,.5);color:#F3A268;padding:8px 13px;cursor:pointer;border-radius:8px;transition:all .15s}
 .cl .gapAct:hover{background:#E07B3E;border-color:#E07B3E;color:#fff}
+.cl .gapAct.added{background:rgba(143,211,166,.12);border-color:rgba(143,211,166,.5);color:#8FD3A6}
+.cl .gapAct.added:hover{background:rgba(143,211,166,.2);color:#8FD3A6}
+.cl .cart{margin-top:26px;padding-top:20px;border-top:1px solid #243029}
+.cl .cartHead{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#8FA495;margin-bottom:6px}
+.cl .cartTitle{font-size:17px;font-weight:600;letter-spacing:-.01em}
+.cl .cartHint{font-size:13px;color:#8FA495;line-height:1.5;max-width:62ch;margin-top:9px}
+.cl .cartHint b{color:#F3A268;font-weight:600}
+.cl .statusToggle{display:inline-flex;gap:4px;background:#0f1713;border:1px solid #243029;border-radius:999px;padding:3px;margin-top:14px}
+.cl .statusToggle button{font-family:'IBM Plex Mono',monospace;font-size:11.5px;padding:8px 14px;border-radius:999px;border:none;background:transparent;color:#8FA495;cursor:pointer;transition:all .15s}
+.cl .statusToggle button[aria-pressed="true"]{background:rgba(224,123,62,.18);color:#fff}
+.cl .statusNote{font-size:12px;color:#8FA495;line-height:1.45;margin-top:11px;max-width:62ch}
+.cl .cartItems{list-style:none;padding:0;margin:14px 0 0;display:flex;flex-direction:column;gap:7px}
+.cl .cartItems li{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#131C17;border:1px solid #243029;border-radius:10px;padding:9px 12px;font-size:13.5px}
+.cl .cartItems button{background:none;border:none;color:#8FA495;font-size:17px;line-height:1;cursor:pointer;padding:0 2px}
+.cl .cartItems button:hover{color:#F3A268}
+.cl .copyBtn{margin-top:15px;font-size:13px;font-weight:600;padding:11px 19px;border-radius:999px;cursor:pointer;border:1px solid rgba(143,211,166,.5);background:rgba(143,211,166,.12);color:#8FD3A6;transition:all .15s}
+.cl .copyBtn:hover{background:rgba(143,211,166,.2)}
+.cl .cartOut{margin-top:13px;background:#0e1512;border:1px solid #243029;border-radius:11px;padding:13px 15px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;line-height:1.55;color:#A9BBAD;white-space:pre-wrap;max-height:240px;overflow:auto}
 .cl .foot{margin-top:26px;padding-top:18px;border-top:1px solid #243029}
 .cl .footLine{font-size:14.5px;color:#8FD3A6}
 .cl .footNote{font-size:11.5px;color:#8FA495;margin-top:7px;line-height:1.55;max-width:64ch}
@@ -210,6 +229,27 @@ const CSS = `
 export function ClaimLensDemoPage() {
   const [activeId, setActiveId] = useState('retaliation');
   const lens = LENSES.find((l) => l.id === activeId) ?? LENSES[0];
+
+  // Gap cart — the attorney clicks "no material on file" cards to build a list. Client-status-aware
+  // (prospect → records the worker gathers; signed → firm discovery worklist) so it never tasks a
+  // non-client. Gaps are theory-specific → a new lens starts a fresh list.
+  const [cart, setCart] = useState<GapItem[]>([]);
+  const [clientStatus, setClientStatus] = useState<ClientStatus>('prospect');
+  const [copied, setCopied] = useState(false);
+  useEffect(() => { setCart([]); setCopied(false); }, [activeId]);
+  const inCart = (key: string) => cart.some((g) => g.key === key);
+  const toggleCart = (g: GapItem) => {
+    setCopied(false);
+    setCart((c) => (c.some((x) => x.key === g.key) ? c.filter((x) => x.key !== g.key) : [...c, g]));
+  };
+  const copyCart = async () => {
+    try {
+      await navigator.clipboard.writeText(buildCartOutput(cart, clientStatus, lens.title));
+      setCopied(true);
+    } catch {
+      setCopied(false);
+    }
+  };
 
   let linked = 0, named = 0, worker = 0, counted = 0, gaps = 0;
   for (const el of lens.elements) {
@@ -295,7 +335,13 @@ export function ClaimLensDemoPage() {
                 <div className="gapCard">
                   <div className="gapLabel">No material on file for this element</div>
                   <p className="gapText">{el.empty}</p>
-                  <button type="button" className="gapAct">Add to evidence request →</button>
+                  <button
+                    type="button"
+                    className={`gapAct ${inCart(el.name) ? 'added' : ''}`}
+                    onClick={() => toggleCart({ key: el.name, element: el.name, note: el.empty || 'no material on file' })}
+                  >
+                    {inCart(el.name) ? '✓ Added to list' : '+ Add to list'}
+                  </button>
                 </div>
               ) : (
                 <ul className="items">
@@ -313,6 +359,47 @@ export function ClaimLensDemoPage() {
             </section>
           ))}
         </div>
+
+        {/* Gap cart — absence becomes an action the attorney CHOOSES. Client-status-aware so it never
+            tasks a non-client. Names absences only; draws no conclusion. */}
+        <section className="cart">
+          <div className="cartHead mono">Your list · {cart.length} item{cart.length === 1 ? '' : 's'} · from this theory&rsquo;s gaps</div>
+          <div className="cartTitle serif">Build a request from what isn&rsquo;t on file</div>
+          {cart.length === 0 ? (
+            <p className="cartHint">
+              Click <b>&ldquo;+ Add to list&rdquo;</b> on any element with no material on file. Selected gaps become a records
+              request the worker can gather, or your own discovery worklist — your call.
+            </p>
+          ) : (
+            <>
+              <div className="statusToggle" role="group" aria-label="Client status">
+                <button type="button" aria-pressed={clientStatus === 'prospect'} onClick={() => { setClientStatus('prospect'); setCopied(false); }}>
+                  Prospect — not yet signed
+                </button>
+                <button type="button" aria-pressed={clientStatus === 'client'} onClick={() => { setClientStatus('client'); setCopied(false); }}>
+                  Signed client
+                </button>
+              </div>
+              <p className="statusNote">
+                {clientStatus === 'prospect'
+                  ? 'Pre-representation: these become records the worker can request on their own — worker-owned, worker-sent. one3seven composes; they send.'
+                  : 'Client is represented: these become your own discovery / follow-up worklist. Confirm representation before directing records-gathering.'}
+              </p>
+              <ul className="cartItems">
+                {cart.map((g) => (
+                  <li key={g.key}>
+                    <span>{g.element}</span>
+                    <button type="button" onClick={() => toggleCart(g)} aria-label={`Remove ${g.element}`}>×</button>
+                  </li>
+                ))}
+              </ul>
+              <button type="button" className="copyBtn" onClick={copyCart}>
+                {copied ? '✓ Copied' : clientStatus === 'prospect' ? 'Copy records request (worker)' : 'Copy discovery worklist'}
+              </button>
+              <pre className="cartOut">{buildCartOutput(cart, clientStatus, lens.title)}</pre>
+            </>
+          )}
+        </section>
 
         <footer className="foot">
           <div className="footLine serif">one3seven organizes and reflects. It draws no conclusions.</div>

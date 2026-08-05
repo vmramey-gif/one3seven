@@ -1,5 +1,5 @@
 /**
- * Claim Lens — the Element Coverage Map engine (firm-side).
+ * Claim Lens (codename) — the Element Lens engine (firm-side; customer-facing name = "Element Lens").
  *
  * The attorney SELECTS a lens (a claim). The intake's real facts re-sort around that claim's
  * statutory elements. For each element we show every matching item with its source state, plus a
@@ -27,7 +27,15 @@ export type ClaimLensInput = {
   files: Array<{ fileName: string; category?: string | null }>;
 };
 
-export type LensItem = { state: LensSourceState; text: string; meta: string };
+export type LensItem = {
+  state: LensSourceState;
+  text: string;
+  meta: string;
+  /** Source PDF file name, when the item is source-linked — used to open the citation. */
+  sourceFile?: string;
+  /** Verbatim text to anchor/highlight in the source PDF (quote text, or the event title). */
+  snippet?: string;
+};
 export type LensElementView = { name: string; note?: string; items: LensItem[]; empty?: string };
 export type ClaimLensView = {
   title: string;
@@ -41,7 +49,10 @@ export type ClaimLensView = {
 
 export type ExistenceCheck = { label: string; value: string; present: boolean; note: string };
 
-type ElementDef = { name: string; note?: string; patterns: RegExp[]; absence: string };
+// `exclude` = the "does-not-prove" gate: a fact whose text trips an exclude pattern does NOT satisfy
+// this element even if an include pattern matched. This is what stops an accommodation REQUEST (or a
+// doctor's restriction) from counting as accommodation PROVIDED — the #1 element-precision fix.
+type ElementDef = { name: string; note?: string; patterns: RegExp[]; exclude?: RegExp[]; absence: string };
 type LensDef = { id: string; tab: string; title: string; elements: ElementDef[] };
 
 const p = (...s: string[]): RegExp[] => s.map((x) => new RegExp(x, 'i'));
@@ -72,6 +83,10 @@ export const CLAIM_LENSES: LensDef[] = [
         absence: 'Nothing in the record shows the employer received or acknowledged the report.' },
       { name: 'Employment actions after the report, with dates',
         patterns: p('terminat', 'fired', 'discharg', 'laid off', 'layoff', 'written warning', 'write[- ]?up', 'written up', 'disciplin', 'demot', 'suspend', 'hours (cut|reduced)', 'pay cut', 'transfer', 'schedule change', 'separation'),
+        // does-not-prove: the worker's own report is NOT an employer action against them. Targets the
+        // report ITEM (e.g. "Complaint submitted…") — not any text merely mentioning a complaint, so a
+        // write-up "…predating the complaint" (a real action) still counts.
+        exclude: p('complaint submitted', 'submitted (a |an )?(complaint|grievance)', 'filed (a |an )(complaint|grievance)', 'reported to (hr|human resources|management|the)'),
         absence: 'No employment action after the report is documented.' },
       { name: 'Sequence and interval',
         note: 'Includes material pointing in both directions. one3seven does not omit items that cut against a theory.',
@@ -109,6 +124,9 @@ export const CLAIM_LENSES: LensDef[] = [
         absence: 'No witnesses to the complaint are identified.' },
       { name: 'Employment actions after the complaint, with dates',
         patterns: p('terminat', 'fired', 'written warning', 'disciplin', 'demot', 'suspend', 'hours (cut|reduced)', 'transfer', 'separation'),
+        // does-not-prove: the worker's own complaint is NOT an employer action against them (targets
+        // the report ITEM, not any text mentioning a complaint).
+        exclude: p('complaint submitted', 'submitted (a |an )?(complaint|grievance)', 'filed (a |an )(complaint|grievance)', 'reported to (hr|human resources|management|the)'),
         absence: 'No employment action after the complaint is documented.' },
       { name: 'Sequence and interval',
         patterns: p('day(s)? (after|before)', 'week(s)? (after|later)', 'month(s)? (after|later)', 'shortly (after|before)'),
@@ -232,12 +250,18 @@ export const CLAIM_LENSES: LensDef[] = [
         absence: 'Nothing describes an accommodation the worker requested.' },
       { name: 'Employer response',
         patterns: p('responded', 'met with', 'offered', 'denied', 'granted', 'hr.*(respon|met)', 'interactive process'),
+        // does-not-prove: the worker's REQUEST (or a doctor's restriction) is not the employer's response.
+        exclude: p('\\brequest', 'asked for', 'restriction', 'doctor gave'),
         absence: 'Nothing addresses whether the employer responded.' },
       { name: 'Accommodations provided, and duration',
         patterns: p('provided', 'granted', 'allowed', 'gave me', 'for (weeks|months)', 'temporar'),
+        // A REQUEST, or a doctor's restriction, does NOT prove the employer PROVIDED an accommodation.
+        exclude: p('\\brequest', 'asked for', 'restriction', 'doctor gave', 'no lifting'),
         absence: 'No material describes accommodations provided.' },
       { name: 'Leave used as accommodation',
         patterns: p('\\bleave\\b', 'time off', '\\bfmla\\b', '\\bcfra\\b', 'medical leave', 'out (for|on)'),
+        // A request FOR leave/accommodation is not leave USED.
+        exclude: p('\\brequest', 'asked for'),
         absence: 'No material describes leave used as an accommodation.' },
       { name: 'Separation material',
         patterns: p('terminat', 'fired', 'let go', 'separation', 'could not return', 'resign'),
@@ -738,10 +762,22 @@ function collectFacts(input: ClaimLensInput): LensItem[] {
   for (const e of input.events) {
     if (!e.title?.trim() || isClusterEvent(e.title)) continue;
     const meta = [e.date, e.sourceFile].filter(Boolean).join(' · ');
-    out.push({ state: e.sourceFile ? 'linked' : 'named', text: e.title, meta: meta || 'timeline event' });
+    out.push({
+      state: e.sourceFile ? 'linked' : 'named',
+      text: e.title,
+      meta: meta || 'timeline event',
+      sourceFile: e.sourceFile ?? undefined,
+      snippet: e.title,
+    });
   }
   for (const q of input.quotes) {
-    out.push({ state: 'linked', text: `"${q.quote}"`, meta: [q.category, q.fileName].filter(Boolean).join(' · ') || 'extracted quote' });
+    out.push({
+      state: 'linked',
+      text: `"${q.quote}"`,
+      meta: [q.category, q.fileName].filter(Boolean).join(' · ') || 'extracted quote',
+      sourceFile: q.fileName ?? undefined,
+      snippet: q.quote,
+    });
   }
   for (const iv of input.intervals) {
     out.push({ state: 'counted', text: iv.description, meta: `${iv.days} day${iv.days === 1 ? '' : 's'}` });
@@ -755,7 +791,11 @@ function collectFacts(input: ClaimLensInput): LensItem[] {
 // Match element assignment on the fact's TEXT only — never its category/meta. Matching on the
 // category ("HR Documents") is what pulled a handbook into "protected activity."
 function matchesElement(item: LensItem, el: ElementDef): boolean {
-  return el.patterns.some((re) => re.test(item.text));
+  if (!el.patterns.some((re) => re.test(item.text))) return false;
+  // does-not-prove gate: an include match is disqualified if the fact also trips an exclude pattern
+  // (e.g. a REQUEST for an accommodation, or a doctor's restriction, does not prove one was PROVIDED).
+  if (el.exclude?.some((re) => re.test(item.text))) return false;
+  return true;
 }
 
 export function buildClaimLensView(lensId: string, input: ClaimLensInput): ClaimLensView {
