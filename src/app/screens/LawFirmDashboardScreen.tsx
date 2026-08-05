@@ -10,7 +10,6 @@ import {
   Settings,
 } from 'lucide-react';
 import { Screen } from '../App';
-import { IntakeWorkspace } from '../types/IntakeWorkspace';
 
 import type { FirmDashboardRow } from '../../services/intakeDataService';
 import { polishFirmFacingProse } from '../../services/firmIntakeDisplay';
@@ -28,7 +27,6 @@ interface LawFirmDashboardScreenProps {
     intakeId: string,
     meta?: { routeId: string; routeStatus: string; intakeNumber: string }
   ) => void;
-  submittedIntakes: IntakeWorkspace[];
   dbIntakes?: FirmDashboardRow[];
   /** Set when the routed-intake load FAILED (vs a genuinely empty queue) — shows a retry banner. */
   dashboardError?: string | null;
@@ -78,18 +76,6 @@ interface IntakeSubmission {
   employmentMatterTags?: import('../constants/employmentMatter').EmploymentMatterTagId[];
 }
 
-function formatLastActivity(workspace: IntakeWorkspace): string {
-  const lastMod = new Date(workspace.lastModifiedAt);
-  const now = new Date();
-  const diffMs = now.getTime() - lastMod.getTime();
-  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-  const diffDays = Math.floor(diffHours / 24);
-  if (diffHours < 1) return 'Just now';
-  if (diffHours < 24) return `${diffHours} ${diffHours === 1 ? 'hour' : 'hours'} ago`;
-  if (diffDays === 1) return '1 day ago';
-  return `${diffDays} days ago`;
-}
-
 function isAcceptedWorkflowStatus(workflowStatus: string | null | undefined) {
   return (workflowStatus ?? '').trim().toLowerCase() === 'accepted by firm';
 }
@@ -114,16 +100,9 @@ function chronologyGapCount(intake: IntakeSubmission) {
   return 3;
 }
 
-function generateFallbackSummary(workspace: IntakeWorkspace): string {
-  const docCount = workspace.documents.length;
-  const concerns = workspace.reportedConcerns.join(', ') || 'stated concerns';
-  return `Available records indicate ${concerns} with ${docCount} supporting ${docCount === 1 ? 'record' : 'records'} uploaded. Timeline organization ${workspace.timelineComplete ? 'is reconstructed' : 'is in progress'}.`;
-}
-
 export function LawFirmDashboardScreen({
   onNavigate,
   onSelectIntake,
-  submittedIntakes,
   dbIntakes,
   dashboardError,
   onViewSampleIntakeFlow,
@@ -152,48 +131,6 @@ export function LawFirmDashboardScreen({
   useEffect(() => {
     if (BETA_HIDE_FIRM_ARCHIVED_TAB && activeTab === 'archived') setActiveTab('all');
   }, [activeTab]);
-
-  const intakesFromWorkspaces: IntakeSubmission[] = submittedIntakes.map((workspace) => {
-    const readiness: IntakeReadiness =
-      workspace.timelineComplete && workspace.documents.length >= 5
-        ? 'ready'
-        : workspace.documents.length >= 3
-          ? 'needs-docs'
-          : 'incomplete';
-    const reviewStatusMap: Record<string, ReviewStatus> = {
-      new: 'new',
-      'additional-docs': 'under-review',
-      'ready-review': 'new',
-      'under-review': 'under-review',
-      contacted: 'contacted',
-      accepted: 'accepted',
-      archived: 'archived',
-      'not-pursuing': 'archived',
-    };
-    return {
-      id: workspace.id,
-      routeId: workspace.id,
-      routeStatus: 'full_access',
-      intakeNumber: workspace.id.slice(0, 8).toUpperCase(),
-      readiness,
-      categories: workspace.reportedConcerns,
-      documentCount: workspace.documents.length,
-      uploadDate: workspace.submittedAt || workspace.createdAt,
-      workerLocation: workspace.workerLocation || 'Location not specified',
-      employerState: workspace.employerState || 'Unknown',
-      timelineComplete: workspace.timelineComplete,
-      hasAlerts: workspace.organizationNotes.some((note) => note.type === 'alert' || note.type === 'neutral'),
-      lastActivity: formatLastActivity(workspace),
-      reviewStatus: reviewStatusMap[workspace.workflowStatus] || 'new',
-      summary: workspace.intakeSummary?.overview || generateFallbackSummary(workspace),
-      submissionType: 'Participating Firm Review',
-      timelineSummary: workspace.intakeSummary?.chronology ?? '',
-      readinessHints: [],
-      missingHints: [],
-      workflowStatusLabel: workspace.workflowStatus ?? 'new',
-      workerLabel: 'Prepared case file',
-    };
-  });
 
   const intakesFromDb: IntakeSubmission[] = (dbIntakes ?? []).map((row) => ({
     id: row.intakeId,
@@ -232,9 +169,8 @@ export function LawFirmDashboardScreen({
     employmentMatterTags: row.employmentMatterTags,
   }));
 
-  const liveFirmMode = Boolean(firmBanner);
-  const allIntakes = liveFirmMode ? intakesFromDb : [...intakesFromDb, ...intakesFromWorkspaces];
-  const noRealFirmIntakes = intakesFromDb.length === 0 && intakesFromWorkspaces.length === 0;
+  const allIntakes = intakesFromDb;
+  const noRealFirmIntakes = intakesFromDb.length === 0;
 
   // Firm-facing "time saved" moment: the value claim, made visible. Estimated from the firm's own
   // organized-intake count × the per-intake time-saved figure used across our materials (~90 min).
@@ -591,7 +527,7 @@ export function LawFirmDashboardScreen({
               <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: '#A78BFA', boxShadow: '0 0 8px #A78BFA' }} />
               Every fact is <span className="font-medium text-[#A78BFA]">source-linked</span> — open a case to jump to the record behind it.
             </p>
-            <p className="mb-5 text-[11.5px] text-white/40">Open a case to run the Claim Lens on its own facts.</p>
+            <p className="mb-5 text-[11.5px] text-white/40">Open a case to run Element Lens on its own facts.</p>
 
             <section className="rounded-[24px] border border-white/10 bg-white/[0.02] p-5 shadow-[0_18px_50px_-30px_rgba(0,0,0,0.7)] sm:p-7">
             <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center">

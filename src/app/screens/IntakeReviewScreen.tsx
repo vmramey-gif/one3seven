@@ -15,6 +15,11 @@ import {
   Settings,
   LogOut,
   Loader2,
+  ClipboardCheck,
+  Search,
+  HelpCircle,
+  User,
+  HeartHandshake,
 } from 'lucide-react';
 import { Screen } from '../App';
 import {
@@ -23,6 +28,7 @@ import {
   updateWorkflowStatus,
   addInternalReviewerNote,
 } from '../types/IntakeWorkspace';
+import { pickReviewBase } from '../utils/reviewDataSelection';
 
 import type { FirmLiveIntakeView } from '../../services/intakeDataService';
 import { downloadFirmIntakeReviewDocument, resolveWageExposure } from '../../services/firmIntakeSummaryDownload';
@@ -77,7 +83,7 @@ interface IntakeReviewScreenProps {
   onNavigate: (screen: Screen) => void;
   intakeId: string;
   intakeWorkspace?: IntakeWorkspace;
-  onUpdateWorkspace: (updates: Partial<IntakeWorkspace>) => void;
+  onUpdateWorkspace?: (updates: Partial<IntakeWorkspace>) => void;
   firmLiveView?: FirmLiveIntakeView | null;
   firmLiveViewLoading?: boolean;
   onRequestFullAccess?: () => Promise<{ error?: string }>;
@@ -135,38 +141,6 @@ function firmDocumentEntryKey(entry: FirmDocumentEntry): string {
   return entry.uploadedFileId ?? entry.label;
 }
 
-// Mock data
-const mockTimelineEvents: TimelineEvent[] = [
-  {
-    date: '2025-01-15',
-    event: 'Employment Start',
-    category: 'Employment Status',
-    summary: 'Worker began employment as delivery driver',
-    relatedDocs: 2,
-  },
-  {
-    date: '2025-08-22',
-    event: 'Overtime Hours Worked',
-    category: 'Overtime',
-    summary: 'Multiple weeks with hours exceeding 40 per week documented in timecards',
-    relatedDocs: 4,
-  },
-  {
-    date: '2025-11-03',
-    event: 'Meal Period Concerns',
-    category: 'Meal & Rest Periods',
-    summary: 'Communications indicate shortened or missed meal periods during shifts',
-    relatedDocs: 3,
-  },
-  {
-    date: '2026-03-10',
-    event: 'Employment End',
-    category: 'Final Pay',
-    summary: 'Final paycheck received with potential outstanding overtime',
-    relatedDocs: 3,
-  },
-];
-
 function buildDocCategoriesFromFiles(
   files: FirmAccessibleUploadFile[],
   _previewOnly: boolean
@@ -186,39 +160,6 @@ function buildDocCategoriesFromFiles(
   }
   return [...map.entries()].map(([name, documents]) => ({ name, count: documents.length, documents }));
 }
-
-const mockDocumentCategories: DocumentCategory[] = [
-  {
-    name: 'Pay Records',
-    count: 5,
-    documents: [
-      { label: 'Feb 2025 Paystub.pdf' },
-      { label: 'March 1-15 Pay.pdf' },
-      { label: 'March 16-31 Paystub.pdf' },
-      { label: 'April Pay Record.pdf' },
-      { label: 'Final Paycheck May.pdf' },
-    ],
-  },
-  {
-    name: 'Time Records',
-    count: 4,
-    documents: [
-      { label: 'Timecard Feb Week 1.pdf' },
-      { label: 'Timecard Feb Week 3.pdf' },
-      { label: 'March Hours Log.pdf' },
-      { label: 'April Timesheet.pdf' },
-    ],
-  },
-  {
-    name: 'Workplace Communications',
-    count: 3,
-    documents: [
-      { label: 'Manager Email - Scheduling.pdf' },
-      { label: 'Meal Break Discussion.pdf' },
-      { label: 'Shift Coverage Text.pdf' },
-    ],
-  },
-];
 
 function buildDocCategoriesFromWorkspaceDocuments(ws: IntakeWorkspace | undefined): DocumentCategory[] {
   if (!ws?.documents?.length) return [];
@@ -294,6 +235,19 @@ export function IntakeReviewScreen({
   // wage-exposure effect owns and resets on firmLiveView changes) so an on-demand quote URL can't be
   // clobbered out from under an open panel.
   const [quoteCitationUrl, setQuoteCitationUrl] = useState<string | null>(null);
+
+  // Binder-spine tab state — presentation wrapper only. Gates which top-level
+  // sections render; does not change any data, logic, or doctrine gating.
+  type BinderTab = 'decision' | 'timeline' | 'claimlens' | 'documents' | 'gaps' | 'context';
+  const [activeTab, setActiveTab] = useState<BinderTab>('decision');
+  const TABS: { id: BinderTab; label: string; Icon: typeof FileText; accent?: boolean }[] = [
+    { id: 'decision', label: 'Decision card', Icon: ClipboardCheck },
+    { id: 'timeline', label: 'Timeline', Icon: Clock },
+    { id: 'claimlens', label: 'Claim lens', Icon: Search },
+    { id: 'documents', label: 'Documents', Icon: FileText },
+    { id: 'gaps', label: 'Gaps & requests', Icon: HelpCircle },
+    { id: 'context', label: 'Worker context', Icon: User, accent: true },
+  ];
 
   // Pre-generate 3600s signed URLs for the documents cited by the wage estimate, so the
   // CitationPanel opens with no round-trip. Full-access only (storage RLS enforces it too).
@@ -505,17 +459,14 @@ export function IntakeReviewScreen({
   };
 
   const timelineForDisplay: TimelineEvent[] = (() => {
-    const base: TimelineEvent[] = (() => {
-      if (preferConnectedLiveIntake) {
-        if (firmLiveViewLoading) return [];
-        if (firmLiveView?.events?.length) return mapEventsToTimeline(firmLiveView);
-        return [];
-      }
-      if (firmLiveView?.events?.length) return mapEventsToTimeline(firmLiveView);
-      const wsTimeline = mapWorkspaceTimelineForReview(intakeWorkspace);
-      if (wsTimeline.length) return wsTimeline;
-      return mockTimelineEvents;
-    })();
+    const timelineLivePresent = Boolean(firmLiveView?.events?.length);
+    const base: TimelineEvent[] = pickReviewBase<TimelineEvent>({
+      connected: preferConnectedLiveIntake,
+      loading: Boolean(firmLiveViewLoading),
+      livePresent: timelineLivePresent,
+      live: timelineLivePresent && firmLiveView ? mapEventsToTimeline(firmLiveView) : [],
+      ws: mapWorkspaceTimelineForReview(intakeWorkspace),
+    });
     // Chronological order is load-bearing: "The sequence", the chronology, and the key-date
     // anchors all read top-to-bottom. An unsorted feed put a May-2026 record above a March-2021
     // start and mis-anchored the timing display. Sort ascending; undated events sink to the end
@@ -533,17 +484,13 @@ export function IntakeReviewScreen({
       .map((x) => x.e);
   })();
 
-  const documentCategoriesForDisplay = (() => {
-    if (preferConnectedLiveIntake) {
-      if (firmLiveViewLoading) return [];
-      if (firmLiveView) return buildDocCategoriesFromFiles(firmLiveView.files, firmLiveView.previewOnly);
-      return [];
-    }
-    if (firmLiveView) return buildDocCategoriesFromFiles(firmLiveView.files, firmLiveView.previewOnly);
-    const fromWs = buildDocCategoriesFromWorkspaceDocuments(intakeWorkspace);
-    if (fromWs.length) return fromWs;
-    return mockDocumentCategories;
-  })();
+  const documentCategoriesForDisplay = pickReviewBase<DocumentCategory>({
+    connected: preferConnectedLiveIntake,
+    loading: Boolean(firmLiveViewLoading),
+    livePresent: Boolean(firmLiveView),
+    live: firmLiveView ? buildDocCategoriesFromFiles(firmLiveView.files, firmLiveView.previewOnly) : [],
+    ws: buildDocCategoriesFromWorkspaceDocuments(intakeWorkspace),
+  });
 
   const liveTimelineEmptyMessage =
     'No timeline events are available for this intake yet. Records may still be organizing, or your preview access may be limited until full access is approved.';
@@ -557,6 +504,43 @@ export function IntakeReviewScreen({
 
   const firmWorkerStoryDisplay =
     firmLiveView && useConnectedFirmLayout ? buildFirmWorkerStoryDisplay(firmLiveView) : '';
+
+  // Worker identity — lifted to component scope so the case-file spine and the intake header
+  // can lead with a real human name (never a bare number). A named worker who assembled and
+  // shared their own record is the visible proof of the worker-first ecosystem the attorney benefits from.
+  const workerIdentity = (() => {
+    const ctx = firmLiveView?.workerProvidedContext ?? firmWorkerStoryDisplay ?? '';
+    const extract = (source: string, patterns: RegExp[]): string => {
+      for (const p of patterns) {
+        const m = source.match(p);
+        if (m?.[1]?.trim()) return m[1].trim();
+      }
+      return '';
+    };
+    // 1) Structured intake fields (real intakes carry a labeled "Full name…" line).
+    let name = polishNameForDisplay(extract(ctx, [
+      /full name used during employment[:\s]+([^\n]+)/i,
+      /worker name[:\s]+([^\n]+)/i,
+      /name[:\s]+([^\n]+)/i,
+    ]));
+    // 2) Prose fallback — pull the name from the overview narrative ("…records, NAME was employed…").
+    if (!name) {
+      const prose = `${firmLiveView?.overview ?? ''}\n${ctx}`;
+      const m = prose.match(/\b([A-Z][a-z]+(?:\s+[A-Z][a-z'’.-]+){1,2})\s+(?:was|is|were)\s+employed\b/);
+      if (m?.[1]) name = polishNameForDisplay(m[1]);
+    }
+    let employer = polishNameForDisplay(extract(ctx, [
+      /employer\s*\/?\s*organization[:\s]+([^\n]+)/i,
+      /employer[:\s]+([^\n]+)/i,
+      /organization[:\s]+([^\n]+)/i,
+    ]));
+    // Employer fallback — the structured follow-up answer.
+    if (!employer && firmLiveView?.workerFollowUp?.employer) {
+      employer = polishNameForDisplay(firmLiveView.workerFollowUp.employer);
+    }
+    const firstName = name ? name.split(/\s+/)[0] : '';
+    return { name, employer, firstName };
+  })();
 
   const firmRecordGroups =
     documentCategoriesForDisplay.length > 0
@@ -630,8 +614,9 @@ export function IntakeReviewScreen({
     if (isNaN(parsed.getTime())) return null;
     const today = new Date();
     const elapsed = Math.floor((today.getTime() - parsed.getTime()) / (1000 * 60 * 60 * 24));
-    const remaining = 180 - elapsed;
-    return { elapsed, remaining, fromTermination: !!intel.confirmedTerminationDate };
+    // Elapsed time only — no countdown, no hardcoded window, no computed deadline. We surface that
+    // time has passed (a describable fact) and route any deadline determination to the attorney.
+    return { elapsed, fromTermination: !!intel.confirmedTerminationDate };
   })();
 
   if (preferConnectedLiveIntake && firmLiveViewLoading) {
@@ -784,7 +769,7 @@ export function IntakeReviewScreen({
 
     if (intakeWorkspace) {
       const updated = updateWorkflowStatus(intakeWorkspace, status);
-      onUpdateWorkspace(updated);
+      onUpdateWorkspace?.(updated);
     }
 
     showToastMessage('Demo workspace status updated (not saved to live intakes).');
@@ -799,7 +784,7 @@ export function IntakeReviewScreen({
         'JS', // In production, this would be the current user
         'firm-001' // In production, this would be the current firm ID
       );
-      onUpdateWorkspace(updated);
+      onUpdateWorkspace?.(updated);
       setInternalNotes('');
       showToastMessage('Reviewer note saved.');
     }
@@ -976,12 +961,8 @@ export function IntakeReviewScreen({
             <div className="flex items-center gap-2.5">
               {/* Desktop quick actions — always accessible without scrolling */}
               {navSolData && navSolData.elapsed >= 120 && (
-                <span className={`hidden lg:inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-semibold border ${
-                  navSolData.remaining <= 0 ? 'bg-red-50 text-red-700 border-red-200' :
-                  navSolData.remaining <= 14 ? 'bg-orange-50 text-orange-700 border-orange-200' :
-                  'bg-amber-50 text-amber-700 border-amber-200'
-                }`}>
-                  ⚠ Filing dates
+                <span className="hidden lg:inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-[10px] font-semibold text-amber-700">
+                  ⚠ Time-sensitive dates
                 </span>
               )}
               <button
@@ -1017,12 +998,8 @@ export function IntakeReviewScreen({
               <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto sm:justify-end">
                 {/* Desktop quick actions */}
                 {navSolData && navSolData.elapsed >= 120 && (
-                  <span className={`hidden lg:inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-semibold border ${
-                    navSolData.remaining <= 0 ? 'bg-red-50 text-red-700 border-red-200' :
-                    navSolData.remaining <= 14 ? 'bg-orange-50 text-orange-700 border-orange-200' :
-                    'bg-amber-50 text-amber-700 border-amber-200'
-                  }`}>
-                    ⚠ Filing dates
+                  <span className="hidden lg:inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-[10px] font-semibold text-amber-700">
+                    ⚠ Time-sensitive dates
                   </span>
                 )}
                 <button
@@ -1129,12 +1106,83 @@ export function IntakeReviewScreen({
         </div>
       )}
 
-      {/* Content */}
+      {/* Content — binder-spine layout (presentation wrapper only) */}
       <div className="px-6 py-8">
-        <div className="mx-auto flex max-w-5xl flex-col gap-6">
+        <div className="mx-auto max-w-6xl flex gap-6 items-start">
+          {/* LEFT SPINE */}
+          <nav className="w-52 shrink-0 sticky top-4 self-start rounded-[16px] border border-[#E4E5DE] bg-white overflow-hidden">
+            <div className="bg-[#F5ECD6] px-4 py-3 border-b border-[#E4D9BC] font-mono">
+              <div className="text-[10px] uppercase tracking-[0.14em] text-[#8A7A4E]">Case file</div>
+              <div className="text-sm font-semibold text-[#1B2623] mt-0.5 truncate">
+                {workerIdentity.name
+                  || (isSampleFirmIntakeIdentifier
+                    ? SAMPLE_INTAKE_PREVIEW_DISPLAY_LABEL
+                    : firmLiveView?.intakeNumber
+                      ? `#${firmLiveView.intakeNumber}`
+                      : 'Firm review')}
+              </div>
+              <div className="text-[10px] text-[#8A7A4E]/80 mt-0.5 truncate">
+                {workerIdentity.employer ? `${workerIdentity.employer} · ` : ''}
+                {reconstructedRecordCount} record{reconstructedRecordCount === 1 ? '' : 's'}
+              </div>
+            </div>
+            <div className="py-2 flex flex-col">
+              {TABS.map((t) => {
+                const isActive = activeTab === t.id;
+                const base = 'flex items-center gap-2.5 px-4 py-2.5 text-sm text-left w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#42574E]';
+                const cls = t.accent
+                  ? isActive
+                    ? 'bg-red-50 text-red-800 border-l-[3px] border-red-600 font-medium'
+                    : 'text-red-700/80 hover:bg-[#F5F6F1] border-l-[3px] border-transparent'
+                  : isActive
+                    ? 'bg-[#EEF1E8] text-[#1B2623] font-medium border-l-[3px] border-[#42574E]'
+                    : 'text-[#6A6D66] hover:bg-[#F5F6F1] border-l-[3px] border-transparent';
+                const Icon = t.Icon;
+                return (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onClick={() => setActiveTab(t.id)}
+                    aria-current={isActive ? 'true' : undefined}
+                    className={`${base} ${cls}`}
+                  >
+                    <Icon className="w-4 h-4 shrink-0" aria-hidden />
+                    {t.label}
+                  </button>
+                );
+              })}
+            </div>
+          </nav>
+
+          {/* MAIN */}
+          <div className="flex-1 min-w-0 flex flex-col gap-6">
+
+            {/* Intake header — a person, not a number. The ownership line shows the attorney the
+                one thing the traditional intake never surfaces: a cooperative worker who assembled
+                and shared their own record and keeps the original. That cooperation is the benefit. */}
+            {useConnectedFirmLayout && firmLiveView && (workerIdentity.name || reconstructedRecordCount > 0) ? (
+              <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
+                <div>
+                  <h1 className="text-[26px] font-semibold leading-tight text-[#1B2623]">
+                    {workerIdentity.name || 'Worker intake'}
+                  </h1>
+                  {workerIdentity.employer ? (
+                    <p className="mt-1 text-sm text-[#6A6D66]">{workerIdentity.employer}</p>
+                  ) : null}
+                </div>
+                <div className="inline-flex items-center gap-2 rounded-full border border-[#D8E0CF] bg-[#F2F5EC] px-3.5 py-2">
+                  <HeartHandshake className="h-4 w-4 shrink-0 text-[#42574E]" aria-hidden />
+                  <span className="text-[12.5px] leading-snug text-[#42574E]">
+                    {workerIdentity.firstName
+                      ? `${workerIdentity.firstName} organized and shared these ${reconstructedRecordCount} records — and keeps the originals.`
+                      : `Worker-organized · ${reconstructedRecordCount} records shared with you directly.`}
+                  </span>
+                </div>
+              </div>
+            ) : null}
 
             {/* Case Readiness Snapshot — attorney orientation card */}
-            {useConnectedFirmLayout && firmLiveView ? (() => {
+            {activeTab === 'decision' && useConnectedFirmLayout && firmLiveView ? (() => {
               const ctx = (firmLiveView.workerProvidedContext ?? firmWorkerStoryDisplay ?? '');
               const extract = (patterns: RegExp[]): string => {
                 for (const p of patterns) {
@@ -1193,7 +1241,7 @@ export function IntakeReviewScreen({
               })();
 
               const snapshotItems: Array<{ label: string; value: string }> = [];
-              if (workerName) snapshotItems.push({ label: 'Worker', value: workerName });
+              // Worker name intentionally omitted here — it leads the intake header above; repeating it inflates the card.
               if (employer) snapshotItems.push({ label: 'Employer', value: employer });
               if (employmentDates) snapshotItems.push({ label: 'Employment Period', value: employmentDates });
               snapshotItems.push({ label: 'Records', value: `${reconstructedRecordCount} document${reconstructedRecordCount === 1 ? '' : 's'}` });
@@ -1272,7 +1320,7 @@ export function IntakeReviewScreen({
 
             {/* Claim Lens — real element-coverage map on THIS intake's facts. Firm-access-gated;
                 counsel-gated before any real firm is given the feature. Organizes, never concludes. */}
-            {useConnectedFirmLayout && firmLiveView ? (
+            {activeTab === 'claimlens' && useConnectedFirmLayout && firmLiveView ? (
               <ClaimLensPanel
                 input={{
                   events: (firmLiveView.events ?? []).map((e) => {
@@ -1313,11 +1361,12 @@ export function IntakeReviewScreen({
                   workerContext: firmLiveView.workerProvidedContext ?? firmWorkerStoryDisplay ?? '',
                   files: (firmLiveView.files ?? []).map((f) => ({ fileName: f.file_name, category: f.category })),
                 }}
+                onOpenSource={(fileName, snippet) => void openQuoteCitation(fileName, snippet)}
               />
             ) : null}
 
             {/* 3-Minute Review Layer — fast triage signal for attorneys */}
-            {useConnectedFirmLayout && firmLiveView ? (() => {
+            {activeTab === 'decision' && useConnectedFirmLayout && firmLiveView ? (() => {
               const hasStory = Boolean(
                 firmLiveView.workerProvidedContext?.trim() || firmWorkerStoryDisplay?.trim()
               );
@@ -1452,77 +1501,10 @@ export function IntakeReviewScreen({
               );
             })() : null}
 
-            {/* Firm Actions — elevated to top so attorneys see next steps immediately */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.04 }}
-              className={FIRM_REVIEW_PROMINENT_CARD}
-            >
-              <h3 className="text-sm font-semibold text-[#1B2623] mb-3">Firm Actions</h3>
-              <div className="space-y-2">
-                <button
-                  onClick={handleDownloadSummary}
-                  className={`w-full flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition-colors ${FIRM_REVIEW_PRIMARY_BUTTON}`}
-                >
-                  <Download className="w-4 h-4" />
-                  Download Intake Summary
-                </button>
-                {/* AI extraction runs automatically in the background — no button needed */}
-                {firmLiveView?.routeStatus === 'full_access' && onReloadFirmLiveView ? (
-                  <button
-                    type="button"
-                    onClick={() => void onReloadFirmLiveView()}
-                    className="w-full flex items-center gap-2 rounded-full bg-emerald-700 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-emerald-800"
-                  >
-                    <FileText className="w-4 h-4" />
-                    Review uploaded files
-                  </button>
-                ) : null}
-                {firmLiveView?.routeStatus === 'full_access' && !isFirmAccepted && !isFirmDeclined ? (
-                  <div className="flex gap-2">
-                    {onAcceptIntake ? (
-                      <button
-                        onClick={() => void handleAcceptIntake()}
-                        className={`flex-1 flex items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition-colors ${FIRM_REVIEW_PRIMARY_BUTTON}`}
-                      >
-                        <CheckCircle2 className="w-4 h-4" />
-                        Accept
-                      </button>
-                    ) : null}
-                    {onDeclineIntake ? (
-                      <button
-                        onClick={() => setShowDeclineConfirm(true)}
-                        className="flex-1 flex items-center justify-center gap-2 rounded-full border border-[#E4E5DE] bg-white px-4 py-2.5 text-sm font-medium text-[#6A6D66] transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-700"
-                      >
-                        Not Pursuing
-                      </button>
-                    ) : null}
-                  </div>
-                ) : isFirmAccepted || firmLiveView?.routeStatus === 'accepted' ? (
-                  <div className="w-full flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm font-medium text-emerald-700">
-                    <CheckCircle2 className="w-4 h-4" />
-                    Added for follow-up
-                  </div>
-                ) : isFirmDeclined ? (
-                  <div className="w-full flex items-center gap-2 rounded-full border border-[#E4E5DE] bg-[#FAF9F6] px-4 py-2.5 text-sm font-medium text-[#7C857F]">
-                    Marked as not pursuing
-                  </div>
-                ) : null}
-                {onRequestAdditionalDocuments ? (
-                  <button
-                    type="button"
-                    onClick={openFirmDocRequestModal}
-                    className={`w-full flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition-colors ${FIRM_REVIEW_SECONDARY_BUTTON}`}
-                  >
-                    Request Additional Documents
-                  </button>
-                ) : null}
-              </div>
-            </motion.div>
+            {/* Firm Actions relocated to the pinned actions bar at the bottom of this column. */}
 
             {/* Worker-provided context (persisted in intake summary; not verified fact) */}
-            {useConnectedFirmLayout && firmLiveView ? (
+            {activeTab === 'context' && useConnectedFirmLayout && firmLiveView ? (
               firmWorkerStoryDisplay ? (
                 <FirmExpandableSection
                   title={FIRM_REVIEW_SECTION.workerStory}
@@ -1538,7 +1520,7 @@ export function IntakeReviewScreen({
                 </FirmExpandableSection>
               ) : null
             ) : null}
-            {!(useConnectedFirmLayout && firmLiveView) ? (
+            {activeTab === 'context' && !(useConnectedFirmLayout && firmLiveView) ? (
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -1577,6 +1559,7 @@ export function IntakeReviewScreen({
             </motion.div>
             ) : null}
 
+            {activeTab === 'context' && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -1609,6 +1592,7 @@ export function IntakeReviewScreen({
                 </div>
               )}
             </motion.div>
+            )}
 
             {/* Intake Overview */}
             <motion.div
@@ -1767,6 +1751,7 @@ export function IntakeReviewScreen({
               </div>
             </div>
 
+            {activeTab === 'timeline' && (
             <motion.section
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -1892,6 +1877,7 @@ export function IntakeReviewScreen({
                 )}
               </div>
             </motion.section>
+            )}
 
             {chronologyGapLines.length > 0 ? (
               <motion.section
@@ -1911,6 +1897,7 @@ export function IntakeReviewScreen({
               </motion.section>
             ) : null}
 
+            {activeTab === 'documents' && (
             <FirmExpandableSection
               title="Supporting Records"
               meta={`${documentCategoriesForDisplay.length} categories`}
@@ -1989,9 +1976,10 @@ export function IntakeReviewScreen({
                 )))}
               </div>
             </FirmExpandableSection>
+            )}
 
             {/* Phase 2B: Extracted facts panel — shown when document intelligence block is present */}
-            {firmLiveView?.intelligence ? (() => {
+            {activeTab === 'documents' && firmLiveView?.intelligence ? (() => {
               const intel = firmLiveView.intelligence!;
               // Defensive: API cast may return null instead of [] for array fields
               const intelCorroboration: string[] = Array.isArray(intel.coworkerCorroboration) ? intel.coworkerCorroboration : [];
@@ -2051,7 +2039,7 @@ export function IntakeReviewScreen({
                       <div>
                         <p className="text-xs font-semibold text-amber-700">
                           {hasPotentialAgencyMatter
-                            ? 'Potential agency deadline — attorney review recommended'
+                            ? 'Time-sensitive dates — attorney review recommended'
                             : 'Time-sensitive dates present'}
                         </p>
                         <p className="text-[10px] mt-0.5 leading-snug text-amber-600/70">
@@ -2198,7 +2186,7 @@ export function IntakeReviewScreen({
             })() : null}
 
             {/* Items Requiring Confirmation — upgraded with intelligence when available */}
-            {(() => {
+            {activeTab === 'gaps' && (() => {
               const rawConfirmationNeeded = firmLiveView?.intelligence?.confirmationNeeded;
               const intelligenceItems: string[] = Array.isArray(rawConfirmationNeeded) ? rawConfirmationNeeded : [];
               const fallbackItems = chronologyGapLines;
@@ -2226,7 +2214,7 @@ export function IntakeReviewScreen({
             })()}
 
             {/* Questions that may help complete the intake (Phase 2a clarification engine) */}
-            {(() => {
+            {activeTab === 'gaps' && (() => {
               const rawClarifications = firmLiveView?.intelligence?.clarificationQuestions;
               const clarifications: string[] = Array.isArray(rawClarifications) ? rawClarifications : [];
               if (!clarifications.length) return null;
@@ -2250,7 +2238,7 @@ export function IntakeReviewScreen({
               );
             })()}
 
-            {firmLiveView?.documentRequest?.categories?.length ? (() => {
+            {activeTab === 'gaps' && firmLiveView?.documentRequest?.categories?.length ? (() => {
               const requested = firmLiveView.documentRequest!.categories;
               const fulfilled: string[] = firmLiveView?.documentResponse?.fulfilled ?? [];
               const fulfilledNorm = fulfilled.map((s) => s.toLowerCase().trim());
@@ -2307,7 +2295,8 @@ export function IntakeReviewScreen({
             })() : null}
 
             {/* Legacy: show response note if no request categories present */}
-            {!firmLiveView?.documentRequest?.categories?.length &&
+            {activeTab === 'gaps' &&
+            !firmLiveView?.documentRequest?.categories?.length &&
             firmLiveView?.documentResponse &&
             (firmLiveView.documentResponse.fulfilled.length > 0 || firmLiveView.documentResponse.note) ? (
               <motion.div
@@ -2335,17 +2324,20 @@ export function IntakeReviewScreen({
               </motion.div>
             ) : null}
 
-            {/* Methodology statement — attorney trust layer */}
+            {/* Methodology statement — attorney trust layer. Lives on the Decision card only. */}
+            {activeTab === 'decision' && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               className="rounded-[16px] border border-[#E4E5DE]/60 bg-[#FAF9F6] px-5 py-4"
             >
               <p className="text-[11px] leading-relaxed text-[#1B2623]/52">
-                <span className="font-medium text-[#1B2623]/70">How this intake was organized:</span> one3seven organizes file names, extracted dates, worker-provided context, and document categories into a review structure. Automated organization may require confirmation against the original source records. one3seven does not provide legal conclusions, case scoring, or outcome predictions. Source documents are available for direct review.
+                <span className="font-medium text-[#1B2623]/70">How this was organized:</span> one3seven structures the worker's own records — dates, context, and categories — into a reviewable file for you to confirm against the sources. It does not score, conclude, or predict outcomes.
               </p>
             </motion.div>
+            )}
 
+            {activeTab === 'context' && (
             <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -2407,6 +2399,7 @@ export function IntakeReviewScreen({
                   </p>
                 )}
               </motion.div>
+            )}
 
             {firmLiveView?.employmentMatterTags && firmLiveView.employmentMatterTags.length > 0 ? (
               <motion.div
@@ -3022,8 +3015,8 @@ export function IntakeReviewScreen({
               </p>
             </motion.div>
 
-            {/* Demo sign-up card — appears after the attorney has read the full intake */}
-            {demoMode && (
+            {/* Demo sign-up card — appears after the attorney has read the full intake. Decision card only. */}
+            {demoMode && activeTab === 'decision' && (
               <motion.div
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -3056,10 +3049,80 @@ export function IntakeReviewScreen({
                       See pricing
                     </button>
                   </div>
-                  <p className="text-[10px] text-white/28 mt-4">No card required · Practice from $249/mo after trial</p>
+                  <p className="text-[10px] text-white/28 mt-4">No card required · Practice from $400/seat/mo after trial</p>
                 </div>
               </motion.div>
             )}
+
+            {/* PINNED ACTIONS BAR — Firm Actions relocated here (shows on every tab) */}
+            <div className="sticky bottom-0 z-10 mt-2 rounded-2xl border border-[#E4E5DE] bg-white/95 px-4 py-3 shadow-[0_-6px_24px_rgba(31,27,75,0.06)] backdrop-blur">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="mr-1 hidden text-[11px] font-semibold uppercase tracking-wider text-[#7C857F] sm:inline">
+                  Firm actions
+                </span>
+                <button
+                  onClick={handleDownloadSummary}
+                  className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#42574E] focus-visible:ring-offset-1 ${FIRM_REVIEW_SECONDARY_BUTTON}`}
+                >
+                  <Download className="h-4 w-4" aria-hidden />
+                  Download summary
+                </button>
+                {/* AI extraction runs automatically in the background — no button needed */}
+                {firmLiveView?.routeStatus === 'full_access' && onReloadFirmLiveView ? (
+                  <button
+                    type="button"
+                    onClick={() => void onReloadFirmLiveView()}
+                    className="inline-flex items-center gap-2 rounded-xl border border-[#E4E5DE] bg-white px-4 py-2.5 text-sm font-medium text-[#1B2623] transition-colors hover:border-[#7C8B6F] hover:bg-[#F2F4EC] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#42574E] focus-visible:ring-offset-1"
+                  >
+                    <FileText className="h-4 w-4" aria-hidden />
+                    Review files
+                  </button>
+                ) : null}
+                {onRequestAdditionalDocuments ? (
+                  <button
+                    type="button"
+                    onClick={openFirmDocRequestModal}
+                    className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#42574E] focus-visible:ring-offset-1 ${FIRM_REVIEW_SECONDARY_BUTTON}`}
+                  >
+                    Request documents
+                  </button>
+                ) : null}
+                {/* The decision itself, anchored to the right so it reads as the primary action. */}
+                <div className="ml-auto flex items-center gap-2">
+                  {firmLiveView?.routeStatus === 'full_access' && !isFirmAccepted && !isFirmDeclined ? (
+                    <>
+                      {onAcceptIntake ? (
+                        <button
+                          onClick={() => void handleAcceptIntake()}
+                          className={`inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1B2623] focus-visible:ring-offset-2 ${FIRM_REVIEW_PRIMARY_BUTTON}`}
+                        >
+                          <CheckCircle2 className="h-4 w-4" aria-hidden />
+                          Accept
+                        </button>
+                      ) : null}
+                      {onDeclineIntake ? (
+                        <button
+                          onClick={() => setShowDeclineConfirm(true)}
+                          className="inline-flex items-center gap-2 rounded-xl border border-[#E4E5DE] bg-white px-4 py-2.5 text-sm font-medium text-[#6A6D66] transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-1"
+                        >
+                          Not pursuing
+                        </button>
+                      ) : null}
+                    </>
+                  ) : isFirmAccepted || firmLiveView?.routeStatus === 'accepted' ? (
+                    <span className="inline-flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm font-medium text-emerald-700">
+                      <CheckCircle2 className="h-4 w-4" aria-hidden />
+                      Added for follow-up
+                    </span>
+                  ) : isFirmDeclined ? (
+                    <span className="inline-flex items-center gap-2 rounded-xl border border-[#E4E5DE] bg-[#FAF9F6] px-4 py-2.5 text-sm font-medium text-[#7C857F]">
+                      Marked as not pursuing
+                    </span>
+                  ) : null}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 

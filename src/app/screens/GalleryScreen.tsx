@@ -14,10 +14,9 @@ import { Screen } from '../App';
 
 interface GalleryScreenProps {
   onNavigate: (screen: Screen) => void;
-  submittedIntakes: any[];
 }
 
-export function GalleryScreen({ onNavigate, submittedIntakes }: GalleryScreenProps) {
+export function GalleryScreen({ onNavigate }: GalleryScreenProps) {
   const [focusedScreen, setFocusedScreen] = useState<string | null>(null);
 
   const screens = [
@@ -67,7 +66,6 @@ export function GalleryScreen({ onNavigate, submittedIntakes }: GalleryScreenPro
           <LawFirmDashboardScreen
             onNavigate={dummyNavigate}
             onSelectIntake={dummySelectIntake}
-            submittedIntakes={submittedIntakes}
             onViewSampleIntakeFlow={() => {}}
             firmBellNotifications={[]}
           />

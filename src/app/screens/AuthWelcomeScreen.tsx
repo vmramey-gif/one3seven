@@ -56,7 +56,7 @@ export function AuthWelcomeScreen({
         <header className="flex items-center justify-between gap-2">
           <button
             type="button"
-            onClick={() => onNavigate('publicMarketing')}
+            onClick={() => onNavigate('forWorkers')}
             style={SERIF}
             className="text-[19px] font-semibold tracking-[-0.01em] text-[#17181C] transition hover:opacity-80"
             aria-label="one3seven — home"
