@@ -1,0 +1,94 @@
+<title>one3seven — Field Manual (narrated)</title>
+<style>
+  :root{
+    --bg:#0E1512;--bg2:#0A100D;--panel:#16201B;--ink:#ECF0E8;--soft:#9DA99F;--faint:#6B776E;
+    --sage:#8FB8A2;--sage-deep:#B7D2C4;--orange:#E08A4E;--line:#263029;
+    --serif:'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;
+    --sans:'Inter Tight',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+    --mono:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  body{background:radial-gradient(120% 90% at 50% 0%,#16201B 0%,var(--bg) 46%,var(--bg2) 100%);
+    color:var(--ink);font-family:var(--sans);min-height:100%;-webkit-font-smoothing:antialiased;}
+  .app{max-width:1120px;margin:0 auto;padding:20px 20px 40px;}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;}
+  .brand{font-family:var(--serif);font-weight:600;font-size:18px;} .brand b{color:var(--orange);}
+  .topmeta{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);}
+  .stage{position:relative;margin-top:14px;border:1px solid var(--line);border-radius:20px;
+    background:linear-gradient(160deg,#17211C 0%,#101713 100%);aspect-ratio:16/9;overflow:hidden;
+    box-shadow:0 30px 80px rgba(0,0,0,.45);}
+  .slide{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;
+    padding:clamp(24px,4.5vw,58px);opacity:0;transition:opacity .5s;pointer-events:none;}
+  .slide.active{opacity:1;pointer-events:auto;}
+  @media (prefers-reduced-motion:reduce){.slide{transition:none;}}
+  .kick{font-family:var(--mono);font-size:clamp(9px,1.2vw,12px);letter-spacing:.2em;text-transform:uppercase;color:var(--sage);margin-bottom:14px;}
+  .slide .title{font-family:var(--serif);font-weight:600;font-size:clamp(24px,4vw,44px);letter-spacing:-.015em;line-height:1.06;margin-bottom:18px;text-wrap:balance;}
+  .slide .body{font-size:clamp(15px,2vw,21px);color:var(--soft);max-width:56ch;line-height:1.5;}
+  .slide .body p{margin:0 0 12px;} .slide .body b{color:var(--ink);font-weight:600;}
+  .slide .body ul{margin:0 0 12px;padding-left:22px;} .slide .body li{margin:7px 0;}
+  .slide .body .hi{color:var(--sage-deep);border-left:2px solid var(--sage);padding-left:14px;font-style:italic;}
+  .slide .body .mut{color:var(--faint);font-size:.85em;}
+  .slide.card{align-items:center;justify-content:center;text-align:center;}
+  .slide.card .title{font-size:clamp(34px,6.5vw,68px);} .slide.card .sub{color:var(--soft);font-size:clamp(15px,2vw,21px);max-width:44ch;margin:0 auto;}
+  .counter{position:absolute;top:14px;right:18px;font-family:var(--mono);font-size:12px;color:var(--faint);}
+  .ticks{position:absolute;left:18px;right:18px;bottom:12px;display:flex;gap:3px;}
+  .ticks span{height:3px;flex:1;border-radius:2px;background:var(--line);} .ticks span.done{background:var(--sage);}
+  .controls{margin-top:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  button.ctl{font-family:var(--sans);font-size:14px;color:var(--ink);background:var(--panel);border:1px solid var(--line);
+    border-radius:999px;padding:10px 16px;cursor:pointer;} button.ctl:hover{border-color:var(--sage);}
+  button.ctl:focus-visible{outline:2px solid var(--sage);outline-offset:2px;}
+  button.play{background:var(--sage);color:#0E1512;border-color:var(--sage);font-weight:700;padding:10px 22px;}
+  .spacer{flex:1;} .rate{font-family:var(--mono);font-size:11px;color:var(--faint);display:flex;gap:8px;align-items:center;} .rate input{accent-color:var(--sage);}
+  .caption{margin-top:14px;min-height:44px;border-left:2px solid var(--sage);padding:4px 0 4px 16px;font-size:15px;color:var(--soft);font-style:italic;}
+  .caption b{color:var(--ink);font-style:normal;}
+  .note{margin-top:18px;font-family:var(--mono);font-size:11px;color:var(--faint);line-height:1.6;}
+</style>
+<div class="app">
+  <div class="topbar"><div class="brand">one3<b>seven</b></div><div class="topmeta">Field Manual · narrated · internal</div></div>
+  <div class="stage" id="stage">
+    <div class="counter" id="counter"></div>
+    <div class="ticks" id="ticks"></div>
+  </div>
+  <div class="controls">
+    <button class="ctl play" id="play">▶ Play</button>
+    <button class="ctl" id="prev">‹ Prev</button>
+    <button class="ctl" id="next">Next ›</button>
+    <button class="ctl" id="restart">↺ Restart</button>
+    <span class="spacer"></span>
+    <span class="rate">speed <input id="rate" type="range" min="0.8" max="1.3" step="0.05" value="1" aria-label="playback speed"></span>
+  </div>
+  <div class="caption" id="caption"><b>Press Play.</b> A narrated tour of the tools, Steno, the conferences, and the funders.</div>
+  <div class="note">Internal FL study reference. Figures as of mid-2026 — verify before repeating. one3seven organizes and cites; it does not score cases or give legal advice.</div>
+  <audio id="audio" preload="auto"></audio>
+</div>
+<script>
+  var S=[{"card":true,"kick":"one3seven · FL field manual","title":"The Field Manual","sub":"The tools · Steno · the conferences · the funders — narrated"},{"kick":"The map","title":"Dozens of tools. One question.","body":"<p>Every category is crowded — assistants, research, contracts, e-discovery, depositions, intake.</p><ul><li>Harvey · CoCounsel · Legora — general A I</li><li>Westlaw · Lexis — research</li><li>Spellbook · Ironclad — contracts</li><li>Eve · Filevine · Clio — plaintiff / intake</li></ul>"},{"kick":"The seam","title":"Nobody is worker-owned","body":"<p>The employment tools — <b>Eve, Lex Machina, Filevine, Darrow</b> — are all <b>firm-owned</b>.</p><p>The consumer tools that serve workers don't do employment records.</p><p class=\"hi\">Across the whole catalog, not one verified tool is a worker-owned employment-record product.</p>"},{"kick":"Steno · 1 of 3","title":"The closest analog","body":"<p>Court reporting + <b>DelayPay</b> deferred-cost financing for contingency firms + an A I layer.</p><p><b>$49M</b> raised Mar 2026 · ~<b>$150M</b> total. Plaintiff-friendly.</p>"},{"kick":"Steno · 2 of 3","title":"\"Transcript Genius\"","body":"<ul><li>Interrogate a transcript with follow-ups</li><li>Flag inconsistencies across testimony</li><li>Summaries with page-and-line citations</li><li>Compare multiple transcripts at once</li></ul><p>Genuinely good technology.</p>"},{"kick":"Steno · 3 of 3","title":"Why it isn’t us","body":"<p>It works on <b>deposition transcripts</b> — testimony taken <b>after</b> a lawsuit is filed.</p><p>Firm-facing. No worker surface. Never touches the worker’s own primary records before a firm engages.</p><p class=\"hi\">Even our closest analog confirms the whitespace.</p>"},{"kick":"Conferences","title":"Three buckets","body":"<p><b>Customers · Investors · Press.</b></p><p>The edge: rivals cluster at the legal-tech shows. The <b>bar conventions</b>, where our buyers are, they mostly ignore.</p>"},{"kick":"Customer rooms","title":"Where the buyers are","body":"<ul><li><b>CELA</b> — Oct, Los Angeles — the bullseye</li><li><b>CAOC</b> — Nov, San Francisco — 800 attorneys</li><li><b>NELA</b> — Jun, New Orleans — workers’-rights, brand-fit</li></ul><p class=\"mut\">Pricing unpublished — request the exhibitor packet directly.</p>"},{"kick":"Investor / press rooms","title":"TLTF + ABA TECHSHOW","body":"<p><b>TLTF Summit</b> (Scottsdale) — the legal-tech venture room.</p><p><b>ABA TECHSHOW Startup Alley</b> — free to apply. 2026 round closed → <b>watch the ~Nov window for 2027.</b></p>"},{"kick":"Funders","title":"No fund has a worker thesis","body":"<p>Every legal-A-I fund so far is <b>attorney-facing.</b></p><p class=\"hi\">So we name that gap as the opportunity — and frame one3seven as infrastructure firms <i>hire</i>. Investors hear B2B, not a consumer bet.</p>"},{"kick":"Funders · cold-friendly","title":"Start here","body":"<ul><li><b>The LegalTech Fund</b> — Zach Posner. Backed by Clio + Thomson Reuters — one relationship opens the web.</li><li><b>NFX FAST</b> — submit online, decision in <b>9 days.</b></li></ul>"},{"kick":"Funders · warm","title":"The thesis match","body":"<p><b>Spark Capital — James Kuklinski.</b></p><p>He led the round in <b>Eve</b> — our exact competitor. He already believes in this market.</p><p class=\"mut\">The warmest intro to line up.</p>"},{"kick":"Funders · cautions","title":"Warm, and skip the dead doors","body":"<p>Strategics — <b>TR Ventures, LexisNexis/REV, Clio Ventures</b> — real money + distribution, but approach warm; mind the worker-owns-the-record tension.</p><p class=\"mut\">Paused, don’t chase: LexisNexis accelerator (since ~2021) · Duke Law Tech Lab (since 2022).</p>"},{"kick":"First moves","title":"The playbook","body":"<ul><li>Two cold funder talks — <b>TLTF + NFX FAST</b></li><li>One warm intro — <b>Spark</b></li><li>Two customer rooms — <b>CELA + CAOC</b></li><li>Apply to <b>ABA TECHSHOW</b> when it opens</li></ul>"},{"kick":"The discipline","title":"Facts and provenance, never a verdict","body":"<p>Teaching from this manual: flag what’s verified vs. not. Rounds are sourced; several conference prices aren’t — <b>confirm before you budget.</b></p><p class=\"hi\">We hold ourselves to the standard we sell. The category is wide open.</p>"}];
+  var SCRIPT=["The field manual. A deeper study than Know the Field — four things every one three seven rep should carry: the full map of legal-A-I tools, a close look at Steno, the conferences worth our time, and the funders who actually write early checks. Same rule as always: every number is as of mid-2026, so verify before you repeat it to a firm or an investor.","Start with the map. There are dozens of legal-A-I tools now, across every category — general assistants like Harvey, research like Westlaw and Lexis, contract tools like Spellbook, e-discovery, deposition tools, intake and practice management. It is a crowded field. But the point of the map is not to memorize it.","The point is the seam. Look at the tools that actually touch employment — Eve, Lex Machina, Filevine, Darrow. Every one of them is firm-owned. And the consumer tools that serve workers — the robot-lawyer types — do not do employment records. Across the entire catalog, not one verified tool is a worker-owned employment-record product. That empty space is the whole company.","Now Steno, because you asked about it specifically. Steno is the closest thing to us — a records-plus-A-I company that is friendly to the plaintiff side. It does court reporting, it runs a deferred-payment product called DelayPay for contingency firms, and in March 2026 it raised a forty-nine-million-dollar round, about a hundred and fifty million total.","Steno's A I is called Transcript Genius. You can interrogate a transcript with follow-up questions, it flags inconsistencies across testimony, it writes summaries with page-and-line citations, and it compares multiple transcripts at once. It is genuinely good technology.","But here is why it is not us. Transcript Genius works on deposition transcripts — testimony taken after a lawsuit is already filed. It is firm-facing, it has no worker surface, and it never touches the worker's own primary records — the pay stubs, the schedules — before a firm ever engages. Even our closest analog confirms the whitespace: nobody organizes the worker's own record, earlier, owned by the worker.","Conferences. Think in three buckets — rooms full of customers, rooms full of investors, and rooms that give you press and credibility. And notice the edge: our rivals cluster at the legal-tech shows. The bar conventions, where our actual buyers are, they mostly ignore.","The customer rooms come first. C E L A, the California Employment Lawyers Association, October in Los Angeles — that is the bullseye, the exact firms who receive a worker's record. Then C A O C in San Francisco in November, eight hundred plaintiff attorneys. And N E L A in New Orleans in June — a workers'-rights bar, the cleanest fit for our brand. Their pricing is not published, so request the exhibitor packet directly.","For investors and press: the T L T F Summit in Scottsdale is the legal-tech venture room. And A B A Techshow runs a startup pitch competition that is free to apply to — the 2026 round already closed, so watch the November window for the 2027 show. High exposure, no cost.","Now the funders — and here is the single most useful thing in this manual. Every legal-A-I fund so far has an attorney-facing thesis. Not one has a worker-side thesis. So when we pitch, we name that gap as the opportunity, and we frame one three seven as infrastructure the firms hire — so investors hear a business-to-business motion, not a risky consumer bet.","Two funders take cold inbound and are the right stage for us. The LegalTech Fund — Zach Posner — is the pure legal-tech seed fund, and its backers include Clio and Thomson Reuters, so one relationship opens the whole web. And N F X runs a program called FAST — you submit online and get a decision in nine days.","One warm target to line up: Spark Capital, James Kuklinski. He led the round in Eve — our exact competitor, plaintiff-side employment A I. He already believes in this market. That is the warmest thesis match we have, once we can earn an introduction.","Two cautions on funders. The strategics — Thomson Reuters Ventures, the LexisNexis fund, Clio Ventures — have real money and distribution, but approach them warm, and mind the tension that the worker owns the record. And do not waste time on the paused doors: the LexisNexis accelerator has been dormant since about 2021, and the Duke Law Tech Lab since 2022.","So the first moves are simple. Open two cold funder conversations now — the LegalTech Fund and N F X FAST. Line up one warm intro to Spark. Work two customer rooms, C E L A and C A O C. And apply to A B A Techshow when the window opens.","And the discipline that ties it together. When you teach the team from this manual, flag what is verified and what is not. The tool categories and the funding rounds are sourced. The conference prices, several of them, are not — so confirm before you budget. We hold ourselves to the same standard we sell the firms: facts and provenance, never a verdict. The category is wide open. Let us go earn it."];
+  var AUDIO=["voice/fieldmanual/fm_01.mp3","voice/fieldmanual/fm_02.mp3","voice/fieldmanual/fm_03.mp3","voice/fieldmanual/fm_04.mp3","voice/fieldmanual/fm_05.mp3","voice/fieldmanual/fm_06.mp3","voice/fieldmanual/fm_07.mp3","voice/fieldmanual/fm_08.mp3","voice/fieldmanual/fm_09.mp3","voice/fieldmanual/fm_10.mp3","voice/fieldmanual/fm_11.mp3","voice/fieldmanual/fm_12.mp3","voice/fieldmanual/fm_13.mp3","voice/fieldmanual/fm_14.mp3","voice/fieldmanual/fm_15.mp3"];
+  var stage=document.getElementById('stage'),ticks=document.getElementById('ticks'),counter=document.getElementById('counter'),
+      caption=document.getElementById('caption'),playBtn=document.getElementById('play'),rateEl=document.getElementById('rate'),audio=document.getElementById('audio');
+  var i=0,playing=false;
+  S.forEach(function(s){
+    var d=document.createElement('div');d.className='slide'+(s.card?' card':'');
+    var html='<div class="kick">'+s.kick+'</div><div class="title">'+s.title+'</div>';
+    html+= s.card ? (s.sub?'<div class="sub">'+s.sub+'</div>':'') : '<div class="body">'+s.body+'</div>';
+    d.innerHTML=html;stage.appendChild(d);
+    ticks.appendChild(document.createElement('span'));
+  });
+  var slides=stage.querySelectorAll('.slide'),tickEls=ticks.querySelectorAll('span');
+  function paint(){
+    slides.forEach(function(el,idx){el.classList.toggle('active',idx===i);});
+    tickEls.forEach(function(el,idx){el.classList.toggle('done',idx<=i);});
+    counter.textContent=String(i+1).padStart(2,'0')+' / '+String(S.length).padStart(2,'0');
+    caption.innerHTML=(playing?'<b>▶</b> ':'')+SCRIPT[i];
+  }
+  function playCurrent(){ audio.src=AUDIO[i]; audio.playbackRate=parseFloat(rateEl.value)||1; var p=audio.play(); if(p&&p.catch)p.catch(function(){caption.innerHTML='<b>Tap Play once more</b> — autoplay was blocked.';}); }
+  audio.addEventListener('ended',function(){ if(!playing)return; if(i<S.length-1){i++;paint();playCurrent();} else {playing=false;setLabel();caption.innerHTML='<b>Fin.</b> Replay any step, or screen-record to export.';} });
+  function setLabel(){playBtn.textContent=playing?'❚❚ Pause':'▶ Play';}
+  playBtn.addEventListener('click',function(){ playing=!playing;setLabel(); if(playing){paint();playCurrent();} else audio.pause(); });
+  document.getElementById('next').addEventListener('click',function(){ if(i<S.length-1){i++;paint(); if(playing)playCurrent();} });
+  document.getElementById('prev').addEventListener('click',function(){ if(i>0){i--;paint(); if(playing)playCurrent();} });
+  document.getElementById('restart').addEventListener('click',function(){ i=0;paint(); if(playing)playCurrent(); else audio.pause(); });
+  rateEl.addEventListener('input',function(){ audio.playbackRate=parseFloat(rateEl.value)||1; });
+  paint();
+</script>

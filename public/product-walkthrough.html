@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>one3seven — Product Walkthrough (narrated)</title>
+<style>
+  :root{
+    --bg:#0E1512; --bg2:#0A100D; --panel:#16201B; --ink:#ECF0E8; --soft:#9DA99F; --faint:#6B776E;
+    --sage:#8FB8A2; --sage-deep:#B7D2C4; --orange:#E08A4E; --line:#263029;
+    --serif:'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;
+    --sans:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+    --mono:ui-monospace,'SF Mono','Cascadia Mono',Menlo,monospace;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  body{background:radial-gradient(120% 90% at 50% 0%,#16201B 0%,var(--bg) 46%,var(--bg2) 100%);
+    color:var(--ink);font-family:var(--sans);min-height:100%;-webkit-font-smoothing:antialiased;}
+  .app{max-width:1120px;margin:0 auto;padding:20px 20px 40px;}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;}
+  .brand{font-family:var(--serif);font-weight:600;font-size:18px;} .brand b{color:var(--orange);}
+  .topmeta{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);}
+  .stage{position:relative;margin-top:14px;border:1px solid var(--line);border-radius:20px;
+    background:linear-gradient(160deg,#17211C 0%,#101713 100%);aspect-ratio:16/9;overflow:hidden;
+    box-shadow:0 30px 80px rgba(0,0,0,.45);}
+  .slide{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:clamp(16px,3vw,30px);opacity:0;transition:opacity .5s;pointer-events:none;}
+  .slide.active{opacity:1;pointer-events:auto;}
+  @media (prefers-reduced-motion:reduce){.slide{transition:none;}}
+  .kick{font-family:var(--mono);font-size:clamp(9px,1.2vw,12px);letter-spacing:.2em;text-transform:uppercase;color:var(--sage);margin-bottom:9px;}
+  .slide img{max-width:100%;max-height:76%;border-radius:12px;border:1px solid var(--line);box-shadow:0 18px 50px rgba(0,0,0,.5);object-fit:contain;}
+  .slide .title{font-family:var(--serif);font-weight:600;font-size:clamp(18px,3.1vw,32px);letter-spacing:-.01em;margin-bottom:12px;text-align:center;text-wrap:balance;}
+  .slide.card .title{font-size:clamp(26px,5vw,52px);} .slide.card .sub{color:var(--soft);font-size:clamp(14px,1.8vw,19px);max-width:40ch;text-align:center;margin-top:12px;}
+  .counter{position:absolute;top:14px;right:18px;font-family:var(--mono);font-size:12px;color:var(--faint);}
+  .ticks{position:absolute;left:18px;right:18px;bottom:12px;display:flex;gap:3px;}
+  .ticks span{height:3px;flex:1;border-radius:2px;background:var(--line);} .ticks span.done{background:var(--sage);}
+  .controls{margin-top:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  button.ctl{font-family:var(--sans);font-size:14px;color:var(--ink);background:var(--panel);border:1px solid var(--line);
+    border-radius:999px;padding:10px 16px;cursor:pointer;} button.ctl:hover{border-color:var(--sage);}
+  button.play{background:var(--sage);color:#0E1512;border-color:var(--sage);font-weight:700;padding:10px 22px;}
+  .spacer{flex:1;} .rate{font-family:var(--mono);font-size:11px;color:var(--faint);display:flex;gap:8px;align-items:center;} .rate input{accent-color:var(--sage);}
+  .caption{margin-top:14px;min-height:44px;border-left:2px solid var(--sage);padding:4px 0 4px 16px;font-size:15px;color:var(--soft);font-style:italic;}
+  .caption b{color:var(--ink);font-style:normal;}
+  .note{margin-top:18px;font-family:var(--mono);font-size:11px;color:var(--faint);line-height:1.6;}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar"><div class="brand">one3<b>seven</b></div><div class="topmeta">Product walkthrough · narrated</div></div>
+  <div class="stage" id="stage">
+    <div class="counter" id="counter">01 / 18</div>
+    <div class="ticks" id="ticks"></div>
+  </div>
+  <div class="controls">
+    <button class="ctl play" id="play">▶ Play</button>
+    <button class="ctl" id="prev">‹ Prev</button>
+    <button class="ctl" id="next">Next ›</button>
+    <button class="ctl" id="restart">↺ Restart</button>
+    <span class="spacer"></span>
+    <span class="rate">speed <input id="rate" type="range" min="0.8" max="1.3" step="0.05" value="1"></span>
+  </div>
+  <div class="caption" id="caption"><b>Press Play.</b> A narrated tour of the worker side, the delivery routes, and the firm binder.</div>
+  <div class="note">Real production screens (captured from live one3seven). To export an .mp4, screen-record this tab while it plays. · one3seven organizes and cites; it does not provide legal advice, case scoring, or conclusions.</div>
+  <audio id="audio" preload="auto"></audio>
+</div>
+<script>
+(function(){
+  var S=[
+    {card:true,k:'one3seven',title:'A full walkthrough',sub:'Worker side · how the record reaches an attorney · firm side'},
+    {k:'Worker · Home',img:'walkthrough/home.jpg',title:'The worker’s home'},
+    {k:'Worker · Add records',img:'walkthrough/add_records.jpg',title:'Add records — no sorting needed'},
+    {k:'Worker · Firm code',img:'walkthrough/firm_code.jpg',title:'Connect a firm by code'},
+    {k:'Worker · Home',img:'walkthrough/reminders.jpg',title:'Recent record + reminders'},
+    {k:'Worker · Dates',img:'walkthrough/dates.jpg',title:'Important dates, in one place'},
+    {k:'Worker · Status',img:'walkthrough/status.jpg',title:'Where things stand'},
+    {k:'Worker · Case',img:'walkthrough/coverage.jpg',title:'What’s on file vs. what’s required'},
+    {k:'Worker · Self-help',img:'walkthrough/records.jpg',title:'We write the records request'},
+    {k:'Worker · Share',img:'walkthrough/summary.jpg',title:'The worker chooses to send it'},
+    {k:'Delivery',img:'walkthrough/journey.jpg',title:'How it reaches the attorney'},
+    {k:'Firm · Queue',img:'walkthrough/firm_queue.jpg',title:'The firm’s review queue'},
+    {k:'Firm · Binder',img:'walkthrough/firm_decision.jpg',title:'The attorney’s decision card'},
+    {k:'Firm · Claim Lens',img:'walkthrough/firm_lens.jpg',title:'Elements on file · gaps'},
+    {k:'Firm · Source link',img:'walkthrough/firm_sourcelink.jpg',title:'Every fact, one click to its page'},
+    {k:'Firm · Actions',img:'walkthrough/firm_actions.jpg',title:'Accept, request, or decline — one click'},
+    {k:'Firm · Organize',img:'walkthrough/firm_organize.jpg',title:'The firm organizes its own matters'},
+    {k:'Firm · Packet',img:'walkthrough/firm_pdf.jpg',title:'A clean, source-linked review packet'},
+    {card:true,k:'one3seven',title:'The case, in the worker’s hands',sub:'A verified, source-linked file the attorney can trust.'}
+  ];
+  var SCRIPT=[
+    'one3seven, end to end — the worker owns the record, the attorney gets a clean file, every fact carries its source.',
+    'The worker’s home: where their record stands — records, dated events, what’s still to gather. Private until they share.',
+    'Add records — drag in pay stubs, emails, screenshots. No sorting; one3seven infers the types. Only the name is required.',
+    'Already have a firm’s code? Link it here — connecting the case to that firm before organizing. Nothing is sent yet.',
+    'Recent events, and their own reminders — what’s mine to do.',
+    'Every date in one place, each tagged. The attorney sets filing dates — one3seven doesn’t.',
+    'The status tab: where things stand, in plain language.',
+    'What California requires vs. what’s on file — so the worker sees what’s missing.',
+    'Records missing? one3seven writes the request letter so the worker gathers the evidence.',
+    'The worker downloads their packet, or sends it to a firm. They choose who sees it.',
+    'A firm opens the file and asks for full access — only the worker’s approval unlocks it.',
+    'The firm’s review queue: routed intakes, already prepared — records counted, gaps flagged, timeline reconstructed.',
+    'The binder’s decision card — the ten-second read: records, sequence, key dates.',
+    'Claim Lens: elements on file, and how many gaps remain.',
+    'Click any fact and the exact source page opens beside it — verify in one click, not twenty minutes.',
+    'Every decision is one click — download, review files, request documents, accept, or mark not pursuing.',
+    'The firm can organize its own matters too — same source-linked timeline and packet.',
+    'It all exports to a clean review packet, every citation traceable to its page.',
+    'The case, in the worker’s hands — and a verified file the attorney can trust.'
+  ];
+  var stage=document.getElementById('stage'),ticks=document.getElementById('ticks'),counter=document.getElementById('counter'),
+      caption=document.getElementById('caption'),playBtn=document.getElementById('play'),rateEl=document.getElementById('rate'),audio=document.getElementById('audio');
+  var i=0,playing=false;
+  S.forEach(function(s){
+    var d=document.createElement('div');d.className='slide'+(s.card?' card':'');
+    var html='<div class="kick">'+s.k+'</div>';
+    if(s.card){ html+='<div class="title">'+s.title+'</div>'+(s.sub?'<div class="sub">'+s.sub+'</div>':''); }
+    else { html+='<div class="title">'+s.title+'</div><img src="'+s.img+'" alt="'+s.title+'">'; }
+    d.innerHTML=html;stage.appendChild(d);
+    var t=document.createElement('span');ticks.appendChild(t);
+  });
+  var slides=stage.querySelectorAll('.slide'),tickEls=ticks.querySelectorAll('span');
+  function paint(){
+    slides.forEach(function(el,idx){el.classList.toggle('active',idx===i);});
+    tickEls.forEach(function(el,idx){el.classList.toggle('done',idx<=i);});
+    counter.textContent=String(i+1).padStart(2,'0')+' / '+String(S.length).padStart(2,'0');
+    caption.innerHTML=(playing?'<b>▶</b> ':'')+SCRIPT[i];
+  }
+  function src(n){return 'voice/walkthrough/wt_'+String(n+1).padStart(2,'0')+'.mp3';}
+  function playCurrent(){ audio.src=src(i); audio.playbackRate=parseFloat(rateEl.value)||1; var p=audio.play(); if(p&&p.catch)p.catch(function(){caption.innerHTML='<b>Tap Play once more</b> — autoplay was blocked.';}); }
+  audio.addEventListener('ended',function(){ if(!playing)return; if(i<S.length-1){i++;paint();playCurrent();} else {playing=false;setLabel();caption.innerHTML='<b>Fin.</b> Replay any step, or screen-record to export.';} });
+  function setLabel(){playBtn.textContent=playing?'❚❚ Pause':'▶ Play';}
+  playBtn.addEventListener('click',function(){ playing=!playing;setLabel(); if(playing){paint();playCurrent();} else audio.pause(); });
+  document.getElementById('next').addEventListener('click',function(){ if(i<S.length-1){i++;paint(); if(playing)playCurrent();} });
+  document.getElementById('prev').addEventListener('click',function(){ if(i>0){i--;paint(); if(playing)playCurrent();} });
+  document.getElementById('restart').addEventListener('click',function(){ i=0;paint(); if(playing)playCurrent(); else audio.pause(); });
+  rateEl.addEventListener('input',function(){ audio.playbackRate=parseFloat(rateEl.value)||1; });
+  paint();
+})();
+</script>
+</body>
+</html>

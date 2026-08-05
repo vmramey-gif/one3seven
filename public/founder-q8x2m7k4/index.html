@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>one3seven — The Honest Version</title>
+<style>
+  :root{
+    --bg:#0C1310; --bg2:#0E1613; --ink:#ECF0E8; --soft:#B9C4B9; --faint:#7C8B80;
+    --sage:#8FB8A2; --sage-deep:#6E9A82; --accent:#E0894E; --line:#20302A;
+    --serif:"Iowan Old Style",Palatino,"Palatino Linotype",Georgia,serif;
+    --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{height:100%;}
+  body{background:radial-gradient(120% 120% at 50% 0%,#12201A 0%,var(--bg) 60%);color:var(--ink);
+    font-family:var(--sans);overflow:hidden;}
+  #film{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+  .slide{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;padding:clamp(28px,7vw,90px);opacity:0;transform:translateY(14px) scale(.995);
+    transition:opacity .9s ease,transform .9s ease;pointer-events:none;}
+  .slide.on{opacity:1;transform:none;}
+  .eyebrow{font-family:var(--mono);font-size:clamp(10px,1.5vw,12px);letter-spacing:.22em;text-transform:uppercase;
+    color:var(--sage);margin-bottom:22px;}
+  h1{font-family:var(--serif);font-weight:600;letter-spacing:-.015em;line-height:1.04;
+    font-size:clamp(34px,7vw,72px);max-width:16ch;text-wrap:balance;}
+  h2{font-family:var(--serif);font-weight:600;letter-spacing:-.01em;line-height:1.1;
+    font-size:clamp(26px,4.6vw,46px);max-width:20ch;text-wrap:balance;}
+  .big{font-family:var(--serif);font-size:clamp(28px,5vw,52px);line-height:1.18;max-width:18ch;text-wrap:balance;}
+  p.sub{margin-top:22px;font-size:clamp(15px,2.3vw,21px);line-height:1.6;color:var(--soft);max-width:52ch;text-wrap:pretty;}
+  .kicker{color:var(--accent);}
+  .sage{color:var(--sage);}
+  .two{display:flex;gap:clamp(16px,3vw,40px);flex-wrap:wrap;justify-content:center;margin-top:30px;}
+  .card{border:1px solid var(--line);border-radius:16px;padding:22px 24px;max-width:300px;text-align:left;
+    background:linear-gradient(180deg,rgba(143,184,162,.05),transparent);}
+  .card .k{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:8px;}
+  .card h3{font-family:var(--serif);font-size:22px;font-weight:600;margin-bottom:6px;}
+  .card p{font-size:14.5px;line-height:1.5;color:var(--soft);}
+  .list{margin-top:26px;text-align:left;max-width:36ch;display:flex;flex-direction:column;gap:14px;}
+  .list div{display:flex;gap:12px;align-items:flex-start;font-size:clamp(15px,2.2vw,19px);color:var(--soft);line-height:1.45;}
+  .list b{color:var(--ink);font-weight:600;}
+  .dot{color:var(--sage);flex:none;margin-top:.15em;}
+  .shield{margin-bottom:30px;}
+  .ask{font-size:clamp(16px,2.4vw,22px);line-height:1.55;color:var(--soft);max-width:46ch;margin-top:8px;}
+  #bar{position:fixed;top:0;left:0;height:3px;background:var(--sage);width:0;transition:width .25s linear;z-index:10;}
+  #dots{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);display:flex;gap:9px;z-index:10;}
+  #dots i{width:7px;height:7px;border-radius:50%;background:#2c3b34;transition:background .3s,transform .3s;display:block;}
+  #dots i.on{background:var(--sage);transform:scale(1.35);}
+  #hint{position:fixed;bottom:44px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:10.5px;
+    letter-spacing:.14em;text-transform:uppercase;color:var(--faint);z-index:10;transition:opacity .6s;}
+  #ctr{position:fixed;top:16px;right:20px;font-family:var(--mono);font-size:11px;color:var(--faint);letter-spacing:.1em;z-index:10;}
+  #pause{position:fixed;top:14px;left:18px;z-index:10;background:none;border:1px solid var(--line);color:var(--faint);
+    font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;border-radius:20px;padding:6px 12px;cursor:pointer;}
+  #pause:hover{color:var(--sage);border-color:var(--sage);}
+  .end-motto{font-family:var(--serif);font-size:clamp(28px,5vw,54px);line-height:1.14;max-width:18ch;text-wrap:balance;}
+  .end-sig{margin-top:24px;font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--sage);}
+  #start{position:fixed;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;
+    background:radial-gradient(120% 120% at 50% 0%,#12201A 0%,var(--bg) 60%);}
+  #startbtn{font-family:var(--sans);font-size:17px;color:var(--ink);background:none;border:1px solid var(--sage);border-radius:999px;
+    padding:15px 32px;cursor:pointer;letter-spacing:.02em;transition:background .3s,transform .2s;}
+  #startbtn:hover{background:rgba(143,184,162,.12);transform:translateY(-1px);}
+  .startsub{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);}
+</style>
+</head>
+<body>
+<div id="bar"></div>
+<button id="pause">⏸ pause</button>
+<div id="ctr"></div>
+<div id="film"></div>
+<div id="hint">click, or → to advance</div>
+<div id="dots"></div>
+
+<script>
+var SHIELD = '<svg class="shield" width="58" height="68" viewBox="0 0 38 44" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
+ + '<path d="M19 1 L37 7 V22 C37 33 29 40 19 43 C9 40 1 33 1 22 V7 Z" fill="none" stroke="#8FB8A2" stroke-width="1.4"/>'
+ + '<text x="19" y="21" text-anchor="middle" font-family="Iowan Old Style,Palatino,Georgia,serif" font-size="12" font-weight="700" fill="#ECF0E8">137</text>'
+ + '<rect x="9" y="26" width="20" height="1.3" fill="#E0894E"/>'
+ + '<text x="19" y="35" text-anchor="middle" font-family="ui-monospace,monospace" font-size="4" letter-spacing="1" fill="#8FB8A2">ONE3SEVEN</text></svg>';
+
+var S = [
+  { t: 8000, html: SHIELD
+    + `<div class="eyebrow">The honest version</div>`
+    + `<h1>one3seven</h1>`
+    + `<p class="sub">This is the honest version: where it came from, what’s real today, what isn’t, and where I could use a hand.</p>` },
+
+  { t: 9500, html:
+      `<div class="eyebrow">Where it started</div>`
+    + `<h2>I didn’t start with a market. I started with my <span class="sage">own</span> claim.</h2>`
+    + `<p class="sub">Earlier this year I had a claim of my own — the same mess everyone has: a pile of documents, a story in my head, and no idea what a stranger would need to see.</p>` },
+
+  { t: 10500, html:
+      `<div class="eyebrow">What I did</div>`
+    + `<div class="big">So I organized my own record — the way I’d want a stranger to see it.</div>`
+    + `<p class="sub">Every fact tied to the document that proved it. I handed it to my lawyers, and the claim settled for the policy limit. <b style="color:var(--ink)">I’d never claim the record won it</b> — but it made the truth impossible to miss.</p>` },
+
+  { t: 10500, html:
+      `<div class="eyebrow">The realization</div>`
+    + `<h2>What worked for me is what every worker deserves — and almost no one is shown how to build.</h2>`
+    + `<p class="sub">They arrive with a shoebox and a story, and the system asks them to <b style="color:var(--ink)">retell the worst thing that happened — again</b> — to someone trying to screen hundreds of other stories too. The workflow is the problem, not the people in it.</p>` },
+
+  { t: 10500, html:
+      `<div class="eyebrow">The promise</div>`
+    + `<div class="big">You’ve been a passenger in your own story. <span class="sage">Now you’re driving.</span></div>`
+    + `<p class="sub">one3seven turns a worker’s scattered evidence into a clean, <b style="color:var(--ink)">source-linked record that’s theirs</b> — every fact traced to the document behind it — before the first serious legal review.</p>` },
+
+  { t: 10500, html:
+      `<div class="eyebrow">Worker-first, on purpose</div>`
+    + `<h2>The worker chooses which firm ever sees it.</h2>`
+    + `<p class="sub">This isn’t a firm-owned file that vanishes when a firm says no. Firms subscribe to the review tools. <b style="color:var(--ink)">The worker isn’t the lead — the worker is the customer we’re accountable to.</b></p>` },
+
+  { t: 10500, html:
+      `<div class="eyebrow">The discipline</div>`
+    + `<div class="big">We organize and cite. We <span class="kicker">never</span> conclude.</div>`
+    + `<p class="sub">No verdict, no “you have a case,” no legal advice — that stays with the attorney. It sounds like a limit. It’s the moat: it preserves the line between organizing a record and legal judgment — and it’s the only reason a real firm can put us in front of a client at all.</p>` },
+
+  { t: 11000, html:
+      `<div class="eyebrow">The math firms feel</div>`
+    + `<h2>Not only righteous — it’s margin.</h2>`
+    + `<p class="sub">The case-screening that eats a firm’s most expensive hour, one3seven cuts to a fraction of it. Every minute handed back is a <b style="color:var(--ink)">billable</b> minute — and catching one buried clause can pay for the year.</p>` },
+
+  { t: 11500, html:
+      `<div class="eyebrow">What’s actually built</div>`
+    + `<h2>Not a deck. A working product.</h2>`
+    + `<div class="list">`
+    + `<div><span class="dot">—</span><span>A worker’s pile of evidence becomes a clean, <b>source-linked file</b> — reviewable in a fraction of the usual time.</span></div>`
+    + `<div><span class="dot">—</span><span>The firm sees a clean binder and <b>clicks any fact straight to its source page</b>.</span></div>`
+    + `<div><span class="dot">—</span><span>Dozens of California-employment <b>review lenses</b> — counsel-gated and under evaluation.</span></div>`
+    + `<div><span class="dot">—</span><span>Every worker’s data <b>locked to them alone</b>.</span></div>`
+    + `</div>` },
+
+  { t: 12000, html:
+      `<div class="eyebrow">The part I keep</div>`
+    + `<div class="big">The story is worker-first. The engine, <span class="sage">I keep.</span></div>`
+    + `<p class="sub">How the mess actually becomes that record — the method, the way it stays accurate, the thing I proved on my own claim — is the moat, and I don’t put it in a video. What I’ll say: the worker carries the record from firm to firm, and each firm that accepts it makes the format harder to dislodge.</p>` },
+
+  { t: 10500, html:
+      `<div class="eyebrow">Where it honestly stands</div>`
+    + `<h2>Pre-pilot. Built since May. Customer adoption is zero.</h2>`
+    + `<p class="sub">I won’t show you a hockey stick that doesn’t exist. The product is real — I’ve run it on my own matter — but paying customers are zero. <b style="color:var(--ink)">Accuracy is the moat and the number-one risk</b>, and there’s honest cleanup ahead. That’s the starting line — and why I’m talking to you now, not after.</p>` },
+
+  { t: 11000, html:
+      `<div class="eyebrow">Why now</div>`
+    + `<h2>A window that won’t stay open.</h2>`
+    + `<p class="sub">Legal AI did <b style="color:var(--ink)">over two billion dollars</b> in the first half of this year. Attorney fear of it is peaking — exactly when <b style="color:var(--ink)">“we never conclude, we just show you the source”</b> lands hardest. California’s rules are a tailwind, and the worker-first ground is still unclaimed.</p>` },
+
+  { t: 12500, html:
+      `<div class="eyebrow">The ask</div>`
+    + `<h2>Where I could use a hand.</h2>`
+    + `<div class="ask"><div class="list" style="margin-top:6px">`
+    + `<div><span class="dot">1</span><span><b>Candor</b> — poke the thesis. Where would <i>you</i> not bet?</span></div>`
+    + `<div><span class="dot">2</span><span><b>A door</b> — one warm intro to a plaintiff-side employment firm beats a month of cold outreach.</span></div>`
+    + `<div><span class="dot">3</span><span><b>The judgment</b> — does the evidence justify reorganizing my life around this now, or have I fallen for the thesis before earning distribution?</span></div>`
+    + `</div></div>` },
+
+  { t: 12000, html: SHIELD
+    + `<div class="end-motto">A worker deserves to be understood before they’re judged.</div>`
+    + `<p class="sub" style="margin-top:22px">We organize the record. The attorney keeps the judgment.</p>`
+    + `<div class="end-sig">one3seven · built worker-first</div>` },
+];
+
+var film=document.getElementById('film'), dots=document.getElementById('dots'),
+    bar=document.getElementById('bar'), ctr=document.getElementById('ctr'),
+    hint=document.getElementById('hint'), pauseBtn=document.getElementById('pause');
+var AUDIO = S.map(function(_,ix){ return 'audio/s'+(ix+1)+'.mp3'; });
+var audio = new Audio(); audio.preload='auto';
+var i=0, started=false, paused=false;
+
+S.forEach(function(s){
+  var d=document.createElement('div'); d.className='slide'; d.innerHTML=s.html; film.appendChild(d);
+  dots.appendChild(document.createElement('i'));
+});
+var slides=document.querySelectorAll('.slide'), ds=dots.querySelectorAll('i');
+
+function paint(){
+  slides.forEach(function(s,ix){ s.classList.toggle('on', ix===i); });
+  ds.forEach(function(x,ix){ x.classList.toggle('on', ix===i); });
+  ctr.textContent=(i+1)+' / '+S.length;
+  bar.style.width=(i/S.length*100)+'%';
+  if(i>0) hint.style.opacity='0';
+}
+function playAudio(){ try{ audio.pause(); }catch(e){} audio.src=AUDIO[i]; audio.currentTime=0; var p=audio.play(); if(p&&p.catch)p.catch(function(){}); }
+function goTo(n){ i=(n+S.length)%S.length; paint(); if(started&&!paused) playAudio(); }
+function next(){ if(i<S.length-1) goTo(i+1); }
+function prev(){ goTo(Math.max(0,i-1)); }
+
+audio.addEventListener('timeupdate', function(){ if(audio.duration) bar.style.width=(((i)+(audio.currentTime/audio.duration))/S.length*100)+'%'; });
+audio.addEventListener('ended', function(){ if(!paused && i<S.length-1) goTo(i+1); });
+
+film.addEventListener('click', function(){ if(started) next(); });
+document.addEventListener('keydown', function(e){
+  if(e.key==='ArrowRight'||e.key===' '){ e.preventDefault(); if(started) next(); }
+  else if(e.key==='ArrowLeft'){ if(started) prev(); }
+});
+pauseBtn.addEventListener('click', function(e){
+  e.stopPropagation(); if(!started) return; paused=!paused;
+  pauseBtn.textContent = paused ? '▶ play' : '⏸ pause';
+  if(paused) audio.pause(); else { var p=audio.play(); if(p&&p.catch)p.catch(function(){}); }
+});
+
+var overlay=document.createElement('div'); overlay.id='start';
+overlay.innerHTML='<button id="startbtn">▶ Play the film</button><div class="startsub">about 5 minutes · sound on</div>';
+document.body.appendChild(overlay);
+paint();
+document.getElementById('startbtn').addEventListener('click', function(e){
+  e.stopPropagation(); overlay.style.display='none'; started=true; i=0; paint(); playAudio();
+});
+</script>
+</body>
+</html>

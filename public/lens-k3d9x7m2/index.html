@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>one3seven — Inside Claim Lens & Pricing (internal)</title>
+<style>
+  :root{
+    --bg:#0C1310; --ink:#ECF0E8; --soft:#B9C4B9; --faint:#7C8B80;
+    --sage:#8FB8A2; --sage-deep:#6E9A82; --accent:#E0894E; --amber:#D9A441; --line:#20302A; --panel:#111A15;
+    --serif:"Iowan Old Style",Palatino,"Palatino Linotype",Georgia,serif;
+    --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{height:100%;}
+  body{background:radial-gradient(120% 120% at 50% 0%,#12201A 0%,var(--bg) 60%);color:var(--ink);font-family:var(--sans);overflow:hidden;}
+  #film{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+  .slide{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;padding:clamp(24px,5vw,70px);opacity:0;transform:translateY(12px);transition:opacity .7s ease,transform .7s ease;
+    pointer-events:none;overflow-y:auto;}
+  .slide.on{opacity:1;transform:none;pointer-events:auto;}
+  .inner{max-width:920px;width:100%;margin:auto;}
+  .eyebrow{font-family:var(--mono);font-size:clamp(10px,1.4vw,11.5px);letter-spacing:.2em;text-transform:uppercase;color:var(--sage);margin-bottom:18px;}
+  h1{font-family:var(--serif);font-weight:600;letter-spacing:-.015em;line-height:1.05;font-size:clamp(30px,6vw,62px);text-wrap:balance;}
+  h2{font-family:var(--serif);font-weight:600;letter-spacing:-.01em;line-height:1.12;font-size:clamp(24px,4.2vw,42px);text-wrap:balance;margin-bottom:8px;}
+  .big{font-family:var(--serif);font-size:clamp(24px,4.4vw,44px);line-height:1.2;text-wrap:balance;}
+  p.sub{margin-top:16px;font-size:clamp(14px,2vw,19px);line-height:1.6;color:var(--soft);max-width:60ch;margin-left:auto;margin-right:auto;text-wrap:pretty;}
+  .kicker{color:var(--accent);} .sage{color:var(--sage);} .amberc{color:var(--amber);}
+  /* pipeline steps */
+  .steps{display:flex;flex-direction:column;gap:10px;margin-top:22px;text-align:left;}
+  .step{display:grid;grid-template-columns:34px 1fr;gap:14px;align-items:start;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;}
+  .step .n{font-family:var(--mono);font-size:13px;color:var(--accent);border:1px solid var(--accent);border-radius:8px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;}
+  .step .h{font-family:var(--serif);font-size:17px;margin-bottom:3px;}
+  .step .d{font-size:14px;color:var(--soft);line-height:1.5;}
+  .step .d code{font-family:var(--mono);font-size:12.5px;color:var(--ink);background:#0c140f;border:1px solid var(--line);border-radius:5px;padding:1px 6px;}
+  /* chips */
+  .chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px;}
+  .chip{font-family:var(--mono);font-size:11.5px;padding:4px 10px;border-radius:999px;border:1px solid var(--line);}
+  .chip.inc{color:var(--sage);border-color:var(--sage-deep);background:#12201a;}
+  .chip.exc{color:var(--accent);border-color:var(--accent);background:#221710;}
+  /* source states */
+  .states{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:20px;}
+  .st{border:1px solid var(--line);border-radius:12px;padding:12px 14px;min-width:150px;max-width:200px;text-align:left;background:var(--panel);}
+  .st .t{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px;}
+  .st .x{font-size:13px;color:var(--soft);line-height:1.45;}
+  .st.linked .t{color:var(--sage);} .st.worker .t{color:var(--amber);} .st.missing .t{color:var(--accent);}
+  /* coverage bar */
+  .cov{margin:20px auto 0;max-width:520px;text-align:left;}
+  .covrow{display:flex;align-items:center;gap:12px;margin-bottom:8px;font-size:14px;}
+  .covrow .el{flex:1;color:var(--soft);} .covrow .el b{color:var(--ink);}
+  .dotm{width:11px;height:11px;border-radius:3px;flex:none;}
+  .ok{background:var(--sage);} .gap{background:var(--accent);}
+  .rate{margin-top:14px;font-family:var(--mono);font-size:13px;color:var(--sage);}
+  /* price bars */
+  .pbars{margin-top:20px;text-align:left;max-width:640px;margin-left:auto;margin-right:auto;display:flex;flex-direction:column;gap:11px;}
+  .pb{display:grid;grid-template-columns:220px 1fr 42px;gap:12px;align-items:center;font-size:14px;}
+  .pb .lab{color:var(--ink);} .pb .lab span{color:var(--faint);font-size:12px;display:block;}
+  .pb .track{height:12px;background:#0c140f;border:1px solid var(--line);border-radius:7px;overflow:hidden;}
+  .pb .fill{height:100%;background:linear-gradient(90deg,var(--sage-deep),var(--sage));border-radius:7px;}
+  .pb .fill.t{background:linear-gradient(90deg,#8a6a2a,var(--amber));}
+  .pb .pct{font-family:var(--mono);font-size:12.5px;color:var(--soft);text-align:right;}
+  /* tiers */
+  .tiers{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:22px;}
+  .tier{border:1px solid var(--line);border-radius:14px;padding:18px;width:230px;text-align:left;background:var(--panel);}
+  .tier.firm{border-color:var(--sage-deep);}
+  .tier .nm{font-family:var(--serif);font-size:20px;margin-bottom:2px;}
+  .tier .pr{font-family:var(--mono);font-size:15px;color:var(--sage);margin-bottom:10px;}
+  .tier ul{list-style:none;font-size:13px;color:var(--soft);line-height:1.5;}
+  .tier li{padding-left:14px;position:relative;margin-bottom:3px;}
+  .tier li::before{content:"–";position:absolute;left:0;color:var(--faint);}
+  .note{margin-top:18px;font-size:12.5px;color:var(--faint);font-style:italic;max-width:60ch;margin-left:auto;margin-right:auto;line-height:1.5;}
+  .badge{display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:4px 11px;margin-bottom:16px;}
+  /* chrome */
+  #bar{position:fixed;top:0;left:0;height:3px;background:var(--sage);width:0;transition:width .3s;z-index:10;}
+  #dots{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);display:flex;gap:7px;z-index:10;}
+  #dots i{width:6px;height:6px;border-radius:50%;background:#2c3b34;transition:background .3s,transform .3s;}
+  #dots i.on{background:var(--sage);transform:scale(1.4);}
+  #ctr{position:fixed;top:14px;right:18px;font-family:var(--mono);font-size:11px;color:var(--faint);z-index:10;}
+  #hint{position:fixed;bottom:34px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);z-index:10;transition:opacity .5s;}
+  #nav{position:fixed;bottom:14px;right:18px;display:flex;gap:8px;z-index:11;}
+  #nav button{background:none;border:1px solid var(--line);color:var(--faint);border-radius:8px;padding:6px 12px;cursor:pointer;font-family:var(--mono);font-size:13px;}
+  #nav button:hover{color:var(--sage);border-color:var(--sage);}
+  #start{position:fixed;inset:0;z-index:30;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;
+    background:radial-gradient(120% 120% at 50% 0%,#12201A 0%,var(--bg) 60%);}
+  #startbtn{font-family:var(--sans);font-size:17px;color:var(--ink);background:none;border:1px solid var(--sage);border-radius:999px;
+    padding:15px 32px;cursor:pointer;letter-spacing:.02em;transition:background .3s,transform .2s;}
+  #startbtn:hover{background:rgba(143,184,162,.12);transform:translateY(-1px);}
+  .startsub{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);}
+</style>
+</head>
+<body>
+<div id="bar"></div>
+<div id="ctr"></div>
+<div id="film"></div>
+<div id="hint">click, or → to advance</div>
+<div id="dots"></div>
+<div id="nav"><button id="pp">⏸</button><button id="pv">‹</button><button id="nx">›</button></div>
+
+<script>
+var SHIELD='<svg width="52" height="60" viewBox="0 0 38 44" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:22px" aria-hidden="true">'
+ +'<path d="M19 1 L37 7 V22 C37 33 29 40 19 43 C9 40 1 33 1 22 V7 Z" fill="none" stroke="#8FB8A2" stroke-width="1.4"/>'
+ +'<text x="19" y="21" text-anchor="middle" font-family="Iowan Old Style,Palatino,Georgia,serif" font-size="12" font-weight="700" fill="#ECF0E8">137</text>'
+ +'<rect x="9" y="26" width="20" height="1.3" fill="#E0894E"/>'
+ +'<text x="19" y="35" text-anchor="middle" font-family="ui-monospace,monospace" font-size="4" letter-spacing="1" fill="#8FB8A2">ONE3SEVEN</text></svg>';
+
+var S = [
+`<div class="inner">`+SHIELD
+ +`<div class="badge">Internal · confidential</div>`
+ +`<h1>Inside Claim Lens<br>— and where the price comes from</h1>`
+ +`<p class="sub">A deep look at how the case-selection engine actually works, the logic that keeps it doctrine-safe, and how each capability earns its share of the subscription.</p></div>`,
+
+`<div class="inner"><div class="eyebrow">The problem it solves</div>`
+ +`<h2>A firm lives or dies on missing facts.</h2>`
+ +`<p class="sub">To take a contingency case, an attorney screens it against a statute’s <b style="color:var(--ink)">elements</b> — and one undocumented element can sink it. Traditionally a lawyer rebuilds that map by hand, from a shoebox, on the clock. Claim Lens does that reconstruction first.</p></div>`,
+
+`<div class="inner"><div class="eyebrow">What Claim Lens is</div>`
+ +`<div class="big">Pick a legal theory. The record re-sorts around that statute’s <span class="sage">elements</span>.</div>`
+ +`<p class="sub">Every fact in the intake snaps into the element it touches — with its source — and every element with <b style="color:var(--ink)">nothing behind it</b> is shown loudly. It is a <b style="color:var(--ink)">coverage map, never a verdict.</b></p></div>`,
+
+`<div class="inner"><div class="eyebrow">The logic · step by step</div>`
+ +`<h2 style="margin-bottom:4px">How a fact earns a place</h2>`
+ +`<div class="steps">`
+ +`<div class="step"><div class="n">1</div><div><div class="h">Break the statute into elements</div><div class="d">e.g. §1102.5 retaliation → protected activity · employer knowledge · adverse action · causal link.</div></div></div>`
+ +`<div class="step"><div class="n">2</div><div><div class="h">Cast a wide net (include patterns)</div><div class="d">Each element has <b>over-inclusive</b> keyword patterns — bias toward catching every fact that <i>might</i> touch it. Recall first.</div></div></div>`
+ +`<div class="step"><div class="n">3</div><div><div class="h">Then a precision gate (does-not-prove)</div><div class="d">A fact counts only if it matches an include <b>AND</b> matches <b>no exclude</b>. <code>match = include(x) AND NOT exclude(x)</code></div></div></div>`
+ +`<div class="step"><div class="n">4</div><div><div class="h">Tag every fact by its source</div><div class="d">source-linked · named · worker-stated · counted — never dressed up as one another.</div></div></div>`
+ +`<div class="step"><div class="n">5</div><div><div class="h">Show absence as a fact</div><div class="d">Elements with nothing on file are surfaced, not hidden. The gap <i>is</i> the output.</div></div></div>`
+ +`</div></div>`,
+
+`<div class="inner"><div class="eyebrow">The gate that matters · a real example</div>`
+ +`<h2>“Requested” is not “provided.”</h2>`
+ +`<p class="sub" style="margin-top:10px">Take the element <b style="color:var(--ink)">“accommodation provided”</b> under a disability theory:</p>`
+ +`<div style="max-width:560px;margin:14px auto 0;text-align:left">`
+ +`<div style="font-family:var(--mono);font-size:12px;color:var(--faint);margin-bottom:5px">INCLUDE (catches)</div>`
+ +`<div class="chips"><span class="chip inc">accommodation</span><span class="chip inc">modified duty</span><span class="chip inc">reassigned</span><span class="chip inc">leave granted</span></div>`
+ +`<div style="font-family:var(--mono);font-size:12px;color:var(--faint);margin:14px 0 5px">EXCLUDE · does-not-prove (rejects)</div>`
+ +`<div class="chips"><span class="chip exc">requested</span><span class="chip exc">asked for</span><span class="chip exc">doctor’s restriction</span><span class="chip exc">note recommending</span></div>`
+ +`</div>`
+ +`<p class="sub" style="margin-top:16px">A worker <b style="color:var(--ink)">requesting</b> accommodation, or a doctor’s <b style="color:var(--ink)">restriction</b>, satisfies “accommodation <i>requested</i>” — but the exclude gate stops it from counting as “<b>provided</b>.” Loose matching would inflate coverage here; this is what stops it. <span class="sage">Precision over recall — that is the moat.</span></p></div>`,
+
+`<div class="inner"><div class="eyebrow">Provenance · never blurred</div>`
+ +`<h2>Every fact wears its source.</h2>`
+ +`<div class="states">`
+ +`<div class="st linked"><div class="t">Source-linked</div><div class="x">Points to a document you can open — a pay stub, a text, a schedule.</div></div>`
+ +`<div class="st worker"><div class="t">Worker-stated</div><div class="x">The worker said it; no document backs it yet. Shown honestly as such.</div></div>`
+ +`<div class="st missing"><div class="t">Not on file</div><div class="x">The element the record can’t answer — surfaced, not hidden.</div></div>`
+ +`</div>`
+ +`<p class="sub">A worker-stated fact is <b style="color:var(--ink)">never</b> dressed up as a document. That discipline is what lets an attorney trust the map in seconds instead of re-verifying it for an hour.</p></div>`,
+
+`<div class="inner"><div class="eyebrow">The output</div>`
+ +`<h2>A coverage rate. Never a verdict.</h2>`
+ +`<div class="cov">`
+ +`<div class="covrow"><span class="dotm ok"></span><span class="el"><b>Protected activity</b> · source-linked</span></div>`
+ +`<div class="covrow"><span class="dotm ok"></span><span class="el"><b>Employer knowledge</b> · source-linked</span></div>`
+ +`<div class="covrow"><span class="dotm ok"></span><span class="el"><b>Adverse action</b> · source-linked</span></div>`
+ +`<div class="covrow"><span class="dotm gap"></span><span class="el"><b>Causal link</b> · worker-stated only — <span class="amberc">gap</span></span></div>`
+ +`<div class="rate">4 of 5 elements have material on file · 1 gap · Coverage Rate 80%</div>`
+ +`</div>`
+ +`<p class="note">Coverage describes the <b>record</b> — what’s present, missing, and where it came from. It never judges the <b>case</b>. That single line is why a firm can put us in front of a client without us practicing law.</p></div>`,
+
+`<div class="inner"><div class="eyebrow">Where the price comes from</div>`
+ +`<h2>Each capability earns its share.</h2>`
+ +`<div class="pbars">`
+ +`<div class="pb"><div class="lab">Claim Lens<span>element coverage · Tier-1 included, packs on top</span></div><div class="track"><div class="fill" style="width:30%"></div></div><div class="pct">30%</div></div>`
+ +`<div class="pb"><div class="lab">Source-linking<span>click any fact to its page · the trust layer</span></div><div class="track"><div class="fill" style="width:20%"></div></div><div class="pct">20%</div></div>`
+ +`<div class="pb"><div class="lab">Intake &amp; extraction<span>the mess → structured, typed facts</span></div><div class="track"><div class="fill" style="width:15%"></div></div><div class="pct">15%</div></div>`
+ +`<div class="pb"><div class="lab">Evidence timeline<span>a source-traced chronology</span></div><div class="track"><div class="fill" style="width:10%"></div></div><div class="pct">10%</div></div>`
+ +`<div class="pb"><div class="lab">Gaps &amp; requests<span>what’s missing + ask the worker for it</span></div><div class="track"><div class="fill" style="width:8%"></div></div><div class="pct">8%</div></div>`
+ +`<div class="pb"><div class="lab">Wage exposure <span style="color:var(--amber)">Firm tier +</span><span>the tier differentiator</span></div><div class="track"><div class="fill t" style="width:7%"></div></div><div class="pct">7%</div></div>`
+ +`<div class="pb"><div class="lab">Worker-owned record<span>cooperation, fuller file — the moat</span></div><div class="track"><div class="fill" style="width:6%"></div></div><div class="pct">6%</div></div>`
+ +`<div class="pb"><div class="lab">Security &amp; compliance<span>per-worker isolation · “hirable” by a firm</span></div><div class="track"><div class="fill" style="width:4%"></div></div><div class="pct">4%</div></div>`
+ +`</div>`
+ +`<p class="note">Illustrative value-attribution for communication — not cost accounting. Claim Lens and source-linking carry half the value because they’re the two things a generic tool can’t hand a firm: a coverage map, and a fact that proves itself.</p></div>`,
+
+`<div class="inner"><div class="eyebrow">Axis 1 · the seat tier</div>`
+ +`<h2>The base — priced per seat, and capped.</h2>`
+ +`<div class="tiers">`
+ +`<div class="tier"><div class="nm">Practice</div><div class="pr">$400 / seat / mo</div><ul><li>1–2 seats</li><li>~15 intakes / seat</li><li>Claim Lens, timeline, source-linking</li><li>no wage-exposure</li></ul></div>`
+ +`<div class="tier firm"><div class="nm">Firm</div><div class="pr">$375 / seat / mo</div><ul><li>min 3 seats</li><li>~20 intakes / seat</li><li><b style="color:var(--amber)">+ wage exposure</b></li><li>priority · cheaper per seat</li></ul></div>`
+ +`<div class="tier"><div class="nm">Surge</div><div class="pr">$3,500 / mo flat</div><ul><li>unlimited seats + intakes</li><li>everything in Firm</li><li>branded packets</li><li>a cost <b>ceiling</b></li></ul></div>`
+ +`</div>`
+ +`<p class="note">Firm is <b>cheaper per seat</b> than Practice by design — volume, and it unlocks wage-exposure. Surge caps a big firm’s bill (per-seat crosses $3,500 at ~9 attorneys). Enterprise is custom, multi-vertical.</p></div>`,
+
+`<div class="inner"><div class="eyebrow">Axis 2 · lens packs</div>`
+ +`<h2>The lenses stack as add-on packs.</h2>`
+ +`<p class="sub">Pricing has a <b style="color:var(--ink)">second axis</b>. The seat tier is the base; which Claim Lens categories a firm gets is a separate choice, sold as packs on top.</p>`
+ +`<div class="tiers">`
+ +`<div class="tier firm"><div class="nm">Tier 1</div><div class="pr">included</div><ul><li>the default library</li><li>the priority CA-employment theories</li><li>ships with every seat</li></ul></div>`
+ +`<div class="tier"><div class="nm">Tier 2</div><div class="pr">add-on pack</div><ul><li>~22 more lenses</li><li>bought on top of the seat tier</li><li>price TBD</li></ul></div>`
+ +`<div class="tier"><div class="nm">Tier 3</div><div class="pr">on request</div><ul><li>bespoke / niche theories</li><li>add-on</li><li>price TBD</li></ul></div>`
+ +`</div>`
+ +`<p class="note">Seats and lens packs are <b>independent</b> — a firm picks how many attorneys <i>and</i> which packs. New packs (a PI pack, a wage pack) are how revenue-per-firm grows over time — by giving more, not raising rent. Add-on pack prices aren’t set yet.</p></div>`,
+
+`<div class="inner"><div class="eyebrow">The pricing logic</div>`
+ +`<div class="big">Priced on the cost it <span class="sage">removes</span> — not the features it lists.</div>`
+ +`<p class="sub">A firm already underwrites every case by hand — thousands of dollars of unbillable senior time before a single filing. Every screening minute Claim Lens hands back is margin. The subscription is a <b style="color:var(--ink)">fraction of the cost it deletes</b> — and it’s clean money: a flat software fee, <b style="color:var(--ink)">never</b> per case, never a cut of a recovery.</p></div>`,
+
+`<div class="inner"><div class="eyebrow">Honest footnotes</div>`
+ +`<h2>What’s real, what’s illustrative.</h2>`
+ +`<p class="sub"><b style="color:var(--ink)">Real:</b> the Claim Lens logic, the does-not-prove gate, the source states, the per-seat tiers ($400 / $375 / $3,500), and the two-axis structure (seat tier × lens packs; Tier-1 included, Tier-2/3 add-ons) are as built and decided today.</p>`
+ +`<p class="sub"><b style="color:var(--ink)">Illustrative / not-yet-set:</b> the value-attribution percentages are a communication tool, not cost accounting; and the add-on pack prices (plus the avoided-cost reprice) are still pending founder numbers and counsel.</p>`
+ +`<p class="note" style="margin-top:22px">one3seven organizes and cites; it never scores cases or gives legal advice. Internal document — not for external distribution.</p></div>`,
+];
+
+var film=document.getElementById('film'),dots=document.getElementById('dots'),bar=document.getElementById('bar'),
+    ctr=document.getElementById('ctr'),hint=document.getElementById('hint');
+var AUDIO=S.map(function(_,ix){return 'audio/s'+(ix+1)+'.mp3';});
+var audio=new Audio(); audio.preload='auto';
+var i=0, started=false, paused=false;
+S.forEach(function(html){ var d=document.createElement('div'); d.className='slide'; d.innerHTML=html; film.appendChild(d); dots.appendChild(document.createElement('i')); });
+var slides=document.querySelectorAll('.slide'), ds=dots.querySelectorAll('i');
+function paint(){
+  slides.forEach(function(s,ix){ s.classList.toggle('on', ix===i); s.scrollTop=0; });
+  ds.forEach(function(x,ix){ x.classList.toggle('on', ix===i); });
+  ctr.textContent=(i+1)+' / '+S.length;
+  bar.style.width=(i/S.length*100)+'%';
+  if(i>0) hint.style.opacity='0';
+}
+function playAudio(){ try{audio.pause();}catch(e){} audio.src=AUDIO[i]; audio.currentTime=0; var p=audio.play(); if(p&&p.catch)p.catch(function(){}); }
+function goTo(n){ i=(n+S.length)%S.length; paint(); if(started&&!paused) playAudio(); }
+function next(){ if(i<S.length-1) goTo(i+1); }
+function prev(){ goTo(Math.max(0,i-1)); }
+audio.addEventListener('timeupdate',function(){ if(audio.duration) bar.style.width=(((i)+(audio.currentTime/audio.duration))/S.length*100)+'%'; });
+audio.addEventListener('ended',function(){ if(!paused && i<S.length-1) goTo(i+1); });
+film.addEventListener('click', function(e){ if(e.target.closest('#nav')) return; if(started) next(); });
+document.getElementById('nx').addEventListener('click',function(e){e.stopPropagation();next();});
+document.getElementById('pv').addEventListener('click',function(e){e.stopPropagation();prev();});
+var pp=document.getElementById('pp');
+pp.addEventListener('click',function(e){e.stopPropagation(); if(!started)return; paused=!paused; pp.textContent=paused?'▶':'⏸'; if(paused)audio.pause(); else{var p=audio.play();if(p&&p.catch)p.catch(function(){});} });
+document.addEventListener('keydown', function(e){ if(e.key==='ArrowRight'||e.key===' '){e.preventDefault(); if(started)next();} else if(e.key==='ArrowLeft'){ if(started)prev(); } });
+var overlay=document.createElement('div'); overlay.id='start';
+overlay.innerHTML='<button id="startbtn">▶ Play the walkthrough</button><div class="startsub">about 6 minutes · sound on · internal</div>';
+document.body.appendChild(overlay);
+paint();
+document.getElementById('startbtn').addEventListener('click',function(e){e.stopPropagation(); overlay.style.display='none'; started=true; i=0; paint(); playAudio();});
+</script>
+</body>
+</html>

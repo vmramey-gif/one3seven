@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>
+  :root{ --ink:#1B1813; --sage:#3F6B57; --sage2:#5E8C74; --shirt:#FBF8F1; --skin:#F1C9A5; --accent:#F0654C; }
+  *{margin:0;box-sizing:border-box;} html,body{height:100%;}
+  body{background:#000;overflow:hidden;}
+  .stage{position:relative;width:100vw;height:100vh;background:#000;display:grid;place-items:end center;}
+  /* the little guy sits low (on the desk when composited); walks in from the left, then shrugs */
+  .guy{position:relative;width:min(46vw,360px);margin-bottom:9vh;transform-origin:bottom center;
+    animation:walkIn 2s cubic-bezier(.3,.7,.3,1) both, bob .5s ease-in-out infinite;}
+  @keyframes walkIn{from{transform:translateX(-130%)}to{transform:translateX(0)}}
+  @keyframes bob{0%,100%{translate:0 0}50%{translate:0 -8px}}
+  /* stop bobbing after arrival */
+  .guy.arrived{animation:walkIn 2s cubic-bezier(.3,.7,.3,1) both, sway 3s ease-in-out infinite;}
+  @keyframes sway{0%,100%{rotate:-1.5deg}50%{rotate:1.5deg}}
+  svg{width:100%;height:auto;overflow:visible;display:block;filter:drop-shadow(0 6px 10px rgba(0,0,0,.25));}
+
+  .legL,.legR{transform-box:fill-box;transform-origin:top center;}
+  .walking .legL{animation:stepL .5s ease-in-out infinite;}
+  .walking .legR{animation:stepR .5s ease-in-out infinite;}
+  @keyframes stepL{0%,100%{rotate:16deg}50%{rotate:-16deg}}
+  @keyframes stepR{0%,100%{rotate:-16deg}50%{rotate:16deg}}
+  .armL,.armR{transform-box:fill-box;transform-origin:top center;}
+  .walking .armL{animation:swingA .5s ease-in-out infinite;}
+  .walking .armR{animation:swingB .5s ease-in-out infinite;}
+  @keyframes swingA{0%,100%{rotate:-14deg}50%{rotate:14deg}}
+  @keyframes swingB{0%,100%{rotate:14deg}50%{rotate:-14deg}}
+  /* shrug pose */
+  .shrug .armL{rotate:-120deg!important;animation:none!important;transition:rotate .5s ease;}
+  .shrug .armR{rotate:120deg!important;animation:none!important;transition:rotate .5s ease;}
+  .shrug .legL{rotate:8deg!important;animation:none!important;transition:rotate .4s;}
+  .shrug .legR{rotate:-8deg!important;animation:none!important;transition:rotate .4s;}
+  .shrug .head{transform-box:fill-box;transform-origin:bottom center;rotate:-8deg;transition:rotate .5s ease;}
+  .shrug .brow{opacity:1;}
+
+  .q{position:absolute;font-family:"Arial Black",sans-serif;font-weight:900;color:var(--sage2);opacity:0;
+     text-shadow:0 0 10px rgba(94,140,116,.6);}
+  .shrug .q{animation:qpop .5s ease-out forwards;}
+  .shrug .q2{animation:qpop .5s .12s ease-out forwards;}
+  .shrug .q3{animation:qpop .5s .24s ease-out forwards;}
+  @keyframes qpop{0%{opacity:0;transform:translateY(14px) scale(.4)}70%{opacity:1;transform:translateY(-6px) scale(1.2)}100%{opacity:1;transform:translateY(-10px) scale(1)}}
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="guy walking" id="guy">
+    <span class="q" style="left:8%;top:2%;font-size:38px">?</span>
+    <span class="q q2" style="left:46%;top:-6%;font-size:52px">?</span>
+    <span class="q q3" style="left:80%;top:4%;font-size:38px">?</span>
+    <svg viewBox="0 0 240 380" aria-hidden="true">
+      <ellipse cx="120" cy="366" rx="60" ry="10" fill="#000" opacity=".18"/>
+      <!-- legs -->
+      <path class="legL" d="M108 250 L100 320" stroke="#2B3A33" stroke-width="16" stroke-linecap="round"/>
+      <path class="legR" d="M132 250 L140 320" stroke="#2B3A33" stroke-width="16" stroke-linecap="round"/>
+      <ellipse cx="98" cy="326" rx="16" ry="8" fill="#1B1813"/>
+      <ellipse cx="142" cy="326" rx="16" ry="8" fill="#1B1813"/>
+      <!-- body / blazer -->
+      <path d="M86 168 Q120 156 154 168 L162 250 Q120 262 78 250 Z" fill="var(--sage)" stroke="#22382E" stroke-width="4"/>
+      <!-- shirt + tie -->
+      <path d="M110 164 L120 210 L130 164 Z" fill="var(--shirt)"/>
+      <path d="M118 176 L122 176 L124 206 L120 214 L116 206 Z" fill="var(--accent)"/>
+      <!-- arms -->
+      <path class="armL" d="M92 176 L74 236" stroke="var(--sage2)" stroke-width="15" stroke-linecap="round"/>
+      <path class="armR" d="M148 176 L166 236" stroke="var(--sage2)" stroke-width="15" stroke-linecap="round"/>
+      <circle cx="72" cy="240" r="10" fill="var(--skin)"/>
+      <circle cx="168" cy="240" r="10" fill="var(--skin)"/>
+      <!-- head -->
+      <g class="head">
+        <circle cx="120" cy="118" r="40" fill="var(--skin)" stroke="#C98B63" stroke-width="2"/>
+        <path d="M82 108 Q120 66 158 108 Q150 86 120 82 Q90 86 82 108Z" fill="#5A3B29"/>
+        <circle cx="106" cy="120" r="5" fill="#1B1813"/>
+        <circle cx="134" cy="120" r="5" fill="#1B1813"/>
+        <path class="brow" d="M99 106 q7 -5 14 0 M127 106 q7 -5 14 0" stroke="#1B1813" stroke-width="3" fill="none" stroke-linecap="round" opacity="0"/>
+        <path d="M110 138 q10 8 20 0" stroke="#B5715A" stroke-width="3" fill="none" stroke-linecap="round"/>
+      </g>
+    </svg>
+  </div>
+</div>
+<script>
+  var g=document.getElementById('guy');
+  window.__scenes=1;
+  window.__setScene=function(){ /* single scene; re-arm timeline */
+    g.className='guy walking';
+    void g.offsetWidth;
+    // arrive + stop walking at 2s, shrug at 2.4s
+    setTimeout(function(){ g.classList.remove('walking'); g.classList.add('arrived'); }, 2000);
+    setTimeout(function(){ g.classList.add('shrug'); }, 2400);
+  };
+  window.__setScene(0);
+</script>
+</body>
+</html>

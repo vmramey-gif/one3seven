@@ -1,0 +1,112 @@
+<title>one3seven — Know the Field (narrated FL briefing)</title>
+<style>
+  :root{
+    --bg:#0E1512; --bg2:#0A100D; --panel:#16201B; --ink:#ECF0E8; --soft:#9DA99F; --faint:#6B776E;
+    --sage:#8FB8A2; --sage-deep:#B7D2C4; --orange:#E08A4E; --violet:#B69AE6; --red:#E0857F; --line:#263029; --muted:#3A463E;
+    --serif:'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;
+    --sans:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif; --mono:ui-monospace,'SF Mono',Menlo,monospace;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  body{background:radial-gradient(120% 90% at 50% 0%,#16201B 0%,var(--bg) 46%,var(--bg2) 100%);color:var(--ink);font-family:var(--sans);min-height:100%;-webkit-font-smoothing:antialiased;}
+  .app{max-width:1120px;margin:0 auto;padding:20px 20px 40px;}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;}
+  .brand{font-family:var(--serif);font-weight:600;font-size:18px;} .brand b{color:var(--orange);}
+  .topmeta{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);}
+  .stage{position:relative;margin-top:14px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(160deg,#17211C 0%,#101713 100%);aspect-ratio:16/9;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.45);}
+  .slide{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:clamp(20px,4vw,50px);opacity:0;transition:opacity .5s;pointer-events:none;overflow:auto;}
+  .slide.active{opacity:1;pointer-events:auto;}
+  @media (prefers-reduced-motion:reduce){.slide{transition:none;}}
+  .kick{font-family:var(--mono);font-size:clamp(9px,1.2vw,12px);letter-spacing:.2em;text-transform:uppercase;color:var(--sage);margin-bottom:12px;}
+  h2{font-family:var(--serif);font-weight:600;letter-spacing:-.015em;font-size:clamp(22px,4vw,44px);line-height:1.06;margin:0 0 14px;text-wrap:balance;max-width:24ch;}
+  h2 em{color:var(--orange);font-style:italic;}
+  .body{font-size:clamp(13px,1.6vw,18px);color:var(--soft);max-width:52ch;line-height:1.5;}
+  .body b{color:var(--ink);}
+  .cols{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:64ch;margin-top:4px;}
+  .col{border:1px solid var(--line);border-radius:12px;padding:12px 14px;} .col.win{border-color:color-mix(in srgb,var(--sage) 45%,var(--line));}
+  .col .t{font-family:var(--serif);font-size:15px;margin-bottom:4px;} .col .d{font-size:12.5px;color:var(--soft);}
+  ul.b{margin:.2rem 0;padding-left:18px;max-width:56ch;} ul.b li{font-size:clamp(13px,1.5vw,16.5px);color:var(--soft);margin:6px 0;} ul.b li b{color:var(--ink);}
+  .stat{font-family:var(--serif);font-size:clamp(30px,6vw,60px);color:var(--sage-deep);line-height:1;}
+  .callout{display:inline-block;margin-top:14px;border:1px solid color-mix(in srgb,var(--orange) 45%,var(--line));color:var(--orange);border-radius:999px;padding:6px 14px;font-family:var(--mono);font-size:12px;}
+  .callout.win{border-color:color-mix(in srgb,var(--sage) 55%,var(--line));color:var(--sage-deep);}
+  .callout.warn{border-color:color-mix(in srgb,var(--red) 55%,var(--line));color:var(--red);}
+  .slide.card{align-items:center;text-align:center;} .slide.card h2{max-width:26ch;} .slide.card .sub{color:var(--soft);font-size:clamp(14px,1.9vw,20px);max-width:44ch;margin-top:10px;}
+  .counter{position:absolute;top:14px;right:18px;font-family:var(--mono);font-size:12px;color:var(--faint);}
+  .ticks{position:absolute;left:18px;right:18px;bottom:12px;display:flex;gap:3px;} .ticks span{height:3px;flex:1;border-radius:2px;background:var(--line);} .ticks span.done{background:var(--sage);}
+  .controls{margin-top:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  button.ctl{font-family:var(--sans);font-size:14px;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:10px 16px;cursor:pointer;} button.ctl:hover{border-color:var(--sage);}
+  button.play{background:var(--sage);color:#0E1512;border-color:var(--sage);font-weight:700;padding:10px 22px;}
+  .spacer{flex:1;} .rate{font-family:var(--mono);font-size:11px;color:var(--faint);display:flex;gap:8px;align-items:center;} .rate input{accent-color:var(--sage);}
+  .caption{margin-top:14px;min-height:44px;border-left:2px solid var(--sage);padding:4px 0 4px 16px;font-size:15px;color:var(--soft);font-style:italic;} .caption b{color:var(--ink);font-style:normal;}
+  .note{margin-top:16px;font-family:var(--mono);font-size:11px;color:var(--faint);line-height:1.6;}
+</style>
+<div class="app">
+  <div class="topbar"><div class="brand">one3<b>seven</b></div><div class="topmeta">Know the Field · internal FL briefing</div></div>
+  <div class="stage" id="stage"><div class="counter" id="counter">01 / 17</div><div class="ticks" id="ticks"></div></div>
+  <div class="controls">
+    <button class="ctl play" id="play">▶ Play</button>
+    <button class="ctl" id="prev">‹ Prev</button><button class="ctl" id="next">Next ›</button><button class="ctl" id="restart">↺ Restart</button>
+    <span class="spacer"></span><span class="rate">speed <input id="rate" type="range" min="0.8" max="1.3" step="0.05" value="1"></span>
+  </div>
+  <div class="caption" id="caption"><b>Press Play.</b> A narrated tour of the AI legal-tech landscape — for founding leadership only.</div>
+  <div class="note">Internal. Every figure is "as of mid-2026 — verify before repeating to a firm." Facts and provenance, never verdicts. Screen-record this tab to export an .mp4.</div>
+  <audio id="audio" preload="auto"></audio>
+</div>
+<script>
+  var AUDIO=["voice/fleducation/fl_01.mp3","voice/fleducation/fl_02.mp3","voice/fleducation/fl_03.mp3","voice/fleducation/fl_04.mp3","voice/fleducation/fl_05.mp3","voice/fleducation/fl_06.mp3","voice/fleducation/fl_07.mp3","voice/fleducation/fl_08.mp3","voice/fleducation/fl_09.mp3","voice/fleducation/fl_10.mp3","voice/fleducation/fl_11.mp3","voice/fleducation/fl_12.mp3","voice/fleducation/fl_13.mp3","voice/fleducation/fl_14.mp3","voice/fleducation/fl_15.mp3","voice/fleducation/fl_16.mp3","voice/fleducation/fl_17.mp3"];
+  var S=[
+    {card:true,k:'one3seven · FL',title:'Know the Field',sub:'The AI legal-tech landscape — who’s out there, why they win, where they’re weak, and how we win. First rule: separate fact from claim from reporting from opinion.'},
+    {k:'The frame',title:'A firm-owned, conclude-first market',body:'<div class="stat">$4B+</div><div class="body" style="margin-top:8px">raised into legal-AI in <b>2025</b> (+77%). Nearly every funded company is <b>firm-owned</b>, and most <b>conclude</b> — they score leads, value cases, or write the argument.</div>'},
+    {k:'The seam',title:'They don’t all do the <em>same job</em>',body:'<div class="cols"><div class="col"><div class="t">Harvey</div><div class="d">helps legal pros <b>do legal work</b></div></div><div class="col"><div class="t">Eve · EvenUp · Supio</div><div class="d">help firms <b>evaluate / develop</b> matters</div></div><div class="col win"><div class="t">one3seven</div><div class="d">helps the <b>worker build a source-linked record</b> before the firm reconstructs it</div></div></div><span class="callout win">different job · earlier in the timeline</span>'},
+    {k:'The map',title:'Three tiers',body:'<ul class="b"><li><b>Closest rival:</b> Eve — plaintiff-side intake (does employment)</li><li><b>Adjacent analogs:</b> EvenUp, Supio, Darrow</li><li><b>Incumbents:</b> Harvey, Clio, Filevine, Thomson Reuters</li></ul><span class="callout">none are worker-owned</span>'},
+    {k:'Closest rival',title:'Eve',body:'<div class="body"><b>$1B+</b> plaintiff-side platform. Does <b>employment intake</b>; an AI voice agent that <b>qualifies leads</b> and gets retainers signed.</div><span class="callout warn">firm-owned · it scores the case — the line we won’t cross</span>'},
+    {k:'The cautionary tale',title:'EvenUp',body:'<div class="body"><b>$2B+</b> valuation automating injury demand letters — proof the plaintiff-side market is real and richly funded. It also <b>became the cautionary tale</b> (see flaws).</div>'},
+    {k:'Incumbents',title:'A different game',body:'<ul class="b"><li><b>Harvey</b> — $11B, sells to BigLaw</li><li><b>Clio · Filevine</b> — own practice management</li><li><b>Thomson Reuters</b> — owns research</li></ul><span class="callout">none touch the worker</span>'},
+    {k:'Why they win',title:'Why they raise so much',body:'<ul class="b"><li>Huge, traditional, barely-automated market</li><li>Document-heavy work that’s easy to monetize</li><li><b>Winner-take-most</b> — a third of 2025’s legal-AI money went to 3 firms</li></ul>'},
+    {k:'Flaw 1 · say it carefully',title:'Hallucination — and <em>our honest posture</em>',body:'<div class="body">A <b>2024 Stanford study of two research tools</b> found 17–33% hallucination — a documented, dated concern, <b>not a universal rate</b>. Honest part: <b>we use AI too</b> (extraction), so we have accuracy risk as well.</div><span class="callout win">our edge = auditability, not perfection · every fact is one click from its source</span>'},
+    {k:'Flaw 2',title:'The courts lost patience',body:'<ul class="b"><li><i>Mata v. Avianca</i> → … → <b>~$110k</b> penalty (2026)</li><li>~<b>1,598</b> tracked hallucination cases (as of mid-2026)</li><li>CA <b>AB 316</b>: the lawyer can’t blame the AI</li></ul><span class="callout win">a source-linked record makes verification instant</span>'},
+    {k:'Flaw 3',title:'Over-claiming',body:'<div class="body"><b>EvenUp</b> — reported by its own ex-employees to rely on humans behind the AI. <b>DoNotPay</b> — paid the FTC for over-claiming.</div><span class="callout win">we describe the record · we never characterize the case</span>'},
+    {k:'Flaw 4',title:'Nobody is worker-owned',body:'<div class="body">Eve scores; EvenUp &amp; Darrow value the case; Darrow’s fee-share is barred in most states. The <b>worker owning and choosing</b> is our clean-money foundation.</div>'},
+    {k:'The key finding',title:'The market wants <em>trust</em>',body:'<div class="body">A rival — <b>Supio</b> — published its own research (vendor-sponsored → signal, not proof): <b>96%</b> of attorneys demand source traceability; <b>99%</b> won’t use AI they can’t verify.</div><span class="callout win">the pivot: “can AI do it?” → “can I trust it?” — our turf</span>'},
+    {k:'Next 2 years',title:'Provenance wins',body:'<div class="body">Market keeps growing; <b>Big Tech enters</b> (Microsoft, Google, Anthropic); regulation tightens. Every trend rewards <b>provenance over generation</b>.</div><span class="callout win">they won’t build consented, worker-owned, CA-compliant records</span>'},
+    {k:'Where we show up',title:'The rooms rivals ignore',body:'<ul class="b"><li><b>CELA · CAOC</b> — CA plaintiff / employment attorneys</li><li><b>ABA TECHSHOW</b> startup pitch — free to apply</li></ul><span class="callout">confirm every price before you budget — they change</span>'},
+    {k:'How we get funded',title:'Start two relationships now',body:'<ul class="b"><li><b>The LegalTech Fund</b> — most thesis-aligned</li><li><b>LexisNexis Accelerator</b> — records/data fit, non-dilutive</li><li>Pre-seed pipeline via <b>NFX + OpenVC</b></li></ul>'},
+    {card:true,k:'The discipline',title:'Facts and provenance, never verdicts',sub:'Never say a competitor is bad, or that we’re flawless, or that a worker has a good case. Say: we organize the worker’s own record, link every fact to its source, and the worker chooses. The category is open — let’s earn it.'}
+  ];
+  var SCRIPT=[
+    'Know the field. First rule: separate fact from a company’s marketing claim from reporting from our own opinion.',
+    'Legal AI raised $4B+ in 2025 — but nearly everyone is firm-owned and most conclude: score leads, value cases, write the argument.',
+    'They don’t do the same job. Harvey = legal work. Eve/EvenUp/Supio = firms evaluate matters. one3seven = the worker’s source-linked record, earlier.',
+    'Three tiers: Eve (closest), EvenUp/Supio/Darrow (analogs), Harvey/Clio/Filevine/TR (incumbents). None worker-owned.',
+    'Eve — $1B+, does employment intake, scores leads. Firm-owned; scoring is the line we won’t cross.',
+    'EvenUp — $2B+ demand-letter automation. Proves the market is real — and became the cautionary tale.',
+    'Incumbents: Harvey ($11B) sells BigLaw; Clio/Filevine own practice mgmt; TR owns research. None touch the worker.',
+    'Why they raise: huge market, monetizable document work, winner-take-most (a third of 2025 to 3 firms).',
+    'Stanford (2024, two research tools) found 17–33% hallucination — dated, not universal. We use AI too, so we have risk. Our edge is auditability, not perfection.',
+    'Courts lost patience: Mata → ~$110k → ~1,598 cases → AB 316. A source-linked record makes verification instant.',
+    'Over-claiming: EvenUp relied on humans; DoNotPay paid the FTC. We describe the record, never the case.',
+    'Nobody is worker-owned; everybody concludes. Worker ownership + choice is our clean-money foundation.',
+    'Supio’s own research (signal, not proof): 96% demand traceability, 99% won’t use unverifiable AI. Trust is our turf.',
+    'Next 2 years: growth, Big Tech entering, tighter regulation — all reward provenance over generation.',
+    'Show up where rivals don’t: CELA, CAOC, ABA TECHSHOW pitch. Confirm every price first.',
+    'Funding: The LegalTech Fund + LexisNexis Accelerator now; pre-seed pipeline via NFX + OpenVC.',
+    'Facts and provenance, never verdicts. Never “they’re bad,” “we’re flawless,” or “good case.” The category is open — let’s earn it.'
+  ];
+  var stage=document.getElementById('stage'),ticks=document.getElementById('ticks'),counter=document.getElementById('counter'),
+      caption=document.getElementById('caption'),playBtn=document.getElementById('play'),rateEl=document.getElementById('rate'),audio=document.getElementById('audio');
+  var i=0,playing=false;
+  S.forEach(function(s){var d=document.createElement('div');d.className='slide'+(s.card?' card':'');
+    var h='<div class="kick">'+s.k+'</div><h2>'+s.title+'</h2>';h+=s.card?('<div class="sub">'+(s.sub||'')+'</div>'):(s.body||'');
+    d.innerHTML=h;stage.appendChild(d);var t=document.createElement('span');ticks.appendChild(t);});
+  var slides=stage.querySelectorAll('.slide'),tickEls=ticks.querySelectorAll('span');
+  function paint(){slides.forEach(function(el,idx){el.classList.toggle('active',idx===i);});tickEls.forEach(function(el,idx){el.classList.toggle('done',idx<=i);});
+    counter.textContent=String(i+1).padStart(2,'0')+' / '+String(S.length).padStart(2,'0');caption.innerHTML=(playing?'<b>▶</b> ':'')+SCRIPT[i];}
+  function playCurrent(){ if(!AUDIO[i]){return;} audio.src=AUDIO[i]; audio.playbackRate=parseFloat(rateEl.value)||1; var p=audio.play(); if(p&&p.catch)p.catch(function(){caption.innerHTML='<b>Tap Play once more</b> — autoplay was blocked.';}); }
+  audio.addEventListener('ended',function(){ if(!playing)return; if(i<S.length-1){i++;paint();playCurrent();} else {playing=false;setLabel();caption.innerHTML='<b>Fin.</b> Replay any beat, or screen-record to export.';} });
+  function setLabel(){playBtn.textContent=playing?'❚❚ Pause':'▶ Play';}
+  playBtn.addEventListener('click',function(){ playing=!playing;setLabel(); if(playing){paint();playCurrent();} else audio.pause(); });
+  document.getElementById('next').addEventListener('click',function(){ if(i<S.length-1){i++;paint(); if(playing)playCurrent();} });
+  document.getElementById('prev').addEventListener('click',function(){ if(i>0){i--;paint(); if(playing)playCurrent();} });
+  document.getElementById('restart').addEventListener('click',function(){ i=0;paint(); if(playing)playCurrent(); else audio.pause(); });
+  rateEl.addEventListener('input',function(){ audio.playbackRate=parseFloat(rateEl.value)||1; });
+  paint();
+</script>

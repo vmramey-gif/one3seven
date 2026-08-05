@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>one3seven — Pricing Planning (FL team)</title>
+<style>
+  :root{
+    --bg:#0E1512;--bg2:#0A100D;--panel:#16201B;--ink:#ECF0E8;--soft:#9DA99F;--faint:#6B776E;
+    --sage:#8FB8A2;--sage-deep:#B7D2C4;--orange:#E08A4E;--orange-soft:#2A1B10;--red:#D97A6C;--line:#263029;
+    --serif:'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;
+    --sans:'Inter Tight',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+    --mono:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;}
+  body{background:radial-gradient(120% 80% at 50% 0%,#16201B 0%,var(--bg) 46%,var(--bg2) 100%);color:var(--ink);font-family:var(--sans);min-height:100vh;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1000px;margin:0 auto;padding:40px 22px 64px;}
+  .brand{font-family:var(--serif);font-weight:600;font-size:19px;} .brand b{color:var(--orange);}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--sage);margin:30px 0 10px;}
+  h1{font-family:var(--serif);font-weight:600;font-size:clamp(30px,5vw,48px);letter-spacing:-.015em;line-height:1.05;margin:0 0 14px;text-wrap:balance;}
+  .lede{color:var(--soft);font-size:clamp(15px,2vw,18px);max-width:62ch;line-height:1.55;margin:0;}
+  .readfirst{margin:28px 0 8px;border:1px solid var(--orange);border-radius:18px;background:linear-gradient(160deg,#20160e,#140f0a);padding:22px 24px;}
+  .readfirst .rh{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--orange);margin-bottom:6px;}
+  .readfirst h2{font-family:var(--serif);font-size:24px;margin:0 0 10px;}
+  .readfirst p{color:var(--soft);font-size:14.5px;line-height:1.6;margin:0 0 14px;max-width:70ch;} .readfirst b{color:var(--ink);}
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:6px;} @media(max-width:720px){.split{grid-template-columns:1fr;}}
+  .box{border:1px solid var(--line);border-radius:12px;background:#131c17;padding:14px 16px;}
+  .box h3{margin:0 0 8px;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;}
+  .box.vision h3{color:var(--sage);} .box.hold h3{color:var(--orange);}
+  .box ul{margin:0;padding-left:16px;color:var(--soft);font-size:13px;line-height:1.55;} .box li{margin:5px 0;} .box b{color:var(--ink);}
+  .sec{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin:40px 0 14px;padding-bottom:8px;border-bottom:1px solid var(--line);}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;}
+  a.card{display:flex;flex-direction:column;gap:7px;text-decoration:none;color:inherit;border:1px solid var(--line);border-radius:14px;background:linear-gradient(160deg,#17211C,#101713);padding:18px;transition:border-color .2s,transform .2s;}
+  a.card:hover{border-color:var(--orange);transform:translateY(-2px);} a.card:focus-visible{outline:2px solid var(--orange);outline-offset:2px;}
+  .num{font-family:var(--mono);font-size:11px;color:var(--faint);letter-spacing:.1em;}
+  .ct{font-family:var(--serif);font-size:20px;line-height:1.15;}
+  .cs{color:var(--soft);font-size:13.5px;line-height:1.45;flex:1;}
+  .meta{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--orange);margin-top:4px;}
+  .note{margin-top:34px;border:1px solid var(--line);border-left:3px solid var(--orange);border-radius:0 12px 12px 0;background:#1a130c;padding:14px 18px;color:var(--soft);font-size:13.5px;line-height:1.55;} .note b{color:var(--ink);}
+  .foot{margin-top:22px;font-family:var(--mono);font-size:11px;color:var(--faint);line-height:1.7;}
+  @media (prefers-reduced-motion:reduce){a.card{transition:none;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">one3<b>seven</b></div>
+  <div class="eyebrow">Pricing planning · FL team · private link</div>
+  <h1>Pricing — the target model &amp; how to plan it</h1>
+  <p class="lede">The whole monetization picture in one place: the model, the postures, what firms pay, what they already spend, what they save, and how we collect it. This is <b>inspiration to plan toward</b> — the North Star — not a description of what's shipped today. Read the guardrails first.</p>
+
+  <div class="readfirst">
+    <div class="rh">Read first — vision vs. load-bearing constraints</div>
+    <h2>How to use these numbers</h2>
+    <p>The <b>doctrine and the pricing structure are real and locked.</b> The specific dollars are an ambitious, doctrine-clean target — deliberately ahead of the current product (no Stripe/metering/packs yet; that's the roadmap the model pulls toward). Take the vision freely. But four things bind even as a plan, because they're about <b>aiming at the right customer</b>, not timing:</p>
+    <div class="split">
+      <div class="box vision">
+        <h3>Take as vision (don't sweat it)</h3>
+        <ul>
+          <li>Lanes / metering / <b>Stripe</b> — plumbing to build before billing; a sequencing note, not a flaw.</li>
+          <li>Element-packs, enterprise/SSO/SLA — roadmap the model pulls toward.</li>
+          <li>"Prices features that don't exist yet" — on purpose. This is the destination.</li>
+        </ul>
+      </div>
+      <div class="box hold">
+        <h3>Hold as real constraints (4)</h3>
+        <ul>
+          <li><b>ICP aim:</b> plan for <b>referral-driven employment boutiques</b> → lead with partner/paralegal <b>hours + speed</b>. The lead-gen story is a <b>second</b> ICP (firms that buy leads). Ask which they are first.</li>
+          <li><b>Wallet realism:</b> small CA boutiques spend less than the ILTA benchmark — plan <b>Conservative-first</b>, climb as value is proven.</li>
+          <li><b>No intake-tool claim:</b> we don't replace a firm's intake CRM. Keep it out of the pitch.</li>
+          <li><b>Savings = a milestone, not a claim:</b> instrument <code>minutes_saved</code>, run one pilot, prove the hours before quoting them.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">The model</div>
+  <div class="grid">
+    <a class="card" href="sheet.html"><span class="num">01</span><span class="ct">Pricing sheet</span><span class="cs">The full model — worker free, firm tiers, lanes, element-packs, add-ons, founding offer, clean-money line.</span><span class="meta">target model</span></a>
+    <a class="card" href="postures.html"><span class="num">02</span><span class="ct">Three postures</span><span class="cs">Conservative · Medium · Ceiling — how much value to capture, and the greedy line not to cross.</span><span class="meta">launch Conservative</span></a>
+  </div>
+
+  <div class="sec">What it means for a firm</div>
+  <div class="grid">
+    <a class="card" href="examples.html"><span class="num">03</span><span class="ct">Example bills</span><span class="cs">What a small / medium / large firm actually pays — monthly &amp; annual, itemized.</span><span class="meta">Medium posture</span></a>
+    <a class="card" href="spend.html"><span class="num">04</span><span class="ct">What firms already spend</span><span class="cs">The annual stack — lead-gen, intake labor, tools — with one3seven as a sliver of it.</span><span class="meta">lead-gen = 2nd ICP</span></a>
+    <a class="card" href="savings.html"><span class="num">05</span><span class="ct">What they save</span><span class="cs">Labor freed &amp; what's removed — hours redeployed, never headcount. Estimates, pending pilot.</span><span class="meta">validate before quoting</span></a>
+  </div>
+
+  <div class="sec">How we collect it</div>
+  <div class="grid">
+    <a class="card" href="billing.html"><span class="num">06</span><span class="ct">Billing &amp; collections</span><span class="cs">Annual prepaid via ACH; where Biller Genie fits, the card-vs-ACH math, and when to adopt it.</span><span class="meta">annual prepaid · ACH</span></a>
+  </div>
+
+  <div class="note"><b>For the DOR:</b> plan the revenue model toward this vision, but calibrate to the four constraints above. Launch Conservative through the capped founding offer; lead the value story with <b>partner hours + speed</b>, not lead-gen; prove savings in one instrumented pilot before any of these dollar figures reach a firm. Every number here is illustrative and counsel-gated.</div>
+  <div class="foot">one3seven · internal pricing planning · unlisted &amp; not indexed. Keep this link within the FL team. Illustrative figures — verify before quoting. one3seven organizes and cites; it never scores cases or gives legal advice.</div>
+</div>
+</body>
+</html>

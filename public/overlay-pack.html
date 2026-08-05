@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>one3seven — holographic overlay pack</title>
+<style>
+  :root{
+    --sage:#7FE9B4;        /* luminous sage — one3seven (reads as brand green on black) */
+    --sage-deep:#2F5142;
+    --violet:#B69AE6;      /* AI / hallucination */
+    --coral:#F0654C;       /* danger / FAKE */
+    --ink:#EAF6EF;
+    --disp:"Arial Black","Helvetica Neue",Helvetica,Arial,sans-serif;
+    --sans:"Inter Tight",ui-sans-serif,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,monospace;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  /* PURE BLACK ground so the clip screen-blends cleanly over the presenter */
+  body{background:#000;color:var(--ink);font-family:var(--sans);overflow:hidden;-webkit-font-smoothing:antialiased;}
+  .stage{position:relative;width:100vw;height:100vh;background:#000;overflow:hidden;}
+  .scene{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    opacity:0;pointer-events:none;}
+  .scene.active{opacity:1;}
+  /* faint holographic scanlines over everything */
+  .scan{position:absolute;inset:0;pointer-events:none;opacity:.5;
+    background:repeating-linear-gradient(0deg,rgba(255,255,255,.04) 0 1px,transparent 1px 4px);
+    mix-blend-mode:screen;}
+
+  .float{animation:float 4s ease-in-out infinite;}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+
+  /* ── glass card ── */
+  .card{position:relative;border-radius:18px;padding:22px 26px;backdrop-filter:none;
+    border:1.5px solid color-mix(in srgb,var(--c) 55%,transparent);
+    background:color-mix(in srgb,var(--c) 10%,transparent);
+    box-shadow:0 0 40px color-mix(in srgb,var(--c) 30%,transparent),inset 0 0 24px color-mix(in srgb,var(--c) 12%,transparent);}
+  .card .lab{font-family:var(--mono);font-size:14px;letter-spacing:.16em;text-transform:uppercase;color:var(--c);
+    text-shadow:0 0 12px var(--c);}
+  .card .big{font-family:var(--disp);font-weight:900;color:#fff;letter-spacing:-.02em;line-height:1;
+    text-shadow:0 0 22px var(--c);}
+
+  /* ── S0 hero: messy docs → source-linked timeline (sage) ── */
+  .tl{--c:var(--sage);display:flex;flex-direction:column;gap:14px;width:min(74vw,760px);}
+  .tl .row{display:flex;align-items:center;gap:16px;opacity:0;transform:translateX(-40px) rotate(-6deg);}
+  .scene.active .tl .row{animation:snap .7s cubic-bezier(.2,.8,.2,1) forwards;}
+  .scene.active .tl .row:nth-child(1){animation-delay:.2s}
+  .scene.active .tl .row:nth-child(2){animation-delay:.5s}
+  .scene.active .tl .row:nth-child(3){animation-delay:.8s}
+  .scene.active .tl .row:nth-child(4){animation-delay:1.1s}
+  @keyframes snap{to{opacity:1;transform:none}}
+  .tl .doc{flex:1;height:56px;border-radius:12px;border:1.5px solid color-mix(in srgb,var(--sage) 55%,transparent);
+    background:color-mix(in srgb,var(--sage) 12%,transparent);box-shadow:0 0 26px color-mix(in srgb,var(--sage) 26%,transparent);
+    display:flex;align-items:center;padding:0 18px;gap:12px;}
+  .tl .doc .dot{width:10px;height:10px;border-radius:50%;background:var(--sage);box-shadow:0 0 12px var(--sage);}
+  .tl .doc .bar{height:8px;border-radius:6px;background:color-mix(in srgb,var(--sage) 45%,transparent);}
+  .tl .link{width:52px;height:52px;border-radius:12px;display:grid;place-items:center;font-size:22px;opacity:0;
+    border:1.5px solid var(--sage);color:var(--sage);text-shadow:0 0 12px var(--sage);box-shadow:0 0 20px color-mix(in srgb,var(--sage) 40%,transparent);}
+  .scene.active .tl .link{animation:ping .5s ease-out forwards;}
+  .scene.active .tl .row:nth-child(1) .link{animation-delay:.7s}
+  .scene.active .tl .row:nth-child(2) .link{animation-delay:1.0s}
+  .scene.active .tl .row:nth-child(3) .link{animation-delay:1.3s}
+  .scene.active .tl .row:nth-child(4) .link{animation-delay:1.6s}
+  @keyframes ping{0%{opacity:0;transform:scale(.3)}70%{opacity:1;transform:scale(1.25)}100%{opacity:1;transform:scale(1)}}
+  .caption{margin-top:30px;font-family:var(--mono);font-size:20px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--sage);text-shadow:0 0 16px var(--sage);opacity:0;}
+  .scene.active .caption{animation:fadeup .6s 1.9s forwards;}
+  @keyframes fadeup{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+  /* ── S1 hallucination (violet), glitches to static ── */
+  .halu{--c:var(--violet);}
+  .halu .big{font-size:clamp(34px,7vw,60px);}
+  .scene.active .halu{animation:glitch 4s steps(1) forwards;}
+  @keyframes glitch{
+    0%{opacity:0;transform:scale(.9)} 8%{opacity:1;transform:none}
+    60%{opacity:1;filter:none} 68%{filter:hue-rotate(40deg);transform:translateX(6px)}
+    72%{transform:translateX(-8px)} 76%{transform:none;filter:none}
+    88%{opacity:1} 100%{opacity:.05;filter:blur(3px)}}
+  .halu .sub{font-family:var(--mono);font-size:15px;color:var(--violet);margin-top:8px;opacity:.85;text-shadow:0 0 10px var(--violet);}
+
+  /* ── S2 stat 200+ / FAKE ── */
+  .stat{--c:var(--violet);text-align:center;}
+  .stat .num{font-family:var(--disp);font-weight:900;font-size:clamp(70px,16vw,150px);color:#fff;text-shadow:0 0 34px var(--violet);}
+  .stat .fake{margin-top:8px;display:inline-block;font-family:var(--disp);font-size:clamp(28px,6vw,46px);color:var(--coral);
+    border:3px solid var(--coral);border-radius:12px;padding:6px 20px;transform:rotate(-8deg) scale(2);opacity:0;
+    text-shadow:0 0 18px var(--coral);box-shadow:0 0 30px color-mix(in srgb,var(--coral) 40%,transparent);}
+  .scene.active .stat .fake{animation:slam .5s .6s cubic-bezier(.2,.8,.2,1) forwards;}
+  @keyframes slam{to{opacity:1;transform:rotate(-8deg) scale(1)}}
+  .stat .cap2{margin-top:22px;font-family:var(--mono);font-size:16px;letter-spacing:.12em;text-transform:uppercase;color:var(--violet);text-shadow:0 0 12px var(--violet);}
+
+  /* ── S3 receipts: doc → source beam (sage) ── */
+  .rcpt{--c:var(--sage);display:flex;flex-direction:column;align-items:center;gap:18px;}
+  .rcpt .docbig{width:min(52vw,420px);border-radius:16px;padding:22px;border:1.5px solid color-mix(in srgb,var(--sage) 55%,transparent);
+    background:color-mix(in srgb,var(--sage) 10%,transparent);box-shadow:0 0 34px color-mix(in srgb,var(--sage) 28%,transparent);
+    display:flex;flex-direction:column;gap:12px;}
+  .rcpt .docbig .l{height:12px;border-radius:6px;background:color-mix(in srgb,var(--sage) 45%,transparent);}
+  .rcpt .beam{width:4px;height:70px;background:linear-gradient(var(--sage),transparent);opacity:0;box-shadow:0 0 14px var(--sage);}
+  .scene.active .rcpt .beam{animation:beam .5s .5s forwards;}
+  @keyframes beam{from{opacity:0;height:0}to{opacity:1;height:70px}}
+  .rcpt .src{opacity:0;font-family:var(--mono);font-size:15px;color:var(--sage);text-shadow:0 0 12px var(--sage);
+    border:1.5px solid var(--sage);border-radius:10px;padding:9px 16px;box-shadow:0 0 20px color-mix(in srgb,var(--sage) 34%,transparent);}
+  .scene.active .rcpt .src{animation:ping .5s 1s forwards;}
+  .rcpt .cap3{font-family:var(--disp);font-weight:900;font-size:clamp(22px,4.6vw,34px);color:#fff;text-shadow:0 0 18px var(--sage);opacity:0;}
+  .scene.active .rcpt .cap3{animation:fadeup .6s 1.3s forwards;}
+
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;opacity:1!important;transform:none!important;}}
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <div class="scan"></div>
+
+  <!-- S0 — messy docs snap into a source-linked timeline (SAGE = one3seven) -->
+  <div class="scene" data-i="0">
+    <div class="tl float">
+      <div class="row"><div class="doc"><span class="dot"></span><span class="bar" style="width:60%"></span></div><div class="link">🔗</div></div>
+      <div class="row"><div class="doc"><span class="dot"></span><span class="bar" style="width:75%"></span></div><div class="link">🔗</div></div>
+      <div class="row"><div class="doc"><span class="dot"></span><span class="bar" style="width:50%"></span></div><div class="link">🔗</div></div>
+      <div class="row"><div class="doc"><span class="dot"></span><span class="bar" style="width:68%"></span></div><div class="link">🔗</div></div>
+    </div>
+    <div class="caption">Organized · every fact linked to its source</div>
+  </div>
+
+  <!-- S1 — hallucination card glitches out (VIOLET = AI) -->
+  <div class="scene" data-i="1">
+    <div class="card halu float" style="--c:var(--violet)">
+      <div class="lab">AI · unverified</div>
+      <div class="big">"Case #99 ✓"</div>
+      <div class="sub">…confidently made up</div>
+    </div>
+  </div>
+
+  <!-- S2 — 200+ / FAKE (VIOLET + coral) -->
+  <div class="scene" data-i="2">
+    <div class="stat float">
+      <div class="num">200+</div>
+      <div class="fake">FAKE</div>
+      <div class="cap2">AI cases filed in real courts · by 2025</div>
+    </div>
+  </div>
+
+  <!-- S3 — receipts: doc → source (SAGE) -->
+  <div class="scene" data-i="3">
+    <div class="rcpt float">
+      <div class="docbig"><div class="l" style="width:90%"></div><div class="l" style="width:70%"></div><div class="l" style="width:80%"></div></div>
+      <div class="beam"></div>
+      <div class="src">↳ source · page 3</div>
+      <div class="cap3">Receipts, not guesses.</div>
+    </div>
+  </div>
+</div>
+<script>
+  var scenes=[].slice.call(document.querySelectorAll('.scene'));
+  window.__scenes = scenes.length;
+  window.__setScene = function(n){
+    scenes.forEach(function(el){el.classList.remove('active');});
+    void document.body.offsetWidth;
+    scenes.forEach(function(el,idx){el.classList.toggle('active',idx===n);});
+  };
+  window.__setScene(0);
+</script>
+</body>
+</html>

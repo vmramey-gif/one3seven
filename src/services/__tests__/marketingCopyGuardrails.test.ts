@@ -31,8 +31,11 @@ import { fileURLToPath } from 'node:url';
 const ROOT = fileURLToPath(new URL('../../../', import.meta.url));
 
 const SCANNED_FILES = [
+  // public customer-facing narrated film. (pitch-film.html is INVESTOR-facing — caveated market
+  // estimates trip the customer-copy metric rules, so it stays human-reviewed; the Academy is
+  // excluded because it quotes banned phrases as teaching examples; obfuscated rep decks excluded.)
+  'public/product-walkthrough.html',
   // public marketing
-  'src/app/screens/SageMarketingPage.tsx',
   'src/app/screens/ForFirmsPage.tsx',
   'src/app/screens/WorkerLandingPage.tsx',
   'src/app/screens/BrandPreviewPage.tsx',

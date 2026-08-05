@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>one3seven — Film Library</title>
+<style>
+  :root{
+    --bg:#0E1512;--bg2:#0A100D;--panel:#16201B;--ink:#ECF0E8;--soft:#9DA99F;--faint:#6B776E;
+    --sage:#8FB8A2;--sage-deep:#B7D2C4;--orange:#E08A4E;--line:#263029;
+    --serif:'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;
+    --sans:'Inter Tight',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+    --mono:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;}
+  body{background:radial-gradient(120% 80% at 50% 0%,#16201B 0%,var(--bg) 46%,var(--bg2) 100%);
+    color:var(--ink);font-family:var(--sans);min-height:100vh;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1000px;margin:0 auto;padding:40px 22px 64px;}
+  .brand{font-family:var(--serif);font-weight:600;font-size:19px;} .brand b{color:var(--orange);}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--sage);margin:34px 0 10px;}
+  h1{font-family:var(--serif);font-weight:600;font-size:clamp(30px,5vw,50px);letter-spacing:-.015em;line-height:1.05;margin:0 0 14px;text-wrap:balance;}
+  .lede{color:var(--soft);font-size:clamp(15px,2vw,19px);max-width:60ch;line-height:1.55;margin:0 0 8px;}
+  .sec{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);
+    margin:40px 0 14px;padding-bottom:8px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:baseline;gap:12px;}
+  .sec .tag{color:var(--sage);} .sec .tag.int{color:var(--orange);}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;}
+  a.card{display:flex;flex-direction:column;gap:7px;text-decoration:none;color:inherit;border:1px solid var(--line);
+    border-radius:14px;background:linear-gradient(160deg,#17211C 0%,#101713 100%);padding:18px 18px 16px;transition:border-color .2s,transform .2s;}
+  a.card:hover{border-color:var(--accent,var(--sage));transform:translateY(-2px);}
+  a.card:focus-visible{outline:2px solid var(--sage);outline-offset:2px;}
+  a.card.int:hover{border-color:var(--orange);}
+  .num{font-family:var(--mono);font-size:11px;color:var(--faint);letter-spacing:.1em;}
+  .ct{font-family:var(--serif);font-size:20px;line-height:1.15;}
+  .cs{color:var(--soft);font-size:13.5px;line-height:1.45;flex:1;}
+  .meta{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--sage);margin-top:4px;}
+  a.card.int .meta{color:var(--orange);}
+  .go{font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:2px;}
+  .note{margin-top:44px;border:1px solid var(--line);border-left:3px solid var(--orange);border-radius:0 12px 12px 0;
+    background:#1a130c;padding:14px 18px;color:var(--soft);font-size:13.5px;line-height:1.55;}
+  .note b{color:var(--ink);}
+  .foot{margin-top:26px;font-family:var(--mono);font-size:11px;color:var(--faint);line-height:1.7;}
+  @media (prefers-reduced-motion:reduce){a.card{transition:none;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">one3<b>seven</b></div>
+  <div class="eyebrow">Film library · private link</div>
+  <h1>Everything we’ve filmed, in one place</h1>
+  <p class="lede">The product tour, the public education films, and the internal sales-training set — narrated, built on the same system. Click any card to watch. Each film auto-advances and has a transcript below it.</p>
+
+  <div class="sec"><span>Start here — required onboarding</span><span class="tag int">FL Certification</span></div>
+  <div class="grid">
+    <a class="card int" href="fl-certification.html" style="border-color:var(--orange)">
+      <span class="num">★</span><span class="ct">Become FL Certified</span>
+      <span class="cs">The required course — foundations &amp; doctrine, product &amp; pitch, money &amp; market, then live sign-off. ~20–25 hrs. You shadow until you pass; no solo firm calls before certification.</span>
+      <span class="meta">required · trackable</span></a>
+  </div>
+
+  <div class="sec"><span>Product &amp; pitch</span><span class="tag">Public-facing</span></div>
+  <div class="grid">
+    <a class="card" href="/product-walkthrough.html">
+      <span class="num">01</span><span class="ct">Product Walkthrough</span>
+      <span class="cs">End-to-end tour: the worker record, how it reaches an attorney, and the firm binder.</span>
+      <span class="meta">~19 slides · narrated</span></a>
+    <a class="card" href="/pitch-film.html">
+      <span class="num">02</span><span class="ct">The Pitch Film</span>
+      <span class="cs">The investor/partner story — the problem, the shoebox, the math, the moat.</span>
+      <span class="meta">narrated</span></a>
+  </div>
+
+  <div class="sec"><span>Education — “Keeping receipts” series</span><span class="tag">Public</span></div>
+  <div class="grid">
+    <a class="card" href="/fl-education.html">
+      <span class="num">03</span><span class="ct">Know the Field</span>
+      <span class="cs">The legal-AI landscape — who’s out there, why they win, and where our worker-first record fits.</span>
+      <span class="meta">17 slides · narrated</span></a>
+    <a class="card" href="/fm-education.html">
+      <span class="num">04</span><span class="ct">The Field Manual</span>
+      <span class="cs">Deeper study — the tool map, Steno, the conferences, and the funders with how to reach them.</span>
+      <span class="meta">15 slides · narrated</span></a>
+  </div>
+
+  <div class="sec"><span>Sales training — internal coaching</span><span class="tag int">Internal</span></div>
+  <div class="grid">
+    <a class="card int" href="demo.html">
+      <span class="num">05</span><span class="ct">The 15-Minute Intake Review</span>
+      <span class="cs">How to run the live demo — the beats, the pauses, and the lines you say word-for-word.</span>
+      <span class="meta">15 slides · the demo</span></a>
+    <a class="card int" href="discovery.html">
+      <span class="num">06</span><span class="ct">The Discovery Call</span>
+      <span class="cs">The 12-beat call before the demo — locate the operational friction, land Coverage Rate.</span>
+      <span class="meta">14 slides</span></a>
+    <a class="card int" href="objections.html">
+      <span class="num">07</span><span class="ct">Objection Handling</span>
+      <span class="cs">Nine objections in the 4-layer model — with the doctrine-trap line and how to hold it.</span>
+      <span class="meta">13 slides</span></a>
+    <a class="card int" href="guardrails.html">
+      <span class="num">08</span><span class="ct">The Guardrails</span>
+      <span class="cs">The six bright lines — each with the NEVER-SAY line and the safe line to use instead.</span>
+      <span class="meta">11 slides · doctrine</span></a>
+    <a class="card int" href="pricing.html">
+      <span class="num">09</span><span class="ct">Pricing &amp; Clean Money</span>
+      <span class="cs">The clean-money test, the fee-split bright lines, and the money lines never to say.</span>
+      <span class="meta">10 slides</span></a>
+    <a class="card int" href="coldpitch.html">
+      <span class="num">10</span><span class="ct">The 60-Second Pitch</span>
+      <span class="cs">The hallway pitch — hook, what, proof, ask — plus the three-minute expansion.</span>
+      <span class="meta">7 slides</span></a>
+  </div>
+
+  <div class="sec"><span>Monetization doctrine — internal</span><span class="tag int">Internal</span></div>
+  <div class="grid">
+    <a class="card int" href="monetization.html">
+      <span class="num">11</span><span class="ct">How one3seven Makes Money</span>
+      <span class="cs">Price organizing capacity, never the case — the §6155-vs-5.4 split, the hidden alley, price packs, and the counsel questions. With the numbers on screen.</span>
+      <span class="meta">21 slides · pricing + doctrine</span></a>
+  </div>
+
+  <div class="note"><b>A note on the internal set.</b> Films 05–10 are coaching for the one3seven team — they include verbatim talk tracks and the lines we never cross. Please keep this link within the team. Nothing here scores cases or gives legal advice; the discipline is the product.</div>
+  <div class="foot">one3seven · unlisted film library. Figures in the education films are as of mid-2026 — verify before repeating. This page is not indexed.</div>
+</div>
+</body>
+</html>

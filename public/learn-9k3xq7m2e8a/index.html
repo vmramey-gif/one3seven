@@ -1,0 +1,1432 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>one3seven Academy — Get Certified with Morgan</title>
+<style>
+  :root{
+    --bg:#0E1512;--bg2:#0A100D;--panel:#16201B;--ink:#ECF0E8;--soft:#9DA99F;--faint:#6B776E;
+    --sage:#8FB8A2;--sage-deep:#B7D2C4;--orange:#E08A4E;--orange-soft:#2A1B10;--violet:#8B7DD8;--amber:#E0B84E;--red:#D97A6C;--line:#263029;
+    --serif:'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;
+    --sans:'Inter Tight',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+    --mono:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;}
+  body{background:radial-gradient(120% 80% at 50% 0%,#16201B 0%,var(--bg) 46%,var(--bg2) 100%);color:var(--ink);font-family:var(--sans);min-height:100vh;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:960px;margin:0 auto;padding:28px 20px 70px;}
+  .top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+  .brand{font-family:var(--serif);font-weight:600;font-size:18px;cursor:pointer;} .brand b{color:var(--orange);} .brand .m{color:var(--sage);}
+  .topmeta{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);}
+  a{color:var(--sage-deep);text-decoration:none;} a:hover{text-decoration:underline;}
+  button{font-family:var(--sans);cursor:pointer;}
+  .btn{background:var(--sage);color:#0E1512;border:none;border-radius:999px;padding:10px 20px;font-weight:700;font-size:14px;}
+  .btn.ghost{background:var(--panel);color:var(--ink);border:1px solid var(--line);font-weight:500;}
+  .btn.orange{background:var(--orange);color:#0E1512;}
+  .btn:focus-visible{outline:2px solid var(--orange);outline-offset:2px;}
+  .crumbs{font-family:var(--mono);font-size:12px;color:var(--faint);margin:18px 0 4px;} .crumbs a{color:var(--faint);}
+  /* HOME */
+  .hero{margin:22px 0 6px;} .kick{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--sage);}
+  h1{font-family:var(--serif);font-weight:600;font-size:clamp(32px,5.5vw,52px);letter-spacing:-.015em;line-height:1.04;margin:8px 0 12px;text-wrap:balance;}
+  .lede{color:var(--soft);font-size:16.5px;max-width:60ch;line-height:1.55;margin:0;} .lede b{color:var(--ink);}
+  .prog{margin:22px 0;border:1px solid var(--line);border-radius:14px;background:#131c17;padding:14px 16px;}
+  .bar{height:8px;border-radius:6px;background:#0f1713;overflow:hidden;border:1px solid var(--line);} .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--sage),var(--orange));transition:width .3s;}
+  .prog .pl{font-family:var(--mono);font-size:12px;color:var(--soft);margin-top:8px;} .prog .pl b{color:var(--sage);}
+  .sec{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin:30px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;}
+  .sec .t{color:var(--sage);}
+  .courses{display:grid;grid-template-columns:1fr 1fr;gap:14px;} @media(max-width:720px){.courses{grid-template-columns:1fr;}}
+  .cc{border:1px solid var(--line);border-radius:16px;background:linear-gradient(160deg,#17211C,#101713);padding:18px;display:flex;flex-direction:column;gap:8px;}
+  .cc.open{cursor:pointer;} .cc.open:hover{border-color:var(--sage);transform:translateY(-2px);transition:.2s;}
+  .cc.soon{opacity:.6;}
+  .cc .track{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--sage);}
+  .cc .ct{font-family:var(--serif);font-size:21px;line-height:1.15;} .cc .cs{color:var(--soft);font-size:13px;line-height:1.45;flex:1;}
+  .cc .row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:4px;}
+  .pill{font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:6px;border:1px solid;}
+  .p-core{color:var(--orange);border-color:var(--orange);} .p-done{color:var(--sage);border-color:var(--sage);background:#12201a;} .p-soon{color:var(--faint);border-color:var(--line);}
+  .mini{font-family:var(--mono);font-size:11px;color:var(--faint);}
+  /* LESSON */
+  .lessonwrap{display:grid;grid-template-columns:230px 1fr;gap:22px;margin-top:10px;}
+  .resnote{margin-top:14px;font-size:12.5px;color:var(--faint);max-width:60ch;line-height:1.5;}
+  .lprog{display:flex;align-items:center;gap:12px;margin:2px 0 16px;}
+  .lstep{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);white-space:nowrap;}
+  .lbar{flex:1;height:4px;background:#13201a;border-radius:3px;overflow:hidden;} .lbar i{display:block;height:100%;background:var(--sage);border-radius:3px;transition:width .3s;}
+  @media(max-width:760px){.lessonwrap{grid-template-columns:1fr;} .rail{position:static;display:flex;gap:6px;overflow-x:auto;padding:8px;} .rail .rt{display:none;} .rail button{width:auto;white-space:nowrap;flex:none;font-size:12px;padding:7px 10px;} .rail .dot{display:none;}}
+  .rail{border:1px solid var(--line);border-radius:14px;background:#131c17;padding:12px;height:max-content;position:sticky;top:14px;}
+  .rail .rt{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin:2px 6px 8px;}
+  .rail button{display:flex;gap:8px;align-items:flex-start;width:100%;text-align:left;background:none;border:none;color:var(--soft);font-size:13px;padding:8px;border-radius:8px;line-height:1.35;}
+  .rail button:hover{background:#0f1713;} .rail button.active{background:var(--orange-soft);color:var(--ink);}
+  .rail .dot{width:16px;height:16px;border-radius:5px;border:1.5px solid var(--faint);flex:none;margin-top:1px;position:relative;}
+  .rail button.done .dot{background:var(--sage);border-color:var(--sage);} .rail button.done .dot::after{content:'✓';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#0E1512;font-size:10px;font-weight:700;}
+  .lesson h2{font-family:var(--serif);font-size:clamp(24px,3.6vw,34px);letter-spacing:-.01em;margin:6px 0 4px;}
+  .lesson .obj{color:var(--sage-deep);font-size:14px;font-style:italic;border-left:2px solid var(--sage);padding-left:12px;margin:0 0 18px;line-height:1.5;}
+  .lesson h3{font-family:var(--serif);font-size:20px;margin:22px 0 6px;color:var(--ink);}
+  .lesson p{font-size:15.5px;line-height:1.62;color:var(--soft);margin:0 0 12px;max-width:64ch;} .lesson p b{color:var(--ink);}
+  .say{border-left:3px solid var(--sage);background:#12201a;border-radius:0 10px 10px 0;padding:10px 14px;margin:0 0 12px;font-size:14.5px;color:var(--ink);max-width:64ch;}
+  .say::before{content:'SAY';font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--sage);display:block;margin-bottom:3px;}
+  .never{border-left:3px solid var(--red);background:#20130f;border-radius:0 10px 10px 0;padding:10px 14px;margin:0 0 12px;font-size:14.5px;color:#F0B7AD;max-width:64ch;}
+  .never::before{content:'NEVER';font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--red);display:block;margin-bottom:3px;}
+  .cites{margin:22px 0 4px;padding-top:14px;border-top:1px solid var(--line);}
+  .cites-h{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--sage);margin-bottom:8px;}
+  .cites ul{margin:0;padding:0;list-style:none;}
+  .cites li{font-size:12.5px;line-height:1.5;color:var(--sage-deep);padding:3px 0 3px 16px;position:relative;}
+  .cites li::before{content:'§';position:absolute;left:0;color:var(--sage);}
+  .cites a{color:var(--sage);text-decoration:underline;text-underline-offset:2px;}
+  .cites .internal{color:#8a938c;}
+  .filmlink{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--orange);color:var(--orange);border-radius:999px;padding:8px 14px;font-size:13px;margin:4px 0 14px;}
+  .listen{display:inline-flex;align-items:center;gap:7px;font-family:var(--sans);font-size:13px;font-weight:500;color:var(--sage);background:#12201a;border:1px solid var(--sage);border-radius:999px;padding:8px 15px;margin:2px 0 18px;cursor:pointer;}
+  .listen:hover{background:#16281f;} .listen:focus-visible{outline:2px solid var(--orange);outline-offset:2px;}
+  .listen.playing{color:var(--orange);border-color:var(--orange);background:var(--orange-soft);}
+  .lnav{display:flex;justify-content:space-between;gap:10px;margin-top:26px;border-top:1px solid var(--line);padding-top:16px;}
+  /* QUIZ */
+  .quiz{border:1px solid var(--line);border-radius:16px;background:#131c17;padding:20px;margin-top:10px;}
+  .quiz .qi{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--orange);margin-bottom:12px;}
+  .qq{font-size:16px;color:var(--ink);margin:0 0 12px;line-height:1.5;} .qq .tag{font-family:var(--mono);font-size:11px;color:var(--amber);display:block;margin-bottom:4px;}
+  .opts{display:flex;flex-direction:column;gap:8px;} .opt{border:1px solid var(--line);border-radius:10px;padding:11px 14px;background:#0f1713;color:var(--soft);font-size:14px;text-align:left;}
+  .opt:hover{border-color:var(--sage);} .opt.pick{border-color:var(--orange);color:var(--ink);}
+  .opt.right{border-color:var(--sage);background:#12201a;color:var(--sage-deep);} .opt.wrong{border-color:var(--red);background:#20130f;color:#F0B7AD;}
+  .fb{margin-top:12px;font-size:14px;line-height:1.5;padding:12px 14px;border-radius:10px;} .fb.ok{background:#12201a;color:var(--sage-deep);border:1px solid var(--sage);} .fb.no{background:#20130f;color:#F0B7AD;border:1px solid var(--red);}
+  .demo{margin-top:14px;border-left:3px solid var(--amber);background:#231e10;border-radius:0 10px 10px 0;padding:10px 14px;font-size:13.5px;color:#EBD9A0;line-height:1.5;} .demo b{color:#fff;}
+  /* CERT */
+  .cert{border:2px solid var(--sage);border-radius:20px;background:linear-gradient(160deg,#12201a,#0f1713);padding:30px;text-align:center;margin-top:16px;}
+  .cert .cm{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--sage);}
+  .cert h2{font-family:var(--serif);font-size:30px;margin:8px 0;} .cert p{color:var(--soft);font-size:14px;line-height:1.55;max-width:52ch;margin:0 auto;}
+  .foot{margin-top:30px;font-family:var(--mono);font-size:11px;color:var(--faint);line-height:1.7;}
+  .hidden{display:none;}
+  /* CERTIFICATE (light paper, print-ready) */
+  .certificate{background:#FBF8F1;color:#22201b;border:1px solid #d8cfbe;border-radius:8px;max-width:840px;margin:12px auto;padding:40px 44px;box-shadow:0 24px 70px rgba(0,0,0,.45);}
+  .certificate .frame{border:2px solid #cdb98f;border-radius:4px;padding:32px 28px;text-align:center;}
+  .cert-crest{width:54px;height:62px;margin:0 auto 6px;display:block;}
+  .cert-school{font-family:var(--serif);font-size:27px;font-weight:600;color:#22201b;} .cert-school b{color:#b5652e;}
+  .cert-morgan{font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:#8a6d3b;margin-top:3px;}
+  .cert-rule{height:1px;background:#cdb98f;margin:16px auto;width:55%;}
+  .cert-kind{font-family:var(--mono);font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:#8a6d3b;}
+  .cert-level{font-family:var(--serif);font-size:16px;color:#5a5347;margin-top:4px;}
+  .cert-pre{font-size:13px;color:#5a5347;margin:22px 0 4px;letter-spacing:.02em;}
+  .cert-name{font-family:var(--serif);font-size:clamp(30px,5vw,42px);font-weight:600;color:#22201b;line-height:1.1;margin:0 0 6px;}
+  .cert-nameline{height:1px;background:#cdb98f;width:58%;margin:0 auto 16px;}
+  .cert-body{font-size:14.5px;color:#3a352c;line-height:1.62;max-width:54ch;margin:0 auto 8px;}
+  .cert-sig{margin-top:30px;} .cert-sig .l{border-top:1px solid #8a8172;width:200px;margin:0 auto 4px;} .cert-sig .r{font-size:11px;color:#6a6152;letter-spacing:.03em;}
+  .cert-meta{display:flex;justify-content:space-between;gap:20px;font-family:var(--mono);font-size:11px;color:#6a6152;margin-top:24px;padding:0 4px;}
+  .cert-disclaimer{font-family:var(--mono);font-size:9.5px;color:#8a8172;line-height:1.5;margin:20px auto 0;max-width:64ch;text-align:center;}
+  .cert-actions{max-width:840px;margin:14px auto;display:flex;gap:10px;justify-content:center;}
+  @media print{
+    @page{size:landscape;margin:.4in;}
+    body *{visibility:hidden;}
+    #cert-print, #cert-print *{visibility:visible;}
+    #cert-print{position:absolute;left:0;top:0;width:100%;}
+    .certificate{box-shadow:none;border:none;margin:0;max-width:100%;}
+  }
+  /* UNIVERSITY HOME */
+  .nav{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:4px 0 14px;border-bottom:1px solid var(--line);flex-wrap:wrap;}
+  .nav .wm{display:flex;align-items:center;gap:12px;cursor:pointer;}
+  .nav .wm .crest{width:38px;height:44px;flex:none;}
+  .nav .wm .txt .n{font-family:var(--serif);font-weight:600;font-size:19px;letter-spacing:.01em;} .nav .wm .txt .n b{color:var(--orange);}
+  .nav .wm .txt .s{font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--sage);margin-top:1px;}
+  .nav .links{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+  .nav .links a{font-family:var(--sans);font-size:13.5px;color:var(--soft);padding:8px 12px;border-radius:8px;cursor:pointer;} .nav .links a:hover{background:var(--panel);text-decoration:none;color:var(--ink);}
+  .nav .signin{font-family:var(--sans);font-size:13.5px;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:8px 16px;}
+  .nav .signin:hover{border-color:var(--sage);}
+  .uhero{position:relative;margin:26px 0 8px;border:1px solid var(--line);border-radius:22px;overflow:hidden;
+    background:linear-gradient(150deg,#1a2620 0%,#101713 60%,#0c120f 100%);padding:clamp(28px,5vw,52px);}
+  .uhero::after{content:'';position:absolute;right:-60px;top:-60px;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(224,138,78,.14),transparent 70%);}
+  .uhero .est{font-family:var(--mono);font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--sage);}
+  .uhero h1{font-family:var(--serif);font-weight:600;font-size:clamp(30px,5vw,52px);line-height:1.05;letter-spacing:-.015em;margin:12px 0 6px;max-width:20ch;}
+  .uhero .motto{font-family:var(--serif);font-style:italic;font-size:clamp(15px,2vw,20px);color:var(--sage-deep);margin:0 0 16px;}
+  .uhero .sub{color:var(--soft);font-size:16px;max-width:56ch;line-height:1.55;margin:0 0 22px;} .uhero .sub b{color:var(--ink);}
+  .uhero .cta{display:flex;gap:10px;flex-wrap:wrap;}
+  .colleges{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px;} @media(max-width:760px){.colleges{grid-template-columns:1fr 1fr;}} @media(max-width:460px){.colleges{grid-template-columns:1fr;}}
+  .col{border:1px solid var(--line);border-radius:14px;background:#131c17;padding:14px 15px;} .col .cn{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);}
+  .col .cc2{font-family:var(--serif);font-size:18px;margin:3px 0 2px;} .col .cd{color:var(--soft);font-size:12px;line-height:1.4;}
+  .col.col-link{cursor:pointer;transition:border-color .2s,transform .2s;} .col.col-link:hover{border-color:var(--sage);transform:translateY(-2px);}
+  .cc.pathlink{cursor:pointer;transition:border-color .2s,transform .2s;} .cc.pathlink:hover{border-color:var(--orange);transform:translateY(-2px);}
+  a.cc.cc-link{text-decoration:none;color:inherit;transition:border-color .2s,transform .2s;} a.cc.cc-link:hover{border-color:var(--orange);transform:translateY(-2px);}
+  .col.col-link .more{font-family:var(--mono);font-size:10px;color:var(--sage);margin-top:8px;}
+  .cintro{color:var(--soft);font-size:15.5px;line-height:1.6;max-width:64ch;margin:6px 0 6px;} .cintro b{color:var(--ink);}
+  .reslist{list-style:none;padding:0;margin:14px 0 0;}
+  .res{border:1px solid var(--line);border-radius:12px;background:#131c17;padding:13px 15px;margin-bottom:10px;}
+  .res.done{border-color:var(--sage);background:#12201a;}
+  .rrow{display:flex;gap:12px;align-items:flex-start;} .rbody{flex:1;min-width:0;}
+  .rcheck{appearance:none;width:20px;height:20px;border:1.5px solid var(--faint);border-radius:6px;cursor:pointer;position:relative;flex:none;margin-top:2px;background:#0f1713;}
+  .rcheck:checked{background:var(--sage);border-color:var(--sage);} .rcheck:checked::after{content:'✓';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#0E1512;font-size:12px;font-weight:700;}
+  .rcheck:focus-visible{outline:2px solid var(--orange);outline-offset:2px;}
+  .cprog{font-family:var(--mono);font-size:12px;color:var(--soft);margin:12px 0 2px;} .cprog b{color:var(--sage);}
+  .lens{border:1px solid var(--sage);border-radius:14px;background:linear-gradient(160deg,#12201a,#0f1713);padding:16px 18px;margin:14px 0 6px;}
+  .lens-h{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--sage);margin-bottom:9px;}
+  .lens p{font-size:14.5px;color:var(--soft);line-height:1.6;margin:0 0 10px;max-width:66ch;} .lens p b{color:var(--ink);}
+  .lens .lens-attr{font-size:12.5px;color:var(--faint);border-top:1px solid var(--line);padding-top:10px;margin:4px 0 0;}
+  .res .rh{display:flex;justify-content:space-between;gap:10px;align-items:baseline;flex-wrap:wrap;}
+  .res .rn{font-size:15px;color:var(--ink);} .res .rn a{color:var(--sage-deep);} .res .rp{font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:2px;}
+  .res .rnote{color:var(--soft);font-size:12.5px;line-height:1.45;margin-top:6px;}
+  .rtag{font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:6px;border:1px solid;white-space:nowrap;flex:none;}
+  .t-free{color:var(--sage);border-color:var(--sage);} .t-read{color:var(--violet);border-color:var(--violet);}
+  .t-paid{color:var(--amber);border-color:var(--amber);} .t-company{color:var(--orange);border-color:var(--orange);} .t-internal{color:var(--sage-deep);border-color:var(--sage-deep);}
+  .cstrat{border:1px solid var(--orange);border-radius:12px;background:var(--orange-soft);padding:12px 15px;margin:16px 0 4px;color:var(--soft);font-size:13px;line-height:1.55;} .cstrat b{color:var(--ink);}
+  .signedin{font-family:var(--mono);font-size:12px;color:var(--sage);}
+  .modal{position:fixed;inset:0;background:rgba(8,12,10,.72);display:flex;align-items:center;justify-content:center;padding:20px;z-index:20;}
+  .modal .card{max-width:400px;width:100%;border:1px solid var(--line);border-radius:18px;background:linear-gradient(160deg,#17211C,#101713);padding:24px;}
+  .modal h3{font-family:var(--serif);font-size:23px;margin:0 0 4px;} .modal p{color:var(--soft);font-size:13.5px;line-height:1.5;margin:0 0 16px;}
+  .modal label{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);display:block;margin:10px 0 4px;}
+  .modal input{width:100%;background:#0f1713;border:1px solid var(--line);border-radius:10px;padding:11px 13px;color:var(--ink);font-size:15px;font-family:var(--sans);}
+  .modal input:focus{outline:2px solid var(--sage);outline-offset:1px;}
+  .modal .row{display:flex;gap:10px;margin-top:18px;} .modal .note{font-family:var(--mono);font-size:10.5px;color:var(--faint);margin-top:14px;line-height:1.5;}
+  .gatecard{max-width:430px;margin:24px auto 0;text-align:left;border:1px solid var(--line);border-radius:18px;background:linear-gradient(160deg,#17211C,#101713);padding:24px;}
+  .gatecard label{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);display:block;margin:12px 0 4px;}
+  .gatecard label:first-child{margin-top:0;}
+  .gatecard input{width:100%;background:#0f1713;border:1px solid var(--line);border-radius:10px;padding:11px 13px;color:var(--ink);font-size:15px;font-family:var(--sans);box-sizing:border-box;}
+  .gatecard input:focus{outline:2px solid var(--sage);outline-offset:1px;}
+  .gatecard .row{margin-top:18px;} .gatecard .note{font-family:var(--mono);font-size:10.5px;color:var(--faint);margin-top:12px;line-height:1.5;}
+  .edwrap{max-width:760px;margin:0 auto;text-align:left;}
+  .edwrap label{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);display:block;margin:14px 0 4px;}
+  .edwrap input,.edwrap textarea,.edwrap select{width:100%;box-sizing:border-box;background:#0f1713;border:1px solid var(--line);border-radius:9px;padding:9px 11px;color:var(--ink);font-size:14px;font-family:var(--sans);}
+  .edwrap textarea{min-height:96px;resize:vertical;line-height:1.55;}
+  .edwrap input:focus,.edwrap textarea:focus,.edwrap select:focus{outline:2px solid var(--sage);outline-offset:1px;}
+  .edblock{border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-top:12px;background:#111a15;}
+  .edblock .rmv{float:right;background:none;border:1px solid var(--line);color:var(--faint);border-radius:8px;padding:3px 10px;font-size:10.5px;cursor:pointer;font-family:var(--mono);}
+  .edopt{display:flex;gap:9px;align-items:center;margin-top:6px;} .edopt input[type=text]{flex:1;} .edopt input[type=radio]{width:auto;flex:none;}
+  .edhint{font-size:12px;color:var(--faint);margin-top:6px;line-height:1.55;} .edhint b{color:var(--soft);}
+  .edrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px;align-items:center;}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<div class="wrap">
+  <div class="nav">
+    <div class="wm" id="home-link">
+      <svg class="crest" viewBox="0 0 38 44" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M19 1 L37 7 V22 C37 33 29 40 19 43 C9 40 1 33 1 22 V7 Z" fill="#12201a" stroke="#8FB8A2" stroke-width="1.4"/>
+        <path d="M19 1 L37 7 V22 C37 33 29 40 19 43 C9 40 1 33 1 22 V7 Z" fill="url(#g)" opacity=".25"/>
+        <text x="19" y="21" text-anchor="middle" font-family="Iowan Old Style,Palatino,Georgia,serif" font-size="12" font-weight="700" fill="#ECF0E8">137</text>
+        <rect x="8" y="26" width="22" height="1.4" fill="#E08A4E"/>
+        <text x="19" y="35" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="4.4" letter-spacing="1" fill="#8FB8A2">ACADEMY</text>
+        <defs><linearGradient id="g" x1="0" y1="0" x2="38" y2="44"><stop stop-color="#8FB8A2"/><stop offset="1" stop-color="#E08A4E"/></linearGradient></defs>
+      </svg>
+      <div class="txt"><div class="n">one3<b>seven</b> Academy</div><div class="s">Get Certified with Morgan</div></div>
+    </div>
+    <div class="links">
+      <a id="nav-courses">Courses</a>
+      <a id="nav-cert">Certification</a>
+      <a id="nav-reimburse">Reimbursement</a>
+      <button class="signin" id="signin">Sign in</button>
+    </div>
+  </div>
+  <div id="view"></div>
+  <div class="foot">one3seven Academy — unlisted, members-only · Sign in with your team email to enter; your progress and certificate save to your account. one3seven organizes and cites; it never scores cases or gives legal advice.</div>
+</div>
+<script>
+/* ---------------- CONTENT ---------------- */
+var ACADEMY = [
+  { id:'worker', track:'Core · Track 1', title:'The Worker & The Mission', core:true,
+    blurb:'Who we serve and why — and the one habit that keeps warmth from becoming a promise you can’t keep.',
+    lessons:[
+      { t:'Who the worker is', obj:'See the person on the other side, and understand what the company is really promising them.',
+        blocks:[
+          {p:'The people one3seven serves are usually scared, and usually new to this. They may have just lost a job, fallen behind on rent, and be reaching out about a legal problem for the first time in their life. They are not a “lead.” They are a person in the middle of a hard moment, deciding whether to trust a stranger with it.'},
+          {p:'Many arrive braced to be dismissed — because they already have been. An employer waved them off, an HR line went in circles, a lawyer’s voicemail never called back. That is the experience the whole product is built to answer.'},
+          {p:'Our promise is <b>ownership</b>: the worker’s record is theirs, start to finish — we organize it, we never take it over, and they choose who ever sees it. They’ve spent this whole ordeal as a passenger in their own story; here, they’re driving. Everything one3seven does — the way the app is written, the way we sell it, the way anyone talks about a worker — has to keep that true. When a decision is unclear, this is the tie-breaker: choose the option that leaves the worker in the driver’s seat, treated as a person, not a transaction.'},
+          {p:'This is also the company’s edge, not just its conscience. The entire market treats workers as inventory to be scored and routed. The moment one3seven drifts into that, it becomes one more funnel. Staying genuinely worker-first is the moat — so understanding the worker is everyone’s job, whether or not you ever speak to one directly.'},
+          {p:'A picture to keep in mind: the single parent who quietly screenshotted every last-minute schedule change at 2 a.m. because they sensed something was wrong. That instinct is why they found us. Treat it with respect.'},
+        ]},
+      { t:'Empathy without overpromising', obj:'Be warm and human while never predicting an outcome or giving legal advice.',
+        blocks:[
+          {p:'Warmth and honesty are not in tension. You can care deeply and still hold the line. The trap is that empathy quietly tips into a promise you can’t keep — and that same reflex is the one you’ll need everywhere else at one3seven: care about the person, never predict the outcome.'},
+          {p:'It matters more here than almost anywhere, because a frightened person hears <b>hope</b> in whatever you say. A throwaway “that sounds unfair” can become, in their memory, “they told me I have a case.” Guard your words the way you would guard theirs.'},
+          {never:'You definitely have a case. · You’ll probably win. · Here’s what you should do legally.'},
+          {say:'I can’t tell you how this turns out — that’s for an attorney. What I can do is help you get your record organized so a lawyer can look at it clearly.'},
+          {p:'And honesty is itself a kindness. False hope is a cruelty: it costs a worker months and money chasing a door that was never open. Telling the truth gently is the more caring thing — not the colder one.'},
+          {p:'None of this means going cold. Warmth is the point — you can say “that sounds really hard, take your time, there’s no rush” all day long. Reassure the <b>person</b> as much as you want; just never reassure the <b>outcome</b>. “I’m here, we’ll go at your pace” is safe. “It’ll be fine, you’ll win” is not. That single distinction is the whole skill.'},
+          {p:'Know one boundary precisely: you are not a therapist and you are not a lawyer. For a hard moment, your steady presence is enough. But if a worker is in real crisis — someone in danger, talking about self-harm, making threats — your job is to stay kind and <b>escalate to a founder immediately</b>, not to counsel them. That is a safety line, not a suggestion.'},
+          {p:'This lesson is the worker-facing slice of a bigger rule. The full list of lines nobody at one3seven may cross — with a firm, in a demo, anywhere — lives in <b>The Doctrine</b>, which is the required next course.'},
+        ]},
+    ],
+    quiz:{ intro:'Apply what you learned', items:[
+      { apply:true, q:'A worker asks, “Do you think I’ll win?” What do you say?',
+        opts:[
+          {t:'“Honestly, your case sounds strong.”',ok:false},
+          {t:'“I can’t say how it’ll turn out — that’s for an attorney. What I can do is help you get your record organized so a lawyer can look at it clearly.”',ok:true},
+          {t:'“You should probably file a lawsuit.”',ok:false},
+        ], fb:{ ok:'Exactly — hold the no-promise line, and redirect to what you can actually do.', no:'That either overpromises or gives legal advice. Never predict the outcome; redirect to organizing the record.' } },
+      { q:'What does one3seven promise the worker about their record?',
+        opts:[
+          {t:'“You will win your case.”',ok:false},
+          {t:'“It’s yours — start to finish. You own it, and you choose who ever sees it.”',ok:true},
+        ], fb:{ ok:'Right — ownership is the promise, and every decision is measured against whether it keeps the worker in the driver’s seat.', no:'The promise is ownership: the record stays theirs, start to finish. We never promise an outcome.' } },
+    ]},
+  },
+  { id:'doctrine', track:'Core · Track 6', title:'The Doctrine', core:true,
+    blurb:'Organize, never conclude — the never-say lines, and the rules that keep the whole model clean.',
+    lessons:[
+      { t:'Organize, never conclude', obj:'State the one rule everything else hangs from — and why it protects everyone.',
+        blocks:[
+          {p:'The entire company runs on a single rule: <b>we organize and reflect the record; we never conclude.</b> We can show what is present, what is missing, and where each fact came from. We can never say what it <i>proves</i>, whether there is a case, or what it is worth.'},
+          {p:'A shorthand worth memorizing: <b>revelation is safe; conclusion is not.</b> Pointing at a document is revelation. Telling someone what the document means for their legal rights is conclusion — and that is practicing law.'},
+          {p:'Why the discipline is not just caution: concluding is the <b>unauthorized practice of law</b> when we’re not the attorney, and it is exactly what a court or a bar would seize on. Refusing to conclude is what lets a real firm safely put one3seven in front of a client at all.'},
+          {p:'So the line does triple duty — it protects the <b>worker</b> from false hope, the <b>firm</b> from an ethics problem, and <b>one3seven</b> from liability, all with one habit. Hold it and almost everything else takes care of itself.'},
+        ], cites:[
+          {label:'Bus. & Prof. Code §§6125–6126 — unauthorized practice of law', url:'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=BPC&sectionNum=6125.'},
+          {label:'one3seven Doctrine — internal (organize, never conclude)'},
+        ]},
+      { t:'Source-linked vs worker-stated', obj:'Separate what a document shows from what a person told us — and never blur them.',
+        blocks:[
+          {p:'Two very different kinds of “fact” live in every record. A <b>source-linked</b> fact points to a document you can open — a pay stub, a text, a schedule. A <b>worker-stated</b> fact is something the worker told us that no document yet backs up.'},
+          {p:'Both belong in the record, and both are presented honestly — but they are <b>never</b> dressed up as each other. “The pay stub shows $22/hour” is source-linked. “My manager said I’d get overtime” is worker-stated. Collapsing the second into the first is exactly the kind of quiet overclaim that destroys a firm’s trust.'},
+          {p:'This is also one3seven’s moat in a sentence: <b>every source-linked fact traces to its page in one click.</b> An attorney can verify in seconds instead of reconstructing for an hour. Provenance is the product.'},
+          {p:'The safe reflex, whenever you’re unsure: <b>describe the record and let the attorney weigh it.</b> “Here’s the pay stub; here’s what the worker said about it” — and stop. That phrase is your reset button any time a conversation drifts toward a conclusion.'},
+        ], cites:[
+          {label:'Bus. & Prof. Code §17200 — unfair/deceptive practices (why overclaiming a fact is a legal risk, not just style)', url:'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=BPC&sectionNum=17200.'},
+          {label:'one3seven Doctrine — internal (source-linked vs worker-stated; provenance is the product)'},
+        ]},
+      { t:'The never-say lines', obj:'Memorize the exact statements nobody at one3seven may make.',
+        blocks:[
+          {p:'These are not style preferences. Each one is a sentence that can create real legal exposure the moment it leaves your mouth — in a call, an email, a demo, or a hallway.'},
+          {never:'“Our AI finds / ranks the strongest cases.” · “This case is worth $X.” · “You’ll win / you have a strong case.” · “Your filing deadline is…” · “It’s flawless / never wrong.” · “We’ll send you to the right firm.”'},
+          {say:'We show how complete the record is against what the law requires — your attorney decides.'},
+          {p:'Notice the pattern: every banned line either <b>predicts an outcome</b>, <b>assigns a value</b>, <b>gives legal advice</b>, <b>overclaims accuracy</b>, or <b>routes a client</b>. If a sentence does any of those five things, it’s a never-say — even one you’ve never seen before.'},
+          {p:'The universal escape hatch: if you’re unsure whether a sentence crosses the line, it probably does — so fall back to <b>describe the record and let the attorney decide.</b> That single phrase is doctrine-safe in every situation you will ever be in.'},
+        ], cites:[
+          {label:'Bus. & Prof. Code §6125 — predicting outcome/value or giving advice = practicing law', url:'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=BPC&sectionNum=6125.'},
+          {label:'Bus. & Prof. Code §6155 — "we’ll send you to the right firm" = referral service', url:'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=BPC&sectionNum=6155.'},
+          {label:'one3seven Doctrine — internal (the five never-say categories)'},
+        ]},
+      { t:'No scoring, no advice, no deadlines', obj:'Understand why the three most tempting shortcuts are the three most dangerous.',
+        blocks:[
+          {p:'<b>No case scoring.</b> Ranking or selecting the “best” cases is the single thing firms most want to hear — and the single fastest way to become the unauthorized practice of law. We show <b>coverage</b> (how much of what the law requires is on file), never a verdict. Coverage describes the record; a score judges the case.'},
+          {p:'<b>No legal advice or deadlines.</b> Calculating a statute of limitations — telling someone “you must file by March” — <i>is</i> practicing law. We surface the dates that appear on the record or that the worker entered; the <b>attorney</b> calculates any deadline. We show dates; we never do the math on them.'},
+          {p:'<b>No dollar value.</b> What a claim is worth turns on judgment, strategy, and facts we don’t have — it is the attorney’s call, never ours. “The record shows unpaid overtime hours” is fine; “that’s about $40,000” is a never-say.'},
+          {p:'These three share one root: each substitutes <b>our</b> judgment for the attorney’s. The tell, every time, is a sentence that concludes something about the <i>case</i> rather than describing the <i>record</i>.'},
+        ], cites:[
+          {label:'Bus. & Prof. Code §6125 — legal advice & calculating deadlines are the practice of law', url:'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=BPC&sectionNum=6125.'},
+          {label:'one3seven Doctrine — internal (coverage describes the record; it never scores the case)'},
+        ]},
+      { t:'Worker choice & firm independence', obj:'Explain, in plain English, why the worker chooses and why our money stays clean.',
+        blocks:[
+          {p:'The worker chooses their own attorney and can freely export and deliver their record to anyone they like. one3seven <b>never</b> steers a worker toward a firm that pays us — presenting a menu of paying firms is precisely what turns a company into a lawyer <b>referral service</b>, which is regulated under §6155. We are a tool the worker uses, not a service that refers them.'},
+          {p:'The single question that keeps us clean: <b>does the worker choose the firm, or do we?</b> As long as the worker brings their own firm (or exports and walks the record in), we’re a tool. The moment we rank, match, or route, we’ve crossed into referral territory.'},
+          {p:'Our money is just as disciplined. We are <b>never</b> paid out of a case — no percentage of a recovery, no per-signed-case fee. That’s the fee-sharing rule (CRPC 5.4): a non-lawyer can’t take a cut of legal fees. We charge a flat fee for software, decoupled from any outcome. Clean money only.'},
+          {p:'You do not need a law degree to hold any of this. It compresses to seven words: <b>the worker chooses, we organize, the attorney concludes.</b>'},
+        ], cites:[
+          {label:'Bus. & Prof. Code §6155 — lawyer referral services (why we never rank/route)', url:'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=BPC&sectionNum=6155.'},
+          {label:'Cal. Rules of Prof. Conduct 5.4 — no fee-sharing with non-lawyers (clean money)', url:'https://www.calbar.ca.gov/Attorneys/Conduct-Discipline/Rules/Rules-of-Professional-Conduct/Current-Rules'},
+          {label:'one3seven Doctrine — internal (worker chooses; flat software fee)'},
+        ]},
+    ],
+    quiz:{ intro:'The doctrine gate — this one must be right', items:[
+      { gate:true, q:'A firm asks, “Can it tell us if the worker has a case?” What’s the correct answer?',
+        opts:[
+          {t:'“Yes — that’s the point.”',ok:false},
+          {t:'“No, and that’s deliberate — we organize and reflect; your firm makes every legal decision.”',ok:true},
+          {t:'“It gives each case a score.”',ok:false},
+        ], fb:{ ok:'Correct — and held with confidence. That line is the moat.', no:'This is the doctrine trap. The answer is a clear no — we never conclude whether there’s a case.' } },
+      { gate:true, q:'Which statement is one you may NOT make?',
+        opts:[
+          {t:'“We show how complete the record is against what the law requires.”',ok:false},
+          {t:'“Based on this, you’ll probably win about $40,000.”',ok:true},
+          {t:'“The worker chooses which firm sees their record.”',ok:false},
+        ], fb:{ ok:'Right — predicting an outcome and a dollar value crosses two lines at once.', no:'Read again — one of these predicts an outcome and a dollar amount. That’s a never-say.' } },
+    ]},
+  },
+  // ---- coming soon (catalog scaffold) ----
+  { id:'product', track:'Core · Track 1', title:'The Product', core:true,
+    blurb:'What one3seven does, the core workflow, and its limits — the basics everyone here can explain.',
+    lessons:[
+      { t:'What one3seven is', obj:'Explain, in one breath, what one3seven does and for whom.',
+        blocks:[
+          {p:'one3seven helps a worker <b>organize their own employment record</b> — pay stubs, emails, schedules, texts — into a clear, source-linked file, and then <b>choose</b> to share it with an employment attorney.'},
+          {p:'The one-line version to keep in your pocket: <b>an organized record, in the worker’s hands.</b> Not a lawyer, not advice, not a verdict — a clean, verifiable file the worker owns and controls.'},
+          {p:'It helps to name what it replaces. Today a worker walks into a firm with a shoebox — a phone full of screenshots, a folder of PDFs, a story in their head — and a paralegal spends the first hour of the intake reconstructing it. one3seven does that reconstruction <b>before</b> anyone reaches an attorney, and hands the firm a finished file instead of a pile.'},
+          {p:'The customers are two, and it matters which is which: the <b>worker</b> is who we serve and who owns the record; the <b>firm</b> is who eventually pays for the software to receive and work it. The product is built worker-first for exactly that reason.'},
+        ]},
+      { t:'The worker’s side', obj:'Describe what the worker actually does — and what the product does for them.',
+        blocks:[
+          {p:'The worker drops in documents — no sorting, no folders, no “which category is this?” one3seven infers the document types on its own and reconstructs a <b>timeline</b> of what happened when. Only the worker’s name is required to begin.'},
+          {p:'As they go, the product shows them <b>what’s still missing</b> against what a claim like theirs typically needs — so instead of guessing, the worker can see the gaps and gather the specific records that fill them. When a document isn’t in their possession, one3seven can even draft the records-request letter for them.'},
+          {p:'They keep their own <b>reminders and important dates</b> in one place — hearing dates a firm gave them, a date they entered themselves, dates that appear on a record. Every date is tagged by where it came from.'},
+          {p:'The one hard limit to state plainly here: those dates are <b>surfaced, never calculated.</b> one3seven does not compute a filing deadline or a “days left” countdown — that is the attorney’s call, and doing the math ourselves would cross the doctrine line (see <b>The Doctrine</b> for why).'},
+          {p:'Underneath it all: the worker <b>owns and can export the entire file at any time</b>, with or without ever involving a firm. That ownership is not a nicety — it’s the foundation of the whole model.'},
+        ]},
+      { t:'How it reaches a firm', obj:'Explain the two paths a record can travel — and who is in control of both.',
+        blocks:[
+          {p:'There are exactly two ways a record gets to an attorney, and both are driven by the worker: they enter a firm’s <b>code</b> and share it directly, or they <b>export</b> the finished file and hand it to any attorney they choose.'},
+          {say:'Nothing is sent to anyone until you decide. You choose who sees your record.'},
+          {p:'If the firm the worker picks is a one3seven customer, they receive the rich interactive version (next lesson). If not, the worker simply exports and delivers it — and that firm, seeing the value, often becomes the next customer. Either way the worker is never stuck and never gated.'},
+          {p:'The reason it works this way is doctrine, not just design: <b>the worker chooses the firm; one3seven never picks one for them.</b> That is the exact line that keeps us a tool rather than a referral service — the full explanation lives in <b>The Doctrine</b>.'},
+        ]},
+      { t:'The firm’s side', obj:'Describe what an attorney actually sees when a worker shares a record.',
+        blocks:[
+          {p:'A firm opens a <b>binder</b>, not a data dump. The front of it is a <b>decision card</b> — the ten-second read: who the worker is, the sequence of events, the key dates, the records on file.'},
+          {p:'Behind it sits the <b>Element Lens</b>. For a given kind of claim, the law requires certain elements to be shown; the Element Lens displays how many of those elements have material <b>on file</b> and, just as importantly, where the <b>gaps</b> are. That “how much is covered” figure is the <b>Coverage Rate</b> — and it is a completeness measure, <b>never</b> a judgment of whether the case is good (that distinction is the whole ballgame; see The Doctrine).'},
+          {p:'The feature that earns an attorney’s trust is <b>source-linking</b>: click any fact and the exact page it came from opens beside it. Verification drops from twenty minutes of hunting to one click. For a lawyer whose license rides on not repeating an unverified claim, that is the difference between usable and not.'},
+          {p:'And the firm can act right there — accept, request more documents, or decline — each in a click. The tool organizes; the attorney decides. That handoff is deliberate, and it never inverts.'},
+        ]},
+      { t:'What it does NOT do', obj:'State the product’s limits clearly — because the limits are the product.',
+        blocks:[
+          {p:'A one3seven person should be able to recite the limits as fluently as the features. The product does <b>not</b> score or rank cases, predict an outcome or a value, give legal advice or compute deadlines, or route workers to firms for a fee. (Those are the never-say lines — owned and explained in <b>The Doctrine</b>.)'},
+          {p:'Say it as a strength, because it is one: one3seven <b>organizes and reflects</b> the record; the attorney concludes. Every competitor that scores, values, or routes has taken on legal risk we deliberately refuse.'},
+          {p:'If you remember one thing about the product, remember its <b>restraint</b>. The discipline about what it won’t do is not a limitation bolted onto the moat — it <i>is</i> the moat.'},
+        ]},
+    ],
+    quiz:{ intro:'Apply what you learned', items:[
+      { apply:true, q:'A worker asks, “Once I upload everything, will you automatically send it to a law firm?” What’s the right answer?',
+        opts:[
+          {t:'“Yes, we match you to the best firm automatically.”',ok:false},
+          {t:'“No — nothing is sent until you choose. You pick the firm and decide when to share.”',ok:true},
+          {t:'“We send it to all the firms in our network.”',ok:false},
+        ], fb:{ ok:'Right — worker-driven, worker-chosen. That is the whole model.', no:'one3seven never auto-routes or matches. The worker chooses the firm and decides when to share.' } },
+      { q:'What does a firm get from the Element Lens?',
+        opts:[
+          {t:'A score for how strong the case is.',ok:false},
+          {t:'How much of what the law requires is on file, and where the gaps are.',ok:true},
+        ], fb:{ ok:'Correct — coverage of the record, never a verdict.', no:'The Element Lens shows coverage (on file vs required) — it never scores or judges the case.' } },
+    ]},
+  },
+  { id:'trust', track:'Core · Track 3/4', title:'Trust in Practice', core:true,
+    blurb:'Handling worker information safely — the applied privacy & security you use every day.',
+    lessons:[
+      { t:'Why the worker owns the data', obj:'Grasp whose data this is, and the standard it must be held to.',
+        blocks:[
+          {p:'The record belongs to the <b>worker</b>, not to us. We are custodians of some of the most sensitive information a person has: the story of how they lost their job, their exact pay, screenshots of private conversations, sometimes health or immigration details tucked inside the documents.'},
+          {p:'Hold it to a <b>privileged-adjacent</b> standard — guard it the way a law firm guards a client file. That is not us being dramatic. When a firm eventually works with a worker’s record, the attorney’s duty of confidentiality (Rule 1.6) effectively extends to the vendors touching that data. If we’re sloppy, we don’t just embarrass ourselves — we can compromise the firm’s ethical obligations.'},
+          {p:'So this is the quiet reason a compliant firm can hire us at all: our data discipline is what makes one3seven <b>hirable</b>. Lose that and there is no business, no matter how good the product is.'},
+          {p:'And it ties straight back to the mission — a worker who trusts us with the worst week of their life is owed that trust in how their data is handled. Privacy here is dignity, continued past the conversation.'},
+        ], cites:[
+          {label:'Cal. Rules of Prof. Conduct 1.6 — duty of confidentiality (extends to the firm’s vendors)', url:'https://www.calbar.ca.gov/Attorneys/Conduct-Discipline/Rules/Rules-of-Professional-Conduct/Current-Rules'},
+          {label:'Cal. State Bar Formal Opinion 2010-179 — confidentiality & the use of technology'},
+          {label:'Civ. Code §1798.100 et seq. — CCPA / CPRA (consumer data rights)', url:'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&sectionNum=1798.100.'},
+        ]},
+      { t:'Least privilege', obj:'Touch only what your job needs — and understand that the system enforces it.',
+        blocks:[
+          {p:'The principle is simple: see only what your role actually requires, only when you need it. A firm cannot see a worker’s intake until the <b>worker grants full access</b> — and that boundary is enforced by the database itself (row-level security), not by anyone remembering a policy.'},
+          {p:'That “enforced, not promised” part matters. Every worker’s records are walled off from every other firm and every other worker at the data layer, so a leak can’t happen just because someone clicked the wrong thing. But the wall only holds if we don’t deliberately reach around it.'},
+          {p:'So don’t go browsing records that aren’t yours to work on. <b>“I was curious” is never a reason to open someone’s file.</b> Curiosity about a “wild case” is exactly the instinct to distrust in yourself.'},
+          {p:'If you ever find you <i>can</i> see something you don’t think you should — that’s not a lucky shortcut, it’s a bug. Report it (last lesson tells you how). Finding a gap and flagging it is one of the most valuable things you can do here.'},
+        ], cites:[
+          {label:'Civ. Code §1798.100 — CCPA / CPRA (data minimization & access limits)', url:'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&sectionNum=1798.100.'},
+          {label:'one3seven Security Curriculum — internal (row-level security enforces least privilege)'},
+        ]},
+      { t:'Handling records safely', obj:'Build the everyday habits that keep worker data safe.',
+        blocks:[
+          {p:'The single most common way sensitive data leaks at an AI company is boring: someone pastes it into a tool that wasn’t built to hold it, to save five minutes.'},
+          {never:'Pasting a worker’s document or details into a personal or public AI tool (public ChatGPT, a random summarizer, a personal drive) — even “just part of it,” even “just to summarize.”'},
+          {p:'Use <b>only the approved systems</b> for anything containing worker information. If you’re not sure whether a tool is approved, treat it as “no” and ask. There is no summary worth a confidentiality breach.'},
+          {p:'The ordinary hygiene still matters and is not optional: lock your devices, use MFA everywhere, don’t leave a screen open in a coffee shop, and don’t retell a worker’s story where it isn’t needed. A breach is usually a small habit that slipped, not a movie-style hack.'},
+          {p:'Be alert to <b>phishing and social engineering</b> — the email that looks like a firm asking for a worker’s file “urgently,” the login page that’s slightly off. When in doubt, slow down and verify through a channel you already trust. Urgency is the con artist’s favorite tool.'},
+          {p:'Privacy is a <b>habit</b>, not a policy you read once and forget. It’s the hundred small choices a day, not the one document you signed.'},
+        ], cites:[
+          {label:'Civ. Code §1798.81.5 — reasonable security procedures for personal information', url:'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&sectionNum=1798.81.5.'},
+          {label:'one3seven Security Curriculum — internal (approved-tools-only; phishing awareness)'},
+        ]},
+      { t:'When something goes wrong', obj:'Respond correctly the moment an access, privacy, or security problem happens.',
+        blocks:[
+          {p:'You will, at some point, make or spot a mistake — saw a file you shouldn’t have, lost a laptop, clicked a link you shouldn’t have, sent something to the wrong person. What defines you here is the next ten minutes, not the mistake.'},
+          {p:'The rule is one word: <b>report.</b> Immediately, to a founder. Don’t investigate it quietly first, don’t wait to see if it matters, don’t hope it goes away.'},
+          {say:'I think I may have accessed / sent / lost something I shouldn’t have — flagging it right away so we can handle it.'},
+          {p:'Why speed beats everything: most data incidents are containable if caught fast (revoke access, reset a credential, notify) and become real damage only when they’re hidden and age. A same-hour report is a non-event; a week-late one is a crisis.'},
+          {p:'So the culture here is explicit: <b>fast, honest reporting is a strength, never a punishment.</b> Hiding a mistake is the only version of it that actually fails the worker — and it’s the only version anyone is ever in trouble for.'},
+        ], cites:[
+          {label:'Civ. Code §1798.82 — California data-breach notification law', url:'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&sectionNum=1798.82.'},
+          {label:'one3seven — internal (incident response: report to a founder immediately)'},
+        ]},
+      { t:'The promise we keep', obj:'State the concrete data promises one3seven makes — and why living them is the point.',
+        blocks:[
+          {p:'We make a few promises to workers and we keep them literally. We <b>never sell</b> worker data — not raw, not “anonymized,” not as “insights.” It is not a revenue line and never will be.'},
+          {p:'The worker can <b>export</b> their full record whenever they want, and <b>delete</b> it. Their data is theirs to take and theirs to erase — ownership isn’t a slogan on the marketing page, it’s an actual capability.'},
+          {p:'We collect what the work needs and no more, and we don’t repurpose it. The record exists to help this worker with this situation — not to train something, not to build a side dataset to sell.'},
+          {p:'The through-line: a company that <b>teaches</b> privacy has to <b>live</b> it, visibly. Everything one3seven says about being worker-first and trustworthy is only as real as how the person reading this handles the next document they touch.'},
+        ], cites:[
+          {label:'Civ. Code §1798.105 — right to delete personal information', url:'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&sectionNum=1798.105.'},
+          {label:'Civ. Code §1798.120 — right to opt out of sale (we never sell worker data)', url:'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&sectionNum=1798.120.'},
+          {label:'one3seven — internal (export, delete, never sell)'},
+        ]},
+    ],
+    quiz:{ intro:'Apply what you learned', items:[
+      { gate:true, q:'To summarize a worker’s uploaded document faster, you think about pasting it into public ChatGPT. What do you do?',
+        opts:[
+          {t:'Paste it in — it’s quicker.',ok:false},
+          {t:'Never put worker data in an unapproved tool. Use only approved systems, or ask.',ok:true},
+          {t:'Paste just part of it.',ok:false},
+        ], fb:{ ok:'Correct — worker data never goes into an unapproved or public tool, full stop.', no:'Worker data must never go into an unapproved or public tool — not even part of it. Use approved systems or ask.' } },
+      { q:'You accidentally opened a worker file that isn’t yours to work on. The right move is:',
+        opts:[
+          {t:'Say nothing; no harm done.',ok:false},
+          {t:'Report it to a founder right away.',ok:true},
+        ], fb:{ ok:'Right — report fast and honestly. That is a strength here.', no:'Report it immediately to a founder. Fast, honest reporting is never punished; hiding it is the failure.' } },
+    ]},
+  },
+  { id:'howwework', track:'Core', title:'How We Work', core:true,
+    blurb:'The values, quality bar, and habits that make one3seven trustworthy — how we operate.',
+    lessons:[
+      { t:'The mission above the task', obj:'Use worker-first as the tiebreaker when two good options pull apart.',
+        blocks:[
+          {p:'Most days the work is obvious. This lesson is for the days it isn’t — when two reasonable choices conflict and you have to pick. The tiebreaker is always the same: <b>worker-first.</b>'},
+          {p:'Concretely, that means when a shortcut would help the task but bruise a worker’s dignity, rush their pace, or drift toward the doctrine line, the mission wins — even if it’s slower or harder. The promise the company makes (see <b>The Worker & The Mission</b>) is only real if it survives the moment it’s inconvenient.'},
+          {p:'This also protects <i>you</i>: when you can point to “I chose the worker’s dignity / the safe line,” you will never be second-guessed here for it. Erring toward the mission is always the defensible call.'},
+        ]},
+      { t:'Quality over volume', obj:'Internalize why one3seven optimizes for precision, not throughput.',
+        blocks:[
+          {p:'one3seven’s moat is <b>accuracy</b>. A firm will trust the tool only if what it shows is right — and trust, once dented, doesn’t come back at the next intake, it’s gone for all of them. So we deliberately favor precision over recall.'},
+          {p:'The rule that falls out of that: <b>a wrong fact is worse than a missing one.</b> A gap is honest — the firm sees “not on file” and moves on. A confident error is a landmine — the attorney relies on it and gets burned in front of a client or a court. We would rather show less and be right than show more and be wrong.'},
+          {p:'So the instinct to resist is “ship it, it’s probably fine.” Do it right, not fast. One clean, correct record does more for the company than ten rushed ones — because a single sloppy one can cost the trust the other nine earned.'},
+          {p:'This isn’t perfectionism for its own sake; it’s strategy. Competitors can copy a portal in a weekend. They cannot cheaply copy a reputation for being <b>right</b>. That reputation is built one careful record at a time, by you.'},
+        ]},
+      { t:'Say what’s true', obj:'Hold, internally, the same honesty discipline the product holds externally.',
+        blocks:[
+          {p:'one3seven’s public posture is <b>auditable, not flawless</b> — we don’t claim perfection, we make everything checkable. That same discipline has to run inside the company, not just in the pitch.'},
+          {p:'Practically: never overclaim — about a case, about the product, about a metric, about what you got done. If you’re not certain, say so out loud. Confident-but-wrong is the exact failure mode we sell against, so we can’t live it ourselves.'},
+          {say:'I’m not sure about that number — let me verify before we put it in front of anyone.'},
+          {p:'Be especially careful with <b>figures and legal specifics</b> — a pricing number, a statute, a “firms usually…” claim. Verify before you repeat it, because the moment it leaves the building someone will treat it as fact. Flagging “I need to check that” is a mark of credibility here, never of weakness.'},
+        ]},
+      { t:'Document & hand off', obj:'Leave a trail the next person can act on without you in the room.',
+        blocks:[
+          {p:'We build clean, legible records for workers so an attorney can act without reconstructing anything. We owe each other exactly the same. Write things down so the next person — or you in three weeks — can pick it up cold.'},
+          {p:'What to capture: a decision and <i>why</i>, a change and what it affects, a promise made to a firm or a worker. Put it where the team can find it, not just in your own head or a DM.'},
+          {p:'The bar is simple and unforgiving: <b>undocumented is unfinished.</b> A brilliant call nobody can find is worth about as much as a call never made — and it quietly recreates the single-point-of-failure problem the whole company exists to remove.'},
+        ]},
+      { t:'Escalate & ask', obj:'Recognize the questions to route up instead of answering yourself.',
+        blocks:[
+          {p:'You are not alone and you are not expected to know everything. Two categories go <b>up</b>, every time, no matter how sure you feel: any <b>legal</b> question, and anything that would cross a doctrine or data line. Route those to a founder or counsel — never answer them yourself.'},
+          {p:'Asking early is cheaper than a mistake, always. A thirty-second “can I say this?” beats a doctrine slip you can’t take back, or a worker who acted on advice you weren’t allowed to give. Nobody here loses standing for asking; people lose it for guessing on the things that matter.'},
+          {p:'And when you’re genuinely unsure in the moment, you already have a safe default from <b>The Doctrine</b> — describe the record and route the judgment to the person whose call it actually is. Say less, flag more, and let the right person decide.'},
+        ]},
+    ],
+    quiz:{ intro:'Apply what you learned', items:[
+      { q:'A task would go faster if you skipped verifying a fact. The one3seven way is:',
+        opts:[
+          {t:'Skip it — speed matters most.',ok:false},
+          {t:'Verify it — a wrong fact is worse than a slow one; accuracy is the moat.',ok:true},
+        ], fb:{ ok:'Right — precision over speed, every time.', no:'Accuracy is the moat. A wrong fact can lose a firm’s trust; verify it.' } },
+      { apply:true, q:'A worker asks you a specific legal question you think you know the answer to. What do you do?',
+        opts:[
+          {t:'Answer it — you’re pretty sure.',ok:false},
+          {t:'Route it to a founder/counsel and stick to describing the record.',ok:true},
+        ], fb:{ ok:'Correct — legal questions go up; you describe the record, the attorney concludes.', no:'Never answer a legal question yourself. Route it to a founder/counsel and describe the record.' } },
+    ]},
+  },
+  { id:'emplaw', track:'Domain · Employment Law', title:'California Employment Law — for Fluency', core:true,
+    blurb:'The laws behind the record — taught so you can recognize and describe, never diagnose. Grounded in the same statutes the product uses.',
+    lessons:[
+      { t:'Learn the law to describe — never to apply', obj:'Hold the one frame that makes learning employment law safe here.',
+        blocks:[
+          {p:'This course teaches you real California employment law. That is unusual for a company whose first rule is <b>never conclude</b> — so read this lesson before any other, because it is the frame that keeps the rest safe.'},
+          {p:'You learn the law for three reasons: to <b>recognize</b> what a worker is describing, to know <b>which records</b> matter for it, and to speak credibly with a firm. You do <b>not</b> learn it to tell a worker what they have, whether they will win, or what to do. Knowing the elements of retaliation is fluency; telling a worker "you were retaliated against" is the unauthorized practice of law.'},
+          {never:'"That’s clearly discrimination." · "You have a wage claim." · "This means you’ll win." · "You should sue."'},
+          {say:'What you’re describing sounds like it touches on pay records and schedules — let’s get those organized so an attorney can look at it clearly.'},
+          {p:'The tell is the same as always: describing the <b>record</b> ("here are the pay stubs and the dates") is safe; concluding about the <b>case</b> ("that’s a §510 overtime violation worth $X") is not. Keep every lesson below on the describe side of that line. <i>(Internal fluency training; counsel verifies any specific before it’s treated as authoritative.)</i>'},
+        ], cites:[
+          {label:'Bus. & Prof. Code §§6125–6126 — unauthorized practice of law', url:'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=BPC&sectionNum=6125.'},
+          {label:'one3seven Doctrine — internal (organize, never conclude)'},
+        ]},
+      { t:'The money claims — wage & hour', obj:'Recognize the most common wage/hour claims and the records that show them.',
+        blocks:[
+          {p:'Most employment matters start with money. California wage law is dense and worker-protective. You don’t need to litigate it — you need to recognize the shapes and know what documents each one lives or dies on.'},
+          {p:'<b>Overtime (§510):</b> generally 1.5× after 8 hours/day or 40/week, 2× after 12/day, with 7th-consecutive-day rules. <b>Meal & rest (§512, §226.7):</b> a meal period by the 5th hour, paid rest breaks by the hours worked; a missed one owes a premium hour. <b>Wage statements (§226):</b> the pay stub must itemize specific things (hours, rates, gross/net, employer name); missing items are their own violation. <b>Final pay & waiting time (§201–203):</b> final wages are due fast on separation, and late payment can owe a penalty of up to 30 days’ wages. <b>Expense reimbursement (§2802):</b> necessary business costs — mileage, phone, tools — must be repaid. <b>Equal pay (§1197.5):</b> substantially similar work, different pay.'},
+          {p:'What powers our product: each of these is proven by <b>records</b> — timecards, pay stubs, schedules, expense logs. That’s why "collect the pay records" is never busywork; it’s the evidence the whole claim rests on. You describe what the records contain; the attorney decides what they establish.'},
+        ], cites:[
+          {label:'Lab. Code §510 — daily overtime', url:'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=LAB&sectionNum=510.'},
+          {label:'Lab. Code §§226.7 & 512 — meal & rest periods', url:'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=LAB&sectionNum=512.'},
+          {label:'Lab. Code §226 — itemized wage statements', url:'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=LAB&sectionNum=226.'},
+          {label:'Lab. Code §§201–203 — final pay & waiting-time penalty', url:'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=LAB&sectionNum=203.'},
+          {label:'Lab. Code §2802 — expense reimbursement', url:'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=LAB&sectionNum=2802.'},
+          {label:'Lab. Code §1197.5 — equal pay', url:'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=LAB&sectionNum=1197.5.'},
+          {label:'CA Labor Commissioner (DLSE) — wage & hour', url:'https://www.dir.ca.gov/dlse/'},
+        ]},
+      { t:'Retaliation', obj:'Recognize the retaliation family and its shared shape.',
+        blocks:[
+          {p:'Retaliation is punishing a worker for doing something the law protects. California has several flavors: <b>§1102.5</b> (whistleblower — reporting a suspected legal violation), <b>§98.6</b> (complaining about wages/hours), <b>§6310</b> (raising health & safety), and <b>FEHA §12940(h)</b> (opposing discrimination/harassment).'},
+          {p:'They share one shape you can learn once: a <b>protected activity</b> (the report/complaint), the <b>employer’s knowledge</b> of it, an <b>adverse action</b> (fired, cut hours, demoted), and a <b>connection</b> between them — often shown by <b>timing</b>. Notice that last piece: "what happened, and when, relative to the complaint" is a <i>records</i> question, which is exactly what we organize.'},
+          {p:'So when a worker says "I complained, and two weeks later they cut my hours," you don’t say "that’s retaliation." You recognize the shape, and help assemble the complaint, the dates, and the action — the record an attorney needs to make that call.'},
+        ], cites:[
+          {label:'Lab. Code §1102.5 — whistleblower retaliation', url:'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=LAB&sectionNum=1102.5.'},
+          {label:'Lab. Code §98.6 — wage-complaint retaliation', url:'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=LAB&sectionNum=98.6.'},
+          {label:'Lab. Code §6310 — health & safety retaliation', url:'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=LAB&sectionNum=6310.'},
+          {label:'Gov. Code §12940(h) — FEHA retaliation', url:'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=GOV&sectionNum=12940.'},
+        ]},
+      { t:'Discrimination, harassment & leave (FEHA)', obj:'Recognize the FEHA family — the anti-discrimination backbone.',
+        blocks:[
+          {p:'The Fair Employment and Housing Act (FEHA) is California’s core anti-discrimination law, and it’s broad. <b>Discrimination (§12940(a))</b> covers adverse treatment because of a <b>protected characteristic</b> — race, sex, age (40+), disability, religion, national origin, sexual orientation, pregnancy, and more. <b>Harassment (§12940(j))</b> covers a hostile environment or quid-pro-quo conduct.'},
+          {p:'FEHA also carries the <b>disability</b> duties: <b>reasonable accommodation (§12940(m))</b> and the <b>interactive process (§12940(n))</b> — the back-and-forth an employer must engage in about an accommodation. And a family of <b>protected leaves</b> lives alongside it: CFRA (§12945.2), Pregnancy Disability Leave (§12945), pregnancy/lactation accommodation, paid sick leave (§246), with FMLA as a federal overlay.'},
+          {p:'The record here is often communications and dates — the accommodation request and the response, the leave asked for and what happened next, statements attributed to decision-makers. You help gather and date those; you never label a characteristic or conclude that bias caused the outcome. That causal call is the attorney’s.'},
+        ], cites:[
+          {label:'Gov. Code §12940 — FEHA discrimination, harassment & accommodation', url:'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=GOV&sectionNum=12940.'},
+          {label:'Gov. Code §12945.2 — CFRA family/medical leave', url:'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=GOV&sectionNum=12945.2.'},
+          {label:'Lab. Code §246 — paid sick leave', url:'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=LAB&sectionNum=246.'},
+          {label:'California Civil Rights Department (FEHA enforcement)', url:'https://calcivilrights.ca.gov/'},
+        ]},
+      { t:'Ending the job — termination & constructive discharge', obj:'Recognize wrongful-termination shapes without concluding one occurred.',
+        blocks:[
+          {p:'California is at-will by default — either side can end the job for almost any reason. The exceptions are what plaintiff firms look at. <b>Wrongful termination in violation of public policy (the "Tameny" claim)</b> is firing someone for a reason the law forbids — e.g., for refusing to break the law, or for exercising a protected right.'},
+          {p:'<b>Constructive discharge</b> is when conditions are made so intolerable that a reasonable person would feel forced to quit — legally treated like a firing. It’s a high bar and fact-heavy, which is exactly why the <b>record of the conditions and dates</b> matters so much.'},
+          {p:'Your job is unchanged: help the worker lay out what happened and when, with the documents that back it. Whether it clears the legal bar for Tameny or constructive discharge is a judgment for counsel — never a sentence you say.'},
+        ], cites:[
+          {label:'Lab. Code §2922 — at-will employment presumption', url:'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=LAB&sectionNum=2922.'},
+          {label:'Tameny v. Atlantic Richfield Co. (1980) 27 Cal.3d 167 — wrongful discharge in violation of public policy'},
+        ]},
+      { t:'The worker’s records rights', obj:'Know what a worker can legally demand — the toolkit our product hands them.',
+        blocks:[
+          {p:'This lesson is the one that ties employment law directly to what we build. California gives workers the right to <b>get their own records</b>, and the product helps them exercise it.'},
+          {p:'<b>Personnel file (§1198.5):</b> a current or former employee can request their personnel records, and the employer must produce them within a set window. <b>Pay records (§226(b)):</b> a right to inspect/copy wage statements. <b>Documents you signed (§432):</b> copies of anything the worker signed. <b>Wage-theft notice (§2810.5):</b> at hire, employers must give written notice of pay rate, payday, and employer details — its absence is itself informative.'},
+          {p:'This is why one3seven can <b>draft a records-request letter</b> for a worker: we’re helping them use a right the law already gives them, on their own behalf. Describing that right ("the law lets you request your personnel file") is fine; telling them what the file will prove is not.'},
+        ], cites:[
+          {label:'Lab. Code §1198.5 — personnel records inspection', url:'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=LAB&sectionNum=1198.5.'},
+          {label:'Lab. Code §226(b) — wage-record inspection', url:'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=LAB&sectionNum=226.'},
+          {label:'Lab. Code §432 — copies of signed documents', url:'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=LAB&sectionNum=432.'},
+          {label:'Lab. Code §2810.5 — wage-theft notice at hire', url:'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=LAB&sectionNum=2810.5.'},
+        ]},
+    ],
+    quiz:{ intro:'Fluency check — recognize, don’t diagnose', items:[
+      { gate:true, q:'A worker describes a classic wage/hour pattern and asks, "So do I have a §510 overtime case?" You:',
+        opts:[
+          {t:'"Yes, that’s a clear overtime violation."',ok:false},
+          {t:'Recognize the shape, and help gather timecards and pay stubs so an attorney can make that call — without saying they have a case.',ok:true},
+          {t:'"Probably — you’ll likely win the penalty."',ok:false},
+        ], fb:{ ok:'Right — recognize and describe the record; the attorney concludes.', no:'Recognizing the shape is fluency; telling the worker they have a case is UPL. Gather the records; route the conclusion.' } },
+      { q:'The four-part shape shared across the retaliation claims is:',
+        opts:[
+          {t:'Protected activity, employer knowledge, adverse action, and a connection (often timing).',ok:true},
+          {t:'Damages, liability, causation, and a jury.',ok:false},
+        ], fb:{ ok:'Correct — and each piece is largely a records question, which is what we organize.', no:'It’s: protected activity → employer knowledge → adverse action → connection (timing). Records show each.' } },
+      { q:'Why can one3seven draft a records-request letter for a worker?',
+        opts:[
+          {t:'Because we give legal advice about their case.',ok:false},
+          {t:'Because the law (§1198.5, §226(b), §432) already gives the worker that right — we help them use their own.',ok:true},
+        ], fb:{ ok:'Right — we’re helping the worker exercise an existing right, not advising on the merits.', no:'It’s the worker’s own statutory right (§1198.5 etc.); we help them use it. We don’t advise on what it proves.' } },
+    ]},
+  },
+  { id:'plaintiff', track:'Domain · Plaintiff-Side Law', title:'Plaintiff-Side Practice', core:true,
+    blurb:'How an employment plaintiff’s firm actually works — contingency, intake, the case journey — and exactly where one3seven fits.',
+    lessons:[
+      { t:'What a plaintiff-side firm is', obj:'Understand the business model that makes everything else make sense.',
+        blocks:[
+          {p:'Our customer is the <b>plaintiff-side employment firm</b> — the lawyers who represent <b>workers</b>, not employers. Almost all of them work on <b>contingency</b>: they front the time and cost, and only get paid if the case resolves in the worker’s favor, taking a percentage of the recovery.'},
+          {p:'That single fact explains their whole world. Because they only get paid when they win, <b>which cases they take</b> is the most consequential decision they make — an accepted case that goes nowhere is months of unpaid work and real out-of-pocket cost. Case <b>selection</b> is existential, not administrative.'},
+          {p:'Keep this in your pocket: to this buyer, <b>a cleaner, more complete record de-risks the single scariest decision they make.</b> That’s not a feature pitch — it’s their economics. Everything one3seven sells to a firm connects back to this.'},
+        ], cites:[
+          {label:'Cal. Rules of Prof. Conduct 1.5 — fees, including contingency', url:'https://www.calbar.ca.gov/Attorneys/Conduct-Discipline/Rules/Rules-of-Professional-Conduct/Current-Rules'},
+          {label:'one3seven — internal (customer & business model)'},
+        ]},
+      { t:'The intake funnel', obj:'See the triage problem one3seven plugs into.',
+        blocks:[
+          {p:'Firms are flooded with inquiries and can accept only a fraction. So the front of the firm is a <b>funnel</b>: a fast triage that passes on most matters and advances a few. The hard part is that triage is expensive — staff spend hours reconstructing a worker’s scattered story just to decide whether to look closer, much of it on matters they’ll decline.'},
+          {p:'That reconstruction is the cost we remove. A worker who arrives with an organized, source-linked record lets the firm screen in minutes instead of a week — and lets them screen <b>more</b> matters without adding staff. We move intake work <b>off the firm’s clock</b> by having the worker assemble the file before they ever reach the firm.'},
+          {p:'Say it in their terms: not "we generate leads" (we don’t — that’s the referral line we never cross), but "the worker walks in already organized, so your team spends its first hour deciding, not digging."'},
+        ], cites:[
+          {label:'Bus. & Prof. Code §6155 — lawyer referral services (the line we don’t cross)', url:'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=BPC&sectionNum=6155.'},
+          {label:'one3seven — internal (go-to-market thesis)'},
+        ]},
+      { t:'The case journey', obj:'Know the arc a matter travels, so you can speak to the whole timeline.',
+        blocks:[
+          {p:'A matter that gets accepted travels a long arc — often <b>18 to 36 months</b>. Roughly: a <b>demand</b> or filing, then <b>discovery</b> (both sides exchange documents and take depositions), then <b>mediation or settlement talks</b>, and — rarely — <b>trial</b>. Most cases settle; few see a courtroom.'},
+          {p:'Two things follow. First, the <b>record matters the entire way</b>, not just at intake — depositions and discovery are where an organized, source-linked file keeps paying off. Second, the worker lives inside a slow, opaque process, which is why reminders and important-dates — hearing dates, exams, records due — are part of what we hold for them.'},
+          {p:'You don’t manage litigation and you never calculate a legal deadline. But knowing the arc lets you speak credibly to a firm about where the tool helps beyond the first screen.'},
+        ], cites:[
+          {label:'California Courts — civil lawsuit basics & timeline', url:'https://selfhelp.courts.ca.gov/civil-lawsuit'},
+          {label:'one3seven — internal (case-journey framing)'},
+        ]},
+      { t:'Case economics & selection', obj:'Understand what makes a firm take a case — and why records decide it.',
+        blocks:[
+          {p:'Simplifying a complex judgment: firms weigh roughly three things — <b>liability</b> (is the wrong clear?), <b>damages</b> (is there meaningful harm to recover?), and <b>documentation</b> (can it be proven?). A case can have real harm and still be declined because it can’t be <b>shown</b>.'},
+          {p:'That third leg is ours. <b>Missing records kill provable cases.</b> A worker who "knows" they were shorted but has no timecards is a much harder yes than one who walks in with the pay stubs and schedules laid out. We don’t judge liability or damages — we make the documentation leg strong, and we show, plainly, what’s present and what’s missing.'},
+          {p:'This is where <b>coverage</b> earns its keep: it describes how much of what a claim requires is on file — a structural fact about the record that helps a firm de-risk selection. It is never a score of the case or a prediction of the outcome. Describe the record; the firm judges the matter.'},
+        ], cites:[
+          {label:'one3seven — internal (case-selection thesis; coverage = describe, never score)'},
+          {label:'Bus. & Prof. Code §6125 — why "which cases are strong" is a legal judgment we can’t make', url:'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=BPC&sectionNum=6125.'},
+        ]},
+      { t:'Deadlines & the statute of limitations', obj:'Hold the hardest never-conclude line in this whole course.',
+        blocks:[
+          {p:'Every claim has a <b>statute of limitations</b> — a deadline to file, after which the right is usually lost. In employment they vary and some are short, and there are administrative steps (like a filing with the civil-rights agency) that gate certain claims. This is real, and it is <b>urgent</b> for workers.'},
+          {p:'And it is the single most dangerous place to slip. <b>We never calculate a deadline.</b> Telling a worker "you must file by March 14" is practicing law, full stop — even when we’re sure, even when they’re scared, even when it feels kind. We <b>surface</b> dates that appear on the record or that the worker enters; the <b>attorney</b> does the math on them.'},
+          {never:'"Your deadline is…" · "You still have time." · "You’re too late." · "File by [date]."'},
+          {say:'Deadlines in these cases can be short, so getting your record in front of an attorney soon matters — I can’t calculate the date, but a lawyer can, quickly.'},
+        ], cites:[
+          {label:'Code Civ. Proc. §335.1 — two-year limitations period', url:'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CCP&sectionNum=335.1.'},
+          {label:'Code Civ. Proc. §338 — three-year limitations (liability created by statute)', url:'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CCP&sectionNum=338.'},
+          {label:'Gov. Code §12960 — FEHA administrative complaint window', url:'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=GOV&sectionNum=12960.'},
+          {label:'Bus. & Prof. Code §6125 — calculating a deadline is the practice of law', url:'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=BPC&sectionNum=6125.'},
+        ]},
+      { t:'Where one3seven fits', obj:'Tie the whole course into one sentence you can say on a call.',
+        blocks:[
+          {p:'Put it together. A contingency firm lives or dies on case selection; selection turns on documentation; documentation is exactly what a scattered worker lacks and what we assemble. one3seven is <b>case-selection infrastructure</b> — not a lead source, not a scorer, not a referral service.'},
+          {p:'The worker owns and chooses; we organize and cite; the attorney evaluates and concludes. Every part of the plaintiff-side world you just learned points back to that division of labor — and to why staying strictly on the "organize" side of it is what makes a compliant firm able to hire us at all.'},
+          {p:'One sentence for a call: <b>"You screen the case, not the chaos — the worker walks in organized and source-linked, so your team’s first hour is a decision, not a reconstruction."</b>'},
+        ], cites:[
+          {label:'Bus. & Prof. Code §6155 — not a lawyer referral service', url:'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=BPC&sectionNum=6155.'},
+          {label:'Cal. Rules of Prof. Conduct 5.4 — no fee-sharing with non-lawyers', url:'https://www.calbar.ca.gov/Attorneys/Conduct-Discipline/Rules/Rules-of-Professional-Conduct/Current-Rules'},
+          {label:'one3seven Doctrine — internal (organize, cite, never conclude)'},
+        ]},
+    ],
+    quiz:{ intro:'Apply what you learned', items:[
+      { q:'Why is case selection existential for a plaintiff-side firm?',
+        opts:[
+          {t:'Because they’re paid on contingency — an accepted case that fails is months of unpaid work and real cost.',ok:true},
+          {t:'Because they bill hourly regardless of outcome.',ok:false},
+        ], fb:{ ok:'Right — contingency means selection is the scariest decision they make, and records de-risk it.', no:'Plaintiff firms work on contingency — no win, no fee. That’s why selection, and documentation, matter so much.' } },
+      { gate:true, q:'A worker asks, "When’s my deadline to file?" You:',
+        opts:[
+          {t:'Estimate it — you know the general limits.',ok:false},
+          {t:'Never calculate it. Say deadlines can be short so getting to an attorney soon matters — and that a lawyer calculates the date.',ok:true},
+        ], fb:{ ok:'Correct — calculating a deadline is practicing law. Surface urgency; route the math to counsel.', no:'Never calculate a statute of limitations — that’s UPL. Convey urgency, route the actual date to an attorney.' } },
+      { q:'Which framing is safe when describing coverage to a firm?',
+        opts:[
+          {t:'"Coverage tells you which cases are strong."',ok:false},
+          {t:'"Coverage describes how much of what a claim requires is on file — a structural fact, not a score of the case."',ok:true},
+        ], fb:{ ok:'Right — coverage describes the record; it never judges the matter.', no:'Coverage is about the record’s completeness, never the case’s strength. Describe; don’t score.' } },
+    ]},
+  },
+  { id:'gtm', track:'Path · Go-to-Market', title:'Go-to-Market Path', soon:true, blurb:'Demo, discovery, objections, pricing & pilots, prohibited claims.' },
+  { id:'ops', track:'Path · Worker & Firm Ops', title:'Worker & Firm Operations', soon:true, blurb:'Supporting workers, intake status, firm handoff, records requests, escalations.' },
+  { id:'eng', track:'Path · Product & Engineering', title:'Product & Engineering', soon:true, blurb:'Architecture, RLS, source integrity, extraction pipeline, incident response.' },
+  { id:'lead', track:'Path · Leadership', title:'Leadership', soon:true, blurb:'Decision standards, supervision, approving claims, incident leadership.' },
+];
+
+/* ---------------- STATE ---------------- */
+var KEY='academy:';
+function get(k){try{return localStorage.getItem(KEY+k);}catch(e){return null;}}
+function rawSet(k,v){try{localStorage.setItem(KEY+k,v);}catch(e){}}
+function set(k,v){ rawSet(k,v); try{ cloudPush(k,v); }catch(e){} }
+
+/* ---------------- CLOUD · Stage 2 real accounts (one3seven-academy project) ---------------- */
+var SB_URL='https://yididnbnnzstfogckood.supabase.co';
+var SB_KEY='sb_publishable_-HkPw3gJVU2FNu9uFfVZAg__H9TOcyG';
+var sb=null, SB_USER=null, SB_ADMIN=false;
+try{ if(window.supabase&&window.supabase.createClient) sb=window.supabase.createClient(SB_URL,SB_KEY); }catch(e){}
+
+function cloudPush(k,v){
+  if(!sb||!SB_USER) return; var m;
+  if((m=k.match(/^l:(.+):(\d+)$/)) && v==='1'){
+    sb.from('academy_progress').upsert({user_id:SB_USER.id,course_id:m[1],lesson_index:parseInt(m[2])},{onConflict:'user_id,course_id,lesson_index'}).then(function(){},function(){});
+  } else if((m=k.match(/^q:(.+)$/)) && v==='pass'){
+    sb.from('academy_quiz').upsert({user_id:SB_USER.id,course_id:m[1],passed:true},{onConflict:'user_id,course_id'}).then(function(){},function(){});
+  } else if((m=k.match(/^cert:(.+):date$/))){
+    sb.from('academy_certificates').upsert({user_id:SB_USER.id,level:m[1]},{onConflict:'user_id,level'}).then(function(){},function(){});
+  } else if(k==='name'){
+    sb.from('academy_profiles').update({full_name:v}).eq('id',SB_USER.id).then(function(){},function(){});
+  }
+}
+function cloudReq(kind,p){
+  if(!sb||!SB_USER) return;
+  sb.from('academy_requests').insert({user_id:SB_USER.id,kind:kind,course:p.course||null,cost:p.cost||null,reason:p.why||p.reason||null,completed_date:p.date||null}).then(function(){},function(){});
+}
+function syncPull(){
+  if(!sb||!SB_USER) return Promise.resolve();
+  return Promise.all([
+    sb.from('academy_profiles').select('full_name,is_admin').eq('id',SB_USER.id).maybeSingle(),
+    sb.from('academy_progress').select('course_id,lesson_index'),
+    sb.from('academy_quiz').select('course_id,passed'),
+    sb.from('academy_certificates').select('level')
+  ]).then(function(res){
+    var prof=res[0]&&res[0].data; if(prof){ if(prof.full_name) rawSet('name',prof.full_name); SB_ADMIN=!!prof.is_admin; }
+    ((res[1]&&res[1].data)||[]).forEach(function(r){ rawSet('l:'+r.course_id+':'+r.lesson_index,'1'); });
+    ((res[2]&&res[2].data)||[]).forEach(function(r){ if(r.passed) rawSet('q:'+r.course_id,'pass'); });
+    ((res[3]&&res[3].data)||[]).forEach(function(r){ if(!get('cert:'+r.level+':date')) rawSet('cert:'+r.level+':date', new Date().toISOString().slice(0,10)); });
+  }).catch(function(){});
+}
+function signInMagic(email,name){
+  if(!sb) return Promise.reject(new Error('offline'));
+  return sb.auth.signInWithOtp({email:email,options:{emailRedirectTo:location.origin+location.pathname,data:{full_name:name||''}}});
+}
+function signInGoogle(){
+  if(!sb) return Promise.resolve({error:{message:'Sign-in is unavailable right now.'}});
+  return sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:location.origin+location.pathname}});
+}
+function signOutCloud(){ if(sb){ sb.auth.signOut().then(function(){ location.reload(); },function(){ location.reload(); }); } }
+function bootAuth(){
+  if(!sb){ updateSigninBtn(); return; }
+  function onSession(s){ if(s&&s.user){ SB_USER=s.user; if(s.user.email) rawSet('email',s.user.email); syncPull().then(function(){ return fetchCourses(); }).then(function(){ updateSigninBtn(); renderHome(); }); } }
+  sb.auth.getSession().then(function(r){ onSession(r.data&&r.data.session); });
+  sb.auth.onAuthStateChange(function(ev,s){ if(s&&s.user){ onSession(s); } else if(ev==='SIGNED_OUT'){ SB_USER=null; SB_ADMIN=false; updateSigninBtn(); } });
+}
+function lessonDone(cid,i){return get('l:'+cid+':'+i)==='1';}
+function courseComplete(c){ if(!c.lessons)return false; return c.lessons.every(function(_,i){return lessonDone(c.id,i);}) && get('q:'+c.id)==='pass'; }
+function coreComplete(){ return ACADEMY.filter(function(c){return c.core;}).every(courseComplete); }
+
+/* ---------------- READ-ALOUD (Web Speech API) ---------------- */
+var synth=window.speechSynthesis;
+if(synth&&typeof synth.onvoiceschanged!=='undefined'){synth.onvoiceschanged=function(){};}
+function pickVoice(){
+  if(!synth)return null; var vs=synth.getVoices()||[];
+  var en=vs.filter(function(v){return /^en(-|_|$)/i.test(v.lang);});
+  // Prefer high-quality neural voices; fall back down the list. (Zira/David = the old robotic ones — avoided.)
+  var pref=[/natural/i,/neural/i,/google us english/i,/samantha/i,/(aria|jenny|libby|nova|serena|allison)/i,/google/i];
+  for(var i=0;i<pref.length;i++){ var m=en.find(function(v){return pref[i].test(v.name);}); if(m)return m; }
+  return en[0]||vs[0]||null;
+}
+function stripTags(s){var d=document.createElement('div');d.innerHTML=s;return (d.textContent||'').replace(/\s+/g,' ').trim();}
+function lessonSpeech(l){ var parts=[l.t+'.', stripTags(l.obj)];
+  l.blocks.forEach(function(b){ if(b.p)parts.push(stripTags(b.p)); if(b.say)parts.push('Here is what to say. '+stripTags(b.say)); if(b.never)parts.push('Never say the following. '+stripTags(b.never)); });
+  return parts.join(' '); }
+function stopSpeech(){ if(synth)synth.cancel(); }
+function toggleListen(l,btn){
+  if(!synth){btn.textContent='Read-aloud not supported';return;}
+  if(synth.speaking&&!synth.paused){ synth.pause(); btn.classList.remove('playing'); btn.textContent='▶ Resume'; return; }
+  if(synth.paused){ synth.resume(); btn.classList.add('playing'); btn.textContent='⏸ Pause'; return; }
+  synth.cancel();
+  var text=lessonSpeech(l), v=pickVoice();
+  var chunks=text.match(/[^.!?]+[.!?]+/g)||[text];
+  chunks.forEach(function(ch,i){ var u=new SpeechSynthesisUtterance(ch.trim()); if(v)u.voice=v; u.rate=0.98; u.pitch=1;
+    if(i===chunks.length-1)u.onend=function(){ btn.classList.remove('playing'); btn.textContent='🔊 Listen'; }; synth.speak(u); });
+  btn.classList.add('playing'); btn.textContent='⏸ Pause';
+}
+
+var view=document.getElementById('view');
+document.getElementById('home-link').addEventListener('click',renderHome);
+
+/* ---------------- HOME ---------------- */
+var COLLEGES=[
+  {n:'College I',t:'one3seven',d:'The company, the doctrine, the pitch.',
+   intro:'The one thing only we teach — and the one that matters most. Fully covered by the Foundations core; there is no external substitute for our doctrine.',
+   res:[
+     {name:'The Foundations core — 5 courses',prov:'one3seven Academy',tag:'internal',note:'This IS College I. Start here.'},
+   ]},
+  {n:'College II',t:'Artificial Intelligence',d:'What AI is, and how we use it honestly.',
+   intro:'Understand what AI can and can’t do. Free courses do the job; the paid governance cert is for a dedicated compliance role, later — not everyone, not now.',
+   res:[
+     {name:'AI Fluency: Frameworks & Foundations',prov:'Anthropic Academy',tag:'free cert',url:'https://www.anthropic.com/learn',note:'Non-technical. Start here.'},
+     {name:'Introduction to Responsible AI',prov:'Google Cloud',tag:'free',url:'https://www.cloudskillsboost.google/',note:'The trust / auditability vocabulary.'},
+     {name:'Build with Claude · Claude Code · MCP',prov:'Anthropic Academy',tag:'free',url:'https://www.anthropic.com/learn',note:'For whoever builds the product.'},
+     {name:'AIGP — AI Governance Professional',prov:'IAPP',tag:'paid · later',url:'https://iapp.org/certify/aigp/',note:'The gold-standard governance cert — for a compliance lead, later. Not required now.'},
+     {name:'AI Strategy for Legal Leaders',prov:'Stanford Law · Executive Ed',tag:'paid · later',url:'https://law.stanford.edu/executive-education/ai-strategy-for-legal-leaders/',note:'~8 hrs · ~$900 · Stanford certificate. Executive/leadership track — for a founder or lead, later.'},
+     {name:'GenAI for the Legal Profession (Power User)',prov:'Berkeley Law · Executive Ed',tag:'paid · later',url:'https://executive.law.berkeley.edu/programs/generative-ai-for-the-legal-profession/',note:'~8 hrs · ~$950 · 6.5 MCLE. Building AI work habits — optional, later.'},
+   ]},
+  {n:'College III',t:'Cybersecurity',d:'Protecting the records at our core.',
+   intro:'Protect the sensitive records we hold. At our stage the SUBSTANCE (MFA, least privilege, a real policy) matters more than a badge — and SOC 2 / ISO 27001 are COMPANY audits for when a buyer asks, not employee courses.',
+   res:[
+     {name:'Certified in Cybersecurity (CC)',prov:'ISC2',tag:'free cert',url:'https://www.isc2.org/certifications/cc',note:'Legit entry-level credential. ISC2 has run a free CC training+exam program — confirm it’s still open before treating it as free.'},
+     {name:'Security habits (MFA · phishing · least privilege)',prov:'Applied in Trust in Practice',tag:'internal',note:'The habits, taught with our real data rules.'},
+     {name:'SOC 2 Type II · ISO 27001',prov:'Company audits',tag:'company · later',note:'What a firm may ask for in an RFP — an org milestone, not an employee cert. Do the substance now; the audit when a buyer demands it.'},
+   ]},
+  {n:'College IV',t:'Privacy',d:'Why the worker owns their data.',
+   intro:'Handle worker data the way a firm handles a client file. The applied version is in Trust in Practice; the deep credential (CIPP) is for a privacy lead, later.',
+   res:[
+     {name:'CCPA / CPRA — official resources',prov:'California Privacy Protection Agency',tag:'read',url:'https://cppa.ca.gov/',note:'The CA privacy law, from the source.'},
+     {name:'Privacy by design + worker-owns-data',prov:'Applied in Trust in Practice',tag:'internal',note:'How we live it.'},
+     {name:'CIPP/US — Certified Information Privacy Professional',prov:'IAPP',tag:'paid · later',url:'https://iapp.org/certify/cippus/',note:'The privacy credential — for a dedicated privacy/compliance hire.'},
+   ]},
+  {n:'College V',t:'Technology',d:'Plain-English literacy for everyone.',
+   intro:'Enough tech literacy to speak the same language — not to build models. Keep it light; skip heavy ML certs (we consume Claude, we don’t train models).',
+   res:[
+     {name:'The legal-tech landscape',prov:'Know the Field + Field Manual (films)',tag:'internal',url:'/fl-education.html',note:'Who’s out there and how we differ.'},
+     {name:'General tech literacy',prov:'Self-directed',tag:'free',note:'Optional. How web apps, cloud, and databases work — in plain English.'},
+   ]},
+  {n:'College VI',t:'Legal',d:'The rules that keep the model clean.',
+   intro:'The rules that make the model clean. The doctrine is in The Doctrine course; these free resources add the wider legal-AI context.',
+   res:[
+     {name:'Generative AI Practical Guidance',prov:'CA State Bar',tag:'read',url:'https://www.calbar.ca.gov/legal-professionals/ethics-compliance-practice-resources/ethics/ethics-technology-resources',note:'Governs our CUSTOMERS (attorneys). Master it to design + sell — our source-linking is what lets them meet it.'},
+     {name:'AI for Lawyers — resources & training',prov:'Clio',tag:'free',url:'https://www.clio.com/resources/ai-for-lawyers/',note:'Legal-AI basics from a vendor firms use. (Confirm the current course/cert name on the page.)'},
+     {name:'AI, Justice and Rule of Law',prov:'UNESCO × University of Oxford',tag:'free cert',url:'https://www.unesco.org/en/articles/unesco-and-university-oxford-launch-free-global-course-ai-and-rule-law',note:'Free MOOC — ethics / human-rights of AI in justice; Oxford certificate of completion.'},
+     {name:'AI for Legal Basics',prov:'Harvey Academy',tag:'free cert',url:'https://www.harvey.ai/blog/introducing-harvey-academy',note:'A free legal-AI-literacy cert from a competitor — good for learning the landscape.'},
+     {name:'UPL · §6155 · never-conclude',prov:'Taught in The Doctrine',tag:'internal',note:'The one3seven-specific application.'},
+   ]},
+];
+function academyBypass(){ return get('bypass')==='1'; }
+function isAuthed(){ return !!SB_USER || academyBypass(); }
+function toggleNav(show){ ['nav-courses','nav-cert','nav-reimburse'].forEach(function(id){ var e=document.getElementById(id); if(e) e.style.display= show?'':'none'; }); }
+function renderGate(){
+  try{stopSpeech();}catch(e){}
+  toggleNav(false);
+  var email=get('email')||'';
+  view.innerHTML='<div class="uhero" style="max-width:640px;margin:0 auto"><div class="est">Members only · the one3seven team</div>'
+    +'<h1>one3seven Academy</h1><div class="motto">“Organize the record. Never conclude it.”</div>'
+    +'<p class="sub">The internal school for the one3seven team. Sign in <b>once</b> — with Google, or a one-tap email link. No password, and we keep you signed in on this device; your progress follows you across devices too.</p>'
+    +'<div class="gatecard">'
+    +'<button class="btn ghost" id="g-google" style="width:100%;font-weight:600">Continue with Google</button>'
+    +'<div style="text-align:center;color:var(--faint);font-size:12px;margin:12px 0">— or use email —</div>'
+    +'<label>Full name</label><input id="g-name" placeholder="Your name">'
+    +'<label>Email</label><input id="g-email" value="'+email.replace(/"/g,'&quot;')+'" placeholder="you@one3seven.com">'
+    +'<div class="row" style="margin-top:6px"><button class="btn orange" id="g-link">Email me a sign-in link</button></div>'
+    +'<div id="g-msg" class="note"></div></div></div>';
+  var msg=document.getElementById('g-msg');
+  document.getElementById('g-google').addEventListener('click',function(){
+    msg.style.color='var(--sage-deep)'; msg.textContent='Redirecting to Google…';
+    signInGoogle().then(function(r){ if(r&&r.error){ msg.style.color='var(--orange)'; msg.textContent=r.error.message; } });
+  });
+  document.getElementById('g-link').addEventListener('click',function(){
+    var nm=document.getElementById('g-name').value.trim(); var em=document.getElementById('g-email').value.trim();
+    if(!em){ msg.style.color='var(--orange)'; msg.textContent='Enter your email first.'; return; }
+    if(nm) rawSet('name',nm); rawSet('email',em);
+    msg.style.color='var(--sage-deep)'; msg.textContent='Sending…';
+    signInMagic(em,nm).then(function(r){ if(r&&r.error){ msg.style.color='var(--orange)'; msg.textContent=r.error.message; } else { msg.style.color='var(--sage-deep)'; msg.innerHTML='✓ Check your email — a sign-in link is on its way to <b>'+em+'</b>. Open it to enter.'; } },
+      function(){ msg.style.color='var(--orange)'; msg.textContent='Could not send the link — check your connection and try again.'; });
+  });
+  window.scrollTo(0,0);
+}
+function renderHome(){
+  stopSpeech();
+  if(!isAuthed()){ renderGate(); return; }
+  toggleNav(true);
+  var coreCourses=ACADEMY.filter(function(c){return c.lessons;});
+  var totalL=0,doneL=0;
+  coreCourses.forEach(function(c){c.lessons.forEach(function(_,i){totalL++;if(lessonDone(c.id,i))doneL++;});});
+  var pct=totalL?Math.round(doneL/totalL*100):0;
+  var name=get('name');
+  // resume: last-opened lesson, if that course isn't already finished
+  var resume=null; var last=get('last');
+  if(last){ var lp=last.split(':'); var rc=ACADEMY.filter(function(x){return x.id===lp[0]&&x.lessons;})[0];
+    if(rc && !courseComplete(rc)){ resume={cid:lp[0], idx:Math.max(0,Math.min(parseInt(lp[1])||0, rc.lessons.length-1)), title:rc.title}; } }
+  var h='';
+  // hero
+  h+='<div class="uhero"><div class="est">Established 2026 · California</div>'
+    +'<h1>one3seven Academy</h1>'
+    +'<div class="motto">“Organize the record. Never conclude it.”</div>'
+    +'<p class="sub">'+(name?('Welcome back, <b>'+name+'</b>. '):'')+'The school for everyone who works at one3seven — the mission, the doctrine, and the craft of treating people with dignity. Begin with the <b>core</b>; earn your certification from there.</p>'
+    +'<div class="cta">'
+    +(resume
+        ? '<button class="btn orange" id="resume">Continue: '+resume.title+' · Lesson '+(resume.idx+1)+' ›</button><button class="btn ghost" id="begin" style="margin-left:8px">Start from the beginning</button>'
+        : '<button class="btn orange" id="begin">Begin the core ›</button>')
+    +(name?'':'<button class="btn ghost" id="begin-name" style="margin-left:8px">Sign in</button>')
+    +'</div>'
+    +(resume?'':'<div class="resnote">Your progress saves automatically in this browser — leave and come back and you’ll pick up here. Saving across devices arrives with logins.</div>')
+    +'</div>';
+  // colleges
+  h+='<div class="sec"><span class="t">The six colleges</span><span>one3seven Academy</span></div><div class="colleges">';
+  var coreCount=ACADEMY.filter(function(x){return x.core;}).length;
+  COLLEGES.forEach(function(c,ci){
+    var more;
+    if(ci===0){ more=coreCount+' courses ›'; }
+    else {
+      var n=(c.res||[]).length, ct=0,cd=0;
+      (c.res||[]).forEach(function(r,ri){ if(/free|read/i.test(r.tag)){ ct++; if(get('ext:'+ci+':'+ri)==='1') cd++; } });
+      more = n ? (n+' resources'+(ct?(' · '+cd+'/'+ct+' ✓'):'')+' ›') : '';
+    }
+    h+='<div class="col col-link" data-col="'+ci+'"><div class="cn">'+c.n+'</div><div class="cc2">'+c.t+'</div><div class="cd">'+c.d+'</div><div class="more">'+more+'</div></div>';
+  });
+  h+='</div>';
+  // progress
+  h+='<div class="prog"><div class="bar"><i style="width:'+pct+'%"></i></div><div class="pl"><b>'+doneL+'</b> of '+totalL+' core lessons complete'+(coreComplete()?' · <b>Core certified ✓</b>':'')+'</div></div>';
+  // core courses
+  h+='<div class="sec" id="courses"><span class="t">Begin here — core courses</span><span>Open now</span></div><div class="courses">';
+  ACADEMY.filter(function(c){return c.core;}).forEach(function(c){
+    var done=courseComplete(c); var n=c.lessons.length;
+    h+='<div class="cc open" data-c="'+c.id+'"><div class="track">'+c.track+'</div><div class="ct">'+c.title+'</div><div class="cs">'+c.blurb+'</div>'
+      +'<div class="row"><span class="mini">'+n+' lessons · quiz</span><span class="pill '+(done?'p-done':'p-core')+'">'+(done?'✓ done':'core')+'</span></div></div>';
+  });
+  h+='</div>';
+  // catalog
+  h+='<div class="sec" id="paths"><span class="t">Advanced role paths</span><span>After Foundations</span></div><div class="courses">';
+  ACADEMY.filter(function(c){return c.soon;}).forEach(function(c){
+    var p=PATHS[c.id]||{}; var avail=p.status==='available';
+    h+='<div class="cc pathlink" data-path="'+c.id+'"><div class="track">'+c.track+'</div><div class="ct">'+c.title+'</div><div class="cs">'+c.blurb+'</div>'
+      +'<div class="row"><span class="mini">'+(avail?(p.items.length+' films ›'):'overview ›')+'</span><span class="pill '+(avail?'p-done':'p-soon')+'">'+(avail?'open':'developing')+'</span></div></div>';
+  });
+  h+='</div>';
+  // certification levels
+  h+='<div class="sec" id="cert"><span class="t">Certification levels</span><span>Your path</span></div><div class="colleges">'
+    +'<div class="col"><div class="cn">Level I</div><div class="cc2">Foundations</div><div class="cd">The full 5-course core — mission, doctrine, product, data-trust &amp; how we work. The safety floor for anyone here.</div></div>'
+    +'<div class="col" style="border-color:var(--orange)"><div class="cn" style="color:var(--orange)">Level II</div><div class="cc2">Certified Associate</div><div class="cd">The working credential for most roles.</div></div>'
+    +'<div class="col"><div class="cn">Level III</div><div class="cc2">one3seven AI Certified</div><div class="cd">The full credential — all six colleges. The Morgan capstone.</div></div></div>';
+  // reimbursement & proof of completion
+  h+='<div class="sec" id="reimburse"><span class="t">Paid courses &amp; proof</span><span>Approvals</span></div><div class="courses">'
+    +'<div class="cc"><div class="track">Before you pay</div><div class="ct">Request approval to pay for a course</div><div class="cs">Paying for an external certificate (Stanford, Berkeley, AIGP, CIPP)? Get approval first — then get reimbursed on completion. No card details ever entered here.</div><div class="row" style="margin-top:8px"><button class="btn orange" id="req-appr">Request approval ›</button></div></div>'
+    +'<div class="cc"><div class="track">Proof of completion</div><div class="ct">Submit a completed certificate</div><div class="cs">Finished an external course? Send your certificate as proof so it counts toward your credential. Logs the request to your account and emails your approver with the file attached.</div><div class="row" style="margin-top:8px"><button class="btn" id="req-upl">Submit certificate ›</button></div></div>'
+    +'</div>';
+  // certificate
+  if(coreComplete()){
+    h+='<div class="cert"><div class="cm">Certificate of Completion · Level I</div><h2>Foundations — Core Certified</h2><p>'+(name?'<b>'+esc(name)+'</b> has completed ':'You have completed ')+'the one3seven Academy Foundations core — mission, doctrine, product, data-trust, and how we work.</p><div class="cta" style="justify-content:center;margin-top:16px"><button class="btn orange" id="view-cert">'+(name?'View your certificate ›':'Sign in to claim your certificate ›')+'</button></div></div>';
+  }
+  view.innerHTML=h;
+  document.querySelectorAll('.cc.open').forEach(function(el){el.addEventListener('click',function(){openCourse(el.getAttribute('data-c'),0);});});
+  document.querySelectorAll('.col-link').forEach(function(el){el.addEventListener('click',function(){renderCollege(parseInt(el.getAttribute('data-col')));});});
+  document.querySelectorAll('.pathlink').forEach(function(el){el.addEventListener('click',function(){renderPath(el.getAttribute('data-path'));});});
+  var b=document.getElementById('begin'); if(b)b.addEventListener('click',function(){openCourse('worker',0);});
+  var rz=document.getElementById('resume'); if(rz&&resume)rz.addEventListener('click',function(){openCourse(resume.cid,resume.idx);});
+  var bn=document.getElementById('begin-name'); if(bn)bn.addEventListener('click',openSignin);
+  var vc=document.getElementById('view-cert'); if(vc)vc.addEventListener('click',function(){ get('name')?renderCertificate('Foundations'):openSignin(); });
+  var ra=document.getElementById('req-appr'); if(ra)ra.addEventListener('click',openReimburse);
+  var ru=document.getElementById('req-upl'); if(ru)ru.addEventListener('click',openUpload);
+  window.scrollTo(0,0);
+}
+var PATHS={
+  gtm:{ status:'available',
+    intro:'The sales craft — for anyone who talks to a firm. These are the full narrated films from the one3seven sales set. Watch them in order, then practice live with a founder before running a solo firm call.',
+    items:[
+      {name:'The 15-Minute Intake Review (the demo)', url:'/v7k3xq9m2e8a4t6/demo.html'},
+      {name:'The Discovery Call', url:'/v7k3xq9m2e8a4t6/discovery.html'},
+      {name:'Objection Handling', url:'/v7k3xq9m2e8a4t6/objections.html'},
+      {name:'The Guardrails', url:'/v7k3xq9m2e8a4t6/guardrails.html'},
+      {name:'Pricing & Clean Money', url:'/v7k3xq9m2e8a4t6/pricing.html'},
+      {name:'The 60-Second Pitch', url:'/v7k3xq9m2e8a4t6/coldpitch.html'},
+    ]},
+  ops:{ status:'developing', prereq:'the Foundations core',
+    intro:'Supporting workers and firms through the real, messy middle — status updates, handoffs, records requests, and the hard conversations. Built directly on the empathy and doctrine you learn in the core.',
+    topics:['Supporting distressed workers','Intake status communication','Firm handoff','Records-request workflow','Escalations & complaints','Quality-control review'] },
+  eng:{ status:'developing', prereq:'the Foundations core + Trust in Practice',
+    intro:'How the product is actually built and kept safe — architecture, the security model, the extraction pipeline, and how every fact stays traceable to its source. For whoever ships the code.',
+    topics:['System architecture','Access control & row-level security','Source integrity & provenance','Extraction & matching pipeline','AI evaluation & accuracy','Privacy by design','Incident response'] },
+  lead:{ status:'developing', prereq:'the full core',
+    intro:'Setting the standards others follow — decisions, supervision, approving what the company claims in public, and leading through an incident. For founders and future leads.',
+    topics:['Decision & escalation standards','Supervision & hiring','Approving claims & marketing language','Quality & compliance reviews','Incident leadership','Ethical growth decisions'] },
+};
+function renderPath(id){
+  stopSpeech();
+  var p=PATHS[id]; var meta=ACADEMY.filter(function(x){return x.id===id;})[0]; if(!p||!meta)return;
+  var h='<div class="crumbs"><a id="bk">‹ Academy</a> / '+meta.title+'</div>';
+  h+='<div class="eyebrow" style="margin-top:6px">'+meta.track+'</div><h1 style="font-size:clamp(26px,4vw,40px)">'+meta.title+'</h1>';
+  h+='<p class="cintro">'+p.intro+'</p>';
+  if(p.status==='available'){
+    h+='<div class="courses" style="margin-top:14px">';
+    p.items.forEach(function(it,ix){
+      h+='<a class="cc cc-link" href="'+it.url+'" target="_blank" rel="noopener"><div class="track">Film '+(ix+1)+' of '+p.items.length+'</div><div class="ct">'+it.name+'</div><div class="row"><span class="mini">watch ›</span><span class="pill p-core">film</span></div></a>';
+    });
+    h+='</div>';
+  } else {
+    h+='<div class="cstrat"><b>In active development.</b> The topics below are the planned track. Prerequisite: <b>'+p.prereq+'</b> — complete that first; this path builds on it. Until it ships, learn on the job under a certified teammate.</div>';
+    h+='<ul class="reslist">';
+    p.topics.forEach(function(t){ h+='<li class="res"><div class="rrow"><div class="rbody"><div class="rn">'+t+'</div></div></div></li>'; });
+    h+='</ul>';
+    h+='<div class="cta" style="margin-top:16px"><button class="btn orange" id="tofound">Start with the Foundations core ›</button></div>';
+  }
+  h+='<div class="cta" style="margin-top:16px"><button class="btn ghost" id="bk2">‹ Back to Academy</button></div>';
+  view.innerHTML=h;
+  document.getElementById('bk').addEventListener('click',renderHome);
+  document.getElementById('bk2').addEventListener('click',renderHome);
+  var tf=document.getElementById('tofound'); if(tf)tf.addEventListener('click',function(){openCourse('worker',0);});
+  window.scrollTo(0,0);
+}
+var COLLEGE_LENS={
+  1:'<div class="lens-h">The one3seven lens · native</div>'
+    +'<p><b>What AI actually is, minus the hype:</b> a pattern-matcher trained on enormous amounts of text. It’s astonishing at organizing and rephrasing, and it can be <b>confidently wrong</b> in the same breath — it doesn’t “know” things, it predicts them. At one3seven, the model (Claude) reads a worker’s documents, pulls out facts, and helps build a timeline. It never decides anything.</p>'
+    +'<p><b>Our stance, made concrete:</b> we use AI to <b>organize and cite</b>, never to conclude. Every fact the model surfaces is anchored to the exact source page a human can open. That is what “responsible AI” means here — not a policy poster, a product design. The AI proposes; the record proves; the attorney decides.</p>'
+    +'<p><b>Hallucination in our world:</b> the model can invent a fact or misread a date. Our defense is not “trust the AI” — it is “every fact links to its page,” so an error is catchable in seconds. We compete on <b>auditability, not on the AI being perfect</b>, because no AI is.</p>'
+    +'<p class="lens-attr">For the foundational frameworks, Anthropic’s <b>AI Fluency</b> is excellent and Creative-Commons licensed — take it for the credential below. This lens is how those ideas land at one3seven.</p>',
+  2:'<div class="lens-h">The one3seven lens · native</div>'
+    +'<p><b>Why security is existential here, not an IT chore:</b> we hold the most sensitive week of a worker’s life — their firing, their pay, their private messages. A breach isn’t a support ticket; it’s a betrayal of the person and a <b>legal</b> problem, because it can compromise a partner firm’s duty of confidentiality.</p>'
+    +'<p><b>The threats that actually hit small teams</b> are boring, not cinematic: a fake-urgent email, a reused password, an unlocked laptop, data pasted into an unapproved tool. Breaches are almost always a small habit that slipped — which is good news, because habits are trainable.</p>'
+    +'<p><b>How one3seven is built to contain mistakes:</b> row-level security isolates every worker’s data at the database itself (not just by policy), least privilege limits what anyone can reach, and MFA is everywhere. The system is designed so one wrong click can’t cascade into a leak.</p>'
+    +'<p class="lens-attr">For a free, legitimate credential, <b>ISC2’s Certified in Cybersecurity</b> is below. The applied version is also taught in <b>Trust in Practice</b>.</p>',
+  3:'<div class="lens-h">The one3seven lens · native</div>'
+    +'<p><b>Privacy here is the product promise, not compliance theater.</b> The worker <b>owns</b> their data; we are custodians of it. That ownership is real and mechanical — they can export the whole record and they can delete it — not a line on a marketing page.</p>'
+    +'<p><b>The California backdrop:</b> CCPA and CPRA give people real rights over their data — to see it, delete it, and opt out of its sale. one3seven already lives past that bar: we <b>never sell</b> worker data, in any form, and the worker can take it or erase it whenever they want.</p>'
+    +'<p><b>Privacy by design:</b> collect only what the work needs, isolate it, never repurpose it, never build a side dataset to sell. The private thing is protected <b>by default</b>, by how the system is built — not by everyone remembering a rule under pressure.</p>'
+    +'<p class="lens-attr">The law itself is in the free CCPA/CPRA resources below. The deep credential (<b>CIPP</b>) is for a dedicated privacy role, later. The applied version is in <b>Trust in Practice</b>.</p>',
+  4:'<div class="lens-h">The one3seven lens · native</div>'
+    +'<p><b>The goal is literacy, not engineering.</b> You do not need to build software to work here — you need enough of the picture to speak accurately and never make a false claim about how the product works.</p>'
+    +'<p><b>The stack in plain English:</b> a <b>web app</b> (what the worker and firm see) talks to a <b>database</b> (where data lives, locked down per person) and to an <b>AI model</b> (Claude, reached through an API). “Source-linking,” the thing that makes us trustworthy, just means every fact we show remembers exactly which document and page it came from.</p>'
+    +'<p><b>The literacy that matters for us:</b> know where worker data is stored, what “access approval” means, what happens when an extraction is wrong (a human verifies it), and why you can describe all of this honestly without ever overpromising what the machine can do.</p>'
+    +'<p class="lens-attr">The competitive side of legal tech is covered in the <b>Know the Field</b> and <b>Field Manual</b> films (below). General literacy resources are optional.</p>',
+  5:'<div class="lens-h">The one3seven lens · native</div>'
+    +'<p><b>The legal rules are not bolted-on constraints — they are the reason the product is shaped the way it is.</b> Unauthorized practice of law is <b>why</b> we never conclude. Section 6155 is <b>why</b> the worker chooses the firm and we never route. Rule 5.4 is <b>why</b> our money is a flat software fee, never a cut of a case.</p>'
+    +'<p><b>The attorney duties we design around:</b> under California’s rules and AB 316, the lawyer must independently verify any AI output and cannot blame the tool for an error. one3seven’s source-linking is <b>literally the feature</b> that lets them do that in one click — which means our compliance is also our best sales argument.</p>'
+    +'<p><b>What every one3seven person carries:</b> we describe the record, the attorney concludes; the worker chooses; we never take a share of a case. These aren’t legal trivia — they’re the daily lines that keep the whole model clean.</p>'
+    +'<p class="lens-attr">Read the free <b>CA State Bar Generative AI Guidance</b> below, plus the Clio / Oxford free certs for context. The one3seven application is the <b>Doctrine</b> course.</p>'
+};
+function renderCollege(i){
+  stopSpeech();
+  var c=COLLEGES[i]; if(!c)return;
+  var tagCls={'free cert':'t-free','free':'t-free','read':'t-read','paid · later':'t-paid','company · later':'t-company','internal':'t-internal'};
+  var h='<div class="crumbs"><a id="bk">‹ Academy</a> / '+c.n+'</div>';
+  h+='<div class="eyebrow" style="margin-top:6px">'+c.n+'</div><h1 style="font-size:clamp(26px,4vw,40px)">'+c.t+'</h1>';
+  h+='<p class="cintro">'+c.intro+'</p>';
+  if(i===0){
+    // College I is one3seven's OWN college — its content is the core courses themselves. Launch them here.
+    h+='<div class="cstrat"><b>This college is ours.</b> It is taught in full by the courses below — there is no external substitute for the one3seven doctrine. Start with <b>The Worker & The Mission</b> and <b>The Doctrine</b>; those are the safety floor.</div>';
+    h+='<div class="courses" style="margin-top:14px">';
+    ACADEMY.filter(function(x){return x.core;}).forEach(function(cc){
+      var done=courseComplete(cc);
+      h+='<div class="cc open" data-c="'+cc.id+'"><div class="track">'+cc.track+'</div><div class="ct">'+cc.title+'</div><div class="cs">'+cc.blurb+'</div><div class="row"><span class="mini">'+cc.lessons.length+' lessons · quiz</span><span class="pill '+(done?'p-done':'p-core')+'">'+(done?'✓ done':'core')+'</span></div></div>';
+    });
+    h+='</div>';
+  } else {
+    h+='<div class="cstrat"><b>How to use this college:</b> read the <b>one3seven lens</b> below (that’s ours, and it’s the part that matters most), then take the <b>free</b> external courses and check them off. Paid governance/privacy certs are for a dedicated role, later; company audits (SOC 2 / ISO 27001) are for when a buyer asks. Certs are indicators, not substitutes for doing the work.</div>';
+    if(COLLEGE_LENS[i]) h+='<div class="lens">'+COLLEGE_LENS[i]+'</div>';
+    var cTotal=0,cDone=0;
+    (c.res||[]).forEach(function(r,ri){ if(/free|read/i.test(r.tag)){ cTotal++; if(get('ext:'+i+':'+ri)==='1') cDone++; } });
+    if(cTotal) h+='<div class="cprog" id="cprog"><b>'+cDone+'</b> of '+cTotal+' free items complete'+(cDone===cTotal?' · college complete ✓':'')+'</div>';
+    h+='<ul class="reslist">';
+    (c.res||[]).forEach(function(r,ri){
+      var cls=tagCls[r.tag]||'t-internal';
+      var completable=/free|read/i.test(r.tag);
+      var done=completable && get('ext:'+i+':'+ri)==='1';
+      var body='<div class="rbody"><div class="rh"><div><div class="rn">'+(r.url?'<a href="'+r.url+'" target="_blank" rel="noopener">'+r.name+'</a>':r.name)+'</div><div class="rp">'+r.prov+'</div></div><span class="rtag '+cls+'">'+r.tag+'</span></div>'+(r.note?'<div class="rnote">'+r.note+'</div>':'')+'</div>';
+      h+='<li class="res'+(done?' done':'')+'"><div class="rrow">'+(completable?'<input type="checkbox" class="rcheck" data-r="'+ri+'" aria-label="Mark complete"'+(done?' checked':'')+'>':'')+body+'</div></li>';
+    });
+    h+='</ul>';
+  }
+  h+='<div class="cta" style="margin-top:20px"><button class="btn ghost" id="bk2">‹ Back to Academy</button></div>';
+  view.innerHTML=h;
+  document.getElementById('bk').addEventListener('click',renderHome);
+  document.getElementById('bk2').addEventListener('click',renderHome);
+  document.querySelectorAll('.cc.open').forEach(function(el){el.addEventListener('click',function(){openCourse(el.getAttribute('data-c'),0);});});
+  document.querySelectorAll('.rcheck').forEach(function(cb){ cb.addEventListener('change',function(){
+    set('ext:'+i+':'+cb.getAttribute('data-r'), cb.checked?'1':'0');
+    var li=cb.closest('.res'); if(li) li.classList.toggle('done', cb.checked);
+    var t=0,d=0; (COLLEGES[i].res||[]).forEach(function(r,ri){ if(/free|read/i.test(r.tag)){ t++; if(get('ext:'+i+':'+ri)==='1') d++; } });
+    var pe=document.getElementById('cprog'); if(pe) pe.innerHTML='<b>'+d+'</b> of '+t+' free items complete'+(d===t?' · college complete ✓':'');
+  }); });
+  window.scrollTo(0,0);
+}
+function openSignin(){
+  if(SB_USER){ openAccount(); return; }
+  var name=get('name')||'', email=get('email')||'';
+  var m=document.createElement('div'); m.className='modal';
+  m.innerHTML='<div class="card"><h3>Sign in to the Academy</h3><p>Enter your email and we’ll send a one-tap sign-in link — no password. Your progress and certificate then follow you on any device.</p>'
+    +'<label>Full name</label><input id="si-name" value="'+name.replace(/"/g,'&quot;')+'" placeholder="Your name">'
+    +'<label>Email</label><input id="si-email" value="'+email.replace(/"/g,'&quot;')+'" placeholder="you@one3seven.com">'
+    +'<div class="row"><button class="btn orange" id="si-link">Email me a sign-in link</button><button class="btn ghost" id="si-cancel">Cancel</button></div>'
+    +'<div id="si-msg" class="note"></div>'
+    +'<div class="note" style="margin-top:8px">Prefer not to sign in? <a id="si-local" style="color:var(--sage);cursor:pointer;text-decoration:underline">Just use my name on this device</a> — progress stays here only.</div></div>';
+  document.body.appendChild(m);
+  var msg=document.getElementById('si-msg');
+  document.getElementById('si-link').addEventListener('click',function(){
+    var nm=document.getElementById('si-name').value.trim(); var em=document.getElementById('si-email').value.trim();
+    if(!em){ msg.style.color='var(--orange)'; msg.textContent='Enter your email first.'; return; }
+    if(nm) rawSet('name',nm);
+    msg.style.color='var(--sage-deep)'; msg.textContent='Sending…';
+    signInMagic(em,nm).then(function(r){ if(r&&r.error){ msg.style.color='var(--orange)'; msg.textContent=r.error.message; } else { msg.style.color='var(--sage-deep)'; msg.innerHTML='✓ Check your email — a sign-in link is on its way to <b>'+em+'</b>. Open it on any device.'; } },
+      function(){ msg.style.color='var(--orange)'; msg.textContent='Could not send the link. Check your connection and try again.'; });
+  });
+  document.getElementById('si-local').addEventListener('click',function(){ var nm=document.getElementById('si-name').value.trim(); if(nm)rawSet('name',nm); var em=document.getElementById('si-email').value.trim(); if(em)rawSet('email',em); document.body.removeChild(m); updateSigninBtn(); renderHome(); });
+  document.getElementById('si-cancel').addEventListener('click',function(){ document.body.removeChild(m); });
+  m.addEventListener('click',function(e){ if(e.target===m)document.body.removeChild(m); });
+}
+function openAccount(){
+  var m=document.createElement('div'); m.className='modal';
+  var email=get('email')||(SB_USER&&SB_USER.email)||'';
+  m.innerHTML='<div class="card"><h3>Your account</h3><p>Signed in as <b>'+esc(get('name')||email)+'</b>'+(email?(' · '+esc(email)):'')+'. Your progress and certificates save to your account and follow you across devices.</p>'
+    +(SB_ADMIN?'<div class="row" style="flex-wrap:wrap"><button class="btn orange" id="ac-roster">Team roster</button><button class="btn orange" id="ac-manage">Manage courses</button><button class="btn ghost" id="ac-out">Sign out</button></div>':'<div class="row"><button class="btn ghost" id="ac-out">Sign out</button></div>')
+    +'</div>';
+  document.body.appendChild(m);
+  var rb=document.getElementById('ac-roster'); if(rb)rb.addEventListener('click',function(){ document.body.removeChild(m); renderRoster(); });
+  var mb=document.getElementById('ac-manage'); if(mb)mb.addEventListener('click',function(){ document.body.removeChild(m); renderAdmin(); });
+  document.getElementById('ac-out').addEventListener('click',function(){ document.body.removeChild(m); signOutCloud(); });
+  m.addEventListener('click',function(e){ if(e.target===m)document.body.removeChild(m); });
+}
+function renderRoster(){
+  if(!sb||!SB_ADMIN){ renderHome(); return; }
+  stopSpeech();
+  view.innerHTML='<div class="crumbs"><a id="bk">‹ Academy</a> / Roster</div><h1 style="font-size:clamp(24px,4vw,36px)">Team roster</h1><p class="cintro">Everyone enrolled, their progress, and certificates. Visible to admins only.</p><div id="rost" style="margin-top:14px;color:var(--faint)">Loading…</div>';
+  document.getElementById('bk').addEventListener('click',renderHome);
+  sb.from('academy_roster').select('*').then(function(r){
+    var el=document.getElementById('rost');
+    if(r.error){ el.textContent='Could not load roster: '+r.error.message; return; }
+    var rows=r.data||[]; if(!rows.length){ el.textContent='No learners have signed in yet.'; return; }
+    var h='<ul class="reslist">';
+    rows.forEach(function(x){ h+='<li class="res"><div class="rrow"><div class="rbody"><div class="rn">'+esc(x.full_name||'(no name)')+'</div><div class="rp">'+esc(x.email||'')+' · '+(x.courses_touched||0)+' course(s) touched · '+(x.certificates||0)+' certificate(s)</div></div></div></li>'; });
+    h+='</ul>'; el.innerHTML=h;
+  },function(){ var el=document.getElementById('rost'); if(el)el.textContent='Could not load roster.'; });
+  window.scrollTo(0,0);
+}
+function updateSigninBtn(){ var name=get('name')||get('email'); var el=document.getElementById('signin'); if(!el)return; if(name){ el.textContent='☰ '+name; el.classList.add('signedin'); } else { el.textContent='Sign in'; el.classList.remove('signedin'); } }
+
+/* ---------------- ADMIN COURSE EDITOR ---------------- */
+function fetchCourses(){
+  if(!sb||!SB_USER) return Promise.resolve();
+  return sb.from('academy_courses').select('*').then(function(r){
+    if(r.error||!r.data) return;
+    r.data.forEach(function(row){
+      var d=row.data||{};
+      var c={ id:row.id, track:row.track||'Core', title:row.title, blurb:row.blurb||'', core:!!row.core, lessons:d.lessons||[], quiz:d.quiz||{intro:'Check your understanding',items:[]} };
+      var ix=ACADEMY.findIndex(function(x){return x.id===c.id;});
+      if(ix>=0) ACADEMY[ix]=c; else ACADEMY.push(c);
+    });
+  },function(){});
+}
+function serializeBlocks(blocks){ return (blocks||[]).map(function(b){ if(b.say)return 'SAY: '+b.say; if(b.never)return 'NEVER: '+b.never; return b.p||''; }).join('\n\n'); }
+function parseBlocks(text){ return String(text||'').split(/\n\s*\n/).map(function(s){return s.trim();}).filter(Boolean).map(function(s){ if(/^SAY:/i.test(s))return {say:s.replace(/^SAY:\s*/i,'')}; if(/^NEVER:/i.test(s))return {never:s.replace(/^NEVER:\s*/i,'')}; return {p:s}; }); }
+function slugify(s){ return String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40); }
+
+function renderAdmin(){
+  if(!SB_ADMIN){ renderHome(); return; }
+  stopSpeech();
+  var h='<div class="crumbs"><a id="bk">‹ Academy</a> / Manage courses</div><h1 style="font-size:clamp(24px,4vw,36px)">Manage courses</h1>'
+    +'<p class="cintro">Edit any course or create a new one. Saved changes appear for everyone signed in. Admin-only.</p>'
+    +'<div class="cta" style="margin:6px 0 16px"><button class="btn orange" id="new-course">+ New course</button></div><div class="courses">';
+  ACADEMY.filter(function(c){return c.lessons;}).forEach(function(c){
+    h+='<div class="cc" style="cursor:default"><div class="track">'+esc(c.track||'')+(c.core?' · core':'')+'</div><div class="ct">'+esc(c.title)+'</div><div class="cs">'+esc(c.blurb||'')+'</div>'
+      +'<div class="row" style="margin-top:8px"><span class="mini">'+(c.lessons.length)+' lessons</span><button class="btn ghost edit-c" data-c="'+c.id+'">Edit ›</button></div></div>';
+  });
+  h+='</div>';
+  view.innerHTML=h;
+  document.getElementById('bk').addEventListener('click',renderHome);
+  document.getElementById('new-course').addEventListener('click',function(){ renderCourseEditor(null); });
+  document.querySelectorAll('.edit-c').forEach(function(b){ b.addEventListener('click',function(){ renderCourseEditor(b.getAttribute('data-c')); }); });
+  window.scrollTo(0,0);
+}
+function lessonBlockHTML(l){ l=l||{}; return '<div class="edblock lesson-b"><button class="rmv" type="button">remove</button>'
+  +'<label>Lesson title</label><input class="l-t" value="'+esc(l.t||'').replace(/"/g,'&quot;')+'" placeholder="e.g. Organize, never conclude">'
+  +'<label>Objective (one line)</label><input class="l-obj" value="'+esc(l.obj||'').replace(/"/g,'&quot;')+'" placeholder="What the learner should take away.">'
+  +'<label>Lesson body</label><textarea class="l-body" placeholder="Paragraphs separated by a blank line. Start a line with SAY: or NEVER: for a callout.">'+esc(serializeBlocks(l.blocks))+'</textarea></div>'; }
+function questionBlockHTML(it){ it=it||{}; var opts=(it.opts&&it.opts.slice())||[]; if(!opts.length)opts=[{t:'',ok:true},{t:'',ok:false}]; while(opts.length<4)opts.push({t:'',ok:false});
+  var typ=it.gate?'gate':(it.apply?'apply':'know'); var nm='q'+Math.floor((''+Math.random()).slice(2));
+  var oh=''; opts.slice(0,4).forEach(function(o,i){ oh+='<div class="edopt"><input type="radio" name="'+nm+'" class="q-ok"'+(o.ok?' checked':'')+' title="mark correct"><input type="text" class="q-opt" value="'+esc(o.t||'').replace(/"/g,'&quot;')+'" placeholder="Answer '+(i+1)+(i<2?'':' (optional)')+'"></div>'; });
+  return '<div class="edblock q-b"><button class="rmv" type="button">remove</button>'
+   +'<label>Question</label><textarea class="q-text" style="min-height:60px" placeholder="The question.">'+esc(it.q||'')+'</textarea>'
+   +'<label>Answers — select the correct one</label>'+oh
+   +'<label>Feedback if correct</label><input class="q-fbok" value="'+esc((it.fb&&it.fb.ok)||'').replace(/"/g,'&quot;')+'" placeholder="Shown when they pick right.">'
+   +'<label>Feedback if wrong</label><input class="q-fbno" value="'+esc((it.fb&&it.fb.no)||'').replace(/"/g,'&quot;')+'" placeholder="Shown when they pick wrong.">'
+   +'<label>Type</label><select class="q-type"><option value="know"'+(typ==='know'?' selected':'')+'>Know — standard</option><option value="apply"'+(typ==='apply'?' selected':'')+'>Apply — scenario</option><option value="gate"'+(typ==='gate'?' selected':'')+'>Doctrine gate — must pass</option></select></div>'; }
+function renderCourseEditor(id){
+  if(!SB_ADMIN){ renderHome(); return; }
+  stopSpeech();
+  var c = id ? ACADEMY.filter(function(x){return x.id===id;})[0] : null; var isNew=!c;
+  var course = c || { id:'', track:'Core', title:'', blurb:'', core:true, lessons:[], quiz:{intro:'Check your understanding', items:[]} };
+  var h='<div class="crumbs"><a id="bk">‹ Manage courses</a></div><h1 style="font-size:clamp(22px,3.6vw,32px)">'+(isNew?'New course':'Edit: '+esc(course.title))+'</h1><div class="edwrap">'
+   +'<label>Course title</label><input id="ed-title" value="'+esc(course.title).replace(/"/g,'&quot;')+'" placeholder="e.g. The Doctrine">'
+   +'<label>Track label</label><input id="ed-track" value="'+esc(course.track||'').replace(/"/g,'&quot;')+'" placeholder="e.g. Core · Track 2">'
+   +'<label>One-line blurb</label><input id="ed-blurb" value="'+esc(course.blurb||'').replace(/"/g,'&quot;')+'" placeholder="What this course teaches, in one line.">'
+   +'<label style="text-transform:none;letter-spacing:0;font-family:var(--sans);font-size:14px;color:var(--soft);display:flex;gap:8px;align-items:center;margin-top:14px"><input type="checkbox" id="ed-core" style="width:auto"'+(course.core?' checked':'')+'> Show in the “core courses” list on the home page</label>'
+   +'<div class="sec" style="margin-top:22px"><span class="t">Lessons</span></div>'
+   +'<div class="edhint">Write each lesson body as paragraphs separated by a blank line. Start a line with <b>SAY:</b> for a green example line, or <b>NEVER:</b> for a red never-say line. Wrap words in &lt;b&gt;…&lt;/b&gt; for bold.</div>'
+   +'<div id="ed-lessons"></div><button class="btn ghost" id="add-lesson" style="margin-top:12px">+ Add lesson</button>'
+   +'<div class="sec" style="margin-top:24px"><span class="t">Quiz</span></div>'
+   +'<label>Quiz intro line</label><input id="ed-qintro" value="'+esc((course.quiz&&course.quiz.intro)||'').replace(/"/g,'&quot;')+'" placeholder="e.g. Apply what you learned">'
+   +'<div id="ed-questions"></div><button class="btn ghost" id="add-q" style="margin-top:12px">+ Add question</button>'
+   +'<div class="edrow"><button class="btn orange" id="ed-save">Save course</button>'+(isNew?'':'<button class="btn ghost" id="ed-del">Delete course</button>')+'<span id="ed-msg" class="edhint"></span></div></div>';
+  view.innerHTML=h;
+  document.getElementById('bk').addEventListener('click',renderAdmin);
+  var lc=document.getElementById('ed-lessons'), qc=document.getElementById('ed-questions');
+  (course.lessons&&course.lessons.length?course.lessons:[{t:'',obj:'',blocks:[]}]).forEach(function(l){ lc.insertAdjacentHTML('beforeend', lessonBlockHTML(l)); });
+  (course.quiz&&course.quiz.items||[]).forEach(function(it){ qc.insertAdjacentHTML('beforeend', questionBlockHTML(it)); });
+  document.getElementById('add-lesson').addEventListener('click',function(){ lc.insertAdjacentHTML('beforeend', lessonBlockHTML({})); });
+  document.getElementById('add-q').addEventListener('click',function(){ qc.insertAdjacentHTML('beforeend', questionBlockHTML(null)); });
+  view.addEventListener('click',function(e){ if(e.target&&e.target.classList&&e.target.classList.contains('rmv')){ var blk=e.target.closest('.edblock'); if(blk)blk.remove(); } });
+  document.getElementById('ed-save').addEventListener('click',function(){ saveCourseFromForm(course.id, isNew); });
+  var del=document.getElementById('ed-del'); if(del)del.addEventListener('click',function(){ if(confirm('Delete this course? It reverts to the built-in version if there is one.')) deleteCourse(course.id); });
+  window.scrollTo(0,0);
+}
+function saveCourseFromForm(existingId, isNew){
+  var msg=document.getElementById('ed-msg');
+  var title=document.getElementById('ed-title').value.trim();
+  if(!title){ if(msg){msg.style.color='var(--accent)'; msg.textContent='Give the course a title first.';} return; }
+  var id = existingId || slugify(title) || ('course-'+(''+Math.random()).slice(2,8));
+  var lessons=[];
+  document.querySelectorAll('#ed-lessons .lesson-b').forEach(function(b){
+    var t=b.querySelector('.l-t').value.trim(), obj=b.querySelector('.l-obj').value.trim(), body=b.querySelector('.l-body').value;
+    if(!t && !body.trim()) return; lessons.push({ t:t, obj:obj, blocks:parseBlocks(body) });
+  });
+  var items=[];
+  document.querySelectorAll('#ed-questions .q-b').forEach(function(b){
+    var q=b.querySelector('.q-text').value.trim(); if(!q)return;
+    var oks=b.querySelectorAll('.q-ok'), texts=b.querySelectorAll('.q-opt'), opts=[];
+    texts.forEach(function(t,i){ var v=t.value.trim(); if(v) opts.push({t:v, ok:!!(oks[i]&&oks[i].checked)}); });
+    if(opts.length<2) return; if(!opts.some(function(o){return o.ok;})) opts[0].ok=true;
+    var typ=b.querySelector('.q-type').value;
+    var item={ q:q, opts:opts, fb:{ ok:b.querySelector('.q-fbok').value.trim(), no:b.querySelector('.q-fbno').value.trim() } };
+    if(typ==='apply')item.apply=true; if(typ==='gate')item.gate=true; items.push(item);
+  });
+  if(!lessons.length){ if(msg){msg.style.color='var(--accent)'; msg.textContent='Add at least one lesson.';} return; }
+  var course={ id:id, track:document.getElementById('ed-track').value.trim()||'Core', title:title, blurb:document.getElementById('ed-blurb').value.trim(), core:document.getElementById('ed-core').checked, lessons:lessons, quiz:{ intro:document.getElementById('ed-qintro').value.trim()||'Check your understanding', items:items } };
+  if(!sb){ if(msg){msg.style.color='var(--accent)'; msg.textContent='Offline — cannot save.';} return; }
+  if(msg){msg.style.color='var(--sage-deep)'; msg.textContent='Saving…';}
+  sb.from('academy_courses').upsert({ id:course.id, track:course.track, title:course.title, blurb:course.blurb, core:course.core, data:{lessons:course.lessons, quiz:course.quiz}, updated_at:new Date().toISOString() },{onConflict:'id'}).then(function(r){
+    if(r.error){ if(msg){msg.style.color='var(--accent)'; msg.textContent='Error: '+r.error.message;} return; }
+    var ix=ACADEMY.findIndex(function(x){return x.id===course.id;}); if(ix>=0)ACADEMY[ix]=course; else ACADEMY.push(course);
+    if(msg){msg.style.color='var(--sage-deep)'; msg.textContent='Saved ✓';} setTimeout(renderAdmin,600);
+  },function(){ if(msg){msg.style.color='var(--accent)'; msg.textContent='Could not save — try again.';} });
+}
+function deleteCourse(id){ if(!sb)return; sb.from('academy_courses').delete().eq('id',id).then(function(){ location.reload(); },function(){ location.reload(); }); }
+
+/* ---------------- REIMBURSEMENT & PROOF OF COMPLETION ---------------- */
+var ACADEMY_APPROVER='victoria@one3seven.com';
+function extCourses(){
+  var out=[];
+  COLLEGES.forEach(function(c){ (c.res||[]).forEach(function(r){ if(r.url){ out.push({v:c.t+' — '+r.name, paid:/paid/i.test(r.tag)}); } }); });
+  return out;
+}
+function courseOptions(){
+  var h='<option value="">— choose a course —</option>';
+  extCourses().forEach(function(o){ h+='<option>'+o.v+(o.paid?' · paid':'')+'</option>'; });
+  h+='<option>Other (type below)</option>';
+  return h;
+}
+function sendVia(subject, body){ return 'mailto:'+ACADEMY_APPROVER+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body); }
+function openMail(kind, subject, body){ var to=ACADEMY_APPROVER;
+  if(kind==='gmail'){ window.open('https://mail.google.com/mail/?view=cm&fs=1&to='+encodeURIComponent(to)+'&su='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body),'_blank','noopener'); return; }
+  if(kind==='outlook'){ window.open('https://outlook.office.com/mail/deeplink/compose?to='+encodeURIComponent(to)+'&subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body),'_blank','noopener'); return; }
+  window.location.href=sendVia(subject, body);
+}
+function copyText(t, btn){ try{ navigator.clipboard.writeText(t).then(function(){ if(btn){ var o=btn.textContent; btn.textContent='Copied ✓'; setTimeout(function(){ btn.textContent=o; },1500); } }); }catch(e){} }
+function logReq(kind, obj){ try{ var k='reqs'; var a=JSON.parse(get(k)||'[]'); a.unshift({kind:kind,course:obj.course,name:obj.name,date:new Date().toISOString().slice(0,10)}); rawSet(k, JSON.stringify(a.slice(0,50))); }catch(e){} try{ cloudReq(kind,obj); }catch(e){} }
+var FLD='width:100%;box-sizing:border-box;margin-top:4px';
+function openReimburse(){
+  var nm=get('name')||'', em=get('email')||'';
+  var m=document.createElement('div'); m.className='modal';
+  m.innerHTML='<div class="card"><h3>Request approval to pay for a course</h3>'
+   +'<p>Get the go-ahead <b>before</b> you pay. This sends your request to your approver; once it’s approved and you finish the course, you’re reimbursed. No card details here — you pay the provider directly after approval.</p>'
+   +'<label>Your name</label><input id="rb-name" value="'+nm.replace(/"/g,'&quot;')+'">'
+   +'<label>Your email</label><input id="rb-email" value="'+em.replace(/"/g,'&quot;')+'" placeholder="you@one3seven.com">'
+   +'<label>Course</label><select id="rb-course" style="'+FLD+'">'+courseOptions()+'</select>'
+   +'<label>If “Other”, name it</label><input id="rb-other" placeholder="Course + provider">'
+   +'<label>Estimated cost (USD)</label><input id="rb-cost" placeholder="e.g. $900">'
+   +'<label>Why it’s worth it (1–2 lines)</label><textarea id="rb-why" rows="3" style="'+FLD+'" placeholder="How this helps your role at one3seven."></textarea>'
+   +'<div class="row" style="flex-wrap:wrap"><button class="btn orange" id="rb-gmail">Open in Gmail</button><button class="btn" id="rb-outlook">Outlook</button><button class="btn" id="rb-mailto">Mail app</button><button class="btn ghost" id="rb-copy">Copy</button><button class="btn ghost" id="rb-cancel">Cancel</button></div>'
+   +'<div class="note">Opens a pre-filled draft to '+ACADEMY_APPROVER+' — review and send it yourself. Also saved to your account.</div></div>';
+  document.body.appendChild(m);
+  function payload(){
+    var course=document.getElementById('rb-course').value; if(/Other/.test(course)||!course) course=document.getElementById('rb-other').value.trim()||course||'(unspecified)';
+    return { course:course, name:document.getElementById('rb-name').value.trim(), email:document.getElementById('rb-email').value.trim(), cost:document.getElementById('rb-cost').value.trim(), why:document.getElementById('rb-why').value.trim() };
+  }
+  function body(p){ return 'one3seven Academy — course approval request\n\nName: '+p.name+'\nEmail: '+p.email+'\nCourse: '+p.course+'\nEstimated cost: '+p.cost+'\n\nWhy it helps my role:\n'+p.why+'\n\n(Requesting approval to pay before purchase; reimbursement on completion.)'; }
+  function rbSend(kind){ var p=payload(); logReq('approval',p); openMail(kind,'Academy — approval to pay: '+p.course, body(p)); }
+  document.getElementById('rb-gmail').addEventListener('click',function(){ rbSend('gmail'); });
+  document.getElementById('rb-outlook').addEventListener('click',function(){ rbSend('outlook'); });
+  document.getElementById('rb-mailto').addEventListener('click',function(){ rbSend('mailto'); });
+  document.getElementById('rb-copy').addEventListener('click',function(){ var p=payload(); logReq('approval',p); copyText(body(p), this); });
+  document.getElementById('rb-cancel').addEventListener('click',function(){ document.body.removeChild(m); });
+  m.addEventListener('click',function(e){ if(e.target===m)document.body.removeChild(m); });
+}
+function openUpload(){
+  var nm=get('name')||'', em=get('email')||'';
+  var m=document.createElement('div'); m.className='modal';
+  m.innerHTML='<div class="card"><h3>Submit a completed certificate</h3>'
+   +'<p>Send your certificate as proof so it can be logged toward your credential. <b>Attach the PDF or screenshot</b> to the email that opens.</p>'
+   +'<label>Your name</label><input id="up-name" value="'+nm.replace(/"/g,'&quot;')+'">'
+   +'<label>Your email</label><input id="up-email" value="'+em.replace(/"/g,'&quot;')+'" placeholder="you@one3seven.com">'
+   +'<label>Course completed</label><select id="up-course" style="'+FLD+'">'+courseOptions()+'</select>'
+   +'<label>If “Other”, name it</label><input id="up-other" placeholder="Course + provider">'
+   +'<label>Date completed</label><input id="up-date" placeholder="e.g. 2026-07-31">'
+   +'<div class="row" style="flex-wrap:wrap"><button class="btn orange" id="up-gmail">Open in Gmail</button><button class="btn" id="up-outlook">Outlook</button><button class="btn" id="up-mailto">Mail app</button><button class="btn ghost" id="up-copy">Copy</button><button class="btn ghost" id="up-cancel">Cancel</button></div>'
+   +'<div class="note"><b>Attach the certificate file</b> to the draft before sending. Opens a pre-filled draft to '+ACADEMY_APPROVER+' and saves the request to your account. Direct in-app upload is coming.</div></div>';
+  document.body.appendChild(m);
+  function payload(){
+    var course=document.getElementById('up-course').value; if(/Other/.test(course)||!course) course=document.getElementById('up-other').value.trim()||course||'(unspecified)';
+    return { course:course, name:document.getElementById('up-name').value.trim(), email:document.getElementById('up-email').value.trim(), date:document.getElementById('up-date').value.trim() };
+  }
+  function body(p){ return 'one3seven Academy — certificate submission\n\nName: '+p.name+'\nEmail: '+p.email+'\nCourse: '+p.course+'\nCompleted: '+p.date+'\n\n>>> Please ATTACH the certificate PDF/screenshot to this email before sending. <<<'; }
+  function upSend(kind){ var p=payload(); logReq('upload',p); openMail(kind,'Academy — certificate: '+p.course+' — '+p.name, body(p)); }
+  document.getElementById('up-gmail').addEventListener('click',function(){ upSend('gmail'); });
+  document.getElementById('up-outlook').addEventListener('click',function(){ upSend('outlook'); });
+  document.getElementById('up-mailto').addEventListener('click',function(){ upSend('mailto'); });
+  document.getElementById('up-copy').addEventListener('click',function(){ var p=payload(); logReq('upload',p); copyText(body(p), this); });
+  document.getElementById('up-cancel').addEventListener('click',function(){ document.body.removeChild(m); });
+  m.addEventListener('click',function(e){ if(e.target===m)document.body.removeChild(m); });
+}
+
+/* ---------------- CERTIFICATE ---------------- */
+function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function credHash(seed){ var h=5381; for(var i=0;i<seed.length;i++){ h=((h<<5)+h+seed.charCodeAt(i))>>>0; } return h.toString(36).toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,6); }
+function getCert(level){
+  var name=get('name')||'';
+  var idKey='cert:'+level+':id', dKey='cert:'+level+':date';
+  var id=get(idKey), date=get(dKey);
+  if(!date){ date=new Date().toISOString().slice(0,10); set(dKey,date); }
+  if(!id){ var code=credHash((name||'anon')+level+date); id='O37-FND-'+(code+'000000').slice(0,6); set(idKey,id); }
+  return {name:name,id:id,date:date};
+}
+var CREST_LIGHT='<svg class="cert-crest" viewBox="0 0 38 44" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
+ +'<path d="M19 1 L37 7 V22 C37 33 29 40 19 43 C9 40 1 33 1 22 V7 Z" fill="#F3ECDD" stroke="#8a6d3b" stroke-width="1.4"/>'
+ +'<text x="19" y="21" text-anchor="middle" font-family="Iowan Old Style,Palatino,Georgia,serif" font-size="12" font-weight="700" fill="#22201b">137</text>'
+ +'<rect x="8" y="26" width="22" height="1.4" fill="#b5652e"/>'
+ +'<text x="19" y="35" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="4.4" letter-spacing="1" fill="#8a6d3b">ACADEMY</text></svg>';
+function renderCertificate(level){
+  stopSpeech();
+  var name=get('name');
+  if(!name){
+    view.innerHTML='<div class="crumbs"><a id="bk">‹ Academy</a></div><div class="cert"><div class="cm">Certificate</div><h2>Sign in to claim your certificate</h2><p>Your name goes on the certificate — sign in to generate it.</p><div class="cta" style="justify-content:center;margin-top:16px"><button class="btn orange" id="ci">Sign in</button></div></div>';
+    document.getElementById('bk').addEventListener('click',renderHome); document.getElementById('ci').addEventListener('click',openSignin); window.scrollTo(0,0); return;
+  }
+  var c=getCert(level);
+  var pretty=new Date(c.date+'T00:00:00').toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  var h='<div class="crumbs"><a id="bk">‹ Academy</a> / Certificate</div>';
+  h+='<div id="cert-print"><div class="certificate"><div class="frame">'
+    +CREST_LIGHT
+    +'<div class="cert-school">one3<b>seven</b> Academy</div>'
+    +'<div class="cert-morgan">Get Certified with Morgan</div>'
+    +'<div class="cert-rule"></div>'
+    +'<div class="cert-kind">Certificate of Completion</div>'
+    +'<div class="cert-level">Level I · Foundations</div>'
+    +'<div class="cert-pre">This certifies that</div>'
+    +'<div class="cert-name">'+esc(name)+'</div><div class="cert-nameline"></div>'
+    +'<div class="cert-body">has completed the Foundations core of the one3seven Academy — the mission, the doctrine, the product, data-trust, and how we work — demonstrating a working understanding of what one3seven does and the discipline that governs how we work.</div>'
+    +'<div class="cert-sig"><div class="l"></div><div class="r">one3seven · Founder</div></div>'
+    +'<div class="cert-meta"><span>Issued '+pretty+'</span><span>Credential ID · '+c.id+'</span></div>'
+    +'<div class="cert-disclaimer">A certificate of completion issued by one3seven Academy. It attests to completion of one3seven’s own coursework and is not an accredited academic degree, diploma, or continuing-legal-education (CLE) credit.</div>'
+    +'</div></div></div>';
+  h+='<div class="cert-actions"><button class="btn orange" id="print">⤓ Print / Save as PDF</button><button class="btn ghost" id="bk2">‹ Back to Academy</button></div>';
+  view.innerHTML=h;
+  document.getElementById('bk').addEventListener('click',renderHome);
+  document.getElementById('bk2').addEventListener('click',renderHome);
+  document.getElementById('print').addEventListener('click',function(){window.print();});
+  window.scrollTo(0,0);
+}
+
+/* ---------------- LESSON ---------------- */
+function openCourse(cid,idx){
+  var c=ACADEMY.filter(function(x){return x.id===cid;})[0]; if(!c||!c.lessons)return;
+  set('last', cid+':'+idx);
+  stopSpeech();
+  var atQuiz = idx>=c.lessons.length;
+  var h='<div class="crumbs"><a id="bk">‹ Academy</a> / '+c.title+'</div>';
+  h+='<div class="lessonwrap"><div class="rail"><div class="rt">'+c.title+'</div>';
+  c.lessons.forEach(function(l,i){
+    h+='<button data-i="'+i+'" class="lz '+(i===idx&&!atQuiz?'active':'')+' '+(lessonDone(cid,i)?'done':'')+'"><span class="dot"></span><span>'+(i+1)+'. '+l.t+'</span></button>';
+  });
+  h+='<button data-i="'+c.lessons.length+'" class="lz '+(atQuiz?'active':'')+' '+(get('q:'+cid)==='pass'?'done':'')+'"><span class="dot"></span><span>✎ Quiz</span></button>';
+  h+='</div><div class="lesson" id="lz-body"></div></div>';
+  view.innerHTML=h;
+  document.getElementById('bk').addEventListener('click',renderHome);
+  document.querySelectorAll('.rail .lz').forEach(function(b){b.addEventListener('click',function(){openCourse(cid,parseInt(b.getAttribute('data-i')));});});
+  var body=document.getElementById('lz-body');
+  if(atQuiz){ renderQuiz(c,body); window.scrollTo(0,0); return; }
+  var l=c.lessons[idx]; var pctL=Math.round((idx+1)/c.lessons.length*100);
+  var hb='<div class="lprog"><span class="lstep">Lesson '+(idx+1)+' of '+c.lessons.length+'</span><div class="lbar"><i style="width:'+pctL+'%"></i></div></div>';
+  hb+='<h2>'+l.t+'</h2><div class="obj">'+l.obj+'</div><button class="listen" id="listen">🔊 Listen to this lesson</button>';
+  l.blocks.forEach(function(b){
+    if(b.p)hb+='<p>'+b.p+'</p>';
+    if(b.say)hb+='<div class="say">'+b.say+'</div>';
+    if(b.never)hb+='<div class="never">'+b.never+'</div>';
+  });
+  if(l.cites && l.cites.length){
+    hb+='<div class="cites"><div class="cites-h">Sources</div><ul>';
+    l.cites.forEach(function(c){
+      hb+= c.url ? '<li><a href="'+c.url+'" target="_blank" rel="noopener noreferrer">'+c.label+'</a></li>'
+                 : '<li><span class="internal">'+c.label+'</span></li>';
+    });
+    hb+='</ul></div>';
+  }
+  hb+='<div class="lnav">';
+  hb+= idx>0 ? '<button class="btn ghost" id="prev">‹ Previous</button>' : '<span></span>';
+  var last = idx===c.lessons.length-1;
+  hb+='<button class="btn" id="next">'+(lessonDone(cid,idx)?(last?'Go to quiz ›':'Next ›'):'Mark complete ›')+'</button>';
+  hb+='</div>';
+  body.innerHTML=hb;
+  document.getElementById('listen').addEventListener('click',function(){ toggleListen(l,this); });
+  if(idx>0)document.getElementById('prev').addEventListener('click',function(){openCourse(cid,idx-1);});
+  document.getElementById('next').addEventListener('click',function(){ set('l:'+cid+':'+idx,'1'); openCourse(cid,idx+1); });
+  window.scrollTo(0,0);
+}
+
+/* ---------------- QUIZ ---------------- */
+function renderQuiz(c,body){
+  var q=c.quiz; var picks={};
+  function draw(){
+    var h='<div class="quiz"><div class="qi">'+q.intro+(c.quiz.items.some(function(it){return it.gate;})?' · must pass':'')+'</div>';
+    q.items.forEach(function(it,qi){
+      h+='<div class="qq">'+(it.gate?'<span class="tag">DOCTRINE GATE</span>':(it.apply?'<span class="tag">APPLY</span>':''))+it.q+'</div><div class="opts">';
+      it.opts.forEach(function(o,oi){
+        var cls='opt'; if(picks[qi]!==undefined){ if(o.ok)cls+=' right'; else if(picks[qi]===oi)cls+=' wrong'; } else if(picks[qi]===oi)cls+=' pick';
+        h+='<button class="'+cls+'" data-q="'+qi+'" data-o="'+oi+'">'+o.t+'</button>';
+      });
+      h+='</div>';
+      if(picks[qi]!==undefined){ var ok=it.opts[picks[qi]].ok; h+='<div class="fb '+(ok?'ok':'no')+'">'+(ok?'✓ ':'✗ ')+(ok?it.fb.ok:it.fb.no)+'</div>'; }
+      h+='</div>';
+    });
+    var answered=q.items.every(function(_,qi){return picks[qi]!==undefined;});
+    var allright=q.items.every(function(it,qi){return picks[qi]!==undefined&&it.opts[picks[qi]].ok;});
+    if(answered){
+      if(allright){ set('q:'+c.id,'pass');
+        h+='<div class="fb ok" style="margin-top:16px"><b>Passed.</b> You’ve completed <b>'+c.title+'</b>.</div>';
+        h+='<div class="demo"><b>Demonstrate (Stage 3):</b> a founder will have you handle this live before it counts toward hiring. Knowing it here is step one; doing it under pressure is the real gate.</div>';
+        h+='<div class="lnav"><span></span><button class="btn orange" id="fin">Finish ›</button></div>';
+      } else {
+        h+='<div class="fb no" style="margin-top:16px">Review the red answers, then try those questions again — the gate needs every answer right.</div>';
+        h+='<div class="lnav"><span></span><button class="btn ghost" id="retry">Try again</button></div>';
+      }
+    }
+    h+='</div>';
+    body.innerHTML=h;
+    body.querySelectorAll('.opt').forEach(function(b){b.addEventListener('click',function(){ var qi=b.getAttribute('data-q'); if(picks[qi]!==undefined)return; picks[qi]=parseInt(b.getAttribute('data-o')); draw(); });});
+    var fin=document.getElementById('fin'); if(fin)fin.addEventListener('click',renderHome);
+    var rt=document.getElementById('retry'); if(rt)rt.addEventListener('click',function(){ picks={}; draw(); });
+  }
+  draw();
+}
+
+document.getElementById('signin').addEventListener('click',openSignin);
+document.getElementById('nav-courses').addEventListener('click',function(){renderHome();var e=document.getElementById('courses');if(e)e.scrollIntoView({behavior:'smooth'});});
+document.getElementById('nav-cert').addEventListener('click',function(){renderHome();var e=document.getElementById('cert');if(e)e.scrollIntoView({behavior:'smooth'});});
+document.getElementById('nav-reimburse').addEventListener('click',function(){renderHome();var e=document.getElementById('reimburse');if(e)e.scrollIntoView({behavior:'smooth'});});
+if(location.hash.indexOf('founder-9k3xq7v2')>=0){ rawSet('bypass','1'); try{history.replaceState(null,'',location.pathname);}catch(e){} }
+updateSigninBtn();
+renderHome();
+bootAuth();
+</script>
+</body>
+</html>

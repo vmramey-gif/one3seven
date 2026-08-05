@@ -1,0 +1,63 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex, nofollow"><title>one3seven — Billing & Collections (annual prepaid)</title></head><body>
+<style>
+  :root{
+    --bg:#0E1512;--bg2:#0A100D;--panel:#16201B;--ink:#ECF0E8;--soft:#9DA99F;--faint:#6B776E;
+    --sage:#8FB8A2;--sage-deep:#B7D2C4;--orange:#E08A4E;--orange-soft:#2A1B10;--red:#D97A6C;--line:#263029;
+    --serif:'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;
+    --sans:'Inter Tight',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+    --mono:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;
+  }
+  *{box-sizing:border-box;} body{margin:0;background:radial-gradient(120% 70% at 50% 0%,#16201B 0%,var(--bg) 46%,var(--bg2) 100%);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:900px;margin:0 auto;padding:26px 20px 60px;}
+  .banner{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--orange);border:1px solid var(--orange);background:var(--orange-soft);border-radius:999px;padding:7px 14px;display:inline-block;margin-bottom:18px;}
+  .brand{font-family:var(--serif);font-size:20px;} .brand b{color:var(--orange);}
+  h1{font-family:var(--serif);font-weight:600;font-size:clamp(26px,4.2vw,38px);letter-spacing:-.015em;margin:8px 0 6px;}
+  .lede{color:var(--soft);font-size:15.5px;max-width:66ch;line-height:1.55;margin:0 0 6px;}
+  .sec{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin:30px 0 14px;padding-bottom:8px;border-bottom:1px solid var(--line);}
+  .flow{display:flex;gap:6px;align-items:center;justify-content:center;flex-wrap:wrap;}
+  .flow .step{border:1px solid var(--line);border-radius:10px;padding:9px 13px;background:#131c17;font-size:13px;color:var(--ink);text-align:center;}
+  .flow .step.hero{border-color:var(--orange);color:var(--orange);} .flow .step small{display:block;color:var(--faint);font-size:10.5px;font-family:var(--mono);}
+  .flow .arrow{color:var(--orange);font-family:var(--mono);}
+  table{width:100%;border-collapse:collapse;margin-top:6px;font-size:13.5px;}
+  th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);} th{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);}
+  td.n{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right;} td.bad{color:var(--red);} td.good{color:var(--sage);}
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px;} @media(max-width:640px){.cards{grid-template-columns:1fr;}}
+  .card{border:1px solid var(--line);border-radius:12px;background:#131c17;padding:14px 16px;} .card h4{margin:0 0 6px;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--sage);} .card p{margin:0;color:var(--soft);font-size:13px;line-height:1.5;} .card b{color:var(--ink);}
+  .verdict{margin-top:20px;border:1px solid var(--sage);border-radius:16px;background:#12201a;padding:16px 20px;color:var(--soft);font-size:14.5px;line-height:1.6;} .verdict b{color:var(--sage-deep);}
+  .foot{margin-top:22px;font-family:var(--mono);font-size:11px;color:var(--faint);line-height:1.7;}
+</style>
+<div class="wrap">
+  <div class="banner">Illustrative · verify Biller Genie pricing · planning note</div>
+  <div class="brand">one3<b>seven</b></div>
+  <h1>Billing &amp; collections — annual prepaid</h1>
+  <p class="lede">How one3seven invoices firms and collects annual-prepaid subscriptions — and where an AR tool like Biller Genie fits. The day-one rule: <b>annual prepaid, collected by ACH.</b></p>
+
+  <div class="sec">The stack</div>
+  <div class="flow">
+    <span class="step">one3seven<small>the plan</small></span><span class="arrow">→</span>
+    <span class="step hero">Biller Genie<small>invoice · dunning · reconcile</small></span><span class="arrow">→</span>
+    <span class="step">Processor / gateway<small>ACH or card</small></span><span class="arrow">→</span>
+    <span class="step">QuickBooks<small>the books</small></span>
+  </div>
+  <p class="lede" style="margin-top:14px">Biller Genie is an <b>AR-automation layer, not a processor</b> — it sends the invoice, chases it automatically, gives firms a pay portal, and reconciles to QuickBooks, riding on top of a processor. It complements Stripe; it doesn't replace the processor underneath.</p>
+
+  <div class="sec">The number that decides it — card vs ACH on a big annual charge</div>
+  <table>
+    <tr><th>Annual prepaid</th><th>Card fee (~2.9%+30¢)</th><th>ACH (often capped)</th></tr>
+    <tr><td>Small · $4,990</td><td class="n bad">~$145</td><td class="n good">~$5–25</td></tr>
+    <tr><td>Medium · $12,990</td><td class="n bad">~$377</td><td class="n good">~$5–25</td></tr>
+    <tr><td>Large · $28,000</td><td class="n bad">~$812</td><td class="n good">~$5–25</td></tr>
+  </table>
+  <p class="lede" style="margin-top:12px">Card quietly eats ~3% of a large annual invoice. <b>Steer firms to ACH</b> (they pay by AP/ACH anyway). Biller Genie also supports surcharging — passing the card fee to the firm — but ACH is simpler and cleaner.</p>
+
+  <div class="sec">Cost to one3seven &amp; when to adopt</div>
+  <div class="cards">
+    <div class="card"><h4>Fixed opex</h4><p>Biller Genie ≈ <b>$45–$135/mo</b> (~$540–$1,620/yr), <b>independent of firm count</b>. Verify current pricing.</p></div>
+    <div class="card"><h4>When it earns its keep</h4><p>Overkill for the <b>first 2–3 firms</b> — send manual invoices, collect by ACH, free. Graduate in at <b>~8–10+ firms</b>, when AR-chasing + bookkeeping eats founder time.</p></div>
+  </div>
+
+  <div class="verdict"><b>Verdict:</b> Biller Genie fits the annual-prepaid model well — it's the AR layer you <b>graduate into</b>, not a day-one dependency. Day one: annual prepaid, ACH, a spreadsheet. Layer in Biller Genie for automated dunning + QuickBooks reconciliation once the invoice count justifies the flat opex.</div>
+
+  <div class="foot">Illustrative planning note — verify Biller Genie's current plans, ACH caps, and processor fees before budgeting. Fees vary by processor and negotiated rate. Not financial advice.</div>
+</div>
+</body></html>

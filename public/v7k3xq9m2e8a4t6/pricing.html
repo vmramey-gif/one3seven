@@ -1,0 +1,154 @@
+<title>one3seven — Pricing & Clean Money</title>
+<style>
+  :root{
+    --bg:#0E1512;--bg2:#0A100D;--panel:#16201B;--ink:#ECF0E8;--soft:#9DA99F;--faint:#6B776E;
+    --sage:#8FB8A2;--amber:#E0B84E;--red:#D97A6C;--acc:#E08A4E;--acc-soft:#2A1B10;--line:#263029;
+    --serif:'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;
+    --sans:'Inter Tight',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+    --mono:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  body{background:radial-gradient(120% 90% at 50% 0%,#16201B 0%,var(--bg) 46%,var(--bg2) 100%);color:var(--ink);font-family:var(--sans);min-height:100%;-webkit-font-smoothing:antialiased;}
+  .app{max-width:1120px;margin:0 auto;padding:20px 20px 44px;}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;}
+  .brand{font-family:var(--serif);font-weight:600;font-size:18px;} .brand b{color:var(--acc);}
+  .topmeta{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);}
+  .stage{position:relative;margin-top:14px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(160deg,#17211C 0%,#101713 100%);aspect-ratio:16/9;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.45);}
+  .slide{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:clamp(20px,3.2vw,44px);opacity:0;transition:opacity .5s;pointer-events:none;text-align:center;overflow-y:auto;}
+  .slide.active{opacity:1;pointer-events:auto;}
+  @media (prefers-reduced-motion:reduce){.slide{transition:none;}}
+  .beat{font-family:var(--mono);font-size:clamp(9px,1.1vw,11px);letter-spacing:.16em;text-transform:uppercase;color:var(--acc);border:1px solid var(--acc);border-radius:999px;padding:4px 12px;margin-bottom:13px;background:var(--acc-soft);}
+  .title{font-family:var(--serif);font-weight:600;font-size:clamp(20px,3.2vw,36px);letter-spacing:-.01em;line-height:1.08;margin-bottom:10px;text-wrap:balance;max-width:26ch;}
+  .dtext{color:var(--acc);font-size:clamp(14px,1.9vw,20px);font-weight:600;max-width:46ch;margin-bottom:12px;line-height:1.3;}
+  .layer{max-width:60ch;text-align:left;margin:5px auto;padding:8px 14px;border-radius:0 10px 10px 0;font-size:clamp(12.5px,1.55vw,16px);line-height:1.4;}
+  .layer .lab{font-family:var(--mono);font-size:10px;letter-spacing:.14em;display:block;margin-bottom:3px;}
+  .l-obj{border-left:3px solid var(--faint);background:#151d18;color:var(--soft);font-style:italic;} .l-obj .lab{color:var(--faint);font-style:normal;}
+  .l-mean{border-left:3px solid var(--sage);background:#12201a;color:var(--sage-deep,#B7D2C4);} .l-mean .lab{color:var(--sage);}
+  .l-say{border-left:3px solid var(--acc);background:var(--acc-soft);color:var(--ink);} .l-say .lab{color:var(--acc);}
+  .l-ask{border-left:3px solid var(--amber);background:#231e10;color:#EBD9A0;} .l-ask .lab{color:var(--amber);}
+  .l-never{border-left:3px solid var(--red);background:#241512;color:#F0B7AD;} .l-never .lab{color:var(--red);}
+  .badge{display:inline-block;font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;border-radius:6px;margin-left:8px;vertical-align:middle;}
+  .b-exact{background:#183025;color:var(--sage);border:1px solid var(--sage);}
+  .b-adaptable{background:#2b2410;color:var(--amber);border:1px solid var(--amber);}
+  .b-never{background:#2b1512;color:var(--red);border:1px solid var(--red);}
+  .note{color:var(--faint);font-size:clamp(12px,1.5vw,15px);max-width:56ch;line-height:1.4;margin-top:8px;}
+  .stale{margin-top:8px;font-family:var(--mono);font-size:11px;color:var(--amber);}
+  .kick{font-family:var(--mono);font-size:clamp(9px,1.2vw,12px);letter-spacing:.2em;text-transform:uppercase;color:var(--sage);margin-bottom:12px;}
+  .slide.card .title{font-size:clamp(28px,5.2vw,54px);max-width:20ch;} .slide.card .sub{color:var(--soft);font-size:clamp(14px,1.9vw,20px);max-width:54ch;margin:0 auto;line-height:1.5;}
+  .counter{position:absolute;top:12px;right:16px;font-family:var(--mono);font-size:12px;color:var(--faint);}
+  .ticks{position:absolute;left:16px;right:16px;bottom:10px;display:flex;gap:3px;} .ticks span{height:3px;flex:1;border-radius:2px;background:var(--line);} .ticks span.done{background:var(--acc);}
+  .controls{margin-top:14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  button.ctl{font-family:var(--sans);font-size:14px;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:9px 15px;cursor:pointer;}
+  button.ctl:hover{border-color:var(--acc);} button.ctl:focus-visible{outline:2px solid var(--acc);outline-offset:2px;}
+  button.play{background:var(--acc);color:#0E1512;border-color:var(--acc);font-weight:700;padding:9px 20px;}
+  .spacer{flex:1;} .rate{font-family:var(--mono);font-size:11px;color:var(--faint);display:flex;gap:8px;align-items:center;} .rate input{accent-color:var(--acc);}
+  .resume{margin-top:10px;font-family:var(--mono);font-size:12px;color:var(--acc);display:none;} .resume button{margin-left:8px;}
+  .caption{margin-top:12px;min-height:38px;border-left:2px solid var(--acc);padding:4px 0 4px 16px;font-size:15px;color:var(--soft);font-style:italic;} .caption b{color:var(--ink);font-style:normal;}
+  .panel{display:none;margin-top:14px;border:1px solid var(--line);border-radius:14px;background:#0f1713;padding:16px 18px;}
+  .panel.open{display:block;} .panel h3{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin:0 0 12px;}
+  .tr{border-bottom:1px solid var(--line);padding:10px 0;} .tr:last-child{border-bottom:0;}
+  .tr .th{font-family:var(--serif);font-size:15px;color:var(--ink);margin-bottom:4px;} .tr .tn{color:var(--soft);font-size:13.5px;line-height:1.5;}
+  .tr .ts{margin-top:6px;color:var(--ink);font-size:13.5px;background:var(--acc-soft);border-left:2px solid var(--acc);padding:6px 10px;border-radius:0 8px 8px 0;display:flex;justify-content:space-between;gap:10px;align-items:flex-start;}
+  .cpy{font-family:var(--mono);font-size:10px;color:var(--acc);background:none;border:1px solid var(--acc);border-radius:6px;padding:2px 7px;cursor:pointer;white-space:nowrap;}
+  .src{font-size:13px;color:var(--soft);padding:6px 0;border-bottom:1px solid var(--line);} .src a{color:var(--acc);} .src .dt{font-family:var(--mono);font-size:11px;color:var(--faint);}
+  .foot{margin-top:16px;font-family:var(--mono);font-size:11px;color:var(--faint);line-height:1.6;}
+</style>
+<div class="app">
+  <div class="topbar"><div class="brand">one3<b>seven</b></div><div class="topmeta">Sales training · pricing · internal</div></div>
+  <div class="stage" id="stage"><div class="counter" id="counter"></div><div class="ticks" id="ticks"></div></div>
+  <div class="controls">
+    <button class="ctl play" id="play">▶ Play</button>
+    <button class="ctl" id="prev">‹ Prev</button>
+    <button class="ctl" id="next">Next ›</button>
+    <button class="ctl" id="restart">↺ Restart</button>
+    <button class="ctl" id="tbtn">☰ Transcript</button>
+    <button class="ctl" id="sbtn">⌗ Sources</button>
+    <span class="spacer"></span>
+    <span class="rate">speed <input id="rate" type="range" min="0.8" max="1.3" step="0.05" value="1" aria-label="playback speed"></span>
+  </div>
+  <div class="resume" id="resume"></div>
+  <div class="caption" id="caption"><b>Press Play.</b> Pricing & Clean Money — internal rep coaching. Arrow keys navigate · Space plays.</div>
+  <div class="panel" id="transcript"><h3>Transcript · copyable talk tracks</h3><div id="trbody"></div></div>
+  <div class="panel" id="sources"><h3>Sources · verify before repeating</h3><div id="srcbody"></div></div>
+  <div class="foot">Internal FL sales training. Coaching, not a customer script. SAY badges: <b style="color:var(--sage)">EXACT</b> = verbatim · <b style="color:var(--amber)">ADAPTABLE</b> = keep the meaning · <b style="color:var(--red)">NEVER</b> = prohibited. one3seven organizes and cites; it never scores cases or gives legal advice.</div>
+  <audio id="audio" preload="auto"></audio>
+</div>
+<script>
+  var ID="pricing", S=[{"card":true,"kick":"one3seven · FL sales training","title":"Pricing & Clean Money","sub":"Where doctrine and sales collide. Principles before price — get the structure right and the number is easy."},{"beat":"The test","title":"The clean-money test","displayText":"One question decides if a revenue idea is safe.","say":"Does the money depend on a worker's outcome, or is it a fee for sending a case? If yes to either — we don't do it.","sayClass":"exact","note":"Clean = a flat fee for using software, regardless of who wins or how many sign."},{"beat":"Bright lines","title":"Four lines you never cross","displayText":"§6155 + CRPC 5.4 — not preferences, law.","note":"Never: a % of winnings · a per-referral or per-case fee · splitting fees with attorneys · a success fee tied to settlements.","sources":[{"label":"CA Bus. & Prof. Code §6155 + CRPC 5.4","url":"","checked":"2026-07-30"}],"verifiedOn":"2026-07-30","reviewAfter":"2027-01-30","claimStatus":"counsel-reviewed"},{"beat":"What we charge","title":"A flat subscription","displayText":"Fixed. Decoupled from outcomes and client count.","say":"The firm pays a fixed amount to use the software — it doesn't change based on who connects or whether any case wins.","sayClass":"exact","note":"A roster / membership fee. The only structure we quote."},{"beat":"The reframe","title":"Price on avoided cost","displayText":"Anchor to the problem, not the Clio invoice.","say":"Price against the staff hours we remove and the intakes that no longer get dropped — not against what other software costs.","sayClass":"adaptable","note":"Anchoring to other tools teaches them to see us as a cheaper tool."},{"beat":"Numbers · verify","title":"The current tiers","displayText":"Practice · Firm · Surge — CURRENT, not locked.","say":"Let me confirm our live pricing and send it over — we've been refining the tiers.","sayClass":"adaptable","note":"Repricing under review with counsel. Do NOT present as final on a call. Confirm live numbers before quoting.","verifiedOn":"2026-07-30","reviewAfter":"2026-10-30","claimStatus":"in-flux"},{"beat":"Scaling","title":"Scale by seats, not clients","displayText":"Meter the software use — never the outcomes.","never":"Volume pricing based on how many cases we send you.","say":"If you want a volume conversation, we meter tool usage and seats — never clients delivered or cases won.","sayClass":"exact"},{"beat":"On the call","title":"How to talk price","displayText":"Lead with avoided cost, not a number.","say":"You told me your coordinator spends six hours per intake — against that, the flat fee is small. What do you spend today getting a file ready to screen?","sayClass":"adaptable"},{"beat":"Never say","title":"The money lines you never say","displayText":"If they propose contingency or per-case — decline, route to counsel.","never":"We only get paid when you win. / It's a small cut of the settlement. / Pay us per case we send.","say":"It's a flat subscription for the software, and the worker's record is free and theirs.","sayClass":"exact"},{"card":true,"kick":"Close","title":"Clean money is impossible to regret","sub":"A flat fee for software, never a stake in a case. Anchor to avoided cost, scale by seats, confirm live numbers before you quote."}], NARR=["Pricing. This is where doctrine and sales collide, so it is the easiest place to say something that sounds good and is actually illegal. Get the principles right and the numbers are easy. Get the principles wrong and you have created a fee-splitting problem. So we start with the test, not the price.","The clean-money test — one question decides whether a revenue idea is safe. Does the money depend on a specific worker's outcome, or is it a fee for sending a case? If yes to either, it is dirty, and we do not do it. If the money is a flat fee for using software, regardless of who wins or how many clients sign, it is clean. Run every pricing idea through that test first.","The bright lines that follow. Never a percentage of winnings. Never a per-referral or per-case fee. Never splitting fees with attorneys. Never a success fee tied to settlements. These are not our preferences — they are section six one five five and rule five point four. Cross them, and the entire model becomes illegal.","So what do we actually charge? A flat subscription — a roster, or membership, fee. The firm pays a fixed amount to use the software, and it does not change based on how many workers connect or whether any case wins. Fixed, and decoupled from outcomes and from the number of clients. That is the clean structure, and it is the only one we quote.","Now the reframe that raises the price. Do not anchor to what other legal software costs — that teaches the firm to see us as a cheaper tool. Anchor to avoided cost: the hours of staff time we remove, the intakes that no longer get half-built and dropped. Price against the problem we solve, not against the Clio invoice.","The current tiers — and treat these as current, not locked, because a repricing is under review with counsel. Today there is a Practice tier, a Firm tier, and a higher Surge tier. Do not present these as final numbers on a call yet. Confirm the live pricing before you quote it — this is exactly the kind of figure that changes.","How the price should scale. It scales by seats and by usage of the tool — never by the number of clients delivered or cases won. If a firm wants a volume conversation, meter the software use, not the outcomes. That single distinction is what keeps volume pricing on the clean side of the line.","How to talk price on a call. Do not lead with a number. Lead with the avoided cost you uncovered in discovery — you told me your coordinator spends six hours per intake. Then the flat fee looks small against that. And ask a budget diagnostic: what do you currently spend, in hours or dollars, getting a file ready to screen?","The lines you never say about money. Never: we only get paid when you win. Never: it is a small cut of the settlement. Never: pay us per case we send. Say instead: it is a flat subscription for the software, and the worker's record is free and theirs. If a firm proposes a contingency or per-case arrangement, decline it and route to counsel.","So — principles before price. Money must be a flat fee for software, never a stake in a case. Anchor to avoided cost, scale by seats, and confirm the live numbers before you quote. When a money conversation drifts toward outcomes, stop and describe the clean structure. Clean money is slower to explain, and impossible to regret."], AUDIO=["/voice/pricing/pr_01.mp3","/voice/pricing/pr_02.mp3","/voice/pricing/pr_03.mp3","/voice/pricing/pr_04.mp3","/voice/pricing/pr_05.mp3","/voice/pricing/pr_06.mp3","/voice/pricing/pr_07.mp3","/voice/pricing/pr_08.mp3","/voice/pricing/pr_09.mp3","/voice/pricing/pr_10.mp3"];
+  var stage=document.getElementById('stage'),ticks=document.getElementById('ticks'),counter=document.getElementById('counter'),
+      caption=document.getElementById('caption'),playBtn=document.getElementById('play'),rateEl=document.getElementById('rate'),audio=document.getElementById('audio');
+  var i=0,playing=false,now=new Date();
+  function esc(t){return (t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');}
+  function className(c){return c==='exact'?'b-exact':c==='adaptable'?'b-adaptable':c==='never'?'b-never':'';}
+  function staleFor(s){ if(!s.reviewAfter) return false; try{ return new Date(s.reviewAfter) < now; }catch(e){ return false; } }
+  S.forEach(function(s){
+    var d=document.createElement('div');d.className='slide'+(s.card?' card':'');
+    var h='';
+    if(s.card){ h='<div class="kick">'+esc(s.kick)+'</div><div class="title">'+esc(s.title)+'</div>'+(s.sub?'<div class="sub">'+esc(s.sub)+'</div>':''); }
+    else {
+      if(s.beat) h+='<div class="beat">'+esc(s.beat)+'</div>';
+      h+='<div class="title">'+esc(s.title)+'</div>';
+      if(s.displayText) h+='<div class="dtext">'+esc(s.displayText)+'</div>';
+      if(s.obj) h+='<div class="layer l-obj"><span class="lab">THEY SAY</span>'+esc(s.obj)+'</div>';
+      if(s.mean) h+='<div class="layer l-mean"><span class="lab">WHAT THEY MAY MEAN</span>'+esc(s.mean)+'</div>';
+      if(s.never) h+='<div class="layer l-never"><span class="lab">NEVER SAY</span>'+esc(s.never)+'</div>';
+      if(s.say){ var cls=s.sayClass==='never'?'l-never':'l-say'; var lab=s.sayClass==='never'?'NEVER SAY':(s.never?'SAY INSTEAD':'SAY');
+        var badge=s.sayClass&&s.sayClass!=='never'?'<span class="badge '+className(s.sayClass)+'">'+s.sayClass+'</span>':'';
+        h+='<div class="layer '+cls+'"><span class="lab">'+lab+badge+'</span>'+esc(s.say)+'</div>'; }
+      if(s.ask) h+='<div class="layer l-ask"><span class="lab">ASK NEXT</span>'+esc(s.ask)+'</div>';
+      if(s.note) h+='<div class="note">'+esc(s.note)+'</div>';
+      if(staleFor(s)) h+='<div class="stale">⚠ Research figure — reverification required (review-after '+esc(s.reviewAfter)+').</div>';
+    }
+    d.innerHTML=h;stage.appendChild(d);ticks.appendChild(document.createElement('span'));
+  });
+  var slides=stage.querySelectorAll('.slide'),tickEls=ticks.querySelectorAll('span');
+  // Transcript
+  var trbody=document.getElementById('trbody');
+  S.forEach(function(s,idx){
+    var row=document.createElement('div');row.className='tr';
+    var h='<div class="th">'+String(idx+1).padStart(2,'0')+' · '+esc(s.title||s.kick||'')+'</div>';
+    h+='<div class="tn">'+esc(NARR[idx])+'</div>';
+    if(s.say){ h+='<div class="ts"><span>'+esc(s.say)+'</span><button class="cpy" data-say="'+esc(s.say).replace(/"/g,'&quot;')+'">copy</button></div>'; }
+    row.innerHTML=h;trbody.appendChild(row);
+  });
+  trbody.addEventListener('click',function(e){ var b=e.target.closest('.cpy'); if(!b)return; var t=b.getAttribute('data-say');
+    if(navigator.clipboard){navigator.clipboard.writeText(t);} b.textContent='copied'; setTimeout(function(){b.textContent='copy';},1200); });
+  // Sources
+  var srcbody=document.getElementById('srcbody'),anySrc=false;
+  S.forEach(function(s,idx){ (s.sources||[]).forEach(function(src){ anySrc=true;
+    var el=document.createElement('div');el.className='src';
+    el.innerHTML='<b>'+esc(s.title||('Slide '+(idx+1)))+'</b> — '+(src.url?'<a href="'+esc(src.url)+'" target="_blank" rel="noopener">'+esc(src.label)+'</a>':esc(src.label))
+      +(src.checked?' <span class="dt">· checked '+esc(src.checked)+'</span>':'')
+      +(s.reviewAfter?' <span class="dt">· review-after '+esc(s.reviewAfter)+(staleFor(s)?' ⚠ DUE':'')+'</span>':'');
+    srcbody.appendChild(el); }); });
+  if(!anySrc) srcbody.innerHTML='<div class="src" style="color:var(--faint)">No external market claims in this film — talk tracks are doctrine and workflow, not figures.</div>';
+  function paint(){
+    slides.forEach(function(el,idx){el.classList.toggle('active',idx===i);});
+    tickEls.forEach(function(el,idx){el.classList.toggle('done',idx<=i);});
+    counter.textContent=String(i+1).padStart(2,'0')+' / '+String(S.length).padStart(2,'0');
+    var s=S[i]; caption.innerHTML=(playing?'<b>▶</b> ':'')+esc(s.displayText||s.title||NARR[i]);
+    try{ localStorage.setItem('film:'+ID+':slide', i); if(i===S.length-1) localStorage.setItem('film:'+ID+':completed','true'); }catch(e){}
+  }
+  function playCurrent(){ audio.src=AUDIO[i]; audio.playbackRate=parseFloat(rateEl.value)||1; var p=audio.play(); if(p&&p.catch)p.catch(function(){caption.innerHTML='<b>Tap Play once more</b> — autoplay was blocked.';}); }
+  audio.addEventListener('ended',function(){ if(!playing)return; if(i<S.length-1){i++;paint();playCurrent();} else {playing=false;setLabel();caption.innerHTML='<b>Fin.</b> Transcript below has every talk track. Replay any beat, or screen-record to export.';} });
+  function setLabel(){playBtn.textContent=playing?'❚❚ Pause':'▶ Play';}
+  function togglePlay(){ playing=!playing;setLabel(); if(playing){paint();playCurrent();} else audio.pause(); }
+  playBtn.addEventListener('click',togglePlay);
+  document.getElementById('next').addEventListener('click',function(){ if(i<S.length-1){i++;paint(); if(playing)playCurrent();} });
+  document.getElementById('prev').addEventListener('click',function(){ if(i>0){i--;paint(); if(playing)playCurrent();} });
+  document.getElementById('restart').addEventListener('click',function(){ i=0;paint(); if(playing)playCurrent(); else audio.pause(); });
+  document.getElementById('tbtn').addEventListener('click',function(){ document.getElementById('transcript').classList.toggle('open'); });
+  document.getElementById('sbtn').addEventListener('click',function(){ document.getElementById('sources').classList.toggle('open'); });
+  rateEl.addEventListener('input',function(){ audio.playbackRate=parseFloat(rateEl.value)||1; });
+  document.addEventListener('keydown',function(e){ if(e.target.tagName==='INPUT')return;
+    if(e.key==='ArrowRight'){ if(i<S.length-1){i++;paint(); if(playing)playCurrent();} }
+    else if(e.key==='ArrowLeft'){ if(i>0){i--;paint(); if(playing)playCurrent();} }
+    else if(e.key===' '){ e.preventDefault(); togglePlay(); } });
+  // Resume
+  try{ var saved=parseInt(localStorage.getItem('film:'+ID+':slide')||'0',10);
+    if(saved>0 && saved<S.length-1){ var r=document.getElementById('resume');
+      r.style.display='block'; r.innerHTML='You left off at slide '+(saved+1)+'. <button class="ctl" id="rz">Resume</button> <button class="ctl" id="rs">Start over</button>';
+      document.getElementById('rz').addEventListener('click',function(){ i=saved;paint();r.style.display='none'; });
+      document.getElementById('rs').addEventListener('click',function(){ i=0;paint();r.style.display='none'; }); } }catch(e){}
+  paint();
+</script>

@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>one3seven — FL Certification (required onboarding)</title>
+<style>
+  :root{
+    --bg:#0E1512;--bg2:#0A100D;--panel:#16201B;--ink:#ECF0E8;--soft:#9DA99F;--faint:#6B776E;
+    --sage:#8FB8A2;--sage-deep:#B7D2C4;--orange:#E08A4E;--orange-soft:#2A1B10;--violet:#8B7DD8;--red:#D97A6C;--line:#263029;
+    --serif:'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;
+    --sans:'Inter Tight',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+    --mono:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;}
+  body{background:radial-gradient(120% 80% at 50% 0%,#16201B 0%,var(--bg) 46%,var(--bg2) 100%);color:var(--ink);font-family:var(--sans);min-height:100vh;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:920px;margin:0 auto;padding:38px 22px 64px;}
+  .brand{font-family:var(--serif);font-weight:600;font-size:19px;} .brand b{color:var(--orange);}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--orange);margin:26px 0 10px;}
+  h1{font-family:var(--serif);font-weight:600;font-size:clamp(28px,4.6vw,44px);letter-spacing:-.015em;line-height:1.05;margin:0 0 12px;text-wrap:balance;}
+  .lede{color:var(--soft);font-size:15.5px;max-width:64ch;line-height:1.55;margin:0 0 6px;} .lede b{color:var(--ink);}
+  .rule{margin:18px 0;border:1px solid var(--red);border-radius:12px;background:#20130f;padding:12px 16px;color:#F0B7AD;font-size:14px;line-height:1.5;} .rule b{color:#fff;}
+  .prog{position:sticky;top:0;z-index:5;background:rgba(14,21,18,.94);backdrop-filter:blur(6px);padding:12px 0 10px;margin:18px 0 8px;border-bottom:1px solid var(--line);}
+  .bar{height:8px;border-radius:6px;background:#131c17;overflow:hidden;border:1px solid var(--line);} .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--sage),var(--orange));transition:width .3s;}
+  .pl{font-family:var(--mono);font-size:12px;color:var(--soft);margin-top:7px;display:flex;justify-content:space-between;} .pl b{color:var(--sage);}
+  .phase{margin-top:26px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(160deg,#17211C,#101713);padding:20px 20px 16px;}
+  .ph-h{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+  .ph-n{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--sage);}
+  .ph-t{font-family:var(--serif);font-size:23px;margin:2px 0 0;} .ph-time{font-family:var(--mono);font-size:11px;color:var(--faint);}
+  .items{list-style:none;padding:0;margin:14px 0 0;}
+  .item{display:flex;gap:12px;align-items:flex-start;padding:11px 0;border-top:1px solid var(--line);}
+  .item input{appearance:none;width:20px;height:20px;border:1.5px solid var(--faint);border-radius:6px;margin-top:2px;cursor:pointer;flex:none;position:relative;}
+  .item input:checked{background:var(--sage);border-color:var(--sage);} .item input:checked::after{content:'✓';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#0E1512;font-size:13px;font-weight:700;}
+  .item input:focus-visible{outline:2px solid var(--orange);outline-offset:2px;}
+  .it-body{flex:1;} .it-t{font-size:14.5px;color:var(--ink);} .it-t a{color:var(--sage-deep);} .it-s{font-size:12.5px;color:var(--faint);margin-top:3px;line-height:1.45;}
+  .badge{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:6px;margin-left:6px;vertical-align:middle;border:1px solid;}
+  .b-cert{color:var(--sage);border-color:var(--sage);} .b-film{color:var(--orange);border-color:var(--orange);} .b-read{color:var(--violet);border-color:var(--violet);} .b-live{color:var(--red);border-color:var(--red);}
+  .gate{margin-top:14px;border-left:3px solid var(--orange);background:var(--orange-soft);border-radius:0 10px 10px 0;padding:10px 14px;font-size:13px;color:#F0C79A;line-height:1.5;} .gate b{color:#fff;}
+  .cert{margin-top:26px;border:1px solid var(--sage);border-radius:16px;background:#12201a;padding:20px;text-align:center;}
+  .cert h3{font-family:var(--serif);font-size:24px;margin:0 0 8px;} .cert p{color:var(--soft);font-size:14px;margin:0;line-height:1.55;} .cert .stamp{font-family:var(--mono);font-size:12px;color:var(--sage);margin-top:10px;}
+  .foot{margin-top:24px;font-family:var(--mono);font-size:11px;color:var(--faint);line-height:1.7;}
+  a{text-decoration:none;} a:hover{text-decoration:underline;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">one3<b>seven</b></div>
+  <div class="eyebrow">FL Certification · required onboarding · internal</div>
+  <h1>Become FL Certified</h1>
+  <p class="lede">A required, self-paced course — about <b>20–25 hours over ~2 weeks</b>. Four gated phases: foundations &amp; doctrine, product &amp; pitch, money &amp; market, then a live certification. Your progress saves on this device. External certs are free.</p>
+  <div class="rule">🚫 <b>Hard rule:</b> you are not cleared to run a <b>solo firm call</b> until you're FL Certified. The doctrine gates are non-negotiable — a rep who can't hold the never-say lines is a legal liability, not just untrained.</div>
+
+  <div class="prog">
+    <div class="bar"><i id="fill"></i></div>
+    <div class="pl"><span id="ptext">0 of 0 complete</span><span>Progress saves automatically ·&nbsp;<a href="#" id="reset" style="color:var(--faint)">reset</a></span></div>
+  </div>
+
+  <!-- PHASE 0 -->
+  <div class="phase">
+    <div class="ph-h"><div><div class="ph-n">Phase 0</div><div class="ph-t">Foundations &amp; doctrine</div></div><div class="ph-time">~8 hrs</div></div>
+    <ul class="items">
+      <li class="item"><input type="checkbox" data-id="p0a"><div class="it-body"><div class="it-t">Anthropic — AI Fluency: Frameworks &amp; Foundations <span class="badge b-cert">free cert</span></div><div class="it-s">Understand what Claude can/can't do. On-brand, non-technical. → <a href="https://www.anthropic.com/learn" target="_blank" rel="noopener">anthropic.com/learn</a> · upload cert to the shared drive</div></div></li>
+      <li class="item"><input type="checkbox" data-id="p0b"><div class="it-body"><div class="it-t">Clio — Legal AI Fundamentals Certification <span class="badge b-cert">free cert</span></div><div class="it-s">Legal-AI basics from a vendor your buyers use. → <a href="https://www.clio.com/resources/ai-for-lawyers/legal-ai-fundamentals-certification/" target="_blank" rel="noopener">clio.com</a></div></div></li>
+      <li class="item"><input type="checkbox" data-id="p0c"><div class="it-body"><div class="it-t">UNESCO × University of Oxford — AI &amp; the Rule of Law <span class="badge b-cert">free cert</span></div><div class="it-s">The ethics/human-rights of AI in justice — our exact subject. → <a href="https://www.unesco.org/en/articles/unesco-and-university-oxford-launch-free-global-course-ai-and-rule-law" target="_blank" rel="noopener">course info</a></div></div></li>
+      <li class="item"><input type="checkbox" data-id="p0d"><div class="it-body"><div class="it-t">Watch — <a href="monetization.html">How one3seven Makes Money</a> <span class="badge b-film">film</span></div><div class="it-s">The doctrine spine: organize never conclude · §6155 vs 5.4 · price capacity not the case.</div></div></li>
+      <li class="item"><input type="checkbox" data-id="p0e"><div class="it-body"><div class="it-t">Watch — <a href="guardrails.html">The Guardrails</a> <span class="badge b-film">film</span></div><div class="it-s">The six bright lines + the NEVER-SAY / SAY-instead pairs. This is the liability firewall.</div></div></li>
+      <li class="item"><input type="checkbox" data-id="p0f"><div class="it-body"><div class="it-t">Read — CA State Bar 2026 AI guidance + AB 316 <span class="badge b-read">read</span></div><div class="it-s">The primary source our doctrine is built on. Skim the State Bar Generative AI Practical Guidance; know that the lawyer can't blame the AI.</div></div></li>
+    </ul>
+    <div class="gate">✅ <b>Gate 0 — Doctrine check (with a founder):</b> recite the three never-say lines and explain §6155-routing vs 5.4-outcome in your own words. No pass, no Phase 1.</div>
+  </div>
+
+  <!-- PHASE 1 -->
+  <div class="phase">
+    <div class="ph-h"><div><div class="ph-n">Phase 1</div><div class="ph-t">The product &amp; the pitch</div></div><div class="ph-time">~5 hrs</div></div>
+    <ul class="items">
+      <li class="item"><input type="checkbox" data-id="p1a"><div class="it-body"><div class="it-t">Watch — <a href="/product-walkthrough.html">Product Walkthrough</a> <span class="badge b-film">film</span></div><div class="it-s">End to end: worker record → delivery → firm binder.</div></div></li>
+      <li class="item"><input type="checkbox" data-id="p1b"><div class="it-body"><div class="it-t">Watch — <a href="demo.html">The 15-Minute Intake Review</a> <span class="badge b-film">film</span></div><div class="it-s">How to run the live demo — the beats, pauses, and word-for-word lines.</div></div></li>
+      <li class="item"><input type="checkbox" data-id="p1c"><div class="it-body"><div class="it-t">Watch — <a href="discovery.html">The Discovery Call</a> <span class="badge b-film">film</span></div><div class="it-s">The 12 beats + the locked Coverage Rate definition. Note the referral-vs-leads first question.</div></div></li>
+      <li class="item"><input type="checkbox" data-id="p1d"><div class="it-body"><div class="it-t">Watch — <a href="objections.html">Objection Handling</a> <span class="badge b-film">film</span></div><div class="it-s">The 4-layer model + the doctrine-trap objection.</div></div></li>
+    </ul>
+    <div class="gate">✅ <b>Gate 1 — The metric:</b> say the Coverage Rate definition verbatim, and answer "can it tell us if they have a case?" correctly (the held line). Founder checks.</div>
+  </div>
+
+  <!-- PHASE 2 -->
+  <div class="phase">
+    <div class="ph-h"><div><div class="ph-n">Phase 2</div><div class="ph-t">The money &amp; the market</div></div><div class="ph-time">~5 hrs</div></div>
+    <ul class="items">
+      <li class="item"><input type="checkbox" data-id="p2a"><div class="it-body"><div class="it-t">Watch — <a href="pricing.html">Pricing &amp; Clean Money</a> <span class="badge b-film">film</span></div><div class="it-s">The clean-money test + the money lines never to say.</div></div></li>
+      <li class="item"><input type="checkbox" data-id="p2b"><div class="it-body"><div class="it-t">Study — <a href="/px7k4m9t2e8b3a6/index.html">the Pricing Planning hub</a> <span class="badge b-read">read</span></div><div class="it-s">Postures · example bills · what firms spend · what they save · billing. Read the "vision vs constraints" guardrails first.</div></div></li>
+      <li class="item"><input type="checkbox" data-id="p2c"><div class="it-body"><div class="it-t">Watch — <a href="/fl-education.html">Know the Field</a> + <a href="/fm-education.html">Field Manual</a> <span class="badge b-film">film</span></div><div class="it-s">The competitive landscape, the tools, the conferences, the funders.</div></div></li>
+    </ul>
+    <div class="gate">✅ <b>Gate 2 — Market quiz:</b> name the four planning constraints (ICP aim, wallet realism, no intake-tool claim, savings-pending-pilot) and where the "greedy line" sits.</div>
+  </div>
+
+  <!-- PHASE 3 -->
+  <div class="phase">
+    <div class="ph-h"><div><div class="ph-n">Phase 3</div><div class="ph-t">Certify — live, with a founder</div></div><div class="ph-time">~4 hrs</div></div>
+    <ul class="items">
+      <li class="item"><input type="checkbox" data-id="p3a"><div class="it-body"><div class="it-t">Run a mock <b>discovery call</b> <span class="badge b-live">live</span></div><div class="it-s">Open without pitching, locate the friction, land Coverage Rate, ask the referral-vs-leads question.</div></div></li>
+      <li class="item"><input type="checkbox" data-id="p3b"><div class="it-body"><div class="it-t">Deliver the <b>15-minute demo</b> <span class="badge b-live">live</span></div><div class="it-s">Hit the beats and the pauses; nail the source-link moment.</div></div></li>
+      <li class="item"><input type="checkbox" data-id="p3c"><div class="it-body"><div class="it-t">Handle <b>5 objections live</b> — including the trap <span class="badge b-live">live</span></div><div class="it-s">Run the structure, hold the doctrine line under pressure.</div></div></li>
+      <li class="item"><input type="checkbox" data-id="p3d"><div class="it-body"><div class="it-t">Deliver the <b>60-second cold pitch</b> <span class="badge b-live">live</span></div><div class="it-s">Hook · what · proof · ask — then silence.</div></div></li>
+      <li class="item"><input type="checkbox" data-id="p3e"><div class="it-body"><div class="it-t"><b>Founder sign-off</b> <span class="badge b-live">live</span></div><div class="it-s">A founder marks you FL Certified. You're now cleared for solo firm calls.</div></div></li>
+    </ul>
+  </div>
+
+  <div class="cert">
+    <h3 id="certtitle">Not yet certified</h3>
+    <p id="certbody">Finish all four phases and the live sign-off. Until then, you shadow — you don't run solo firm calls.</p>
+    <div class="stamp" id="certstamp"></div>
+  </div>
+
+  <div class="phase" style="border-style:dashed">
+    <div class="ph-n">Ongoing (after certification)</div>
+    <p class="lede" style="margin-top:8px">Attend the founder-led <b>weekly 15-minute Intake Review</b>. <b>Re-certify quarterly</b> — doctrine and pricing evolve, and the never-say lines must stay sharp. Optional baseline: <a href="https://www.elementsofai.com/" target="_blank" rel="noopener">Helsinki — Elements of AI</a> (free cert).</p>
+  </div>
+
+  <div class="phase" style="border-color:var(--sage)">
+    <div class="ph-h"><div><div class="ph-n" style="color:var(--sage)">For the DOR</div><div class="ph-t">Program documents &amp; setup</div></div><div class="ph-time">Google Workspace</div></div>
+    <p class="lede" style="margin-top:10px">This page is the self-study front end. The <b>official program</b> lives in Google Workspace as five documents (system of record):</p>
+    <ul class="items">
+      <li class="item"><input type="checkbox" data-id="doc1"><div class="it-body"><div class="it-t">Onboarding &amp; Certification Policy v1.0 <span class="badge b-read">Doc</span></div><div class="it-s">The governing rules. Load into Google Docs.</div></div></li>
+      <li class="item"><input type="checkbox" data-id="doc2"><div class="it-body"><div class="it-t">Mandatory Curriculum <span class="badge b-read">Doc</span></div><div class="it-s">The syllabus — modules, learning outcomes, gates.</div></div></li>
+      <li class="item"><input type="checkbox" data-id="doc3"><div class="it-body"><div class="it-t">Assessment Bank (master) → build as <b>Google Forms</b> <span class="badge b-live">Forms</span></div><div class="it-s">3 quizzes: quiz mode ON, collect email, 80% pass, doctrine gate 100%.</div></div></li>
+      <li class="item"><input type="checkbox" data-id="doc4"><div class="it-body"><div class="it-t">Doctrine Attestation <span class="badge b-read">Doc</span></div><div class="it-s">Each rep signs before certifying; store signed copies in Drive.</div></div></li>
+      <li class="item"><input type="checkbox" data-id="doc5"><div class="it-body"><div class="it-t">Certification Roster → <b>Google Sheets</b> <span class="badge b-live">Sheet</span></div><div class="it-s">The authoritative record: scores, sign-off dates, status.</div></div></li>
+    </ul>
+    <div class="gate">⚠ <b>Before rollout:</b> confirm worker-classification and compensable-training-time with HR/employment counsel (Policy §14). Not legal advice.</div>
+  </div>
+
+  <div class="foot">Internal FL onboarding · unlisted &amp; not indexed. External courses are free at time of writing — verify. Trainee progress is stored only in this browser; the Google Sheets roster is the authoritative record. one3seven organizes and cites; it never scores cases or gives legal advice.</div>
+</div>
+<script>
+  var boxes=[].slice.call(document.querySelectorAll('.item input'));
+  var KEY='fl-cert:';
+  function refresh(){
+    var done=boxes.filter(function(b){return b.checked;}).length, total=boxes.length;
+    document.getElementById('fill').style.width=(total?Math.round(done/total*100):0)+'%';
+    document.getElementById('ptext').innerHTML='<b>'+done+'</b> of '+total+' complete';
+    var certified = done===total;
+    document.getElementById('certtitle').textContent = certified ? '✅ FL Certified' : 'Not yet certified';
+    document.getElementById('certbody').textContent = certified
+      ? 'All phases complete and signed off. You are cleared to run solo firm calls. Keep the never-say lines sharp and re-certify quarterly.'
+      : 'Finish all four phases and the live sign-off. Until then, you shadow — you don’t run solo firm calls.';
+    document.getElementById('certstamp').textContent = certified ? 'one3seven · FL Certified' : '';
+  }
+  boxes.forEach(function(b){
+    var id=b.getAttribute('data-id');
+    try{ if(localStorage.getItem(KEY+id)==='1') b.checked=true; }catch(e){}
+    b.addEventListener('change',function(){ try{ localStorage.setItem(KEY+id, b.checked?'1':'0'); }catch(e){} refresh(); });
+  });
+  document.getElementById('reset').addEventListener('click',function(e){ e.preventDefault(); boxes.forEach(function(b){ b.checked=false; try{localStorage.setItem(KEY+b.getAttribute('data-id'),'0');}catch(err){} }); refresh(); });
+  refresh();
+</script>
+</body>
+</html>

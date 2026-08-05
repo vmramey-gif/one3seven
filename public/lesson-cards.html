@@ -1,0 +1,58 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><style>
+  :root{--paper:#FBF8F1;--ink:#1B1813;--sage:#2F5142;--sage2:#5E8C74;--sageL:#8FD3A6;--soft:#6E675A;
+    --serif:Georgia,'Times New Roman',serif;--mono:'Courier New',monospace;}
+  html,body{margin:0;height:100%;}
+  body{width:1080px;height:1920px;overflow:hidden;}
+  .scene{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;}
+  .scene.active{opacity:1;}
+  /* ---------- INTRO (educational lesson segment) ---------- */
+  #intro{background:radial-gradient(120% 80% at 50% 20%,#fffdf8,var(--paper) 60%,#efe9db 100%);gap:26px;}
+  #intro .bar{display:flex;align-items:center;gap:14px;opacity:0;}
+  .active#intro .bar{animation:up .6s .1s forwards;}
+  #intro .dot{width:12px;height:12px;border-radius:50%;background:var(--sage);}
+  #intro .kick{font-family:var(--mono);font-size:30px;letter-spacing:.34em;text-transform:uppercase;color:var(--sage);}
+  #intro .num{font-family:var(--mono);font-size:26px;letter-spacing:.3em;color:var(--sage2);opacity:0;}
+  .active#intro .num{animation:up .6s .25s forwards;}
+  #intro h1{font-family:var(--serif);font-weight:700;font-size:98px;line-height:1.06;letter-spacing:-.02em;color:var(--ink);margin:6px 0;opacity:0;text-align:center;max-width:15ch;}
+  .active#intro h1{animation:up .7s .4s forwards;}
+  #intro .rule{width:0;height:3px;background:var(--sage);}
+  .active#intro .rule{animation:grow .6s .7s forwards;}
+  #intro .sub{font-family:var(--serif);font-style:italic;font-size:44px;color:var(--soft);max-width:22ch;text-align:center;opacity:0;}
+  .active#intro .sub{animation:up .7s .85s forwards;}
+  /* ---------- OUTRO (sharp brand close) ---------- */
+  #outro{background:radial-gradient(130% 90% at 50% 35%,#3c6555,var(--sage) 52%,#223b31 100%);gap:30px;}
+  #outro .word{font-family:var(--serif);font-weight:700;font-size:168px;letter-spacing:-.03em;color:#F3FBF6;
+    opacity:0;transform:scale(.9);filter:drop-shadow(0 0 30px rgba(143,211,166,.0));}
+  #outro .word b{color:var(--sageL);}
+  .active#outro .word{animation:pop .7s cubic-bezier(.2,.8,.2,1) .1s forwards;}
+  @keyframes pop{to{opacity:1;transform:scale(1);filter:drop-shadow(0 0 34px rgba(143,211,166,.35))}}
+  #outro .rule{width:0;height:2px;background:var(--sageL);opacity:.8;}
+  .active#outro .rule{animation:grow .6s .6s forwards;}
+  #outro .tag{font-family:var(--serif);font-style:italic;font-size:46px;color:#CFE6D9;text-align:center;max-width:20ch;opacity:0;}
+  .active#outro .tag{animation:up .7s .75s forwards;}
+  #outro .url{font-family:var(--mono);font-size:38px;letter-spacing:.26em;color:var(--sageL);opacity:0;}
+  .active#outro .url{animation:up .7s 1s forwards;}
+
+  @keyframes up{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+  @keyframes grow{to{width:150px}}
+</style></head><body>
+  <div class="scene" id="intro">
+    <div class="bar"><span class="dot"></span><span class="kick">Keeping Receipts · with Morgan</span></div>
+    <div class="num">one3seven · AI Education · Lesson 1</div>
+    <h1>Can we still<br>trust AI?</h1>
+    <div class="rule"></div>
+    <div class="sub">Rule one: always keep your receipts.</div>
+  </div>
+  <div class="scene" id="outro">
+    <div class="word">one3<b>seven</b></div>
+    <div class="rule"></div>
+    <div class="tag">Judgment deserves an organized record.</div>
+    <div class="url">one3seven.com</div>
+  </div>
+<script>
+  var scenes=[document.getElementById('intro'),document.getElementById('outro')];
+  window.__scenes=2;
+  window.__setScene=function(n){scenes.forEach(function(s){s.classList.remove('active');});void document.body.offsetWidth;scenes[n].classList.add('active');};
+  window.__setScene(0);
+</script></body></html>

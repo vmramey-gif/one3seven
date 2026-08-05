@@ -1,0 +1,154 @@
+<title>one3seven — Objection Handling</title>
+<style>
+  :root{
+    --bg:#0E1512;--bg2:#0A100D;--panel:#16201B;--ink:#ECF0E8;--soft:#9DA99F;--faint:#6B776E;
+    --sage:#8FB8A2;--amber:#E0B84E;--red:#D97A6C;--acc:#E08A4E;--acc-soft:#2A1B10;--line:#263029;
+    --serif:'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;
+    --sans:'Inter Tight',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+    --mono:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  body{background:radial-gradient(120% 90% at 50% 0%,#16201B 0%,var(--bg) 46%,var(--bg2) 100%);color:var(--ink);font-family:var(--sans);min-height:100%;-webkit-font-smoothing:antialiased;}
+  .app{max-width:1120px;margin:0 auto;padding:20px 20px 44px;}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;}
+  .brand{font-family:var(--serif);font-weight:600;font-size:18px;} .brand b{color:var(--acc);}
+  .topmeta{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);}
+  .stage{position:relative;margin-top:14px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(160deg,#17211C 0%,#101713 100%);aspect-ratio:16/9;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.45);}
+  .slide{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:clamp(20px,3.2vw,44px);opacity:0;transition:opacity .5s;pointer-events:none;text-align:center;overflow-y:auto;}
+  .slide.active{opacity:1;pointer-events:auto;}
+  @media (prefers-reduced-motion:reduce){.slide{transition:none;}}
+  .beat{font-family:var(--mono);font-size:clamp(9px,1.1vw,11px);letter-spacing:.16em;text-transform:uppercase;color:var(--acc);border:1px solid var(--acc);border-radius:999px;padding:4px 12px;margin-bottom:13px;background:var(--acc-soft);}
+  .title{font-family:var(--serif);font-weight:600;font-size:clamp(20px,3.2vw,36px);letter-spacing:-.01em;line-height:1.08;margin-bottom:10px;text-wrap:balance;max-width:26ch;}
+  .dtext{color:var(--acc);font-size:clamp(14px,1.9vw,20px);font-weight:600;max-width:46ch;margin-bottom:12px;line-height:1.3;}
+  .layer{max-width:60ch;text-align:left;margin:5px auto;padding:8px 14px;border-radius:0 10px 10px 0;font-size:clamp(12.5px,1.55vw,16px);line-height:1.4;}
+  .layer .lab{font-family:var(--mono);font-size:10px;letter-spacing:.14em;display:block;margin-bottom:3px;}
+  .l-obj{border-left:3px solid var(--faint);background:#151d18;color:var(--soft);font-style:italic;} .l-obj .lab{color:var(--faint);font-style:normal;}
+  .l-mean{border-left:3px solid var(--sage);background:#12201a;color:var(--sage-deep,#B7D2C4);} .l-mean .lab{color:var(--sage);}
+  .l-say{border-left:3px solid var(--acc);background:var(--acc-soft);color:var(--ink);} .l-say .lab{color:var(--acc);}
+  .l-ask{border-left:3px solid var(--amber);background:#231e10;color:#EBD9A0;} .l-ask .lab{color:var(--amber);}
+  .l-never{border-left:3px solid var(--red);background:#241512;color:#F0B7AD;} .l-never .lab{color:var(--red);}
+  .badge{display:inline-block;font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;border-radius:6px;margin-left:8px;vertical-align:middle;}
+  .b-exact{background:#183025;color:var(--sage);border:1px solid var(--sage);}
+  .b-adaptable{background:#2b2410;color:var(--amber);border:1px solid var(--amber);}
+  .b-never{background:#2b1512;color:var(--red);border:1px solid var(--red);}
+  .note{color:var(--faint);font-size:clamp(12px,1.5vw,15px);max-width:56ch;line-height:1.4;margin-top:8px;}
+  .stale{margin-top:8px;font-family:var(--mono);font-size:11px;color:var(--amber);}
+  .kick{font-family:var(--mono);font-size:clamp(9px,1.2vw,12px);letter-spacing:.2em;text-transform:uppercase;color:var(--sage);margin-bottom:12px;}
+  .slide.card .title{font-size:clamp(28px,5.2vw,54px);max-width:20ch;} .slide.card .sub{color:var(--soft);font-size:clamp(14px,1.9vw,20px);max-width:54ch;margin:0 auto;line-height:1.5;}
+  .counter{position:absolute;top:12px;right:16px;font-family:var(--mono);font-size:12px;color:var(--faint);}
+  .ticks{position:absolute;left:16px;right:16px;bottom:10px;display:flex;gap:3px;} .ticks span{height:3px;flex:1;border-radius:2px;background:var(--line);} .ticks span.done{background:var(--acc);}
+  .controls{margin-top:14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  button.ctl{font-family:var(--sans);font-size:14px;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:9px 15px;cursor:pointer;}
+  button.ctl:hover{border-color:var(--acc);} button.ctl:focus-visible{outline:2px solid var(--acc);outline-offset:2px;}
+  button.play{background:var(--acc);color:#0E1512;border-color:var(--acc);font-weight:700;padding:9px 20px;}
+  .spacer{flex:1;} .rate{font-family:var(--mono);font-size:11px;color:var(--faint);display:flex;gap:8px;align-items:center;} .rate input{accent-color:var(--acc);}
+  .resume{margin-top:10px;font-family:var(--mono);font-size:12px;color:var(--acc);display:none;} .resume button{margin-left:8px;}
+  .caption{margin-top:12px;min-height:38px;border-left:2px solid var(--acc);padding:4px 0 4px 16px;font-size:15px;color:var(--soft);font-style:italic;} .caption b{color:var(--ink);font-style:normal;}
+  .panel{display:none;margin-top:14px;border:1px solid var(--line);border-radius:14px;background:#0f1713;padding:16px 18px;}
+  .panel.open{display:block;} .panel h3{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin:0 0 12px;}
+  .tr{border-bottom:1px solid var(--line);padding:10px 0;} .tr:last-child{border-bottom:0;}
+  .tr .th{font-family:var(--serif);font-size:15px;color:var(--ink);margin-bottom:4px;} .tr .tn{color:var(--soft);font-size:13.5px;line-height:1.5;}
+  .tr .ts{margin-top:6px;color:var(--ink);font-size:13.5px;background:var(--acc-soft);border-left:2px solid var(--acc);padding:6px 10px;border-radius:0 8px 8px 0;display:flex;justify-content:space-between;gap:10px;align-items:flex-start;}
+  .cpy{font-family:var(--mono);font-size:10px;color:var(--acc);background:none;border:1px solid var(--acc);border-radius:6px;padding:2px 7px;cursor:pointer;white-space:nowrap;}
+  .src{font-size:13px;color:var(--soft);padding:6px 0;border-bottom:1px solid var(--line);} .src a{color:var(--acc);} .src .dt{font-family:var(--mono);font-size:11px;color:var(--faint);}
+  .foot{margin-top:16px;font-family:var(--mono);font-size:11px;color:var(--faint);line-height:1.6;}
+</style>
+<div class="app">
+  <div class="topbar"><div class="brand">one3<b>seven</b></div><div class="topmeta">Sales training · objections · internal</div></div>
+  <div class="stage" id="stage"><div class="counter" id="counter"></div><div class="ticks" id="ticks"></div></div>
+  <div class="controls">
+    <button class="ctl play" id="play">▶ Play</button>
+    <button class="ctl" id="prev">‹ Prev</button>
+    <button class="ctl" id="next">Next ›</button>
+    <button class="ctl" id="restart">↺ Restart</button>
+    <button class="ctl" id="tbtn">☰ Transcript</button>
+    <button class="ctl" id="sbtn">⌗ Sources</button>
+    <span class="spacer"></span>
+    <span class="rate">speed <input id="rate" type="range" min="0.8" max="1.3" step="0.05" value="1" aria-label="playback speed"></span>
+  </div>
+  <div class="resume" id="resume"></div>
+  <div class="caption" id="caption"><b>Press Play.</b> Objection Handling — internal rep coaching. Arrow keys navigate · Space plays.</div>
+  <div class="panel" id="transcript"><h3>Transcript · copyable talk tracks</h3><div id="trbody"></div></div>
+  <div class="panel" id="sources"><h3>Sources · verify before repeating</h3><div id="srcbody"></div></div>
+  <div class="foot">Internal FL sales training. Coaching, not a customer script. SAY badges: <b style="color:var(--sage)">EXACT</b> = verbatim · <b style="color:var(--amber)">ADAPTABLE</b> = keep the meaning · <b style="color:var(--red)">NEVER</b> = prohibited. one3seven organizes and cites; it never scores cases or gives legal advice.</div>
+  <audio id="audio" preload="auto"></audio>
+</div>
+<script>
+  var ID="objections", S=[{"card":true,"kick":"one3seven · FL sales training","title":"Objection Handling","sub":"Not comebacks — a repeatable structure you can run on any objection, even one you've never heard."},{"beat":"The method","title":"Six steps, every time","displayText":"Run the structure, not a memorized line.","note":"1 Acknowledge · 2 Identify what they protect · 3 Clarify the workflow · 4 State our narrow role · 5 Ask a diagnostic question · 6 Continue or disqualify honestly."},{"beat":"Objection 1","title":"“We already have intake software.”","obj":"We already use Clio Grow / our own intake system.","mean":"I don't want another disconnected system to manage.","say":"one3seven doesn't replace your intake or case system — it organizes the worker's underlying record before your team has to reconstruct it, then feeds what you already use.","sayClass":"adaptable","ask":"What does your team still assemble by hand before an attorney can screen a matter?"},{"beat":"Objection 2","title":"“We already use AI.”","obj":"We've already got AI in our stack.","mean":"We've seen the hype; we're skeptical of one more AI tool.","say":"We use AI too — the difference is what we let it do: it organizes and links to the source, and it never judges the case.","sayClass":"adaptable","ask":"Which part of intake does your current AI actually touch — drafting, or the worker's raw record?"},{"beat":"Objection 3","title":"“Workers won't upload everything.”","obj":"Clients won't do the work of uploading documents.","mean":"I don't want staff time wasted on half-empty files.","say":"The worker owns the record and is motivated — it's their claim — and the system shows them exactly what's missing and writes the request letter for them.","sayClass":"adaptable","ask":"What share of your intakes arrive complete on the first pass today?"},{"beat":"Objection 4","title":"“Our staff already handles this.”","obj":"My paralegals already do intake.","mean":"Don't threaten my people's jobs.","say":"This hands your staff the reconstructed file so they spend their time on judgment, not assembly.","sayClass":"adaptable","ask":"How many hours a week does that assembly take across the team right now?"},{"beat":"Objection 5","title":"“We don't have enough volume.”","obj":"We're not high-volume enough for this.","mean":"I'm not sure the value justifies the cost.","say":"The value is per-intake time saved and cleaner screening, not raw volume — and if you're genuinely not a fit yet, I'll tell you.","sayClass":"adaptable","ask":"How many potential matters do you turn away or leave half-built each month?"},{"beat":"Objection 6","title":"“We can't trust AI with legal intake.”","obj":"I can't put AI between us and a client file.","mean":"My bar license and AB 316 liability are on the line.","say":"That's exactly why every fact links to its source page — nothing is taken on faith, everything is one click to verify.","sayClass":"exact","ask":"What would it take for you to trust an automated file? (It's almost always traceability.)","sources":[{"label":"CA AB 316 — attorney cannot delegate accountability to AI","url":"","checked":"2026-07-30"}],"verifiedOn":"2026-07-30","reviewAfter":"2027-01-30","claimStatus":"verified"},{"beat":"Objection 7","title":"“We don't want another tool.”","obj":"We have tool fatigue.","mean":"I'm tired of onboarding software that doesn't stick.","say":"one3seven sits before or beside what you already use — the worker does the work, and your firm simply receives a finished file.","sayClass":"adaptable","ask":"What happens today between a worker first reaching out and an attorney being able to decide?"},{"beat":"Objection 8","title":"“How is this different from a chatbot?”","obj":"Isn't this just a chatbot / document summarizer?","mean":"Show me why this isn't a commodity.","say":"A chatbot answers questions and a summarizer condenses documents — one3seven builds the worker's own source-linked record and hands them ownership of it. Different job, earlier in the timeline.","sayClass":"adaptable","ask":"Do your current tools produce anything the worker actually keeps and controls?"},{"beat":"Objection 9 · the trap","title":"“Can it tell us if they have a case?”","obj":"Does it tell us whether the worker has a viable claim?","mean":"I want a shortcut to case selection.","say":"Our AI identifies the strong cases before your team touches them.","sayClass":"never","note":"This is the objection most likely to tempt a rep across the doctrine line. The correct answer is below — hold it with confidence."},{"beat":"Objection 9 · the answer","title":"The line you hold","displayText":"No — and that's deliberate.","say":"one3seven organizes and reflects. Your firm makes every legal and screening decision. We show what's present and missing against what the law requires — we never conclude whether there's a claim.","sayClass":"exact","ask":"Would a complete, source-linked record make your own screening decision faster?"},{"card":true,"kick":"Close","title":"Describe the record. Let the attorney decide.","sub":"None of these were comebacks — each acknowledged, clarified the workflow, stated our narrow role, and ended in a question. Run the structure."}], NARR=["Objection handling. This is not a list of clever comebacks — memorized rebuttals make you sound like you are selling, and they collapse the moment a firm says something you did not rehearse. What you are learning here is a repeatable structure you can run on any objection, even one you have never heard. The goal is judgment, not a script.","The structure — six steps. One, acknowledge the concern; never argue. Two, identify what they are actually protecting. Three, clarify the real workflow. Four, state one three seven's narrow role. Five, ask a diagnostic question. Six, decide whether to keep going or to disqualify honestly. Every objection ahead follows this same shape.","When they say we already have intake software, they usually mean I do not want another disconnected system. Do not attack the tool they use. Acknowledge it, then place us before it — one three seven organizes the worker's underlying record before your team has to reconstruct it, and it feeds the system you already have. Then ask what their staff still assembles by hand before an attorney can screen.","We already use A I often means we have seen the hype and we are skeptical. Agree with the skepticism. Say we use A I too — the difference is what we let it do: we organize and link to the source, and we never let it judge the case. Then ask which part of intake their current A I actually touches. Usually it is drafting, not the worker's raw record.","Workers will not upload everything is a real concern, not a brush-off. What they are protecting is staff time wasted on incomplete files. Say the worker owns the record and is motivated — it is their claim — and the system shows them exactly what is missing and even writes the request letter. Then ask what share of their current intakes arrive complete on the first pass.","Our staff already handles this means do not threaten my people. Never frame this as replacing staff. Say we hand your staff the reconstructed file so they spend their time on judgment, not on assembly. Then ask how many hours a week that assembly currently takes across the team. The number is usually bigger than they expect once they add it up.","We do not have enough volume can be a genuine disqualifier — respect it. What they may mean is I am not sure this pays off. Say the value is per-intake time saved and cleaner screening, not raw volume. Then ask how many potential matters they turn away or leave half-built each month. And if the honest answer is that they are not a fit yet, say so — that builds more trust than a forced pitch.","We cannot trust A I with legal intake — good, they should not blindly. What they are protecting is their bar license and their liability under California A B three-sixteen, which says the lawyer cannot blame the tool. Say that is exactly why every fact links to its source page — nothing is taken on faith, everything is one click to verify. Then ask what it would take for them to trust an automated file. The answer is almost always traceability, which is our entire design.","We do not want another tool means tool fatigue. Do not oversell an integration you cannot yet prove. Say one three seven sits before or beside what they already use — the worker does the work, and the firm simply receives a finished file. Then ask what happens today between a worker first reaching out and the moment an attorney can actually make a decision.","How is this different from a chatbot or a document-summary product — treat this as your opening, not a threat. Say a chatbot answers questions and a summarizer condenses documents, but one three seven builds the worker's own source-linked record and hands them ownership of it. Different job, earlier in the timeline. Then ask whether their current tools produce anything the worker actually keeps and controls.","This is the dangerous one — can it tell us whether the worker has a case. This is the objection most likely to tempt you across the doctrine line. The wrong answer sounds helpful — something like, our A I finds the strong cases before your team touches them. Never say that. It is untrue to what we do, and it puts both of us at legal risk.","Here is the line you hold instead. Say it clearly: no, and that is deliberate. We organize and reflect the record; your firm makes every legal and screening decision. We show what is present and what is missing against what the law requires — we never conclude whether there is a claim. Then turn it into a question: would a complete, source-linked record make your own screening decision faster? Hold that line with confidence — it is what keeps us clean and what keeps them safe.","That is the set. Notice that none of these were comebacks — each one acknowledged the concern, clarified the workflow, stated our narrow role, and ended in a question. Run the structure, not a memorized line. And whenever you are unsure, fall back to the one move that is always safe: describe the record, and let the attorney decide."], AUDIO=["/voice/objections/ob_01.mp3","/voice/objections/ob_02.mp3","/voice/objections/ob_03.mp3","/voice/objections/ob_04.mp3","/voice/objections/ob_05.mp3","/voice/objections/ob_06.mp3","/voice/objections/ob_07.mp3","/voice/objections/ob_08.mp3","/voice/objections/ob_09.mp3","/voice/objections/ob_10.mp3","/voice/objections/ob_11.mp3","/voice/objections/ob_12.mp3","/voice/objections/ob_13.mp3"];
+  var stage=document.getElementById('stage'),ticks=document.getElementById('ticks'),counter=document.getElementById('counter'),
+      caption=document.getElementById('caption'),playBtn=document.getElementById('play'),rateEl=document.getElementById('rate'),audio=document.getElementById('audio');
+  var i=0,playing=false,now=new Date();
+  function esc(t){return (t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');}
+  function className(c){return c==='exact'?'b-exact':c==='adaptable'?'b-adaptable':c==='never'?'b-never':'';}
+  function staleFor(s){ if(!s.reviewAfter) return false; try{ return new Date(s.reviewAfter) < now; }catch(e){ return false; } }
+  S.forEach(function(s){
+    var d=document.createElement('div');d.className='slide'+(s.card?' card':'');
+    var h='';
+    if(s.card){ h='<div class="kick">'+esc(s.kick)+'</div><div class="title">'+esc(s.title)+'</div>'+(s.sub?'<div class="sub">'+esc(s.sub)+'</div>':''); }
+    else {
+      if(s.beat) h+='<div class="beat">'+esc(s.beat)+'</div>';
+      h+='<div class="title">'+esc(s.title)+'</div>';
+      if(s.displayText) h+='<div class="dtext">'+esc(s.displayText)+'</div>';
+      if(s.obj) h+='<div class="layer l-obj"><span class="lab">THEY SAY</span>'+esc(s.obj)+'</div>';
+      if(s.mean) h+='<div class="layer l-mean"><span class="lab">WHAT THEY MAY MEAN</span>'+esc(s.mean)+'</div>';
+      if(s.never) h+='<div class="layer l-never"><span class="lab">NEVER SAY</span>'+esc(s.never)+'</div>';
+      if(s.say){ var cls=s.sayClass==='never'?'l-never':'l-say'; var lab=s.sayClass==='never'?'NEVER SAY':(s.never?'SAY INSTEAD':'SAY');
+        var badge=s.sayClass&&s.sayClass!=='never'?'<span class="badge '+className(s.sayClass)+'">'+s.sayClass+'</span>':'';
+        h+='<div class="layer '+cls+'"><span class="lab">'+lab+badge+'</span>'+esc(s.say)+'</div>'; }
+      if(s.ask) h+='<div class="layer l-ask"><span class="lab">ASK NEXT</span>'+esc(s.ask)+'</div>';
+      if(s.note) h+='<div class="note">'+esc(s.note)+'</div>';
+      if(staleFor(s)) h+='<div class="stale">⚠ Research figure — reverification required (review-after '+esc(s.reviewAfter)+').</div>';
+    }
+    d.innerHTML=h;stage.appendChild(d);ticks.appendChild(document.createElement('span'));
+  });
+  var slides=stage.querySelectorAll('.slide'),tickEls=ticks.querySelectorAll('span');
+  // Transcript
+  var trbody=document.getElementById('trbody');
+  S.forEach(function(s,idx){
+    var row=document.createElement('div');row.className='tr';
+    var h='<div class="th">'+String(idx+1).padStart(2,'0')+' · '+esc(s.title||s.kick||'')+'</div>';
+    h+='<div class="tn">'+esc(NARR[idx])+'</div>';
+    if(s.say){ h+='<div class="ts"><span>'+esc(s.say)+'</span><button class="cpy" data-say="'+esc(s.say).replace(/"/g,'&quot;')+'">copy</button></div>'; }
+    row.innerHTML=h;trbody.appendChild(row);
+  });
+  trbody.addEventListener('click',function(e){ var b=e.target.closest('.cpy'); if(!b)return; var t=b.getAttribute('data-say');
+    if(navigator.clipboard){navigator.clipboard.writeText(t);} b.textContent='copied'; setTimeout(function(){b.textContent='copy';},1200); });
+  // Sources
+  var srcbody=document.getElementById('srcbody'),anySrc=false;
+  S.forEach(function(s,idx){ (s.sources||[]).forEach(function(src){ anySrc=true;
+    var el=document.createElement('div');el.className='src';
+    el.innerHTML='<b>'+esc(s.title||('Slide '+(idx+1)))+'</b> — '+(src.url?'<a href="'+esc(src.url)+'" target="_blank" rel="noopener">'+esc(src.label)+'</a>':esc(src.label))
+      +(src.checked?' <span class="dt">· checked '+esc(src.checked)+'</span>':'')
+      +(s.reviewAfter?' <span class="dt">· review-after '+esc(s.reviewAfter)+(staleFor(s)?' ⚠ DUE':'')+'</span>':'');
+    srcbody.appendChild(el); }); });
+  if(!anySrc) srcbody.innerHTML='<div class="src" style="color:var(--faint)">No external market claims in this film — talk tracks are doctrine and workflow, not figures.</div>';
+  function paint(){
+    slides.forEach(function(el,idx){el.classList.toggle('active',idx===i);});
+    tickEls.forEach(function(el,idx){el.classList.toggle('done',idx<=i);});
+    counter.textContent=String(i+1).padStart(2,'0')+' / '+String(S.length).padStart(2,'0');
+    var s=S[i]; caption.innerHTML=(playing?'<b>▶</b> ':'')+esc(s.displayText||s.title||NARR[i]);
+    try{ localStorage.setItem('film:'+ID+':slide', i); if(i===S.length-1) localStorage.setItem('film:'+ID+':completed','true'); }catch(e){}
+  }
+  function playCurrent(){ audio.src=AUDIO[i]; audio.playbackRate=parseFloat(rateEl.value)||1; var p=audio.play(); if(p&&p.catch)p.catch(function(){caption.innerHTML='<b>Tap Play once more</b> — autoplay was blocked.';}); }
+  audio.addEventListener('ended',function(){ if(!playing)return; if(i<S.length-1){i++;paint();playCurrent();} else {playing=false;setLabel();caption.innerHTML='<b>Fin.</b> Transcript below has every talk track. Replay any beat, or screen-record to export.';} });
+  function setLabel(){playBtn.textContent=playing?'❚❚ Pause':'▶ Play';}
+  function togglePlay(){ playing=!playing;setLabel(); if(playing){paint();playCurrent();} else audio.pause(); }
+  playBtn.addEventListener('click',togglePlay);
+  document.getElementById('next').addEventListener('click',function(){ if(i<S.length-1){i++;paint(); if(playing)playCurrent();} });
+  document.getElementById('prev').addEventListener('click',function(){ if(i>0){i--;paint(); if(playing)playCurrent();} });
+  document.getElementById('restart').addEventListener('click',function(){ i=0;paint(); if(playing)playCurrent(); else audio.pause(); });
+  document.getElementById('tbtn').addEventListener('click',function(){ document.getElementById('transcript').classList.toggle('open'); });
+  document.getElementById('sbtn').addEventListener('click',function(){ document.getElementById('sources').classList.toggle('open'); });
+  rateEl.addEventListener('input',function(){ audio.playbackRate=parseFloat(rateEl.value)||1; });
+  document.addEventListener('keydown',function(e){ if(e.target.tagName==='INPUT')return;
+    if(e.key==='ArrowRight'){ if(i<S.length-1){i++;paint(); if(playing)playCurrent();} }
+    else if(e.key==='ArrowLeft'){ if(i>0){i--;paint(); if(playing)playCurrent();} }
+    else if(e.key===' '){ e.preventDefault(); togglePlay(); } });
+  // Resume
+  try{ var saved=parseInt(localStorage.getItem('film:'+ID+':slide')||'0',10);
+    if(saved>0 && saved<S.length-1){ var r=document.getElementById('resume');
+      r.style.display='block'; r.innerHTML='You left off at slide '+(saved+1)+'. <button class="ctl" id="rz">Resume</button> <button class="ctl" id="rs">Start over</button>';
+      document.getElementById('rz').addEventListener('click',function(){ i=saved;paint();r.style.display='none'; });
+      document.getElementById('rs').addEventListener('click',function(){ i=0;paint();r.style.display='none'; }); } }catch(e){}
+  paint();
+</script>

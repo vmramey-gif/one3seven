@@ -1,0 +1,72 @@
+[
+  { "card": true, "kick": "one3seven · monetization doctrine · internal", "title": "How one3seven Makes Money", "sub": "The whole thinking — with the prices, packs, and scenarios you can actually show. We price organizing capacity. Never the case." },
+
+  { "beat": "The core", "title": "One idea everything serves", "displayText": "Price the capacity to organize — never the outcome of a matter.",
+    "visual": "<div class='cmp'><div class='col us'><h4>✓ We price — CAPACITY</h4><ul><li>Software access &amp; seats</li><li>Concurrent organizing capacity</li><li>Configuration &amp; element-packs</li><li>Storage / processing</li></ul></div><div class='col them'><h4>✗ We never price — THE CASE</h4><ul><li>Whether a worker signs</li><li>Whether it's accepted</li><li>Whether it settles or wins</li></ul></div></div>" },
+
+  { "beat": "The wall", "title": "What we can never charge for", "displayText": "Where legal's money visibly sits — all of it barred to us.",
+    "visual": "<div class='pcards'><div class='pcard dead'><div class='pc-name'>Barred · CRPC 5.4</div><div class='pc-price'>33%</div><div class='pc-unit'>of the recovery</div></div><div class='pcard dead'><div class='pc-name'>Barred · CRPC 5.4</div><div class='pc-price'>$1,500</div><div class='pc-unit'>per signed case</div></div><div class='pcard dead'><div class='pc-name'>Barred · §6155</div><div class='pc-price'>$250</div><div class='pc-unit'>per lead</div></div><div class='pcard dead'><div class='pc-name'>Barred · §6155</div><div class='pc-price'>$500</div><div class='pc-unit'>referral fee / worker sent</div></div></div>" },
+
+  { "beat": "The reframe", "title": "The wall is the advantage", "displayText": "Competitors price on the case. We legally can't — so we found the alley.",
+    "visual": "<div class='cmp'><div class='col them'><h4>Everyone else — the main road</h4><ul><li>Eve · price per qualified lead</li><li>EvenUp · value the demand</li><li>Lead-gen · per signed case</li><li>All standing on the case</li></ul></div><div class='col us'><h4>one3seven — the empty alley</h4><ul><li>Price the capacity to organize</li><li>The one ground that's legal for us</li><li>…which is why no one's there</li></ul></div></div>" },
+
+  { "beat": "The correction", "title": "Two rules, two different questions", "displayText": "Confuse them and you guard the wrong door.",
+    "visual": "<div class='cardgrid'><div class='qcard'><div class='qh'>§6155 asks</div><div class='qb'>Are we a lawyer <b>referral service</b>? → driven by <b>ROUTING</b> (do we choose the firm?)</div></div><div class='qcard'><div class='qh'>CRPC 5.4 asks</div><div class='qb'>Are we <b>sharing a legal fee</b>? → driven by <b>OUTCOME-LINKAGE</b> (does money follow the win?)</div></div></div>" },
+
+  { "beat": "§6155 · routing", "title": "The referral test is about routing", "displayText": "Do we rank, match, prefer, or steer the worker to a firm?",
+    "visual": "<div class='flow'><span class='step'>Worker</span><span class='arrow'>→</span><span class='step free'>chooses the firm</span><span class='arrow'>→</span><span class='step'>Firm</span><span class='chip good'>✓ tool the worker uses</span></div><div class='flow' style='margin-top:10px'><span class='step'>Worker</span><span class='arrow'>→</span><span class='step' style='border-color:var(--red);color:var(--red)'>one3seven ranks / matches</span><span class='arrow'>→</span><span class='step'>Firm</span><span class='chip bad'>✗ referral service</span></div>",
+    "say": "If the worker chooses and can export without us, we're a tool — not a service that refers them.", "sayClass": "exact" },
+
+  { "beat": "CRPC 5.4 · outcome", "title": "The fee-sharing test is about outcome-linkage", "displayText": "Does our money follow the win?",
+    "visual": "<div class='chips'><span class='chip'>Case WON</span><span class='chip'>Case SETTLED</span><span class='chip'>Case DECLINED</span><span class='chip'>Case LOST</span></div><div style='margin-top:12px'><span class='bignum'>$549</span> <span class='pc-unit'>/mo — the same in every column above</span></div>",
+    "never": "Per signed case · a share of a recovery — that is sharing in the legal fee." },
+
+  { "beat": "The meter truth", "title": "The meter isn't the referral risk", "displayText": "Routing is. The meter has only two jobs.",
+    "visual": "<div class='cardgrid'><div class='qcard'><div class='qh'>Meter job 1 · CRPC 5.4</div><div class='qb'>Never tie the unit to an outcome.</div></div><div class='qcard'><div class='qh'>Meter job 2 · roster tripwire</div><div class='qb'>Meter tool <b>USE</b>, not clients delivered.</div></div><div class='qcard' style='border-color:var(--acc)'><div class='qh'>What drives §6155</div><div class='qb'><b>Routing</b> — not the billing unit. Spend the legal budget proving the worker chooses.</div></div></div>" },
+
+  { "beat": "The foundation", "title": "Free worker side = the compliance wall", "displayText": "Not an adoption tactic — the load-bearing legal fact.",
+    "visual": "<div class='pcards'><div class='pcard hero' style='max-width:300px'><div class='pc-name'>Worker</div><div class='pc-price'>$0 · forever</div><ul class='pc-feat'><li>Builds the record with no firm</li><li>Owns it · exports it freely</li><li>Firm-optional by design</li></ul><div class='chip good' style='margin-top:8px'>⇒ we're infrastructure, not a marketplace</div></div></div>" },
+
+  { "beat": "The sweep", "title": "What the 30 models showed", "displayText": "The strong ones all clustered in one place.",
+    "visual": "<div class='ledger'><div class='lr'><span>Free worker access</span><span class='num good'>25 / 25</span></div><div class='lr'><span>“Less than one paralegal hour”</span><span class='num good'>25 / 25</span></div><div class='lr'><span>Annual prepay · founding-firm lock</span><span class='num good'>24 / 25</span></div><div class='lr'><span>Reserved lanes (capacity)</span><span class='num good'>23 / 25</span></div><div class='lr'><span>Element-packs</span><span class='num good'>22 / 25</span></div><div class='lr tot'><span>Anything that reached for the case</span><span class='num bad'>✗ barred</span></div></div>" },
+
+  { "beat": "The hidden alley", "title": "Price organizing capacity", "displayText": "And let the free worker side do acquisition.",
+    "visual": "<div class='flow'><span class='step free'>Free worker record</span><span class='arrow'>→</span><span class='step'>worker walks the file in</span><span class='arrow'>→</span><span class='step'>firm buys software to work it</span><span class='arrow'>↺</span></div><div class='pc-unit' style='margin-top:10px'>Distribution the firm never paid for — that's the engine.</div>" },
+
+  { "beat": "The frame", "title": "Reserved lanes = concurrent capacity", "displayText": "Pay for how many intakes run at once — never per intake.",
+    "visual": "<div class='flow'><span class='step'>intake starts</span><span class='arrow'>→</span><span class='step' style='border-color:var(--acc);color:var(--acc)'>occupies a lane</span><span class='arrow'>→</span><span class='step'>completes / exports</span><span class='arrow'>→</span><span class='step free'>lane frees · reused</span></div><div class='lanes' style='margin-top:12px'><span class='lane on'></span><span class='lane on'></span><span class='lane on'></span><span class='lane on'></span><span class='lane on'></span><span class='lane on'></span><span class='lane'></span><span class='lane'></span><span class='lane'></span><span class='lane'></span></div><div class='pcards'><div class='pcard hero'><div class='pc-name'>Reserved capacity</div><div class='pc-price'>$400</div><div class='pc-unit'>per lane / mo · 6 of 10 in use</div></div></div><div class='pc-unit' style='margin-top:8px'>Like seats in a restaurant — guests come and go; you pay for how many can sit at once, never per meal. 5 lanes = unlimited intakes/yr, ≤5 live at once.</div>" },
+
+  { "beat": "The wallet", "title": "Know the budget you price into", "displayText": "Land your lanes + packs inside the firm's actual AI line.",
+    "visual": "<div class='ledger'><div class='lr'><span>Total legal-tech / attorney / yr</span><span class='num'>$8,000 – $17,000</span></div><div class='lr'><span>AI + automated-intake slice / attorney / yr</span><span class='num good'>$1,800 – $4,500</span></div><div class='lr'><span>Per-seat AI intake tools / mo</span><span class='num good'>$100 – $250</span></div><div class='lr tot'><span>one3seven lands here — inside the AI line</span><span class='num good'>✓ fits</span></div></div><div class='pc-unit' style='margin-top:8px'>Illustrative benchmarks (ILTA / industry, 2025–26) — verify before quoting.</div>",
+    "sources": [ { "label": "ILTA / legal-tech spend benchmarks — $8–17k/attorney/yr; AI-intake slice $1.8–4.5k", "url": "", "checked": "2026-07-30" } ], "verifiedOn": "2026-07-30", "reviewAfter": "2026-12-31", "claimStatus": "illustrative" },
+
+  { "beat": "The trap", "title": "An allowance is lanes in a cardigan", "displayText": "You can't escape per-matter substance by renaming it.",
+    "visual": "<div class='cmp'><div class='col'><h4>“Reserved lanes”</h4><ul><li>10 concurrent intakes</li><li>$400 / lane</li></ul></div><div class='eq'>=</div><div class='col'><h4>“Monthly allowance”</h4><ul><li>10 intakes / month</li><li>same substance</li></ul></div></div>",
+    "say": "Two honest exits: pure seats / flat tier — or own one volume meter openly. Pick one.", "sayClass": "exact" },
+
+  { "beat": "Expansion", "title": "Element-packs — expand off doctrine", "displayText": "Base = wage & hour. Add the packs a firm actually works.",
+    "visual": "<div class='packs'><div class='pack base'><div class='pk-n'>Wage &amp; Hour</div><div class='pk-p'>$299 base</div></div><div class='pack'><div class='pk-n'>+ PAGA</div><div class='pk-p'>+$150</div></div><div class='pack'><div class='pk-n'>+ CalWARN</div><div class='pk-p'>+$150</div></div><div class='pack'><div class='pk-n'>+ Discrimination</div><div class='pk-p'>+$150</div></div><div class='pack'><div class='pk-n'>+ Verticals (later)</div><div class='pk-p'>+$—</div></div></div><div class='pc-unit' style='margin-top:10px'>Expands platform use — never any case's economics.</div>" },
+
+  { "beat": "Tonation 1", "title": "Quote paralegal-hours, not dollars", "displayText": "Lead with the labor you delete.",
+    "visual": "<div class='ledger'><div class='lr'><span>One paralegal hour (loaded)</span><span class='num'>~$65</span></div><div class='lr'><span>one3seven · per available intake</span><span class='num good'>&lt; $65</span></div><div class='lr tot'><span>The pitch</span><span class='num'>“less than one staff hour / intake”</span></div></div>",
+    "say": "Priced below the cost of one typical staff hour per available intake.", "sayClass": "adaptable" },
+
+  { "beat": "Tonation 2", "title": "Price the no's", "displayText": "Cheaper, faster declines — a claim we can defend.",
+    "visual": "<div class='ledger'><div class='lr'><span>100 employment leads × $250</span><span class='num bad'>$25,000</span></div><div class='lr'><span>90 declines × 50 min × $400/hr</span><span class='num bad'>≈ $30,000</span></div><div class='lr tot'><span>Wasted per signed case (~10%)</span><span class='num bad'>≈ $5,500</span></div></div><div class='pc-unit' style='margin-top:8px'>We don't promise more yeses. We make the no's cheaper &amp; faster.</div>" },
+
+  { "beat": "Retire this phrase", "title": "“Reserve your lane in the network”", "displayText": "Sounds great. Reads as marketplace placement.",
+    "visual": "<div class='chips'><span class='chip bad'>reserve</span><span class='chip bad'>network</span><span class='chip bad'>worker choice</span><span class='chip bad'>paid firm access</span></div><div class='pc-unit' style='margin-top:10px'>Together = “pay for placement” = the §6155 referral reading. <span class='chip good'>“Reserved capacity” ✓</span></div>",
+    "never": "“Reserve your lane in the network.”" },
+
+  { "beat": "Adopted", "title": "Four corrections we took", "displayText": "A good critique makes the thesis stronger.",
+    "visual": "<div class='ledger'><div class='lr'><span>“Lifetime” founding price</span><span class='num good'>→ 24–36 mo term</span></div><div class='lr'><span>Source-linking behind a tier</span><span class='num good'>→ never — it's core trust</span></div><div class='lr'><span>Counsel reviews copy</span><span class='num good'>→ reviews architecture</span></div><div class='lr'><span>“§6155 bans every unit”</span><span class='num good'>→ it regulates routing</span></div></div>" },
+
+  { "beat": "Don't over-correct", "title": "Worker-initiated ≠ marketplace", "displayText": "Referral-phobia can neuter the distribution that feeds us.",
+    "visual": "<div class='cmp'><div class='col us'><h4>✓ Not a marketplace</h4><ul><li>Worker chooses the firm</li><li>We transmit</li><li>We never rank or prefer</li></ul></div><div class='col them'><h4>✗ The thing to avoid</h4><ul><li>We rank / match / place</li><li>Payers get priority visibility</li></ul></div></div>",
+    "say": "The worker chooses, we transmit, we never rank or prefer — even though a firm paid for the software.", "sayClass": "exact" },
+
+  { "beat": "The spine + counsel", "title": "What goes in front of counsel", "displayText": "No unit ever touches a case, a client, or an outcome.",
+    "visual": "<div class='flow'><span class='step free'>Free worker</span><span class='arrow'>→</span><span class='step'>capacity meter</span><span class='arrow'>→</span><span class='step'>element-packs</span><span class='arrow'>→</span><span class='step'>annual prepay</span><span class='arrow'>→</span><span class='step'>capped founding</span></div><div class='cardgrid' style='margin-top:12px'><div class='qcard'><div class='qh'>Counsel reviews architecture</div><div class='qb'>Who chooses the firm? · preferential visibility for payers? · export with no firm? · what triggers a charge? · price move on signing/recovery? · any fee-share?</div></div></div>" },
+
+  { "card": true, "kick": "The one true sentence", "title": "Price the capacity to organize. Never the case.", "sub": "The advantage was never a clever name for a billable unit — it's genuinely being worker-controlled record infrastructure. Free in the worker's hands, priced only as software in the firm's." }
+]

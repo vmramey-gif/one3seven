@@ -30,7 +30,7 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 // Default model + a calm narration voice. Model/voice ids change — override as needed.
 // Pick a warmer voice in the ElevenLabs dashboard and pass its id via --voice / env.
 const DEFAULT_MODEL = 'eleven_multilingual_v2';
-const DEFAULT_VOICE = '21m00Tcm4TlvDq8ikWAM'; // ElevenLabs "Rachel" (calm) — replace with your chosen warm voice
+const DEFAULT_VOICE = '21m00Tcm4TlvDq8ikWAM'; // ElevenLabs "Rachel" — most natural/human narration voice (2026 consensus). Override via --voice / ELEVENLABS_VOICE_ID.
 const VOICE_SETTINGS = { stability: 0.5, similarity_boost: 0.75, style: 0.0, use_speaker_boost: true };
 
 function loadKey() {
@@ -58,6 +58,8 @@ function parseArgs(argv) {
     if (a === '--voice') opts.voice = argv[++i];
     else if (a === '--model') opts.model = argv[++i];
     else if (a === '--lines') opts.lines = argv[++i];
+    else if (a === '--style') opts.style = parseFloat(argv[++i]);
+    else if (a === '--stability') opts.stability = parseFloat(argv[++i]);
     else positional.push(a);
   }
   opts.first = positional[0];
@@ -65,12 +67,12 @@ function parseArgs(argv) {
   return opts;
 }
 
-async function synthesize(text, voice, model, key) {
+async function synthesize(text, voice, model, key, settings = VOICE_SETTINGS) {
   const url = `https://api.elevenlabs.io/v1/text-to-speech/${voice}?output_format=mp3_44100_128`;
   const res = await fetch(url, {
     method: 'POST',
     headers: { 'xi-api-key': key, 'Content-Type': 'application/json', Accept: 'audio/mpeg' },
-    body: JSON.stringify({ text, model_id: model, voice_settings: VOICE_SETTINGS }),
+    body: JSON.stringify({ text, model_id: model, voice_settings: settings }),
   });
   if (!res.ok) {
     const body = await res.text().catch(() => '');
@@ -81,6 +83,12 @@ async function synthesize(text, voice, model, key) {
 
 async function main() {
   const opts = parseArgs(process.argv.slice(2));
+  // Livelier delivery: raise --style, lower --stability. Base is the calm narration default.
+  const settings = {
+    ...VOICE_SETTINGS,
+    ...(Number.isFinite(opts.style) ? { style: opts.style } : {}),
+    ...(Number.isFinite(opts.stability) ? { stability: opts.stability } : {}),
+  };
   const key = loadKey();
   if (!key) {
     console.error('Missing ELEVENLABS_API_KEY. Add it to .env (gitignored) or your shell.');
@@ -99,7 +107,7 @@ async function main() {
     for (const [k, text] of Object.entries(lines)) {
       const outPath = resolve(ROOT, outDir, `${k}.mp3`);
       try {
-        const buf = await synthesize(String(text), opts.voice, opts.model, key);
+        const buf = await synthesize(String(text), opts.voice, opts.model, key, settings);
         writeFileSync(outPath, buf);
         console.log(`✓ ${k}.mp3 (${(buf.length / 1024).toFixed(0)} KB)`);
       } catch (err) {
@@ -117,7 +125,7 @@ async function main() {
   }
   console.log(`Voice: ${opts.voice} · model: ${opts.model}`);
   try {
-    const buf = await synthesize(opts.first, opts.voice, opts.model, key);
+    const buf = await synthesize(opts.first, opts.voice, opts.model, key, settings);
     writeFileSync(resolve(ROOT, opts.out), buf);
     console.log(`✓ ${opts.out} (${(buf.length / 1024).toFixed(0)} KB)`);
   } catch (err) {

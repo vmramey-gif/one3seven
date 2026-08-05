@@ -1,0 +1,154 @@
+<title>one3seven — The Guardrails</title>
+<style>
+  :root{
+    --bg:#0E1512;--bg2:#0A100D;--panel:#16201B;--ink:#ECF0E8;--soft:#9DA99F;--faint:#6B776E;
+    --sage:#8FB8A2;--amber:#E0B84E;--red:#D97A6C;--acc:#E08A4E;--acc-soft:#2A1B10;--line:#263029;
+    --serif:'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;
+    --sans:'Inter Tight',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+    --mono:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+  body{background:radial-gradient(120% 90% at 50% 0%,#16201B 0%,var(--bg) 46%,var(--bg2) 100%);color:var(--ink);font-family:var(--sans);min-height:100%;-webkit-font-smoothing:antialiased;}
+  .app{max-width:1120px;margin:0 auto;padding:20px 20px 44px;}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;}
+  .brand{font-family:var(--serif);font-weight:600;font-size:18px;} .brand b{color:var(--acc);}
+  .topmeta{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);}
+  .stage{position:relative;margin-top:14px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(160deg,#17211C 0%,#101713 100%);aspect-ratio:16/9;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.45);}
+  .slide{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:clamp(20px,3.2vw,44px);opacity:0;transition:opacity .5s;pointer-events:none;text-align:center;overflow-y:auto;}
+  .slide.active{opacity:1;pointer-events:auto;}
+  @media (prefers-reduced-motion:reduce){.slide{transition:none;}}
+  .beat{font-family:var(--mono);font-size:clamp(9px,1.1vw,11px);letter-spacing:.16em;text-transform:uppercase;color:var(--acc);border:1px solid var(--acc);border-radius:999px;padding:4px 12px;margin-bottom:13px;background:var(--acc-soft);}
+  .title{font-family:var(--serif);font-weight:600;font-size:clamp(20px,3.2vw,36px);letter-spacing:-.01em;line-height:1.08;margin-bottom:10px;text-wrap:balance;max-width:26ch;}
+  .dtext{color:var(--acc);font-size:clamp(14px,1.9vw,20px);font-weight:600;max-width:46ch;margin-bottom:12px;line-height:1.3;}
+  .layer{max-width:60ch;text-align:left;margin:5px auto;padding:8px 14px;border-radius:0 10px 10px 0;font-size:clamp(12.5px,1.55vw,16px);line-height:1.4;}
+  .layer .lab{font-family:var(--mono);font-size:10px;letter-spacing:.14em;display:block;margin-bottom:3px;}
+  .l-obj{border-left:3px solid var(--faint);background:#151d18;color:var(--soft);font-style:italic;} .l-obj .lab{color:var(--faint);font-style:normal;}
+  .l-mean{border-left:3px solid var(--sage);background:#12201a;color:var(--sage-deep,#B7D2C4);} .l-mean .lab{color:var(--sage);}
+  .l-say{border-left:3px solid var(--acc);background:var(--acc-soft);color:var(--ink);} .l-say .lab{color:var(--acc);}
+  .l-ask{border-left:3px solid var(--amber);background:#231e10;color:#EBD9A0;} .l-ask .lab{color:var(--amber);}
+  .l-never{border-left:3px solid var(--red);background:#241512;color:#F0B7AD;} .l-never .lab{color:var(--red);}
+  .badge{display:inline-block;font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;border-radius:6px;margin-left:8px;vertical-align:middle;}
+  .b-exact{background:#183025;color:var(--sage);border:1px solid var(--sage);}
+  .b-adaptable{background:#2b2410;color:var(--amber);border:1px solid var(--amber);}
+  .b-never{background:#2b1512;color:var(--red);border:1px solid var(--red);}
+  .note{color:var(--faint);font-size:clamp(12px,1.5vw,15px);max-width:56ch;line-height:1.4;margin-top:8px;}
+  .stale{margin-top:8px;font-family:var(--mono);font-size:11px;color:var(--amber);}
+  .kick{font-family:var(--mono);font-size:clamp(9px,1.2vw,12px);letter-spacing:.2em;text-transform:uppercase;color:var(--sage);margin-bottom:12px;}
+  .slide.card .title{font-size:clamp(28px,5.2vw,54px);max-width:20ch;} .slide.card .sub{color:var(--soft);font-size:clamp(14px,1.9vw,20px);max-width:54ch;margin:0 auto;line-height:1.5;}
+  .counter{position:absolute;top:12px;right:16px;font-family:var(--mono);font-size:12px;color:var(--faint);}
+  .ticks{position:absolute;left:16px;right:16px;bottom:10px;display:flex;gap:3px;} .ticks span{height:3px;flex:1;border-radius:2px;background:var(--line);} .ticks span.done{background:var(--acc);}
+  .controls{margin-top:14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  button.ctl{font-family:var(--sans);font-size:14px;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:9px 15px;cursor:pointer;}
+  button.ctl:hover{border-color:var(--acc);} button.ctl:focus-visible{outline:2px solid var(--acc);outline-offset:2px;}
+  button.play{background:var(--acc);color:#0E1512;border-color:var(--acc);font-weight:700;padding:9px 20px;}
+  .spacer{flex:1;} .rate{font-family:var(--mono);font-size:11px;color:var(--faint);display:flex;gap:8px;align-items:center;} .rate input{accent-color:var(--acc);}
+  .resume{margin-top:10px;font-family:var(--mono);font-size:12px;color:var(--acc);display:none;} .resume button{margin-left:8px;}
+  .caption{margin-top:12px;min-height:38px;border-left:2px solid var(--acc);padding:4px 0 4px 16px;font-size:15px;color:var(--soft);font-style:italic;} .caption b{color:var(--ink);font-style:normal;}
+  .panel{display:none;margin-top:14px;border:1px solid var(--line);border-radius:14px;background:#0f1713;padding:16px 18px;}
+  .panel.open{display:block;} .panel h3{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin:0 0 12px;}
+  .tr{border-bottom:1px solid var(--line);padding:10px 0;} .tr:last-child{border-bottom:0;}
+  .tr .th{font-family:var(--serif);font-size:15px;color:var(--ink);margin-bottom:4px;} .tr .tn{color:var(--soft);font-size:13.5px;line-height:1.5;}
+  .tr .ts{margin-top:6px;color:var(--ink);font-size:13.5px;background:var(--acc-soft);border-left:2px solid var(--acc);padding:6px 10px;border-radius:0 8px 8px 0;display:flex;justify-content:space-between;gap:10px;align-items:flex-start;}
+  .cpy{font-family:var(--mono);font-size:10px;color:var(--acc);background:none;border:1px solid var(--acc);border-radius:6px;padding:2px 7px;cursor:pointer;white-space:nowrap;}
+  .src{font-size:13px;color:var(--soft);padding:6px 0;border-bottom:1px solid var(--line);} .src a{color:var(--acc);} .src .dt{font-family:var(--mono);font-size:11px;color:var(--faint);}
+  .foot{margin-top:16px;font-family:var(--mono);font-size:11px;color:var(--faint);line-height:1.6;}
+</style>
+<div class="app">
+  <div class="topbar"><div class="brand">one3<b>seven</b></div><div class="topmeta">Sales training · doctrine · internal</div></div>
+  <div class="stage" id="stage"><div class="counter" id="counter"></div><div class="ticks" id="ticks"></div></div>
+  <div class="controls">
+    <button class="ctl play" id="play">▶ Play</button>
+    <button class="ctl" id="prev">‹ Prev</button>
+    <button class="ctl" id="next">Next ›</button>
+    <button class="ctl" id="restart">↺ Restart</button>
+    <button class="ctl" id="tbtn">☰ Transcript</button>
+    <button class="ctl" id="sbtn">⌗ Sources</button>
+    <span class="spacer"></span>
+    <span class="rate">speed <input id="rate" type="range" min="0.8" max="1.3" step="0.05" value="1" aria-label="playback speed"></span>
+  </div>
+  <div class="resume" id="resume"></div>
+  <div class="caption" id="caption"><b>Press Play.</b> The Guardrails — internal rep coaching. Arrow keys navigate · Space plays.</div>
+  <div class="panel" id="transcript"><h3>Transcript · copyable talk tracks</h3><div id="trbody"></div></div>
+  <div class="panel" id="sources"><h3>Sources · verify before repeating</h3><div id="srcbody"></div></div>
+  <div class="foot">Internal FL sales training. Coaching, not a customer script. SAY badges: <b style="color:var(--sage)">EXACT</b> = verbatim · <b style="color:var(--amber)">ADAPTABLE</b> = keep the meaning · <b style="color:var(--red)">NEVER</b> = prohibited. one3seven organizes and cites; it never scores cases or gives legal advice.</div>
+  <audio id="audio" preload="auto"></audio>
+</div>
+<script>
+  var ID="guardrails", S=[{"card":true,"kick":"one3seven · FL sales training","title":"The Guardrails","sub":"Not about winning a deal — about not blowing up the company. The doctrine IS the product."},{"beat":"The one rule","title":"Organize & reflect. Never conclude.","displayText":"Revelation is safe. Conclusion is not.","say":"We show what's present, what's missing, and where it came from. What it means is the attorney's call.","sayClass":"exact","note":"We may reveal the record. We may never say what it proves, whether there's a claim, or what it's worth."},{"beat":"The map","title":"Six bright lines","displayText":"Each has a wrong line and a safe line.","note":"1 No case-scoring · 2 No legal deadlines · 3 No dollar value · 4 No referral/fee-split · 5 No guarantees · 6 No claim of flawlessness."},{"beat":"Bright line 1","title":"Case scoring","displayText":"The UPL trap — and the thing firms most want to hear.","never":"Our AI finds and ranks the strongest cases before your team touches them.","say":"We show how complete the record is against what the law requires — your attorney decides.","sayClass":"exact","note":"Coverage, not a verdict."},{"beat":"Bright line 2","title":"Legal deadlines","displayText":"Calculating a statute of limitations is practicing law.","never":"Your claim has to be filed by this date.","say":"The system surfaces the dates on the record; your attorney calculates any deadlines.","sayClass":"exact","note":"We show dates. We never compute them."},{"beat":"Bright line 3","title":"The value of a claim","displayText":"Describe the record, not the case.","never":"This case is strong / worth about $X / likely to settle.","say":"We describe what's on the record — documents, timeline, gaps. What it's worth is the attorney's judgment.","sayClass":"exact"},{"beat":"Bright line 4 · existential","title":"Referral fees & fee-splitting","displayText":"§6155 + the Rules of Professional Conduct. This one can end the company.","never":"We send you cases for a cut. / Pricing is per case or per client.","say":"The worker's record is free and exportable, the worker chooses the firm, and the firm pays a flat subscription for the software. Clean money only.","sayClass":"exact","sources":[{"label":"CA Bus. & Prof. Code §6155 + CRPC 5.4 (fee-splitting / referral)","url":"","checked":"2026-07-30"}],"verifiedOn":"2026-07-30","reviewAfter":"2027-01-30","claimStatus":"counsel-reviewed"},{"beat":"Bright line 5","title":"Guarantees","displayText":"We change the quality of the file — never the outcome of the case.","never":"You'll win. / We improve win rates and settlement amounts.","say":"We make the record complete and reviewable so the attorney can decide faster.","sayClass":"exact"},{"beat":"Bright line 6","title":"Over-claiming accuracy","displayText":"We compete on auditability, not on being perfect.","never":"Our AI is flawless / never makes mistakes.","say":"We use AI to organize, and every fact links to its source page — anything can be verified in one click.","sayClass":"exact","note":"Honesty here is strength. We use AI too; the difference is provenance."},{"beat":"The reframe","title":"The discipline is the moat","displayText":"Not handcuffs — the reason a compliant firm can hire us.","note":"Every rival that scores, values, or takes a cut has taken on legal risk. Our refusal to conclude is why we're hirable. Sell it proudly."},{"card":true,"kick":"Close","title":"Unsure? It probably crosses the line.","sub":"Say less, cite more, route the hard question to counsel. Describe the record — let the attorney decide."}], NARR=["The guardrails. This film is different from the others — it is not about winning a deal, it is about not blowing up the company. one three seven's whole legal foundation is a single discipline: we organize and reflect the record, we never conclude. Cross that line on a call and you create real exposure, for the firm and for us. So learn these cold.","The one rule everything hangs from: we organize and reflect, the attorney concludes. We can show what is present, what is missing, and where it came from. We can never say what the record proves, whether there is a claim, or what it is worth. Revelation is safe; conclusion is not. That single line is the moat.","There are six bright lines. Never score or rank cases. Never state a legal deadline. Never put a dollar value on a claim. Never take a referral fee or split fees. Never guarantee an outcome. And never claim the system is flawless. We will take them one at a time — each with the wrong line, and the safe line to use instead.","Bright line one — case scoring. Never say the system finds or ranks the strongest cases. That is the unauthorized-practice-of-law trap, and it is the single most tempting thing to say, because firms want exactly that. Say instead: we show how complete the record is against what the law requires, and your attorney decides. Coverage, not a verdict.","Bright line two — legal deadlines. Never tell a worker or a firm that a claim must be filed by a certain date. Calculating a statute of limitations is practicing law. Say instead: the system surfaces the dates that are on the record; your attorney calculates any deadlines. We show dates — we never compute them.","Bright line three — the value of a claim. Never say a case is worth a number, or that it is strong, or likely to settle. Say instead: we describe what is on the record — the documents, the timeline, the gaps. What it is worth is the attorney's judgment, not ours. Describe the record, not the case.","Bright line four — referral fees and fee splitting. This one is existential. Never say we send you cases for a cut, and never price anything per case or per client. Under section six one five five and the rules of professional conduct, that is illegal fee splitting. Say instead: the worker's record is free and exportable, the worker chooses the firm, and the firm pays a flat subscription for the software. Clean money only.","Bright line five — guarantees. Never say a worker will win, or that we improve win rates or settlement amounts. Say instead: we make the record complete and reviewable, so the attorney can decide faster. We change the quality of the file — never the outcome of the case.","Bright line six — over-claiming accuracy. Do not oversell the A I. Never say it is flawless or never makes mistakes — that is both untrue and a liability. Say instead: we use A I to organize, and every single fact links to its source page, so anything can be verified in one click. We compete on auditability, not on being perfect. Honesty here is strength, not weakness.","Here is the reframe that keeps you confident. These are not handcuffs — they are the moat. Every competitor that scores cases, values claims, or takes a cut has taken on legal risk and regulatory attention. Our refusal to conclude is exactly why a compliant firm can hire us. The discipline is the product. Sell it proudly.","So when a firm pushes — and they will — do not stretch to please them. The safe move is always the same: describe the record, and let the attorney decide. If you are ever unsure whether a sentence crosses the line, it probably does. Say less, cite more, and route the hard question to counsel."], AUDIO=["/voice/guardrails/gd_01.mp3","/voice/guardrails/gd_02.mp3","/voice/guardrails/gd_03.mp3","/voice/guardrails/gd_04.mp3","/voice/guardrails/gd_05.mp3","/voice/guardrails/gd_06.mp3","/voice/guardrails/gd_07.mp3","/voice/guardrails/gd_08.mp3","/voice/guardrails/gd_09.mp3","/voice/guardrails/gd_10.mp3","/voice/guardrails/gd_11.mp3"];
+  var stage=document.getElementById('stage'),ticks=document.getElementById('ticks'),counter=document.getElementById('counter'),
+      caption=document.getElementById('caption'),playBtn=document.getElementById('play'),rateEl=document.getElementById('rate'),audio=document.getElementById('audio');
+  var i=0,playing=false,now=new Date();
+  function esc(t){return (t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');}
+  function className(c){return c==='exact'?'b-exact':c==='adaptable'?'b-adaptable':c==='never'?'b-never':'';}
+  function staleFor(s){ if(!s.reviewAfter) return false; try{ return new Date(s.reviewAfter) < now; }catch(e){ return false; } }
+  S.forEach(function(s){
+    var d=document.createElement('div');d.className='slide'+(s.card?' card':'');
+    var h='';
+    if(s.card){ h='<div class="kick">'+esc(s.kick)+'</div><div class="title">'+esc(s.title)+'</div>'+(s.sub?'<div class="sub">'+esc(s.sub)+'</div>':''); }
+    else {
+      if(s.beat) h+='<div class="beat">'+esc(s.beat)+'</div>';
+      h+='<div class="title">'+esc(s.title)+'</div>';
+      if(s.displayText) h+='<div class="dtext">'+esc(s.displayText)+'</div>';
+      if(s.obj) h+='<div class="layer l-obj"><span class="lab">THEY SAY</span>'+esc(s.obj)+'</div>';
+      if(s.mean) h+='<div class="layer l-mean"><span class="lab">WHAT THEY MAY MEAN</span>'+esc(s.mean)+'</div>';
+      if(s.never) h+='<div class="layer l-never"><span class="lab">NEVER SAY</span>'+esc(s.never)+'</div>';
+      if(s.say){ var cls=s.sayClass==='never'?'l-never':'l-say'; var lab=s.sayClass==='never'?'NEVER SAY':(s.never?'SAY INSTEAD':'SAY');
+        var badge=s.sayClass&&s.sayClass!=='never'?'<span class="badge '+className(s.sayClass)+'">'+s.sayClass+'</span>':'';
+        h+='<div class="layer '+cls+'"><span class="lab">'+lab+badge+'</span>'+esc(s.say)+'</div>'; }
+      if(s.ask) h+='<div class="layer l-ask"><span class="lab">ASK NEXT</span>'+esc(s.ask)+'</div>';
+      if(s.note) h+='<div class="note">'+esc(s.note)+'</div>';
+      if(staleFor(s)) h+='<div class="stale">⚠ Research figure — reverification required (review-after '+esc(s.reviewAfter)+').</div>';
+    }
+    d.innerHTML=h;stage.appendChild(d);ticks.appendChild(document.createElement('span'));
+  });
+  var slides=stage.querySelectorAll('.slide'),tickEls=ticks.querySelectorAll('span');
+  // Transcript
+  var trbody=document.getElementById('trbody');
+  S.forEach(function(s,idx){
+    var row=document.createElement('div');row.className='tr';
+    var h='<div class="th">'+String(idx+1).padStart(2,'0')+' · '+esc(s.title||s.kick||'')+'</div>';
+    h+='<div class="tn">'+esc(NARR[idx])+'</div>';
+    if(s.say){ h+='<div class="ts"><span>'+esc(s.say)+'</span><button class="cpy" data-say="'+esc(s.say).replace(/"/g,'&quot;')+'">copy</button></div>'; }
+    row.innerHTML=h;trbody.appendChild(row);
+  });
+  trbody.addEventListener('click',function(e){ var b=e.target.closest('.cpy'); if(!b)return; var t=b.getAttribute('data-say');
+    if(navigator.clipboard){navigator.clipboard.writeText(t);} b.textContent='copied'; setTimeout(function(){b.textContent='copy';},1200); });
+  // Sources
+  var srcbody=document.getElementById('srcbody'),anySrc=false;
+  S.forEach(function(s,idx){ (s.sources||[]).forEach(function(src){ anySrc=true;
+    var el=document.createElement('div');el.className='src';
+    el.innerHTML='<b>'+esc(s.title||('Slide '+(idx+1)))+'</b> — '+(src.url?'<a href="'+esc(src.url)+'" target="_blank" rel="noopener">'+esc(src.label)+'</a>':esc(src.label))
+      +(src.checked?' <span class="dt">· checked '+esc(src.checked)+'</span>':'')
+      +(s.reviewAfter?' <span class="dt">· review-after '+esc(s.reviewAfter)+(staleFor(s)?' ⚠ DUE':'')+'</span>':'');
+    srcbody.appendChild(el); }); });
+  if(!anySrc) srcbody.innerHTML='<div class="src" style="color:var(--faint)">No external market claims in this film — talk tracks are doctrine and workflow, not figures.</div>';
+  function paint(){
+    slides.forEach(function(el,idx){el.classList.toggle('active',idx===i);});
+    tickEls.forEach(function(el,idx){el.classList.toggle('done',idx<=i);});
+    counter.textContent=String(i+1).padStart(2,'0')+' / '+String(S.length).padStart(2,'0');
+    var s=S[i]; caption.innerHTML=(playing?'<b>▶</b> ':'')+esc(s.displayText||s.title||NARR[i]);
+    try{ localStorage.setItem('film:'+ID+':slide', i); if(i===S.length-1) localStorage.setItem('film:'+ID+':completed','true'); }catch(e){}
+  }
+  function playCurrent(){ audio.src=AUDIO[i]; audio.playbackRate=parseFloat(rateEl.value)||1; var p=audio.play(); if(p&&p.catch)p.catch(function(){caption.innerHTML='<b>Tap Play once more</b> — autoplay was blocked.';}); }
+  audio.addEventListener('ended',function(){ if(!playing)return; if(i<S.length-1){i++;paint();playCurrent();} else {playing=false;setLabel();caption.innerHTML='<b>Fin.</b> Transcript below has every talk track. Replay any beat, or screen-record to export.';} });
+  function setLabel(){playBtn.textContent=playing?'❚❚ Pause':'▶ Play';}
+  function togglePlay(){ playing=!playing;setLabel(); if(playing){paint();playCurrent();} else audio.pause(); }
+  playBtn.addEventListener('click',togglePlay);
+  document.getElementById('next').addEventListener('click',function(){ if(i<S.length-1){i++;paint(); if(playing)playCurrent();} });
+  document.getElementById('prev').addEventListener('click',function(){ if(i>0){i--;paint(); if(playing)playCurrent();} });
+  document.getElementById('restart').addEventListener('click',function(){ i=0;paint(); if(playing)playCurrent(); else audio.pause(); });
+  document.getElementById('tbtn').addEventListener('click',function(){ document.getElementById('transcript').classList.toggle('open'); });
+  document.getElementById('sbtn').addEventListener('click',function(){ document.getElementById('sources').classList.toggle('open'); });
+  rateEl.addEventListener('input',function(){ audio.playbackRate=parseFloat(rateEl.value)||1; });
+  document.addEventListener('keydown',function(e){ if(e.target.tagName==='INPUT')return;
+    if(e.key==='ArrowRight'){ if(i<S.length-1){i++;paint(); if(playing)playCurrent();} }
+    else if(e.key==='ArrowLeft'){ if(i>0){i--;paint(); if(playing)playCurrent();} }
+    else if(e.key===' '){ e.preventDefault(); togglePlay(); } });
+  // Resume
+  try{ var saved=parseInt(localStorage.getItem('film:'+ID+':slide')||'0',10);
+    if(saved>0 && saved<S.length-1){ var r=document.getElementById('resume');
+      r.style.display='block'; r.innerHTML='You left off at slide '+(saved+1)+'. <button class="ctl" id="rz">Resume</button> <button class="ctl" id="rs">Start over</button>';
+      document.getElementById('rz').addEventListener('click',function(){ i=saved;paint();r.style.display='none'; });
+      document.getElementById('rs').addEventListener('click',function(){ i=0;paint();r.style.display='none'; }); } }catch(e){}
+  paint();
+</script>
