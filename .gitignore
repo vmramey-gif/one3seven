@@ -5,3 +5,10 @@ dist
 .env.local
 .env.production
 dev-server.log
+
+# Generated film-render workspaces (hundreds of MB of frames/audio intermediates)
+build/
+scratchpad/
+
+# MS Office lock files
+~$*

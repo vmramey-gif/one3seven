@@ -110,3 +110,5 @@ Especially document ones." · "It's not the size of the file. It's the organizat
 - Less scrolling. More judging.  _(safe, but "judging" = the attorney's judgment; drop first if you want zero ambiguity)_
 - The receipts aren't petty. They're chronological.
 - Chaos is not a legal strategy.
+- Get SaaS'd.  _(founder/dev-crowd wink, internal + social only — never a product/UPL surface. Use the apostrophe-verb form; plain "SaaSy" is worn out and un-ownable. Checked 2026-08-02: no company uses "Get SaaS'd".)_
+- You've been SaaS'd.  _(same lane as above)_
