@@ -9,7 +9,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Phone, Mail, Calendar, ArrowLeft, Plus, X, TrendingUp,
   ClipboardList, LayoutGrid, Building2, BookOpen, BarChart3, CheckCircle2,
-  GraduationCap, ListChecks, Check, MessageSquare, Send, StickyNote, Trash2, ChevronRight, ChevronDown, ShieldCheck, RefreshCw, AlertTriangle, DollarSign, Flame, Sparkles, Trophy, Calculator, Link2, Copy, ExternalLink, Globe, Hand, Lock, Linkedin,
+  GraduationCap, ListChecks, Check, MessageSquare, Send, StickyNote, Trash2, ChevronRight, ChevronDown, ShieldCheck, RefreshCw, AlertTriangle, DollarSign, Flame, Sparkles, Trophy, Calculator, Link2, Copy, ExternalLink, Globe, Hand, Lock, Linkedin, Users, CreditCard, LifeBuoy, MapPin,
 } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
 import {
@@ -33,7 +33,7 @@ import { AUDIT_SITE_CHECKS, AUDIT_MANUAL_GROUPS } from '../constants/crmAudit';
 import { crmFirmIntel } from '../constants/crmFirmIntel';
 import { STARTER_QUESTIONS, askAssistant, type ChatMessage } from '../../services/chatAssistant';
 
-type Tab = 'dashboard' | 'pipeline' | 'firms' | 'activity' | 'metrics' | 'revenue' | 'comp' | 'economics' | 'growth' | 'team' | 'inbox' | 'notes' | 'scripts' | 'training' | 'askai' | 'checklist' | 'audit' | 'links' | 'email_fu' | 'outreach' | 'callqueue' | 'linkedin' | 'add';
+type Tab = 'dashboard' | 'pipeline' | 'firms' | 'activity' | 'metrics' | 'revenue' | 'comp' | 'economics' | 'growth' | 'team' | 'inbox' | 'notes' | 'scripts' | 'training' | 'askai' | 'checklist' | 'audit' | 'links' | 'email_fu' | 'outreach' | 'callqueue' | 'linkedin' | 'people' | 'accounts' | 'support' | 'zipfinder' | 'firmmap' | 'add';
 
 // Pre-filled outreach email. Opens the founder's default mail app (Outlook) composing
 // FROM victoria@ — so it lands in Sent and replies thread back — with the firm's own
@@ -99,9 +99,14 @@ const SITE_LINK_GROUPS: { group: string; items: { path: string; label: string; d
     { path: '/hq', label: 'HQ / CRM', desc: 'Sales CRM, pipeline, earnings' },
     { path: '/company-demo', label: 'Demo coach', desc: 'Rep demo guide (Coach / Present)' },
     { path: '/company-demo/debrief', label: 'Demo debrief', desc: 'Post-demo debrief form' },
+    { path: '/learn-9k3xq7m2e8a/', label: 'Academy', desc: 'Get Certified with Morgan — members-only team training (7 courses incl. CA employment law + plaintiff-side, cited). Sign in with your team email.' },
   ]},
-  { group: 'Pitch & strategy', items: [
-    { path: '/pitch-film.html', label: 'The Pitch — narrated', desc: 'Voiced strategy film (arithmetic, Claim Lens, why now) — plays on your phone' },
+  { group: 'Films — narrated (Tad’s voice)', items: [
+    { path: '/pitch-film.html', label: 'The Pitch — narrated', desc: 'Voiced strategy film (arithmetic, Element Lens, why now) — plays on your phone' },
+    { path: '/firm-learn', label: 'Education — for firms', desc: 'The business case: minutes, throughput & dollars vs. standard and the top AI tool (firm-only route)' },
+    { path: '/learn', label: 'Education — for workers', desc: 'The worker film: your record, feature-by-feature — free, forever (public)' },
+    { path: '/voice/education/l1_freya.mp3', label: 'AI Education — Lesson 1 voice (Freya ⬇)', desc: 'Master narration for the AI-hallucination lesson. Youthful/lively. Upload to Artlist AI Avatar (image + this audio → talking presenter), add B-roll + music.' },
+    { path: '/voice/education/l2_freya.mp3', label: 'AI Education — Lesson 2 voice (Freya ⬇)', desc: '“Magic words” lesson — how you ask changes what AI gives you; one3seven needs none. Same Artlist AI Avatar workflow.' },
   ]},
   { group: 'Legal', items: [
     { path: '/terms', label: 'Terms of Service', desc: 'Legal terms' },
@@ -129,6 +134,11 @@ const TABS: { id: Tab; label: string; icon: typeof LayoutGrid; founderOnly?: boo
   { id: 'scripts', label: 'Scripts', icon: BookOpen },
   { id: 'training', label: 'Training', icon: GraduationCap },
   { id: 'comp', label: 'Earnings', icon: Trophy },
+  { id: 'accounts', label: 'Accounts', icon: CreditCard },
+  { id: 'support', label: 'Support', icon: LifeBuoy },
+  { id: 'zipfinder', label: 'Zip finder', icon: MapPin },
+  { id: 'firmmap', label: 'Map', icon: Globe },
+  { id: 'people', label: 'People & HR', icon: Users, founderOnly: true },
   { id: 'economics', label: 'Company Economics', icon: Calculator, econOnly: true },
   { id: 'growth', label: 'Growth', icon: Globe, econOnly: true },
   { id: 'links', label: 'Links', icon: Link2, founderOnly: true },
@@ -603,6 +613,11 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
             {tab === 'audit' && isFounder && <AuditTab />}
             {tab === 'revenue' && isFounder && <RevenueTab firms={firms} />}
             {tab === 'comp' && <CompTab firms={firms} />}
+            {tab === 'accounts' && <AccountsTab firms={firms} activity={activity} />}
+            {tab === 'support' && <SupportTab />}
+            {tab === 'zipfinder' && <ZipFinderTab />}
+            {tab === 'firmmap' && <MapTab firms={firms} />}
+            {tab === 'people' && isFounder && <PeopleTab />}
             {tab === 'economics' && showEconomics && <CompanyEconomicsTab firms={firms} />}
             {tab === 'growth' && showEconomics && <GrowthTab />}
             {tab === 'links' && isFounder && <LinksTab />}
@@ -3118,6 +3133,522 @@ function ChecklistTab() {
           </div>
         </section>
       ))}
+    </div>
+  );
+}
+
+// ── People & HR — roster, legal/HR paperwork (incl. the founder gate), onboarding, academy ──
+type CrmPerson = { id: string; name: string; role: string; type: 'founder' | 'hire' };
+type CrmPersonData = { paperwork: Record<string, 'needed' | 'sent' | 'signed'>; onboarding: Record<string, boolean>; academy: Record<string, boolean> };
+const PAPERWORK_FOUNDER = ['Founder Agreement (with co-founder)', 'IP Assignment to the company', 'LLC Operating Agreement', 'EIN / entity formation'];
+const PAPERWORK_HIRE = ['Offer letter', 'IP & confidentiality assignment', 'Tax form (W-4 / W-9)', 'I-9 work eligibility', 'Direct deposit', 'Handbook acknowledgment'];
+const ONBOARDING_ITEMS = ['All paperwork signed', 'Tool access (CRM · email · Supabase)', 'Kickoff / intro call', 'Comp plan reviewed', 'Read the Doctrine'];
+const ACADEMY_COURSE_LIST = ['The Worker & The Mission', 'The Doctrine', 'The Product', 'Trust in Practice', 'How We Work', 'CA Employment Law', 'Plaintiff-Side Practice'];
+const PW_NEXT: Record<string, 'needed' | 'sent' | 'signed'> = { needed: 'sent', sent: 'signed', signed: 'needed' };
+const PW_STYLE: Record<string, string> = {
+  needed: 'border-amber-300 bg-amber-50 text-amber-700',
+  sent: 'border-sky-300 bg-sky-50 text-sky-700',
+  signed: 'border-emerald-300 bg-emerald-50 text-emerald-700',
+};
+
+function PeopleTab() {
+  const KEY = 'o3s_crm_people_v1';
+  const [state, setState] = useState<{ people: CrmPerson[]; data: Record<string, CrmPersonData> }>(() => {
+    try { const s = JSON.parse(localStorage.getItem(KEY) || 'null'); if (s && Array.isArray(s.people)) return s; } catch { /* ignore */ }
+    return {
+      people: [
+        { id: 'victoria', name: 'Victoria', role: 'Founder / CEO', type: 'founder' },
+        { id: 'tad', name: 'Tad', role: 'Co-founder / Sales', type: 'founder' },
+      ],
+      data: {},
+    };
+  });
+  const [selId, setSelId] = useState<string>(state.people[0]?.id || '');
+  const [newName, setNewName] = useState('');
+  const [newRole, setNewRole] = useState('');
+
+  const persist = (next: { people: CrmPerson[]; data: Record<string, CrmPersonData> }) => {
+    try { localStorage.setItem(KEY, JSON.stringify(next)); } catch { /* ignore */ }
+    setState(next);
+  };
+  const sel = state.people.find((p) => p.id === selId) || state.people[0];
+  const pdata: CrmPersonData = (sel && state.data[sel.id]) || { paperwork: {}, onboarding: {}, academy: {} };
+
+  const updateData = (patch: Partial<CrmPersonData>) => {
+    if (!sel) return;
+    const cur = state.data[sel.id] || { paperwork: {}, onboarding: {}, academy: {} };
+    persist({ ...state, data: { ...state.data, [sel.id]: { ...cur, ...patch } } });
+  };
+  const cyclePaperwork = (doc: string) => updateData({ paperwork: { ...pdata.paperwork, [doc]: PW_NEXT[pdata.paperwork[doc] || 'needed'] } });
+  const toggleOnboarding = (item: string) => updateData({ onboarding: { ...pdata.onboarding, [item]: !pdata.onboarding[item] } });
+  const toggleAcademy = (c: string) => updateData({ academy: { ...pdata.academy, [c]: !pdata.academy[c] } });
+
+  const addPerson = () => {
+    const name = newName.trim(); if (!name) return;
+    const id = name.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + state.people.length;
+    persist({ ...state, people: [...state.people, { id, name, role: newRole.trim() || 'Team', type: 'hire' }] });
+    setNewName(''); setNewRole(''); setSelId(id);
+  };
+  const removePerson = (id: string) => {
+    const nextPeople = state.people.filter((p) => p.id !== id);
+    const nextData = { ...state.data }; delete nextData[id];
+    persist({ people: nextPeople, data: nextData });
+    if (selId === id) setSelId(nextPeople[0]?.id || '');
+  };
+
+  const docs = sel?.type === 'founder' ? PAPERWORK_FOUNDER : PAPERWORK_HIRE;
+  const signedCount = docs.filter((d) => pdata.paperwork[d] === 'signed').length;
+  const obDone = ONBOARDING_ITEMS.filter((i) => pdata.onboarding[i]).length;
+  const acDone = ACADEMY_COURSE_LIST.filter((c) => pdata.academy[c]).length;
+
+  return (
+    <div className="space-y-5">
+      <p className="text-[12px] leading-relaxed text-[#1B2623]/55">
+        Team roster, legal &amp; HR paperwork, onboarding, and Academy progress — saved on this device. The founder + IP agreement lives here too; it&rsquo;s the #1 thing to close.
+      </p>
+
+      <div className="flex flex-wrap gap-2">
+        {state.people.map((p) => (
+          <button key={p.id} type="button" onClick={() => setSelId(p.id)}
+            className={`rounded-full border px-3.5 py-1.5 text-[13px] font-semibold transition ${p.id === sel?.id ? 'border-[#42574E] bg-[#42574E] text-white' : 'border-[#D3DED6] bg-white text-[#1B2623] hover:border-[#95AB9B]'}`}>
+            {p.name}
+          </button>
+        ))}
+      </div>
+      <div className="flex flex-wrap items-center gap-2">
+        <input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="Add person — name" className="w-40 rounded-lg border border-[#D3DED6] px-3 py-1.5 text-[13px]" />
+        <input value={newRole} onChange={(e) => setNewRole(e.target.value)} placeholder="role" className="w-32 rounded-lg border border-[#D3DED6] px-3 py-1.5 text-[13px]" />
+        <button type="button" onClick={addPerson} className="rounded-lg bg-[#42574E] px-3 py-1.5 text-[13px] font-semibold text-white">Add</button>
+      </div>
+
+      {sel && (
+        <div className="rounded-[16px] border border-[#E4E5DE] bg-white p-4">
+          <div className="mb-3 flex items-center justify-between">
+            <div>
+              <div className="text-[15px] font-bold text-[#1B2623]">{sel.name}</div>
+              <div className="text-[12px] text-[#1B2623]/55">{sel.role}</div>
+            </div>
+            {state.people.length > 1 && (
+              <button type="button" onClick={() => removePerson(sel.id)} className="text-[#1B2623]/35 hover:text-red-500"><Trash2 className="h-4 w-4" /></button>
+            )}
+          </div>
+
+          <section className="mb-4">
+            <div className="mb-2 flex items-center justify-between text-[13px] font-bold text-[#1B2623]">
+              <span>Legal &amp; HR paperwork</span><span className="text-[#42574E]">{signedCount} of {docs.length} signed</span>
+            </div>
+            <div className="space-y-2">
+              {docs.map((doc) => {
+                const st = pdata.paperwork[doc] || 'needed';
+                return (
+                  <div key={doc} className="flex items-center justify-between gap-3 rounded-[12px] border border-[#E4E5DE] bg-[#FBFBFA] px-3.5 py-2.5">
+                    <span className="text-[13px] text-[#1B2623]">{doc}</span>
+                    <button type="button" onClick={() => cyclePaperwork(doc)} className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold capitalize ${PW_STYLE[st]}`}>{st}</button>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+
+          <section className="mb-4">
+            <div className="mb-2 flex items-center justify-between text-[13px] font-bold text-[#1B2623]">
+              <span>Onboarding</span><span className="text-[#42574E]">{obDone} of {ONBOARDING_ITEMS.length}</span>
+            </div>
+            <div className="space-y-1.5">
+              {ONBOARDING_ITEMS.map((item) => {
+                const done = !!pdata.onboarding[item];
+                return (
+                  <button key={item} type="button" onClick={() => toggleOnboarding(item)}
+                    className={`flex w-full items-center gap-2.5 rounded-[10px] border px-3 py-2 text-left text-[13px] transition ${done ? 'border-emerald-200 bg-emerald-50 text-emerald-800' : 'border-[#D3DED6] bg-white text-[#1B2623] hover:border-[#95AB9B]'}`}>
+                    <span className={`flex h-4 w-4 items-center justify-center rounded border ${done ? 'border-emerald-500 bg-emerald-500 text-white' : 'border-[#95AB9B]'}`}>{done && <Check className="h-3 w-3" />}</span>
+                    {item}
+                  </button>
+                );
+              })}
+            </div>
+          </section>
+
+          <section>
+            <div className="mb-2 flex items-center justify-between text-[13px] font-bold text-[#1B2623]">
+              <span>Academy progress</span><span className="text-[#42574E]">{acDone} of {ACADEMY_COURSE_LIST.length}</span>
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {ACADEMY_COURSE_LIST.map((c) => {
+                const done = !!pdata.academy[c];
+                return (
+                  <button key={c} type="button" onClick={() => toggleAcademy(c)}
+                    className={`rounded-full border px-2.5 py-1 text-[11px] font-medium transition ${done ? 'border-emerald-300 bg-emerald-50 text-emerald-700' : 'border-[#D3DED6] bg-white text-[#1B2623]/70 hover:border-[#95AB9B]'}`}>
+                    {done ? '✓ ' : ''}{c}
+                  </button>
+                );
+              })}
+            </div>
+            <a href="/learn-9k3xq7m2e8a/" target="_blank" rel="noreferrer" className="mt-2.5 inline-block text-[12px] font-semibold text-[#42574E] hover:underline">Open the Academy ↗</a>
+          </section>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Accounts — customer subscriptions & account activity (Stripe-ready scaffold) ──
+function AccountsTab({ firms, activity }: { firms: CrmFirm[]; activity: CrmActivityWithFirm[] }) {
+  const activityByFirm = useMemo(() => {
+    const m: Record<string, number> = {};
+    activity.forEach((a) => { if (a.firm_name) m[a.firm_name] = (m[a.firm_name] || 0) + 1; });
+    return m;
+  }, [activity]);
+  const sorted = [...firms].sort((a, b) => (activityByFirm[b.name] || 0) - (activityByFirm[a.name] || 0));
+
+  return (
+    <div className="space-y-5">
+      <div className="flex items-start gap-2.5 rounded-[12px] border border-amber-200 bg-amber-50 px-4 py-3">
+        <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
+        <p className="text-[12.5px] leading-relaxed text-amber-800">
+          Live billing &amp; subscription status connect when Stripe goes live. Until then, this shows your firms as <b>accounts</b> with pipeline stage and activity, plus the plan catalog.
+        </p>
+      </div>
+
+      <Collapsible title="Plan catalog" defaultOpen>
+        <div className="space-y-2">
+          {CRM_SUBSCRIPTION_TIERS.map((t) => (
+            <div key={t.tier} className="rounded-[12px] border border-[#E4E5DE] bg-white p-3">
+              <div className="flex items-center justify-between">
+                <span className="text-[13px] font-bold text-[#1B2623]">{t.tier}</span>
+                <span className="text-[13px] font-semibold text-[#42574E]">{t.price}</span>
+              </div>
+              <p className="mt-1 text-[12px] leading-relaxed text-[#1B2623]/55">{t.detail}</p>
+            </div>
+          ))}
+        </div>
+      </Collapsible>
+
+      <section>
+        <div className="mb-2 text-[13px] font-bold text-[#1B2623]">Accounts ({firms.length})</div>
+        {sorted.length === 0 ? (
+          <p className="rounded-[12px] border border-dashed border-[#D3DED6] bg-[#FBFBFA] px-4 py-6 text-center text-[12.5px] text-[#1B2623]/50">No accounts yet — firms you add in the pipeline appear here.</p>
+        ) : (
+          <div className="space-y-2">
+            {sorted.map((f) => (
+              <div key={f.id} className="flex items-center justify-between gap-3 rounded-[12px] border border-[#E4E5DE] bg-white px-3.5 py-2.5">
+                <div className="min-w-0">
+                  <div className="truncate text-[13px] font-semibold text-[#1B2623]">{f.name}</div>
+                  <div className="text-[11px] text-[#1B2623]/50">{activityByFirm[f.name] || 0} activities · subscription — (Stripe pending)</div>
+                </div>
+                <span className="shrink-0 rounded-full border border-[#D3DED6] bg-[#F2F4EC] px-2.5 py-1 text-[11px] font-medium text-[#42574E]">{CRM_STAGE_LABELS[f.stage] || f.stage}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+    </div>
+  );
+}
+
+// ── Support — help-request queue ─────────────────────────────────────────────
+type SupportTicket = { id: string; from: string; subject: string; body: string; status: 'open' | 'resolved'; created: string };
+type DeletionReq = { id: string; email: string | null; user_id: string | null; requested_at: string; status: string; fulfilled_at: string | null };
+function SupportTab() {
+  const KEY = 'o3s_crm_support_v1';
+  const [tickets, setTickets] = useState<SupportTicket[]>(() => { try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch { return []; } });
+  const [from, setFrom] = useState(''); const [subject, setSubject] = useState(''); const [body, setBody] = useState('');
+  const save = (next: SupportTicket[]) => { try { localStorage.setItem(KEY, JSON.stringify(next)); } catch { /* ignore */ } setTickets(next); };
+  const add = () => {
+    if (!subject.trim()) return;
+    const t: SupportTicket = { id: 'tk' + tickets.length + '-' + subject.slice(0, 6).replace(/\W+/g, ''), from: from.trim() || 'Unknown', subject: subject.trim(), body: body.trim(), status: 'open', created: new Date().toISOString().slice(0, 10) };
+    save([t, ...tickets]); setFrom(''); setSubject(''); setBody('');
+  };
+  const toggle = (id: string) => save(tickets.map((t) => t.id === id ? { ...t, status: t.status === 'open' ? 'resolved' : 'open' } : t));
+  const del = (id: string) => save(tickets.filter((t) => t.id !== id));
+  const open = tickets.filter((t) => t.status === 'open');
+
+  // Account/data deletion requests (CCPA §1798.105) — read from Supabase (founder RLS).
+  const [delReqs, setDelReqs] = useState<DeletionReq[]>([]);
+  const [delLoading, setDelLoading] = useState(true);
+  useEffect(() => {
+    void (async () => {
+      try {
+        const { data } = await supabase.from('deletion_requests').select('*').order('requested_at', { ascending: false });
+        setDelReqs((data as DeletionReq[]) || []);
+      } catch { /* table may not be provisioned yet */ }
+      setDelLoading(false);
+    })();
+  }, []);
+  const markFulfilled = async (id: string) => {
+    try {
+      await supabase.from('deletion_requests').update({ status: 'fulfilled', fulfilled_at: new Date().toISOString() }).eq('id', id);
+      setDelReqs((prev) => prev.map((r) => (r.id === id ? { ...r, status: 'fulfilled' } : r)));
+    } catch { /* ignore */ }
+  };
+  const pendingDel = delReqs.filter((r) => r.status === 'pending');
+
+  return (
+    <div className="space-y-5">
+      {/* Account deletion requests — time-sensitive; purge within the CCPA window, then mark fulfilled */}
+      <div>
+        <div className="mb-2 flex items-center justify-between text-[13px] font-bold text-[#1B2623]">
+          <span className="flex items-center gap-1.5"><ShieldCheck className="h-4 w-4 text-red-500" /> Account deletion requests</span>
+          {pendingDel.length > 0 ? <span className="rounded-full bg-red-100 px-2 py-0.5 text-[11px] font-semibold text-red-700">{pendingDel.length} to fulfill</span> : null}
+        </div>
+        {delLoading ? (
+          <p className="text-[12px] text-[#1B2623]/45">Loading…</p>
+        ) : delReqs.length === 0 ? (
+          <p className="rounded-[12px] border border-dashed border-[#D3DED6] bg-[#FBFBFA] px-4 py-4 text-center text-[12px] text-[#1B2623]/50">No deletion requests. (If this never changes, the <code>deletion_requests</code> table may not be provisioned yet.)</p>
+        ) : (
+          <div className="space-y-2">
+            {delReqs.map((r) => (
+              <div key={r.id} className={`flex items-center justify-between gap-3 rounded-[12px] border px-3.5 py-2.5 ${r.status === 'pending' ? 'border-red-200 bg-red-50' : 'border-[#E4E5DE] bg-white'}`}>
+                <div className="min-w-0">
+                  <div className="truncate text-[13px] font-semibold text-[#1B2623]">{r.email || r.user_id || 'Unknown user'}</div>
+                  <div className="text-[11px] text-[#1B2623]/50">requested {new Date(r.requested_at).toLocaleDateString()} · {r.status}</div>
+                </div>
+                {r.status === 'pending' ? (
+                  <button type="button" onClick={() => void markFulfilled(r.id)} className="shrink-0 rounded-full border border-red-300 bg-white px-2.5 py-1 text-[11px] font-semibold text-red-700 transition hover:bg-red-50">Mark fulfilled</button>
+                ) : null}
+              </div>
+            ))}
+          </div>
+        )}
+        <p className="mt-2 text-[11px] leading-relaxed text-[#1B2623]/45">Fulfilling = permanently purge the worker&rsquo;s records, storage, and account, then mark done here. Do it within 30 days.</p>
+      </div>
+      <div className="h-px bg-[#E4E5DE]" />
+      <p className="text-[12px] leading-relaxed text-[#1B2623]/55">
+        Help requests from firms and workers. Log them here for now; this can wire to a support form later. Saved on this device.
+      </p>
+      <div className="space-y-2 rounded-[14px] border border-[#E4E5DE] bg-white p-4">
+        <div className="flex gap-2">
+          <input value={from} onChange={(e) => setFrom(e.target.value)} placeholder="From (firm / person)" className="w-1/2 rounded-lg border border-[#D3DED6] px-3 py-1.5 text-[13px]" />
+          <input value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="Subject" className="w-1/2 rounded-lg border border-[#D3DED6] px-3 py-1.5 text-[13px]" />
+        </div>
+        <textarea value={body} onChange={(e) => setBody(e.target.value)} placeholder="What do they need?" rows={2} className="w-full rounded-lg border border-[#D3DED6] px-3 py-2 text-[13px]" />
+        <button type="button" onClick={add} className="rounded-lg bg-[#42574E] px-3.5 py-1.5 text-[13px] font-semibold text-white">Log request</button>
+      </div>
+      <div className="flex items-center justify-between text-[13px] font-bold text-[#1B2623]">
+        <span>Requests</span><span className="text-[#42574E]">{open.length} open</span>
+      </div>
+      {tickets.length === 0 ? (
+        <p className="rounded-[12px] border border-dashed border-[#D3DED6] bg-[#FBFBFA] px-4 py-6 text-center text-[12.5px] text-[#1B2623]/50">No help requests yet.</p>
+      ) : (
+        <div className="space-y-2">
+          {tickets.map((t) => (
+            <div key={t.id} className={`rounded-[12px] border p-3 ${t.status === 'resolved' ? 'border-emerald-200 bg-emerald-50' : 'border-[#E4E5DE] bg-white'}`}>
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <div className="text-[13px] font-semibold text-[#1B2623]">{t.subject}</div>
+                  <div className="text-[11px] text-[#1B2623]/50">{t.from} · {t.created}</div>
+                  {t.body && <p className="mt-1 text-[12.5px] leading-relaxed text-[#1B2623]/70">{t.body}</p>}
+                </div>
+                <div className="flex shrink-0 gap-1.5">
+                  <button type="button" onClick={() => toggle(t.id)} className="rounded-full border border-[#D3DED6] px-2.5 py-1 text-[11px] font-semibold text-[#42574E]">{t.status === 'open' ? 'Resolve' : 'Reopen'}</button>
+                  <button type="button" onClick={() => del(t.id)} className="text-[#1B2623]/35 hover:text-red-500"><Trash2 className="h-4 w-4" /></button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Firm map — Leaflet + OpenStreetMap (free, no key). Pins every firm with a location,
+//    geocodes a typed city once (cached to crm_firms.lat/lng), home base = Tracy, CA. ──
+const HOME_BASE: [number, number] = [37.7397, -121.4252]; // Tracy, CA
+
+function FirmLocRow({ firm, busy, onSave }: { firm: CrmFirm; busy: boolean; onSave: (f: CrmFirm, city: string) => void }) {
+  const [city, setCity] = useState(firm.city || '');
+  return (
+    <div className="flex items-center gap-2 rounded-[10px] border border-[#E4E5DE] bg-white px-3 py-2">
+      <span className="min-w-0 flex-1 truncate text-[13px] font-medium text-[#1B2623]">{firm.name}</span>
+      <input value={city} onChange={(e) => setCity(e.target.value)} placeholder="City, CA" className="w-32 rounded-md border border-[#D3DED6] px-2 py-1 text-[12px]" />
+      <button type="button" disabled={busy || !city.trim()} onClick={() => onSave(firm, city)} className="rounded-md bg-[#42574E] px-2.5 py-1 text-[11px] font-semibold text-white disabled:opacity-40">{busy ? '…' : 'Pin'}</button>
+    </div>
+  );
+}
+
+function MapTab({ firms }: { firms: CrmFirm[] }) {
+  const mapEl = useRef<HTMLDivElement>(null);
+  const mapObj = useRef<unknown>(null);
+  const layer = useRef<unknown>(null);
+  const [ready, setReady] = useState(false);
+  const [rows, setRows] = useState<CrmFirm[]>(firms);
+  const [busyId, setBusyId] = useState('');
+  useEffect(() => { setRows(firms); }, [firms]);
+
+  // load Leaflet from CDN once
+  useEffect(() => {
+    const w = window as unknown as { L?: unknown };
+    if (w.L) { setReady(true); return; }
+    if (!document.querySelector('link[data-leaflet]')) {
+      const css = document.createElement('link'); css.rel = 'stylesheet'; css.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'; css.setAttribute('data-leaflet', '1'); document.head.appendChild(css);
+    }
+    let s = document.querySelector('script[data-leaflet]') as HTMLScriptElement | null;
+    if (!s) { s = document.createElement('script'); s.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'; s.setAttribute('data-leaflet', '1'); document.body.appendChild(s); }
+    s.addEventListener('load', () => setReady(true));
+    if ((window as unknown as { L?: unknown }).L) setReady(true);
+  }, []);
+
+  // init map
+  useEffect(() => {
+    const L = (window as unknown as { L?: any }).L;
+    if (!ready || !L || !mapEl.current || mapObj.current) return;
+    const map = L.map(mapEl.current).setView([36.9, -119.4], 6);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap contributors', maxZoom: 19 }).addTo(map);
+    L.circleMarker(HOME_BASE, { radius: 8, color: '#B5531F', fillColor: '#B5531F', fillOpacity: 0.9 }).addTo(map).bindPopup('<b>Home base</b><br>Tracy, CA');
+    mapObj.current = map;
+    layer.current = L.layerGroup().addTo(map);
+    setTimeout(() => map.invalidateSize(), 100);
+  }, [ready]);
+
+  // (re)draw pins whenever rows change
+  useEffect(() => {
+    const L = (window as unknown as { L?: any }).L;
+    const map = mapObj.current as any; const grp = layer.current as any;
+    if (!L || !map || !grp) return;
+    grp.clearLayers();
+    const pts: [number, number][] = [HOME_BASE];
+    rows.forEach((f) => {
+      if (f.latitude != null && f.longitude != null) {
+        pts.push([f.latitude, f.longitude]);
+        L.marker([f.latitude, f.longitude]).addTo(grp)
+          .bindPopup('<b>' + (f.name || '') + '</b>' + (f.city ? '<br>' + f.city : '') + (f.attorney_name ? '<br>' + f.attorney_name : '') + (f.phone ? '<br>' + f.phone : ''));
+      }
+    });
+    if (pts.length > 1) { try { map.fitBounds(pts, { padding: [40, 40], maxZoom: 10 }); } catch { /* ignore */ } }
+  }, [rows, ready]);
+
+  const geocodeAndSave = async (f: CrmFirm, cityInput: string) => {
+    const city = cityInput.trim(); if (!city) return;
+    setBusyId(f.id);
+    try {
+      const q = /,/.test(city) ? city : city + ', CA, USA';
+      const res = await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(q));
+      const d = await res.json();
+      if (d && d[0]) {
+        const lat = parseFloat(d[0].lat), lng = parseFloat(d[0].lon);
+        await supabase.from('crm_firms').update({ city, latitude: lat, longitude: lng }).eq('id', f.id);
+        setRows((prev) => prev.map((x) => (x.id === f.id ? { ...x, city, latitude: lat, longitude: lng } : x)));
+      }
+    } catch { /* ignore */ }
+    setBusyId('');
+  };
+
+  const missing = rows.filter((f) => f.latitude == null || f.longitude == null);
+  const placed = rows.length - missing.length;
+
+  return (
+    <div className="space-y-4">
+      <p className="text-[12px] leading-relaxed text-[#1B2623]/55">
+        Every firm with a location is pinned; the orange dot is home base (Tracy). Add a city to any firm below and it drops on the map — the location saves so it stays pinned next time.
+      </p>
+      <div ref={mapEl} style={{ height: 440, borderRadius: 16, overflow: 'hidden', border: '1px solid #D3DED6' }} />
+      {!ready ? <p className="text-[12px] text-[#1B2623]/45">Loading map…</p> : null}
+      <div className="flex items-center justify-between text-[13px] font-bold text-[#1B2623]">
+        <span>Add locations</span>
+        <span className="text-[#42574E]">{placed} mapped · {missing.length} to place</span>
+      </div>
+      {missing.length === 0 ? (
+        <p className="rounded-[12px] border border-dashed border-[#D3DED6] bg-[#FBFBFA] px-4 py-4 text-center text-[12px] text-[#1B2623]/50">Every firm has a location. 🎯</p>
+      ) : (
+        <div className="space-y-2">
+          {missing.map((f) => <FirmLocRow key={f.id} firm={f} busy={busyId === f.id} onSave={geocodeAndSave} />)}
+        </div>
+      )}
+      <p className="text-[11px] text-[#1B2623]/40">Map: Leaflet + OpenStreetMap (free). Geocoding: nominatim.openstreetmap.org. Click a pin for firm details.</p>
+    </div>
+  );
+}
+
+// ── Zip finder — two-way ZIP <-> City,ST lookup (free keyless zippopotam.us) ──
+type ZipResult =
+  | { kind: 'zip'; zip: string; city: string; st: string; state: string }
+  | { kind: 'city'; city: string; st: string; zips: string[] }
+  | { kind: 'error'; msg: string }
+  | null;
+
+function ZipFinderTab() {
+  const [q, setQ] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<ZipResult>(null);
+
+  const lookup = async () => {
+    const query = q.trim();
+    if (!query) return;
+    setLoading(true); setResult(null);
+    try {
+      if (/^\d{5}$/.test(query)) {
+        const res = await fetch(`https://api.zippopotam.us/us/${query}`);
+        if (!res.ok) throw new Error('nf');
+        const d = await res.json();
+        const p = d.places?.[0];
+        if (!p) throw new Error('nf');
+        setResult({ kind: 'zip', zip: query, city: p['place name'], st: p['state abbreviation'], state: p['state'] });
+      } else {
+        const m = query.match(/^(.+?),\s*([A-Za-z]{2})$/);
+        if (!m) { setResult({ kind: 'error', msg: 'Enter a 5-digit ZIP, or “City, ST” — e.g., 95377 or Tracy, CA.' }); setLoading(false); return; }
+        const city = m[1].trim(); const st = m[2].trim();
+        const res = await fetch(`https://api.zippopotam.us/us/${st.toLowerCase()}/${encodeURIComponent(city)}`);
+        if (!res.ok) throw new Error('nf');
+        const d = await res.json();
+        const zips = (d.places || []).map((p: Record<string, string>) => p['post code']);
+        if (!zips.length) throw new Error('nf');
+        setResult({ kind: 'city', city, st: st.toUpperCase(), zips });
+      }
+    } catch {
+      setResult({ kind: 'error', msg: 'No match found (or the lookup couldn’t be reached). Check spelling and try again.' });
+    }
+    setLoading(false);
+  };
+  const copy = (text: string) => { try { navigator.clipboard?.writeText(text); } catch { /* ignore */ } };
+
+  return (
+    <div className="space-y-4">
+      <p className="text-[12px] leading-relaxed text-[#1B2623]/55">
+        Look up a ZIP or a city. Enter a <b>5-digit ZIP</b> to get its city &amp; state, or <b>“City, ST”</b> (e.g., <i>Tracy, CA</i>) to get its ZIP codes.
+      </p>
+      <div className="flex gap-2">
+        <input
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          onKeyDown={(e) => { if (e.key === 'Enter') void lookup(); }}
+          placeholder="95377   or   Tracy, CA"
+          className="flex-1 rounded-lg border border-[#D3DED6] px-3.5 py-2.5 text-[14px]"
+        />
+        <button type="button" onClick={() => void lookup()} disabled={loading} className="rounded-lg bg-[#42574E] px-4 py-2.5 text-[14px] font-semibold text-white disabled:opacity-50">
+          {loading ? '…' : 'Find'}
+        </button>
+      </div>
+
+      {result?.kind === 'zip' ? (
+        <div className="rounded-[14px] border border-[#E4E5DE] bg-white p-4">
+          <div className="text-[11px] font-semibold uppercase tracking-wide text-[#42574E]">ZIP {result.zip}</div>
+          <div className="mt-1 flex items-center justify-between gap-2">
+            <div className="text-[17px] font-bold text-[#1B2623]">{result.city}, {result.st}</div>
+            <button type="button" onClick={() => copy(`${result.city}, ${result.st}`)} className="rounded-full border border-[#D3DED6] p-1.5 text-[#42574E] hover:bg-[#F2F4EC]"><Copy className="h-3.5 w-3.5" /></button>
+          </div>
+          <div className="text-[12px] text-[#1B2623]/55">{result.state}</div>
+        </div>
+      ) : null}
+
+      {result?.kind === 'city' ? (
+        <div className="rounded-[14px] border border-[#E4E5DE] bg-white p-4">
+          <div className="mb-2 flex items-center justify-between">
+            <div className="text-[15px] font-bold text-[#1B2623]">{result.city}, {result.st} <span className="text-[12px] font-normal text-[#1B2623]/50">· {result.zips.length} ZIP{result.zips.length > 1 ? 's' : ''}</span></div>
+            <button type="button" onClick={() => copy(result.zips.join(', '))} className="rounded-full border border-[#D3DED6] px-2.5 py-1 text-[11px] font-semibold text-[#42574E] hover:bg-[#F2F4EC]">Copy all</button>
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {result.zips.map((z) => (
+              <button key={z} type="button" onClick={() => copy(z)} className="rounded-md border border-[#D3DED6] bg-[#FBFBFA] px-2 py-1 text-[12px] font-medium text-[#1B2623] hover:border-[#95AB9B]" title="Click to copy">{z}</button>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
+      {result?.kind === 'error' ? (
+        <p className="rounded-[12px] border border-amber-200 bg-amber-50 px-4 py-3 text-[13px] text-amber-800">{result.msg}</p>
+      ) : null}
+
+      <p className="text-[11px] text-[#1B2623]/40">US lookups via zippopotam.us (free). Click any result to copy it.</p>
     </div>
   );
 }

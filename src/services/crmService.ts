@@ -36,6 +36,11 @@ export interface CrmFirm {
   tier?: number | null;
   /** Flagged for a founder ("Victoria to email f/u") — collects into the founder email queue. */
   needs_founder_email?: boolean | null;
+  /** Location for the CRM map. city/address are entered; lat/lng are the geocode cache. */
+  city?: string | null;
+  address?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
   created_at: string;
 }
 
