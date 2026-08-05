@@ -91,6 +91,9 @@ const isBrand =
   url.pathname === '/brand';
 
 const isLearn = url.pathname === '/learn';
+// Firm education is its OWN route — never a toggle on the worker /learn page. Used from firm/CRM
+// contexts only (not linked from any worker screen), so a worker has no path into firm material.
+const isFirmLearn = url.pathname === '/firm-learn';
 
 // Stripe billing return — ?billing=success|canceled|portal_return
 // Store in sessionStorage so App.tsx can surface a notification, then strip from URL.
@@ -183,7 +186,11 @@ if (url.pathname === '/terms') {
   );
 } else if (isLearn) {
   createRoot(rootEl).render(
-    <AppErrorBoundary><LearnScreen /></AppErrorBoundary>
+    <AppErrorBoundary><LearnScreen audience="worker" /></AppErrorBoundary>
+  );
+} else if (isFirmLearn) {
+  createRoot(rootEl).render(
+    <AppErrorBoundary><LearnScreen audience="firm" /></AppErrorBoundary>
   );
 } else if (isForWorkers) {
   // Direct/ad hits to /for-workers render the worker landing standalone. The CTAs set a

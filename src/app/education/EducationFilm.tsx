@@ -1,6 +1,57 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Play, Pause, ChevronLeft, ChevronRight, RotateCcw } from 'lucide-react';
-import type { Lesson } from './lessons';
+import type { Lesson, BeatVisual } from './lessons';
+
+// Comparison palette (light education theme): traditional = muted, top-AI = amber, one3seven = sage.
+const BAR_TONE: Record<'base' | 'ai' | 'o3s', string> = { base: '#B9C1B4', ai: '#C99A55', o3s: '#42574E' };
+const CELL_TONE: Record<'yes' | 'no' | 'part' | 'o3s', string> = { yes: '#3F7A5E', no: '#AEB6AC', part: '#B87A33', o3s: '#2F5142' };
+
+function VisualBlock({ visual }: { visual: BeatVisual }) {
+  const MONO = { fontFamily: '"IBM Plex Mono", ui-monospace, Menlo, monospace' } as const;
+  if (visual.kind === 'bars') {
+    return (
+      <div className="mt-3 flex flex-col gap-2.5">
+        {visual.rows.map((r) => (
+          <div key={r.label} className="grid grid-cols-[minmax(84px,110px)_1fr_auto] items-center gap-3">
+            <div className="text-[12px] leading-tight text-[#4B564E]">
+              {r.label}
+              {r.sub ? <span className="block text-[10.5px] text-[#8A938A]">{r.sub}</span> : null}
+            </div>
+            <div className="h-[18px] overflow-hidden rounded-[5px] border border-[#DCE1D6] bg-[#F3F5EF]">
+              <div className="h-full rounded-[4px] transition-[width] duration-[900ms] ease-out" style={{ width: `${r.pct}%`, background: BAR_TONE[r.tone] }} />
+            </div>
+            <div style={MONO} className="min-w-[64px] text-right text-[12.5px] tabular-nums text-[#2A332C]">{r.value}</div>
+          </div>
+        ))}
+        {visual.note ? <div style={MONO} className="mt-1 text-[10px] leading-snug text-[#9AA39B]">{visual.note}</div> : null}
+      </div>
+    );
+  }
+  return (
+    <div className="mt-3 overflow-x-auto">
+      <table className="w-full border-collapse text-[clamp(11px,1.4vw,13.5px)]">
+        <thead>
+          <tr>
+            <th className="border-b border-[#DCE1D6] px-2.5 py-2 text-left" />
+            {visual.cols.map((c, idx) => (
+              <th key={c} style={MONO} className={`border-b border-[#DCE1D6] px-2.5 py-2 text-center text-[10px] uppercase tracking-[0.08em] ${idx === visual.cols.length - 1 ? 'text-[#42574E]' : 'text-[#9AA39B]'}`}>{c}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {visual.rows.map((row) => (
+            <tr key={row.feature}>
+              <td className="border-b border-[#EEF0EA] px-2.5 py-2 text-[#4B564E]">{row.feature}</td>
+              {row.cells.map((cell, idx) => (
+                <td key={idx} style={{ ...MONO, color: cell.tone ? CELL_TONE[cell.tone] : '#6B756C' }} className={`border-b border-[#EEF0EA] px-2.5 py-2 text-center ${cell.tone === 'o3s' ? 'font-semibold' : ''}`}>{cell.text}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
 
 /**
  * EducationFilm — the reusable narrated-lesson player (worker-facing, public).
@@ -61,11 +112,15 @@ export function EducationFilm({ lesson, audioBase = '/voice/lessons' }: { lesson
         {beats.map((b, idx) => (
           <div
             key={b.key}
-            className={`absolute inset-0 flex flex-col justify-center px-6 py-8 transition-opacity duration-500 sm:px-12 ${idx === i ? 'opacity-100' : 'pointer-events-none opacity-0'} motion-reduce:transition-none`}
+            className={`absolute inset-0 flex flex-col justify-center overflow-auto px-6 py-8 transition-opacity duration-500 sm:px-12 ${idx === i ? 'opacity-100' : 'pointer-events-none opacity-0'} motion-reduce:transition-none`}
           >
             <div style={MONO} className="mb-3 text-[10.5px] uppercase tracking-[0.2em] text-[#7C8B6F]">{b.kicker}</div>
-            <h3 style={SERIF} className="max-w-[20ch] text-[clamp(22px,4.4vw,44px)] font-semibold leading-[1.05] tracking-[-0.01em] text-[#1B2623]" dangerouslySetInnerHTML={{ __html: emphasize(b.title) }} />
-            <p className="mt-4 max-w-[46ch] text-[clamp(13px,1.7vw,18px)] leading-relaxed text-[#4B564E]">{b.body}</p>
+            <h3 style={SERIF} className={`${b.visual ? 'text-[clamp(19px,3.4vw,34px)]' : 'text-[clamp(22px,4.4vw,44px)]'} max-w-[22ch] font-semibold leading-[1.05] tracking-[-0.01em] text-[#1B2623]`} dangerouslySetInnerHTML={{ __html: emphasize(b.title) }} />
+            {b.visual ? (
+              <VisualBlock visual={b.visual} />
+            ) : (
+              <p className="mt-4 max-w-[46ch] text-[clamp(13px,1.7vw,18px)] leading-relaxed text-[#4B564E]">{b.body}</p>
+            )}
           </div>
         ))}
         <div className="absolute right-5 top-4 font-mono text-[12px] text-[#9AA39B]" style={MONO}>
