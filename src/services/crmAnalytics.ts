@@ -3,16 +3,18 @@
  */
 import type { CrmFirm } from './crmService';
 
-/** Sticker price per tier. Practice/Firm are billed monthly; Surge is billed
- *  annually ($1,490/yr). Use this for DISPLAY; use tierPrice() for MRR math. */
-export const TIER_PRICES = { practice: 249, firm: 549, surge: 1490 } as const;
+/** Representative per-account MONTHLY MRR by tier (per-seat model, 2026-07-28 reprice).
+ *  Practice = $400/seat × ~2 seats; Firm = $375/seat × ~5 seats; Surge = $3,500 flat. Actual MRR
+ *  varies with seat count; these are typical-account values for CRM forecast + commission math. */
+export const TIER_PRICES = { practice: 800, firm: 1875, surge: 3500 } as const;
 export type SubscriptionTier = 'practice' | 'firm' | 'surge';
 
-/** Billing cadence per tier. MRR math divides annual tiers by 12. */
+/** Billing cadence per tier. Values above are already monthly MRR, so no annual divisor is applied
+ *  (Surge is annual-committed but its monthly-equivalent MRR is the flat $3,500). */
 export const TIER_BILLING: Record<SubscriptionTier, 'monthly' | 'annual'> = {
   practice: 'monthly',
   firm: 'monthly',
-  surge: 'annual',
+  surge: 'monthly',
 };
 
 export const PHASE1_PAYING_TARGET = 3;
@@ -34,7 +36,7 @@ export function avgMinutesSaved(firms: { est_minutes_saved?: number | null }[]):
 }
 
 /** Monthly-recurring-revenue contribution for a tier (annual tiers ÷ 12, rounded).
- *  null/unknown defaults to Practice ($249/mo). For the sticker price use TIER_PRICES. */
+ *  null/unknown defaults to Practice ($800/mo representative account). For the sticker price use TIER_PRICES. */
 export function tierPrice(tier: string | null | undefined): number {
   const t: SubscriptionTier = tier === 'firm' || tier === 'surge' ? tier : 'practice';
   const sticker = TIER_PRICES[t];

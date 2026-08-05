@@ -64,7 +64,7 @@ export const LAUNCH_CHECKLIST: { group: string; items: { id: string; label: stri
   {
     group: 'Payments — needed before you can charge firms',
     items: [
-      { id: 'stripe-products', label: 'Create the Stripe prices: Practice $249, Firm $549, Surge $1,490 (annual)', why: 'These are the plans already in the app; Stripe needs matching products to bill them.' },
+      { id: 'stripe-products', label: 'Create the Stripe prices (PER-SEAT): Practice $400/seat, Firm $375/seat (min 3 seats), Surge $3,500/mo flat', why: 'These are the plans already in the app; Stripe needs matching per-seat (quantity) products to bill them.' },
       { id: 'stripe-env', label: 'Add the Stripe price IDs to the app settings (env vars)', why: 'VITE_STRIPE_PRICE_PRACTICE / FIRM / SURGE — this “lights up” the paid plans so firms can subscribe.' },
       { id: 'stripe-webhook', label: 'Turn on the payment webhook (stripe-webhook)', why: 'It’s built but not deployed yet. It flips a firm to “paid” automatically after they subscribe.' },
       { id: 'stripe-test', label: 'Test a checkout in Stripe test mode', why: 'Confirm a firm can actually subscribe end-to-end before you go live.' },
@@ -81,9 +81,9 @@ export const LAUNCH_CHECKLIST: { group: string; items: { id: string; label: stri
 
 /** What a firm pays — the monthly subscription tiers reps are selling. */
 export const CRM_SUBSCRIPTION_TIERS = [
-  { tier: 'Practice', price: '$249 / month', detail: 'Up to 20 intakes · 2 seats · standard processing' },
-  { tier: 'Firm', price: '$549 / month', detail: 'Up to 60 intakes · 5 seats · priority processing' },
-  { tier: 'Surge', price: '$1,490 / month (annual only)', detail: 'Unlimited intakes · unlimited seats · dedicated onboarding · firm-branded packets' },
+  { tier: 'Practice', price: '$400 / seat / month', detail: '1–2 seats · ~15 intakes/seat (fair-use) · full intake engine + all Element Lens packs' },
+  { tier: 'Firm', price: '$375 / seat / month', detail: 'Min 3 seats · ~20 intakes/seat · includes 8B wage-exposure · priority (cheaper per-seat by design)' },
+  { tier: 'Surge', price: '$3,500 / month flat (annual)', detail: 'Unlimited seats + intakes · 8B · dedicated onboarding · firm-branded packets (cost ceiling — beats per-seat past ~9 attorneys)' },
   { tier: 'Enterprise', price: 'Custom', detail: 'Contact info@one3seven.com' },
 ];
 
@@ -91,16 +91,18 @@ export const CRM_COMMISSIONS = {
   headline: 'Commission — 20% recurring, every month the firm stays',
   intro:
     '20% recurring monthly commission on every firm you close — paid every month that firm stays active. No salary, no draw, no base. You earn when a firm converts and keep earning every month they stay. Your incentive is tied to retention, not just the close — so you have a reason to make sure the firm actually uses the product and stays.',
+  // Per-seat plans — these are TYPICAL-ACCOUNT figures (Practice ≈ 2 seats × $400 = $800;
+  // Firm ≈ 5 seats × $375 = $1,875; Surge = $3,500 flat). Bigger firms = more seats = more commission.
   perTier: [
-    { tier: 'Practice', price: '$249/mo', perMo: '$49.80/mo', perYr: '$597.60/yr' },
-    { tier: 'Firm', price: '$549/mo', perMo: '$109.80/mo', perYr: '$1,317.60/yr' },
-    { tier: 'Surge', price: '$1,490/mo', perMo: '$298.00/mo', perYr: '$3,576.00/yr' },
+    { tier: 'Practice (~2 seats)', price: '$800/mo', perMo: '$160.00/mo', perYr: '$1,920/yr' },
+    { tier: 'Firm (~5 seats)', price: '$1,875/mo', perMo: '$375.00/mo', perYr: '$4,500/yr' },
+    { tier: 'Surge (flat)', price: '$3,500/mo', perMo: '$700.00/mo', perYr: '$8,400/yr' },
   ],
   compounding: [
-    { firms: '1 firm', mix: 'Firm ($549)', mo: '$109.80', yr: '$1,318' },
-    { firms: '3 firms', mix: '1 Practice + 2 Firm', mo: '$269.40', yr: '$3,233' },
-    { firms: '5 firms', mix: '2 Practice + 2 Firm + 1 Surge', mo: '$617.20', yr: '$7,406' },
-    { firms: '10 firms', mix: '4 Practice + 4 Firm + 2 Surge', mo: '$1,234.40', yr: '$14,813' },
+    { firms: '1 firm', mix: 'Firm (~5 seats, $1,875)', mo: '$375.00', yr: '$4,500' },
+    { firms: '3 firms', mix: '1 Practice + 2 Firm', mo: '$910.00', yr: '$10,920' },
+    { firms: '5 firms', mix: '2 Practice + 2 Firm + 1 Surge', mo: '$1,770.00', yr: '$21,240' },
+    { firms: '10 firms', mix: '4 Practice + 4 Firm + 2 Surge', mo: '$3,540.00', yr: '$42,480' },
   ],
   terms: [
     'When you get paid: monthly, within 5 business days of one3seven receiving the firm’s subscription payment.',

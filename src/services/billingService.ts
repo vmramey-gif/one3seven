@@ -1,11 +1,16 @@
 /**
  * one3seven billing service — Stripe via Supabase Edge Functions.
  *
- * Plans (volume-based; core organize/source-link value is identical on every tier):
- *   practice   $249/mo    up to 20 intakes · 2 seats · standard processing
- *   firm       $549/mo    up to 60 intakes · 5 seats · priority processing
- *   surge      $1,490/mo  unlimited intakes · unlimited seats · dedicated onboarding (annual only)
- *   enterprise custom
+ * Plans (PER-SEAT; core organize/source-link value is identical on every tier; worker never pays):
+ *   practice   $400/seat/mo   1–2 seats · ~15 intakes/seat (fair-use) · no 8B wage-exposure
+ *   firm       $375/seat/mo   min 3 seats · ~20 intakes/seat (fair-use) · includes 8B · priority
+ *   surge      $3,500/mo flat unlimited seats + intakes · 8B · priority · branded packets (a cost CEILING)
+ *   enterprise custom         multi-vertical / new packs / multi-state
+ *
+ * Priced on avoided cost, not a competitor benchmark: a firm underwrites each case by hand at an
+ * industry-reported $3,500–$13,000, so these tiers capture well under 15% of the cost removed. Firm
+ * is cheaper per-seat than Practice by design (volume discount + it unlocks 8B); Surge is a ceiling
+ * that caps a large firm's cost (per-seat crosses $3,500 at ~9 attorneys). See project_pricing memory.
  *
  * Edge Functions:
  *   create-checkout-session  POST { firmProfileId, priceId } → { url }
@@ -24,8 +29,8 @@ export type FirmPlanId = 'beta_pilot' | 'practice' | 'firm' | 'surge' | 'enterpr
 
 /**
  * Single source of truth for which tiers include the wage-exposure estimate (section 8B)
- * + live source citations. Firm and above (Firm $549, Surge $1,490, Enterprise) — NOT
- * Practice ($249). Checked at the data-assembly layer (resolveWageExposure) so the feature
+ * + live source citations. Firm and above (Firm $375/seat, Surge $3,500 flat, Enterprise) — NOT
+ * Practice ($400/seat). Checked at the data-assembly layer (resolveWageExposure) so the feature
  * never reaches an ineligible firm — not a client-side-only restriction.
  *
  * The legacy names (practice_plus / firm_plus) are still accepted so any firm_profiles row
@@ -46,9 +51,11 @@ export function firmTierIncludesDamagesFeature(planId: string | null | undefined
 export interface FirmPlan {
   id: FirmPlanId;
   label: string;
-  price: number | null;           // monthly USD, null = custom
-  intakesPerMonth: number | null; // null = unlimited
-  seats: number | null;           // null = unlimited
+  price: number | null;           // headline monthly USD — PER SEAT when perSeat, else flat. null = custom
+  perSeat: boolean;               // true = price is per attorney-seat
+  minSeats: number;               // minimum billable seats (0 = flat plan)
+  intakesPerMonth: number | null; // soft cap (per seat when perSeat); fair-use at launch. null = unlimited
+  includesDamages: boolean;       // Section 8B wage-exposure layer (see firmTierIncludesDamagesFeature)
   highlight: boolean;
   annualOnly?: boolean;           // billed yearly only (Surge)
   priceId: string | null;         // Stripe price ID from env
@@ -58,27 +65,33 @@ export const FIRM_PLANS: FirmPlan[] = [
   {
     id: 'practice',
     label: 'Practice',
-    price: 249,
-    intakesPerMonth: 20,
-    seats: 2,
+    price: 400,
+    perSeat: true,
+    minSeats: 1,
+    intakesPerMonth: 15,
+    includesDamages: false,
     highlight: false,
     priceId: import.meta.env.VITE_STRIPE_PRICE_PRACTICE ?? null,
   },
   {
     id: 'firm',
     label: 'Firm',
-    price: 549,
-    intakesPerMonth: 60,
-    seats: 5,
+    price: 375,
+    perSeat: true,
+    minSeats: 3,
+    intakesPerMonth: 20,
+    includesDamages: true,
     highlight: true,
     priceId: import.meta.env.VITE_STRIPE_PRICE_FIRM ?? null,
   },
   {
     id: 'surge',
     label: 'Surge',
-    price: 1490,
+    price: 3500,
+    perSeat: false,
+    minSeats: 0,
     intakesPerMonth: null,
-    seats: null,
+    includesDamages: true,
     highlight: false,
     annualOnly: true,
     priceId: import.meta.env.VITE_STRIPE_PRICE_SURGE ?? null,

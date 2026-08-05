@@ -506,22 +506,26 @@ export function FirmSettingsScreen({
                         <span className="text-[28px] font-black leading-none tracking-tight text-[#1B2623]">
                           ${plan.price}
                         </span>
-                        <span className="mb-1 text-xs text-[#1B2623]/45">/mo</span>
+                        <span className="mb-1 text-xs text-[#1B2623]/45">{plan.perSeat ? '/seat/mo' : '/mo'}</span>
                       </div>
                     </div>
 
                     <ul className="mb-5 flex-1 space-y-1.5">
                       <li className="flex items-center gap-1.5 text-xs text-[#1B2623]/65">
                         <span className="text-[#42574E]">✓</span>
-                        {plan.intakesPerMonth ? `Up to ${plan.intakesPerMonth} intakes/mo` : 'Unlimited intakes'}
+                        {plan.perSeat
+                          ? (plan.minSeats > 1 ? `${plan.minSeats}+ seats` : 'From 1 seat')
+                          : 'Unlimited seats'}
                       </li>
                       <li className="flex items-center gap-1.5 text-xs text-[#1B2623]/65">
                         <span className="text-[#42574E]">✓</span>
-                        {plan.seats ? `${plan.seats} seat${plan.seats > 1 ? 's' : ''}` : 'Unlimited seats'}
+                        {plan.intakesPerMonth
+                          ? `~${plan.intakesPerMonth} intakes/seat · fair-use`
+                          : 'Unlimited intakes'}
                       </li>
                       <li className="flex items-center gap-1.5 text-xs text-[#1B2623]/65">
                         <span className="text-[#42574E]">✓</span>
-                        Intake organization + review packet
+                        {plan.includesDamages ? 'Includes 8B wage-exposure (CA)' : 'Full intake engine + all Element Lens packs'}
                       </li>
                       <li className="flex items-center gap-1.5 text-xs text-[#1B2623]/65">
                         <span className="text-[#42574E]">✓</span>
