@@ -1,5 +1,6 @@
 
 import { createRoot } from 'react-dom/client';
+import { initSentry } from './lib/sentry.ts';
 import App from './app/App.tsx';
 import './styles/index.css';
 import { SupabaseConfigRequired } from './app/components/SupabaseConfigRequired.tsx';
@@ -24,6 +25,8 @@ import { LanguageProvider } from './i18n/i18n.tsx';
 import { OFFLINE_DEV_GALLERY_ONLY } from './lib/supabaseAvailability.ts';
 import { isSupabaseConfigured } from './lib/supabaseClient';
 import { pageview, startHeartbeat } from './lib/analytics';
+
+initSentry();
 
 const rootEl = document.getElementById('root')!;
 

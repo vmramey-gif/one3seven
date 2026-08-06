@@ -1,5 +1,6 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
 import { WordMark } from './WordMark';
+import { Sentry } from '../../lib/sentry';
 
 interface Props {
   children: ReactNode;
@@ -36,6 +37,8 @@ export class AppErrorBoundary extends Component<Props, State> {
       stack: error?.stack,
       componentStack: info?.componentStack,
     });
+    // componentStack is React component names/tree shape, not app data — safe to attach as-is.
+    Sentry.captureException(error, { extra: { componentStack: info?.componentStack } });
   }
 
   handleReload = () => {
