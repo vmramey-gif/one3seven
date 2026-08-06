@@ -1719,8 +1719,14 @@ function formatWorkerProvidedContextForFirmView(parsed: ParsedWorkerIntakeNotes)
 export function resolveWorkerProvidedContextForFirmView(
   overviewRaw: string | null | undefined,
   timelineWorkerContexts: string[],
-  options?: { includeTimelineContext?: boolean }
+  options?: { includeTimelineContext?: boolean; previewOnly?: boolean }
 ): string | undefined {
+  // PRIVACY GATE (worker dashboard promise, one3sevenProduct.ts: "Firms do not see yet: your full
+  // file contents, personal narrative, or private notes—unless you approve expanded review
+  // access"): a preview-only (pre-approval) firm receives NO worker-provided narrative at all —
+  // no story, no additional notes, no guided summary, no follow-up narrative, no timeline
+  // context. Gated here, at the source, so every consumer of the firm view model is protected.
+  if (options?.previewOnly) return undefined;
   const parsed = parseWorkerIntakeNotesFromOverview(overviewRaw);
   const structured = formatWorkerProvidedContextForFirmView(parsed);
   const followUp = extractStoryFollowUpFromOverview(overviewRaw);
@@ -1736,6 +1742,27 @@ export function resolveWorkerProvidedContextForFirmView(
   if (!parts.length) return undefined;
   const combined = parts.join('\n\n');
   return polishFirmFacingProse(combined) || undefined;
+}
+
+/**
+ * Preview-only strip for the structured worker follow-up: the free-text NARRATIVE answers
+ * (what happened when they complained, what changed afterward, remote-expense description,
+ * prior-filing details) are part of the worker's personal narrative and are withheld until the
+ * worker approves expanded access. The identity/scheduling facts the preview surface already
+ * shows (employment name, employer, dates, status, arbitration/agency flags, work state) are
+ * kept so the preview card and preview PDF cover keep working.
+ */
+export function stripWorkerFollowUpNarrativeForPreview(
+  followUp: import('../app/constants/workerStoryIntake').StoryFollowUpAnswers | null
+): import('../app/constants/workerStoryIntake').StoryFollowUpAnswers | null {
+  if (!followUp) return followUp;
+  return {
+    ...followUp,
+    complainedOrReported: '',
+    changedAfterward: '',
+    remoteExpenses: '',
+    priorAgencyFilingDetails: '',
+  };
 }
 
 export function mergeWorkerIntakeNotesIntoOverview(
@@ -4368,15 +4395,36 @@ export async function loadFirmLiveIntakeView(
     ai_summary: sanitizeFirmFacingText(e.ai_summary),
     worker_context: previewOnly ? '' : sanitizeFirmFacingText(e.worker_context),
   }));
+  // ────────────────────────────────────────────────────────────────────────────
+  // PRIVACY GATE (centralized here, at the loader, so every present AND future render site is
+  // protected): when `previewOnly` (pre-approval routes), the returned view model carries NONE of
+  // the worker's personal narrative — no worker story, no intake notes, no guided summary, no
+  // follow-up narrative answers, no per-event worker context. This is the product promise on the
+  // worker dashboard (one3sevenProduct.ts: "Firms do not see yet: your full file contents,
+  // personal narrative, or private notes—unless you approve expanded review access"). Reminder
+  // and mitigation-log sidecar blocks never reach the firm view either — sanitizeFirmFacingText /
+  // stripWorkerIntakeNotesBlock delete every embedded O3S_ sidecar block from firm-facing text.
+  //
+  // ⚠️ NOTE — the DURABLE fix is SERVER-SIDE. This strip is a presentation gate, not a security
+  // boundary: a preview-route firm client can still SELECT intake_summaries.overview via RLS
+  // (it must, to show the preview at all), and that row embeds the worker-note sidecar blocks.
+  // Until the narrative blocks are stripped server-side (an RLS view or edge function that
+  // removes worker-note blocks before the row reaches a preview-only firm), a hostile client
+  // can read them directly. Do not treat this client-side strip as sufficient.
+  // ────────────────────────────────────────────────────────────────────────────
   const workerProvidedContext = resolveWorkerProvidedContextForFirmView(
     overviewRaw,
     eventsRaw.map((e) => String(e.worker_context ?? '')),
-    { includeTimelineContext: !previewOnly }
+    { includeTimelineContext: !previewOnly, previewOnly }
   );
 
   const employmentMatterTags = extractEmploymentMatterTagsFromOverview(overviewRaw);
   const orgSections = extractOrgEngineFromOverview(overviewRaw)?.sections;
-  const workerFollowUp = extractStoryFollowUpFromOverview(overviewRaw);
+  // Preview routes get the follow-up with its free-text narrative answers withheld (the
+  // structured identity fields the preview surface already shows are kept).
+  const workerFollowUp = previewOnly
+    ? stripWorkerFollowUpNarrativeForPreview(extractStoryFollowUpFromOverview(overviewRaw))
+    : extractStoryFollowUpFromOverview(overviewRaw);
   // Worker contact is only present in the overview once the worker shared with a firm.
   // For preview-only routes (no full access yet) we withhold it, mirroring the privacy gate.
   const workerContact = previewOnly ? null : extractWorkerContactFromOverview(overviewRaw);

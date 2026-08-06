@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import {
   CLAIM_LENSES,
   buildClaimLensView,
+  lensEligibleForStrongestRanking,
   type ClaimLensInput,
   type LensSourceState,
 } from '../../services/claimLens';
@@ -114,14 +115,21 @@ export function ClaimLensPanel({
 }) {
   // Theories, ordered by where the material actually lives (highest element coverage first) — so the
   // strongest-covered claim leads and the rest fall back as secondary options. A manual pick overrides.
+  // Ranking-gated wage lenses (see lensEligibleForStrongestRanking) are excluded from the
+  // "strongest" pick unless the record carries a concrete pay-gap fact — they still appear as
+  // selectable theory pills and render fully in their own tab.
   const orderedLenses = useMemo(
     () =>
       [...CLAIM_LENSES]
-        .map((l) => ({ ...l, score: buildClaimLensView(l.id, input).coverage.withMaterial }))
+        .map((l) => ({
+          ...l,
+          score: buildClaimLensView(l.id, input).coverage.withMaterial,
+          rankEligible: lensEligibleForStrongestRanking(l.id, input),
+        }))
         .sort((a, b) => b.score - a.score),
     [input]
   );
-  const defaultId = orderedLenses[0].id;
+  const defaultId = (orderedLenses.find((l) => l.rankEligible) ?? orderedLenses[0]).id;
   const [picked, setPicked] = useState<string | null>(null);
   const activeId = picked ?? defaultId;
   const view = useMemo(() => buildClaimLensView(activeId, input), [activeId, input]);

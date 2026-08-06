@@ -502,14 +502,22 @@ export function IntakeReviewScreen({
   const firmOverviewFields =
     firmLiveView && useConnectedFirmLayout ? buildFirmIntakeOverviewFields(firmLiveView) : [];
 
+  // Defense-in-depth preview gate: the loader already withholds the worker narrative on
+  // preview-only routes (see loadFirmLiveIntakeView), but every narrative render site on this
+  // screen re-checks previewOnly so no future loader regression can leak the story pre-approval.
   const firmWorkerStoryDisplay =
-    firmLiveView && useConnectedFirmLayout ? buildFirmWorkerStoryDisplay(firmLiveView) : '';
+    firmLiveView && useConnectedFirmLayout && !firmLiveView.previewOnly
+      ? buildFirmWorkerStoryDisplay(firmLiveView)
+      : '';
 
   // Worker identity — lifted to component scope so the case-file spine and the intake header
   // can lead with a real human name (never a bare number). A named worker who assembled and
   // shared their own record is the visible proof of the worker-first ecosystem the attorney benefits from.
   const workerIdentity = (() => {
-    const ctx = firmLiveView?.workerProvidedContext ?? firmWorkerStoryDisplay ?? '';
+    // Preview gate (defense-in-depth): never mine the worker narrative pre-approval.
+    const ctx = firmLiveView?.previewOnly
+      ? ''
+      : firmLiveView?.workerProvidedContext ?? firmWorkerStoryDisplay ?? '';
     const extract = (source: string, patterns: RegExp[]): string => {
       for (const p of patterns) {
         const m = source.match(p);
@@ -1183,7 +1191,10 @@ export function IntakeReviewScreen({
 
             {/* Case Readiness Snapshot — attorney orientation card */}
             {activeTab === 'decision' && useConnectedFirmLayout && firmLiveView ? (() => {
-              const ctx = (firmLiveView.workerProvidedContext ?? firmWorkerStoryDisplay ?? '');
+              // Preview gate (defense-in-depth): the Decision Card never reads the narrative pre-approval.
+              const ctx = firmLiveView.previewOnly
+                ? ''
+                : (firmLiveView.workerProvidedContext ?? firmWorkerStoryDisplay ?? '');
               const extract = (patterns: RegExp[]): string => {
                 for (const p of patterns) {
                   const m = ctx.match(p);
@@ -1358,7 +1369,10 @@ export function IntakeReviewScreen({
                     if (it.confirmedTerminationReason) c.push({ label: 'Termination states', value: it.confirmedTerminationReason });
                     return c;
                   })(),
-                  workerContext: firmLiveView.workerProvidedContext ?? firmWorkerStoryDisplay ?? '',
+                  // Preview gate (defense-in-depth): the lens never receives the narrative pre-approval.
+                  workerContext: firmLiveView.previewOnly
+                    ? ''
+                    : firmLiveView.workerProvidedContext ?? firmWorkerStoryDisplay ?? '',
                   files: (firmLiveView.files ?? []).map((f) => ({ fileName: f.file_name, category: f.category })),
                 }}
                 onOpenSource={(fileName, snippet) => void openQuoteCitation(fileName, snippet)}
@@ -1367,9 +1381,10 @@ export function IntakeReviewScreen({
 
             {/* 3-Minute Review Layer — fast triage signal for attorneys */}
             {activeTab === 'decision' && useConnectedFirmLayout && firmLiveView ? (() => {
-              const hasStory = Boolean(
-                firmLiveView.workerProvidedContext?.trim() || firmWorkerStoryDisplay?.trim()
-              );
+              // Preview gate (defense-in-depth): no "worker narrative provided" signal pre-approval.
+              const hasStory =
+                !firmLiveView.previewOnly &&
+                Boolean(firmLiveView.workerProvidedContext?.trim() || firmWorkerStoryDisplay?.trim());
               const recordCount = firmLiveView.files.length;
               const eventCount = firmLiveView.events.length;
               const gapCount = confirmationDisplayCount;

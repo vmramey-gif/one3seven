@@ -28,16 +28,33 @@ import { supabase } from '../lib/supabaseClient';
 export type FirmPlanId = 'beta_pilot' | 'practice' | 'firm' | 'surge' | 'enterprise';
 
 /**
- * Single source of truth for which tiers include the wage-exposure estimate (section 8B)
- * + live source citations. Firm and above (Firm $375/seat, Surge $3,500 flat, Enterprise) — NOT
- * Practice ($400/seat). Checked at the data-assembly layer (resolveWageExposure) so the feature
- * never reaches an ineligible firm — not a client-side-only restriction.
+ * ⚠️ COUNSEL GATE — DO NOT FLIP WITHOUT COUNSEL SIGN-OFF. ⚠️
+ *
+ * Founder-locked doctrine (project_readiness_counsel_gate): readiness-band and wage-exposure
+ * surfacing are demo-only (/fire-demo) until counsel signs off. While this flag is false, the
+ * section 8B wage-exposure surface FAILS CLOSED for EVERY tier — including Firm/Surge/Enterprise,
+ * whose plans list it as an entitlement. The tier entitlement itself is preserved separately in
+ * `firmTierDamagesEntitlement` (and in FIRM_PLANS.includesDamages for pricing display), so
+ * flipping this single constant to `true` on counsel sign-off restores the feature to exactly
+ * the entitled tiers and nothing else. The /fire-demo and case-facts demo surfaces compute their
+ * illustrative arithmetic directly (calculateDamages on hardcoded demo inputs) and do not pass
+ * through this gate — they keep working while it is closed.
+ */
+export const DAMAGES_SURFACING_COUNSEL_APPROVED: boolean = false;
+
+/**
+ * Tier ENTITLEMENT only — which tiers' plans include the wage-exposure estimate (section 8B)
+ * + live source citations once counsel approves surfacing. Firm and above (Firm $375/seat,
+ * Surge $3,500 flat, Enterprise) — NOT Practice ($400/seat).
  *
  * The legacy names (practice_plus / firm_plus) are still accepted so any firm_profiles row
  * or Stripe metadata written before the tier rename keeps its entitlement; new sales use
  * the current tier ids only.
+ *
+ * This function answers "which tiers pay for the feature" — it deliberately does NOT decide
+ * whether the feature may surface. Use `firmTierIncludesDamagesFeature` for that.
  */
-export function firmTierIncludesDamagesFeature(planId: string | null | undefined): boolean {
+export function firmTierDamagesEntitlement(planId: string | null | undefined): boolean {
   return (
     planId === 'firm' ||
     planId === 'surge' ||
@@ -46,6 +63,17 @@ export function firmTierIncludesDamagesFeature(planId: string | null | undefined
     planId === 'firm_plus' ||
     planId === 'practice_plus'
   );
+}
+
+/**
+ * Single source of truth for whether the wage-exposure estimate (section 8B) may surface for a
+ * firm: tier entitlement AND counsel sign-off. Checked at the data-assembly layer
+ * (resolveWageExposure) so the feature never reaches production surfaces while the counsel gate
+ * is closed — today this returns FALSE for every tier (fails closed) until
+ * `DAMAGES_SURFACING_COUNSEL_APPROVED` flips on counsel sign-off.
+ */
+export function firmTierIncludesDamagesFeature(planId: string | null | undefined): boolean {
+  return DAMAGES_SURFACING_COUNSEL_APPROVED && firmTierDamagesEntitlement(planId);
 }
 
 export interface FirmPlan {

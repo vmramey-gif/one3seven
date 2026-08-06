@@ -35,8 +35,11 @@ export function resolveWageExposure(
   // Section 8B is therefore genuinely unreachable for those jurisdictions (organize-only), not
   // computed-and-blanked. No jurisdiction-gated feature activates without an explicit work state.
   if (!getWageRules(view.workerFollowUp?.workState ?? null)) return null;
-  // Tier gate: firm's tier must include the damages feature, so section 8B and CitationPanel
-  // never render for Solo/Practice/Firm even with valid wage facts in a supported jurisdiction.
+  // Counsel + tier gate: tier entitlement AND counsel sign-off (see
+  // DAMAGES_SURFACING_COUNSEL_APPROVED in billingService). While the counsel gate is closed this
+  // returns false for EVERY tier — section 8B and the CitationPanel fail closed in production
+  // even with valid wage facts in a supported jurisdiction. Demo surfaces compute their
+  // illustrative arithmetic directly and do not pass through this gate.
   if (!firmTierIncludesDamagesFeature(view.firmPlanId)) return null;
   const preview = resolveFirmExportAccessTier(view) === 'limited_preview';
   const intel = view.intelligence;
@@ -378,12 +381,22 @@ function isPriorityCategory(category: string | null | undefined): boolean {
 }
 
 function sortFilesByPriority(files: ResolvedFile[]): ResolvedFile[] {
+  // Total order: category rank, then name (case-insensitive, then case-sensitive as the final
+  // tie-break). Category rank alone left same-category ties in upload order, so two exports of
+  // the same intake could list records differently — the record list must be order-proof, like
+  // the worker-side packet already is.
   return [...files].sort((a, b) => {
     const ai = RECORD_PRIORITY_ORDER.indexOf(a.category);
     const bi = RECORD_PRIORITY_ORDER.indexOf(b.category);
     const aRank = ai === -1 ? 99 : ai;
     const bRank = bi === -1 ? 99 : bi;
-    return aRank - bRank;
+    if (aRank !== bRank) return aRank - bRank;
+    const an = (a.file_name || '').toLowerCase();
+    const bn = (b.file_name || '').toLowerCase();
+    if (an !== bn) return an < bn ? -1 : 1;
+    const ar = a.file_name || '';
+    const br = b.file_name || '';
+    return ar < br ? -1 : ar > br ? 1 : 0;
   });
 }
 

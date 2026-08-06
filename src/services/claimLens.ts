@@ -651,9 +651,12 @@ export const CLAIM_LENSES: LensDef[] = [
     // cross-worker aggregate coverage ("nothing on file for anyone else at this facility") needs
     // multi-intake data — a later slice.
     elements: [
-      { name: 'This worker’s own violation material, by Labor Code section',
+      // Label LOCATES material the worker ties to Labor Code sections — it never CHARACTERIZES it
+      // as a violation (verb test; "violation" is on the banned-vocabulary list this codebase
+      // enforces everywhere else).
+      { name: 'This worker’s own material, by Labor Code section',
         patterns: p('wage statement', 'pay ?stub', '\\b226\\b', '\\bmeal', 'rest (period|break)', 'overtime', '\\b510\\b', 'reimburs', '\\b2802\\b', 'final pay', 'waiting time', 'minimum wage', 'off the clock'),
-        absence: 'No Labor Code violation material for this worker appears in the record.' },
+        absence: 'No material referencing a Labor Code section appears in this worker’s record.' },
       { name: 'Workforce-wide material',
         patterns: p('other (employee|worker)s?', 'all (employees|staff|workers)', 'everyone', 'company (policy|wide)', 'same (policy|practice)', 'facility', 'across the'),
         absence: 'No material applying to other workers or the workforce as a whole appears in the record.' },
@@ -836,6 +839,46 @@ export function buildClaimLensView(lensId: string, input: ClaimLensInput): Claim
   return { title: lens.title, tally, coverage, elements };
 }
 
+/**
+ * Cross-lens ranking guard — the conservative fix for wage-lens keyword over-inclusion.
+ *
+ * The final-pay lens lights up from facts every terminated worker has (a termination event, a
+ * routine final paycheck), so on keyword presence alone it can out-rank the theory the record is
+ * actually about — a pregnancy-retaliation record presented "strongest" as a final-paycheck
+ * matter. Element matching stays intentionally over-inclusive INSIDE a lens (see header note);
+ * the cross-lens "strongest-covered theory" comparison is where over-inclusion misleads.
+ *
+ * Rule: a lens listed here participates in the cross-lens "strongest" comparison only when the
+ * record carries a CONCRETE pay-gap fact — late/missing final pay, unpaid amounts, missed
+ * meal/rest breaks or premium gaps, off-the-clock work — from extracted document facts, quotes,
+ * or the worker's own words. Keyword presence alone (a paystub exists, a termination happened)
+ * is not enough. The lens itself still builds and displays in its own tab either way.
+ */
+const RANKING_GATED_WAGE_LENSES = new Set<string>(['final_pay']);
+
+const CONCRETE_PAY_GAP_PATTERNS: RegExp[] = [
+  /\bunpaid\b|\bnot paid\b|never paid|\bowed\b|still owe|missing (wage|pay|paycheck|premium)/i,
+  /no overtime( pay| rate)?\b|without (a )?(matching )?overtime rate|straight[- ]time (for|only)/i,
+  /off the clock/i,
+  /wage theft/i,
+  /missed (meal|rest|break)|no (meal|rest) (break|period)|never (got|took|received) a[^.]{0,40}break|skipped (meal|rest|break)/i,
+  /(meal|rest|break)[^.]{0,30}premium|premium[^.]{0,30}(meal|rest|break)/i,
+  /final (check|pay|paycheck|wages?)[^.]{0,60}(late\b|never|not (received|paid|arrived)|missing|didn.t (come|arrive)|days? (after|late))/i,
+  /waiting[- ]time/i,
+];
+
+/**
+ * Whether a lens may participate in the cross-lens "strongest-covered theory" comparison for this
+ * record. Always true except for the ranking-gated wage lenses above, which additionally need a
+ * concrete pay-gap fact somewhere in the collected facts. Ineligible lenses still display in
+ * their own tab with full element detail — this gates only the cross-lens comparison.
+ */
+export function lensEligibleForStrongestRanking(lensId: string, input: ClaimLensInput): boolean {
+  if (!RANKING_GATED_WAGE_LENSES.has(lensId)) return true;
+  const facts = collectFacts(input);
+  return facts.some((f) => CONCRETE_PAY_GAP_PATTERNS.some((re) => re.test(f.text)));
+}
+
 /** Layer 0 — the lens-independent flag row. Pure existence facts — no legal judgment. */
 export function buildExistenceChecks(input: ClaimLensInput): ExistenceCheck[] {
   const allText = norm(
@@ -856,7 +899,25 @@ export function buildExistenceChecks(input: ClaimLensInput): ExistenceCheck[] {
   // start date as unconfirmed).
   const hasDates = has('employment dates', 'start date', 'date of hire', 'offer letter', 'hire date') ||
     fileCount(/offer[_\s-]?letter/i) > 0;
-  const hasSeparation = has('terminat', 'separation', 'final pay') || fileCount(/terminat|separation/i) > 0;
+  // Separation date — the timeline is the single source of truth when it carries a
+  // separation-categorized (or termination-titled) dated event; keyword scanning is only the
+  // fallback. This is what keeps the flag row from contradicting the timeline it sits next to
+  // (e.g. a termination communicated by text whose event title is generic "Employment and HR
+  // paperwork" — the event's Separation Records category still establishes the date is on file).
+  const SEPARATIONISH = /terminat|separation|employment end|final day|last day|fired|let go|laid off|dismiss/i;
+  const separationEvent = input.events.find(
+    (e) => !isClusterEvent(e.title) && (SEPARATIONISH.test(String(e.category ?? '')) || SEPARATIONISH.test(e.title))
+  );
+  const separationEventDate = (separationEvent?.date ?? '').trim();
+  const hasSeparation =
+    Boolean(separationEvent) ||
+    has('terminat', 'separation', 'final pay', 'fired', 'let go', 'laid off', 'dismissed', 'last day', 'employment ended') ||
+    fileCount(/terminat|separation/i) > 0;
+  const separationValue = hasSeparation
+    ? /\d{4}/.test(separationEventDate)
+      ? `On file — ${separationEventDate}`
+      : 'On file'
+    : 'Not on file';
   const hasEeoc = has('eeoc');
   const hasLwda = has('lwda', 'paga notice');
   const hasArb = has('arbitrat');
@@ -873,7 +934,7 @@ export function buildExistenceChecks(input: ClaimLensInput): ExistenceCheck[] {
     { label: 'EEOC charge', value: hasEeoc ? 'Referenced' : 'Not on file', present: hasEeoc, note: 'not addressed in intake' },
     { label: 'LWDA / PAGA notice', value: hasLwda ? 'Referenced' : 'Not on file', present: hasLwda, note: 'not addressed in intake' },
     { label: 'Wage statements', value: wageCount > 0 ? `${wageCount} on file` : 'Not on file', present: wageCount > 0, note: wageCount > 0 ? '' : 'not addressed in intake' },
-    { label: 'Separation date', value: hasSeparation ? 'On file' : 'Not on file', present: hasSeparation, note: hasSeparation ? '' : 'not addressed in intake' },
+    { label: 'Separation date', value: separationValue, present: hasSeparation, note: hasSeparation ? '' : 'not addressed in intake' },
     { label: 'Damages material', value: hasDamages ? 'Referenced' : 'Not on file', present: hasDamages, note: 'not addressed in intake' },
     { label: 'Prior claims / agreements', value: hasPrior ? 'Referenced' : 'Not on file', present: hasPrior, note: 'not addressed in intake' },
   ];
