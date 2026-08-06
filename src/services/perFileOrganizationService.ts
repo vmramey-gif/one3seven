@@ -360,20 +360,86 @@ function buildSingleFileRecord(
   };
 }
 
+/**
+ * Corporate markers that make an entry an ORGANIZATION, not a named individual. Live Francis
+ * bug: "Huseby and Esquire Deposition Solutions" was listed among named people as a Human
+ * Resources Representative. Organization strings stay out of the people index entirely
+ * (file records and the employer metadata path are unaffected).
+ */
+const ORGANIZATION_NAME_MARKER_RE =
+  /\b(?:llc|inc|incorporated|corp|corporation|company|companies|ltd|llp|lp|plc|pllc|solutions|services|holdings|enterprises|industries|associates|partners|partnership|agency|staffing|consulting|depositions?|reporting|global)\b|\bl\.l\.c\b|\binc\.|\bcorp\.|\bco\./i;
+
+/** True when a people-index candidate reads as an organization rather than an individual. */
+export function isLikelyOrganizationName(entry: string): boolean {
+  return ORGANIZATION_NAME_MARKER_RE.test(entry);
+}
+
+/** Lowercased, accent-stripped word tokens of a display name (parentheticals dropped). */
+function personNameTokens(name: string): string[] {
+  return name
+    .normalize('NFKD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .replace(/\([^)]*\)/g, ' ')
+    .replace(/[^a-z]+/g, ' ')
+    .trim()
+    .split(/\s+/)
+    .filter((t) => t.length >= 2);
+}
+
+/**
+ * True when a people-index candidate is the worker's OWN name in any order or variant:
+ * "FRANCIS, ALEXIA" == "ALEXIA FRANCIS" == "Alexia S. Francis" for worker "Alexia Francis",
+ * and partial-token variants ("Daniela Reyes" for "Daniela Reyes-Okafor"). The worker is the
+ * subject of the record set, not a person named IN it — live Francis bug listed her twice,
+ * in two name orders, as a "Coworker".
+ */
+export function isWorkerOwnNameEntry(
+  entry: string,
+  workerDisplayName: string | null | undefined
+): boolean {
+  const workerTokens = personNameTokens(workerDisplayName ?? '');
+  if (workerTokens.length < 2) return false;
+  const entryTokens = personNameTokens(entry);
+  if (entryTokens.length < 2) return false;
+  const entrySet = new Set(entryTokens);
+  const first = workerTokens[0];
+  const last = workerTokens[workerTokens.length - 1];
+  if (entrySet.has(first) && entrySet.has(last)) return true;
+  const workerSet = new Set(workerTokens);
+  return entryTokens.every((t) => workerSet.has(t));
+}
+
+/** Order-insensitive dedupe key: "Rojas, Maryandreina" and "Maryandreina Rojas" collide. */
+function nameOrderDedupKey(entry: string): string {
+  const key = personNameTokens(entry).sort().join(' ');
+  return key || entry.trim().toLowerCase();
+}
+
 export function buildPeopleIndexFromFileRecords(
-  records: IntakeFileOrganizationRecord[]
+  records: IntakeFileOrganizationRecord[],
+  workerDisplayName?: string | null
 ): string[] {
-  const seen = new Set<string>();
-  const rawPeople: string[] = [];
+  // Hygiene happens on the RAW names (before role suffixes are appended): the worker's own
+  // name is excluded in any order, organization strings are dropped, and name-order variants
+  // ("Last, First" vs "First Last") collapse to one entry — preferring the "First Last" form.
+  const byKey = new Map<string, string>();
+  const keyOrder: string[] = [];
   for (const r of records) {
     for (const person of r.people_or_entities) {
-      const key = person.toLowerCase();
-      if (!seen.has(key)) {
-        seen.add(key);
-        rawPeople.push(person);
+      if (isWorkerOwnNameEntry(person, workerDisplayName)) continue;
+      if (isLikelyOrganizationName(person)) continue;
+      const key = nameOrderDedupKey(person);
+      const existing = byKey.get(key);
+      if (!existing) {
+        byKey.set(key, person);
+        keyOrder.push(key);
+        continue;
       }
+      if (existing.includes(',') && !person.includes(',')) byKey.set(key, person);
     }
   }
+  const rawPeople = keyOrder.map((k) => byKey.get(k) as string);
 
   const contexts = records.map((r) =>
     [
@@ -404,13 +470,14 @@ export function buildPeopleIndexFromFileRecords(
  */
 export function buildPerFileOrganizationRecords(
   filesMeta: PerFileOrganizationMeta[],
-  completedExtractions: DocumentGroundedFileInput[] = []
+  completedExtractions: DocumentGroundedFileInput[] = [],
+  opts?: { workerDisplayName?: string | null }
 ): { fileRecords: IntakeFileOrganizationRecord[]; peopleIndex: string[] } {
   const fileRecords = filesMeta.map((meta) =>
     buildSingleFileRecord(meta, matchExtraction(meta, completedExtractions))
   );
   return {
     fileRecords,
-    peopleIndex: buildPeopleIndexFromFileRecords(fileRecords),
+    peopleIndex: buildPeopleIndexFromFileRecords(fileRecords, opts?.workerDisplayName),
   };
 }

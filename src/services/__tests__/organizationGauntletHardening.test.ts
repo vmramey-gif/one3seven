@@ -1,8 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import {
+  buildPeopleIndexFromFileRecords,
   buildPerFileOrganizationRecords,
   collectPeopleFromDocumentFacts,
 } from '../perFileOrganizationService';
+import { buildDocumentGroundedOrganization } from '../documentGroundedOrganizationService';
 import { assessEmployerRecordCoverage } from '../caEmployerRecordRequirements';
 import { buildEvidenceMappedTimelineEvents } from '../evidenceMappedTimelineService';
 import {
@@ -384,12 +386,14 @@ describe('termination-title guard (title-selection chokepoint)', () => {
 });
 
 describe('order-independent cluster dates', () => {
+  // (Formerly used W2-named fixtures; tax forms are now excluded from the timeline entirely,
+  // so the date-determinism behavior is pinned with ordinary payroll summaries instead.)
   const undated = () =>
     rec({ id: 'c', fileName: 'wage_summary.pdf', topics: ['Payroll and wages'] });
-  const w2a = () =>
-    rec({ id: 'a', fileName: 'w2_form_a.pdf', topics: ['Payroll and wages'], likelyDate: '2024' });
-  const w2b = () =>
-    rec({ id: 'b', fileName: 'w2_form_b.pdf', topics: ['Payroll and wages'], likelyDate: '2023' });
+  const batchA = () =>
+    rec({ id: 'a', fileName: 'earnings_summary_a.pdf', topics: ['Payroll and wages'], likelyDate: '2024' });
+  const batchB = () =>
+    rec({ id: 'b', fileName: 'earnings_summary_b.pdf', topics: ['Payroll and wages'], likelyDate: '2023' });
 
   const runDates = (records: IntakeFileOrganizationRecord[], documentDates?: Record<string, string>) =>
     buildEvidenceMappedTimelineEvents({ fileRecords: records, documentDates })
@@ -397,8 +401,8 @@ describe('order-independent cluster dates', () => {
       .sort();
 
   it('a mixed-date cluster resolves to the earliest parseable date regardless of file order', () => {
-    const order1 = runDates([undated(), w2a(), w2b()]);
-    const order2 = runDates([undated(), w2b(), w2a()]);
+    const order1 = runDates([undated(), batchA(), batchB()]);
+    const order2 = runDates([undated(), batchB(), batchA()]);
     expect(order1).toEqual(order2);
     expect(order1.join(' ')).toContain('2023|');
     expect(order1.join(' ')).not.toContain('2024|');
@@ -406,10 +410,102 @@ describe('order-independent cluster dates', () => {
 
   it('an authoritative extraction-stored document date beats earlier text-mined dates, in any order', () => {
     const documentDates = { a: '03/14/2025' };
-    const order1 = runDates([undated(), w2a(), w2b()], documentDates);
-    const order2 = runDates([undated(), w2b(), w2a()], documentDates);
+    const order1 = runDates([undated(), batchA(), batchB()], documentDates);
+    const order2 = runDates([undated(), batchB(), batchA()], documentDates);
     expect(order1).toEqual(order2);
     expect(order1.some((d) => d.startsWith('03/14/2025|'))).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Live-run residual (2026-08-05) — tax forms are tax-year payroll context, not
+// events: a W2/1099 must never produce or support a timeline event, and a bare
+// filename-year must not anchor a keyword-inferred title.
+// ---------------------------------------------------------------------------
+
+describe('tax forms never seed or support timeline events', () => {
+  const w2 = (id: string, year: string) =>
+    rec({
+      id,
+      fileName: `Rivera ${year} W2.pdf`,
+      category: 'Pay Records / Payroll',
+      // The live bug: W2 boilerplate wording pulled scheduling-ish topics, and the
+      // filename-year cluster inherited "Schedule change documented".
+      topics: ['Payroll and wage records', 'Scheduling and timekeeping'],
+    });
+
+  it('W2-only record sets produce no timeline events at all (no phantom "Schedule change")', () => {
+    const events = buildEvidenceMappedTimelineEvents({
+      fileRecords: [w2('w2-2023', '2023'), w2('w2-2024', '2024')],
+    });
+    expect(events).toEqual([]);
+  });
+
+  it('W2 files never appear as supporting records for other events', () => {
+    const events = buildEvidenceMappedTimelineEvents({
+      fileRecords: [
+        rec({
+          id: 'stub',
+          fileName: 'pay_stub_march.pdf',
+          category: 'Pay Records / Payroll',
+          topics: ['Payroll and wage records'],
+          likelyDate: '03/14/2025',
+        }),
+        w2('w2-2023', '2023'),
+        w2('w2-2024', '2024'),
+      ],
+    });
+    expect(events.length).toBeGreaterThan(0);
+    for (const e of events) {
+      expect(e.supporting_file_names.join(' ')).not.toMatch(/w-?2/i);
+      expect(e.title).not.toBe('Schedule change documented');
+    }
+  });
+
+  it('a facts-identified tax form (renamed scan) is excluded via taxFormFileIds', () => {
+    const events = buildEvidenceMappedTimelineEvents({
+      fileRecords: [
+        rec({
+          id: 'scan-1',
+          fileName: 'scan_0042.pdf', // renamed — filename alone gives no tax signal
+          category: 'Pay Records / Payroll',
+          topics: ['Payroll and wage records', 'Scheduling and timekeeping'],
+        }),
+      ],
+      taxFormFileIds: new Set(['scan-1']),
+    });
+    expect(events).toEqual([]);
+  });
+
+  it('1099 filenames are treated as tax forms too', () => {
+    const events = buildEvidenceMappedTimelineEvents({
+      fileRecords: [
+        rec({
+          id: 'ten99',
+          fileName: '1099-NEC 2024 Rivera.pdf',
+          category: 'Pay Records / Payroll',
+          topics: ['Payroll and wage records'],
+        }),
+      ],
+    });
+    expect(events).toEqual([]);
+  });
+
+  it('a bare filename-year on a non-tax file cannot anchor a keyword-inferred title', () => {
+    const events = buildEvidenceMappedTimelineEvents({
+      fileRecords: [
+        rec({
+          id: 'photos',
+          fileName: 'team photos 2023.pdf', // bare-year filename token, no other date
+          category: null,
+          topics: ['Scheduling and timekeeping'], // keyword map would say "Schedule change"
+        }),
+      ],
+    });
+    expect(events.length).toBe(1);
+    expect(events[0]?.date).toBe('2023'); // the year still dates the row…
+    expect(events[0]?.title).not.toBe('Schedule change documented'); // …but cannot title it
+    expect(events[0]?.title).toBe('Supporting employment documentation');
   });
 });
 
@@ -499,5 +595,90 @@ describe('supporting-record selection', () => {
     );
     expect(prepared.supportingUploads.length).toBe(1);
     expect(prepared.supportingUploads[0].toLowerCase()).toContain('booklet');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Live-run residual (2026-08-05) — people-index hygiene: the worker's own name
+// (any order/variant) and organization strings never appear among named
+// individuals, and name-order variants collapse to one entry.
+// ---------------------------------------------------------------------------
+
+describe('people-index hygiene (self, organizations, name-order variants)', () => {
+  const recordWithPeople = (id: string, people: string[]) =>
+    ({
+      ...rec({ id, fileName: `${id}.pdf`, category: 'Workplace Communications' }),
+      people_or_entities: people,
+    });
+
+  it("excludes the worker's own name in any order, case, or middle-name variant", () => {
+    const index = buildPeopleIndexFromFileRecords(
+      [
+        recordWithPeople('f1', ['KIMURA, DANA', 'Priya Shah']),
+        recordWithPeople('f2', ['DANA KIMURA', 'Dana R. Kimura', 'Dana Renee Kimura', 'Rob Pacheco']),
+      ],
+      'Dana Kimura'
+    );
+    const blob = index.join(' | ').toLowerCase();
+    expect(blob).not.toMatch(/kimura/);
+    expect(blob).toContain('priya shah');
+    expect(blob).toContain('rob pacheco');
+  });
+
+  it('filters organization strings (LLC / Inc / Solutions / Deposition / "X and Y" org names)', () => {
+    const index = buildPeopleIndexFromFileRecords(
+      [
+        recordWithPeople('f1', [
+          'Acme Logistics, LLC',
+          'Zenith Staffing Inc.',
+          'Acme and Zenith Deposition Solutions',
+          'Priya Shah',
+        ]),
+      ],
+      null
+    );
+    const blob = index.join(' | ').toLowerCase();
+    expect(blob).not.toContain('llc');
+    expect(blob).not.toContain('inc');
+    expect(blob).not.toContain('solutions');
+    expect(blob).toContain('priya shah');
+  });
+
+  it('collapses "Last, First" and "First Last" to one entry, preferring "First Last"', () => {
+    const index = buildPeopleIndexFromFileRecords(
+      [
+        recordWithPeople('f1', ['Shah, Priya']),
+        recordWithPeople('f2', ['Priya Shah', 'Rob Pacheco']),
+      ],
+      null
+    );
+    const shahEntries = index.filter((p) => /shah/i.test(p));
+    expect(shahEntries).toHaveLength(1);
+    expect(shahEntries[0]).toMatch(/^Priya Shah/);
+  });
+
+  it('end-to-end: the grounded organization reads the worker name from the mining context', () => {
+    const org = buildDocumentGroundedOrganization(
+      [{ uploadedFileId: 'f1', fileName: 'hr_email_thread.pdf', category: 'Workplace Communications' }],
+      [
+        {
+          uploadedFileId: 'f1',
+          fileName: 'hr_email_thread.pdf',
+          category: 'Workplace Communications',
+          extractedText:
+            'From: Priya Shah\nTo: Dana Kimura\nDate: March 4, 2025\nSubject: Schedule question\nFollowing up on the schedule question.',
+          documentFacts: {
+            people_mentioned: ['DANA KIMURA', 'Kimura, Dana', 'Priya Shah'],
+            communication_parties: [],
+          },
+        },
+      ],
+      'Worker describes scheduling concerns.\nFull name used during employment: Dana Kimura',
+      {}
+    );
+    expect(org).not.toBeNull();
+    const blob = (org?.peopleIndex ?? []).join(' | ').toLowerCase();
+    expect(blob).not.toMatch(/kimura/);
+    expect(blob).toContain('priya shah');
   });
 });

@@ -221,6 +221,20 @@ function reviewTopicPhraseFromCorpus(lower: string): string | null {
 }
 
 /**
+ * The worker's own name as it appears in the mining context: the story follow-up carries it
+ * both raw ("employment_name:Alexia Francis") and formatted ("Full name used during
+ * employment: Alexia Francis"). Used to keep the worker out of the named-individuals index —
+ * she is the subject of the record set, not a person named in it.
+ */
+const WORKER_NAME_CONTEXT_RE =
+  /^\s*(?:employment_name:|full name used during employment:)\s*(\S[^\n]*)$/im;
+
+function workerNameFromMiningContext(context: string | null | undefined): string | null {
+  const name = (context ?? '').match(WORKER_NAME_CONTEXT_RE)?.[1]?.trim() ?? '';
+  return name.length >= 3 && name.length <= 80 ? name : null;
+}
+
+/**
  * Returns null when there is no completed extracted text to ground on (caller should use placeholder).
  */
 export function buildDocumentGroundedOrganization(
@@ -271,7 +285,8 @@ export function buildDocumentGroundedOrganization(
 
   const { fileRecords, peopleIndex } = buildPerFileOrganizationRecords(
     filesMeta,
-    completedExtractions
+    completedExtractions,
+    { workerDisplayName: workerNameFromMiningContext(workerProvidedContextForMining) }
   );
 
   const helpfulRecords = buildHelpfulRecordSuggestions(

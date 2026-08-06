@@ -48,19 +48,47 @@ export type BuildEvidenceTimelineOpts = {
    * authoritative for that file's event date; otherwise the text-mined date stands.
    */
   documentDates?: Record<string, string | null | undefined>;
+  /**
+   * uploadedFileIds whose extraction facts identify the file as a tax form (see
+   * TAX_FORM_FILENAME_RE / TAX_FORM_FACTS_RE); merged with filename detection.
+   */
+  taxFormFileIds?: ReadonlySet<string>;
 };
+
+/**
+ * HARD GUARD — tax forms (W-2 / W-2c / 1099 family). A tax form is TAX-YEAR PAYROLL CONTEXT,
+ * not a dated workplace occurrence: its filename year is the tax year and its facts carry no
+ * document_date. Live Francis bug: the two W2s fell into a bare "2023" filename-year cluster
+ * that inherited "Schedule change documented" from unrelated topic keywords ("hours" wording
+ * inside the form's boilerplate). Tax forms never seed or support timeline events — they stay
+ * in file records, the inventory, and the coverage rail, where their tax-year context lives.
+ */
+export const TAX_FORM_FILENAME_RE =
+  /\bw-?2c?\b|\b1099(?:[-_ ]?[a-z]{1,4})?\b|wage and tax statement/i;
+/** Facts-side signal (document type / key quote): explicit form phrasing only. */
+export const TAX_FORM_FACTS_RE =
+  /\bform\s+w-?2c?\b|\bform\s+1099\b|wage and tax statement/i;
+
+/** Titles whose keyword-map origin makes a bare filename-year an untrustworthy anchor. */
+const BARE_YEAR_DATE_RE = /^(19|20)\d{2}$/;
 
 type TimelineCluster = {
   dateKey: string;
   topicKey: string;
   files: IntakeFileOrganizationRecord[];
   eventTitle?: string;
+  eventTitleSource?: EventCandidateSource;
 };
+
+/** Where a cluster title candidate came from — filename/communication candidates are anchored
+ *  to a specific document signal; topics/inferred candidates are keyword-derived. */
+type EventCandidateSource = 'filename' | 'communication' | 'topics' | 'inferred';
 
 type EventCandidate = {
   title: string;
   key: string;
   rank: number;
+  source?: EventCandidateSource;
 };
 
 function normalizeDateKey(likelyDate: string | null | undefined): string {
@@ -277,13 +305,15 @@ function bestEventCandidateForRecord(
   const wName = record.file_name.toLowerCase();
   const wTopics = record.employment_topics.join(' ').toLowerCase();
   if (/(^|_|\s)witness(es)?(_|\s|\.|$)/.test(wName) || /\bwitness\b/.test(wTopics)) {
-    return candidate('Witness statement provided', 200);
+    return { ...candidate('Witness statement provided', 200), source: 'filename' };
   }
+  const tagged = (c: EventCandidate | null, source: EventCandidateSource): EventCandidate | null =>
+    c ? { ...c, source } : null;
   const candidates = [
-    eventCandidateFromFilename(record),
-    eventCandidateFromCommunication(record, commFact),
-    eventCandidateFromTopics(record),
-    eventCandidateFromPossibleTimelineEvent(record),
+    tagged(eventCandidateFromFilename(record), 'filename'),
+    tagged(eventCandidateFromCommunication(record, commFact), 'communication'),
+    tagged(eventCandidateFromTopics(record), 'topics'),
+    tagged(eventCandidateFromPossibleTimelineEvent(record), 'inferred'),
   ].filter(Boolean) as EventCandidate[];
   candidates.sort((a, b) => b.rank - a.rank);
   return candidates[0] ?? null;
@@ -313,7 +343,7 @@ function buildEventFirstClusters(
         : null);
 
     if (!target) {
-      target = { dateKey, topicKey, files: [], eventTitle: event.title };
+      target = { dateKey, topicKey, files: [], eventTitle: event.title, eventTitleSource: event.source };
       clusters.push(target);
     }
     target.files.push(record);
@@ -644,7 +674,7 @@ function clusterDateFromFilenames(files: IntakeFileOrganizationRecord[]): string
 function clusterDate(
   files: IntakeFileOrganizationRecord[],
   authoritativeDateIds: ReadonlySet<string> = new Set()
-): string {
+): { label: string; source: 'authoritative' | 'likely' | 'event' | 'filename' | 'none' } {
   const validLikely = (f: IntakeFileOrganizationRecord) => {
     const d = (f.likely_date ?? '').trim();
     return d && d !== DATE_UNCLEAR_LABEL ? d : null;
@@ -654,17 +684,20 @@ function clusterDate(
     .filter((f) => authoritativeDateIds.has(f.source_file_id))
     .map(validLikely)
     .filter((d): d is string => Boolean(d));
-  if (authoritative.length) return pickClusterDateLabel(authoritative);
+  if (authoritative.length) {
+    return { label: pickClusterDateLabel(authoritative), source: 'authoritative' };
+  }
 
   const likely = files.map(validLikely).filter((d): d is string => Boolean(d));
-  if (likely.length) return pickClusterDateLabel(likely);
+  if (likely.length) return { label: pickClusterDateLabel(likely), source: 'likely' };
 
   const eventDates = files
     .map((f) => f.possible_timeline_event?.date?.trim())
     .filter((d): d is string => Boolean(d && d !== DATE_UNCLEAR_LABEL));
-  if (eventDates.length) return pickClusterDateLabel(eventDates);
+  if (eventDates.length) return { label: pickClusterDateLabel(eventDates), source: 'event' };
 
-  return clusterDateFromFilenames(files);
+  const fromFilenames = clusterDateFromFilenames(files);
+  return { label: fromFilenames, source: fromFilenames ? 'filename' : 'none' };
 }
 
 function readableSupportingFiles(files: IntakeFileOrganizationRecord[]): IntakeFileOrganizationRecord[] {
@@ -886,11 +919,27 @@ function clusterToEvent(
   authoritativeDateIds: ReadonlySet<string> = new Set()
 ): EvidenceMappedTimelineEvent {
   const { files } = cluster;
-  const date = clusterDate(files, authoritativeDateIds);
-  const baseTitle = guardTerminationTitle(
+  const dateInfo = clusterDate(files, authoritativeDateIds);
+  const date = dateInfo.label;
+  let baseTitle = guardTerminationTitle(
     cluster.eventTitle ?? neutralClusterTitle(files, commFacts),
     files
   );
+  // HARD GUARD — a bare filename-year ("2023") is period context, not a dated occurrence: it
+  // must not anchor a keyword-inferred title (topic keywords or fallback inference). Titles
+  // anchored to a document signal (filename event patterns, communication subjects) keep their
+  // title. Live Francis bug: a filename-year cluster was titled "Schedule change documented"
+  // from unrelated category keywords.
+  const titleSource: EventCandidateSource = cluster.eventTitle
+    ? cluster.eventTitleSource ?? 'inferred'
+    : 'inferred';
+  if (
+    dateInfo.source === 'filename' &&
+    BARE_YEAR_DATE_RE.test(date) &&
+    (titleSource === 'topics' || titleSource === 'inferred')
+  ) {
+    baseTitle = NEUTRAL_SEPARATION_FALLBACK_TITLE;
+  }
   const supportingReadable = readableSupportingFiles(files);
   const supportingAll = files;
   const supportingIds = supportingAll.map((f) => f.source_file_id).filter(Boolean);
@@ -944,9 +993,20 @@ export function buildEvidenceMappedTimelineEvents(
     return { ...record, likely_date: docDate };
   });
 
-  const eventFirstClusters = buildEventFirstClusters(records, commFacts);
+  // Tax forms never seed or support timeline events (see TAX_FORM_FILENAME_RE). Their
+  // filename year is a tax year, so any cluster they anchored would carry a phantom date
+  // and an unrelated keyword title (live Francis bug: "2023 — Schedule change documented"
+  // supported only by the two W2s). They remain in file records/inventory/coverage.
+  const factsTaxIds = opts.taxFormFileIds ?? new Set<string>();
+  const timelineRecords = records.filter(
+    (record) =>
+      !factsTaxIds.has(record.source_file_id) && !TAX_FORM_FILENAME_RE.test(record.file_name)
+  );
+  if (!timelineRecords.length) return [];
+
+  const eventFirstClusters = buildEventFirstClusters(timelineRecords, commFacts);
   const clusteredIds = new Set(eventFirstClusters.flatMap((c) => c.files.map((f) => f.source_file_id)));
-  const fallbackRecords = records.filter((record) => !clusteredIds.has(record.source_file_id));
+  const fallbackRecords = timelineRecords.filter((record) => !clusteredIds.has(record.source_file_id));
   const clusters = [...eventFirstClusters, ...clusterRecords(fallbackRecords)];
   const events = clusters.map((c) => clusterToEvent(c, payFacts, commFacts, authoritativeDateIds));
 

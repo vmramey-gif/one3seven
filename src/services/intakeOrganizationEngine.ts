@@ -5,6 +5,8 @@
 import {
   buildEvidenceMappedTimelineEvents,
   evidenceTimelineToOrganizationEvents,
+  TAX_FORM_FACTS_RE,
+  TAX_FORM_FILENAME_RE,
 } from './evidenceMappedTimelineService';
 import {
   extractCommunicationFacts,
@@ -83,11 +85,35 @@ export function applyEvidenceMappedOrganization(
     }
   }
 
+  // Tax forms (W-2/1099) are tax-year payroll context, never timeline events. Detected by
+  // filename (row + facts-stored file_name) or explicit form phrasing in the extraction's
+  // document type / key quote, so a renamed scan of a W2 is still recognized.
+  const taxFormFileIds = new Set<string>();
+  for (const row of extractions) {
+    const facts = (row.documentFacts ?? null) as {
+      document_type?: unknown;
+      key_quote?: unknown;
+      file_name?: unknown;
+    } | null;
+    const factsFileName = typeof facts?.file_name === 'string' ? facts.file_name : '';
+    const factsTypeSignal = [facts?.document_type, facts?.key_quote]
+      .filter((v): v is string => typeof v === 'string')
+      .join(' ');
+    if (
+      TAX_FORM_FILENAME_RE.test(row.fileName) ||
+      (factsFileName && TAX_FORM_FILENAME_RE.test(factsFileName)) ||
+      (factsTypeSignal && TAX_FORM_FACTS_RE.test(factsTypeSignal))
+    ) {
+      taxFormFileIds.add(row.uploadedFileId);
+    }
+  }
+
   const evidenceTimeline = buildEvidenceMappedTimelineEvents({
     fileRecords: opts.fileRecords,
     payFacts,
     commFacts,
     documentDates,
+    taxFormFileIds,
   });
   const timelineEvents = evidenceTimelineToOrganizationEvents(evidenceTimeline);
   const sections = buildIntakeOrganizationSections({
