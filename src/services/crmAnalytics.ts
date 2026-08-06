@@ -3,24 +3,31 @@
  */
 import type { CrmFirm } from './crmService';
 
-/** Representative per-account MONTHLY MRR by tier (per-seat model, 2026-07-28 reprice).
- *  Practice = $400/seat × ~2 seats; Firm = $375/seat × ~5 seats; Surge = $3,500 flat. Actual MRR
- *  varies with seat count; these are typical-account values for CRM forecast + commission math. */
-export const TIER_PRICES = { practice: 800, firm: 1875, surge: 3500 } as const;
-export type SubscriptionTier = 'practice' | 'firm' | 'surge';
+/** Flat MONTHLY MRR by tier (decided direction 2026-08-06: flat 4-tier model, no per-seat pricing).
+ *  Starter = $350/mo flat (no 8B); Underwriting Low/Mid/High = $1,500/$2,000/$2,500/mo flat (8B
+ *  included), banded by intake volume, not seats. These are the sticker monthly prices — every
+ *  firm on a tier pays the same amount, so no "representative account" estimate is needed. */
+export const TIER_PRICES = {
+  starter: 350,
+  underwriting_low: 1500,
+  underwriting_mid: 2000,
+  underwriting_high: 2500,
+} as const;
+export type SubscriptionTier = 'starter' | 'underwriting_low' | 'underwriting_mid' | 'underwriting_high';
 
 /** Billing cadence per tier. Values above are already monthly MRR, so no annual divisor is applied
- *  (Surge is annual-committed but its monthly-equivalent MRR is the flat $3,500). */
+ *  (annual billing is 2 months free = 10x monthly, same monthly-equivalent MRR). */
 export const TIER_BILLING: Record<SubscriptionTier, 'monthly' | 'annual'> = {
-  practice: 'monthly',
-  firm: 'monthly',
-  surge: 'monthly',
+  starter: 'monthly',
+  underwriting_low: 'monthly',
+  underwriting_mid: 'monthly',
+  underwriting_high: 'monthly',
 };
 
 export const PHASE1_PAYING_TARGET = 3;
 export const PIPELINE_CONVERSION_RATE = 0.3;
 export const COMMISSION_RATE = 0.2;
-const FORECAST_TIER_PRICE = TIER_PRICES.practice; // forecast assumes Practice tier
+const FORECAST_TIER_PRICE = TIER_PRICES.starter; // forecast assumes Starter tier
 
 /**
  * Average firm-estimated minutes saved per intake, across firms that gave an estimate.
@@ -36,9 +43,12 @@ export function avgMinutesSaved(firms: { est_minutes_saved?: number | null }[]):
 }
 
 /** Monthly-recurring-revenue contribution for a tier (annual tiers ÷ 12, rounded).
- *  null/unknown defaults to Practice ($800/mo representative account). For the sticker price use TIER_PRICES. */
+ *  null/unknown defaults to Starter ($350/mo flat). For the sticker price use TIER_PRICES. */
 export function tierPrice(tier: string | null | undefined): number {
-  const t: SubscriptionTier = tier === 'firm' || tier === 'surge' ? tier : 'practice';
+  const t: SubscriptionTier =
+    tier === 'underwriting_low' || tier === 'underwriting_mid' || tier === 'underwriting_high'
+      ? tier
+      : 'starter';
   const sticker = TIER_PRICES[t];
   return TIER_BILLING[t] === 'annual' ? Math.round(sticker / 12) : sticker;
 }
@@ -55,9 +65,9 @@ export interface RevenueSummary {
 /** Current MRR from paid firms + a conservative pipeline forecast. */
 export function computeRevenue(firms: CrmFirm[]): RevenueSummary {
   const paid = firms.filter((f) => f.stage === 'paid');
-  const tiers: SubscriptionTier[] = ['practice', 'firm', 'surge'];
+  const tiers: SubscriptionTier[] = ['starter', 'underwriting_low', 'underwriting_mid', 'underwriting_high'];
   const perTier = tiers.map((tier) => {
-    const count = paid.filter((f) => (f.subscription_tier ?? 'practice') === tier).length;
+    const count = paid.filter((f) => (f.subscription_tier ?? 'starter') === tier).length;
     return { tier, count, mrr: count * tierPrice(tier) };
   });
   const currentMrr = paid.reduce((sum, f) => sum + tierPrice(f.subscription_tier), 0);

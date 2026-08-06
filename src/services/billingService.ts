@@ -1,23 +1,28 @@
 /**
  * one3seven billing service — Stripe via Supabase Edge Functions.
  *
- * Plans (PER-SEAT; core organize/source-link value is identical on every tier; worker never pays):
- *   practice   $400/seat/mo   1–2 seats · ~15 intakes/seat (fair-use) · no 8B wage-exposure
- *   firm       $375/seat/mo   min 3 seats · ~20 intakes/seat (fair-use) · includes 8B · priority
- *   surge      $3,500/mo flat unlimited seats + intakes · 8B · priority · branded packets (a cost CEILING)
- *   enterprise custom         multi-vertical / new packs / multi-state
+ * Plans (FLAT — no per-seat pricing; core organize/source-link value is identical on every tier;
+ * worker never pays). Decided direction 2026-08-06: replaces the old per-seat Practice/Firm/Surge
+ * structure.
+ *   starter             $350/mo flat   1–2 seats (not per-seat priced) · Tier-1 lens only · no 8B
+ *   underwriting_low    $1,500/mo flat unlimited-ish · ≤~15 intakes/mo (soft fair-use) · 8B included
+ *   underwriting_mid    $2,000/mo flat unlimited-ish · ~16–35 intakes/mo (soft fair-use) · 8B included
+ *   underwriting_high   $2,500/mo flat unlimited-ish · ~36+ intakes/mo (soft fair-use) · 8B included
+ *   enterprise          custom         multi-vertical / new packs / multi-state
  *
- * Priced on avoided cost, not a competitor benchmark: a firm underwrites each case by hand at an
- * industry-reported $3,500–$13,000, so these tiers capture well under 15% of the cost removed. Firm
- * is cheaper per-seat than Practice by design (volume discount + it unlocks 8B); Surge is a ceiling
- * that caps a large firm's cost (per-seat crosses $3,500 at ~9 attorneys). See project_pricing memory.
+ * The Underwriting bands are distinguished by intake VOLUME, not seats — `intakesPerMonth` is a
+ * soft fair-use signal for which band a firm should pick, not a hard metered gate (same
+ * "generous fair-use, don't hard-block" policy the old model used).
  *
  * Edge Functions:
  *   create-checkout-session  POST { firmProfileId, priceId } → { url }
  *   create-portal-session    POST { firmProfileId }          → { url }
  *
  * Stripe price IDs are pulled from env vars injected at build time.
- * Set VITE_STRIPE_PRICE_PRACTICE, VITE_STRIPE_PRICE_FIRM, VITE_STRIPE_PRICE_SURGE
+ * Set VITE_STRIPE_PRICE_STARTER_MONTHLY / _ANNUAL,
+ *     VITE_STRIPE_PRICE_UNDERWRITING_LOW_MONTHLY / _ANNUAL,
+ *     VITE_STRIPE_PRICE_UNDERWRITING_MID_MONTHLY / _ANNUAL,
+ *     VITE_STRIPE_PRICE_UNDERWRITING_HIGH_MONTHLY / _ANNUAL
  * in your .env.local and in Vercel/hosting environment variables.
  */
 
@@ -25,15 +30,21 @@ import { supabase } from '../lib/supabaseClient';
 
 // ── Plan definitions ──────────────────────────────────────────────────────────
 
-export type FirmPlanId = 'beta_pilot' | 'practice' | 'firm' | 'surge' | 'enterprise';
+export type FirmPlanId =
+  | 'beta_pilot'
+  | 'starter'
+  | 'underwriting_low'
+  | 'underwriting_mid'
+  | 'underwriting_high'
+  | 'enterprise';
 
 /**
  * ⚠️ COUNSEL GATE — DO NOT FLIP WITHOUT COUNSEL SIGN-OFF. ⚠️
  *
  * Founder-locked doctrine (project_readiness_counsel_gate): readiness-band and wage-exposure
  * surfacing are demo-only (/fire-demo) until counsel signs off. While this flag is false, the
- * section 8B wage-exposure surface FAILS CLOSED for EVERY tier — including Firm/Surge/Enterprise,
- * whose plans list it as an entitlement. The tier entitlement itself is preserved separately in
+ * section 8B wage-exposure surface FAILS CLOSED for EVERY tier — including the Underwriting bands
+ * and Enterprise, whose plans list it as an entitlement. The tier entitlement itself is preserved separately in
  * `firmTierDamagesEntitlement` (and in FIRM_PLANS.includesDamages for pricing display), so
  * flipping this single constant to `true` on counsel sign-off restores the feature to exactly
  * the entitled tiers and nothing else. The /fire-demo and case-facts demo surfaces compute their
@@ -44,22 +55,25 @@ export const DAMAGES_SURFACING_COUNSEL_APPROVED: boolean = false;
 
 /**
  * Tier ENTITLEMENT only — which tiers' plans include the wage-exposure estimate (section 8B)
- * + live source citations once counsel approves surfacing. Firm and above (Firm $375/seat,
- * Surge $3,500 flat, Enterprise) — NOT Practice ($400/seat).
+ * + live source citations once counsel approves surfacing. All three Underwriting bands and
+ * Enterprise — NOT Starter.
  *
- * The legacy names (practice_plus / firm_plus) are still accepted so any firm_profiles row
- * or Stripe metadata written before the tier rename keeps its entitlement; new sales use
- * the current tier ids only.
+ * The legacy tier ids (firm / surge / firm_plus / practice_plus — pre the 2026-08-06 flat-pricing
+ * rename) are still accepted so any firm_profiles row or Stripe metadata written before the rename
+ * keeps its entitlement; new sales use the current tier ids only.
  *
  * This function answers "which tiers pay for the feature" — it deliberately does NOT decide
  * whether the feature may surface. Use `firmTierIncludesDamagesFeature` for that.
  */
 export function firmTierDamagesEntitlement(planId: string | null | undefined): boolean {
   return (
+    planId === 'underwriting_low' ||
+    planId === 'underwriting_mid' ||
+    planId === 'underwriting_high' ||
+    planId === 'enterprise' ||
+    // legacy tier ids (pre 2026-08-06 rename) — kept so existing subscribers don't lose the feature
     planId === 'firm' ||
     planId === 'surge' ||
-    planId === 'enterprise' ||
-    // legacy tier ids (pre-rename) — kept so existing subscribers don't lose the feature
     planId === 'firm_plus' ||
     planId === 'practice_plus'
   );
@@ -79,50 +93,59 @@ export function firmTierIncludesDamagesFeature(planId: string | null | undefined
 export interface FirmPlan {
   id: FirmPlanId;
   label: string;
-  price: number | null;           // headline monthly USD — PER SEAT when perSeat, else flat. null = custom
-  perSeat: boolean;               // true = price is per attorney-seat
-  minSeats: number;               // minimum billable seats (0 = flat plan)
-  intakesPerMonth: number | null; // soft cap (per seat when perSeat); fair-use at launch. null = unlimited
+  monthlyPrice: number | null;    // flat monthly USD. null = custom (Enterprise)
+  annualPrice: number | null;     // flat annual USD (2 months free = 10x monthly). null = custom
+  intakesPerMonth: number | null; // soft fair-use band signal (NOT a hard metered gate). null = unlimited-ish
   includesDamages: boolean;       // Section 8B wage-exposure layer (see firmTierIncludesDamagesFeature)
   highlight: boolean;
-  annualOnly?: boolean;           // billed yearly only (Surge)
-  priceId: string | null;         // Stripe price ID from env
+  monthlyPriceId: string | null;  // Stripe monthly price ID from env
+  annualPriceId: string | null;   // Stripe annual price ID from env
 }
 
 export const FIRM_PLANS: FirmPlan[] = [
   {
-    id: 'practice',
-    label: 'Practice',
-    price: 400,
-    perSeat: true,
-    minSeats: 1,
-    intakesPerMonth: 15,
+    id: 'starter',
+    label: 'Starter',
+    monthlyPrice: 350,
+    annualPrice: 3500,
+    intakesPerMonth: null,
     includesDamages: false,
     highlight: false,
-    priceId: import.meta.env.VITE_STRIPE_PRICE_PRACTICE ?? null,
+    monthlyPriceId: import.meta.env.VITE_STRIPE_PRICE_STARTER_MONTHLY ?? null,
+    annualPriceId: import.meta.env.VITE_STRIPE_PRICE_STARTER_ANNUAL ?? null,
   },
   {
-    id: 'firm',
-    label: 'Firm',
-    price: 375,
-    perSeat: true,
-    minSeats: 3,
-    intakesPerMonth: 20,
+    id: 'underwriting_low',
+    label: 'Underwriting — Low',
+    monthlyPrice: 1500,
+    annualPrice: 15000,
+    intakesPerMonth: 15,
+    includesDamages: true,
+    highlight: false,
+    monthlyPriceId: import.meta.env.VITE_STRIPE_PRICE_UNDERWRITING_LOW_MONTHLY ?? null,
+    annualPriceId: import.meta.env.VITE_STRIPE_PRICE_UNDERWRITING_LOW_ANNUAL ?? null,
+  },
+  {
+    id: 'underwriting_mid',
+    label: 'Underwriting — Mid',
+    monthlyPrice: 2000,
+    annualPrice: 20000,
+    intakesPerMonth: 35,
     includesDamages: true,
     highlight: true,
-    priceId: import.meta.env.VITE_STRIPE_PRICE_FIRM ?? null,
+    monthlyPriceId: import.meta.env.VITE_STRIPE_PRICE_UNDERWRITING_MID_MONTHLY ?? null,
+    annualPriceId: import.meta.env.VITE_STRIPE_PRICE_UNDERWRITING_MID_ANNUAL ?? null,
   },
   {
-    id: 'surge',
-    label: 'Surge',
-    price: 3500,
-    perSeat: false,
-    minSeats: 0,
+    id: 'underwriting_high',
+    label: 'Underwriting — High',
+    monthlyPrice: 2500,
+    annualPrice: 25000,
     intakesPerMonth: null,
     includesDamages: true,
     highlight: false,
-    annualOnly: true,
-    priceId: import.meta.env.VITE_STRIPE_PRICE_SURGE ?? null,
+    monthlyPriceId: import.meta.env.VITE_STRIPE_PRICE_UNDERWRITING_HIGH_MONTHLY ?? null,
+    annualPriceId: import.meta.env.VITE_STRIPE_PRICE_UNDERWRITING_HIGH_ANNUAL ?? null,
   },
 ];
 
@@ -146,11 +169,12 @@ export function getFirmSubscriptionStatus(
   const isPaid = isActive && id !== 'beta_pilot';
 
   const planLabel =
-    id === 'beta_pilot' ? 'Beta Pilot' :
-    id === 'practice'   ? 'Practice' :
-    id === 'firm'       ? 'Firm' :
-    id === 'surge'      ? 'Surge' :
-    id === 'enterprise' ? 'Enterprise' : id;
+    id === 'beta_pilot'         ? 'Beta Pilot' :
+    id === 'starter'            ? 'Starter' :
+    id === 'underwriting_low'   ? 'Underwriting — Low' :
+    id === 'underwriting_mid'   ? 'Underwriting — Mid' :
+    id === 'underwriting_high'  ? 'Underwriting — High' :
+    id === 'enterprise'         ? 'Enterprise' : id;
 
   return { planId: id, subscriptionStatus: status, isActive, isTrial, isPaid, label: planLabel };
 }

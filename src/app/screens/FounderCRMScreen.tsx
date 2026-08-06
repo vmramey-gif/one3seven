@@ -24,8 +24,17 @@ import {
 import {
   computeRevenue, targetColor, dailyTargetsContext, tierPrice, avgMinutesSaved, DAILY_TARGETS, PHASE1_PAYING_TARGET, COMMISSION_RATE, TIER_PRICES,
   firstThreeBonus, commissionProjection, BONUS_LADDER, SPRINT_BONUS,
-  companyEconomics, ECON_DEFAULTS, type EconomicsInput,
+  companyEconomics, ECON_DEFAULTS, type EconomicsInput, type SubscriptionTier,
 } from '../../services/crmAnalytics';
+
+/** Short display labels for the flat 4-tier model — used in the calculator tier pickers below. */
+const TIER_LABELS: Record<SubscriptionTier, string> = {
+  starter: 'Starter',
+  underwriting_low: 'UW Low',
+  underwriting_mid: 'UW Mid',
+  underwriting_high: 'UW High',
+};
+const SUBSCRIPTION_TIERS: readonly SubscriptionTier[] = ['starter', 'underwriting_low', 'underwriting_mid', 'underwriting_high'];
 import { CRM_STAGES, CRM_STAGE_LABELS, type CrmStage } from '../../services/crmStageLogic';
 import { CRM_WEEKLY_TARGETS, CRM_CALL_SCRIPT, CRM_OBJECTIONS, CRM_COLD_EMAIL, CRM_CREDIBILITY, CRM_COMPETITORS, CRM_WHY_AI_LOVE_HATE, CRM_SPECIALTIES, CRM_PARTNERSHIP, CRM_POSITIONING_NORTH_STAR } from '../constants/crmReference';
 import { FIRE_DEMO_TRAINING, PI_RULES, CRM_COMMISSIONS, CRM_SUBSCRIPTION_TIERS, LAUNCH_CHECKLIST } from '../constants/crmTraining';
@@ -1301,7 +1310,7 @@ function CompTab({ firms }: { firms: CrmFirm[] }) {
   const bonus = firstThreeBonus(paidCount);
 
   const [firmCount, setFirmCount] = useState(3);
-  const [tier, setTier] = useState<'practice' | 'firm' | 'surge'>('practice');
+  const [tier, setTier] = useState<SubscriptionTier>('starter');
   const [months, setMonths] = useState(12);
   const calc = commissionProjection({ firmCount, tier, months });
 
@@ -1368,9 +1377,9 @@ function CompTab({ firms }: { firms: CrmFirm[] }) {
           <div>
             <div className="mb-1 text-[12px] font-semibold text-[#1B2623]/70">Tier</div>
             <div className="flex gap-2">
-              {(['practice', 'firm', 'surge'] as const).map((t) => (
-                <button key={t} type="button" onClick={() => setTier(t)} className={`flex-1 rounded-[10px] border px-2 py-2 text-[12px] font-semibold capitalize transition ${tier === t ? 'border-[#42574E] bg-[#42574E] text-white' : 'border-[#D3DED6] text-[#1B2623]/60 hover:border-[#7C8B6F]'}`}>
-                  {t} ${TIER_PRICES[t]}
+              {SUBSCRIPTION_TIERS.map((t) => (
+                <button key={t} type="button" onClick={() => setTier(t)} className={`flex-1 rounded-[10px] border px-2 py-2 text-[12px] font-semibold transition ${tier === t ? 'border-[#42574E] bg-[#42574E] text-white' : 'border-[#D3DED6] text-[#1B2623]/60 hover:border-[#7C8B6F]'}`}>
+                  {TIER_LABELS[t]} ${TIER_PRICES[t]}
                 </button>
               ))}
             </div>
@@ -1394,7 +1403,7 @@ function CompTab({ firms }: { firms: CrmFirm[] }) {
             </div>
           </div>
           <p className="text-[11px] leading-relaxed text-[#1B2623]/45">
-            Illustration only — assumes all firms on the {tier} tier, retained {months} month{months === 1 ? '' : 's'}. The {Math.round(COMMISSION_RATE * 100)}% commission keeps paying every month a firm stays.
+            Illustration only — assumes all firms on the {TIER_LABELS[tier]} tier, retained {months} month{months === 1 ? '' : 's'}. The {Math.round(COMMISSION_RATE * 100)}% commission keeps paying every month a firm stays.
           </p>
         </div>
       </section>
@@ -1408,7 +1417,7 @@ function CompanyEconomicsTab({ firms }: { firms: CrmFirm[] }) {
   const paidCount = firms.filter((f) => f.stage === 'paid').length;
 
   const [firmCount, setFirmCount] = useState(Math.max(3, paidCount));
-  const [tier, setTier] = useState<'practice' | 'firm' | 'surge'>('practice');
+  const [tier, setTier] = useState<SubscriptionTier>('starter');
   const [months, setMonths] = useState(12);
   const [a, setA] = useState({ ...ECON_DEFAULTS });
   const setNum = (k: keyof typeof a) => (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -1444,8 +1453,8 @@ function CompanyEconomicsTab({ firms }: { firms: CrmFirm[] }) {
           <div>
             <div className="mb-1 text-[12px] font-semibold text-[#1B2623]/70">Tier</div>
             <div className="flex gap-2">
-              {(['practice', 'firm', 'surge'] as const).map((t) => (
-                <button key={t} type="button" onClick={() => setTier(t)} className={`flex-1 rounded-[10px] border px-2 py-2 text-[12px] font-semibold capitalize transition ${tier === t ? 'border-[#42574E] bg-[#42574E] text-white' : 'border-[#D3DED6] text-[#1B2623]/60 hover:border-[#7C8B6F]'}`}>{t} ${TIER_PRICES[t]}</button>
+              {SUBSCRIPTION_TIERS.map((t) => (
+                <button key={t} type="button" onClick={() => setTier(t)} className={`flex-1 rounded-[10px] border px-2 py-2 text-[12px] font-semibold transition ${tier === t ? 'border-[#42574E] bg-[#42574E] text-white' : 'border-[#D3DED6] text-[#1B2623]/60 hover:border-[#7C8B6F]'}`}>{TIER_LABELS[t]} ${TIER_PRICES[t]}</button>
               ))}
             </div>
           </div>
@@ -1492,7 +1501,7 @@ function CompanyEconomicsTab({ firms }: { firms: CrmFirm[] }) {
             </div>
           </div>
           <p className="text-[11px] leading-relaxed text-[#1B2623]/45">
-            Illustration only — assumes all firms on the {tier} tier, retained {months} month{months === 1 ? '' : 's'}. Margin improves with scale as fixed infra amortizes. Excludes founder time, counsel, and E&O.
+            Illustration only — assumes all firms on the {TIER_LABELS[tier]} tier, retained {months} month{months === 1 ? '' : 's'}. Margin improves with scale as fixed infra amortizes. Excludes founder time, counsel, and E&O.
           </p>
         </div>
       </section>
@@ -1701,11 +1710,11 @@ function RevenueTab({ firms }: { firms: CrmFirm[] }) {
         <div className="rounded-[16px] border border-[#CBD6CF] bg-[#F7F9F5] p-4">
           <div className="text-[32px] font-black leading-none text-[#42574E]">{usd(r.currentMrr)}<span className="text-[14px] font-semibold text-[#1B2623]/40">/mo</span></div>
           <div className="mt-1 text-[12px] text-[#1B2623]/55">{r.paidCount} paying firm{r.paidCount === 1 ? '' : 's'}</div>
-          <div className="mt-3 grid grid-cols-3 gap-2">
+          <div className="mt-3 grid grid-cols-4 gap-2">
             {r.perTier.map((t) => (
               <div key={t.tier} className="rounded-[10px] border border-[#D3DED6] bg-white px-2 py-2 text-center">
                 <div className="text-[15px] font-black text-[#1B2623]">{t.count}</div>
-                <div className="text-[10px] font-semibold capitalize text-[#1B2623]/55">{t.tier} · ${TIER_PRICES[t.tier]}</div>
+                <div className="text-[10px] font-semibold text-[#1B2623]/55">{TIER_LABELS[t.tier]} · ${TIER_PRICES[t.tier]}</div>
               </div>
             ))}
           </div>
@@ -1717,7 +1726,7 @@ function RevenueTab({ firms }: { firms: CrmFirm[] }) {
         <h2 className="mb-2 text-[14px] font-bold">Pipeline forecast</h2>
         <div className="rounded-[16px] border border-[#D3DED6] bg-white p-4">
           <div className="text-[26px] font-black leading-none text-[#1B2623]">{usd(r.projectedMrr)}<span className="text-[13px] font-semibold text-[#1B2623]/40">/mo</span></div>
-          <div className="mt-1 text-[12px] text-[#1B2623]/55">projected — 30% conversion estimate on {r.candidateCount} pipeline firm{r.candidateCount === 1 ? '' : 's'} at Practice tier</div>
+          <div className="mt-1 text-[12px] text-[#1B2623]/55">projected — 30% conversion estimate on {r.candidateCount} pipeline firm{r.candidateCount === 1 ? '' : 's'} at Starter tier</div>
         </div>
       </section>
 

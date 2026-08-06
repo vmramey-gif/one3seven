@@ -64,8 +64,8 @@ export const LAUNCH_CHECKLIST: { group: string; items: { id: string; label: stri
   {
     group: 'Payments — needed before you can charge firms',
     items: [
-      { id: 'stripe-products', label: 'Create the Stripe prices (PER-SEAT): Practice $400/seat, Firm $375/seat (min 3 seats), Surge $3,500/mo flat', why: 'These are the plans already in the app; Stripe needs matching per-seat (quantity) products to bill them.' },
-      { id: 'stripe-env', label: 'Add the Stripe price IDs to the app settings (env vars)', why: 'VITE_STRIPE_PRICE_PRACTICE / FIRM / SURGE — this “lights up” the paid plans so firms can subscribe.' },
+      { id: 'stripe-products', label: 'Create the Stripe prices (FLAT, monthly + annual): Starter $350/mo, Underwriting Low $1,500/mo, Mid $2,000/mo, High $2,500/mo (annual = 2 months free)', why: 'These are the plans already in the app; Stripe needs matching flat products (no per-seat quantity) to bill them.' },
+      { id: 'stripe-env', label: 'Add the Stripe price IDs to the app settings (env vars)', why: 'VITE_STRIPE_PRICE_STARTER / UNDERWRITING_LOW / UNDERWRITING_MID / UNDERWRITING_HIGH (each _MONTHLY and _ANNUAL) — this “lights up” the paid plans so firms can subscribe.' },
       { id: 'stripe-webhook', label: 'Turn on the payment webhook (stripe-webhook)', why: 'It’s built but not deployed yet. It flips a firm to “paid” automatically after they subscribe.' },
       { id: 'stripe-test', label: 'Test a checkout in Stripe test mode', why: 'Confirm a firm can actually subscribe end-to-end before you go live.' },
     ],
@@ -79,11 +79,14 @@ export const LAUNCH_CHECKLIST: { group: string; items: { id: string; label: stri
   },
 ];
 
-/** What a firm pays — the monthly subscription tiers reps are selling. */
+/** What a firm pays — the flat monthly subscription tiers reps are selling (decided direction
+ *  2026-08-06). Every firm on a tier pays the same flat price — nothing is per-seat. Annual
+ *  billing is 2 months free (10x the monthly price). */
 export const CRM_SUBSCRIPTION_TIERS = [
-  { tier: 'Practice', price: '$400 / seat / month', detail: '1–2 seats · ~15 intakes/seat (fair-use) · full intake engine + all Element Lens packs' },
-  { tier: 'Firm', price: '$375 / seat / month', detail: 'Min 3 seats · ~20 intakes/seat · includes 8B wage-exposure · priority (cheaper per-seat by design)' },
-  { tier: 'Surge', price: '$3,500 / month flat (annual)', detail: 'Unlimited seats + intakes · 8B · dedicated onboarding · firm-branded packets (cost ceiling — beats per-seat past ~9 attorneys)' },
+  { tier: 'Starter', price: '$350 / month flat', detail: '1–2 seats (not per-seat priced) · Tier-1 Element Lens only · no 8B wage-exposure' },
+  { tier: 'Underwriting — Low', price: '$1,500 / month flat', detail: '≤~15 intakes/mo (fair-use) · includes 8B wage-exposure · Tier-1 + Tier-2 lens packs' },
+  { tier: 'Underwriting — Mid', price: '$2,000 / month flat', detail: '~16–35 intakes/mo (fair-use) · includes 8B wage-exposure · Tier-1 + Tier-2 lens packs' },
+  { tier: 'Underwriting — High', price: '$2,500 / month flat', detail: '~36+ intakes/mo (fair-use) · includes 8B wage-exposure · Tier-1 + Tier-2 lens packs' },
   { tier: 'Enterprise', price: 'Custom', detail: 'Contact info@one3seven.com' },
 ];
 
@@ -91,18 +94,19 @@ export const CRM_COMMISSIONS = {
   headline: 'Commission — 20% recurring, every month the firm stays',
   intro:
     '20% recurring monthly commission on every firm you close — paid every month that firm stays active. No salary, no draw, no base. You earn when a firm converts and keep earning every month they stay. Your incentive is tied to retention, not just the close — so you have a reason to make sure the firm actually uses the product and stays.',
-  // Per-seat plans — these are TYPICAL-ACCOUNT figures (Practice ≈ 2 seats × $400 = $800;
-  // Firm ≈ 5 seats × $375 = $1,875; Surge = $3,500 flat). Bigger firms = more seats = more commission.
+  // Flat plans (decided direction 2026-08-06) — every firm on a tier pays the sticker price
+  // exactly, so these are not "typical-account" estimates, they're the actual per-firm commission.
   perTier: [
-    { tier: 'Practice (~2 seats)', price: '$800/mo', perMo: '$160.00/mo', perYr: '$1,920/yr' },
-    { tier: 'Firm (~5 seats)', price: '$1,875/mo', perMo: '$375.00/mo', perYr: '$4,500/yr' },
-    { tier: 'Surge (flat)', price: '$3,500/mo', perMo: '$700.00/mo', perYr: '$8,400/yr' },
+    { tier: 'Starter', price: '$350/mo', perMo: '$70.00/mo', perYr: '$840/yr' },
+    { tier: 'Underwriting — Low', price: '$1,500/mo', perMo: '$300.00/mo', perYr: '$3,600/yr' },
+    { tier: 'Underwriting — Mid', price: '$2,000/mo', perMo: '$400.00/mo', perYr: '$4,800/yr' },
+    { tier: 'Underwriting — High', price: '$2,500/mo', perMo: '$500.00/mo', perYr: '$6,000/yr' },
   ],
   compounding: [
-    { firms: '1 firm', mix: 'Firm (~5 seats, $1,875)', mo: '$375.00', yr: '$4,500' },
-    { firms: '3 firms', mix: '1 Practice + 2 Firm', mo: '$910.00', yr: '$10,920' },
-    { firms: '5 firms', mix: '2 Practice + 2 Firm + 1 Surge', mo: '$1,770.00', yr: '$21,240' },
-    { firms: '10 firms', mix: '4 Practice + 4 Firm + 2 Surge', mo: '$3,540.00', yr: '$42,480' },
+    { firms: '1 firm', mix: 'Underwriting Low ($1,500)', mo: '$300.00', yr: '$3,600' },
+    { firms: '3 firms', mix: '1 Starter + 2 Underwriting Low', mo: '$670.00', yr: '$8,040' },
+    { firms: '5 firms', mix: '2 Starter + 2 Underwriting Low + 1 Underwriting Mid', mo: '$1,140.00', yr: '$13,680' },
+    { firms: '10 firms', mix: '4 Starter + 4 Underwriting Low + 2 Underwriting Mid', mo: '$2,280.00', yr: '$27,360' },
   ],
   terms: [
     'When you get paid: monthly, within 5 business days of one3seven receiving the firm’s subscription payment.',

@@ -212,6 +212,7 @@ export function FirmSettingsScreen({
 
   const [billingLoading, setBillingLoading] = useState<string | null>(null);
   const [billingError, setBillingError] = useState<string | null>(null);
+  const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('monthly');
 
   const handleUpgrade = async (priceId: string, planId: string) => {
     if (!firmProfile?.id) return;
@@ -470,13 +471,33 @@ export function FirmSettingsScreen({
               </div>
             )}
 
+            {/* Billing cycle toggle — every tier is flat-priced monthly or annual (2 months free) */}
+            <div className="mb-4 flex items-center justify-center gap-2">
+              {(['monthly', 'annual'] as const).map((cycle) => (
+                <button
+                  key={cycle}
+                  type="button"
+                  onClick={() => setBillingCycle(cycle)}
+                  className={`rounded-full px-4 py-1.5 text-xs font-semibold transition ${
+                    billingCycle === cycle
+                      ? 'bg-[#42574E] text-white'
+                      : 'border border-[#E4E5DE] bg-white text-[#1B2623]/55 hover:bg-[#F2F4EC]'
+                  }`}
+                >
+                  {cycle === 'monthly' ? 'Monthly' : 'Annual · 2 months free'}
+                </button>
+              ))}
+            </div>
+
             {/* Plan cards */}
-            <div className="grid gap-4 sm:grid-cols-3">
+            <div className="grid gap-4 sm:grid-cols-4">
               {FIRM_PLANS.map((plan) => {
                 const isCurrent = sub.planId === plan.id;
                 const isPopular = plan.highlight;
                 const loading = billingLoading === plan.id;
-                const canUpgrade = !isCurrent && !!plan.priceId;
+                const price = billingCycle === 'monthly' ? plan.monthlyPrice : plan.annualPrice;
+                const priceId = billingCycle === 'monthly' ? plan.monthlyPriceId : plan.annualPriceId;
+                const canUpgrade = !isCurrent && !!priceId;
 
                 return (
                   <div
@@ -504,28 +525,22 @@ export function FirmSettingsScreen({
                       <p className="text-[13px] font-bold text-[#1B2623]">{plan.label}</p>
                       <div className="mt-1 flex items-end gap-1">
                         <span className="text-[28px] font-black leading-none tracking-tight text-[#1B2623]">
-                          ${plan.price}
+                          ${price}
                         </span>
-                        <span className="mb-1 text-xs text-[#1B2623]/45">{plan.perSeat ? '/seat/mo' : '/mo'}</span>
+                        <span className="mb-1 text-xs text-[#1B2623]/45">{billingCycle === 'monthly' ? '/mo' : '/yr'}</span>
                       </div>
                     </div>
 
                     <ul className="mb-5 flex-1 space-y-1.5">
                       <li className="flex items-center gap-1.5 text-xs text-[#1B2623]/65">
                         <span className="text-[#42574E]">✓</span>
-                        {plan.perSeat
-                          ? (plan.minSeats > 1 ? `${plan.minSeats}+ seats` : 'From 1 seat')
-                          : 'Unlimited seats'}
-                      </li>
-                      <li className="flex items-center gap-1.5 text-xs text-[#1B2623]/65">
-                        <span className="text-[#42574E]">✓</span>
                         {plan.intakesPerMonth
-                          ? `~${plan.intakesPerMonth} intakes/seat · fair-use`
-                          : 'Unlimited intakes'}
+                          ? `~${plan.intakesPerMonth} intakes/mo · fair-use`
+                          : 'Unlimited-ish intakes · fair-use'}
                       </li>
                       <li className="flex items-center gap-1.5 text-xs text-[#1B2623]/65">
                         <span className="text-[#42574E]">✓</span>
-                        {plan.includesDamages ? 'Includes 8B wage-exposure (CA)' : 'Full intake engine + all Element Lens packs'}
+                        {plan.includesDamages ? 'Includes 8B wage-exposure (CA)' : 'Tier-1 Element Lens pack'}
                       </li>
                       <li className="flex items-center gap-1.5 text-xs text-[#1B2623]/65">
                         <span className="text-[#42574E]">✓</span>
@@ -540,7 +555,7 @@ export function FirmSettingsScreen({
                     ) : canUpgrade ? (
                       <button
                         type="button"
-                        onClick={() => void handleUpgrade(plan.priceId!, plan.id)}
+                        onClick={() => void handleUpgrade(priceId!, plan.id)}
                         disabled={!!billingLoading}
                         className={`rounded-xl py-2.5 text-xs font-semibold transition disabled:opacity-60 ${
                           isPopular
@@ -552,7 +567,7 @@ export function FirmSettingsScreen({
                       </button>
                     ) : (
                       <div className="rounded-xl border border-dashed border-[#E4E5DE] py-2.5 text-center text-xs text-[#1B2623]/40">
-                        {!plan.priceId ? 'Coming soon' : 'Select above'}
+                        {!priceId ? 'Coming soon' : 'Select above'}
                       </div>
                     )}
                   </div>
