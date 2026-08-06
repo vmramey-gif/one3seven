@@ -12,6 +12,7 @@ import {
   extractCommunicationFacts,
   extractPayRecordFacts,
 } from './documentFactExtractionService';
+import { usableDocumentDateLabel } from './evidenceMappedTimelineService';
 import type { DocumentGroundedFileInput } from './intakeOrganizationTypes';
 import {
   bestBucketFromScores,
@@ -184,6 +185,41 @@ function mergePeopleForFile(factPeople: string[], minedPeople: string[]): string
   return merged.slice(0, 12);
 }
 
+/** Conclusion vocabulary that must never ride along on a surfaced record fact. */
+const RECORD_FACT_CONCLUSION_RE =
+  /\bviolat|\bpenalt|\bowed\b|\bentitle|\bunlawful|\bwrongful|\billegal|\bretaliat|\bliab|226\.7/i;
+
+/** Files whose facts may carry punch-level meal data worth describing: time/pay records. */
+const TIME_OR_PAY_RECORD_RE = /time|schedul|punch|hour|\bpay\b|paystub|pay stub|wage|payroll/i;
+
+/**
+ * Only punch-level missed-breaks facts (punch/premium/shift counts) are surfaced — an
+ * absence note on a schedule ("no meal period rows shown on schedule") is not what the
+ * time records SHOW. Keep in sync with the coverage rail's filter of the same name
+ * (caEmployerRecordRequirements).
+ */
+const PUNCH_LEVEL_MISSED_BREAKS_RE = /\bpunch(?:es)?\b|\bpremiums?\b|\bshifts?\b/i;
+
+/**
+ * Presence-describing meal-period line from extraction-stored facts
+ * (document_facts.missed_breaks) — e.g. "Time records show no meal period punch on 9 of 11
+ * shifts over 6.0 hours." DESCRIPTION of what the record shows, never a violation/penalty/
+ * entitlement claim: a facts value carrying conclusion vocabulary is dropped entirely.
+ * (Previously these facts reached only the damages path and never the packet.)
+ */
+export function mealPeriodRecordLineFromFacts(
+  facts: Record<string, unknown> | null | undefined
+): string | null {
+  if (!facts || typeof facts !== 'object') return null;
+  const raw = (facts as { missed_breaks?: unknown }).missed_breaks;
+  if (typeof raw !== 'string') return null;
+  const detail = raw.replace(/\s+/g, ' ').trim().replace(/[.\s]+$/, '');
+  if (detail.length < 8 || detail.length > 220) return null;
+  if (!PUNCH_LEVEL_MISSED_BREAKS_RE.test(detail)) return null;
+  if (RECORD_FACT_CONCLUSION_RE.test(detail)) return null;
+  return sanitizeGenerationPhrase(`Time records show ${detail}.`);
+}
+
 function buildPossibleTimelineEvent(opts: {
   documentType: string;
   dates: string[];
@@ -233,8 +269,18 @@ function buildSingleFileRecord(
   const likelyAnchor = fileDates.length
     ? bestEmploymentChronologyAnchor(minedText || meta.fileName)
     : bestEmploymentChronologyAnchor(meta.fileName);
+  // The extraction-stored document date is authoritative for likely_date when usable
+  // (same validation the timeline builder applies); text mining is the fallback. A
+  // template-footer date in the text must not beat the extraction's real document date.
+  const rawFactsDate = extraction?.documentFacts
+    ? (extraction.documentFacts as { document_date?: unknown }).document_date
+    : null;
+  const factsDate = usableDocumentDateLabel(
+    typeof rawFactsDate === 'string' ? rawFactsDate : null
+  );
   const likelyDate =
-    likelyAnchor && likelyAnchor !== DATE_UNCLEAR_LABEL ? likelyAnchor : fileDates[0] ?? null;
+    factsDate ??
+    (likelyAnchor && likelyAnchor !== DATE_UNCLEAR_LABEL ? likelyAnchor : fileDates[0] ?? null);
 
   const payFacts =
     extraction && rawText
@@ -282,6 +328,22 @@ function buildSingleFileRecord(
   const confidence = deriveConfidence(extractionQuality, Boolean(likelyDate), employmentTopics.length);
   const supportingStrength = deriveSupportingStrength(extractionQuality, minedText, fileDates.length);
 
+  const possibleTimelineEvent = buildPossibleTimelineEvent({
+    documentType,
+    dates: fileDates,
+    fileName: meta.fileName,
+    hasText: minedText.length > 0,
+  });
+  // Surface extraction-stored meal-period facts in this time/pay record's summary
+  // (presence description only — see mealPeriodRecordLineFromFacts).
+  const mealLine = TIME_OR_PAY_RECORD_RE.test(`${legacyCategory} ${meta.fileName}`.toLowerCase())
+    ? mealPeriodRecordLineFromFacts(extraction?.documentFacts)
+    : null;
+  if (mealLine) {
+    possibleTimelineEvent.neutral_summary =
+      `${possibleTimelineEvent.neutral_summary} ${mealLine}`.trim();
+  }
+
   return {
     source_file_id: resolveSourceFileId(meta),
     file_name: meta.fileName,
@@ -290,12 +352,7 @@ function buildSingleFileRecord(
     likely_date: likelyDate,
     people_or_entities: people,
     employment_topics: employmentTopics,
-    possible_timeline_event: buildPossibleTimelineEvent({
-      documentType,
-      dates: fileDates,
-      fileName: meta.fileName,
-      hasText: minedText.length > 0,
-    }),
+    possible_timeline_event: possibleTimelineEvent,
     supporting_record_strength: supportingStrength,
     missing_or_unclear_information: [...new Set(missing)].slice(0, 6),
     confidence,

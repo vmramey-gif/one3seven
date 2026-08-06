@@ -74,8 +74,10 @@ function normalizeDateKey(likelyDate: string | null | undefined): string {
  * file's text-mined date. The value is treated as an opaque display string; a time-of-day
  * suffix ("08:46:46 AM CST") is trimmed off for display, and the result must contain a
  * 4-digit year or parse via Date.parse. Returns null when the value is not usable.
+ * Exported: perFileOrganizationService applies the same validation so a file record's
+ * likely_date prefers the extraction-stored date over text-mined candidates.
  */
-function usableDocumentDateLabel(raw: string | null | undefined): string | null {
+export function usableDocumentDateLabel(raw: string | null | undefined): string | null {
   if (typeof raw !== 'string') return null;
   let label = raw.trim();
   if (!label || label === DATE_UNCLEAR_LABEL) return null;

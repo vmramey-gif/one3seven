@@ -323,13 +323,98 @@ const CONTENT_SIGNALS: Record<string, (files: CoverageFileInput[]) => boolean> =
   personnel_file: personnelFileContentSignal,
 };
 
+// ── Time / meal-rest presence gates ────────────────────────────────────────────
+// Filename/category wording alone marked hours records present when the only "time"
+// document was an employer POLICY page ("Attendance Policy - Team Handbook p14.pdf"
+// classifies as category "Time Records"). A false "present" suppresses the
+// records-request line — the worst failure this rail has (see finalPaycheckContentSignal).
+// Presence for these keys therefore requires actual time-data signals in the file's
+// text/facts; category matching alone remains sufficient ONLY when the stored category
+// is an explicit timekeeping category AND the filename is not policy/handbook-flavored.
+// When in doubt: not_in_record.
+
+/** Policy/handbook-flavored filenames — policy wording about time is not a time record. */
+const POLICY_FLAVORED_FILENAME_RE = /polic(?:y|ies)|handbook|manual|guidelines?|acknowledg/i;
+
+/** A stored/inferred category that explicitly names timekeeping records. */
+const EXPLICIT_TIMEKEEPING_CATEGORY_RE =
+  /\btime\s*(?:records?|sheets?|cards?|keeping)\b|\btimekeeping\b|\btime\s*(?:&|and)\s*attendance\b|\bpunch\b/i;
+
+/**
+ * Actual time-data wording: punch/clock exports, hours columns/totals, shift start–end
+ * pairs, and Spanish "Reporte de Horas"-style hours-report wording. Deliberately does NOT
+ * match policy prose ("clocks in more than five minutes late is recorded as tardy").
+ */
+const TIME_DATA_SNIPPET_RES: RegExp[] = [
+  /\btime\s*punch(?:es)?\b|\bpunch\s+(?:export|report|detail|records?)\b|\btime\s+detail\s+report\b/i,
+  // Punch column headers / in–out pairs on one line ("Clock In   Clock Out").
+  /\bclock[\s-]?in\b[^\n]{0,48}\bclock[\s-]?out\b/i,
+  // Spanish hours-report wording.
+  /\breporte\s+de\s+horas\b|\btotal\s+de\s+horas\b/i,
+  /\b(?:total|scheduled)\s+hours\b/i,
+  // Shift start–end pair: two clock times with meridiems separated by a short non-digit run.
+  /\d{1,2}:\d{2}\s*[ap]\.?m\.?[^\d\n]{1,8}\d{1,2}:\d{2}\s*[ap]\.?m\.?/i,
+];
+
+function timeRecordsPresenceSignal(files: CoverageFileInput[]): boolean {
+  return files.some((f) => {
+    const snippet = coverageSnippet(f);
+    if (TIME_DATA_SNIPPET_RES.some((re) => re.test(snippet))) return true;
+    return (
+      EXPLICIT_TIMEKEEPING_CATEGORY_RE.test(f.category ?? '') &&
+      !POLICY_FLAVORED_FILENAME_RE.test(f.fileName ?? '')
+    );
+  });
+}
+
+/**
+ * Punch-level meal data only: meal punch rows, "no meal period recorded" report lines,
+ * meal premium stub lines, missed-break facts (incl. Spanish "periodo de comida").
+ * A handbook meal-break policy page, or any generic time record, never counts.
+ */
+const MEAL_DATA_WORDING_RE =
+  /\bmeal\s+punch(?:es)?\b|\bno\s+meal\s+period\b|\bmeal\s+period\s+(?:recorded|punch)\b|\bmeal\s+premium\b|\bmissed\s+(?:meal|rest)\s+break|\bperiodo\s+de\s+comida\b/i;
+
+/**
+ * A missed_breaks facts value counts only when it is punch-level (punch/premium/shift
+ * counts) — an absence note on a schedule ("no meal period rows shown on schedule") is
+ * not a meal record. Keep in sync with PUNCH_LEVEL_MISSED_BREAKS_RE in
+ * perFileOrganizationService (the packet-surfacing filter).
+ */
+const PUNCH_LEVEL_MISSED_BREAKS_RE = /\bpunch(?:es)?\b|\bpremiums?\b|\bshifts?\b/i;
+
+function mealRestPresenceSignal(files: CoverageFileInput[]): boolean {
+  return files.some((f) => {
+    const missedBreaks = factString(f.documentFacts, 'missed_breaks');
+    if (missedBreaks && PUNCH_LEVEL_MISSED_BREAKS_RE.test(missedBreaks)) return true;
+    // Extraction flags count under the same punch-level bar ("no meal punch recorded on
+    // 9 of 11 shifts…" yes; "no meal period rows shown on schedule" no).
+    const punchLevelFlag = factStringArray(f.documentFacts, 'flags').some(
+      (flag) => MEAL_DATA_WORDING_RE.test(flag) && PUNCH_LEVEL_MISSED_BREAKS_RE.test(flag)
+    );
+    if (punchLevelFlag) return true;
+    return MEAL_DATA_WORDING_RE.test(coverageSnippet(f));
+  });
+}
+
+/**
+ * Keys whose presence is FULLY determined by their conservative gate — the generic
+ * filename/category regex match is NOT sufficient on its own for these.
+ */
+const PRESENCE_GATES: Record<string, (files: CoverageFileInput[]) => boolean> = {
+  time_records: timeRecordsPresenceSignal,
+  meal_rest: mealRestPresenceSignal,
+};
+
 /**
  * Assess a worker's file against the CA requirement list. Pure + factual: present / worker-stated
  * missing / not in record. `stillEmployed` drops separation-only items (a final paycheck isn't
  * "missing" for someone still on the job). `workerStatedMissingKeys` = requirement keys the worker
  * has told us they never received. Rows may optionally carry `documentFacts` + `textSnippet` for
- * conservative content signals (final paycheck, offer/agreement, personnel file); when in doubt a
- * requirement stays `not_in_record` — this rail feeds a records-request letter.
+ * conservative content signals (final paycheck, offer/agreement, personnel file). Time and
+ * meal/rest records are presence-GATED: filename/category wording alone never marks them present
+ * (see PRESENCE_GATES). When in doubt a requirement stays `not_in_record` — this rail feeds a
+ * records-request letter.
  */
 export function assessEmployerRecordCoverage(
   fileInventory: CoverageFileInput[],
@@ -348,9 +433,11 @@ export function assessEmployerRecordCoverage(
   const items: AssessedRequirement[] = CA_EMPLOYER_RECORD_REQUIREMENTS
     .filter((r) => !(opts.stillEmployed && r.scope === 'on_separation'))
     .map((r) => {
-      const present =
-        haystacks.some((h) => r.match.some((re) => re.test(h))) ||
-        Boolean(CONTENT_SIGNALS[r.key]?.(fileInventory));
+      const gate = PRESENCE_GATES[r.key];
+      const present = gate
+        ? gate(fileInventory)
+        : haystacks.some((h) => r.match.some((re) => re.test(h))) ||
+          Boolean(CONTENT_SIGNALS[r.key]?.(fileInventory));
       const state: RecordState = present
         ? 'on_file'
         : stated.has(r.key)

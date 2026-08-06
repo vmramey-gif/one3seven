@@ -37,7 +37,10 @@ import {
   filterTextForOrganizerMining,
   type OrganizerFileInput,
 } from './intakeOrganizerReasoning';
-import { buildPerFileOrganizationRecords } from './perFileOrganizationService';
+import {
+  buildPerFileOrganizationRecords,
+  mealPeriodRecordLineFromFacts,
+} from './perFileOrganizationService';
 import { applyEvidenceMappedOrganization } from './intakeOrganizationEngine';
 import { intakeSatisfiesHelpfulRecordType, resolveHelpfulRecordSuggestionLabels } from './organizationOutputQuality';
 
@@ -333,6 +336,17 @@ export function buildDocumentGroundedOrganization(
   }
   for (const line of narrative.uncertaintyLines) {
     if (!readinessIndicators.includes(line)) readinessIndicators.push(line);
+  }
+  // Extraction-stored meal-period facts (document_facts.missed_breaks) on time/pay records
+  // previously reached only the damages path — surface the presence-describing line here so
+  // it lands in the packet/readiness prose. Description of what the record shows, never a
+  // violation/penalty/entitlement claim (mealPeriodRecordLineFromFacts drops anything else).
+  for (const row of withText) {
+    if (!/time|schedul|punch|pay|wage|payroll/i.test(`${row.category ?? ''} ${row.fileName}`)) {
+      continue;
+    }
+    const mealLine = mealPeriodRecordLineFromFacts(row.documentFacts);
+    if (mealLine && !readinessIndicators.includes(mealLine)) readinessIndicators.push(mealLine);
   }
 
   const missingDocumentSuggestions: string[] = [...helpfulRecords];
