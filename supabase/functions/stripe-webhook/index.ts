@@ -13,23 +13,30 @@
  *
  * Required env (Supabase function secrets):
  *   STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
- *   STRIPE_PRICE_SOLO, STRIPE_PRICE_PRACTICE, STRIPE_PRICE_FIRM,
- *   STRIPE_PRICE_PRACTICE_PLUS, STRIPE_PRICE_FIRM_PLUS   (set as price IDs become available)
+ *   STRIPE_PRICE_STARTER_MONTHLY, STRIPE_PRICE_STARTER_ANNUAL,
+ *   STRIPE_PRICE_UNDERWRITING_LOW_MONTHLY, STRIPE_PRICE_UNDERWRITING_LOW_ANNUAL,
+ *   STRIPE_PRICE_UNDERWRITING_MID_MONTHLY, STRIPE_PRICE_UNDERWRITING_MID_ANNUAL,
+ *   STRIPE_PRICE_UNDERWRITING_HIGH_MONTHLY, STRIPE_PRICE_UNDERWRITING_HIGH_ANNUAL
+ *   (4-tier flat model, decided 2026-08-06 — legacy solo/practice/firm/*_plus ids retired)
  */
 
 import Stripe from 'https://esm.sh/stripe@14?target=deno';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-type PlanId = 'beta_pilot' | 'solo' | 'practice' | 'firm' | 'practice_plus' | 'firm_plus' | 'enterprise';
+type PlanId = 'beta_pilot' | 'starter' | 'underwriting_low' | 'underwriting_mid' | 'underwriting_high' | 'enterprise';
 
-/** Build the price-ID → plan-ID map from env. Unset prices are simply absent (safe). */
+/** Build the price-ID → plan-ID map from env. Unset prices are simply absent (safe). Both the
+ * monthly and annual price of a tier map to the same plan_id — billing interval doesn't change tier. */
 function buildPriceToPlanMap(): Record<string, PlanId> {
   const pairs: Array<[string | undefined, PlanId]> = [
-    [Deno.env.get('STRIPE_PRICE_SOLO'), 'solo'],
-    [Deno.env.get('STRIPE_PRICE_PRACTICE'), 'practice'],
-    [Deno.env.get('STRIPE_PRICE_FIRM'), 'firm'],
-    [Deno.env.get('STRIPE_PRICE_PRACTICE_PLUS'), 'practice_plus'],
-    [Deno.env.get('STRIPE_PRICE_FIRM_PLUS'), 'firm_plus'],
+    [Deno.env.get('STRIPE_PRICE_STARTER_MONTHLY'), 'starter'],
+    [Deno.env.get('STRIPE_PRICE_STARTER_ANNUAL'), 'starter'],
+    [Deno.env.get('STRIPE_PRICE_UNDERWRITING_LOW_MONTHLY'), 'underwriting_low'],
+    [Deno.env.get('STRIPE_PRICE_UNDERWRITING_LOW_ANNUAL'), 'underwriting_low'],
+    [Deno.env.get('STRIPE_PRICE_UNDERWRITING_MID_MONTHLY'), 'underwriting_mid'],
+    [Deno.env.get('STRIPE_PRICE_UNDERWRITING_MID_ANNUAL'), 'underwriting_mid'],
+    [Deno.env.get('STRIPE_PRICE_UNDERWRITING_HIGH_MONTHLY'), 'underwriting_high'],
+    [Deno.env.get('STRIPE_PRICE_UNDERWRITING_HIGH_ANNUAL'), 'underwriting_high'],
   ];
   const map: Record<string, PlanId> = {};
   for (const [priceId, plan] of pairs) {

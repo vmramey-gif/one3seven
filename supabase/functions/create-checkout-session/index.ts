@@ -53,7 +53,12 @@ Deno.serve(async (req: Request) => {
   // priceId is client-supplied; only accept our own configured plan prices (same env vars
   // the webhook maps price -> plan with). If none are configured yet, skip (setup phase).
   const allowedPriceIds = new Set(
-    ['STRIPE_PRICE_SOLO', 'STRIPE_PRICE_PRACTICE', 'STRIPE_PRICE_FIRM', 'STRIPE_PRICE_PRACTICE_PLUS', 'STRIPE_PRICE_FIRM_PLUS']
+    [
+      'STRIPE_PRICE_STARTER_MONTHLY', 'STRIPE_PRICE_STARTER_ANNUAL',
+      'STRIPE_PRICE_UNDERWRITING_LOW_MONTHLY', 'STRIPE_PRICE_UNDERWRITING_LOW_ANNUAL',
+      'STRIPE_PRICE_UNDERWRITING_MID_MONTHLY', 'STRIPE_PRICE_UNDERWRITING_MID_ANNUAL',
+      'STRIPE_PRICE_UNDERWRITING_HIGH_MONTHLY', 'STRIPE_PRICE_UNDERWRITING_HIGH_ANNUAL',
+    ]
       .map((k) => Deno.env.get(k)?.trim())
       .filter((v): v is string => Boolean(v)),
   );
