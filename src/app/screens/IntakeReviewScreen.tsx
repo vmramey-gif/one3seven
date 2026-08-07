@@ -103,6 +103,13 @@ interface IntakeReviewScreenProps {
   demoMode?: boolean;
   /** Name shown in the demo orientation strip. Defaults to the original single-case demo's worker. */
   demoWorkerName?: string;
+  /**
+   * Demo-only citation source lookup: given a source file name, returns a static public URL
+   * to a real PDF (or null if none exists), instead of signing a Supabase Storage URL. When
+   * provided, `openQuoteCitation` checks it FIRST and never touches Supabase. Undefined in
+   * every real (non-demo) call site, so production citation behavior is unchanged.
+   */
+  demoSourceUrlResolver?: (fileName: string) => string | null;
 }
 
 interface TimelineEvent {
@@ -201,6 +208,7 @@ export function IntakeReviewScreen({
   onReloadFirmLiveView,
   demoMode = false,
   demoWorkerName = 'Marcus Rivera',
+  demoSourceUrlResolver,
 }: IntakeReviewScreenProps) {
   // Use workspace data if available, otherwise fall back to mock
   const rawWorkflow = (intakeWorkspace?.workflowStatus as string | undefined) ?? 'new';
@@ -304,8 +312,24 @@ export function IntakeReviewScreen({
   }, [firmLiveView]);
 
   const openQuoteCitation = async (fileName: string, quote: string) => {
+    if (!quote.trim()) return;
+    // Demo mode: resolve against the static PDF lookup instead of Supabase Storage. Checked
+    // FIRST and returns — the real signed-URL path below never runs when a resolver is passed.
+    const demoUrl = demoSourceUrlResolver ? demoSourceUrlResolver(fileName) : null;
+    if (demoUrl) {
+      setQuoteCitationUrl(demoUrl);
+      setOpenCitation({
+        docId: `demo:${fileName}`,
+        docName: fileName,
+        page: 1,
+        charStart: 0,
+        charEnd: quote.length,
+        sourceText: quote,
+      });
+      return;
+    }
     const hit = quoteSourceByFileName.get(normalizeFilenameForMatching(fileName));
-    if (!hit || !quote.trim()) return;
+    if (!hit) return;
     // Open the panel IMMEDIATELY so the click is never dead — it shows the quote right away, then the
     // PDF loads once the signed URL resolves (or a graceful "highlight unavailable" fallback if it
     // can't). Signing is wrapped so a failure/throw can't prevent the panel from opening.
@@ -2143,7 +2167,9 @@ export function IntakeReviewScreen({
                               : conf === 'low'
                               ? 'bg-rose-50 text-rose-600 border-rose-100'
                               : 'bg-amber-50 text-amber-700 border-amber-100';
-                          const canOpenSource = quoteSourceByFileName.has(normalizeFilenameForMatching(q.file_name));
+                          const canOpenSource = demoSourceUrlResolver
+                            ? demoSourceUrlResolver(q.file_name) != null
+                            : quoteSourceByFileName.has(normalizeFilenameForMatching(q.file_name));
                           return (
                             <div
                               key={q.file_name}

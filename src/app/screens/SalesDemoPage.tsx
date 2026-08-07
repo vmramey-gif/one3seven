@@ -24,6 +24,7 @@ import { WorkerTimelineEventCard } from '../components/WorkerTimelineEventCard';
 import { EmploymentMatterChipList } from '../components/EmploymentMatterTagsLine';
 import { WordMark } from '../components/WordMark';
 import { PERSONA_DEMOS, type PersonaDemoEntry, type PersonaWorkerTimelineItem } from '../demo/personaDemoData';
+import { createDemoSourceUrlResolver } from '../demo/demoSourceFiles';
 import { isWorkerTimelineKeyStoryMoment } from '../utils/workerTimelineNarrative';
 import type { WorkerTimelineItem } from '../types/workerTimeline';
 import type { SourceStrength } from '../../services/intakeOrganizationTypes';
@@ -306,6 +307,9 @@ function WorkerCaseView({
 }
 
 function FirmCaseView({ entry, onBackToWorker }: { entry: PersonaDemoEntry; onBackToWorker: () => void }) {
+  // Demo has zero backend — resolve citation clicks to the static generated PDFs
+  // (public/sales-demo-sources/) instead of a Supabase signed URL. See demoSourceFiles.ts.
+  const demoSourceUrlResolver = useMemo(() => createDemoSourceUrlResolver(entry.personaId), [entry.personaId]);
   return (
     <div className="relative">
       <div className="fixed top-3 left-3 z-[1000]">
@@ -330,6 +334,7 @@ function FirmCaseView({ entry, onBackToWorker }: { entry: PersonaDemoEntry; onBa
             firmBellNotifications={[]}
             demoMode
             demoWorkerName={entry.worker.workerName}
+            demoSourceUrlResolver={demoSourceUrlResolver}
             onRequestFullAccess={undefined}
             onAcceptIntake={async () => ({})}
             onDeclineIntake={async () => ({})}
