@@ -1,5 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import { buildClaimLensView, buildExistenceChecks, CLAIM_LENSES, type ClaimLensInput } from '../claimLens';
+import {
+  buildClaimLensView,
+  buildExistenceChecks,
+  CLAIM_LENSES,
+  lensEligibleForStrongestRanking,
+  type ClaimLensInput,
+} from '../claimLens';
 
 const rosa: ClaimLensInput = {
   events: [
@@ -224,5 +230,137 @@ describe('element precision — does-not-prove exclusions (Marquez regression)',
     expect((actions?.items ?? []).some((i) => /complaint submitted/i.test(i.text))).toBe(false);
     // …while the genuine actions (termination) still do.
     expect((actions?.items ?? []).some((i) => /terminat/i.test(i.text))).toBe(true);
+  });
+});
+
+// Negation guard (messy-cases gauntlet Case C finding) — a worker's own DENIAL of a complaint
+// ("I don't have any complaints...") must not register as an affirmative report/complaint just
+// because the substring "complain" appears inside "complaints". This is a shared helper used by
+// every element match, not four ad-hoc patches — verified here across the four lenses the
+// gauntlet found lighting up on the same denied sentence.
+describe('negation guard — a denied complaint is not an affirmative match', () => {
+  const priyaDenial: ClaimLensInput = {
+    events: [],
+    quotes: [],
+    intervals: [],
+    workerContext:
+      "I don't have any complaints about how things went there. I got along well with my manager and the team, and my reviews were positive both years.",
+    files: [],
+  };
+
+  it('retaliation_1102_5 "Reports and complaints made" does not fire on the denial', () => {
+    const v = buildClaimLensView('retaliation_1102_5', priyaDenial);
+    const reports = v.elements.find((e) => /Reports and complaints made/i.test(e.name));
+    expect((reports?.items ?? []).some((i) => /complain/i.test(i.text))).toBe(false);
+  });
+
+  it('constructive_discharge "Reports made about those conditions" does not fire on the denial', () => {
+    const v = buildClaimLensView('constructive_discharge', priyaDenial);
+    const reports = v.elements.find((e) => /Reports made about those conditions/i.test(e.name));
+    expect((reports?.items ?? []).some((i) => /complain/i.test(i.text))).toBe(false);
+  });
+
+  it('lactation "Complaint material" does not fire on the denial', () => {
+    const v = buildClaimLensView('lactation', priyaDenial);
+    const complaintMaterial = v.elements.find((e) => /Complaint material/i.test(e.name));
+    expect((complaintMaterial?.items ?? []).some((i) => /complain/i.test(i.text))).toBe(false);
+  });
+
+  it('separation_public_policy "Policy or statute the worker points to" does not fire on the denial', () => {
+    const v = buildClaimLensView('separation_public_policy', priyaDenial);
+    const policy = v.elements.find((e) => /Policy or statute the worker points to/i.test(e.name));
+    expect((policy?.items ?? []).some((i) => /complain/i.test(i.text))).toBe(false);
+  });
+
+  it('a genuine, non-negated complaint still registers (negation guard is not over-broad)', () => {
+    const genuine: ClaimLensInput = {
+      ...priyaDenial,
+      workerContext: 'I complained to HR about unpaid overtime on March 3rd.',
+    };
+    const v = buildClaimLensView('retaliation_1102_5', genuine);
+    const reports = v.elements.find((e) => /Reports and complaints made/i.test(e.name));
+    expect((reports?.items ?? []).some((i) => /complain/i.test(i.text))).toBe(true);
+  });
+
+  it('a non-negated match elsewhere in the same sentence still registers even when an earlier pattern is negated', () => {
+    // "don't have complaints" is negated, but "reported the unsafe wiring" a few words later is a
+    // real, non-negated report — the guard must not let one negated pattern hide another pattern's
+    // genuine affirmative match in the same text.
+    const mixed: ClaimLensInput = {
+      events: [],
+      quotes: [],
+      intervals: [],
+      workerContext: "I don't have complaints, but I reported the unsafe wiring to my manager.",
+      files: [],
+    };
+    const v = buildClaimLensView('retaliation_1102_5', mixed);
+    const reports = v.elements.find((e) => /Reports and complaints made/i.test(e.name));
+    expect((reports?.items ?? []).some((i) => /reported/i.test(i.text))).toBe(true);
+  });
+
+  it('the Rosa/Francis-style real complaint still registers normally (regression guard)', () => {
+    const v = buildClaimLensView('retaliation_1102_5', rosa);
+    const reports = v.elements.find((e) => REPORTS.test(e.name));
+    expect((reports?.items ?? []).length).toBeGreaterThan(0);
+  });
+});
+
+// FEHA harassment "Participants and witnesses" must not fire on a bare role noun with zero
+// harassment-adjacent context (messy-cases gauntlet Case C finding).
+describe('feha_harassment — bare role nouns require harassment context', () => {
+  it('a benign "manager" mention with no harassment content does not trip "Participants and witnesses"', () => {
+    const benign: ClaimLensInput = {
+      events: [],
+      quotes: [],
+      intervals: [],
+      workerContext: 'I got along well with my manager and the team, and my reviews were positive both years.',
+      files: [],
+    };
+    const v = buildClaimLensView('feha_harassment', benign);
+    const participants = v.elements.find((e) => /Participants and witnesses/i.test(e.name));
+    expect(participants?.items ?? []).toHaveLength(0);
+    expect(participants?.empty).toBeTruthy();
+  });
+
+  it('"manager" co-occurring with real harassment-context language still trips the element', () => {
+    const real: ClaimLensInput = {
+      events: [],
+      quotes: [],
+      intervals: [],
+      workerContext: 'My manager made an inappropriate comment about my appearance in front of two coworkers.',
+      files: [],
+    };
+    const v = buildClaimLensView('feha_harassment', real);
+    const participants = v.elements.find((e) => /Participants and witnesses/i.test(e.name));
+    expect((participants?.items ?? []).length).toBeGreaterThan(0);
+  });
+});
+
+// PAGA joins final_pay on the cross-lens "strongest theory" ranking gate — ordinary, undisputed
+// pay stubs alone must not make PAGA eligible to out-rank other theories, though it still renders
+// fully in its own tab regardless of eligibility (messy-cases gauntlet Case C finding).
+describe('paga ranking eligibility gate', () => {
+  const ordinaryPayStubs: ClaimLensInput = {
+    events: [{ title: 'Pay period or overtime record documented', date: 'June 1, 2026', sourceFile: 'stub.pdf' }],
+    quotes: [],
+    intervals: [],
+    workerContext: '',
+    files: [{ fileName: 'stub.pdf', category: 'Pay Records' }],
+  };
+
+  it('is NOT eligible for strongest-theory ranking on ordinary pay stubs alone', () => {
+    expect(lensEligibleForStrongestRanking('paga', ordinaryPayStubs)).toBe(false);
+  });
+
+  it('IS eligible once a concrete pay-gap/violation fact is present', () => {
+    const withViolation: ClaimLensInput = {
+      ...ordinaryPayStubs,
+      workerContext: 'I was never paid overtime — I worked off the clock most closing shifts.',
+    };
+    expect(lensEligibleForStrongestRanking('paga', withViolation)).toBe(true);
+  });
+
+  it('final_pay is unaffected by adding paga to the gate (regression guard)', () => {
+    expect(lensEligibleForStrongestRanking('final_pay', ordinaryPayStubs)).toBe(false);
   });
 });

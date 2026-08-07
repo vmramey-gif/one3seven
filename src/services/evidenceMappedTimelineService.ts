@@ -912,6 +912,38 @@ function guardTerminationTitle(title: string, files: IntakeFileOrganizationRecor
   return clusterHasSeparationCategorizedSource(files) ? title : NEUTRAL_SEPARATION_FALLBACK_TITLE;
 }
 
+/**
+ * HARD GUARD (title-selection chokepoint, sibling of guardTerminationTitle above): "Schedule
+ * change documented" may win ONLY when a file in the cluster actually names a schedule-type
+ * document. Without this, an exit/offboarding checklist can inherit the title purely from an
+ * upstream bucket/topic false positive — live bug: an "Exit Checklist" whose text mentions
+ * returning a "laptop" scored the "Scheduling, Attendance & Leave" bucket because the topic
+ * keyword list includes the substring "pto" (Paid Time Off), which is also a substring of
+ * "laptop" — a false positive with nothing to do with schedules. That bucket/topic match then
+ * outranked the file's own "Separation Records" category and produced "Schedule change
+ * documented" on a routine departure-paperwork document, which in turn fed adverse-flavored claim
+ * lens elements ("Employment actions after the report", "Changes to work conditions afterward").
+ * When both signals are weakly present — a topic/bucket "schedule" match with no real schedule
+ * content, and a real exit/separation category — the category wins and the title falls back to
+ * the same neutral, concrete label used above, so it isn't re-derived from summary keywords later.
+ */
+const SCHEDULE_CHANGE_TITLE_RE = /^schedule change documented$/i;
+// A file's OWN name actually naming a schedule/timekeeping document — the reliable signal that
+// "Schedule change documented" is warranted rather than inherited from an unrelated bucket/topic
+// collision.
+const SCHEDULE_SOURCE_FILENAME_RE =
+  /time.?sheet|time.?card|\bschedule\b|shift.?(change|swap)|clock.?(in|out)/i;
+
+function clusterHasScheduleFilenameSource(files: IntakeFileOrganizationRecord[]): boolean {
+  return files.some((f) => SCHEDULE_SOURCE_FILENAME_RE.test(f.file_name));
+}
+
+function guardScheduleChangeTitle(title: string, files: IntakeFileOrganizationRecord[]): string {
+  if (!SCHEDULE_CHANGE_TITLE_RE.test(title.trim())) return title;
+  if (clusterHasScheduleFilenameSource(files)) return title;
+  return clusterHasSeparationCategorizedSource(files) ? NEUTRAL_SEPARATION_FALLBACK_TITLE : title;
+}
+
 function clusterToEvent(
   cluster: TimelineCluster,
   payFacts: PayRecordFacts[],
@@ -921,8 +953,8 @@ function clusterToEvent(
   const { files } = cluster;
   const dateInfo = clusterDate(files, authoritativeDateIds);
   const date = dateInfo.label;
-  let baseTitle = guardTerminationTitle(
-    cluster.eventTitle ?? neutralClusterTitle(files, commFacts),
+  let baseTitle = guardScheduleChangeTitle(
+    guardTerminationTitle(cluster.eventTitle ?? neutralClusterTitle(files, commFacts), files),
     files
   );
   // HARD GUARD — a bare filename-year ("2023") is period context, not a dated occurrence: it
@@ -1011,7 +1043,12 @@ export function buildEvidenceMappedTimelineEvents(
   const events = clusters.map((c) => clusterToEvent(c, payFacts, commFacts, authoritativeDateIds));
 
   events.sort((a, b) => compareEmploymentChronologyDates(a.date, b.date));
-  return events.slice(0, 16);
+  // No hard cap here: this is the data-computation layer, and truncating would silently
+  // discard real history on long/high-volume records (a 3.5-year, 107-file case previously
+  // lost every event past month six, including the termination itself). Any display-side
+  // pagination/preview limit belongs at the UI layer (see WorkerTimelineHero's previewLimit),
+  // not here, where it would be indistinguishable from data loss.
+  return events;
 }
 
 export function evidenceTimelineToOrganizationEvents(

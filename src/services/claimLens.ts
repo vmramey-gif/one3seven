@@ -217,7 +217,17 @@ export const CLAIM_LENSES: LensDef[] = [
         patterns: p('every (day|week|shift)', 'repeated', 'constant', 'ongoing', 'for (weeks|months)', 'multiple times', 'daily', '\\bagain\\b'),
         absence: 'Nothing addresses how often or how long the conduct occurred.' },
       { name: 'Participants and witnesses',
-        patterns: p('coworker', 'supervisor', 'manager', 'witness', 'in front of', 'others (saw|heard|present)'),
+        // Bare role nouns ("manager", "supervisor", "coworker") are not harassment-adjacent on
+        // their own — a benign "I got along well with my manager" sentence must not count as
+        // identifying a harassment participant. Require co-occurrence with actual
+        // harassment-context vocabulary nearby (same ~60-char window as the "Reports made"
+        // element below). "witness"/"in front of"/"others (saw|heard|present)" stay bare since
+        // those phrasings already imply witnessing something, not a role alone.
+        patterns: p(
+          '(coworker|supervisor|manager)[\\s\\S]{0,60}(harass|hostile|inappropriate|unwanted|slur|comment|remark|touch|\\bjoke|yelled|conduct)',
+          '(harass|hostile|inappropriate|unwanted|slur|comment|remark|touch|\\bjoke|yelled|conduct)[\\s\\S]{0,60}(coworker|supervisor|manager)',
+          'witness', 'in front of', 'others (saw|heard|present)'
+        ),
         absence: 'No participants or witnesses are identified.' },
       { name: 'Reports made, and to whom',
         // Scoped to the harassing conduct: a wage/hour complaint is not a report of harassment.
@@ -791,10 +801,47 @@ function collectFacts(input: ClaimLensInput): LensItem[] {
   return out;
 }
 
+// Negation guard — shared by every element/lens keyword match (not four ad-hoc patches). A bare
+// substring match can't tell "I reported unsafe conditions" from "I never reported anything" —
+// both contain "reported". Before counting a match as affirmative, check a short window of
+// preceding words in the same CLAUSE for a negation marker; if one precedes the match within that
+// window, it is not counted. Clipped to the current clause (after the last comma/semicolon/
+// coordinating conjunction) so a negation in an earlier clause of a compound sentence — "I don't
+// have complaints, but I reported the unsafe wiring…" — doesn't blank out the later, unrelated,
+// genuinely affirmative clause. Conservative (word-window, not full grammatical parsing) on
+// purpose: it is meant to catch the common "I don't have any complaints…" pattern, not to be a
+// general negation parser.
+const NEGATION_MARKERS_RE = /\b(?:don'?t|does\s?n'?t|did\s?n'?t|was\s?n'?t|were\s?n'?t|has\s?n'?t|have\s?n'?t|had\s?n'?t|is\s?n'?t|are\s?n'?t|no|not|never|n\/a|none|without\s+any)\b/i;
+const NEGATION_WINDOW_WORDS = 8;
+const CLAUSE_BOUNDARY_RE = /[,;]|\b(?:but|however|although|though|yet|except|whereas)\b/gi;
+
+function isNegatedMatch(text: string, matchIndex: number): boolean {
+  const before = text.slice(0, matchIndex);
+  let clauseStart = 0;
+  CLAUSE_BOUNDARY_RE.lastIndex = 0;
+  let boundary: RegExpExecArray | null;
+  while ((boundary = CLAUSE_BOUNDARY_RE.exec(before))) {
+    clauseStart = boundary.index + boundary[0].length;
+  }
+  const clause = before.slice(clauseStart);
+  const words = clause.trim().split(/\s+/).filter(Boolean);
+  const window = words.slice(-NEGATION_WINDOW_WORDS).join(' ');
+  return NEGATION_MARKERS_RE.test(window);
+}
+
 // Match element assignment on the fact's TEXT only — never its category/meta. Matching on the
 // category ("HR Documents") is what pulled a handbook into "protected activity."
 function matchesElement(item: LensItem, el: ElementDef): boolean {
-  if (!el.patterns.some((re) => re.test(item.text))) return false;
+  // A pattern only counts if its match isn't negated. Checked per-pattern (not "first pattern
+  // wins") so a negated match on one pattern doesn't hide a genuine, non-negated match from
+  // another pattern in the same element (e.g. "I don't have complaints, but I reported the unsafe
+  // wiring to my manager" should still register on "reported").
+  const hasAffirmativeMatch = el.patterns.some((re) => {
+    const m = re.exec(item.text); // no 'g' flag on these patterns, so exec always starts at 0
+    if (!m) return false;
+    return !isNegatedMatch(item.text, m.index ?? 0);
+  });
+  if (!hasAffirmativeMatch) return false;
   // does-not-prove gate: an include match is disqualified if the fact also trips an exclude pattern
   // (e.g. a REQUEST for an accommodation, or a doctor's restriction, does not prove one was PROVIDED).
   if (el.exclude?.some((re) => re.test(item.text))) return false;
@@ -853,8 +900,14 @@ export function buildClaimLensView(lensId: string, input: ClaimLensInput): Claim
  * meal/rest breaks or premium gaps, off-the-clock work — from extracted document facts, quotes,
  * or the worker's own words. Keyword presence alone (a paystub exists, a termination happened)
  * is not enough. The lens itself still builds and displays in its own tab either way.
+ *
+ * PAGA has the same shape of problem: its "own material"/"pay periods documented" elements match
+ * on the bare existence of pay stubs / wage statements — the same triggers as the purely
+ * administrative wage_statements lens — so ordinary, undisputed pay records alone could make PAGA
+ * look like a competitive "strongest theory" on a record with no violation pattern at all. It
+ * joins final_pay on this gate for the same reason.
  */
-const RANKING_GATED_WAGE_LENSES = new Set<string>(['final_pay']);
+const RANKING_GATED_WAGE_LENSES = new Set<string>(['final_pay', 'paga']);
 
 const CONCRETE_PAY_GAP_PATTERNS: RegExp[] = [
   /\bunpaid\b|\bnot paid\b|never paid|\bowed\b|still owe|missing (wage|pay|paycheck|premium)/i,

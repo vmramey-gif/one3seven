@@ -445,18 +445,32 @@ function findInlinePayDate(lines: string[]): string | null {
   return m?.[1] ? clip(m[1].trim(), 80) : null;
 }
 
-/** First currency amount on a line that matches `labelTest`. */
-function findLabeledCurrencyLine(lines: string[], labelTest: RegExp): string | null {
+/** First currency amount on a line that matches `labelTest`, optionally skipping/deprioritizing
+ * lines matched by `deprioritizeTest` (e.g. a "YTD Gross" recap line) unless no other candidate
+ * line exists at all. */
+function findLabeledCurrencyLine(
+  lines: string[],
+  labelTest: RegExp,
+  deprioritizeTest?: RegExp
+): string | null {
+  let fallback: string | null = null;
   for (const line of lines) {
     if (!labelTest.test(line)) continue;
     const m = line.match(/\$?\s*([\d,]+\.\d{2})\b/);
-    if (m?.[1]) return m[1];
+    if (!m?.[1]) continue;
+    if (deprioritizeTest && deprioritizeTest.test(line)) {
+      if (fallback === null) fallback = m[1];
+      continue;
+    }
+    return m[1];
   }
-  return null;
+  return fallback;
 }
 
+const YTD_LINE_RE = /\bytd\b|\byear[\s-]?to[\s-]?date\b/i;
+
 function findGrossAmount(lines: string[]): string | null {
-  return findLabeledCurrencyLine(lines, /\bgross\b/i);
+  return findLabeledCurrencyLine(lines, /\bgross\b/i, YTD_LINE_RE);
 }
 
 function findNetPayAmount(lines: string[]): string | null {
