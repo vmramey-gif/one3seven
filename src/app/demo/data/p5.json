@@ -1,0 +1,480 @@
+{
+  "personaId": "p5",
+  "personaName": "Rosa Maldonado-Vieyra",
+  "firm": {
+    "previewOnly": false,
+    "routeId": "demo-p5",
+    "routeStatus": "full_access",
+    "intakeNumber": "P5-DEMO",
+    "isFirmCodeIntake": false,
+    "submissionChannel": "participating",
+    "intakeWorkflowStatus": "Under Firm Review",
+    "overview": "The current record set follows employment activity between October 2024 and 06/18/2025. It is organized around schedule or timekeeping records, pay records, and separation records.\n\nPay period boundaries recur across the payroll materials and may anchor how compensation activity is read over time.\n\nSeparation or final-pay wording appears in the set and may mark a transition point in the chronology.\n\nScheduling or attendance materials sit alongside payroll records, which may help clarify hours versus pay.\n\nTaken together, separation-related materials and payroll records may help clarify final-pay timing near the end of the sequence.\n\nRecords mention materials that span multiple periods between October 2024 and 06/18/2025 and may help reconstruct payroll, scheduling, and employment-related events over time.\n\nOrganized for review preparation only — not legal advice or outcome prediction.",
+    "timelineSummary": "05/15/2025 — Schedule change documented.  Supported by Time Punch Export May 1-15 2025 - Maldonado.",
+    "workerProvidedContext": "I waited tables at Casa Tejocote and on most long shifts I never got a real meal break, even when I worked nine or ten hours; the punch reports show it. They took me off the schedule for good by text on June 6, and my final check is dated June 18.",
+    "workerFollowUp": {
+      "employer": "Casa Tejocote Restaurant Group LLC",
+      "keyPeople": "Benny Cuellar (general manager)",
+      "workState": "CA",
+      "reimbursed": "",
+      "employerState": "CA",
+      "employmentName": "Rosa Maldonado-Vieyra",
+      "remoteExpenses": "",
+      "workedRemotely": "",
+      "employmentDates": "October 2024 to June 6, 2025",
+      "changedAfterward": "",
+      "employmentStatus": "employment_ended",
+      "priorAgencyFiling": "",
+      "arbitrationAgreement": "",
+      "complainedOrReported": "",
+      "priorAgencyFilingDetails": ""
+    },
+    "employmentMatterTags": [
+      "wage_hour"
+    ],
+    "events": [
+      {
+        "id": "p5-ev-1",
+        "event_date": "05/15/2025",
+        "title": "Schedule change documented",
+        "category": "Time Records",
+        "ai_summary": "Supported by Time Punch Export May 1-15 2025 - Maldonado.pdf. Related pattern: Scheduling and timekeeping.",
+        "worker_context": ""
+      },
+      {
+        "id": "p5-ev-2",
+        "event_date": "05/23/2025",
+        "title": "Pay period or overtime record documented",
+        "category": "Pay Records / Payroll",
+        "ai_summary": "Supported by Casa Tejocote Pay Stub 2025-05-23.pdf. Related patterns: Payroll and wage records, Workplace communications.",
+        "worker_context": ""
+      },
+      {
+        "id": "p5-ev-3",
+        "event_date": "05/31/2025",
+        "title": "Worker requests leave or accommodation",
+        "category": "Time Records",
+        "ai_summary": "Supported by Reporte de Horas 16-31 mayo 2025.pdf. Related pattern: Leave or accommodation references.",
+        "worker_context": ""
+      },
+      {
+        "id": "p5-ev-4",
+        "event_date": "June 6, 2025",
+        "title": "Termination documented",
+        "category": "Separation Records",
+        "ai_summary": "Supported by Termination texts - June 6 2025.pdf. Related patterns: Payroll and wage records, Scheduling and timekeeping, Workplace communications.",
+        "worker_context": ""
+      },
+      {
+        "id": "p5-ev-5",
+        "event_date": "06/18/2025",
+        "title": "Supporting employment documentation",
+        "category": "Pay Records / Payroll",
+        "ai_summary": "Supported by Final Check Stub 2025-06-18.pdf. Related patterns: Payroll and wage records, Separation or final pay, Workplace communications.",
+        "worker_context": ""
+      },
+      {
+        "id": "p5-ev-6",
+        "event_date": "Date unclear — review source document",
+        "title": "Schedule change documented",
+        "category": "Uncategorized",
+        "ai_summary": "Supported by Employee Handbook - Meal and Rest Breaks p11.pdf. Related patterns: Scheduling and timekeeping, Workplace communications.",
+        "worker_context": ""
+      }
+    ],
+    "files": [
+      {
+        "file_name": "Time Punch Export May 1-15 2025 - Maldonado.pdf",
+        "category": "Time Records"
+      },
+      {
+        "file_name": "Reporte de Horas 16-31 mayo 2025.pdf",
+        "category": "Time Records"
+      },
+      {
+        "file_name": "Casa Tejocote Pay Stub 2025-05-23.pdf",
+        "category": "Pay Records"
+      },
+      {
+        "file_name": "Employee Handbook - Meal and Rest Breaks p11.pdf",
+        "category": "Uncategorized"
+      },
+      {
+        "file_name": "Termination texts - June 6 2025.pdf",
+        "category": "HR Documents"
+      },
+      {
+        "file_name": "Final Check Stub 2025-06-18.pdf",
+        "category": "Pay Records / Payroll"
+      }
+    ],
+    "readiness": [
+      "Taken together, uploaded payroll records (2 files: Casa Tejocote Pay Stub 2025-05-23.pdf, Final Check Stub 2025-06-18.pdf) include pay periods, amounts, or hou…",
+      "Records mention in “Casa Tejocote Pay Stub 2025-05-23.pdf”: pay date 05/23/2025; gross $1670.13, net $1039.85.",
+      "Records mention in “Final Check Stub 2025-06-18.pdf”: pay date 06/18/2025; gross $470.25, net $405.12.",
+      "Taken together, communication wording across 4 files touches payroll.",
+      "Records mention in “Casa Tejocote Pay Stub 2025-05-23.pdf”, wording that may describe a worker concern (“received in cash and are not paid through payroll.”).",
+      "Records mention in “Termination texts - June 6 2025.pdf”, wording that may describe a worker concern (“I'm owed for this week and my tips.”).",
+      "This may be useful for human review: Pay period boundaries recur across the payroll materials and may anchor how compensation activity is read over time.",
+      "This may be useful for human review: Separation or final-pay wording appears in the set and may mark a transition point in the chronology.",
+      "This may be useful for human review: Scheduling or attendance materials sit alongside payroll records, which may help clarify hours versus pay.",
+      "This may be useful for human review: Payroll and wage records: Additional Information May Help: wording across the uploads touches payroll, pay stub, earnings — pay amounts, periods, and time records should be compared in the source files",
+      "This may be useful for human review: Scheduling and timekeeping: Additional Information May Help: wording across the uploads touches schedule, shift, clock out, meal break — logged hours and schedules should be compared with pay records where both exist",
+      "This may be useful for human review: Separation or final pay: Additional Information May Help: wording across the uploads touches termination, separation, final paycheck, final pay — separation paperwork and final pay records should be read together for timing",
+      "This may be useful for human review: Workplace communications: Additional Information May Help: wording across the uploads touches hr, reported, manager — messages and HR documents should be read in date order with related records",
+      "Time records show no meal period punch on 9 of 11 shifts over 6.0 hours in the 05/01-05/15 export.",
+      "Time records show no meal period punch on 9 of 10 shifts over 6.0 hours in the 05/16-05/31 export (report in Spanish)."
+    ],
+    "missing": [
+      "This may help complete the timeline: Performance history before separation",
+      "This may help complete the timeline: time or schedule records for this period",
+      "This may help complete the timeline: Offer letter or employment agreement",
+      "This may help complete the timeline: Reimbursement records",
+      "This may help complete the timeline: performance or discipline records from this period"
+    ],
+    "documentRequest": null,
+    "documentResponse": null,
+    "intelligence": {
+      "confirmedEmployer": "Casa Tejocote Restaurant Group LLC",
+      "confirmedStartDate": null,
+      "confirmedTerminationDate": "June 6, 2025",
+      "confirmedTerminationReason": null,
+      "confirmedComplaintTopic": null,
+      "confirmedComplaintDate": null,
+      "confirmedHrResponseSummary": null,
+      "confirmedWarningReason": null,
+      "confirmedWarningDate": null,
+      "timingIntervals": [],
+      "overtimeIssueDetected": false,
+      "finalPayPresent": false,
+      "coworkerCorroboration": [],
+      "keyQuotes": [
+        {
+          "category": "Time Records",
+          "file_name": "Time Punch Export May 1-15 2025 - Maldonado.pdf",
+          "quote": "No meal period recorded on 9 of 11 shifts over 6.0 hours.",
+          "confidence": "high"
+        },
+        {
+          "category": "Time Records",
+          "file_name": "Reporte de Horas 16-31 mayo 2025.pdf",
+          "quote": "Sin registro de periodo de comida en 9 de 10 turnos de más de 6.0 horas.",
+          "confidence": "high"
+        },
+        {
+          "category": "Pay Records / Payroll",
+          "file_name": "Casa Tejocote Pay Stub 2025-05-23.pdf",
+          "quote": "Regular               16.50     76.25     1258.13          12139.05",
+          "confidence": "high"
+        },
+        {
+          "category": "Uncategorized",
+          "file_name": "Employee Handbook - Meal and Rest Breaks p11.pdf",
+          "quote": "Team members must clock out at the start of each meal break and clock back in when the break ends.",
+          "confidence": "medium"
+        },
+        {
+          "category": "Separation Records",
+          "file_name": "Termination texts - June 6 2025.pdf",
+          "quote": "Tonight was your last shift. We're taking you off the schedule for good.",
+          "confidence": "high"
+        },
+        {
+          "category": "Pay Records / Payroll",
+          "file_name": "Final Check Stub 2025-06-18.pdf",
+          "quote": "Final paycheck for all time worked through 06/06/2025.",
+          "confidence": "high"
+        }
+      ],
+      "allFlags": [
+        "no meal punch recorded on 9 of 11 shifts exceeding 6 hours in this export",
+        "document is in Spanish (time punch export)",
+        "no meal punch recorded on 9 of 10 shifts exceeding 6 hours in this export",
+        "overtime line shows 0.00",
+        "meal premium line shows 0.00",
+        "tips reported in cash, not paid through payroll",
+        "general policy page; not specific to one employee",
+        "employment end communicated by text message; no separation letter provided",
+        "final pay mentioned",
+        "manual check",
+        "check dated 06/18/2025 for a period ending 06/06/2025"
+      ],
+      "confirmationNeeded": [
+        "Employment start date not confirmed by documents.",
+        "HR complaint date not confirmed by documents.",
+        "Employer-stated reason for written warning not yet extracted."
+      ],
+      "clarificationQuestions": [
+        "A separation is documented, but a final paystub for that period was not detected. Do you have the final paystub or wage statement to upload?",
+        "The records do not yet show an employment start date. Do you have an offer letter or an early paystub that shows when you started?"
+      ],
+      "wageFacts": [
+        {
+          "docId": "p5-f1",
+          "docName": "Time Punch Export May 1-15 2025 - Maldonado.pdf",
+          "category": "Time Records",
+          "payRate": null,
+          "overtimeHours": null,
+          "overtimeRate": null,
+          "missedBreaks": "no meal period punch on 9 of 11 shifts over 6.0 hours in the 05/01-05/15 export",
+          "sources": {}
+        },
+        {
+          "docId": "p5-f2",
+          "docName": "Reporte de Horas 16-31 mayo 2025.pdf",
+          "category": "Time Records",
+          "payRate": null,
+          "overtimeHours": null,
+          "overtimeRate": null,
+          "missedBreaks": "no meal period punch on 9 of 10 shifts over 6.0 hours in the 05/16-05/31 export (report in Spanish)",
+          "sources": {}
+        },
+        {
+          "docId": "p5-f3",
+          "docName": "Casa Tejocote Pay Stub 2025-05-23.pdf",
+          "category": "Pay Records / Payroll",
+          "payRate": "16.50",
+          "overtimeHours": "0.00",
+          "overtimeRate": null,
+          "missedBreaks": null,
+          "sources": {
+            "pay_rate": "Regular               16.50     76.25     1258.13"
+          }
+        },
+        {
+          "docId": "p5-f6",
+          "docName": "Final Check Stub 2025-06-18.pdf",
+          "category": "Pay Records / Payroll",
+          "payRate": "16.50",
+          "overtimeHours": "0.00",
+          "overtimeRate": null,
+          "missedBreaks": null,
+          "sources": {
+            "pay_rate": "Regular               16.50     28.50      470.25"
+          }
+        }
+      ]
+    }
+  },
+  "worker": {
+    "personaId": "p5",
+    "workerName": "Rosa Maldonado-Vieyra",
+    "employer": "Casa Tejocote Restaurant Group LLC",
+    "employmentDates": "October 2024 to June 6, 2025",
+    "scenarioLabel": "Meal & rest break violations",
+    "storyText": "I waited tables at Casa Tejocote and on most long shifts I never got a real meal break, even when I worked nine or ten hours; the punch reports show it. They took me off the schedule for good by text on June 6, and my final check is dated June 18.",
+    "organizedSummary": "Worker reports employment with Casa Tejocote Restaurant Group LLC from October 2024 to June 6, 2025 and describes concerns involving missed breaks and scheduling or hours disputes.\n\nRecords currently reflect complaints or communications with management and Human Resources, payroll and timekeeping records, scheduling records, and separation documents across 6 records.\n\nThe file currently includes communications with management or Human Resources alongside workplace action records, including schedule changes and separation documentation. Dates and sequence may need confirmation against the source files.\n\nPeople referenced in the worker's account and uploaded records include Benny Cuellar (general manager) and Benny Cuellar. What remains unclear: Exact dates and timing may need confirmation against source files. Performance history before separation, Time or schedule records for this period, and Offer letter or employment agreement may help complete the timeline.",
+    "docCount": 6,
+    "timeline": [
+      {
+        "date": "05/15/2025",
+        "event": "Schedule change documented",
+        "category": "Time Records",
+        "summary": "Supported by Time Punch Export May 1-15 2025 - Maldonado.pdf. Related pattern: Scheduling and timekeeping.",
+        "relatedDocs": 1,
+        "sourceFileNames": [
+          "Time Punch Export May 1-15 2025 - Maldonado.pdf"
+        ],
+        "sourceDates": [
+          "05/15/2025"
+        ],
+        "sourceStrength": "partial"
+      },
+      {
+        "date": "05/23/2025",
+        "event": "Pay period or overtime record documented",
+        "category": "Pay Records / Payroll",
+        "summary": "Supported by Casa Tejocote Pay Stub 2025-05-23.pdf. Related patterns: Payroll and wage records, Workplace communications.",
+        "relatedDocs": 1,
+        "sourceFileNames": [
+          "Casa Tejocote Pay Stub 2025-05-23.pdf"
+        ],
+        "sourceDates": [
+          "05/23/2025"
+        ],
+        "sourceStrength": "strong"
+      },
+      {
+        "date": "05/31/2025",
+        "event": "Worker requests leave or accommodation",
+        "category": "Time Records",
+        "summary": "Supported by Reporte de Horas 16-31 mayo 2025.pdf. Related pattern: Leave or accommodation references.",
+        "relatedDocs": 1,
+        "sourceFileNames": [
+          "Reporte de Horas 16-31 mayo 2025.pdf"
+        ],
+        "sourceDates": [
+          "05/31/2025"
+        ],
+        "sourceStrength": "partial"
+      },
+      {
+        "date": "June 6, 2025",
+        "event": "Termination documented",
+        "category": "Separation Records",
+        "summary": "Supported by Termination texts - June 6 2025.pdf. Related patterns: Payroll and wage records, Scheduling and timekeeping, Workplace communications.",
+        "relatedDocs": 1,
+        "sourceFileNames": [
+          "Termination texts - June 6 2025.pdf"
+        ],
+        "sourceDates": [
+          "June 6, 2025"
+        ],
+        "sourceStrength": "strong"
+      },
+      {
+        "date": "06/18/2025",
+        "event": "Supporting employment documentation",
+        "category": "Pay Records / Payroll",
+        "summary": "Supported by Final Check Stub 2025-06-18.pdf. Related patterns: Payroll and wage records, Separation or final pay, Workplace communications.",
+        "relatedDocs": 1,
+        "sourceFileNames": [
+          "Final Check Stub 2025-06-18.pdf"
+        ],
+        "sourceDates": [
+          "06/18/2025"
+        ],
+        "sourceStrength": "strong"
+      },
+      {
+        "date": "Date unclear — review source document",
+        "event": "Schedule change documented",
+        "category": "Uncategorized",
+        "summary": "Supported by Employee Handbook - Meal and Rest Breaks p11.pdf. Related patterns: Scheduling and timekeeping, Workplace communications.",
+        "relatedDocs": 1,
+        "sourceFileNames": [
+          "Employee Handbook - Meal and Rest Breaks p11.pdf"
+        ],
+        "sourceDates": [],
+        "sourceStrength": "partial"
+      }
+    ],
+    "employmentMatterTags": [
+      "wage_hour"
+    ],
+    "coverage": [
+      {
+        "key": "wage_statements",
+        "label": "Itemized wage statements",
+        "citation": "Labor Code § 226",
+        "state": "on_file",
+        "describeMissing": "California requires itemized wage statements each pay period (Labor Code § 226). None are in your file yet.",
+        "workerObtainable": true
+      },
+      {
+        "key": "wtpa_notice",
+        "label": "Wage notice given at hire (Notice to Employee)",
+        "citation": "Labor Code § 2810.5",
+        "state": "not_in_record",
+        "describeMissing": "California requires a written wage notice at hire for most non-exempt employees (Labor Code § 2810.5). It is not in your file yet.",
+        "workerObtainable": true
+      },
+      {
+        "key": "personnel_file",
+        "label": "Personnel file",
+        "citation": "Labor Code § 1198.5",
+        "state": "not_in_record",
+        "describeMissing": "You have the right to inspect and copy your personnel file (Labor Code § 1198.5). It is not in your file yet.",
+        "workerObtainable": true
+      },
+      {
+        "key": "time_records",
+        "label": "Time and hours records",
+        "citation": "Labor Code § 1174 / Wage Order",
+        "state": "on_file",
+        "describeMissing": "Employers must keep accurate time records of hours worked (Labor Code § 1174). None are in your file yet.",
+        "workerObtainable": true
+      },
+      {
+        "key": "meal_rest",
+        "label": "Meal and rest break records",
+        "citation": "Labor Code §§ 226.7, 512",
+        "state": "on_file",
+        "describeMissing": "Records of meal and rest breaks (or premium pay for missed ones) relate to Labor Code §§ 226.7 and 512. None are in your file yet.",
+        "workerObtainable": true
+      },
+      {
+        "key": "final_pay",
+        "label": "Final paycheck",
+        "citation": "Labor Code §§ 201–203",
+        "state": "on_file",
+        "describeMissing": "Final wages are due on a specific timeline after employment ends (Labor Code §§ 201–203). A final paycheck record is not in your file yet.",
+        "workerObtainable": true
+      },
+      {
+        "key": "expense_reimbursement",
+        "label": "Business-expense reimbursement records",
+        "citation": "Labor Code § 2802",
+        "state": "not_in_record",
+        "describeMissing": "California requires employers to reimburse necessary business expenses — including a reasonable share of home internet and personal cell phone used for work (Labor Code § 2802). No expense-reimbursement records are in your file yet.",
+        "workerObtainable": true
+      },
+      {
+        "key": "harassment_policy",
+        "label": "Anti-harassment policy acknowledgment",
+        "citation": "Gov. Code § 12950 / SB 1343",
+        "state": "not_in_record",
+        "describeMissing": "California requires employers to provide a written harassment policy (Gov. Code § 12950). An acknowledgment is not in your file yet.",
+        "workerObtainable": true
+      },
+      {
+        "key": "offer_or_agreement",
+        "label": "Offer letter or employment agreement",
+        "citation": "Records you signed — Labor Code § 432",
+        "state": "not_in_record",
+        "describeMissing": "You are entitled to copies of documents you signed to obtain or hold your job (Labor Code § 432). An offer letter or agreement is not in your file yet.",
+        "workerObtainable": true
+      }
+    ],
+    "readiness": [
+      "Taken together, uploaded payroll records (2 files: Casa Tejocote Pay Stub 2025-05-23.pdf, Final Check Stub 2025-06-18.pdf) include pay periods, amounts, or hou…",
+      "Records mention in “Casa Tejocote Pay Stub 2025-05-23.pdf”: pay date 05/23/2025; gross $1670.13, net $1039.85.",
+      "Records mention in “Final Check Stub 2025-06-18.pdf”: pay date 06/18/2025; gross $470.25, net $405.12.",
+      "Taken together, communication wording across 4 files touches payroll.",
+      "Records mention in “Casa Tejocote Pay Stub 2025-05-23.pdf”, wording that may describe a worker concern (“received in cash and are not paid through payroll.”).",
+      "Records mention in “Termination texts - June 6 2025.pdf”, wording that may describe a worker concern (“I'm owed for this week and my tips.”).",
+      "This may be useful for human review: Pay period boundaries recur across the payroll materials and may anchor how compensation activity is read over time.",
+      "This may be useful for human review: Separation or final-pay wording appears in the set and may mark a transition point in the chronology.",
+      "This may be useful for human review: Scheduling or attendance materials sit alongside payroll records, which may help clarify hours versus pay.",
+      "This may be useful for human review: Payroll and wage records: Additional Information May Help: wording across the uploads touches payroll, pay stub, earnings — pay amounts, periods, and time records should be compared in the source files",
+      "This may be useful for human review: Scheduling and timekeeping: Additional Information May Help: wording across the uploads touches schedule, shift, clock out, meal break — logged hours and schedules should be compared with pay records where both exist",
+      "This may be useful for human review: Separation or final pay: Additional Information May Help: wording across the uploads touches termination, separation, final paycheck, final pay — separation paperwork and final pay records should be read together for timing",
+      "This may be useful for human review: Workplace communications: Additional Information May Help: wording across the uploads touches hr, reported, manager — messages and HR documents should be read in date order with related records",
+      "Time records show no meal period punch on 9 of 11 shifts over 6.0 hours in the 05/01-05/15 export.",
+      "Time records show no meal period punch on 9 of 10 shifts over 6.0 hours in the 05/16-05/31 export (report in Spanish)."
+    ],
+    "missing": [
+      "This may help complete the timeline: Performance history before separation",
+      "This may help complete the timeline: time or schedule records for this period",
+      "This may help complete the timeline: Offer letter or employment agreement",
+      "This may help complete the timeline: Reimbursement records",
+      "This may help complete the timeline: performance or discipline records from this period"
+    ],
+    "fileInventory": [
+      {
+        "fileName": "Time Punch Export May 1-15 2025 - Maldonado.pdf",
+        "category": "Time Records"
+      },
+      {
+        "fileName": "Reporte de Horas 16-31 mayo 2025.pdf",
+        "category": "Time Records"
+      },
+      {
+        "fileName": "Casa Tejocote Pay Stub 2025-05-23.pdf",
+        "category": "Pay Records"
+      },
+      {
+        "fileName": "Employee Handbook - Meal and Rest Breaks p11.pdf",
+        "category": "Uncategorized"
+      },
+      {
+        "fileName": "Termination texts - June 6 2025.pdf",
+        "category": "HR Documents"
+      },
+      {
+        "fileName": "Final Check Stub 2025-06-18.pdf",
+        "category": "Pay Records / Payroll"
+      }
+    ]
+  }
+}

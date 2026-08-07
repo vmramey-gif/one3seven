@@ -1,0 +1,407 @@
+{
+  "personaId": "p4",
+  "personaName": "Gwen Baptiste",
+  "firm": {
+    "previewOnly": false,
+    "routeId": "demo-p4",
+    "routeStatus": "full_access",
+    "intakeNumber": "P4-DEMO",
+    "isFirmCodeIntake": false,
+    "submissionChannel": "participating",
+    "intakeWorkflowStatus": "Under Firm Review",
+    "overview": "The current record set follows employment activity between August 2022 and May 19, 2025. It is organized around workplace communications, schedule or timekeeping records, pay records, and separation records.\n\nWorkplace communications and HR-related wording appear alongside other records and may help show how issues were discussed.\n\nLeave or accommodation wording appears in the materials and may help clarify requests, responses, and timing.\n\nSeparation or final-pay wording appears in the set and may mark a transition point in the chronology.\n\nTaken together, pay records and timekeeping materials may be read together to see how hours and pay periods relate.\n\nRecords mention materials that span multiple periods between August 2022 and May 19, 2025 and may help reconstruct payroll, scheduling, and employment-related events over time.\n\nOrganized for review preparation only — not legal advice or outcome prediction.",
+    "timelineSummary": "April 7, 2025 — Worker requests leave or accommodation.  Supported by Work Status Report - Baptiste 04-07-2025.",
+    "workerProvidedContext": "After a wrist injury, my doctor limited my typing for six weeks and I asked for a few temporary changes like dictation software and someone else covering the daily scanning batch. HR wrote back that data entry was essential and could not be changed, and my employment ended on April 25.",
+    "workerFollowUp": {
+      "employer": "Quillwater Escrow, Inc.",
+      "keyPeople": "Petra Nyland (People & Culture Manager), Desmond Ainsley (Branch Manager), Dr. Imelda Vasquez-Cho (treating physician)",
+      "workState": "CA",
+      "reimbursed": "",
+      "employerState": "CA",
+      "employmentName": "Gwen Baptiste",
+      "remoteExpenses": "",
+      "workedRemotely": "",
+      "employmentDates": "August 2022 to April 25, 2025",
+      "changedAfterward": "",
+      "employmentStatus": "employment_ended",
+      "priorAgencyFiling": "",
+      "arbitrationAgreement": "",
+      "complainedOrReported": "Requested temporary accommodations in writing on April 9, 2025.",
+      "priorAgencyFilingDetails": ""
+    },
+    "employmentMatterTags": [
+      "disability_accommodation",
+      "wrongful_termination"
+    ],
+    "events": [
+      {
+        "id": "p4-ev-1",
+        "event_date": "April 7, 2025",
+        "title": "Worker requests leave or accommodation",
+        "category": "Uncategorized",
+        "ai_summary": "Supported by Work Status Report - Baptiste 04-07-2025.pdf. Related patterns: Scheduling and timekeeping, Workplace communications, Leave or accommodation references.",
+        "worker_context": ""
+      },
+      {
+        "id": "p4-ev-2",
+        "event_date": "April 9, 2025",
+        "title": "Worker requests leave or accommodation",
+        "category": "Uncategorized",
+        "ai_summary": "Supported by Accommodation request email - Baptiste.pdf. Related patterns: Workplace communications, Leave or accommodation references.",
+        "worker_context": ""
+      },
+      {
+        "id": "p4-ev-3",
+        "event_date": "April 16, 2025",
+        "title": "Worker requests leave or accommodation",
+        "category": "Uncategorized",
+        "ai_summary": "Supported by RE Accommodation request - HR response.pdf, IMG_2047.pdf. Related patterns: Workplace communications, Leave or accommodation references.",
+        "worker_context": ""
+      },
+      {
+        "id": "p4-ev-4",
+        "event_date": "April 25, 2025",
+        "title": "Termination documented (Desmond Ainsley)",
+        "category": "Separation Records",
+        "ai_summary": "Supported by Termination Letter - Baptiste.pdf. Related patterns: Payroll and wage records, Separation or final pay, Workplace communications.",
+        "worker_context": ""
+      },
+      {
+        "id": "p4-ev-5",
+        "event_date": "Date unclear — review source document",
+        "title": "Workplace communication documented",
+        "category": "Uncategorized",
+        "ai_summary": "Supported by Escrow Assistant Job Description.pdf. Related patterns: Workplace communications, Offer or pay structure.",
+        "worker_context": ""
+      }
+    ],
+    "files": [
+      {
+        "file_name": "Work Status Report - Baptiste 04-07-2025.pdf",
+        "category": "Uncategorized"
+      },
+      {
+        "file_name": "Accommodation request email - Baptiste.pdf",
+        "category": "Uncategorized"
+      },
+      {
+        "file_name": "RE Accommodation request - HR response.pdf",
+        "category": "Uncategorized"
+      },
+      {
+        "file_name": "Escrow Assistant Job Description.pdf",
+        "category": "Uncategorized"
+      },
+      {
+        "file_name": "Termination Letter - Baptiste.pdf",
+        "category": "HR Documents"
+      },
+      {
+        "file_name": "IMG_2047.pdf",
+        "category": "Uncategorized"
+      }
+    ],
+    "readiness": [
+      "Records mention dated messages or threads in Accommodation request email - Baptiste.pdf, RE Accommodation request - HR response.pdf, IMG_2047.pdf (for example…",
+      "Taken together, communication wording across 4 files touches manager.",
+      "Records mention in “Accommodation request email - Baptiste.pdf”, wording that may describe a worker concern (“I am requesting the following temporary changes:…",
+      "Records mention in “RE Accommodation request - HR response.pdf”, wording that may describe a worker concern (“week. Petra Nyland People & Culture Manager Quill…",
+      "Records mention in “Termination Letter - Baptiste.pdf”, wording that may describe a worker concern (“Sincerely, Desmond Ainsley Branch Manager Quillwater Escro…",
+      "Records mention in “IMG_2047.pdf”, wording that may describe a worker concern (“week. Petra Nyland People & Culture Manager Quillwater Escrow, Inc.”).",
+      "This may be useful for human review: Workplace communications and HR-related wording appear alongside other records and may help show how issues were discussed.",
+      "This may be useful for human review: Leave or accommodation wording appears in the materials and may help clarify requests, responses, and timing.",
+      "This may be useful for human review: Separation or final-pay wording appears in the set and may mark a transition point in the chronology.",
+      "This may be useful for human review: Classification or pay-structure language appears in the materials and may need comparison with pay records.",
+      "This may be useful for human review: Separation or final pay: Additional Information May Help: wording across the uploads touches termination, separation, final paycheck, final pay — separation paperwork and final pay records should be read together for timing",
+      "This may be useful for human review: Workplace communications: Additional Information May Help: wording across the uploads touches hr, manager, email — messages and HR documents should be read in date order with related records",
+      "This may be useful for human review: Leave or accommodation references: Additional Information May Help: wording across the uploads touches accommodation, doctor, restriction — leave or accommodation references should be matched to dates in other uploads",
+      "This may be useful for human review: Offer or pay structure: Additional Information May Help: wording across the uploads touches exempt, non-exempt — offer terms and pay records should be compared for classification and pay wording"
+    ],
+    "missing": [
+      "This may help complete the timeline: Performance history before separation",
+      "This may help complete the timeline: time or schedule records for this period",
+      "This may help complete the timeline: a written policy that may explain this reference",
+      "This may help complete the timeline: Reimbursement records"
+    ],
+    "documentRequest": null,
+    "documentResponse": null,
+    "intelligence": {
+      "confirmedEmployer": "Quillwater Escrow, Inc.",
+      "confirmedStartDate": null,
+      "confirmedTerminationDate": "April 25, 2025",
+      "confirmedTerminationReason": "Current medical restrictions described as preventing an essential function; role described as unable to be modified.",
+      "confirmedComplaintTopic": null,
+      "confirmedComplaintDate": null,
+      "confirmedHrResponseSummary": null,
+      "confirmedWarningReason": null,
+      "confirmedWarningDate": null,
+      "timingIntervals": [],
+      "overtimeIssueDetected": false,
+      "finalPayPresent": false,
+      "coworkerCorroboration": [],
+      "keyQuotes": [
+        {
+          "category": "Uncategorized",
+          "file_name": "Work Status Report - Baptiste 04-07-2025.pdf",
+          "quote": "Keyboarding limited to no more than 2 hours per day, in intervals of 20 minutes or less.",
+          "confidence": "high"
+        },
+        {
+          "category": "Uncategorized",
+          "file_name": "Accommodation request email - Baptiste.pdf",
+          "quote": "I am requesting the following temporary changes: 1. Dictation software for file notes and emails. 2. An ergonomic split keyboard. 3. Reassignment of the daily scanning batch.",
+          "confidence": "high"
+        },
+        {
+          "category": "Uncategorized",
+          "file_name": "RE Accommodation request - HR response.pdf",
+          "quote": "Continuous data entry is an essential function of the Escrow Assistant role as written, and we are not in a position to remove the scanning batch from the role or to fund special equipment at this time.",
+          "confidence": "high"
+        },
+        {
+          "category": "Uncategorized",
+          "file_name": "Escrow Assistant Job Description.pdf",
+          "quote": "Data entry of file information into the escrow production system (approximately 5-6 hours per day).",
+          "confidence": "medium"
+        },
+        {
+          "category": "Separation Records",
+          "file_name": "Termination Letter - Baptiste.pdf",
+          "quote": "Because your current medical restrictions prevent you from performing that function through May 19, and the branch is unable to modify the role, the company has decided to end your employment.",
+          "confidence": "high"
+        },
+        {
+          "category": "Uncategorized",
+          "file_name": "IMG_2047.pdf",
+          "quote": "Continuous data entry is an essential function of the Escrow Assistant role as written, and we are not in a position to remove the scanning batch from the role or to fund special equipment at this time.",
+          "confidence": "high"
+        }
+      ],
+      "allFlags": [
+        "work restrictions stated with a defined start and end date",
+        "accommodation request states specific temporary changes and an end date",
+        "request denied; response sets an end-of-week deadline for the employee to respond",
+        "generic position description; not addressed to an individual",
+        "letter ties the employment end to the medical restrictions and the role as written",
+        "file appears to duplicate the content of another uploaded email (RE Accommodation request - HR response)"
+      ],
+      "confirmationNeeded": [
+        "Employment start date not confirmed by documents.",
+        "HR complaint date not confirmed by documents.",
+        "Employer-stated reason for written warning not yet extracted."
+      ],
+      "clarificationQuestions": [
+        "A separation is documented, but a final paystub for that period was not detected. Do you have the final paystub or wage statement to upload?",
+        "The records do not yet show an employment start date. Do you have an offer letter or an early paystub that shows when you started?"
+      ],
+      "wageFacts": []
+    }
+  },
+  "worker": {
+    "personaId": "p4",
+    "workerName": "Gwen Baptiste",
+    "employer": "Quillwater Escrow, Inc.",
+    "employmentDates": "August 2022 to April 25, 2025",
+    "scenarioLabel": "Disability accommodation denied",
+    "storyText": "After a wrist injury, my doctor limited my typing for six weeks and I asked for a few temporary changes like dictation software and someone else covering the daily scanning batch. HR wrote back that data entry was essential and could not be changed, and my employment ended on April 25.",
+    "organizedSummary": "Worker reports employment with Quillwater Escrow, Inc. from August 2022 to April 25, 2025.\n\nAccording to their account, concerns were raised with management and Human Resources during 2025.\n\nRecords currently reflect complaints or communications with management and Human Resources, payroll and timekeeping records, scheduling records, and separation documents across 6 records.\n\nThe file currently includes communications with management or Human Resources alongside workplace action records, including schedule changes and separation documentation. Dates and sequence may need confirmation against the source files.\n\nPeople referenced in the worker's account and uploaded records include Petra Nyland (People & Culture Manager), Desmond Ainsley (Branch Manager), Dr. Imelda Vasquez-Cho (treating physician), Imelda Vasquez-Cho, and Petra Nyland (Coworker). What remains unclear: Exact dates and timing may need confirmation against source files. Performance history before separation, Time or schedule records for this period, and A written policy that may explain this reference may help complete the timeline.",
+    "docCount": 6,
+    "timeline": [
+      {
+        "date": "April 7, 2025",
+        "event": "Worker requests leave or accommodation",
+        "category": "Uncategorized",
+        "summary": "Supported by Work Status Report - Baptiste 04-07-2025.pdf. Related patterns: Scheduling and timekeeping, Workplace communications, Leave or accommodation references.",
+        "relatedDocs": 1,
+        "sourceFileNames": [
+          "Work Status Report - Baptiste 04-07-2025.pdf"
+        ],
+        "sourceDates": [
+          "April 7, 2025"
+        ],
+        "sourceStrength": "strong"
+      },
+      {
+        "date": "April 9, 2025",
+        "event": "Worker requests leave or accommodation",
+        "category": "Uncategorized",
+        "summary": "Supported by Accommodation request email - Baptiste.pdf. Related patterns: Workplace communications, Leave or accommodation references.",
+        "relatedDocs": 1,
+        "sourceFileNames": [
+          "Accommodation request email - Baptiste.pdf"
+        ],
+        "sourceDates": [
+          "April 9, 2025"
+        ],
+        "sourceStrength": "strong"
+      },
+      {
+        "date": "April 16, 2025",
+        "event": "Worker requests leave or accommodation",
+        "category": "Uncategorized",
+        "summary": "Supported by RE Accommodation request - HR response.pdf, IMG_2047.pdf. Related patterns: Workplace communications, Leave or accommodation references.",
+        "relatedDocs": 2,
+        "sourceFileNames": [
+          "RE Accommodation request - HR response.pdf",
+          "IMG_2047.pdf"
+        ],
+        "sourceDates": [
+          "April 16, 2025"
+        ],
+        "sourceStrength": "strong"
+      },
+      {
+        "date": "April 25, 2025",
+        "event": "Termination documented (Desmond Ainsley)",
+        "category": "Separation Records",
+        "summary": "Supported by Termination Letter - Baptiste.pdf. Related patterns: Payroll and wage records, Separation or final pay, Workplace communications.",
+        "relatedDocs": 1,
+        "sourceFileNames": [
+          "Termination Letter - Baptiste.pdf"
+        ],
+        "sourceDates": [
+          "April 25, 2025"
+        ],
+        "sourceStrength": "strong"
+      },
+      {
+        "date": "Date unclear — review source document",
+        "event": "Workplace communication documented",
+        "category": "Uncategorized",
+        "summary": "Supported by Escrow Assistant Job Description.pdf. Related patterns: Workplace communications, Offer or pay structure.",
+        "relatedDocs": 1,
+        "sourceFileNames": [
+          "Escrow Assistant Job Description.pdf"
+        ],
+        "sourceDates": [],
+        "sourceStrength": "partial"
+      }
+    ],
+    "employmentMatterTags": [
+      "disability_accommodation",
+      "wrongful_termination"
+    ],
+    "coverage": [
+      {
+        "key": "wage_statements",
+        "label": "Itemized wage statements",
+        "citation": "Labor Code § 226",
+        "state": "not_in_record",
+        "describeMissing": "California requires itemized wage statements each pay period (Labor Code § 226). None are in your file yet.",
+        "workerObtainable": true
+      },
+      {
+        "key": "wtpa_notice",
+        "label": "Wage notice given at hire (Notice to Employee)",
+        "citation": "Labor Code § 2810.5",
+        "state": "not_in_record",
+        "describeMissing": "California requires a written wage notice at hire for most non-exempt employees (Labor Code § 2810.5). It is not in your file yet.",
+        "workerObtainable": true
+      },
+      {
+        "key": "personnel_file",
+        "label": "Personnel file",
+        "citation": "Labor Code § 1198.5",
+        "state": "not_in_record",
+        "describeMissing": "You have the right to inspect and copy your personnel file (Labor Code § 1198.5). It is not in your file yet.",
+        "workerObtainable": true
+      },
+      {
+        "key": "time_records",
+        "label": "Time and hours records",
+        "citation": "Labor Code § 1174 / Wage Order",
+        "state": "not_in_record",
+        "describeMissing": "Employers must keep accurate time records of hours worked (Labor Code § 1174). None are in your file yet.",
+        "workerObtainable": true
+      },
+      {
+        "key": "meal_rest",
+        "label": "Meal and rest break records",
+        "citation": "Labor Code §§ 226.7, 512",
+        "state": "not_in_record",
+        "describeMissing": "Records of meal and rest breaks (or premium pay for missed ones) relate to Labor Code §§ 226.7 and 512. None are in your file yet.",
+        "workerObtainable": true
+      },
+      {
+        "key": "final_pay",
+        "label": "Final paycheck",
+        "citation": "Labor Code §§ 201–203",
+        "state": "not_in_record",
+        "describeMissing": "Final wages are due on a specific timeline after employment ends (Labor Code §§ 201–203). A final paycheck record is not in your file yet.",
+        "workerObtainable": true
+      },
+      {
+        "key": "expense_reimbursement",
+        "label": "Business-expense reimbursement records",
+        "citation": "Labor Code § 2802",
+        "state": "not_in_record",
+        "describeMissing": "California requires employers to reimburse necessary business expenses — including a reasonable share of home internet and personal cell phone used for work (Labor Code § 2802). No expense-reimbursement records are in your file yet.",
+        "workerObtainable": true
+      },
+      {
+        "key": "harassment_policy",
+        "label": "Anti-harassment policy acknowledgment",
+        "citation": "Gov. Code § 12950 / SB 1343",
+        "state": "not_in_record",
+        "describeMissing": "California requires employers to provide a written harassment policy (Gov. Code § 12950). An acknowledgment is not in your file yet.",
+        "workerObtainable": true
+      },
+      {
+        "key": "offer_or_agreement",
+        "label": "Offer letter or employment agreement",
+        "citation": "Records you signed — Labor Code § 432",
+        "state": "not_in_record",
+        "describeMissing": "You are entitled to copies of documents you signed to obtain or hold your job (Labor Code § 432). An offer letter or agreement is not in your file yet.",
+        "workerObtainable": true
+      }
+    ],
+    "readiness": [
+      "Records mention dated messages or threads in Accommodation request email - Baptiste.pdf, RE Accommodation request - HR response.pdf, IMG_2047.pdf (for example…",
+      "Taken together, communication wording across 4 files touches manager.",
+      "Records mention in “Accommodation request email - Baptiste.pdf”, wording that may describe a worker concern (“I am requesting the following temporary changes:…",
+      "Records mention in “RE Accommodation request - HR response.pdf”, wording that may describe a worker concern (“week. Petra Nyland People & Culture Manager Quill…",
+      "Records mention in “Termination Letter - Baptiste.pdf”, wording that may describe a worker concern (“Sincerely, Desmond Ainsley Branch Manager Quillwater Escro…",
+      "Records mention in “IMG_2047.pdf”, wording that may describe a worker concern (“week. Petra Nyland People & Culture Manager Quillwater Escrow, Inc.”).",
+      "This may be useful for human review: Workplace communications and HR-related wording appear alongside other records and may help show how issues were discussed.",
+      "This may be useful for human review: Leave or accommodation wording appears in the materials and may help clarify requests, responses, and timing.",
+      "This may be useful for human review: Separation or final-pay wording appears in the set and may mark a transition point in the chronology.",
+      "This may be useful for human review: Classification or pay-structure language appears in the materials and may need comparison with pay records.",
+      "This may be useful for human review: Separation or final pay: Additional Information May Help: wording across the uploads touches termination, separation, final paycheck, final pay — separation paperwork and final pay records should be read together for timing",
+      "This may be useful for human review: Workplace communications: Additional Information May Help: wording across the uploads touches hr, manager, email — messages and HR documents should be read in date order with related records",
+      "This may be useful for human review: Leave or accommodation references: Additional Information May Help: wording across the uploads touches accommodation, doctor, restriction — leave or accommodation references should be matched to dates in other uploads",
+      "This may be useful for human review: Offer or pay structure: Additional Information May Help: wording across the uploads touches exempt, non-exempt — offer terms and pay records should be compared for classification and pay wording"
+    ],
+    "missing": [
+      "This may help complete the timeline: Performance history before separation",
+      "This may help complete the timeline: time or schedule records for this period",
+      "This may help complete the timeline: a written policy that may explain this reference",
+      "This may help complete the timeline: Reimbursement records"
+    ],
+    "fileInventory": [
+      {
+        "fileName": "Work Status Report - Baptiste 04-07-2025.pdf",
+        "category": "Uncategorized"
+      },
+      {
+        "fileName": "Accommodation request email - Baptiste.pdf",
+        "category": "Uncategorized"
+      },
+      {
+        "fileName": "RE Accommodation request - HR response.pdf",
+        "category": "Uncategorized"
+      },
+      {
+        "fileName": "Escrow Assistant Job Description.pdf",
+        "category": "Uncategorized"
+      },
+      {
+        "fileName": "Termination Letter - Baptiste.pdf",
+        "category": "HR Documents"
+      },
+      {
+        "fileName": "IMG_2047.pdf",
+        "category": "Uncategorized"
+      }
+    ]
+  }
+}

@@ -6,6 +6,7 @@ import './styles/index.css';
 import { SupabaseConfigRequired } from './app/components/SupabaseConfigRequired.tsx';
 import { AppErrorBoundary } from './app/components/AppErrorBoundary.tsx';
 import { DemoApp } from './app/screens/DemoApp.tsx';
+import { SalesDemoPage } from './app/screens/SalesDemoPage.tsx';
 import { WorkerDemoPage } from './app/screens/WorkerDemoPage.tsx';
 import { FireWorkerDemoPage } from './app/screens/FireWorkerDemoPage.tsx';
 import { CaseFactsDemoPage } from './app/screens/CaseFactsDemoPage.tsx';
@@ -59,6 +60,10 @@ const isDemo =
 const isWorkerDemo =
   url.searchParams.has('worker-demo') ||
   url.pathname === '/worker-demo';
+
+// Primary sales demo — obscured URL (no in-product link, no memorable slug), no login required.
+// 5 fictional synthetic personas; worker view flips to the firm's side of the same case.
+const isSalesDemo = url.pathname === '/sales-demo-7k2m9x4p';
 
 const isFireDemo =
   url.searchParams.has('fire-demo') ||
@@ -134,6 +139,7 @@ const routeTitle =
   : isCaseDemo ? 'Case Facts, Assembled — one3seven'
   : isClaimLensDemo ? 'Claim Lens — one3seven'
   : isTxDemo ? 'Texas Demo — one3seven'
+  : isSalesDemo ? 'Sample Cases — one3seven'
   : isWorkerDemo ? 'Worker Demo — one3seven'
   : isDemo ? 'Sample Intake Demo — one3seven'
   : isForFirms ? 'one3seven for Firms — Organized Employment Intake'
@@ -174,6 +180,10 @@ if (url.pathname === '/terms') {
 } else if (isTxDemo) {
   createRoot(rootEl).render(
     <AppErrorBoundary><TexasCriminalDemoPage /></AppErrorBoundary>
+  );
+} else if (isSalesDemo) {
+  createRoot(rootEl).render(
+    <AppErrorBoundary><SalesDemoPage /></AppErrorBoundary>
   );
 } else if (isWorkerDemo) {
   createRoot(rootEl).render(

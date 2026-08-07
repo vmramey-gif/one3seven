@@ -1,0 +1,444 @@
+{
+  "personaId": "p2",
+  "personaName": "Daniela Reyes-Okafor",
+  "firm": {
+    "previewOnly": false,
+    "routeId": "demo-p2",
+    "routeStatus": "full_access",
+    "intakeNumber": "P2-DEMO",
+    "isFirmCodeIntake": false,
+    "submissionChannel": "participating",
+    "intakeWorkflowStatus": "Under Firm Review",
+    "overview": "The current record set follows employment activity between June 2021 and January 5, 2026. It is organized around workplace communications, pay records, and separation records.\n\nPay period boundaries recur across the payroll materials and may anchor how compensation activity is read over time.\n\nLeave or accommodation wording appears in the materials and may help clarify requests, responses, and timing.\n\nSeparation or final-pay wording appears in the set and may mark a transition point in the chronology.\n\nTaken together, separation-related materials and payroll records may help clarify final-pay timing near the end of the sequence.\n\nRecords mention materials that span multiple periods between June 2021 and January 5, 2026 and may help reconstruct payroll, scheduling, and employment-related events over time.\n\nOrganized for review preparation only — not legal advice or outcome prediction.",
+    "timelineSummary": "March 10, 2025 — Schedule change documented.  Supported by Pregnancy announcement email 2025-03-10.",
+    "workerProvidedContext": "I announced my pregnancy on March 10 and submitted a leave request for the fall; my March 28 review was the best rating I ever received. I was placed on a performance plan on April 15 and terminated on May 2, and my final check was handed to me the same day.",
+    "workerFollowUp": {
+      "employer": "Lanternfish Media LLC",
+      "keyPeople": "Colin Abernathy (Director of Client Services), Marguerite Solano (People Operations Manager)",
+      "workState": "CA",
+      "reimbursed": "",
+      "employerState": "CA",
+      "employmentName": "Daniela Reyes-Okafor",
+      "remoteExpenses": "",
+      "workedRemotely": "",
+      "employmentDates": "June 2021 to May 2, 2025",
+      "changedAfterward": "",
+      "employmentStatus": "employment_ended",
+      "priorAgencyFiling": "",
+      "arbitrationAgreement": "",
+      "complainedOrReported": "",
+      "priorAgencyFilingDetails": ""
+    },
+    "employmentMatterTags": [
+      "fmla_cfra",
+      "wrongful_termination",
+      "discrimination"
+    ],
+    "events": [
+      {
+        "id": "p2-ev-1",
+        "event_date": "March 10, 2025",
+        "title": "Schedule change documented",
+        "category": "Uncategorized",
+        "ai_summary": "Supported by Pregnancy announcement email 2025-03-10.pdf. Related patterns: Scheduling and timekeeping, Workplace communications.",
+        "worker_context": ""
+      },
+      {
+        "id": "p2-ev-2",
+        "event_date": "March 24, 2025",
+        "title": "Worker requests leave or accommodation",
+        "category": "Uncategorized",
+        "ai_summary": "Supported by Leave of Absence Request - Reyes-Okafor.pdf. Related patterns: Scheduling and timekeeping, Leave or accommodation references.",
+        "worker_context": ""
+      },
+      {
+        "id": "p2-ev-3",
+        "event_date": "March 28, 2025",
+        "title": "Performance review completed",
+        "category": "Uncategorized",
+        "ai_summary": "Supported by 2024 Annual Performance Review - Reyes-Okafor.pdf.",
+        "worker_context": ""
+      },
+      {
+        "id": "p2-ev-4",
+        "event_date": "April 15, 2025",
+        "title": "Performance improvement plan issued",
+        "category": "Performance / discipline records",
+        "ai_summary": "Supported by Performance Improvement Plan - D Reyes-Okafor.pdf. Related patterns: Scheduling and timekeeping, Separation or final pay, Workplace communications.",
+        "worker_context": ""
+      },
+      {
+        "id": "p2-ev-5",
+        "event_date": "05/02/2025",
+        "title": "Supporting employment documentation",
+        "category": "Pay Records / Payroll",
+        "ai_summary": "Supported by Final Pay Stub - Reyes-Okafor 2025-05-02.pdf. Related patterns: Payroll and wage records, Scheduling and timekeeping, Separation or final pay.",
+        "worker_context": ""
+      },
+      {
+        "id": "p2-ev-6",
+        "event_date": "May 2, 2025",
+        "title": "Termination documented",
+        "category": "Separation Records",
+        "ai_summary": "Supported by Termination Letter - Reyes-Okafor.pdf. Related patterns: Payroll and wage records, Scheduling and timekeeping, Separation or final pay.",
+        "worker_context": ""
+      }
+    ],
+    "files": [
+      {
+        "file_name": "2024 Annual Performance Review - Reyes-Okafor.pdf",
+        "category": "Performance Reviews"
+      },
+      {
+        "file_name": "Pregnancy announcement email 2025-03-10.pdf",
+        "category": "Uncategorized"
+      },
+      {
+        "file_name": "Leave of Absence Request - Reyes-Okafor.pdf",
+        "category": "Uncategorized"
+      },
+      {
+        "file_name": "Performance Improvement Plan - D Reyes-Okafor.pdf",
+        "category": "Performance Reviews"
+      },
+      {
+        "file_name": "Termination Letter - Reyes-Okafor.pdf",
+        "category": "HR Documents"
+      },
+      {
+        "file_name": "Final Pay Stub - Reyes-Okafor 2025-05-02.pdf",
+        "category": "HR Documents"
+      }
+    ],
+    "readiness": [
+      "Records mention in “Final Pay Stub - Reyes-Okafor 2025-05-02.pdf”: pay date 05/02/2025; gross $3453.87, net $2612.85.",
+      "A reviewing professional may want to confirm pay period and amount wording against the original upload.",
+      "Records mention dated messages or threads in Pregnancy announcement email 2025-03-10.pdf (for example Monday, March 10, 2025 9:14:32 AM).",
+      "Taken together, communication wording across 4 files touches manager.",
+      "Records mention in “Pregnancy announcement email 2025-03-10.pdf”, wording that may describe a worker concern (“I'm expecting a baby, due September 8, 2025.”).",
+      "Records mention in “Termination Letter - Reyes-Okafor.pdf”, wording that may describe a worker concern (“Marguerite Solano People Operations Manager Lanternfis…",
+      "This may be useful for human review: Pay period boundaries recur across the payroll materials and may anchor how compensation activity is read over time.",
+      "This may be useful for human review: Leave or accommodation wording appears in the materials and may help clarify requests, responses, and timing.",
+      "This may be useful for human review: Separation or final-pay wording appears in the set and may mark a transition point in the chronology.",
+      "This may be useful for human review: Performance or discipline wording appears in the materials and may help clarify the sequence of workplace actions.",
+      "This may be useful for human review: Payroll and wage records: Additional Information May Help: wording across the uploads touches payroll, pay stub, wages, earnings — pay amounts, periods, and time records should be compared in the source files",
+      "This may be useful for human review: Scheduling and timekeeping: Additional Information May Help: wording across the uploads touches schedule, pto, leave — logged hours and schedules should be compared with pay records where both exist",
+      "This may be useful for human review: Separation or final pay: Additional Information May Help: wording across the uploads touches termination, separation, final paycheck, final pay — separation paperwork and final pay records should be read together for timing",
+      "This may be useful for human review: Workplace communications: Additional Information May Help: wording across the uploads touches hr, manager, email — messages and HR documents should be read in date order with related records"
+    ],
+    "missing": [
+      "This may help complete the timeline: time or schedule records for this period",
+      "This may help complete the timeline: Offer letter or employment agreement",
+      "This may help complete the timeline: a written policy that may explain this reference",
+      "This may help complete the timeline: Reimbursement records"
+    ],
+    "documentRequest": null,
+    "documentResponse": null,
+    "intelligence": {
+      "confirmedEmployer": "Lanternfish Media LLC",
+      "confirmedStartDate": null,
+      "confirmedTerminationDate": "May 2, 2025",
+      "confirmedTerminationReason": "The company has determined that the expectations outlined in the Performance Improvement Plan dated April 15, 2025 have not been met.",
+      "confirmedComplaintTopic": null,
+      "confirmedComplaintDate": null,
+      "confirmedHrResponseSummary": null,
+      "confirmedWarningReason": null,
+      "confirmedWarningDate": "April 15, 2025",
+      "timingIntervals": [],
+      "overtimeIssueDetected": false,
+      "finalPayPresent": true,
+      "coworkerCorroboration": [],
+      "keyQuotes": [
+        {
+          "category": "Uncategorized",
+          "file_name": "2024 Annual Performance Review - Reyes-Okafor.pdf",
+          "quote": "Overall rating: 4.8 / 5.0 — Exceeds Expectations",
+          "confidence": "high"
+        },
+        {
+          "category": "Uncategorized",
+          "file_name": "Pregnancy announcement email 2025-03-10.pdf",
+          "quote": "I wanted to share some personal news: I'm expecting a baby, due September 8, 2025.",
+          "confidence": "high"
+        },
+        {
+          "category": "Uncategorized",
+          "file_name": "Leave of Absence Request - Reyes-Okafor.pdf",
+          "quote": "Type of leave requested: Pregnancy Disability Leave, followed by CFRA baby-bonding leave",
+          "confidence": "high"
+        },
+        {
+          "category": "Performance / discipline records",
+          "file_name": "Performance Improvement Plan - D Reyes-Okafor.pdf",
+          "quote": "Areas of concern: 1. Timeliness of client deliverables during the March 2025 reporting cycle.",
+          "confidence": "high"
+        },
+        {
+          "category": "Separation Records",
+          "file_name": "Termination Letter - Reyes-Okafor.pdf",
+          "quote": "This letter confirms the end of your employment with Lanternfish Media LLC, effective today, May 2, 2025.",
+          "confidence": "high"
+        },
+        {
+          "category": "Pay Records / Payroll",
+          "file_name": "Final Pay Stub - Reyes-Okafor 2025-05-02.pdf",
+          "quote": "Final paycheck — includes all earned wages and accrued, unused PTO through 05/02/2025.",
+          "confidence": "high"
+        }
+      ],
+      "allFlags": [
+        "review states zero missed deliverable deadlines in the 2024 period",
+        "approval status shown as pending on the form",
+        "employee note on the plan asks for the specific deliverables referenced",
+        "plan cites the March 2025 reporting cycle; the March 28, 2025 annual review covering 2024 states zero missed deadlines",
+        "final pay mentioned",
+        "letter states final paycheck enclosed and dated the same day as separation",
+        "PTO payout included on final statement"
+      ],
+      "confirmationNeeded": [
+        "Employment start date not confirmed by documents.",
+        "HR complaint date not confirmed by documents."
+      ],
+      "clarificationQuestions": [
+        "The records do not yet show an employment start date. Do you have an offer letter or an early paystub that shows when you started?"
+      ],
+      "wageFacts": [
+        {
+          "docId": "p2-f6",
+          "docName": "Final Pay Stub - Reyes-Okafor 2025-05-02.pdf",
+          "category": "Pay Records / Payroll",
+          "payRate": "30.29 per hour equivalent (salaried)",
+          "overtimeHours": null,
+          "overtimeRate": null,
+          "missedBreaks": null,
+          "sources": {
+            "pay_rate": "PTO Payout               30.29     42.00     1272.18"
+          }
+        }
+      ]
+    }
+  },
+  "worker": {
+    "personaId": "p2",
+    "workerName": "Daniela Reyes-Okafor",
+    "employer": "Lanternfish Media LLC",
+    "employmentDates": "June 2021 to May 2, 2025",
+    "scenarioLabel": "Pregnancy leave, then termination",
+    "storyText": "I announced my pregnancy on March 10 and submitted a leave request for the fall; my March 28 review was the best rating I ever received. I was placed on a performance plan on April 15 and terminated on May 2, and my final check was handed to me the same day.",
+    "organizedSummary": "Worker reports employment with Lanternfish Media LLC from June 2021 to May 2, 2025.\n\nRecords currently reflect complaints or communications with management and Human Resources, payroll and timekeeping records, scheduling records, performance-related records, and separation documents across 6 records.\n\nThe file currently includes communications with management or Human Resources alongside workplace action records, including schedule changes, performance-related documents, and separation documentation. Dates and sequence may need confirmation against the source files.\n\nPeople referenced in the worker's account and uploaded records include Colin Abernathy (Director of Client Services), Marguerite Solano (People Operations Manager), Colin Abernathy (Coworker), Marguerite Solano (Coworker), and Daniela. What remains unclear: Exact dates and timing may need confirmation against source files. Time or schedule records for this period, Offer letter or employment agreement, and A written policy that may explain this reference may help complete the timeline.",
+    "docCount": 6,
+    "timeline": [
+      {
+        "date": "March 10, 2025",
+        "event": "Schedule change documented",
+        "category": "Uncategorized",
+        "summary": "Supported by Pregnancy announcement email 2025-03-10.pdf. Related patterns: Scheduling and timekeeping, Workplace communications.",
+        "relatedDocs": 1,
+        "sourceFileNames": [
+          "Pregnancy announcement email 2025-03-10.pdf"
+        ],
+        "sourceDates": [
+          "March 10, 2025"
+        ],
+        "sourceStrength": "strong"
+      },
+      {
+        "date": "March 24, 2025",
+        "event": "Worker requests leave or accommodation",
+        "category": "Uncategorized",
+        "summary": "Supported by Leave of Absence Request - Reyes-Okafor.pdf. Related patterns: Scheduling and timekeeping, Leave or accommodation references.",
+        "relatedDocs": 1,
+        "sourceFileNames": [
+          "Leave of Absence Request - Reyes-Okafor.pdf"
+        ],
+        "sourceDates": [
+          "March 24, 2025"
+        ],
+        "sourceStrength": "strong"
+      },
+      {
+        "date": "March 28, 2025",
+        "event": "Performance review completed",
+        "category": "Uncategorized",
+        "summary": "Supported by 2024 Annual Performance Review - Reyes-Okafor.pdf.",
+        "relatedDocs": 1,
+        "sourceFileNames": [
+          "2024 Annual Performance Review - Reyes-Okafor.pdf"
+        ],
+        "sourceDates": [
+          "March 28, 2025"
+        ],
+        "sourceStrength": "strong"
+      },
+      {
+        "date": "April 15, 2025",
+        "event": "Performance improvement plan issued",
+        "category": "Performance / discipline records",
+        "summary": "Supported by Performance Improvement Plan - D Reyes-Okafor.pdf. Related patterns: Scheduling and timekeeping, Separation or final pay, Workplace communications.",
+        "relatedDocs": 1,
+        "sourceFileNames": [
+          "Performance Improvement Plan - D Reyes-Okafor.pdf"
+        ],
+        "sourceDates": [
+          "April 15, 2025"
+        ],
+        "sourceStrength": "strong"
+      },
+      {
+        "date": "05/02/2025",
+        "event": "Supporting employment documentation",
+        "category": "Pay Records / Payroll",
+        "summary": "Supported by Final Pay Stub - Reyes-Okafor 2025-05-02.pdf. Related patterns: Payroll and wage records, Scheduling and timekeeping, Separation or final pay.",
+        "relatedDocs": 1,
+        "sourceFileNames": [
+          "Final Pay Stub - Reyes-Okafor 2025-05-02.pdf"
+        ],
+        "sourceDates": [
+          "05/02/2025"
+        ],
+        "sourceStrength": "strong"
+      },
+      {
+        "date": "May 2, 2025",
+        "event": "Termination documented",
+        "category": "Separation Records",
+        "summary": "Supported by Termination Letter - Reyes-Okafor.pdf. Related patterns: Payroll and wage records, Scheduling and timekeeping, Separation or final pay.",
+        "relatedDocs": 1,
+        "sourceFileNames": [
+          "Termination Letter - Reyes-Okafor.pdf"
+        ],
+        "sourceDates": [
+          "May 2, 2025"
+        ],
+        "sourceStrength": "strong"
+      }
+    ],
+    "employmentMatterTags": [
+      "fmla_cfra",
+      "wrongful_termination",
+      "discrimination"
+    ],
+    "coverage": [
+      {
+        "key": "wage_statements",
+        "label": "Itemized wage statements",
+        "citation": "Labor Code § 226",
+        "state": "on_file",
+        "describeMissing": "California requires itemized wage statements each pay period (Labor Code § 226). None are in your file yet.",
+        "workerObtainable": true
+      },
+      {
+        "key": "wtpa_notice",
+        "label": "Wage notice given at hire (Notice to Employee)",
+        "citation": "Labor Code § 2810.5",
+        "state": "not_in_record",
+        "describeMissing": "California requires a written wage notice at hire for most non-exempt employees (Labor Code § 2810.5). It is not in your file yet.",
+        "workerObtainable": true
+      },
+      {
+        "key": "personnel_file",
+        "label": "Personnel file",
+        "citation": "Labor Code § 1198.5",
+        "state": "not_in_record",
+        "describeMissing": "You have the right to inspect and copy your personnel file (Labor Code § 1198.5). It is not in your file yet.",
+        "workerObtainable": true
+      },
+      {
+        "key": "time_records",
+        "label": "Time and hours records",
+        "citation": "Labor Code § 1174 / Wage Order",
+        "state": "not_in_record",
+        "describeMissing": "Employers must keep accurate time records of hours worked (Labor Code § 1174). None are in your file yet.",
+        "workerObtainable": true
+      },
+      {
+        "key": "meal_rest",
+        "label": "Meal and rest break records",
+        "citation": "Labor Code §§ 226.7, 512",
+        "state": "not_in_record",
+        "describeMissing": "Records of meal and rest breaks (or premium pay for missed ones) relate to Labor Code §§ 226.7 and 512. None are in your file yet.",
+        "workerObtainable": true
+      },
+      {
+        "key": "final_pay",
+        "label": "Final paycheck",
+        "citation": "Labor Code §§ 201–203",
+        "state": "on_file",
+        "describeMissing": "Final wages are due on a specific timeline after employment ends (Labor Code §§ 201–203). A final paycheck record is not in your file yet.",
+        "workerObtainable": true
+      },
+      {
+        "key": "expense_reimbursement",
+        "label": "Business-expense reimbursement records",
+        "citation": "Labor Code § 2802",
+        "state": "not_in_record",
+        "describeMissing": "California requires employers to reimburse necessary business expenses — including a reasonable share of home internet and personal cell phone used for work (Labor Code § 2802). No expense-reimbursement records are in your file yet.",
+        "workerObtainable": true
+      },
+      {
+        "key": "harassment_policy",
+        "label": "Anti-harassment policy acknowledgment",
+        "citation": "Gov. Code § 12950 / SB 1343",
+        "state": "not_in_record",
+        "describeMissing": "California requires employers to provide a written harassment policy (Gov. Code § 12950). An acknowledgment is not in your file yet.",
+        "workerObtainable": true
+      },
+      {
+        "key": "offer_or_agreement",
+        "label": "Offer letter or employment agreement",
+        "citation": "Records you signed — Labor Code § 432",
+        "state": "not_in_record",
+        "describeMissing": "You are entitled to copies of documents you signed to obtain or hold your job (Labor Code § 432). An offer letter or agreement is not in your file yet.",
+        "workerObtainable": true
+      }
+    ],
+    "readiness": [
+      "Records mention in “Final Pay Stub - Reyes-Okafor 2025-05-02.pdf”: pay date 05/02/2025; gross $3453.87, net $2612.85.",
+      "A reviewing professional may want to confirm pay period and amount wording against the original upload.",
+      "Records mention dated messages or threads in Pregnancy announcement email 2025-03-10.pdf (for example Monday, March 10, 2025 9:14:32 AM).",
+      "Taken together, communication wording across 4 files touches manager.",
+      "Records mention in “Pregnancy announcement email 2025-03-10.pdf”, wording that may describe a worker concern (“I'm expecting a baby, due September 8, 2025.”).",
+      "Records mention in “Termination Letter - Reyes-Okafor.pdf”, wording that may describe a worker concern (“Marguerite Solano People Operations Manager Lanternfis…",
+      "This may be useful for human review: Pay period boundaries recur across the payroll materials and may anchor how compensation activity is read over time.",
+      "This may be useful for human review: Leave or accommodation wording appears in the materials and may help clarify requests, responses, and timing.",
+      "This may be useful for human review: Separation or final-pay wording appears in the set and may mark a transition point in the chronology.",
+      "This may be useful for human review: Performance or discipline wording appears in the materials and may help clarify the sequence of workplace actions.",
+      "This may be useful for human review: Payroll and wage records: Additional Information May Help: wording across the uploads touches payroll, pay stub, wages, earnings — pay amounts, periods, and time records should be compared in the source files",
+      "This may be useful for human review: Scheduling and timekeeping: Additional Information May Help: wording across the uploads touches schedule, pto, leave — logged hours and schedules should be compared with pay records where both exist",
+      "This may be useful for human review: Separation or final pay: Additional Information May Help: wording across the uploads touches termination, separation, final paycheck, final pay — separation paperwork and final pay records should be read together for timing",
+      "This may be useful for human review: Workplace communications: Additional Information May Help: wording across the uploads touches hr, manager, email — messages and HR documents should be read in date order with related records"
+    ],
+    "missing": [
+      "This may help complete the timeline: time or schedule records for this period",
+      "This may help complete the timeline: Offer letter or employment agreement",
+      "This may help complete the timeline: a written policy that may explain this reference",
+      "This may help complete the timeline: Reimbursement records"
+    ],
+    "fileInventory": [
+      {
+        "fileName": "2024 Annual Performance Review - Reyes-Okafor.pdf",
+        "category": "Performance Reviews"
+      },
+      {
+        "fileName": "Pregnancy announcement email 2025-03-10.pdf",
+        "category": "Uncategorized"
+      },
+      {
+        "fileName": "Leave of Absence Request - Reyes-Okafor.pdf",
+        "category": "Uncategorized"
+      },
+      {
+        "fileName": "Performance Improvement Plan - D Reyes-Okafor.pdf",
+        "category": "Performance Reviews"
+      },
+      {
+        "fileName": "Termination Letter - Reyes-Okafor.pdf",
+        "category": "HR Documents"
+      },
+      {
+        "fileName": "Final Pay Stub - Reyes-Okafor 2025-05-02.pdf",
+        "category": "HR Documents"
+      }
+    ]
+  }
+}
