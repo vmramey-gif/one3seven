@@ -1,8 +1,10 @@
 /**
  * The company's primary sales tool — a no-login, obscured-URL, fully interactive demo built on 5
  * FICTIONAL synthetic personas (gauntlet-verified, see src/app/demo/personaDemoData.ts). A prospect
- * picks a legal scenario, sees the worker's organized record, then flips to the firm's side of the
- * SAME case using the real production `IntakeReviewScreen` component in `demoMode`.
+ * picks a legal scenario and lands directly in the firm's review of that intake (the real production
+ * `IntakeReviewScreen` component in `demoMode`) — the primary pitch, since firms are the buyer. The
+ * worker's organized record is one click away as the secondary view, showing the same case from the
+ * other side.
  *
  * Accessible only via /sales-demo-7k2m9x4p — deliberately not linked from any in-product nav.
  *
@@ -358,12 +360,12 @@ export function SalesDemoPage() {
 
   const selectPersona = (id: string) => {
     setPersonaId(id);
-    setView('worker');
+    setView('firm');
     window.scrollTo({ top: 0, behavior: 'instant' });
   };
   const switchPersona = (id: string) => {
     setPersonaId(id);
-    setView('worker');
+    setView('firm');
     window.scrollTo({ top: 0, behavior: 'instant' });
   };
   const backToPicker = () => {
