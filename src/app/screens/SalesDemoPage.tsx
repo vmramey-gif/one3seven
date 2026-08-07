@@ -329,6 +329,7 @@ function FirmCaseView({ entry, onBackToWorker }: { entry: PersonaDemoEntry; onBa
             firmDisplayName="Demo Law Firm"
             firmBellNotifications={[]}
             demoMode
+            demoWorkerName={entry.worker.workerName}
             onRequestFullAccess={undefined}
             onAcceptIntake={async () => ({})}
             onDeclineIntake={async () => ({})}

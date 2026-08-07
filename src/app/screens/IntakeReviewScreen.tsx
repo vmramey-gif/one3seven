@@ -101,6 +101,8 @@ interface IntakeReviewScreenProps {
   onReloadFirmLiveView?: () => void | Promise<void>;
   /** Strips nav chrome down to a single slim bar — used for the public demo link. */
   demoMode?: boolean;
+  /** Name shown in the demo orientation strip. Defaults to the original single-case demo's worker. */
+  demoWorkerName?: string;
 }
 
 interface TimelineEvent {
@@ -198,6 +200,7 @@ export function IntakeReviewScreen({
   onRequestAdditionalDocuments,
   onReloadFirmLiveView,
   demoMode = false,
+  demoWorkerName = 'Marcus Rivera',
 }: IntakeReviewScreenProps) {
   // Use workspace data if available, otherwise fall back to mock
   const rawWorkflow = (intakeWorkspace?.workflowStatus as string | undefined) ?? 'new';
@@ -1103,7 +1106,7 @@ export function IntakeReviewScreen({
       {demoMode && (
         <div className="bg-[#1B2623] px-5 py-4 border-b border-[#2C3A34]">
           <p className="text-sm text-white/90 leading-relaxed max-w-2xl">
-            Marcus Rivera submitted 11 documents last night.{' '}
+            {demoWorkerName} submitted {firmLiveView?.files.length ?? 0} document{firmLiveView?.files.length === 1 ? '' : 's'} last night.{' '}
             <span className="text-[#7C8B6F]">
               This is what arrived in your review queue — organized, before your first call.
             </span>
@@ -3064,7 +3067,7 @@ export function IntakeReviewScreen({
                       See pricing
                     </button>
                   </div>
-                  <p className="text-[10px] text-white/28 mt-4">No card required · Practice from $400/seat/mo after trial</p>
+                  <p className="text-[10px] text-white/28 mt-4">No card required · Starter from $350/mo after trial</p>
                 </div>
               </motion.div>
             )}
