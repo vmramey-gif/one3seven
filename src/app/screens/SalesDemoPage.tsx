@@ -13,6 +13,7 @@
  * create a database row, send an email, or reach a payment flow.
  */
 import { useMemo, useState } from 'react';
+import { motion } from 'motion/react';
 import {
   ArrowLeft,
   ArrowRight,
@@ -99,64 +100,89 @@ function SampleDataBanner({
   );
 }
 
+/**
+ * The demo's entry screen — deliberately built to LOOK like the real firm dashboard
+ * (LawFirmDashboardScreen: dark "o3s-firm-cockpit" theme, same glass queue-row treatment)
+ * rather than a light marketing picker. A firm's actual first experience is their queue,
+ * not a card grid — so the demo's first experience should be too.
+ */
 function PersonaPicker({ onSelect }: { onSelect: (id: string) => void }) {
   return (
-    <div className="min-h-screen bg-[#FAF9F6] pb-24">
-      <nav className="border-b border-[#E4E5DE] bg-white/90 backdrop-blur sticky top-0 z-40">
+    <div className="min-h-screen o3s-firm-cockpit pb-24">
+      <nav className="sticky top-0 z-40 border-b border-white/10 bg-[#0e1512]/80 backdrop-blur">
         <div className="mx-auto max-w-5xl px-5 py-4 flex items-center justify-between">
-          <span className="text-[15px] font-bold tracking-tight text-[#1B2623]">
+          <span className="text-[15px] font-bold tracking-tight text-white">
             <WordMark />
           </span>
-          <span className="text-xs text-[#1B2623]/50">Interactive sample cases</span>
+          <span className="text-xs text-white/45">Sample review queue</span>
         </div>
       </nav>
 
       <div className="mx-auto max-w-5xl px-5 py-14">
-        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-[#E4E5DE] bg-white px-3 py-1.5 text-xs font-semibold text-[#42574E]">
+        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/[0.04] px-3 py-1.5 text-xs font-semibold text-[#8FD3A6]">
           <Sparkles className="h-3.5 w-3.5" />
           5 fictional sample cases
         </div>
         <h1
           style={{ fontFamily: "'Fraunces', Georgia, serif" }}
-          className="text-[30px] sm:text-[38px] font-medium leading-tight tracking-[-0.01em] text-[#1B2623] max-w-2xl"
+          className="text-[30px] sm:text-[38px] font-medium leading-tight tracking-[-0.01em] text-[#ECF3ED] max-w-2xl"
         >
-          See the record, organized — from both sides of the same case.
+          Your review queue, organized before your first call.
         </h1>
-        <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-[#1B2623]/60">
-          Pick a scenario. You&rsquo;ll see the worker&rsquo;s organized record first, then flip to
-          the firm&rsquo;s review of the exact same intake. Every case below is entirely fictional —
-          built for testing, safe to explore.
+        <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-white/60">
+          This is what a firm sees when they open one3seven. Pick a case to review it —
+          you&rsquo;ll see the worker&rsquo;s original submission as a secondary view from inside
+          it. Every case below is entirely fictional, built for testing.
         </p>
 
-        <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {PERSONA_DEMOS.map((p) => (
-            <button
+        <div className="mt-10 flex flex-col gap-4">
+          {PERSONA_DEMOS.map((p, index) => (
+            <motion.button
               key={p.personaId}
               type="button"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.05 }}
               onClick={() => onSelect(p.personaId)}
-              className="group text-left rounded-[20px] border border-[#E4E5DE] bg-white p-6 transition-all hover:border-[#42574E]/40 hover:shadow-[0_16px_40px_rgba(66,87,78,0.10)]"
+              className="group w-full rounded-3xl border border-white/10 bg-white/[0.03] p-6 text-left shadow-[0_18px_50px_-30px_rgba(0,0,0,0.85)] backdrop-blur transition hover:-translate-y-0.5 hover:border-[rgba(143,211,166,0.32)] hover:bg-white/[0.05] sm:p-7"
             >
-              <div className="flex items-center justify-between">
-                <span className="rounded-full bg-[#F2F4EC] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-[#42574E]">
-                  Sample case
-                </span>
-                <ArrowRight className="h-4 w-4 text-[#1B2623]/25 transition-transform group-hover:translate-x-1 group-hover:text-[#42574E]" />
+              <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                <div className="min-w-0">
+                  <p className="text-xs uppercase tracking-[0.2em] text-white/38">Sample case</p>
+                  <h2
+                    style={{ fontFamily: "'Fraunces', Georgia, serif" }}
+                    className="mt-2 text-2xl font-medium tracking-[-0.01em] text-[#ECF3ED]"
+                  >
+                    {p.scenarioLabel}
+                  </h2>
+                  <div className="mt-4 flex flex-wrap items-center gap-x-7 gap-y-2.5">
+                    <span className="flex items-baseline gap-1.5">
+                      <span style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="text-2xl leading-none text-[#8FD3A6]">
+                        {p.worker.docCount}
+                      </span>
+                      <span className="text-[11px] uppercase tracking-wide text-white/45">records</span>
+                    </span>
+                    <span className="flex items-baseline gap-1.5">
+                      <span style={{ fontFamily: "'Fraunces', Georgia, serif" }} className="text-2xl leading-none text-[#8FD3A6]">
+                        {p.worker.timeline.length}
+                      </span>
+                      <span className="text-[11px] uppercase tracking-wide text-white/45">timeline events</span>
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 text-sm font-medium text-[#F3A268] shrink-0">
+                  Review case
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </div>
               </div>
-              <h2
-                style={{ fontFamily: "'Fraunces', Georgia, serif" }}
-                className="mt-4 text-[19px] font-medium leading-snug text-[#1B2623]"
-              >
-                {p.scenarioLabel}
-              </h2>
-              <p className="mt-2 text-[13px] leading-relaxed text-[#1B2623]/55">
-                {p.worker.docCount} records organized into a {p.worker.timeline.length}-event
-                timeline · {p.worker.employer}
+              <p className="mt-5 border-t border-white/10 pt-4 text-sm leading-relaxed text-white/55">
+                {p.worker.employer}
               </p>
-            </button>
+            </motion.button>
           ))}
         </div>
 
-        <p className="mt-10 text-[11px] leading-relaxed text-[#1B2623]/40 max-w-xl">
+        <p className="mt-10 text-[11px] leading-relaxed text-white/35 max-w-xl">
           Illustrative / sample data. These five people are entirely fictional, invented for
           product testing. No real worker, firm, or case is represented here.
         </p>
