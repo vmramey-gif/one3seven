@@ -60,10 +60,7 @@ const CSS = `
 .clp .st--named{border-color:rgba(143,211,166,.4);color:#8FD3A6;background:rgba(143,211,166,.08)}
 .clp .st--worker{border-color:#243029;color:#8FA495;background:#131C17}
 .clp .st--counted{border-color:rgba(143,211,166,.25);color:#5E8770;background:rgba(143,211,166,.05)}
-.clp .gapCard{margin-top:12px;border:1.5px solid rgba(224,123,62,.45);background:rgba(224,123,62,.06);border-radius:12px;padding:13px 15px 12px}
-.clp .gapLabel{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:#F3A268;display:flex;align-items:center;gap:8px}
-.clp .gapLabel::before{content:"";width:6px;height:6px;border-radius:2px;background:#F3A268;box-shadow:0 0 8px #F3A268}
-.clp .gapText{font-size:12.5px;line-height:1.5;margin-top:8px;max-width:62ch}
+.clp .gapRow{margin-top:2px}
 .clp .foot{font-size:11px;color:#8FA495;line-height:1.5;background:#0e1512;border-top:1px solid #243029;padding:14px 22px}
 .clp .foot b{color:#8FD3A6;font-weight:500}
 .clp .cov{display:flex;align-items:center;gap:16px;margin:16px 0 2px;padding:15px 17px;border:1px solid #243029;border-radius:14px;background:#0f1713}
@@ -102,7 +99,9 @@ const CSS = `
 .clp .elName2{font-size:14.5px;font-weight:600;letter-spacing:-.01em;line-height:1.35;max-width:60ch}
 .clp .elState{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;color:#8FA495;white-space:nowrap;display:flex;align-items:center;gap:8px}
 .clp .elState .chev{color:#61756A;font-size:13px;width:12px;text-align:center}
-.clp .st--gap{background:rgba(224,123,62,.14);border:1px solid rgba(224,123,62,.45);color:#F3A268;padding:3px 8px;border-radius:6px}
+.clp .st--gap{background:#131C17;border:1px solid #243029;color:#8FA495;padding:3px 8px;border-radius:6px}
+.clp .lensSub b{color:#ECF3ED;font-weight:600}
+.clp .groupLabel{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#61756A;margin:22px 0 2px}
 `;
 
 export function ClaimLensPanel({
@@ -210,72 +209,87 @@ export function ClaimLensPanel({
           );
         })()}
 
-        <div className="lensSub">one3seven shows what&rsquo;s on file for each element and what isn&rsquo;t. Gaps are open below; covered elements collapse — click to expand. It draws no conclusions.</div>
+        <div className="lensSub">
+          An <b>element</b> is one fact this claim legally requires &mdash; the theory&rsquo;s own checklist, not a score.
+          {' '}It draws no conclusions.
+        </div>
 
-        {view.elements.map((el) => {
-          const isGap = !!el.empty;
-          const isOpen = isGap || expanded.has(el.name);
+        {(() => {
+          const covered = view.elements.filter((el) => !el.empty);
+          const gaps = view.elements.filter((el) => !!el.empty);
+          const renderEl = (el: (typeof view.elements)[number]) => {
+            const isGap = !!el.empty;
+            const isOpen = isGap || expanded.has(el.name);
+            return (
+              <section className="el" key={el.name}>
+                <button
+                  type="button"
+                  className={`elRow${isGap ? '' : ' tog'}`}
+                  onClick={isGap ? undefined : () => toggleEl(el.name)}
+                  aria-expanded={isOpen}
+                >
+                  <span className="elName2">{el.name}</span>
+                  <span className="elState">
+                    {isGap ? (
+                      <span className="st st--gap">not yet on file</span>
+                    ) : (
+                      <>
+                        {el.items.length} item{el.items.length === 1 ? '' : 's'}
+                        <span className="chev">{isOpen ? '–' : '+'}</span>
+                      </>
+                    )}
+                  </span>
+                </button>
+                {isOpen && el.note ? <div className="elNote" style={{ marginTop: 8 }}>{el.note}</div> : null}
+                {isGap ? (
+                  <div className="gapRow">
+                    {el.empty ? <p className="elNote">{el.empty}</p> : null}
+                    <button
+                      type="button"
+                      className={`addBtn ${inCart(el.name) ? 'added' : ''}`}
+                      onClick={() => toggleCart({ key: el.name, element: el.name, note: el.empty || 'no material on file' })}
+                    >
+                      {inCart(el.name) ? '✓ Added to list' : '+ Add to list'}
+                    </button>
+                  </div>
+                ) : isOpen ? (
+                  <ul className="items">
+                    {el.items.map((it, j) => {
+                      const clickable = it.state === 'linked' && !!it.sourceFile && !!onOpenSource;
+                      const open = () => onOpenSource?.(it.sourceFile as string, it.snippet ?? it.text);
+                      return (
+                        <li
+                          className={`item${clickable ? ' clickable' : ''}`}
+                          key={j}
+                          onClick={clickable ? open : undefined}
+                          role={clickable ? 'button' : undefined}
+                          tabIndex={clickable ? 0 : undefined}
+                          onKeyDown={clickable ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } } : undefined}
+                          title={clickable ? `Open ${it.sourceFile}` : undefined}
+                        >
+                          <span className={`st st--${it.state}`}>{STATE_LABEL[it.state]}{it.state === 'linked' ? ' »' : ''}</span>
+                          <div>
+                            <div className="itemText">{it.text}</div>
+                            <div className="itemMeta">{it.meta}{clickable ? ' · open source ↗' : ''}</div>
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                ) : null}
+              </section>
+            );
+          };
           return (
-            <section className="el" key={el.name}>
-              <button
-                type="button"
-                className={`elRow${isGap ? '' : ' tog'}`}
-                onClick={isGap ? undefined : () => toggleEl(el.name)}
-                aria-expanded={isOpen}
-              >
-                <span className="elName2">{el.name}</span>
-                <span className="elState">
-                  {isGap ? (
-                    <span className="st st--gap">no material</span>
-                  ) : (
-                    <>
-                      {el.items.length} item{el.items.length === 1 ? '' : 's'}
-                      <span className="chev">{isOpen ? '–' : '+'}</span>
-                    </>
-                  )}
-                </span>
-              </button>
-              {isOpen && el.note ? <div className="elNote" style={{ marginTop: 8 }}>{el.note}</div> : null}
-              {isGap ? (
-                <div className="gapCard">
-                  <div className="gapLabel">No material on file for this element</div>
-                  <p className="gapText">{el.empty}</p>
-                  <button
-                    type="button"
-                    className={`addBtn ${inCart(el.name) ? 'added' : ''}`}
-                    onClick={() => toggleCart({ key: el.name, element: el.name, note: el.empty || 'no material on file' })}
-                  >
-                    {inCart(el.name) ? '✓ Added to list' : '+ Add to list'}
-                  </button>
-                </div>
-              ) : isOpen ? (
-                <ul className="items">
-                  {el.items.map((it, j) => {
-                    const clickable = it.state === 'linked' && !!it.sourceFile && !!onOpenSource;
-                    const open = () => onOpenSource?.(it.sourceFile as string, it.snippet ?? it.text);
-                    return (
-                      <li
-                        className={`item${clickable ? ' clickable' : ''}`}
-                        key={j}
-                        onClick={clickable ? open : undefined}
-                        role={clickable ? 'button' : undefined}
-                        tabIndex={clickable ? 0 : undefined}
-                        onKeyDown={clickable ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } } : undefined}
-                        title={clickable ? `Open ${it.sourceFile}` : undefined}
-                      >
-                        <span className={`st st--${it.state}`}>{STATE_LABEL[it.state]}{it.state === 'linked' ? ' »' : ''}</span>
-                        <div>
-                          <div className="itemText">{it.text}</div>
-                          <div className="itemMeta">{it.meta}{clickable ? ' · open source ↗' : ''}</div>
-                        </div>
-                      </li>
-                    );
-                  })}
-                </ul>
+            <>
+              {covered.length > 0 ? covered.map(renderEl) : null}
+              {covered.length > 0 && gaps.length > 0 ? (
+                <div className="groupLabel">Not yet on file &middot; {gaps.length}</div>
               ) : null}
-            </section>
+              {gaps.map(renderEl)}
+            </>
           );
-        })}
+        })()}
 
         {/* The gap cart — the attorney clicks "no material on file" elements above to build a list.
             Absence becomes an ACTION the attorney chooses to take, scoped to the selected lens.

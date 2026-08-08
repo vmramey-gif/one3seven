@@ -1168,7 +1168,7 @@ export function IntakeReviewScreen({
 
       {/* Content — binder-spine layout (presentation wrapper only) */}
       <div className="px-6 py-8">
-        <div className="mx-auto max-w-6xl flex flex-col lg:flex-row gap-6 items-start">
+        <div className="mx-auto max-w-6xl flex flex-col lg:flex-row gap-6 items-stretch lg:items-start">
           {/* LEFT SPINE — full-width above the content on mobile/tablet; a sticky side rail only from lg: up */}
           <nav className="w-full lg:w-52 shrink-0 lg:sticky lg:top-4 self-start rounded-[16px] border border-[#E4E5DE] bg-white overflow-hidden">
             <div className="bg-[#F5ECD6] px-4 py-3 border-b border-[#E4D9BC] font-mono">
