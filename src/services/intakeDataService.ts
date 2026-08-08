@@ -1747,10 +1747,11 @@ export function resolveWorkerProvidedContextForFirmView(
 /**
  * Preview-only strip for the structured worker follow-up: the free-text NARRATIVE answers
  * (what happened when they complained, what changed afterward, remote-expense description,
- * prior-filing details) are part of the worker's personal narrative and are withheld until the
- * worker approves expanded access. The identity/scheduling facts the preview surface already
- * shows (employment name, employer, dates, status, arbitration/agency flags, work state) are
- * kept so the preview card and preview PDF cover keep working.
+ * prior-filing details, and any named individuals — a treating physician, a manager, anyone the
+ * worker named) are part of the worker's personal narrative and are withheld until the worker
+ * approves expanded access. The identity/scheduling facts the preview surface already shows
+ * (employment name, employer, dates, status, arbitration/agency flags, work state) are kept so
+ * the preview card and preview PDF cover keep working.
  */
 export function stripWorkerFollowUpNarrativeForPreview(
   followUp: import('../app/constants/workerStoryIntake').StoryFollowUpAnswers | null
@@ -1762,6 +1763,7 @@ export function stripWorkerFollowUpNarrativeForPreview(
     changedAfterward: '',
     remoteExpenses: '',
     priorAgencyFilingDetails: '',
+    keyPeople: '',
   };
 }
 
@@ -2967,6 +2969,17 @@ export async function linkFirmCodeToIntake(intakeId: string, firmId: string): Pr
   return error ? { error: error.message } : {};
 }
 
+/**
+ * Fetches the four tables that make up an intake's summary bundle. A missing/unavailable table
+ * (`isSchemaRelationUnavailable` — public-beta schema hasn't deployed an optional table yet) is
+ * treated as legitimately empty, same as before. A genuine query error (RLS denial, network
+ * failure, timeout, etc.) is NOT — it is recorded in `fetchErrors` so callers can tell "nothing
+ * here" apart from "we couldn't check." This distinction matters because `intake_summaries`
+ * coming back empty due to a real error used to be indistinguishable from a legitimately new
+ * intake, and the beta-placeholder fallback below would synthesize a fake-looking summary from
+ * filenames alone in either case — see `loadFirmLiveIntakeView`, which now refuses to build a
+ * view (returns null) when `fetchErrors` is non-empty.
+ */
 export async function fetchIntakeSummaryBundle(intakeId: string) {
   const [intakeRes, filesRes, eventsRes, summariesRes] = await Promise.all([
     supabase.from('intakes').select('*').eq('id', intakeId).maybeSingle(),
@@ -2975,34 +2988,55 @@ export async function fetchIntakeSummaryBundle(intakeId: string) {
     supabase.from('intake_summaries').select('*').eq('intake_id', intakeId).order('created_at', { ascending: false }).limit(1),
   ]);
 
-  const intake = intakeRes.data;
-  const fileRows = (filesRes.data ?? []) as Array<{ file_name: string; category: string | null }>;
+  const fetchErrors: string[] = [];
 
+  const intake = intakeRes.data;
+  if (intakeRes.error && !isSchemaRelationUnavailable(intakeRes.error)) {
+    console.error(intakeRes.error);
+    fetchErrors.push(`intakes: ${intakeRes.error.message}`);
+  }
+
+  const fileRows = (filesRes.data ?? []) as Array<{ file_name: string; category: string | null }>;
   if (filesRes.error) {
     console.error(filesRes.error);
+    if (!isSchemaRelationUnavailable(filesRes.error)) {
+      fetchErrors.push(`uploaded_files: ${filesRes.error.message}`);
+    }
   }
 
   let events = (eventsRes.data ?? []) as Record<string, unknown>[];
   if (eventsRes.error) {
-    if (!isSchemaRelationUnavailable(eventsRes.error)) console.error(eventsRes.error);
+    if (!isSchemaRelationUnavailable(eventsRes.error)) {
+      console.error(eventsRes.error);
+      fetchErrors.push(`timeline_events: ${eventsRes.error.message}`);
+    }
     events = [];
   }
 
   let summary = (summariesRes.data?.[0] ?? null) as Record<string, unknown> | null;
+  let summaryFetchFailed = false;
   if (summariesRes.error) {
-    if (!isSchemaRelationUnavailable(summariesRes.error)) console.error(summariesRes.error);
+    if (!isSchemaRelationUnavailable(summariesRes.error)) {
+      console.error(summariesRes.error);
+      fetchErrors.push(`intake_summaries: ${summariesRes.error.message}`);
+      summaryFetchFailed = true;
+    }
     summary = null;
   }
 
-  const summaryMissing = !summary;
-  const timelineMissing = events.length === 0;
+  // The beta placeholder is a convenience for genuinely-new intakes that have files but no
+  // organized summary/timeline yet. It must never fire when the emptiness is actually a fetch
+  // failure — that would render a synthesized, real-looking summary in place of a "we couldn't
+  // load this" signal, indistinguishable to an attorney from genuine output.
+  const summaryMissing = !summary && !summaryFetchFailed;
+  const timelineMissing = events.length === 0 && !fetchErrors.some((e) => e.startsWith('timeline_events:'));
   if (fileRows.length && (summaryMissing || timelineMissing)) {
     const ph = betaPlaceholderBundleFromFiles(intakeId, fileRows);
     if (summaryMissing) summary = ph.summary as Record<string, unknown>;
     if (timelineMissing) events = ph.events as Record<string, unknown>[];
   }
 
-  return { intake, files: fileRows, events, summary };
+  return { intake, files: fileRows, events, summary, fetchErrors };
 }
 
 export async function markIntakeSubmitted(
@@ -4359,6 +4393,14 @@ export async function loadFirmLiveIntakeView(
   }
 
   const bundle = await fetchIntakeSummaryBundle(intakeId);
+  // A real backend fetch failure (not a legitimately-empty table) must not silently produce a
+  // fabricated-looking view — return null so the caller can show a genuine "couldn't load this"
+  // state instead of a summary that's indistinguishable from real output. See
+  // fetchIntakeSummaryBundle for what counts as a genuine fetch error vs. legitimate emptiness.
+  if (bundle.fetchErrors.length) {
+    console.error('[o3s-firm-live-view] fetch error(s), refusing to build a view', bundle.fetchErrors);
+    return null;
+  }
   const intakeRow = bundle.intake as {
     submission_channel?: string | null;
     linked_firm_id?: string | null;

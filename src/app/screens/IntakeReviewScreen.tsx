@@ -86,6 +86,9 @@ interface IntakeReviewScreenProps {
   onUpdateWorkspace?: (updates: Partial<IntakeWorkspace>) => void;
   firmLiveView?: FirmLiveIntakeView | null;
   firmLiveViewLoading?: boolean;
+  /** Set when a connected-firm load was attempted but failed (as opposed to a legitimately empty
+   * or not-yet-connected view) — surfaces a real error state instead of silently showing nothing. */
+  firmLiveViewError?: string | null;
   onRequestFullAccess?: () => Promise<{ error?: string }>;
   onOpenFirmSettings?: () => void;
   onFirmSignOut?: () => void;
@@ -197,6 +200,7 @@ export function IntakeReviewScreen({
   onUpdateWorkspace,
   firmLiveView,
   firmLiveViewLoading = false,
+  firmLiveViewError = null,
   onRequestFullAccess,
   onOpenFirmSettings,
   onFirmSignOut,
@@ -1070,6 +1074,27 @@ export function IntakeReviewScreen({
           </div>
         </nav>
       )}
+
+      {!firmLiveView && !firmLiveViewLoading && firmLiveViewError && !demoMode ? (
+        <div className="border-b border-[#E4E5DE] bg-white px-6 py-4">
+          <div className="max-w-2xl rounded-2xl border border-[#E4B4A0] bg-[#FBF1EC] p-5">
+            <h3 className="text-sm font-semibold text-[#8A3B1E]">Couldn&rsquo;t load this intake</h3>
+            <p className="mt-1.5 text-sm leading-relaxed text-[#7A4B39]">{firmLiveViewError}</p>
+            <p className="mt-1 text-xs text-[#7A4B39]/70">
+              This is a connection or access error, not an empty record — the materials are safe.
+            </p>
+            {onReloadFirmLiveView ? (
+              <button
+                type="button"
+                onClick={() => void onReloadFirmLiveView()}
+                className="mt-3 rounded-full border border-[#E4B4A0] bg-white px-4 py-1.5 text-xs font-semibold text-[#8A3B1E] hover:bg-[#FBF1EC]"
+              >
+                Try again
+              </button>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
 
       {firmLiveView && !demoMode ? (
         <div

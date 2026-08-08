@@ -4,10 +4,12 @@ import {
   resolveWorkerProvidedContextForFirmView,
   stripWorkerFollowUpNarrativeForPreview,
 } from '../intakeDataService';
+import type { FirmLiveIntakeView } from '../intakeDataService';
 import {
   extractStoryFollowUpFromOverview,
   mergeStoryFollowUpIntoWorkerNotesBody,
 } from '../storyFollowUpPersistence';
+import { buildFirmIntakeOverviewFields } from '../firmIntakeDisplay';
 
 /**
  * Loader-level privacy gate — the product promise on the worker dashboard
@@ -90,5 +92,70 @@ describe('firm preview privacy gate (loader-level)', () => {
 
   it('stripWorkerFollowUpNarrativeForPreview passes null through', () => {
     expect(stripWorkerFollowUpNarrativeForPreview(null)).toBeNull();
+  });
+
+  // keyPeople is free text where a worker can name a treating physician, a manager, anyone —
+  // it is personal narrative and must be withheld pre-approval just like the other four
+  // narrative fields above.
+  const KEY_PEOPLE = 'Dr. Priya Raghunathan (treating physician), Store Manager Dolores Fenwick';
+
+  it('stripWorkerFollowUpNarrativeForPreview also blanks keyPeople', () => {
+    const overviewWithPeople = mergeWorkerIntakeNotesIntoOverview(
+      'Organized intake summary.',
+      mergeStoryFollowUpIntoWorkerNotesBody('', {
+        employmentName: 'Jordan Alvarez',
+        employer: 'Bluefin Logistics LLC',
+        keyPeople: KEY_PEOPLE,
+      })
+    );
+    const followUp = extractStoryFollowUpFromOverview(overviewWithPeople);
+    expect(followUp?.keyPeople).toBe(KEY_PEOPLE); // present pre-strip
+    const stripped = stripWorkerFollowUpNarrativeForPreview(followUp);
+    expect(stripped?.keyPeople).toBe('');
+    // structured identity fields still survive
+    expect(stripped?.employmentName).toBe('Jordan Alvarez');
+    expect(stripped?.employer).toBe('Bluefin Logistics LLC');
+  });
+
+  function firmViewWithKeyPeople(previewOnly: boolean): FirmLiveIntakeView {
+    return {
+      previewOnly,
+      routeId: 'route-1',
+      routeStatus: previewOnly ? 'preview_sent' : 'full_access',
+      intakeNumber: 'INT-FIRM-001',
+      overview: 'Organized intake summary.',
+      timelineSummary: '',
+      events: [],
+      files: [],
+      readiness: [],
+      missing: [],
+      documentRequest: null,
+      documentResponse: null,
+      intakeWorkflowStatus: 'Submitted',
+      submissionChannel: 'participating_network',
+      isFirmCodeIntake: false,
+      workerProvidedContext: '',
+      workerFollowUp: {
+        employmentName: 'Jordan Alvarez',
+        employer: 'Bluefin Logistics LLC',
+        keyPeople: KEY_PEOPLE,
+      },
+    } as unknown as FirmLiveIntakeView;
+  }
+
+  it('buildFirmIntakeOverviewFields withholds "Key People Involved" on a preview-only view', () => {
+    const fields = buildFirmIntakeOverviewFields(firmViewWithKeyPeople(true));
+    const keyPeopleField = fields.find((f) => f.label === 'Key People Involved');
+    expect(keyPeopleField).toBeUndefined();
+    const text = JSON.stringify(fields);
+    expect(containsCI(text, KEY_PEOPLE)).toBe(false);
+    expect(containsCI(text, 'Priya Raghunathan')).toBe(false);
+  });
+
+  it('buildFirmIntakeOverviewFields includes "Key People Involved" on a full-access view', () => {
+    const fields = buildFirmIntakeOverviewFields(firmViewWithKeyPeople(false));
+    const keyPeopleField = fields.find((f) => f.label === 'Key People Involved');
+    expect(keyPeopleField).toBeDefined();
+    expect(containsCI(keyPeopleField?.value ?? '', 'Priya Raghunathan')).toBe(true);
   });
 });

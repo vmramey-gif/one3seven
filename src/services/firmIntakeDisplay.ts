@@ -534,7 +534,12 @@ export function buildFirmIntakeOverviewFields(
     fields.push({ label: 'Employment Dates', value: polishFirmFacingText(followUp.employmentDates) });
   }
 
-  if (followUp?.keyPeople?.trim()) {
+  // Preview gate (defense-in-depth): keyPeople is free text where a worker can name a treating
+  // physician, a manager, anyone — part of the personal narrative withheld pre-approval. The
+  // loader already blanks it via stripWorkerFollowUpNarrativeForPreview, but this re-checks
+  // previewOnly here too, matching every other narrative render site in this codebase, so a
+  // future loader regression can't leak it through this field.
+  if (!view.previewOnly && followUp?.keyPeople?.trim()) {
     fields.push({ label: 'Key People Involved', value: polishFirmFacingText(followUp.keyPeople) });
   }
 

@@ -139,6 +139,66 @@ describe('time/meal coverage presence gates (conservative: false present is the 
     expect(state(r, 'meal_rest')).toBe('not_in_record');
   });
 
+  // Adversarial audit fix: the content-snippet branch of each presence gate ran BEFORE the
+  // category+filename branch and had no policy-prose exclusion of its own, so an ordinary
+  // handbook sentence could independently reproduce the exact false positive the
+  // category+filename branch was already fixed to exclude — a second path into the same bug.
+  it('a handbook sentence about clocking in/out does NOT mark time_records present via the content-snippet branch', () => {
+    const r = assessEmployerRecordCoverage([
+      {
+        fileName: 'Attendance-Policy-Handbook.pdf',
+        category: 'Uncategorized', // no category-branch match either — isolates the content branch
+        textSnippet:
+          'RIVERBEND SUPPLY CO. — STAFF HANDBOOK\nSection 4: Attendance and Punctuality\n\n' +
+          'Employees are expected to clock in by 8:00 a.m. and clock out at 5:00 p.m. each ' +
+          'scheduled workday. Employees who fail to do so may be subject to discipline.',
+      },
+    ]);
+    expect(state(r, 'time_records')).toBe('not_in_record');
+  });
+
+  it('a handbook sentence about meal-period waiver does NOT mark meal_rest present via the content-snippet branch', () => {
+    const r = assessEmployerRecordCoverage([
+      {
+        fileName: 'Meal-and-Rest-Break-Policy.pdf',
+        category: 'Uncategorized',
+        textSnippet:
+          'RIVERBEND SUPPLY CO. — STAFF HANDBOOK\nSection 6: Meal and Rest Breaks\n\n' +
+          'Consistent with California law, no meal period may be waived unless the shift is ' +
+          'five hours or less and both parties agree in writing.',
+      },
+    ]);
+    expect(state(r, 'meal_rest')).toBe('not_in_record');
+  });
+
+  it('genuine punch-level content-snippet matches still count present after the policy-prose fix (time)', () => {
+    const r = assessEmployerRecordCoverage([
+      {
+        fileName: 'Punch Export April 2025 - Delgado.pdf',
+        category: 'Uncategorized',
+        textSnippet:
+          'POS TIME PUNCH EXPORT\nEmployee: DELGADO, MARISOL\n\n' +
+          'Date        Clock In   Clock Out   Meal Punch   Hours\n' +
+          '04/01/2025  9:58 AM    6:41 PM     none         8.72',
+      },
+    ]);
+    expect(state(r, 'time_records')).toBe('on_file');
+  });
+
+  it('genuine punch-level content-snippet matches still count present after the policy-prose fix (meal)', () => {
+    const r = assessEmployerRecordCoverage([
+      {
+        fileName: 'Punch Export April 2025 - Delgado.pdf',
+        category: 'Uncategorized',
+        textSnippet:
+          'POS TIME PUNCH EXPORT\nDate        Clock In   Clock Out   Meal Punch   Hours\n' +
+          '04/01/2025  9:58 AM    6:41 PM     none         8.72\n' +
+          'No meal period recorded on 7 of 9 shifts over 6.0 hours.',
+      },
+    ]);
+    expect(state(r, 'meal_rest')).toBe('on_file');
+  });
+
   it('a plain time record without meal data leaves meal_rest not_in_record', () => {
     const r = assessEmployerRecordCoverage([
       {

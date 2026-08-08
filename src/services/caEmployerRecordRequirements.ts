@@ -358,12 +358,14 @@ const TIME_DATA_SNIPPET_RES: RegExp[] = [
 
 function timeRecordsPresenceSignal(files: CoverageFileInput[]): boolean {
   return files.some((f) => {
+    // Same "not just a policy page" discipline for BOTH ways this can match: a content
+    // snippet that happens to contain time-data-shaped wording (e.g. a handbook sentence
+    // like "clock in by 8:00 a.m. and clock out at 5:00 p.m.") is not a time record any
+    // more than a policy-flavored filename with an inferred timekeeping category is.
+    if (POLICY_FLAVORED_FILENAME_RE.test(f.fileName ?? '')) return false;
     const snippet = coverageSnippet(f);
     if (TIME_DATA_SNIPPET_RES.some((re) => re.test(snippet))) return true;
-    return (
-      EXPLICIT_TIMEKEEPING_CATEGORY_RE.test(f.category ?? '') &&
-      !POLICY_FLAVORED_FILENAME_RE.test(f.fileName ?? '')
-    );
+    return EXPLICIT_TIMEKEEPING_CATEGORY_RE.test(f.category ?? '');
   });
 }
 
@@ -393,7 +395,15 @@ function mealRestPresenceSignal(files: CoverageFileInput[]): boolean {
       (flag) => MEAL_DATA_WORDING_RE.test(flag) && PUNCH_LEVEL_MISSED_BREAKS_RE.test(flag)
     );
     if (punchLevelFlag) return true;
-    return MEAL_DATA_WORDING_RE.test(coverageSnippet(f));
+    // Same discipline applied to the raw content snippet: a policy-flavored filename never
+    // counts (mirrors the time-records gate), and meal wording alone isn't enough — it must
+    // co-occur with punch-level wording in the SAME snippet, same bar as the flags check
+    // just above. Otherwise an ordinary handbook sentence ("no meal period may be waived
+    // unless the shift is five hours or less") independently reproduces the false positive
+    // this discipline exists to close.
+    if (POLICY_FLAVORED_FILENAME_RE.test(f.fileName ?? '')) return false;
+    const snippet = coverageSnippet(f);
+    return MEAL_DATA_WORDING_RE.test(snippet) && PUNCH_LEVEL_MISSED_BREAKS_RE.test(snippet);
   });
 }
 

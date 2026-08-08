@@ -363,6 +363,11 @@ export default function App() {
   const [firmOwnCaseFiles, setFirmOwnCaseFiles] = useState<WorkerIntakeListEntry[]>([]);
   const [firmLiveView, setFirmLiveView] = useState<FirmLiveIntakeView | null>(null);
   const [firmLiveViewLoading, setFirmLiveViewLoading] = useState(false);
+  // Set when loadFirmLiveIntakeView returns null because of a genuine backend fetch failure
+  // (not because there was simply no route metadata to load from) — distinguishes "we tried to
+  // load this and it failed" from "there's nothing connected here" so the review screen can show
+  // a real error state instead of silently rendering nothing.
+  const [firmLiveViewError, setFirmLiveViewError] = useState<string | null>(null);
   /** Worker upload: firm gate behavior after "Start organizing" law-firm choice modal */
   const [workerUploadFirmIntent, setWorkerUploadFirmIntent] = useState<'default' | 'skip_firm_gate' | 'enter_firm_code_first'>(
     'default'
@@ -2265,6 +2270,7 @@ export default function App() {
           });
           setFirmLiveViewLoading(true);
           setFirmLiveView(null);
+          setFirmLiveViewError(null);
           try {
             const v = await intakeData.loadFirmLiveIntakeView(
               intakeId,
@@ -2273,12 +2279,14 @@ export default function App() {
               meta.intakeNumber
             );
             setFirmLiveView(v);
+            setFirmLiveViewError(v ? null : 'We had trouble loading the latest materials for this intake.');
           } finally {
             setFirmLiveViewLoading(false);
           }
         } else {
           setSelectedRouteMeta(null);
           setFirmLiveView(null);
+          setFirmLiveViewError(null);
         }
         setCurrentScreen('intakeReview');
       }
@@ -3494,6 +3502,7 @@ export default function App() {
         selectedRouteMeta.intakeNumber
       );
       setFirmLiveView(v);
+      setFirmLiveViewError(v ? null : 'We had trouble loading the latest materials for this intake.');
     } finally {
       setFirmLiveViewLoading(false);
     }
@@ -4879,6 +4888,7 @@ export default function App() {
                   const loadLive = Boolean(meta && isSupabaseConfigured());
                   setFirmLiveViewLoading(loadLive);
                   setFirmLiveView(null);
+                  setFirmLiveViewError(null);
                   void (async () => {
                     try {
                       if (meta && isSupabaseConfigured()) {
@@ -4889,6 +4899,9 @@ export default function App() {
                           meta.intakeNumber
                         );
                         setFirmLiveView(v);
+                        setFirmLiveViewError(
+                          v ? null : 'We had trouble loading the latest materials for this intake.'
+                        );
                       } else {
                         setFirmLiveView(null);
                       }
@@ -4932,6 +4945,7 @@ export default function App() {
                 intakeId={selectedIntakeId}
                 firmLiveView={firmLiveView}
                 firmLiveViewLoading={firmLiveViewLoading}
+                firmLiveViewError={firmLiveViewError}
                 onRequestFullAccess={
                   selectedRouteMeta && isSupabaseConfigured() && !firmLiveView?.isFirmCodeIntake
                     ? async () => {
