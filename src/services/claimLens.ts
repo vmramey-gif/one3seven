@@ -829,23 +829,54 @@ function isNegatedMatch(text: string, matchIndex: number): boolean {
   return NEGATION_MARKERS_RE.test(window);
 }
 
+// Same clause-boundary discipline as isNegatedMatch, but returns the full clause SPAN (start and
+// end) around a match index, not just the preceding window. Used to scope "does-not-prove" exclude
+// matching to the clause the include match actually occurred in.
+function clauseBounds(text: string, index: number): { start: number; end: number } {
+  let start = 0;
+  let end = text.length;
+  CLAUSE_BOUNDARY_RE.lastIndex = 0;
+  let boundary: RegExpExecArray | null;
+  while ((boundary = CLAUSE_BOUNDARY_RE.exec(text))) {
+    const bStart = boundary.index;
+    const bEnd = bStart + boundary[0].length;
+    if (bEnd <= index) {
+      start = bEnd;
+      continue;
+    }
+    if (bStart >= index) {
+      end = bStart;
+      break;
+    }
+  }
+  return { start, end };
+}
+
 // Match element assignment on the fact's TEXT only — never its category/meta. Matching on the
 // category ("HR Documents") is what pulled a handbook into "protected activity."
 function matchesElement(item: LensItem, el: ElementDef): boolean {
-  // A pattern only counts if its match isn't negated. Checked per-pattern (not "first pattern
-  // wins") so a negated match on one pattern doesn't hide a genuine, non-negated match from
-  // another pattern in the same element (e.g. "I don't have complaints, but I reported the unsafe
-  // wiring to my manager" should still register on "reported").
-  const hasAffirmativeMatch = el.patterns.some((re) => {
+  // A pattern only counts if its match isn't negated, AND (when the element has "does-not-prove"
+  // excludes) the exclude doesn't fire in the SAME CLAUSE as that match. Checked per-pattern (not
+  // "first pattern wins" / "exclude anywhere in the item") so: (a) a negated match on one pattern
+  // doesn't hide a genuine, non-negated match from another pattern in the same element (e.g. "I
+  // don't have complaints, but I reported the unsafe wiring to my manager" should still register on
+  // "reported"); and (b) an exclude phrase in one clause of a compound sentence doesn't wrongly
+  // suppress a genuine match in a DIFFERENT clause of the same item text — e.g. "After my doctor
+  // gave me a restriction, HR granted modified duty for six weeks." must still register "granted"
+  // for "Accommodations provided" even though "restriction"/"doctor gave" appear earlier in the same
+  // sentence, because they're in a different clause than the actual grant. An exclude in the SAME
+  // clause as the match (e.g. "I requested lighter duty") still correctly suppresses it — a REQUEST,
+  // or a doctor's restriction, does not prove an accommodation was PROVIDED.
+  return el.patterns.some((re) => {
     const m = re.exec(item.text); // no 'g' flag on these patterns, so exec always starts at 0
     if (!m) return false;
-    return !isNegatedMatch(item.text, m.index ?? 0);
+    const idx = m.index ?? 0;
+    if (isNegatedMatch(item.text, idx)) return false;
+    if (!el.exclude?.length) return true;
+    const { start, end } = clauseBounds(item.text, idx);
+    const clause = item.text.slice(start, end);
+    return !el.exclude.some((ex) => ex.test(clause));
   });
-  if (!hasAffirmativeMatch) return false;
-  // does-not-prove gate: an include match is disqualified if the fact also trips an exclude pattern
-  // (e.g. a REQUEST for an accommodation, or a doctor's restriction, does not prove one was PROVIDED).
-  if (el.exclude?.some((re) => re.test(item.text))) return false;
-  return true;
 }
 
 export function buildClaimLensView(lensId: string, input: ClaimLensInput): ClaimLensView {

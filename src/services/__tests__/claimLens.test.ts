@@ -233,6 +233,62 @@ describe('element precision — does-not-prove exclusions (Marquez regression)',
   });
 });
 
+// does-not-prove exclusions are CLAUSE-scoped, matching the negation guard's clause-boundary
+// discipline — a "doctor gave a restriction" / "requested" word in one clause of a compound
+// sentence must not blank out a genuine "granted" in a DIFFERENT clause of the same item text.
+describe('element precision — does-not-prove exclusions are clause-scoped, not whole-text', () => {
+  it('a request-then-grant sentence correctly registers "Accommodations provided" (the audit-failing sentence)', () => {
+    const grant: ClaimLensInput = {
+      events: [],
+      quotes: [],
+      intervals: [],
+      confirmed: [],
+      workerContext: 'After my doctor gave me a restriction, HR granted modified duty for six weeks.',
+      files: [],
+    };
+    const v = buildClaimLensView('feha_disability', grant);
+    const provided = v.elements.find((e) => /Accommodations provided/i.test(e.name));
+    // the grant is in a DIFFERENT clause than "doctor gave"/"restriction" — must be ON FILE, not excluded
+    expect((provided?.items ?? []).some((i) => /granted/i.test(i.text))).toBe(true);
+    expect(provided?.empty).toBeFalsy();
+  });
+
+  it('a request-only sentence, comma variant (restriction + request in the SAME clause as the only affirmative wording, no separate grant clause) still does NOT register as provided (Marquez regression)', () => {
+    const requestOnly: ClaimLensInput = {
+      events: [],
+      quotes: [],
+      intervals: [],
+      confirmed: [],
+      workerContext: 'My doctor gave me a restriction, and I requested modified duty from HR.',
+      files: [],
+    };
+    const v = buildClaimLensView('feha_disability', requestOnly);
+    const provided = v.elements.find((e) => /Accommodations provided/i.test(e.name));
+    // "gave me" is the only affirmative match, and "restriction"/"doctor gave" sit in that SAME
+    // clause ("My doctor gave me a restriction") — still correctly excluded. The second clause
+    // ("I requested modified duty from HR") never affirmatively matches "provided" at all.
+    expect(provided?.items ?? []).toHaveLength(0);
+    expect(provided?.empty).toBeTruthy();
+  });
+
+  it('an exclude phrase in the SAME clause as the match still correctly excludes (fix is scoped, not disabled)', () => {
+    const sameClause: ClaimLensInput = {
+      events: [],
+      quotes: [],
+      intervals: [],
+      confirmed: [],
+      workerContext: 'HR responded to the restriction from my doctor.',
+      files: [],
+    };
+    const v = buildClaimLensView('feha_disability', sameClause);
+    const resp = v.elements.find((e) => /Employer response/i.test(e.name));
+    // "responded" and "restriction" are in the same single clause (no comma/semicolon/conjunction
+    // boundary) — this is the same event, not a different one, so the exclude must still fire.
+    expect(resp?.items ?? []).toHaveLength(0);
+    expect(resp?.empty).toBeTruthy();
+  });
+});
+
 // Negation guard (messy-cases gauntlet Case C finding) — a worker's own DENIAL of a complaint
 // ("I don't have any complaints...") must not register as an affirmative report/complaint just
 // because the substring "complain" appears inside "complaints". This is a shared helper used by
