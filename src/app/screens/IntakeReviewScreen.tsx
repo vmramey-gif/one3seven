@@ -1168,9 +1168,9 @@ export function IntakeReviewScreen({
 
       {/* Content — binder-spine layout (presentation wrapper only) */}
       <div className="px-6 py-8">
-        <div className="mx-auto max-w-6xl flex gap-6 items-start">
-          {/* LEFT SPINE */}
-          <nav className="w-52 shrink-0 sticky top-4 self-start rounded-[16px] border border-[#E4E5DE] bg-white overflow-hidden">
+        <div className="mx-auto max-w-6xl flex flex-col lg:flex-row gap-6 items-start">
+          {/* LEFT SPINE — full-width above the content on mobile/tablet; a sticky side rail only from lg: up */}
+          <nav className="w-full lg:w-52 shrink-0 lg:sticky lg:top-4 self-start rounded-[16px] border border-[#E4E5DE] bg-white overflow-hidden">
             <div className="bg-[#F5ECD6] px-4 py-3 border-b border-[#E4D9BC] font-mono">
               <div className="text-[10px] uppercase tracking-[0.14em] text-[#8A7A4E]">Case file</div>
               <div className="text-sm font-semibold text-[#1B2623] mt-0.5 truncate">
@@ -1345,9 +1345,9 @@ export function IntakeReviewScreen({
                       <p className="text-[10px] uppercase tracking-wider text-white/40 mb-2">The sequence</p>
                       <div className="flex flex-col gap-1.5">
                         {timelineForDisplay.slice(0, 4).map((e, i) => (
-                          <div key={i} className="flex gap-3 text-sm">
+                          <div key={i} className="flex gap-3 text-sm min-w-0">
                             <span className="w-28 shrink-0 font-medium text-[#7C8B6F]">{e.date}</span>
-                            <span className="text-white/85">{e.event}</span>
+                            <span className="min-w-0 flex-1 text-white/85 break-words">{e.event}</span>
                           </div>
                         ))}
                       </div>
@@ -3123,9 +3123,11 @@ export function IntakeReviewScreen({
               </motion.div>
             )}
 
-            {/* PINNED ACTIONS BAR — Firm Actions relocated here (shows on every tab) */}
-            <div className="sticky bottom-0 z-10 mt-2 rounded-2xl border border-[#E4E5DE] bg-white/95 px-4 py-3 shadow-[0_-6px_24px_rgba(31,27,75,0.06)] backdrop-blur">
-              <div className="flex flex-wrap items-center gap-2">
+            {/* PINNED ACTIONS BAR — Firm Actions relocated here (shows on every tab).
+                Contains its own horizontal scroll on narrow screens so this bar can never force
+                the page itself to overflow, regardless of how many actions are present at once. */}
+            <div className="sticky bottom-0 z-10 mt-2 rounded-2xl border border-[#E4E5DE] bg-white/95 px-4 py-3 shadow-[0_-6px_24px_rgba(31,27,75,0.06)] backdrop-blur max-w-full overflow-x-auto">
+              <div className="flex flex-nowrap sm:flex-wrap items-center gap-2 min-w-max sm:min-w-0">
                 <span className="mr-1 hidden text-[11px] font-semibold uppercase tracking-wider text-[#7C857F] sm:inline">
                   Firm actions
                 </span>

@@ -60,8 +60,8 @@ function SampleDataBanner({
   activePersonaId: string | null;
 }) {
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-[999] bg-[#1B2623]/95 backdrop-blur text-white px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 border-t border-white/10">
-      <p className="text-xs text-white/55 truncate">
+    <div className="fixed bottom-0 left-0 right-0 z-[999] bg-[#1B2623]/95 backdrop-blur text-white px-3 sm:px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 border-t border-white/10">
+      <p className="min-w-0 flex-1 basis-full sm:basis-auto text-xs text-white/55 truncate">
         one3seven · Illustrative sample data — 5 fictional cases, not real clients
       </p>
       <div className="flex items-center gap-2 shrink-0">
@@ -79,7 +79,7 @@ function SampleDataBanner({
             aria-label="Switch case"
             value={activePersonaId}
             onChange={(e) => onSwitchPersona(e.target.value)}
-            className="rounded-full border border-white/20 bg-transparent px-3 py-1.5 text-xs font-medium text-white/80 hover:bg-white/10 transition-colors"
+            className="hidden sm:block max-w-[9rem] rounded-full border border-white/20 bg-transparent px-3 py-1.5 text-xs font-medium text-white/80 hover:bg-white/10 transition-colors"
           >
             {PERSONA_DEMOS.map((p) => (
               <option key={p.personaId} value={p.personaId} className="text-[#1B2623]">
@@ -91,9 +91,9 @@ function SampleDataBanner({
         <button
           type="button"
           onClick={() => { window.location.href = '/'; }}
-          className="shrink-0 rounded-full bg-[#42574E] px-4 py-1.5 text-xs font-semibold text-white hover:bg-[#374A42] transition-colors"
+          className="shrink-0 rounded-full bg-[#42574E] px-3 sm:px-4 py-1.5 text-xs font-semibold text-white hover:bg-[#374A42] transition-colors whitespace-nowrap"
         >
-          Get your firm intake link →
+          Get your firm link →
         </button>
       </div>
     </div>
@@ -400,7 +400,7 @@ export function SalesDemoPage() {
   };
 
   return (
-    <div className="relative">
+    <div className="relative w-full max-w-[100vw] overflow-x-hidden">
       {view === 'picker' || !entry ? (
         <PersonaPicker onSelect={selectPersona} />
       ) : view === 'worker' ? (
