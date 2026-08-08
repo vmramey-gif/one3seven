@@ -258,7 +258,7 @@ export function IntakeReviewScreen({
   const TABS: { id: BinderTab; label: string; Icon: typeof FileText; accent?: boolean }[] = [
     { id: 'decision', label: 'Decision card', Icon: ClipboardCheck },
     { id: 'timeline', label: 'Timeline', Icon: Clock },
-    { id: 'claimlens', label: 'Claim lens', Icon: Search },
+    { id: 'claimlens', label: 'Element lens', Icon: Search },
     { id: 'documents', label: 'Documents', Icon: FileText },
     { id: 'gaps', label: 'Gaps & requests', Icon: HelpCircle },
     { id: 'context', label: 'Worker context', Icon: User, accent: true },

@@ -171,7 +171,7 @@ export function ClaimLensPanel({
     <div className="clp">
       <style>{CSS}</style>
       <div className="pad">
-        <div className="cap"><span className="p" />Claim Lens</div>
+        <div className="cap"><span className="p" />Element Lens</div>
 
         {/* One coverage indicator — no duplicate stat grids or tallies. */}
         <div className="theoryRow">

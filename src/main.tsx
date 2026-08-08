@@ -137,7 +137,7 @@ const routeTitle =
   : isHQ ? 'Founder HQ — one3seven'
   : isFireDemo ? 'Fire Demo — one3seven'
   : isCaseDemo ? 'Case Facts, Assembled — one3seven'
-  : isClaimLensDemo ? 'Claim Lens — one3seven'
+  : isClaimLensDemo ? 'Element Lens — one3seven'
   : isTxDemo ? 'Texas Demo — one3seven'
   : isSalesDemo ? 'Sample Cases — one3seven'
   : isWorkerDemo ? 'Worker Demo — one3seven'
