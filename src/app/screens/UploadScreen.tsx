@@ -673,7 +673,11 @@ export function UploadScreen({
         return;
       }
     } else {
-      setUploadedFiles((prev) => prev.filter((_, i) => i !== index));
+      // setUploadedFiles is declared as a plain (files: File[]) => void prop, not a useState
+      // setter, so the functional-updater form doesn't type-check here even though today's
+      // real caller happens to pass a genuine useState setter. Match the direct-array form
+      // every other call site in this file already uses.
+      setUploadedFiles(uploadedFiles.filter((_, i) => i !== index));
     }
   };
 

@@ -212,6 +212,45 @@ export function parseHumanContextSections(raw: string): ParsedHumanContextSectio
   };
 }
 
+/**
+ * Canonical bucket set for grouping upload categories in packet/PDF exports. Single source of
+ * truth — this used to be hand-copied into 3 files and had drifted (one copy was missing the
+ * bare 'Pay Records' case, so a file categorized exactly that string bucketed differently
+ * depending on which export path rendered it).
+ */
+export const EXPORT_SECTION_BUCKETS = [
+  'Compensation & Payroll',
+  'Employment Records',
+  'Workplace Communications',
+  'Scheduling, Attendance & Leave',
+  'Incident & Workplace Evidence',
+  'Identity & Professional Verification',
+  'Additional Supporting Records',
+] as const;
+
+export type ExportBucket = (typeof EXPORT_SECTION_BUCKETS)[number];
+
+export function legacyCategoryToBucket(name: string): ExportBucket {
+  switch (name) {
+    case 'Pay Records / Payroll':
+    case 'Pay Records':
+    case 'Reimbursement Records':
+      return 'Compensation & Payroll';
+    case 'Offer Letters':
+    case 'HR Documents':
+    case 'Performance Reviews':
+      return 'Employment Records';
+    case 'Workplace Communications':
+      return 'Workplace Communications';
+    case 'Time Records':
+    case 'PTO Records':
+      return 'Scheduling, Attendance & Leave';
+    case 'Uncategorized':
+    default:
+      return 'Additional Supporting Records';
+  }
+}
+
 export function confidenceLabel(confidence: string): string {
   switch (confidence) {
     case 'grounded':

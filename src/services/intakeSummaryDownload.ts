@@ -13,6 +13,7 @@ import { extractStoryFollowUpFromOverview } from './storyFollowUpPersistence';
 import { formatReadinessForExportPacket } from './readinessDiagnosticsPresentation';
 import { ONE3SEVEN_UNIVERSAL_DISCLAIMER } from '../app/constants/one3sevenProduct';
 import type { IntakeOrganizationSections } from './intakeOrganizationTypes';
+import { EXPORT_SECTION_BUCKETS, legacyCategoryToBucket, type ExportBucket } from './intakePacketFormatting';
 
 export type CategoryCountRow = { name: string; count: number };
 
@@ -56,44 +57,12 @@ export type IntakeSummaryDownloadPayload = {
   orgSections?: IntakeOrganizationSections;
 };
 
-const EXPORT_SECTION_BUCKETS = [
-  'Compensation & Payroll',
-  'Employment Records',
-  'Workplace Communications',
-  'Scheduling, Attendance & Leave',
-  'Incident & Workplace Evidence',
-  'Identity & Professional Verification',
-  'Additional Supporting Records',
-] as const;
-
-type ExportBucket = (typeof EXPORT_SECTION_BUCKETS)[number];
-
 function escapeHtml(s: string): string {
   return s
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
-}
-
-function legacyCategoryToBucket(name: string): ExportBucket {
-  switch (name) {
-    case 'Pay Records / Payroll':
-    case 'Reimbursement Records':
-      return 'Compensation & Payroll';
-    case 'Offer Letters':
-    case 'HR Documents':
-    case 'Performance Reviews':
-      return 'Employment Records';
-    case 'Workplace Communications':
-      return 'Workplace Communications';
-    case 'Time Records':
-    case 'PTO Records':
-      return 'Scheduling, Attendance & Leave';
-    case 'Uncategorized':
-    default:
-      return 'Additional Supporting Records';
-  }
 }
 
 function aggregateBucketCounts(payload: IntakeSummaryDownloadPayload): Map<ExportBucket, number> {

@@ -149,7 +149,6 @@ export function WorkerAppShell({
                   items={workerBellNotifications}
                   panelNotice={notificationsPanelNotice}
                   label="Updates"
-                  compact
                 />
                 {onOpenSettings ? (
                   <button

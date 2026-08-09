@@ -290,7 +290,7 @@ export default function App() {
       forFirms: '/for-firms',
       firmDirectedIntake: '/intake',
       upload: '/intake/upload',
-      intakeSummary: '/intake/summary',
+      summary: '/intake/summary',
       firmDashboard: '/firm',
       roleSelection: '/get-started',
     };
@@ -1627,7 +1627,11 @@ export default function App() {
       }
       const fromLocal = loadCaseCategoryLocal(intakeId);
       if (fromLocal) {
-        if (isBetaEmploymentCategory(fromLocal) || fromLocal === BETA_WORKER_CASE_CATEGORY) {
+        // isBetaEmploymentCategory already lowercases and matches BETA_WORKER_CASE_CATEGORY
+        // ('employment') internally, so `|| fromLocal === BETA_WORKER_CASE_CATEGORY` here was
+        // unreachable — fromLocal's type (IntakeCaseCategory) never actually contains the
+        // lowercase literal, which is exactly what tsc was flagging.
+        if (isBetaEmploymentCategory(fromLocal)) {
           return BETA_WORKER_CASE_CATEGORY;
         }
         if (CALIFORNIA_BETA_CASE_CATEGORIES.some((category) => category.name === fromLocal)) {
@@ -2563,7 +2567,7 @@ export default function App() {
     await refreshWorkerRoutingFromIntake(intakeId, firm.firm_name);
     setWorkerLinkedFirmCode(firm.firm_code ?? code.trim().toUpperCase());
     if (profile?.id) await refreshWorkerIntakesList(profile.id);
-    return { firmName: firm.firm_name, firmCode: firm.firm_code };
+    return { firmName: firm.firm_name };
   };
 
   // Auto-apply a firm code stored from a /?fc=FIRMCODE intake link.

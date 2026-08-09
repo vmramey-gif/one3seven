@@ -9,6 +9,7 @@ import {
   sanitizeEmployerForPacket,
   sanitizePacketDateLabel,
   formatPacketFileName,
+  legacyCategoryToBucket,
   PACKET_METADATA_FALLBACK,
 } from './intakePacketFormatting';
 import { extractStoryFollowUpFromOverview } from './storyFollowUpPersistence';
@@ -74,8 +75,6 @@ export type WorkerAccountSection = {
   body: string;
 };
 
-type InventoryRow = { fileName: string; category: string };
-
 function clipProse(s: string, max: number): string {
   const x = sanitizeProse(s);
   if (x.length <= max) return x;
@@ -108,26 +107,6 @@ function englishList(items: string[]): string {
   if (t.length === 1) return t[0];
   if (t.length === 2) return `${t[0]} and ${t[1]}`;
   return `${t.slice(0, -1).join(', ')}, and ${t[t.length - 1]}`;
-}
-
-function legacyCategoryToBucket(name: string): string {
-  switch (name) {
-    case 'Pay Records / Payroll':
-    case 'Pay Records':
-    case 'Reimbursement Records':
-      return 'Compensation & Payroll';
-    case 'Offer Letters':
-    case 'HR Documents':
-    case 'Performance Reviews':
-      return 'Employment Records';
-    case 'Workplace Communications':
-      return 'Workplace Communications';
-    case 'Time Records':
-    case 'PTO Records':
-      return 'Scheduling, Attendance & Leave';
-    default:
-      return 'Additional Supporting Records';
-  }
 }
 
 export function attorneyCategoryLabel(category: string, fileName?: string): string {
@@ -551,7 +530,6 @@ export {
   resolveChronologyEventDate,
   resolveChronologyEventTitle,
 };
-export type { PacketTimelineEventInput };
 
 export function buildCaseSnapshot(payload: IntakeSummaryDownloadPayload): PacketCaseSnapshot {
   const followUp = extractStoryFollowUpFromOverview(payload.workerContext ?? '');

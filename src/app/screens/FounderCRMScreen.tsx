@@ -1812,9 +1812,13 @@ function CallQueueTab({ firms, activity, onLog, today, onQuickEmail, onQuickLog,
   activity: CrmActivityWithFirm[];
   onLog: (firmId: string) => void;
   today: string;
-  onQuickEmail: (firmId: string) => void;
-  onQuickLog: (firmId: string, kind: QuickLogKind) => void;
-  claim?: { userId?: string; onClaim?: (id: string) => void; onRelease?: (id: string) => void; isFounder?: boolean; members?: CrmMember[]; onAssign?: (firmId: string, memberId: string | null, memberName: string | null) => Promise<void> };
+  // Promise<void>, not void: these are forwarded straight through to FirmCard, which awaits
+  // them (to sequence its own pending/claiming spinner state) — and the real values passed in
+  // by this component's own caller (quickEmail/quickLog/claimFirmHandler/releaseFirmHandler)
+  // are all genuinely async. The narrower `void` here was simply an inaccurate declaration.
+  onQuickEmail: (firmId: string) => Promise<void>;
+  onQuickLog: QuickLogFn;
+  claim?: { userId?: string; onClaim?: (id: string) => Promise<void>; onRelease?: (id: string) => Promise<void>; isFounder?: boolean; members?: CrmMember[]; onAssign?: (firmId: string, memberId: string | null, memberName: string | null) => Promise<void> };
 }) {
   const lastEmail = new Map<string, { date: string; at: string; by: string | null }>();
   const called = new Set<string>();

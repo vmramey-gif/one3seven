@@ -23,6 +23,7 @@ import {
   formatPacketDateRange,
   formatPacketFileName,
   formatPacketMetadataValue,
+  legacyCategoryToBucket,
   parseHumanContextSections,
   PACKET_METADATA_FALLBACK,
   sanitizeEmployerForPacket,
@@ -351,26 +352,6 @@ function cleanProse(s: string, max = 480): string {
     t = sp > max * 0.4 ? cut.slice(0, sp).trim() : cut.trim();
   }
   return t;
-}
-
-function legacyCategoryToBucket(name: string): string {
-  switch (name) {
-    case 'Pay Records / Payroll':
-    case 'Pay Records':
-    case 'Reimbursement Records':
-      return 'Compensation & Payroll';
-    case 'Offer Letters':
-    case 'HR Documents':
-    case 'Performance Reviews':
-      return 'Employment Records';
-    case 'Workplace Communications':
-      return 'Workplace Communications';
-    case 'Time Records':
-    case 'PTO Records':
-      return 'Scheduling, Attendance & Leave';
-    default:
-      return 'Additional Supporting Records';
-  }
 }
 
 function aggregateBuckets(payload: IntakeSummaryDownloadPayload): Map<string, number> {

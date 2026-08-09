@@ -377,10 +377,17 @@ type ProfileQueryResult = {
 
 export async function withProfileQueryTimeout<T>(
   label: string,
-  promise: Promise<T>,
+  // PromiseLike, not Promise: Supabase query builders are thenable but not real Promise
+  // instances, so a Promise<T> parameter type fails structural inference and T collapses to
+  // {} at every call site — that was the single root cause behind ~25 of the tsc baseline errors.
+  promise: PromiseLike<T>,
   timeoutMs: number = PROFILE_QUERY_TIMEOUT_MS
 ): Promise<T> {
-  let timer: ReturnType<typeof setTimeout> | undefined;
+  // number, not ReturnType<typeof setTimeout>: @types/node's ambient setTimeout declaration
+  // pollutes the merged global scope (even Window's), so any ReturnType-derived type here
+  // resolves to NodeJS.Timeout — this is always browser code (window.setTimeout), which truly
+  // returns a number at runtime regardless of what the merged ambient types claim.
+  let timer: number | undefined;
   const timeout = new Promise<never>((_, reject) => {
     timer = window.setTimeout(
       () => reject(new Error(`[o3s-ensure-profile] ${label} timed out after ${timeoutMs}ms`)),
@@ -2694,7 +2701,11 @@ export async function persistPlaceholderOrganizationForIntake(
     timelineEventCount: org.timelineEvents.length,
     evidenceTimelineCount: org.evidenceTimeline.length,
     fileRecordCount: org.fileRecords.length,
-    sectionCount: org.sections.length,
+    // org.sections is a fixed-shape object (IntakeOrganizationSections), not an array — this
+    // used to call .length on it, which is always undefined. Count populated sections instead.
+    sectionCount: Object.values(org.sections).filter((v) =>
+      Array.isArray(v) ? v.length > 0 : typeof v === 'string' ? v.trim().length > 0 : Boolean(v)
+    ).length,
     readinessIndicatorCount: org.readinessIndicators.length,
     generationUsedFallback,
   });

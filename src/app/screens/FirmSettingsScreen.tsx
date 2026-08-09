@@ -57,7 +57,11 @@ const LEGACY_CATEGORY_MAP: Record<string, string> = {
 
 function normalizePracticeAreas(areas: string[] | null | undefined): string[] {
   const normalized = (areas ?? []).map((area) => LEGACY_CATEGORY_MAP[area] ?? area);
-  return Array.from(new Set(normalized)).filter((area) => INTAKE_CATEGORIES.includes(area));
+  // Widened to readonly string[] for the membership check only: `area` is a plain string at
+  // this point (post-legacy-mapping), and INTAKE_CATEGORIES' narrow literal-union element type
+  // isn't something a general string can satisfy without an unsound cast in the other direction.
+  const knownCategories: readonly string[] = INTAKE_CATEGORIES;
+  return Array.from(new Set(normalized)).filter((area) => knownCategories.includes(area));
 }
 
 export function FirmSettingsScreen({

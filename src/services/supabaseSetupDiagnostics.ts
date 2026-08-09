@@ -13,7 +13,7 @@ export type DbDiagStepResult = {
 };
 
 async function withDiagTimeout<T>(label: string, promise: Promise<T>): Promise<T> {
-  let timer: ReturnType<typeof setTimeout> | undefined;
+  let timer: number | undefined;
   const timeout = new Promise<never>((_, reject) => {
     timer = window.setTimeout(
       () => reject(new Error(`[o3s-db-diag] ${label} timed out after ${DB_DIAG_STEP_TIMEOUT_MS}ms`)),

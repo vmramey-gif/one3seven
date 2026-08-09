@@ -121,7 +121,16 @@ Deno.serve(async (req: Request) => {
       fpId = (data?.firm_profile_id as string | undefined) ?? null;
     }
     if (!fpId) {
-      console.warn('[stripe-webhook] could not resolve firm_profile_id', { customerId });
+      // error, not warn: this event is dropped with no retry (Stripe sees 200) and no other
+      // code path ever revisits it — a real subscription state change (plan/status) silently
+      // never reaches firm_profiles. Log everything needed to reconcile by hand from Supabase's
+      // function logs, since nothing currently alerts on this automatically.
+      console.error('[stripe-webhook] UNMAPPED FIRM — subscription event dropped, no automatic retry', {
+        eventType: event.type,
+        subscriptionId: subscription.id,
+        customerId,
+        priceId,
+      });
       return new Response(JSON.stringify({ received: true, note: 'unmapped firm' }), { status: 200 });
     }
 
