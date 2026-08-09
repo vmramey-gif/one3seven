@@ -68,7 +68,12 @@ function safeTrimInternal(value: unknown, fieldName: string): string {
   return typeof value === 'number' || typeof value === 'boolean' ? String(value).trim() : '';
 }
 
-/** Temporary: log a safe preview of generated summary text (not full payload). */
+/**
+ * Log shape/size only — never the worker's real narrative text. Previously logged up to 320
+ * chars of the actual generated overview/timeline summary (names, employer details, complaint
+ * narrative) to the browser console on every save; length-only still diagnoses "did this field
+ * generate empty" without writing PII to console/breadcrumb output.
+ */
 export function logGeneratedSummaryPreview(
   intakeId: string,
   fields: {
@@ -79,15 +84,10 @@ export function logGeneratedSummaryPreview(
     timelineEventCount?: number;
   }
 ): void {
-  const preview = (text: string | undefined, max = 320) => {
-    const t = (text ?? '').replace(/\s+/g, ' ').trim();
-    if (!t) return '';
-    return t.length <= max ? t : `${t.slice(0, max)}…`;
-  };
   logSummarySave('generated summary preview', {
     intakeId,
-    overviewPreview: preview(fields.overview),
-    timelineSummaryPreview: preview(fields.timelineSummary, 200),
+    overviewLength: (fields.overview ?? '').trim().length,
+    timelineSummaryLength: (fields.timelineSummary ?? '').trim().length,
     readinessIndicatorCount: fields.readinessCount ?? 0,
     missingAlertCount: fields.missingCount ?? 0,
     timelineEventCount: fields.timelineEventCount ?? 0,

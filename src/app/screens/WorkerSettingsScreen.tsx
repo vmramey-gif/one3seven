@@ -41,7 +41,7 @@ function DeleteAccountControl({ email, onSignOut }: { email: string | null; onSi
   if (status === 'done') {
     return (
       <div className="rounded-2xl border border-red-200 bg-white px-4 py-3 text-sm leading-relaxed text-[#1B2623]">
-        Request received. Your records and account will be permanently deleted within 30 days, and we&rsquo;ll email confirmation{email ? ` to ${email}` : ''}. Signing you out&hellip;
+        Request received. Your records and account will be permanently deleted within 45 days, and we&rsquo;ll email confirmation{email ? ` to ${email}` : ''}. Signing you out&hellip;
       </div>
     );
   }
@@ -220,7 +220,7 @@ export function WorkerSettingsScreen({ onNavigate, userEmail, profileId, onSignO
                 <Trash2 className="h-4 w-4" /> Delete account
               </div>
               <p className="mb-3 text-xs leading-relaxed text-[#1B2623]/64">
-                It&rsquo;s your data — you can delete it anytime. We permanently remove your records and account within 30 days of your request and email you confirmation.
+                It&rsquo;s your data — you can delete it anytime. We permanently remove your records and account within 45 days of your request and email you confirmation.
               </p>
               <DeleteAccountControl email={userEmail} onSignOut={onSignOut} />
             </div>

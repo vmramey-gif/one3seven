@@ -26,26 +26,3 @@ export const supabase: SupabaseClient = createClient(
   }
 );
 
-/** TEMPORARY audit: remove after debugging Auth signup. Logs masked anon key + URL host. */
-function o3sAuthAuditLogClientInit() {
-  if (typeof window === 'undefined') return;
-  const key = supabaseAnonKey ?? '';
-  const anonSummary =
-    !key || key === 'placeholder-anon-key'
-      ? '(missing or placeholder)'
-      : `${key.slice(0, 8)}…${key.slice(-4)} (len=${key.length})`;
-  let urlHost = '(none)';
-  try {
-    if (supabaseUrl) urlHost = new URL(supabaseUrl).host;
-  } catch {
-    urlHost = '(invalid URL string)';
-  }
-  console.info('[o3s-auth-audit] Supabase browser client', {
-    envVarsPresent: Boolean(supabaseUrl && supabaseAnonKey),
-    isSupabaseConfigured: Boolean(supabaseUrl && supabaseAnonKey),
-    urlHost,
-    anonKey: anonSummary,
-  });
-}
-o3sAuthAuditLogClientInit();
-

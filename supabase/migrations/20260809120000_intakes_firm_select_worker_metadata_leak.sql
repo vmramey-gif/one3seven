@@ -1,0 +1,24 @@
+-- SECURITY FIX: intakes_firm_select_routed granted a firm SELECT on the entire `intakes`
+-- row — including `worker_metadata` (workerStory, complainedOrReported, arbitrationAgreement,
+-- priorAgencyFilingDetails, keyPeople) — the moment ANY firm_intake_routes row existed, with no
+-- route_status check at all. A firm at 'preview_sent' or even 'access_requested' (i.e. before the
+-- worker ever approved full access) could read the worker's full private narrative directly via
+-- `select('*')` or any ad-hoc query against `intakes`, regardless of what the React UI rendered.
+--
+-- This is NOT the same fix pattern as the sibling tables (uploaded_files, intake_summaries,
+-- timeline_events, storage.objects), which gate on `route_status = 'full_access'` because their
+-- content is DESIGNED to become visible to the firm once full access is granted. `worker_metadata`
+-- was never meant to be firm-visible at any stage — per the original design (see memory:
+-- "Firms read curated data via scoped tables/edge functions, never the intakes row" — confirmed
+-- get-intake-intelligence never touches `intakes` or `worker_metadata`). So the correct fix is not
+-- a tighter gate on this policy, it's removing direct firm SELECT on `intakes` entirely. The firm
+-- dashboard's legitimate need for a few non-sensitive columns (intake_number, created_at,
+-- submission_channel, linked_firm_id, workflow_status) at preview stage is served instead by the
+-- new `firm_intake_preview` view (see next migration), which exposes only those columns.
+--
+-- NOTE: verify against production first — `select policyname, cmd, qual from pg_policies where
+-- tablename = 'intakes';` — schema.sql and the live DB may have diverged (documented drift,
+-- see docs/rls-testing.md). If a broader/permissive policy exists under a different name, drop it
+-- too; Postgres OR-combines permissive policies.
+
+drop policy if exists intakes_firm_select_routed on public.intakes;

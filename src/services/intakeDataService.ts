@@ -3129,15 +3129,6 @@ type IntakeRoutingEmbed = {
   workflow_status: string;
 };
 
-function normalizeIntakeRoutingEmbed(raw: unknown): IntakeRoutingEmbed | null {
-  if (!raw) return null;
-  if (Array.isArray(raw)) {
-    const first = raw[0];
-    return first && typeof first === 'object' ? (first as IntakeRoutingEmbed) : null;
-  }
-  return typeof raw === 'object' ? (raw as IntakeRoutingEmbed) : null;
-}
-
 async function fetchIntakeRowForRouting(intakeId: string): Promise<{
   submission_channel: string | null;
   workflow_status: string | null;
@@ -3970,9 +3961,7 @@ export async function loadFirmDashboardRows(
 async function loadFirmDashboardRowsInner(firmTableId: string): Promise<FirmDashboardRow[]> {
   const { data: routes, error } = await supabase
     .from('firm_intake_routes')
-    .select(
-      'id, intake_id, route_status, preview_sent_at, created_at, intakes(intake_number, created_at, id, submission_channel, linked_firm_id, workflow_status)'
-    )
+    .select('id, intake_id, route_status, preview_sent_at, created_at')
     .eq('firm_id', firmTableId);
   if (error) {
     console.error(error);
@@ -3982,21 +3971,26 @@ async function loadFirmDashboardRowsInner(firmTableId: string): Promise<FirmDash
   const rawRouteCount = routes?.length ?? 0;
   console.info('[o3s-firm-dashboard] raw route count', { firmTableId, rawRouteCount });
 
+  // Firms no longer read `intakes` directly (that table can hold worker_metadata, which must
+  // never be firm-visible at any route stage — see 20260809120000). `firm_intake_preview` is a
+  // narrow view exposing only the columns the dashboard list actually needs, at any route status.
+  const intakeIds = [...new Set((routes ?? []).map((r) => r.intake_id).filter(Boolean))] as string[];
+  const intakeById = new Map<string, IntakeRoutingEmbed>();
+  if (intakeIds.length) {
+    const { data: previews, error: previewErr } = await supabase
+      .from('firm_intake_preview')
+      .select('intake_number, created_at, id, submission_channel, linked_firm_id, workflow_status')
+      .in('id', intakeIds);
+    if (previewErr) console.error(previewErr);
+    for (const p of previews ?? []) intakeById.set((p as { id: string }).id, p as IntakeRoutingEmbed);
+  }
+
   const rows: FirmDashboardRow[] = [];
   for (const r of routes ?? []) {
     const intakeId = (r.intake_id as string | undefined) ?? undefined;
     if (!intakeId) continue;
 
-    let intake = normalizeIntakeRoutingEmbed(r.intakes);
-    if (!intake) {
-      const { data: intakeRow, error: intakeErr } = await supabase
-        .from('intakes')
-        .select('intake_number, created_at, id, submission_channel, linked_firm_id, workflow_status')
-        .eq('id', intakeId)
-        .maybeSingle();
-      if (intakeErr) console.error(intakeErr);
-      intake = intakeRow as IntakeRoutingEmbed | null;
-    }
+    const intake = intakeById.get(intakeId) ?? null;
 
     const submissionType = resolveFirmSubmissionTypeDisplay({
       submissionChannel: intake?.submission_channel,

@@ -52,11 +52,35 @@ To make it blocking, require the `rls-isolation` check in branch protection on `
 | `intakes` | `worker_id = auth.uid()` | Ownership root |
 | `timeline_events` | `intake_id → intakes.worker_id` | Child of intake |
 | `intake_summaries` | `intake_id → intakes.worker_id` | **Also guards reminders, mitigation log, story follow-up, and the worker's name** — all stored as JSON blocks inside `overview` |
-| `notifications` | `user_id = auth.uid()` | Self-owned |
+| `notifications` | `recipient_user_id = auth.uid()` | Self-owned |
 
 **Intentionally not here:** `intake_routes` and `subscriptions` are worker↔**firm** / billing
-boundaries, not worker↔worker. They belong to a firm-side attacker-matrix harness (Firm A must not
-read Firm B; a preview firm must not read full content). Keep this file focused on the worker wall.
+boundaries, not worker↔worker. They're covered by the companion harness below.
+
+## Firm-side companion: `scripts/rls-firm-isolation-test.mjs` (`npm run test:rls-firm`)
+
+Closes the gap this file used to flag as not-yet-built. Same credentials, same guard pattern, same
+CI job structure (`rls-firm-isolation` in `.github/workflows/ci.yml`). Proves:
+
+1. **`intakes` is NEVER firm-readable, at any `route_status`.** `worker_metadata` (the worker's
+   private narrative) must never reach a firm — not at `preview_sent`, not at `full_access`.
+   Firms read case metadata through `firm_intake_preview` instead (a narrow view exposing only
+   `id, intake_number, created_at, submission_channel, linked_firm_id, workflow_status`).
+2. **Staged access**, using the real `worker_approve_full_access` RPC (not a service-role
+   shortcut) to escalate — proving the actual production approval path, not just the policy:
+   - At `preview_sent`: firm reads the preview view, reads zero of `uploaded_files` /
+     `intake_summaries` / `timeline_events`.
+   - At `full_access`: firm now reads all three; `intakes` itself is still zero.
+3. **Firm↔firm cross-tenant isolation**, at both stages: a second firm with NO route to the
+   intake reads zero of everything above.
+4. **Regression checks**: a firm cannot self-escalate its own route to `full_access` via direct
+   `UPDATE` (must go through the RPC), and cannot self-elevate its own `firm_profiles.plan_id`
+   (legitimate self-edits like `firm_name` still work).
+
+**Not covered by either harness:** `storage.objects` byte-level isolation needs real file uploads
+to test end-to-end — verified today by static policy review instead (the `storage.objects` RLS
+mirrors the same `route_status = 'full_access'` gate as `uploaded_files`). Add a real-upload test
+here if this ever needs to be proven live rather than by policy inspection.
 
 ## Extending the matrix (do this as tables are added)
 

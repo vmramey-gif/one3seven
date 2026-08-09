@@ -19,7 +19,7 @@
  *   - intake_summaries   child of intake: intake_id -> intakes.worker_id
  *                        ALSO guards reminders + mitigation log + story follow-up + worker name,
  *                        which all live as JSON blocks inside intake_summaries.overview.
- *   - notifications      self-owned:      user_id = auth.uid()
+ *   - notifications      self-owned:      recipient_user_id = auth.uid()
  *   NOT here (on purpose): intake_routes + subscriptions are worker<->FIRM / billing boundaries.
  *   They belong to a firm-side attacker-matrix harness, not this worker<->worker test.
  *
@@ -93,7 +93,10 @@ const SELF_TABLES = [
   {
     name: 'notifications',
     seed: (userId) => admin.from('notifications')
-      .insert({ user_id: userId, type: 'system', title: 'RLS harness', body: 'RLS harness' })
+      .insert({
+        recipient_user_id: userId, recipient_kind: 'worker',
+        notification_type: 'worker_documents_submitted', title: 'RLS harness', body: 'RLS harness',
+      })
       .select('id').single(),
     list: (client) => client.from('notifications').select('id'),
   },

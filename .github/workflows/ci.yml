@@ -41,9 +41,27 @@ jobs:
           node-version: '20'
           cache: 'npm'
       - run: npm ci
-      - name: RLS isolation harness
+      - name: RLS isolation harness (worker<->worker)
         env:
           SUPABASE_TEST_URL: ${{ secrets.RLS_TEST_URL }}
           SUPABASE_TEST_ANON_KEY: ${{ secrets.RLS_TEST_ANON_KEY }}
           SUPABASE_TEST_SERVICE_ROLE_KEY: ${{ secrets.RLS_TEST_SERVICE_ROLE_KEY }}
         run: npm run test:rls
+
+  # Firm-side companion to rls-isolation above — proves the worker<->firm boundary and
+  # firm<->firm isolation. Same self-skip / same secrets / same staging-only guard.
+  rls-firm-isolation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - name: RLS isolation harness (worker<->firm, firm<->firm)
+        env:
+          SUPABASE_TEST_URL: ${{ secrets.RLS_TEST_URL }}
+          SUPABASE_TEST_ANON_KEY: ${{ secrets.RLS_TEST_ANON_KEY }}
+          SUPABASE_TEST_SERVICE_ROLE_KEY: ${{ secrets.RLS_TEST_SERVICE_ROLE_KEY }}
+        run: npm run test:rls-firm

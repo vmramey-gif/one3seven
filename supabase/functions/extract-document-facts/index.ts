@@ -430,8 +430,11 @@ async function callClaude(
       }
       const parsed = parseFacts(content);
       if (!parsed) {
+        // Never log `content` here — it's the model's real extracted document facts (names,
+        // pay figures, quoted statements). Length/shape only; enough to diagnose a parse failure
+        // without writing worker PII into Supabase's unredacted function logs.
         console.error(
-          `[extract] unparseable response (model=${model}, stop=${data?.stop_reason}, blocks=${blocks.map((b) => b?.type).join(',')}): ${content.slice(0, 300)}`
+          `[extract] unparseable response (model=${model}, stop=${data?.stop_reason}, blocks=${blocks.map((b) => b?.type).join(',')}, contentLength=${content.length})`
         );
       }
       return parsed;
