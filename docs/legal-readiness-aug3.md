@@ -111,6 +111,19 @@ alongside the Tad founder+IP agreement** — both are really the same question: 
 - [ ] **Litigation-hold basics** — if a Steno dispute is ever reasonably anticipated, what needs to be
   preserved and how. (A)
 
+### ✅ Done 2026-08-09 — public-site exposure sweep
+19 static pages under `public/` (sales-doctrine "never-say" scripts, unreleased pricing math,
+internal financial planning) were reachable by anyone with the URL despite being labeled
+internal/confidential — `robots noindex` blocks search engines, not direct access. Moved to
+`docs/internal-training/` (not served by the live site) rather than deleted. Also reconciled the
+founder's insurance-settlement story to one consistent phrase ("settled for the policy limit")
+across the two public pages that tell it. Left `one3seven.com/fire-demo` untouched — it's a
+memorized, spoken-aloud sales link Tad actively uses on calls, not an accidental leak; worth a
+quick look by counsel given it's public and simulates a live settlement/release scenario. Still
+open: live re-verification that RLS is actually enabled on the `intakes`/`profiles`/`uploaded_files`
+tables in production (blocked today — no Docker for `supabase db dump`, no direct DB password);
+prior sessions verified this via a direct `pg_policies` query, just not re-confirmed today.
+
 ### Don't do in the meantime
 - Don't quote or sell to a real firm — locked "official" pricing is not the same as cleared to quote one.
 - Don't flip the damages/exposure counsel gate (`DAMAGES_SURFACING_COUNSEL_APPROVED`).
