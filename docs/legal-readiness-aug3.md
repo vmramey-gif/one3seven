@@ -72,3 +72,48 @@ law, document ownership, children's privacy, no-sale promise).
 
 **The money-saver:** the attorney-only list is one well-prepped consult — not a retainer. This doc is the
 prep.
+
+---
+
+## 🆕 Added 2026-08-09 — Steno conflict + ownership-fact prep
+
+Victoria is currently employed at **Steno**, a legal-tech company (court reporting / litigation
+services / AI transcript products), while building one3seven. This is now **counsel question #1,
+alongside the Tad founder+IP agreement** — both are really the same question: who owns one3seven.
+
+### 🟢 Do now, without an attorney (fact-gathering, not decisions)
+- [ ] **Read Victoria's own Steno employment/confidentiality/invention-assignment agreement** before
+  the meeting — know what it actually says about scope of assignment, not for the first time in the room. (V)
+- [ ] **Pull the real formation documents** for "One3Seven Ventures LLC" — only evidence on file today is
+  a Sentry org slug; bring the actual filed entity paperwork. (V)
+- [ ] **Ask Tad his current employer/conflict status directly** — unknown today, costs nothing to close. (V)
+- [ ] **Bring `docs/founder-agreement-DRAFT.md` and `docs/ip-assignment-DRAFT.md`** as a starting point for
+  counsel to mark up, not a finished answer. (V)
+- [ ] **Get Alexia's one-line written consent** for processing her employment records — her SSN/DOB/DL
+  currently sit in the prod DB from the OCR'd personnel file. (V)
+- [ ] **Redact or flag that SSN/DOB/DL page** in the prod DB rather than leaving it as-is any longer than
+  necessary. (V/ENG)
+
+### Standing hygiene (already in force — hold the line until sign-off)
+- Steno equipment/accounts/network/time: never used for one3seven. Personal hardware only.
+- Steno internal information (customers, roadmap, pricing, code, docs): never used in any one3seven
+  artifact.
+- Steno is never a reference point, comparison, or example in one3seven work product.
+- No soliciting Steno customers/colleagues while employed.
+- Preserve, don't delete — if a dispute is ever reasonably anticipated, litigation-hold immediately.
+
+### 🔴 Add to the attorney-only list
+- [ ] **CA Labor Code §2870 analysis** on Victoria's Steno invention-assignment clause — side-project
+  protection only holds if own time, no employer equipment/info, AND the work doesn't relate to Steno's
+  business or anticipated R&D. Steno = legal-tech AI; one3seven = legal-tech AI — the "relates to" prong
+  is the real gray zone. (A)
+- [ ] **Disclosure/exit strategy** re: Steno employment once the §2870 analysis lands. (A)
+- [ ] **Litigation-hold basics** — if a Steno dispute is ever reasonably anticipated, what needs to be
+  preserved and how. (A)
+
+### Don't do in the meantime
+- Don't quote or sell to a real firm — locked "official" pricing is not the same as cleared to quote one.
+- Don't flip the damages/exposure counsel gate (`DAMAGES_SURFACING_COUNSEL_APPROVED`).
+- Don't sign anything with Tad informally, even a handshake equity split.
+- Don't publish new marketing copy beyond what's already doctrine-locked (organize-never-conclude, no
+  case/damages language) to "get ahead of it" — that judgment call is exactly what this meeting is for.
