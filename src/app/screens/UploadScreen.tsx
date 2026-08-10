@@ -16,6 +16,7 @@ import {
   Edit3,
   ChevronDown,
   ChevronUp,
+  EyeOff,
 } from 'lucide-react';
 import { Screen } from '../App';
 import {
@@ -252,6 +253,15 @@ export function UploadScreen({
   const [redactionQueue, setRedactionQueue] = useState<File[] | null>(null);
   const [redactionQueueSource, setRedactionQueueSource] = useState<'picker' | 'drop' | 'camera' | null>(null);
   const [redactionEditorIndex, setRedactionEditorIndex] = useState<number | null>(null);
+  /** File currently being re-redacted from the already-saved list (separate from the pending-upload flow above). */
+  const [redactExistingTarget, setRedactExistingTarget] = useState<{
+    index: number;
+    file: File;
+    uploadedFileId: string | null;
+    fileName: string;
+  } | null>(null);
+  /** After a redacted copy is saved: nudge to delete the original, unredacted file it came from. */
+  const [redactionFollowUp, setRedactionFollowUp] = useState<{ uploadedFileId: string | null; fileName: string } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
@@ -698,6 +708,19 @@ export function UploadScreen({
       // every other call site in this file already uses.
       setUploadedFiles(uploadedFiles.filter((_, i) => i !== index));
     }
+  };
+
+  /** Re-resolves the original file's CURRENT index by id (not the index captured when redaction
+      started, which may be stale — the list can reorder/refresh once the redacted copy persists). */
+  const handleDeleteOriginalAfterRedaction = async () => {
+    const followUp = redactionFollowUp;
+    setRedactionFollowUp(null);
+    if (!followUp?.uploadedFileId) return;
+    const currentIndex = uploadedFilePersistMeta.findIndex(
+      (meta) => meta?.uploadedFileId === followUp.uploadedFileId,
+    );
+    if (currentIndex === -1) return;
+    await removeFile(currentIndex);
   };
 
   const startRename = (index: number, currentName: string) => {
@@ -1184,6 +1207,24 @@ export function UploadScreen({
                     >
                       <Edit3 className="w-4 h-4" />
                     </button>
+                    {isRedactableFile(file) ? (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setRedactExistingTarget({
+                            index,
+                            file,
+                            uploadedFileId: uploadedFilePersistMeta[index]?.uploadedFileId ?? null,
+                            fileName: file.name,
+                          });
+                        }}
+                        className="text-[#9AA39B] hover:text-[#42574E] transition-colors"
+                        title="Redact"
+                      >
+                        <EyeOff className="w-4 h-4" />
+                      </button>
+                    ) : null}
                     <button
                       type="button"
                       onClick={(e) => {
@@ -1823,6 +1864,48 @@ export function UploadScreen({
             setRedactionEditorIndex(null);
           }}
         />
+      ) : null}
+
+      {/* Redacting an already-saved file: the result is uploaded as a new, separate file — never
+          overwritten in place — so content_hash / upload-timestamp provenance on the original
+          (see RecordVerificationCard) stays intact. We then nudge the worker to delete the
+          original, unredacted copy so it doesn't linger on the record next to the redacted one. */}
+      {redactExistingTarget ? (
+        <RedactionEditor
+          file={redactExistingTarget.file}
+          onCancel={() => setRedactExistingTarget(null)}
+          onApply={async (redactedFile) => {
+            const target = redactExistingTarget;
+            setRedactExistingTarget(null);
+            await handleFileUpload([redactedFile], 'picker');
+            if (target) setRedactionFollowUp({ uploadedFileId: target.uploadedFileId, fileName: target.fileName });
+          }}
+        />
+      ) : null}
+
+      {redactionFollowUp ? (
+        <div className="fixed bottom-6 left-1/2 z-50 w-[92%] max-w-md -translate-x-1/2 rounded-[14px] border border-amber-200 bg-amber-50 px-4 py-3 shadow-[0_18px_44px_rgba(66,87,78,0.16)]">
+          <p className="text-sm text-amber-950">
+            Redacted copy saved. The original, unredacted{' '}
+            <span className="font-medium">{redactionFollowUp.fileName}</span> is still on your record.
+          </p>
+          <div className="mt-2 flex items-center gap-4">
+            <button
+              type="button"
+              onClick={() => void handleDeleteOriginalAfterRedaction()}
+              className="text-xs font-semibold text-amber-900 underline underline-offset-2"
+            >
+              Delete the original
+            </button>
+            <button
+              type="button"
+              onClick={() => setRedactionFollowUp(null)}
+              className="text-xs text-amber-800 hover:text-amber-950"
+            >
+              Keep both
+            </button>
+          </div>
+        </div>
       ) : null}
     </div>
   );
