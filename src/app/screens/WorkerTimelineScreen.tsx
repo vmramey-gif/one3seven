@@ -16,6 +16,7 @@ import { MitigationLogCard } from '../components/MitigationLogCard';
 import { RecordsRequestCard } from '../components/RecordsRequestCard';
 import { RemindersCard } from '../components/RemindersCard';
 import { RecordVerificationCard } from '../components/RecordVerificationCard';
+import { SmsLinkCard } from '../components/SmsLinkCard';
 
 interface WorkerTimelineScreenProps {
   intakeId: string | null;
@@ -242,6 +243,7 @@ export function WorkerTimelineScreen({
             <RemindersCard intakeId={intakeId} />
             <RecordsRequestCard intakeId={intakeId} />
             <MitigationLogCard intakeId={intakeId} />
+            <SmsLinkCard intakeId={intakeId} />
             <RecordVerificationCard intakeId={intakeId} />
           </div>
         ) : null}

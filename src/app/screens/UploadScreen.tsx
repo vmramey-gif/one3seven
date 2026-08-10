@@ -49,6 +49,7 @@ import { suggestAttorneyFriendlyFileTitle } from '../../services/documentFactExt
 import { NotificationsBell } from '../components/NotificationsBell';
 import type { AppNotificationItem } from '../components/NotificationsBell';
 import { WordMark } from '../components/WordMark';
+import { RedactionEditor } from '../components/RedactionEditor';
 
 const UPLOAD_PAGE_SHELL =
   'min-h-screen bg-[#f2f4ec] text-[#111827] selection:bg-[#CBD6CF]/70 selection:text-[#111827]';
@@ -247,6 +248,10 @@ export function UploadScreen({
   const [uploadError, setUploadError] = useState<string | null>(null);
   /** Files from the current picker/drop action, shown until persist + hydrate finish. */
   const [pendingUploadFiles, setPendingUploadFiles] = useState<File[]>([]);
+  /** Files awaiting the redact-before-upload chooser (null once the worker continues or skips it). */
+  const [redactionQueue, setRedactionQueue] = useState<File[] | null>(null);
+  const [redactionQueueSource, setRedactionQueueSource] = useState<'picker' | 'drop' | 'camera' | null>(null);
+  const [redactionEditorIndex, setRedactionEditorIndex] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
@@ -555,6 +560,20 @@ export function UploadScreen({
     void proceedToProcessing({ routeLinkedFirmAfterProcessing: true });
   };
 
+  const isRedactableFile = (f: File) =>
+    f.type === 'application/pdf' || f.type.startsWith('image/') || /\.(pdf|jpe?g|png|heic|heif|webp)$/i.test(f.name);
+
+  /** Gate before persisting: if any picked file can be redacted, offer the chooser first. */
+  const beginFileIntake = (picked: File[], source: 'picker' | 'drop' | 'camera') => {
+    if (picked.length === 0) return;
+    if (picked.some(isRedactableFile)) {
+      setRedactionQueue(picked);
+      setRedactionQueueSource(source);
+      return;
+    }
+    void handleFileUpload(picked, source);
+  };
+
   const handleFileUpload = async (incomingFiles: File[], source: 'picker' | 'drop' | 'camera') => {
     // Accept PDFs and phone photos/images. Images aren't text-extracted yet (OCR is coming), but
     // they're the worker's actual evidence — we save them as records so the worker is never blocked,
@@ -639,7 +658,7 @@ export function UploadScreen({
     const picked = readPickedFiles(input.files, source);
     input.value = '';
     if (picked.length === 0) return;
-    void handleFileUpload(picked, source);
+    beginFileIntake(picked, source);
   };
 
   const handleDrop = (e: React.DragEvent) => {
@@ -652,7 +671,7 @@ export function UploadScreen({
       filenames: dropped.map((file) => file.name),
     });
     if (dropped.length === 0) return;
-    void handleFileUpload(dropped, 'drop');
+    beginFileIntake(dropped, 'drop');
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -1746,6 +1765,65 @@ export function UploadScreen({
           </motion.div>
         )}
       </AnimatePresence>
+
+      {redactionQueue ? (
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/60 p-4">
+          <div className="w-full max-w-md rounded-[18px] bg-white p-5 shadow-xl">
+            <p className="text-sm font-semibold text-[#1B2623]">Before you upload</p>
+            <p className="mt-1 text-xs text-[#6A6D66]">
+              You can black out anything sensitive — an SSN, an account number — before these files are saved.
+            </p>
+            <ul className="mt-4 max-h-64 space-y-2 overflow-y-auto">
+              {redactionQueue.map((f, i) => (
+                <li
+                  key={`${f.name}-${i}`}
+                  className="flex items-center justify-between gap-3 rounded-lg border border-[#E4E5DE] px-3 py-2"
+                >
+                  <span className="truncate text-xs text-[#2C332E]">{f.name}</span>
+                  {isRedactableFile(f) ? (
+                    <button
+                      type="button"
+                      onClick={() => setRedactionEditorIndex(i)}
+                      className="shrink-0 text-xs font-semibold text-[var(--o3s-action)]"
+                    >
+                      Redact
+                    </button>
+                  ) : (
+                    <span className="shrink-0 text-[10px] text-[#9A9C93]">Can&rsquo;t redact this type</span>
+                  )}
+                </li>
+              ))}
+            </ul>
+            <div className="mt-5 flex items-center justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  const queued = redactionQueue;
+                  const source = redactionQueueSource;
+                  setRedactionQueue(null);
+                  setRedactionQueueSource(null);
+                  if (queued && source) void handleFileUpload(queued, source);
+                }}
+                className="rounded-full bg-[var(--o3s-action)] px-4 py-2 text-xs font-semibold text-white transition hover:brightness-95"
+              >
+                Continue — upload {redactionQueue.length} file{redactionQueue.length === 1 ? '' : 's'}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {redactionQueue && redactionEditorIndex !== null ? (
+        <RedactionEditor
+          file={redactionQueue[redactionEditorIndex]}
+          onCancel={() => setRedactionEditorIndex(null)}
+          onApply={(redactedFile) => {
+            const index = redactionEditorIndex;
+            setRedactionQueue((prev) => (prev ? prev.map((f, i) => (i === index ? redactedFile : f)) : prev));
+            setRedactionEditorIndex(null);
+          }}
+        />
+      ) : null}
     </div>
   );
 }
