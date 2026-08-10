@@ -825,6 +825,7 @@ export function normalizeMissingRecordBullet(raw: string): string {
     .replace(/^follow-up record that may help[:\s-]*/i, '')
     .replace(/^additional records? that may help[:\s-]*/i, '')
     .replace(/^additional records? may help[:\s-]*/i, '')
+    .replace(/^additional information may help[:\s-]*/i, '')
     .replace(/^missing or unclear records[:\s-]*/i, '')
     .replace(/^gap[:\s-]*/i, '')
     .replace(/\.\s*confirm in source records\.?/gi, '')

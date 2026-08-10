@@ -675,7 +675,7 @@ export function firmViewToNarrativePayload(view: FirmLiveIntakeView): IntakeSumm
   };
 }
 
-function firmViewToExportPayload(
+export function firmViewToExportPayload(
   view: FirmLiveIntakeView,
   tier: FirmExportAccessTier
 ): IntakeSummaryDownloadPayload {

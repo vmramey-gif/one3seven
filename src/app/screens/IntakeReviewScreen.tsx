@@ -20,6 +20,7 @@ import {
   HelpCircle,
   User,
   HeartHandshake,
+  AlignLeft,
 } from 'lucide-react';
 import { Screen } from '../App';
 import {
@@ -31,7 +32,20 @@ import {
 import { pickReviewBase } from '../utils/reviewDataSelection';
 
 import type { FirmLiveIntakeView } from '../../services/intakeDataService';
-import { downloadFirmIntakeReviewDocument, resolveWageExposure } from '../../services/firmIntakeSummaryDownload';
+import {
+  downloadFirmIntakeReviewDocument,
+  resolveWageExposure,
+  resolveFirmExportAccessTier,
+  firmViewToExportPayload,
+} from '../../services/firmIntakeSummaryDownload';
+import {
+  buildExecutiveSummary,
+  buildCaseSnapshot,
+  buildPacketChronologyPresentation,
+  buildWorkerAccount,
+  buildReviewTopicBullets,
+  buildMissingRecordBullets,
+} from '../../services/packetStoryPresentation';
 import { triggerIntakeFactExtraction } from '../../services/documentFactsService';
 import type { SourceCitation } from '../../services/damagesCalculator';
 import { normalizeFilenameForMatching } from '../../services/filenameMatching';
@@ -253,9 +267,10 @@ export function IntakeReviewScreen({
 
   // Binder-spine tab state — presentation wrapper only. Gates which top-level
   // sections render; does not change any data, logic, or doctrine gating.
-  type BinderTab = 'decision' | 'timeline' | 'claimlens' | 'documents' | 'gaps' | 'context';
+  type BinderTab = 'simple' | 'decision' | 'timeline' | 'claimlens' | 'documents' | 'gaps' | 'context';
   const [activeTab, setActiveTab] = useState<BinderTab>('decision');
   const TABS: { id: BinderTab; label: string; Icon: typeof FileText; accent?: boolean }[] = [
+    { id: 'simple', label: 'Simple read', Icon: AlignLeft },
     { id: 'decision', label: 'Decision card', Icon: ClipboardCheck },
     { id: 'timeline', label: 'Timeline', Icon: Clock },
     { id: 'claimlens', label: 'Element lens', Icon: Search },
@@ -1240,6 +1255,90 @@ export function IntakeReviewScreen({
                 </div>
               </div>
             ) : null}
+
+            {/* Simple read — the same record as continuous prose instead of a structured, tabbed
+                review. Reuses the exact same privacy-tiered payload (firmViewToExportPayload)
+                and the same content-building functions already used for the PDF export, so this
+                is a second rendering of already-vetted content, not a new data path. */}
+            {activeTab === 'simple' && useConnectedFirmLayout && firmLiveView ? (() => {
+              const tier = resolveFirmExportAccessTier(firmLiveView);
+              const payload = firmViewToExportPayload(firmLiveView, tier);
+              const summary = buildExecutiveSummary(payload);
+              const chronology = buildPacketChronologyPresentation(payload);
+              const account = buildWorkerAccount(payload);
+              const onFile = buildReviewTopicBullets(payload);
+              const missing = buildMissingRecordBullets(payload);
+
+              return (
+                <div className="max-w-[62ch] flex flex-col gap-8 py-2">
+                  <div>
+                    <p className="text-[11px] uppercase tracking-wider text-[#8A7A4E]">Simple read</p>
+                    <h2 className="mt-1 text-[20px] font-semibold text-[#1B2623]">
+                      {workerIdentity.firstName ? `${workerIdentity.firstName}'s record, in plain terms` : 'The record, in plain terms'}
+                    </h2>
+                    <p className="mt-3 text-[15px] leading-[1.7] text-[#3A3F38]">{summary}</p>
+                  </div>
+
+                  {chronology.length > 0 ? (
+                    <div>
+                      <h3 className="text-[13px] font-semibold uppercase tracking-wider text-[#6A6D66] mb-3">What happened, in order</h3>
+                      <div className="flex flex-col gap-2.5">
+                        {chronology.map((e, i) => (
+                          <div key={i} className="flex gap-4 text-[14.5px] leading-relaxed">
+                            <span className="w-32 shrink-0 font-medium text-[#8A7A4E]">{e.date}</span>
+                            <span className="min-w-0 flex-1 text-[#1B2623]">{e.title}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
+
+                  {account.sections.length > 0 ? (
+                    <div>
+                      <h3 className="text-[13px] font-semibold uppercase tracking-wider text-[#6A6D66] mb-3">In the worker&rsquo;s own words</h3>
+                      <div className="flex flex-col gap-4">
+                        {account.sections.map((s, i) => (
+                          <div key={i}>
+                            <p className="mb-1 text-[12px] font-medium text-[#8A7A4E]">{s.heading}</p>
+                            <p className="text-[14.5px] leading-relaxed text-[#3A3F38]">{s.body}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
+
+                  {onFile.length > 0 || missing.length > 0 ? (
+                    <div className="grid grid-cols-1 gap-6 border-t border-[#E4E5DE] pt-6 sm:grid-cols-2">
+                      {onFile.length > 0 ? (
+                        <div>
+                          <h3 className="text-[13px] font-semibold uppercase tracking-wider text-[#6A6D66] mb-3">On file</h3>
+                          <ul className="flex flex-col gap-1.5 text-[14px] text-[#3A3F38]">
+                            {onFile.map((b, i) => (
+                              <li key={i} className="flex gap-2"><span className="text-[#42574E]">&middot;</span>{b}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      ) : null}
+                      {missing.length > 0 ? (
+                        <div>
+                          <h3 className="text-[13px] font-semibold uppercase tracking-wider text-[#6A6D66] mb-3">Not yet on file</h3>
+                          <ul className="flex flex-col gap-1.5 text-[14px] text-[#3A3F38]">
+                            {missing.map((b, i) => (
+                              <li key={i} className="flex gap-2"><span className="text-[#8A7A4E]">&middot;</span>{b}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      ) : null}
+                    </div>
+                  ) : null}
+
+                  <p className="border-t border-[#E4E5DE] pt-4 text-[11px] leading-relaxed text-[#8A8F86]">
+                    This is the same record shown in the other tabs, written as continuous prose instead
+                    of a structured review. It organizes and reflects — it draws no conclusions.
+                  </p>
+                </div>
+              );
+            })() : null}
 
             {/* Case Readiness Snapshot — attorney orientation card */}
             {activeTab === 'decision' && useConnectedFirmLayout && firmLiveView ? (() => {
