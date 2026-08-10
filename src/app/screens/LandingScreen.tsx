@@ -31,6 +31,9 @@ import { WorkerMobileDocRequestCard } from '../components/WorkerMobileDocRequest
 import { WorkerMissionControlHome } from '../components/WorkerMissionControlHome';
 import { RemindersCard } from '../components/RemindersCard';
 import { ImportantDatesCard } from '../components/ImportantDatesCard';
+import { MitigationLogCard } from '../components/MitigationLogCard';
+import { RecordVerificationCard } from '../components/RecordVerificationCard';
+import { SmsLinkCard } from '../components/SmsLinkCard';
 import { WorkerMobileBottomNav, type WorkerMobileHubView, type WorkerMobileNavId } from '../components/WorkerMobileBottomNav';
 import { WorkerStatusJourneyCard } from '../components/WorkerStatusJourneyCard';
 import { WorkerDocumentRequestDashboardCard } from '../components/WorkerDocumentRequestDashboardCard';
@@ -578,6 +581,15 @@ export function LandingScreen({
                 intakeId={homeIntakeId}
                 timeline={hubTimelinePreview.map((t) => ({ date: t.date, event: t.event }))}
               />
+            </div>
+            <div className="mx-auto mt-4 w-full max-w-[680px]">
+              <MitigationLogCard intakeId={homeIntakeId} />
+            </div>
+            <div className="mx-auto mt-4 w-full max-w-[680px]">
+              <SmsLinkCard intakeId={homeIntakeId} />
+            </div>
+            <div className="mx-auto mt-4 w-full max-w-[680px]">
+              <RecordVerificationCard intakeId={homeIntakeId} />
             </div>
           </>
         );
