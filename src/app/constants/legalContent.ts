@@ -225,14 +225,21 @@ export const PRIVACY_POLICY: LegalDoc = {
       ],
     },
     {
-      heading: '7. Data retention',
+      heading: '7. Text messaging (SMS) program',
+      blocks: [
+        { type: 'p', text: 'If you opt in to text-based document upload, we use your mobile phone number solely to send you verification codes and confirmations related to your one3seven record. We do not sell or share your mobile phone number with third parties for marketing purposes.' },
+        { type: 'p', text: 'Message frequency varies based on your activity. Message and data rates may apply. Reply STOP at any time to opt out, or HELP for help.' },
+      ],
+    },
+    {
+      heading: '8. Data retention',
       blocks: [
         { type: 'p', text: 'We retain your account information and intake records for as long as your account is active. If you delete individual intakes, those records are removed from active systems promptly. When you request account deletion, we will delete your account and associated records within 45 days of a verified request, as required by California law.' },
         { type: 'p', text: 'We may retain certain information for longer periods where required by law, for legitimate business purposes such as fraud prevention, or to resolve disputes.' },
       ],
     },
     {
-      heading: '8. Third-party services',
+      heading: '9. Third-party services',
       blocks: [
         { type: 'p', text: 'one3seven uses the following third-party services in operating the platform:' },
         { type: 'bullets', items: [
@@ -240,24 +247,25 @@ export const PRIVACY_POLICY: LegalDoc = {
           'Anthropic (Claude API): document processing and extraction.',
           'Stripe: payment processing for firm subscriptions.',
           'Vercel: website hosting and deployment.',
+          'Twilio: text messaging, for workers who opt in to text-based document upload.',
         ] },
         { type: 'p', text: 'Each of these services has its own privacy practices. We engage these providers to perform functions on our behalf, and expect them to process information only as necessary to provide those services under applicable contractual terms.' },
       ],
     },
     {
-      heading: '9. Children’s privacy',
+      heading: '10. Children’s privacy',
       blocks: [
         { type: 'p', text: 'one3seven is not intended for use by anyone under the age of 18. We do not knowingly collect personal information from children. If you believe a child has created an account, please contact us at legal@one3seven.com and we will delete the account.' },
       ],
     },
     {
-      heading: '10. Changes to this policy',
+      heading: '11. Changes to this policy',
       blocks: [
         { type: 'p', text: 'We may update this Privacy Policy from time to time. When we do, we will update the effective date at the top of this document. If we make material changes to how we handle your personal information, we will notify you by email if we have your email address.' },
       ],
     },
     {
-      heading: '11. Contact',
+      heading: '12. Contact',
       blocks: [
         { type: 'p', text: 'For questions about this Privacy Policy or to exercise your privacy rights:' },
         { type: 'p', text: 'One3Seven Ventures LLC · Stockton, California · legal@one3seven.com' },
