@@ -1050,6 +1050,44 @@ export function buildFirmIntakeReviewPdfLines(view: FirmLiveIntakeView): string[
 // Reuses the same content helpers as the line builder so there is zero content
 // drift — this only changes the SHAPE of the data passed to the PDF layer.
 // ---------------------------------------------------------------------------
+/**
+ * The PDF's "Priority Questions" section, computed standalone for an in-app call-prep checklist.
+ * Mirrors the same resolution steps buildFirmIntakePacketModel uses (tier, worker story, cleaned/
+ * deduped events) so the questions shown here always match what the PDF would generate — same
+ * privacy tier, same preview-stage empty result, no separate logic to drift out of sync.
+ */
+export function buildPriorityQuestionsForView(view: FirmLiveIntakeView): string[] {
+  const tier = resolveFirmExportAccessTier(view);
+  if (tier === 'limited_preview') return [];
+  const payload = firmViewToExportPayload(view, tier);
+  const workerStory = (view.workerProvidedContext || '').trim() || payload.workerContext || '';
+
+  const resolvedFiles: ResolvedFile[] = view.files.map((f) => ({
+    file_name: f.file_name || '',
+    category: (() => {
+      const stored = (f.category ?? '').trim();
+      return stored && stored !== 'Uncategorized' ? stored : inferCategoryFromFileName(f.file_name || '');
+    })(),
+  }));
+
+  const seen = new Set<string>();
+  const cleanEvents = (payload.timelineEvents ?? [])
+    .map((e) => {
+      const sanitized = sanitizeEventTitle(polishFirmFacingText(e.title) || 'Timeline event');
+      const corrected = correctEventTitle(sanitized, e.category);
+      const crossChecked = crossReferenceEventTitle(corrected, e.date, resolvedFiles);
+      return { ...e, title: crossChecked };
+    })
+    .filter((e) => {
+      const key = `${e.date}::${e.title.toLowerCase()}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+
+  return buildPriorityQuestions(cleanEvents, resolvedFiles, workerStory, view.workerFollowUp);
+}
+
 export function buildFirmIntakePacketModel(view: FirmLiveIntakeView): FirmPacketModel {
   const tier = resolveFirmExportAccessTier(view);
   const payload = firmViewToExportPayload(view, tier);

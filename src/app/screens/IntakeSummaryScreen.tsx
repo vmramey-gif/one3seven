@@ -835,6 +835,30 @@ export function IntakeSummaryScreen({
     await downloadIntakeSummaryDocument(payload);
   };
 
+  // Same payload the PDF is built from, exported as plain JSON — the open-format sibling of the
+  // PDF download. Reinforces "the worker owns the record": the underlying organized data, not
+  // just a formatted document, portable to wherever the worker wants to take it.
+  const handleDownloadIntakeDataJson = async () => {
+    let payload = buildSummaryDownloadPayload();
+    const intakeId = (exportIntakeId ?? '').trim();
+    if (intakeId && isSupabaseConfigured()) {
+      try {
+        payload = await loadFreshExportPayloadFields(intakeId, payload);
+      } catch (e) {
+        console.error('[o3s-export] fresh export payload failed', e);
+      }
+    }
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `one3seven-intake-${(payload.intakeNumber || 'export').replace(/[^\w-]/g, '_')}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 60_000);
+  };
+
   const handleSaveForLater = async () => {
     // Save the intake workspace
     onSaveIntake();
@@ -1326,6 +1350,28 @@ export function IntakeSummaryScreen({
               </div>
             ) : null}
           </div>
+
+          {(workerWorkflowStatus ?? '').trim() === 'Not Pursuing' ? (
+            <div className="mb-4 rounded-[18px] border border-[#D8C9A8] bg-[#FBF6EC] p-3.5">
+              <p className="text-sm font-semibold text-[#7A5E22]">What this means</p>
+              <p className="mt-1.5 text-sm leading-relaxed text-[#1B2623]/80">
+                This firm has decided not to move forward — that&rsquo;s a decision about this
+                firm&rsquo;s caseload, not a judgment on your situation. Your organized file is
+                still yours. You can:
+              </p>
+              <ul className="mt-2 space-y-1 text-sm leading-relaxed text-[#1B2623]/80">
+                <li>&middot; Send the same organized file to a different firm of your choosing.</li>
+                <li>
+                  &middot; File directly with a government agency yourself — the California Labor
+                  Commissioner or the EEOC, depending on the situation.
+                </li>
+              </ul>
+              <p className="mt-2 text-xs text-[#8A7A4E]">
+                one3seven doesn&rsquo;t recommend or rank firms — the choice of who to send your
+                file to next is yours.
+              </p>
+            </div>
+          ) : null}
 
           <section className="mb-4 rounded-[20px] border border-[#CBD6CF] bg-white/95 p-4 shadow-[0_16px_42px_rgba(91,53,213,0.09)]">
             <div className="mb-4">
@@ -2055,6 +2101,13 @@ export function IntakeSummaryScreen({
               >
                 <Plus className="w-5 h-5" />
                 Add More Documents
+              </button>
+              <button
+                type="button"
+                onClick={() => void handleDownloadIntakeDataJson()}
+                className="w-full text-center text-[12.5px] font-medium text-[#6A6D66] underline decoration-[#CBD6CF] underline-offset-4 transition hover:text-[#42574E]"
+              >
+                Or download the raw data (JSON)
               </button>
               {preferLiveDataOnly ? (
                 <div className="rounded-[14px] border border-[#E4E5DE] bg-[#FAF9F6] px-4 py-3 text-sm text-[#6A6D66]">

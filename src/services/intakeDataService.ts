@@ -4572,6 +4572,36 @@ export async function listWorkerAccessRequests(workerId: string): Promise<Access
   return out;
 }
 
+export type RecordVerificationRow = {
+  fileName: string;
+  uploadedAt: string;
+  /** SHA-256 content hash, computed once at upload (fileUploadIntegrity.ts). Null on rows
+   * uploaded before the content_hash column existed, or if the column isn't provisioned yet. */
+  contentHash: string | null;
+};
+
+/**
+ * Per-file upload timestamp + content hash, already computed at upload time for dedup — this
+ * just surfaces it. Answers "did this exist, unmodified, as of this date" without one3seven
+ * making any claim about what the record shows or means.
+ */
+export async function loadRecordVerificationRows(intakeId: string): Promise<RecordVerificationRow[]> {
+  const { data, error } = await supabase
+    .from('uploaded_files')
+    .select('file_name, created_at, content_hash')
+    .eq('intake_id', intakeId)
+    .order('created_at', { ascending: true });
+  if (error) {
+    console.warn('[o3s-verification] loadRecordVerificationRows failed', error.message);
+    return [];
+  }
+  return (data ?? []).map((r) => ({
+    fileName: (r.file_name as string) ?? 'Uploaded file',
+    uploadedAt: (r.created_at as string) ?? '',
+    contentHash: (r.content_hash as string | null) ?? null,
+  }));
+}
+
 export type PersistentNotificationRow = {
   id: string;
   recipient_user_id: string;

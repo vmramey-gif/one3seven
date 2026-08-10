@@ -21,6 +21,7 @@ import {
   User,
   HeartHandshake,
   AlignLeft,
+  FileJson,
 } from 'lucide-react';
 import { Screen } from '../App';
 import {
@@ -37,6 +38,7 @@ import {
   resolveWageExposure,
   resolveFirmExportAccessTier,
   firmViewToExportPayload,
+  buildPriorityQuestionsForView,
 } from '../../services/firmIntakeSummaryDownload';
 import {
   buildExecutiveSummary,
@@ -269,6 +271,9 @@ export function IntakeReviewScreen({
   // sections render; does not change any data, logic, or doctrine gating.
   type BinderTab = 'simple' | 'decision' | 'timeline' | 'claimlens' | 'documents' | 'gaps' | 'context';
   const [activeTab, setActiveTab] = useState<BinderTab>('decision');
+  // Call-prep checklist check-state — session-local by design (a live-call aid, not a persisted
+  // record; nothing here is worker-facing or written back to the intake).
+  const [checkedPrepQuestions, setCheckedPrepQuestions] = useState<Set<number>>(new Set());
   const TABS: { id: BinderTab; label: string; Icon: typeof FileText; accent?: boolean }[] = [
     { id: 'simple', label: 'Simple read', Icon: AlignLeft },
     { id: 'decision', label: 'Decision card', Icon: ClipboardCheck },
@@ -771,6 +776,31 @@ export function IntakeReviewScreen({
     }
   };
 
+  // Open-format sibling of the PDF download — same privacy-tiered payload (firmViewToExportPayload),
+  // exported as plain JSON instead of a formatted document.
+  const handleDownloadDataJson = () => {
+    if (!firmLiveView) {
+      showToastMessage('Load an intake before downloading data.');
+      return;
+    }
+    try {
+      const tier = resolveFirmExportAccessTier(firmLiveView);
+      const payload = firmViewToExportPayload(firmLiveView, tier);
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `one3seven-intake-${(payload.intakeNumber || 'export').replace(/[^\w-]/g, '_')}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 60_000);
+      showToastMessage('Intake data downloaded (JSON).');
+    } catch {
+      showToastMessage('Could not export the data. Try again.');
+    }
+  };
+
   const handleRunAiExtraction = async (silent = false) => {
     if (!intakeId) return;
     setExtractionRunning(true);
@@ -1026,6 +1056,14 @@ export function IntakeReviewScreen({
                 <Download className="w-3.5 h-3.5" />
                 Download
               </button>
+              <button
+                type="button"
+                onClick={handleDownloadDataJson}
+                title="Download the underlying data as JSON"
+                className="hidden lg:flex items-center justify-center rounded-full border border-[#D8E0CF] p-1.5 text-[#42574E] transition-colors hover:bg-[#F2F4EC]"
+              >
+                <FileJson className="w-3.5 h-3.5" />
+              </button>
               <span className="rounded-full border border-[#E4E5DE] bg-[#F2F4EC] px-3 py-1 text-[11px] font-medium text-[#42574E]">
                 Sample intake
               </span>
@@ -1062,6 +1100,14 @@ export function IntakeReviewScreen({
                 >
                   <Download className="w-3.5 h-3.5" />
                   Download
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDownloadDataJson}
+                  title="Download the underlying data as JSON"
+                  className="hidden lg:flex items-center justify-center rounded-full border border-[#D8E0CF] p-1.5 text-[#42574E] transition-colors hover:bg-[#F2F4EC]"
+                >
+                  <FileJson className="w-3.5 h-3.5" />
                 </button>
                 <NotificationsBell items={firmBellNotifications} />
                 {onOpenFirmSettings ? (
@@ -1336,6 +1382,58 @@ export function IntakeReviewScreen({
                     This is the same record shown in the other tabs, written as continuous prose instead
                     of a structured review. It organizes and reflects — it draws no conclusions.
                   </p>
+                </div>
+              );
+            })() : null}
+
+            {/* Call-prep checklist — the PDF's "Priority Questions" section, packaged as an
+                interactive checklist for the actual client call. Thin UI layer on top of
+                buildPriorityQuestionsForView; no new question-generation logic. Session-local
+                check state only — not persisted, not worker-facing. */}
+            {activeTab === 'decision' && useConnectedFirmLayout && firmLiveView ? (() => {
+              const questions = buildPriorityQuestionsForView(firmLiveView);
+              if (questions.length === 0) return null;
+              return (
+                <div className="rounded-[18px] border border-[#D8E0CF] bg-white p-4">
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-[#42574E]">
+                    Call-prep checklist
+                  </p>
+                  <p className="mt-1 text-xs text-[#6A6D66]">
+                    Worth asking on the first call, based on what&rsquo;s on file. Check off as you go —
+                    this list isn&rsquo;t saved, it&rsquo;s just for you right now.
+                  </p>
+                  <ul className="mt-3 flex flex-col gap-1.5">
+                    {questions.map((q, i) => {
+                      const checked = checkedPrepQuestions.has(i);
+                      return (
+                        <li key={i}>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setCheckedPrepQuestions((prev) => {
+                                const next = new Set(prev);
+                                if (next.has(i)) next.delete(i);
+                                else next.add(i);
+                                return next;
+                              })
+                            }
+                            className="flex w-full items-start gap-2.5 rounded-[10px] px-2 py-1.5 text-left transition-colors hover:bg-[#F5F6F1]"
+                          >
+                            <span
+                              className={`mt-0.5 flex h-[16px] w-[16px] flex-none items-center justify-center rounded-[4px] border transition-colors ${
+                                checked ? 'border-[#42574E] bg-[#42574E]' : 'border-[#C6D0C8] bg-white'
+                              }`}
+                            >
+                              {checked ? <CheckCircle2 className="h-3 w-3 text-white" /> : null}
+                            </span>
+                            <span className={`text-sm leading-snug ${checked ? 'text-[#6A6D66] line-through' : 'text-[#1B2623]'}`}>
+                              {q}
+                            </span>
+                          </button>
+                        </li>
+                      );
+                    })}
+                  </ul>
                 </div>
               );
             })() : null}

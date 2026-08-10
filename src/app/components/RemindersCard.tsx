@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
-import { Plus, Trash2, BellRing, Check } from 'lucide-react';
+import { Plus, Trash2, BellRing, Check, CalendarPlus } from 'lucide-react';
 import { isSupabaseConfigured } from '../../lib/supabaseClient';
 import { useLang } from '../../i18n/i18n';
 import {
   loadReminders,
   saveReminders,
+  buildRemindersIcs,
   SUGGESTED_REMINDER_KEYS,
   type WorkerReminder,
 } from '../../services/workerReminders';
@@ -75,6 +76,23 @@ export function RemindersCard({ intakeId }: { intakeId: string | null }) {
   const toggleDone = (id: string) =>
     void persist(reminders.map((r) => (r.id === id ? { ...r, done: !r.done } : r)));
 
+  // Exports dates exactly as typed — never a one3seven-computed legal deadline. A worker can
+  // already read these on this screen; this just makes them show up where reminders actually
+  // live for most people, their phone's calendar app.
+  const downloadIcs = () => {
+    const ics = buildRemindersIcs(reminders);
+    const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'one3seven-reminders.ics';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 60_000);
+  };
+  const datedReminderCount = reminders.filter((r) => !r.done && r.dueDate).length;
+
   // Suggested one-tap reminders the worker hasn't added yet (matched by their resolved text).
   const suggestions = SUGGESTED_REMINDER_KEYS.map((k) => t(`rem.suggest.${k}`)).filter(
     (label) => !reminders.some((r) => r.text.toLowerCase() === label.toLowerCase())
@@ -94,15 +112,27 @@ export function RemindersCard({ intakeId }: { intakeId: string | null }) {
           <h3 style={SERIF} className="text-[20px] font-semibold tracking-[-0.01em] text-[#17181C]">{t('rem.title')}</h3>
           <p className="mt-1.5 max-w-[52ch] text-[13.5px] leading-relaxed text-[#5a5f58]">{t('rem.desc')}</p>
         </div>
-        {!showForm ? (
-          <button
-            type="button"
-            onClick={() => setShowForm(true)}
-            className="inline-flex flex-none items-center gap-1.5 rounded-full bg-[var(--o3s-action)] px-4 py-2.5 text-[13.5px] font-semibold text-white transition hover:brightness-95"
-          >
-            <Plus className="h-4 w-4" /> {t('rem.add')}
-          </button>
-        ) : null}
+        <div className="flex flex-none items-center gap-2">
+          {datedReminderCount > 0 ? (
+            <button
+              type="button"
+              onClick={downloadIcs}
+              title="Download a calendar file for your reminders with dates"
+              className="inline-flex items-center gap-1.5 rounded-full border border-[#CBD6CF] bg-white px-3.5 py-2.5 text-[13.5px] font-medium text-[#42574E] transition hover:bg-[#F2F4EC]"
+            >
+              <CalendarPlus className="h-4 w-4" /> Add to calendar
+            </button>
+          ) : null}
+          {!showForm ? (
+            <button
+              type="button"
+              onClick={() => setShowForm(true)}
+              className="inline-flex items-center gap-1.5 rounded-full bg-[var(--o3s-action)] px-4 py-2.5 text-[13.5px] font-semibold text-white transition hover:brightness-95"
+            >
+              <Plus className="h-4 w-4" /> {t('rem.add')}
+            </button>
+          ) : null}
+        </div>
       </div>
 
       {/* One-tap suggestions — all pure logistics, never a computed deadline. */}

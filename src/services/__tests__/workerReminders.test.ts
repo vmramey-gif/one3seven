@@ -4,6 +4,7 @@ import {
   buildRemindersBlock,
   stripRemindersBlock,
   mergeRemindersIntoOverview,
+  buildRemindersIcs,
   type WorkerReminder,
 } from '../workerReminders';
 
@@ -48,5 +49,48 @@ describe('workerReminders', () => {
 
   it('empty list produces no block', () => {
     expect(buildRemindersBlock([])).toBe('');
+  });
+});
+
+describe('buildRemindersIcs', () => {
+  it('includes only open reminders that have a dueDate', () => {
+    const mixed: WorkerReminder[] = [
+      { id: '1', text: 'No date', source: 'worker', done: false, createdAt: '2026-07-27T10:00:00Z' },
+      { id: '2', text: 'Dated but done', dueDate: '2026-08-12', source: 'worker', done: true, createdAt: '2026-07-27T10:00:00Z' },
+      { id: '3', text: 'Open and dated', dueDate: '2026-08-20', source: 'firm', done: false, createdAt: '2026-07-27T10:00:00Z' },
+    ];
+    const ics = buildRemindersIcs(mixed);
+    expect(ics).not.toContain('No date');
+    expect(ics).not.toContain('Dated but done');
+    expect(ics).toContain('Open and dated');
+    expect((ics.match(/BEGIN:VEVENT/g) ?? []).length).toBe(1);
+  });
+
+  it('DOCTRINE: exports the date exactly as typed — never a computed value', () => {
+    const r: WorkerReminder = { id: '1', text: 'Send signed forms', dueDate: '2026-09-03', source: 'worker', done: false, createdAt: '2026-07-27T10:00:00Z' };
+    const ics = buildRemindersIcs([r]);
+    // 2026-09-03 -> 20260903, a direct re-format of the typed string, not a calculation.
+    expect(ics).toContain('DTSTART;VALUE=DATE:20260903');
+  });
+
+  it('escapes commas, semicolons, and backslashes in the reminder text', () => {
+    const r: WorkerReminder = { id: '1', text: 'Call HR; bring pay stubs, W-2s, and notes', source: 'worker', dueDate: '2026-08-15', done: false, createdAt: '2026-07-27T10:00:00Z' };
+    const ics = buildRemindersIcs([r]);
+    expect(ics).toContain('Call HR\\; bring pay stubs\\, W-2s\\, and notes');
+  });
+
+  it('labels firm-authored reminders distinctly from worker-authored ones', () => {
+    const firm: WorkerReminder = { id: '1', text: 'Send additional documents', dueDate: '2026-08-15', source: 'firm', done: false, createdAt: '2026-07-27T10:00:00Z' };
+    const worker: WorkerReminder = { id: '2', text: 'Upload pay stubs', dueDate: '2026-08-16', source: 'worker', done: false, createdAt: '2026-07-27T10:00:00Z' };
+    const ics = buildRemindersIcs([firm, worker]);
+    expect(ics).toContain('DESCRIPTION:Added by your firm via one3seven');
+    expect(ics).toContain('DESCRIPTION:Added by you via one3seven');
+  });
+
+  it('produces a valid empty calendar when nothing qualifies', () => {
+    const ics = buildRemindersIcs([]);
+    expect(ics).toContain('BEGIN:VCALENDAR');
+    expect(ics).toContain('END:VCALENDAR');
+    expect(ics).not.toContain('BEGIN:VEVENT');
   });
 });

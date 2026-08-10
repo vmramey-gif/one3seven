@@ -326,6 +326,7 @@ const WORKER_WORKFLOW_STATUS_DISPLAY: Record<string, string> = {
   'Shared with Firm': 'Your full intake has been shared with the firm',
   'Additional Documents Requested': 'The firm has requested additional documents from you',
   'Worker Uploaded Requested Documents': 'You have submitted the requested documents',
+  'Not Pursuing': "This firm isn't moving forward with your intake",
 };
 
 export function formatWorkerWorkflowStatusForDisplay(

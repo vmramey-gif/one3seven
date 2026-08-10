@@ -2769,6 +2769,14 @@ export default function App() {
           duplicateCount,
           intakeId,
         });
+        pushWorkerNotification({
+          id: `dup-upload-${Date.now()}`,
+          title: duplicateCount === 1 ? 'Already have that one' : `Already have ${duplicateCount} of those`,
+          body:
+            duplicateCount === 1
+              ? "One of those files matched something already in your records, so it wasn't added again."
+              : `${duplicateCount} of those files matched records already on file, so they weren't added again.`,
+        });
       }
     } finally {
       pendingPersistMetaAppendCountRef.current = 0;

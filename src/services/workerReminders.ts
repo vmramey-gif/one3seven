@@ -105,6 +105,54 @@ export async function loadReminders(
   return { reminders: extractReminders((data?.overview as string | null) ?? '') };
 }
 
+/** Escape a text value per RFC 5545 (iCalendar). */
+function icsEscape(text: string): string {
+  return text
+    .replace(/\\/g, '\\\\')
+    .replace(/;/g, '\\;')
+    .replace(/,/g, '\\,')
+    .replace(/\n/g, '\\n');
+}
+
+/** "2026-08-12" -> "20260812". Returns null if not a plain YYYY-MM-DD date the worker/firm typed. */
+function icsDateStamp(dueDate: string): string | null {
+  const m = dueDate.trim().match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  return m ? `${m[1]}${m[2]}${m[3]}` : null;
+}
+
+/**
+ * Build a downloadable .ics file from reminders that have a date. Exports the date exactly as
+ * the worker or firm typed it — this never computes or infers a date, matching the same doctrine
+ * line as the reminders themselves.
+ */
+export function buildRemindersIcs(reminders: WorkerReminder[]): string {
+  const dtstamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
+  const events = reminders
+    .filter((r) => !r.done && r.dueDate)
+    .map((r) => {
+      const stamp = icsDateStamp(r.dueDate as string);
+      if (!stamp) return '';
+      return [
+        'BEGIN:VEVENT',
+        `UID:o3s-reminder-${r.id}@one3seven.com`,
+        `DTSTAMP:${dtstamp}`,
+        `DTSTART;VALUE=DATE:${stamp}`,
+        `SUMMARY:${icsEscape(r.text)}`,
+        r.source === 'firm' ? 'DESCRIPTION:Added by your firm via one3seven' : 'DESCRIPTION:Added by you via one3seven',
+        'END:VEVENT',
+      ].join('\r\n');
+    })
+    .filter(Boolean);
+  return [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//one3seven//Reminders//EN',
+    'CALSCALE:GREGORIAN',
+    ...events,
+    'END:VCALENDAR',
+  ].join('\r\n');
+}
+
 /** Read-modify-write the worker's own summary overview (same path as the mitigation log). */
 export async function saveReminders(
   intakeId: string,
