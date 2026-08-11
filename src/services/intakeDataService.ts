@@ -4144,6 +4144,29 @@ export async function firmRequestAdditionalDocuments(
   return { error: error.message };
 }
 
+/** Firm adds a reminder/date for the worker — same block format as workerReminders.ts, written
+    server-side via a security-definer RPC since intake_summaries has no firm UPDATE policy. */
+export async function firmAddWorkerReminder(
+  routeId: string,
+  text: string,
+  dueDate: string | null
+): Promise<{ error?: string }> {
+  const trimmed = text.trim();
+  if (!trimmed) return { error: 'Reminder text is required.' };
+  const { error } = await supabase.rpc('firm_add_worker_reminder', {
+    p_route_id: routeId,
+    p_text: trimmed,
+    p_due_date: dueDate?.trim() || null,
+  });
+  if (!error) return {};
+  if (isMissingRpcError(error)) {
+    return {
+      error: 'Adding reminders is unavailable until the firm_add_worker_reminder RPC is applied in Supabase (migration 20260811160000).',
+    };
+  }
+  return { error: error.message };
+}
+
 export async function firmRequestFullAccess(routeId: string): Promise<{ error?: string }> {
   const { error } = await supabase.rpc('firm_request_full_access', { p_route_id: routeId });
   if (error) return { error: error.message };

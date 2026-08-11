@@ -3592,6 +3592,32 @@ export default function App() {
     return {};
   };
 
+  const handleFirmAddWorkerReminder = async (payload: {
+    text: string;
+    dueDate: string | null;
+  }): Promise<{ error?: string }> => {
+    if (!isSupabaseConfigured()) {
+      return { error: SUPABASE_REQUIRED_USER_MESSAGE };
+    }
+    if (!selectedRouteMeta?.routeId) {
+      return { error: 'Open this intake from your firm dashboard before adding a reminder.' };
+    }
+    const result = await intakeData.firmAddWorkerReminder(
+      selectedRouteMeta.routeId,
+      payload.text,
+      payload.dueDate
+    );
+    if (result.error) {
+      return {
+        error: toBetaUserMessage(
+          result.error,
+          'Could not add this reminder. Open this intake from your dashboard and try again.'
+        ),
+      };
+    }
+    return {};
+  };
+
   const handleAfterWorkerIntakeRouting = (detail: {
     kind: 'firm_code' | 'participating';
     firmName?: string | null;
@@ -5012,6 +5038,7 @@ export default function App() {
                     : undefined
                 }
                 onRequestAdditionalDocuments={handleFirmRequestAdditionalDocuments}
+                onAddWorkerReminder={handleFirmAddWorkerReminder}
                 onReloadFirmLiveView={
                   selectedRouteMeta && isSupabaseConfigured()
                     ? () => reloadFirmLiveViewForSelection()

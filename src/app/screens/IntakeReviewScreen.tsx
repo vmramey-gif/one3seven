@@ -22,6 +22,7 @@ import {
   HeartHandshake,
   AlignLeft,
   FileJson,
+  CalendarPlus,
 } from 'lucide-react';
 import { Screen } from '../App';
 import {
@@ -114,6 +115,7 @@ interface IntakeReviewScreenProps {
     categories: string[];
     noteToWorker: string;
   }) => Promise<{ error?: string }>;
+  onAddWorkerReminder?: (payload: { text: string; dueDate: string | null }) => Promise<{ error?: string }>;
   onReloadFirmLiveView?: () => void | Promise<void>;
   /** Strips nav chrome down to a single slim bar — used for the public demo link. */
   demoMode?: boolean;
@@ -222,6 +224,7 @@ export function IntakeReviewScreen({
   onAcceptIntake,
   onDeclineIntake,
   onRequestAdditionalDocuments,
+  onAddWorkerReminder,
   onReloadFirmLiveView,
   demoMode = false,
   demoWorkerName = 'Marcus Rivera',
@@ -240,6 +243,11 @@ export function IntakeReviewScreen({
   const [docReqNote, setDocReqNote] = useState('');
   const [docReqSubmitting, setDocReqSubmitting] = useState(false);
   const [docReqError, setDocReqError] = useState<string | null>(null);
+  const [showAddReminderModal, setShowAddReminderModal] = useState(false);
+  const [reminderText, setReminderText] = useState('');
+  const [reminderDueDate, setReminderDueDate] = useState('');
+  const [addReminderSubmitting, setAddReminderSubmitting] = useState(false);
+  const [addReminderError, setAddReminderError] = useState<string | null>(null);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [extractionRunning, setExtractionRunning] = useState(false);
@@ -891,6 +899,45 @@ export function IntakeReviewScreen({
       showToastMessage('Additional document request sent.');
     } finally {
       setDocReqSubmitting(false);
+    }
+  };
+
+  const openAddReminderModal = () => {
+    setReminderText('');
+    setReminderDueDate('');
+    setAddReminderError(null);
+    setShowAddReminderModal(true);
+  };
+
+  const closeAddReminderModal = () => {
+    if (addReminderSubmitting) return;
+    setShowAddReminderModal(false);
+    setReminderText('');
+    setReminderDueDate('');
+    setAddReminderError(null);
+  };
+
+  const handleSubmitAddReminder = async () => {
+    if (!onAddWorkerReminder) return;
+    if (!reminderText.trim()) {
+      setAddReminderError('Enter what this reminder is for.');
+      return;
+    }
+    setAddReminderError(null);
+    setAddReminderSubmitting(true);
+    try {
+      const result = await onAddWorkerReminder({
+        text: reminderText.trim(),
+        dueDate: reminderDueDate.trim() || null,
+      });
+      if (result?.error) {
+        setAddReminderError(result.error);
+        return;
+      }
+      closeAddReminderModal();
+      showToastMessage('Reminder added for the worker.');
+    } finally {
+      setAddReminderSubmitting(false);
     }
   };
 
@@ -2571,6 +2618,16 @@ export function IntakeReviewScreen({
                     Request documents
                   </button>
                 ) : null}
+                {onAddWorkerReminder && firmLiveView?.routeStatus === 'full_access' ? (
+                  <button
+                    type="button"
+                    onClick={openAddReminderModal}
+                    className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#42574E] focus-visible:ring-offset-1 ${FIRM_REVIEW_SECONDARY_BUTTON}`}
+                  >
+                    <CalendarPlus className="h-4 w-4" aria-hidden />
+                    Add a date
+                  </button>
+                ) : null}
                 {/* The decision itself, anchored to the right so it reads as the primary action. */}
                 <div className="ml-auto flex items-center gap-2">
                   {firmLiveView?.routeStatus === 'full_access' && !isFirmAccepted && !isFirmDeclined ? (
@@ -2812,6 +2869,82 @@ export function IntakeReviewScreen({
                   type="button"
                   onClick={closeFirmDocRequestModal}
                   disabled={docReqSubmitting}
+                  className="flex-1 bg-[#F2F4EC] text-[#1B2623] py-2.5 rounded-lg text-sm font-medium"
+                >
+                  Cancel
+                </button>
+              </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Add a reminder/date for the worker (firm -> worker). Same doctrine as the worker's own
+          reminders: a plain logistics item, never a computed legal deadline. Shows up on the
+          worker's dashboard tagged "from your firm". */}
+      <AnimatePresence>
+        {showAddReminderModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-[#1B2623]/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={closeAddReminderModal}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl"
+            >
+              <h3 className="text-lg font-semibold text-[#1B2623] mb-2">Add a date for the worker</h3>
+              <p className="text-sm text-[#6A6D66] mb-4">
+                Shows up on their dashboard, tagged as from your firm. This is a plain logistics
+                note — one3seven does not calculate legal deadlines, so set the date yourself.
+              </p>
+              {addReminderError ? (
+                <p className="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-4">
+                  {addReminderError}
+                </p>
+              ) : null}
+              <label className="text-sm font-medium text-[#1B2623] mb-1 block">What is this for?</label>
+              <textarea
+                value={reminderText}
+                onChange={(e) => {
+                  setReminderText(e.target.value);
+                  if (addReminderError) setAddReminderError(null);
+                }}
+                className="w-full mb-4 px-3 py-2 border border-[#E4E5DE] rounded-lg text-sm h-20 resize-none"
+                placeholder="e.g. Deposition, examination appointment, records due back"
+                disabled={addReminderSubmitting}
+              />
+              <label className="text-sm font-medium text-[#1B2623] mb-1 block">Date (optional)</label>
+              <input
+                type="date"
+                value={reminderDueDate}
+                onChange={(e) => setReminderDueDate(e.target.value)}
+                className="w-full mb-4 px-3 py-2 border border-[#E4E5DE] rounded-lg text-sm"
+                disabled={addReminderSubmitting}
+              />
+              <form
+                className="flex gap-2"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  void handleSubmitAddReminder();
+                }}
+              >
+                <button
+                  type="submit"
+                  disabled={addReminderSubmitting || !onAddWorkerReminder}
+                  className="flex-1 bg-[#42574E] text-white py-2.5 rounded-lg text-sm font-medium disabled:opacity-50"
+                >
+                  {addReminderSubmitting ? 'Adding…' : 'Add reminder'}
+                </button>
+                <button
+                  type="button"
+                  onClick={closeAddReminderModal}
+                  disabled={addReminderSubmitting}
                   className="flex-1 bg-[#F2F4EC] text-[#1B2623] py-2.5 rounded-lg text-sm font-medium"
                 >
                   Cancel
