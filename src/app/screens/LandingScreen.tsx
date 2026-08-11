@@ -27,7 +27,6 @@ import {
 import { EmploymentMatterTagsLine } from '../components/EmploymentMatterTagsLine';
 import type { EmploymentMatterTagId } from '../constants/employmentMatter';
 import { displayCaseCategoryLabel, isBetaEmploymentCategory } from '../constants/employmentMatter';
-import { WorkerMobileDocRequestCard } from '../components/WorkerMobileDocRequestCard';
 import { WorkerMissionControlHome } from '../components/WorkerMissionControlHome';
 import { RemindersCard } from '../components/RemindersCard';
 import { ImportantDatesCard } from '../components/ImportantDatesCard';
@@ -36,9 +35,7 @@ import { RecordVerificationCard } from '../components/RecordVerificationCard';
 import { SmsLinkCard } from '../components/SmsLinkCard';
 import { WorkerMobileBottomNav, type WorkerMobileHubView, type WorkerMobileNavId } from '../components/WorkerMobileBottomNav';
 import { WorkerStatusJourneyCard } from '../components/WorkerStatusJourneyCard';
-import { WorkerDocumentRequestDashboardCard } from '../components/WorkerDocumentRequestDashboardCard';
 import { WorkerIntakeCompactRow } from '../components/WorkerIntakeCompactRow';
-import type { WorkerDocumentRequestStatus } from '../utils/workerDocumentRequest';
 import type { WorkerTimelineItem } from '../types/workerTimeline';
 import {
   O3S_BTN_GHOST,
@@ -95,13 +92,6 @@ interface LandingScreenProps {
   deleteIntakeErrorIntakeId?: string | null;
   onClearDeleteIntakeError?: () => void;
   onSelectWorkerIntake?: (intakeId: string) => void;
-  workerDocumentRequestAlert?: {
-    status: WorkerDocumentRequestStatus;
-    firmName: string | null;
-    categories: string[];
-    note: string;
-  };
-  onReviewDocumentRequest?: () => void;
   onCreateNewIntake?: () => void;
   createNewIntakeBusy?: boolean;
   notificationsPanelNotice?: string;
@@ -172,8 +162,6 @@ export function LandingScreen({
   deleteIntakeErrorIntakeId = null,
   onClearDeleteIntakeError,
   onSelectWorkerIntake,
-  workerDocumentRequestAlert,
-  onReviewDocumentRequest,
   onCreateNewIntake,
   createNewIntakeBusy = false,
   notificationsPanelNotice,
@@ -196,7 +184,6 @@ export function LandingScreen({
   const [openIntakeFeedbackNonce, setOpenIntakeFeedbackNonce] = useState(0);
   const [activeIntakeHighlight, setActiveIntakeHighlight] = useState(false);
   const [openIntakeFeedback, setOpenIntakeFeedback] = useState<string | null>(null);
-  const [docRequestDismissed, setDocRequestDismissed] = useState(false);
   const [mobileNavSection, setMobileNavSection] = useState<WorkerMobileHubView>(mobileHubView);
   const [selectedStatusIntakeId, setSelectedStatusIntakeId] = useState<string | null>(
     activeIntakeHub?.intakeId ?? workerIntakeRoutingCards[0]?.intakeId ?? null
@@ -397,11 +384,6 @@ export function LandingScreen({
     statusJourneyOptions[0] ??
     null;
 
-  const docRequestPending = workerDocumentRequestAlert?.status === 'pending';
-  const showDocRequestCard =
-    Boolean(workerDocumentRequestAlert) &&
-    onReviewDocumentRequest &&
-    (!docRequestPending || !docRequestDismissed);
   const mobileShellHub = showWorkerHub && shellMode;
 
   const missionControlWorkflow =
@@ -647,10 +629,7 @@ export function LandingScreen({
       {sortedIntakeCards.map((card) => {
         const isActive = activeIntakeHub?.intakeId === card.intakeId;
         const lastActivity = formatWorkerIntakeLastActivity(card.updatedAt);
-        const statusLabel =
-          docRequestPending && showDocRequestCard && isActive
-            ? null
-            : formatWorkerWorkflowStatusForDisplay(card.workflowStatus, card.submissionChannel);
+        const statusLabel = formatWorkerWorkflowStatusForDisplay(card.workflowStatus, card.submissionChannel);
         const highlighted = isActive && activeIntakeHighlight;
         const actionNeeded = workerActionNeededIntakeIds.includes(card.intakeId);
         return (
@@ -874,16 +853,6 @@ export function LandingScreen({
                     {organizationRecoveryNotice}
                   </p>
                 ) : null}
-                {showDocRequestCard &&
-                workerDocumentRequestAlert &&
-                docRequestPending &&
-                onReviewDocumentRequest ? (
-                  <WorkerMobileDocRequestCard
-                    firmName={workerDocumentRequestAlert.firmName}
-                    categories={workerDocumentRequestAlert.categories}
-                    onUploadRequested={onReviewDocumentRequest}
-                  />
-                ) : null}
                 <div className="mb-4">
                   <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#42574E]">Your cases</h2>
                   <p className="text-xs leading-relaxed text-[#1B2623]/64">
@@ -925,41 +894,6 @@ export function LandingScreen({
             <p className="text-xs text-amber-400/90 mb-4 leading-relaxed" role="status">
               {organizationRecoveryNotice}
             </p>
-          ) : null}
-          {showDocRequestCard && workerDocumentRequestAlert && onReviewDocumentRequest ? (
-            <div className="mb-4">
-              {docRequestPending ? (
-                <>
-                  <div className="sm:hidden">
-                    <WorkerMobileDocRequestCard
-                      firmName={workerDocumentRequestAlert.firmName}
-                      categories={workerDocumentRequestAlert.categories}
-                      onUploadRequested={onReviewDocumentRequest}
-                    />
-                  </div>
-                  <div className="hidden sm:block">
-                    <WorkerDocumentRequestDashboardCard
-                      firmName={workerDocumentRequestAlert.firmName}
-                      categories={workerDocumentRequestAlert.categories}
-                      note={workerDocumentRequestAlert.note}
-                      status={workerDocumentRequestAlert.status}
-                      onUploadRequested={onReviewDocumentRequest}
-                      onViewTimeline={onGoWorkerSummary ? goSummary : undefined}
-                      onDismiss={() => setDocRequestDismissed(true)}
-                    />
-                  </div>
-                </>
-              ) : (
-                <WorkerDocumentRequestDashboardCard
-                  firmName={workerDocumentRequestAlert.firmName}
-                  categories={workerDocumentRequestAlert.categories}
-                  note={workerDocumentRequestAlert.note}
-                  status={workerDocumentRequestAlert.status}
-                  onUploadRequested={onReviewDocumentRequest}
-                  onViewTimeline={onGoWorkerSummary ? goSummary : undefined}
-                />
-              )}
-            </div>
           ) : null}
           <div className="mb-3">
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#42574E]">
