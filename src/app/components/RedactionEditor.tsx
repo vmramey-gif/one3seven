@@ -213,7 +213,7 @@ export function RedactionEditor({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-black/70 p-3 sm:items-center sm:justify-center sm:p-6">
+    <div className="fixed inset-0 z-[60] flex flex-col bg-black/70 p-3 sm:items-center sm:justify-center sm:p-6">
       <div className="flex w-full max-w-3xl flex-1 flex-col overflow-hidden rounded-[18px] bg-white sm:flex-none sm:max-h-[90vh]">
         <div className="flex items-center justify-between border-b border-[#E4E5DE] px-5 py-4">
           <div>

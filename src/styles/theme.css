@@ -282,9 +282,11 @@
      can't affect the dashboard. Violet AI source-links + orange/sage roles are set inline and win. */
   .o3s-firm-review-skin [class*="text-[#1B2623]"] { color: #ECF3ED; }
   .o3s-firm-review-skin [class*="text-[#384039]"],
+  .o3s-firm-review-skin [class*="text-[#3A3F38]"],
   .o3s-firm-review-skin [class*="text-[#6A6D66]"],
   .o3s-firm-review-skin [class*="text-[#7C857F]"],
   .o3s-firm-review-skin [class*="text-[#9AA39B]"] { color: rgba(236, 243, 237, 0.64); }
+  .o3s-firm-review-skin [class*="text-[#8A8F86]"] { color: rgba(236, 243, 237, 0.46); }
   .o3s-firm-review-skin [class*="text-[#42574E]"] { color: #8FD3A6; }
   .o3s-firm-review-skin [class*="border-[#E4E5DE]"],
   .o3s-firm-review-skin [class*="border-[#F2F4EC]"] { border-color: rgba(255, 255, 255, 0.1); }
