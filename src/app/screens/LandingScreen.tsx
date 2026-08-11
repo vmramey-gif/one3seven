@@ -29,7 +29,6 @@ import type { EmploymentMatterTagId } from '../constants/employmentMatter';
 import { displayCaseCategoryLabel, isBetaEmploymentCategory } from '../constants/employmentMatter';
 import { WorkerMissionControlHome } from '../components/WorkerMissionControlHome';
 import { RemindersCard } from '../components/RemindersCard';
-import { ImportantDatesCard } from '../components/ImportantDatesCard';
 import { MitigationLogCard } from '../components/MitigationLogCard';
 import { RecordVerificationCard } from '../components/RecordVerificationCard';
 import { SmsLinkCard } from '../components/SmsLinkCard';
@@ -555,14 +554,14 @@ export function LandingScreen({
         if (!homeIntakeId) return null;
         return (
           <>
-            <div className="mx-auto mt-4 w-full max-w-[680px]">
-              <RemindersCard intakeId={homeIntakeId} />
+            <div className="mx-auto mt-6 w-full max-w-[680px]">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#42574E]">Your tools</p>
+              <p className="mt-1 text-xs leading-relaxed text-[#1B2623]/60">
+                Reminders, a job-search log, and texting in documents — all optional, all yours.
+              </p>
             </div>
-            <div className="mx-auto mt-4 w-full max-w-[680px]">
-              <ImportantDatesCard
-                intakeId={homeIntakeId}
-                timeline={hubTimelinePreview.map((t) => ({ date: t.date, event: t.event }))}
-              />
+            <div className="mx-auto mt-3 w-full max-w-[680px]">
+              <RemindersCard intakeId={homeIntakeId} />
             </div>
             <div className="mx-auto mt-4 w-full max-w-[680px]">
               <MitigationLogCard intakeId={homeIntakeId} />
