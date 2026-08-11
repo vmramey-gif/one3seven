@@ -116,11 +116,22 @@ Deno.serve(async (req: Request) => {
 
   const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
+  // Keyword sets match exactly what's declared on the Twilio A2P campaign registration — every
+  // declared opt-out/help keyword must actually do something here, or the registration is lying
+  // about what the number does. CTIA-standard set plus our own UNLINK alias.
+  const OPT_OUT_KEYWORDS = new Set([
+    'STOP', 'STOPALL', 'UNSUBSCRIBE', 'CANCEL', 'END', 'QUIT', 'OPTOUT', 'REVOKE', 'UNLINK',
+  ]);
+  const HELP_KEYWORDS = new Set(['HELP', 'INFO']);
+
   const bodyKeyword = (params['Body'] ?? '').trim().toUpperCase();
-  if (bodyKeyword === 'STOP' || bodyKeyword === 'UNLINK') {
+  if (OPT_OUT_KEYWORDS.has(bodyKeyword)) {
     await supabase.from('worker_sms_links').delete().eq('phone_number', from);
     // Twilio also enforces STOP at the carrier level for future delivery — this just clears our link.
     return twiml('This number has been unlinked from one3seven. You can re-link it anytime under Upload.');
+  }
+  if (HELP_KEYWORDS.has(bodyKeyword)) {
+    return twiml('one3seven: text a photo or PDF to add it to your record. Reply STOP to unsubscribe. Msg&Data Rates May Apply.');
   }
 
   const { data: link, error: linkErr } = await supabase
