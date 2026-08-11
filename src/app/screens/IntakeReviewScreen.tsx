@@ -2847,7 +2847,7 @@ export function IntakeReviewScreen({
                   setDocReqNote(e.target.value);
                   if (docReqError) setDocReqError(null);
                 }}
-                className="w-full mb-4 px-3 py-2 border border-[#E4E5DE] rounded-lg text-sm h-24 resize-none"
+                className="w-full mb-4 px-3 py-2 border border-[#E4E5DE] rounded-lg text-sm h-24 resize-none text-[#1B2623]"
                 placeholder="Add context for the record owner (optional)."
                 disabled={docReqSubmitting}
               />
@@ -2915,7 +2915,7 @@ export function IntakeReviewScreen({
                   setReminderText(e.target.value);
                   if (addReminderError) setAddReminderError(null);
                 }}
-                className="w-full mb-4 px-3 py-2 border border-[#E4E5DE] rounded-lg text-sm h-20 resize-none"
+                className="w-full mb-4 px-3 py-2 border border-[#E4E5DE] rounded-lg text-sm h-20 resize-none text-[#1B2623]"
                 placeholder="e.g. Deposition, examination appointment, records due back"
                 disabled={addReminderSubmitting}
               />
@@ -2924,7 +2924,7 @@ export function IntakeReviewScreen({
                 type="date"
                 value={reminderDueDate}
                 onChange={(e) => setReminderDueDate(e.target.value)}
-                className="w-full mb-4 px-3 py-2 border border-[#E4E5DE] rounded-lg text-sm"
+                className="w-full mb-4 px-3 py-2 border border-[#E4E5DE] rounded-lg text-sm text-[#1B2623]"
                 disabled={addReminderSubmitting}
               />
               <form
