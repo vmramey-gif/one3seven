@@ -21,6 +21,19 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 const E164 = /^\+[1-9]\d{6,14}$/;
 const CODE_TTL_MINUTES = 10;
 
+// Browser calls to this function (via supabase.functions.invoke) go cross-origin — Vercel to
+// supabase.co — so without CORS headers the preflight OPTIONS request fails and the client never
+// even sees a response; supabase-js surfaces that as "Failed to send a request to the Edge
+// Function," which looks identical to the function being unreachable. Matches create-checkout-session.
+const CORS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+const json = (data: unknown, status = 200) =>
+  new Response(JSON.stringify(data), { status, headers: { ...CORS, 'Content-Type': 'application/json' } });
+
 async function hashCode(code: string): Promise<string> {
   const bytes = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(code));
   return Array.from(new Uint8Array(bytes)).map((b) => b.toString(16).padStart(2, '0')).join('');
@@ -32,43 +45,31 @@ function generateCode(): string {
 }
 
 Deno.serve(async (req: Request) => {
-  if (req.method !== 'POST') {
-    return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405 });
-  }
+  if (req.method === 'OPTIONS') return new Response(null, { headers: CORS });
+  if (req.method !== 'POST') return json({ error: 'Method not allowed' }, 405);
 
   const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
   const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
   const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY')!;
 
   const authHeader = req.headers.get('authorization') ?? '';
-  if (!authHeader) {
-    return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
-  }
+  if (!authHeader) return json({ error: 'Unauthorized' }, 401);
   const authClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     global: { headers: { Authorization: authHeader } },
   });
   const { data: { user }, error: authErr } = await authClient.auth.getUser();
-  if (authErr || !user) {
-    return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
-  }
+  if (authErr || !user) return json({ error: 'Unauthorized' }, 401);
 
   let body: { intakeId?: string; phoneNumber?: string };
   try {
     body = await req.json();
   } catch {
-    return new Response(JSON.stringify({ error: 'Invalid JSON body' }), { status: 400 });
+    return json({ error: 'Invalid JSON body' }, 400);
   }
   const { intakeId, phoneNumber } = body;
-  if (!intakeId || !phoneNumber) {
-    return new Response(JSON.stringify({ error: 'intakeId and phoneNumber are required' }), { status: 400 });
-  }
+  if (!intakeId || !phoneNumber) return json({ error: 'intakeId and phoneNumber are required' }, 400);
   const phone = phoneNumber.trim();
-  if (!E164.test(phone)) {
-    return new Response(
-      JSON.stringify({ error: 'Enter your phone number in the form +1XXXXXXXXXX.' }),
-      { status: 400 },
-    );
-  }
+  if (!E164.test(phone)) return json({ error: 'Enter your phone number in the form +1XXXXXXXXXX.' }, 400);
 
   const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
@@ -78,9 +79,7 @@ Deno.serve(async (req: Request) => {
     .select('id, worker_id')
     .eq('id', intakeId)
     .maybeSingle();
-  if (intakeErr || !intakeRow || intakeRow.worker_id !== user.id) {
-    return new Response(JSON.stringify({ error: 'Intake not found' }), { status: 404 });
-  }
+  if (intakeErr || !intakeRow || intakeRow.worker_id !== user.id) return json({ error: 'Intake not found' }, 404);
 
   const code = generateCode();
   const codeHash = await hashCode(code);
@@ -102,17 +101,14 @@ Deno.serve(async (req: Request) => {
     );
   if (upsertErr) {
     console.error('[sms-link-request] upsert failed', upsertErr.message);
-    return new Response(JSON.stringify({ error: 'Could not save this phone number. Try again.' }), { status: 500 });
+    return json({ error: 'Could not save this phone number. Try again.' }, 500);
   }
 
   const TWILIO_ACCOUNT_SID = Deno.env.get('TWILIO_ACCOUNT_SID');
   const TWILIO_AUTH_TOKEN = Deno.env.get('TWILIO_AUTH_TOKEN');
   const TWILIO_PHONE_NUMBER = Deno.env.get('TWILIO_PHONE_NUMBER');
   if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN || !TWILIO_PHONE_NUMBER) {
-    return new Response(
-      JSON.stringify({ error: 'Text-in upload is not turned on yet. Check back soon.' }),
-      { status: 503 },
-    );
+    return json({ error: 'Text-in upload is not turned on yet. Check back soon.' }, 503);
   }
 
   const twilioResp = await fetch(
@@ -133,11 +129,8 @@ Deno.serve(async (req: Request) => {
   if (!twilioResp.ok) {
     const detail = await twilioResp.text().catch(() => '');
     console.error('[sms-link-request] Twilio send failed', twilioResp.status, detail);
-    return new Response(JSON.stringify({ error: 'Could not send the code. Try again.' }), { status: 502 });
+    return json({ error: 'Could not send the code. Try again.' }, 502);
   }
 
-  return new Response(JSON.stringify({ sent: true }), {
-    status: 200,
-    headers: { 'Content-Type': 'application/json' },
-  });
+  return json({ sent: true });
 });
