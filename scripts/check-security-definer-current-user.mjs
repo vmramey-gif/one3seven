@@ -104,12 +104,23 @@ function main() {
     process.exit(1);
   }
 
+  // Word-boundary match, not a bare substring test. Caught live tonight: a plain
+  // /current_user/i.test() flags identifiers like `references_current_user_or_role` (a column
+  // name in the catalog-audit RPC whose entire JOB is detecting this pattern, not using it) as a
+  // false positive. \b correctly does NOT match inside that identifier, because in JS regex `_`
+  // counts as a word character, so "references_current_user_or_role" is one unbroken word run
+  // with no boundary before/after "current_user" — while it still correctly matches the real bug
+  // shape (`if current_user in (...)`, surrounded by non-word characters). Also now checks
+  // current_role, the equivalent-risk sibling keyword flagged by external review but not
+  // previously covered.
+  const BAD_PATTERN = /\bcurrent_user\b|\bcurrent_role\b/i;
+
   const violations = [];
   const grandfatheredHits = [];
   for (const file of files) {
     const sql = readFileSync(join(MIGRATIONS_DIR, file), 'utf8');
     for (const body of findFunctionBodies(sql)) {
-      if (/current_user/i.test(body)) {
+      if (BAD_PATTERN.test(body)) {
         (GRANDFATHERED.has(file) ? grandfatheredHits : violations).push(file);
       }
     }
@@ -123,18 +134,19 @@ function main() {
   }
 
   if (violations.length > 0) {
-    console.error('FAIL: SECURITY DEFINER function body references current_user in:');
+    console.error('FAIL: SECURITY DEFINER function body references current_user/current_role in:');
     for (const f of [...new Set(violations)]) console.error(`  - ${f}`);
     console.error(
-      '\ncurrent_user inside SECURITY DEFINER always resolves to the function owner, never the ' +
-        'caller — this silently disables role-based bypass checks. Use session_user, drop ' +
-        'SECURITY DEFINER if the function does not need it (most privilege-lock triggers do not), ' +
-        'or key the check off auth.uid()/auth.role() instead. See security_curriculum.md finding #8.'
+      '\ncurrent_user/current_role inside SECURITY DEFINER always resolves to the function ' +
+        "owner, never the caller — this silently disables role-based bypass checks. Use " +
+        'session_user, drop SECURITY DEFINER if the function does not need it (most ' +
+        'privilege-lock triggers do not), or key the check off auth.uid()/auth.role() instead. ' +
+        'See security_curriculum.md finding #8.'
     );
     process.exit(1);
   }
 
-  console.log('OK: no SECURITY DEFINER function references current_user.');
+  console.log('OK: no SECURITY DEFINER function references current_user/current_role.');
 }
 
 main();
