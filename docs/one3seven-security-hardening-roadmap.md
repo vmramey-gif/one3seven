@@ -1,4 +1,5 @@
-# one3seven — Security Hardening Roadmap: 5.1 → 9-10
+# one3seven — Security Hardening Roadmap: 5.1 → 9-10 (RLS/auth/migration layer — see amendment
+below for what this scope does and doesn't cover)
 
 **Purpose:** convert last night's rubric from a description of what's wrong into a sequenced,
 falsifiable plan to fix it — permanently, not with another one-off patch. Every item below
@@ -19,6 +20,30 @@ there is no staging project and the harness correctly self-refuses to run agains
 changes the diagnosis: the gap was never "we don't test for this," it was "the test that already
 exists has no floor to stand on." That reframing is why item #1 below is the one that matters
 most — it isn't a new build, it's flipping a switch on work already done.
+
+**AMENDMENT 2026-08-12 (external adversarial review, applied same day as staging approval):**
+this document originally overclaimed in three places, corrected here rather than silently
+rewritten, matching the "don't retroactively edit history, add a note instead" principle this
+doc already applies to migrations:
+- **#2's "structurally impossible to reintroduce" was too strong.** The shipped check
+  (`scripts/check-security-definer-current-user.mjs`) catches one textual shape: `current_user`
+  inside a `SECURITY DEFINER` body, in a *tracked migration file*. It does not catch
+  `current_role`, a dynamic-SQL-built check, or — the sharpest version of this gap — a function
+  created directly via the dashboard instead of a migration, which is exactly how this session's
+  undocumented `profiles` auto-provisioning hook got created. A catalog-level check against the
+  live database (enumerate every `SECURITY DEFINER` function via `pg_proc` directly) is the
+  durable answer and is now queued as **#7** below. Corrected in the script's own header comment
+  too, not just here.
+- **#5/#6's default live-attack target should be staging, not prod**, once staging exists. Prod
+  attacks become narrowly-scoped synthetic post-deploy canaries only — not the default method.
+  Tonight's prod-based verification was a justified exception (no staging existed yet), not the
+  intended steady state.
+- **The score table's "9-10 at steady state" is scoped to the RLS/auth/migration layer this
+  roadmap actually covers** — it does not imply proven coverage of storage/signed-URL
+  authorization, edge-function input validation, secrets handling, logging, dependency posture,
+  or disaster recovery. Those are separately measured; folding them into one number would be a
+  false precision claim. See **#8** below for the gates this roadmap was missing before any "9+"
+  claim should be trusted.
 
 ---
 
@@ -60,24 +85,16 @@ actual bug — `SECURITY DEFINER` + `current_user` — is a Postgres semantics t
 mechanically detectable independent of what any specific trigger is supposed to do. Add a
 grep-based static check, since this doesn't need a live database at all:
 
-```bash
-# scripts/check-security-definer-current-user.sh — new, ~10 lines
-# Fails CI if any SQL migration defines a SECURITY DEFINER function whose body references
-# current_user. This exact pattern is always wrong (see security_curriculum.md finding #8) —
-# current_user inside SECURITY DEFINER resolves to the function owner, never the caller.
-grep -rlPzo '(?s)security definer.*?\$\$.*?current_user' supabase/migrations/*.sql \
-  && { echo "FAIL: SECURITY DEFINER function references current_user — see finding #8"; exit 1; } \
-  || echo "OK: no SECURITY DEFINER/current_user pattern found"
-```
+**Shipped as `scripts/check-security-definer-current-user.mjs`** (a real Node script with
+explicit match/no-match branching and a fail-closed tooling-error path, not the bash one-liner
+originally sketched here — noting the discrepancy so this doc doesn't imply a shell-swallow-error
+bug exists in shipped code that isn't actually there). Wired as a `lint-security-definer` job in
+`ci.yml`, no staging or secrets required — it's a pure text scan, so unlike the RLS harnesses it
+runs and blocks on every PR starting today, no waiting on #1.
 
-Wire this as a `lint-security-definer` job in `ci.yml`, no staging or secrets required — it's a
-pure grep, so unlike the RLS harnesses it can be **required on every PR starting today**, no
-waiting on #1. This is the closest thing to an actual guarantee in this whole roadmap: it is not
-possible for this specific bug class to ship again undetected once this job is required.
-
-**Outcome:** the exact failure mode from last night becomes structurally impossible to
-reintroduce, starting immediately — not "less likely," *impossible*, because it's a syntactic
-check, not a judgment call.
+**Outcome (revised per the amendment above):** the *known textual shape* of last night's failure
+mode is caught on every PR starting today — a real, immediate improvement, but not the same as
+"impossible to reintroduce" for the bug class as a whole. #7 below closes the remaining gap.
 
 ---
 
@@ -155,6 +172,23 @@ function's authorization check gets a live-attack verification pass (disposable 
 REST call, real response inspected) as a non-optional step — not reserved for changes that
 subjectively feel high-stakes. Zero infrastructure cost; costs a few extra minutes per fix.
 
+**Target correction (see amendment above): once staging exists, live-attack verification targets
+staging by default.** A minimal, idempotent, synthetic-fixture-only canary against prod is run
+post-deploy to confirm staging and prod actually agree — it is not the primary test method.
+Tonight's prod-only attacks were the right call given no staging existed; they should not be the
+pattern once #1 is done.
+
+**`assertDenied`'s methodology has a real gap, also worth fixing while touching this file.**
+Postgres re-checks a table's SELECT policy against a `RETURNING` clause — so on a table where the
+UPDATE and SELECT policies diverge, a write could theoretically succeed while `RETURNING` reports
+zero rows, and `assertDenied` would misread that as "correctly denied." Tonight's specific tests
+were safe from this (both fixes raised hard `P0001` exceptions, not ambiguous zero-row responses,
+and `profiles`'s SELECT policy lets an owner always read their own row regardless of what else
+changed) — but the harness's general-purpose assertion shouldn't rely on that being true for every
+future table. Queued: extend `assertDenied` to optionally take a privileged (service-role) reader
+and a known before-value, and independently confirm the target row is unchanged, not just that
+the mutating client's own response looked like a denial.
+
 ---
 
 ## #6 — Recurring drift check, not a one-time backfill (Week 3+, ongoing)
@@ -165,17 +199,81 @@ in the moment. Add a lightweight, **Docker-free** monthly (or per-release) job �
 `supabase db dump` attempt failed specifically because it shells out to a Docker-bundled
 `pg_dump`, which isn't installed here, so don't propose the same tool again:
 
+**Design correction (external review, 2026-08-12): a raw PostgREST call cannot introspect
+`pg_proc`/`pg_trigger`/`information_schema` directly** — the technique tonight's live diagnosis
+actually used was a purpose-built `SECURITY DEFINER` RPC (`debug_profiles_trigger_state()`) that
+*wraps* a catalog query and returns rows over PostgREST; that's valid privileged access tunneled
+through one RPC call, proven to work live tonight, but a one-off diagnostic RPC isn't a repeatable
+drift-check design, and it's one more `SECURITY DEFINER` function to keep track of. Better shape,
+adopted from the same review: a direct Postgres connection (the `pg` npm package, no Docker, no
+special RPC needed) querying system catalogs from two **independently produced** sources —
+
 ```js
-// scripts/schema-drift-check.mjs — queries information_schema.tables / pg_trigger / pg_proc
-// directly over PostgREST (the same technique used to live-diagnose tonight's bug), no pg_dump,
-// no Docker. Lists every table/trigger/function in prod not producible by replaying
-// supabase/migrations/*.sql against a scratch project. Non-zero exit if the list is non-empty.
+// scripts/schema-drift-check.mjs — uses `pg` (direct Postgres connection string, no Docker, no
+// pg_dump, no special RPC) to build two catalog inventories: (1) a scratch project built purely
+// by replaying supabase/migrations/*.sql, (2) prod. Diffs tables/columns/constraints/indexes,
+// RLS-enabled state + policies, functions (owner, volatility, SECURITY DEFINER, search_path,
+// grants), triggers, extensions/views. Non-zero exit if prod has anything the migration replay
+// didn't produce.
 ```
 
 This is the mechanism that keeps #3's fix from decaying back to a 3/10 over the next six months.
 Run it manually the first few times; once trustworthy, it's a natural `rls-isolation`-style CI
 job (though it needs the scratch-project step, so it's realistically a scheduled job, not
-per-PR).
+per-PR). Framed the way the same review suggested: **"migrations replay cleanly from an empty
+project and match prod" is a better, more falsifiable security-maturity gate than a subjective
+score** — and it's literally what step 2 of #1 already does the first time staging is built.
+
+---
+
+## #7 — Catalog-level SECURITY DEFINER audit (closes #2's remaining gap) — new, Week 2
+
+#2's text-scan check only sees migration files. A catalog-level check, run against staging (and
+usable ad hoc against prod, read-only) via the same direct-`pg`-connection technique as #6,
+enumerates **every** `SECURITY DEFINER` function that actually exists in the live database —
+including ones created outside migrations — and asserts, per function:
+- owner is the expected role;
+- `EXECUTE` is not granted to `PUBLIC` when it shouldn't be;
+- `search_path` is explicitly set (an unset `search_path` on a `SECURITY DEFINER` function is a
+  separate, classic Postgres privilege-escalation vector — schema-hijacking via an
+  attacker-writable schema earlier in an unset search path — not one this session found evidence
+  of here, but worth checking mechanically now that the tooling exists);
+- the source doesn't reference `current_user`/`current_role` for what looks like a caller-identity
+  decision;
+- any function not clean against the above is in a small, named allowlist with a documented
+  reason and a linked test — not silently ignored.
+
+This is the piece that makes "no more of these, ever" an actual claim instead of an aspiration —
+paired with #2's fast per-PR tripwire (catches the common case immediately) and this catalog audit
+(catches everything else, on a schedule, once staging exists to run it against safely).
+
+---
+
+## #8 — Gates to clear before trusting any future "9+" claim — new, Week 2-3
+
+Four exit criteria this roadmap didn't originally have, each more falsifiable than a subjective
+score:
+
+1. **Incident closure record** for finding #8 (the `SECURITY DEFINER` bug) specifically: exploit
+   path, affected objects, first-introduced migration, remediation, regression test added,
+   explicit statement of whether any real (non-test) data was exposed or modified while the bug
+   was live. Cheap to write now while the details are fresh; valuable if this is ever the subject
+   of a future audit or a firm's own security questionnaire.
+2. **Storage/edge-function/webhook authorization sweep.** RLS on tables is not the full boundary
+   if uploaded-file signed URLs, Storage bucket policies, or an edge function accepting a
+   record/user/firm ID as a parameter can reach the same data by a different path. Prior sessions
+   partially covered this (storage bucket policy review, several edge-function auth fixes); this
+   item is "make it a standing, explicit, re-run check," not "start from zero."
+3. **Production-safe canary.** After any security-relevant deploy, run a tiny, idempotent,
+   synthetic-fixture-only test against prod itself (not staging) that proves deployed
+   routing/auth actually matches what staging verified, then deletes its own fixtures. Separate
+   from and smaller in scope than the staging-based live-attack habit in #5.
+4. **Recovery proof.** Prove a clean environment can be rebuilt entirely from the repository —
+   migrations, config, secrets manifest, synthetic seed data — with nothing load-bearing living
+   only in someone's memory or a dashboard click history. #1's staging build is the first real
+   instance of this proof; #6's scheduled drift check is what keeps it true over time.
+
+None of these four are done yet. Don't let the score table below imply otherwise.
 
 ---
 

@@ -16,6 +16,30 @@
  * runs on every PR with zero infrastructure dependency (unlike the RLS isolation harnesses,
  * which need a staging Supabase project).
  *
+ * SCOPE — read this before trusting a clean result more than it warrants (external review,
+ * 2026-08-12, correctly pushed back on an earlier overclaim here). This catches exactly one
+ * textual shape: `current_user` referenced inside a `SECURITY DEFINER` function body, written in
+ * a tracked migration file, using a `$$...$$`/`$tag$...$tag$`-delimited body. It does NOT catch:
+ *   - `current_role` (same underlying risk, different keyword)
+ *   - the check built via dynamic SQL / string concatenation instead of a literal `if` clause
+ *   - a function created directly via the Supabase dashboard SQL editor instead of a migration
+ *     (this is not hypothetical — the `profiles` auto-provisioning hook found live 2026-08-12
+ *     was created exactly this way, outside any tracked migration)
+ * A catalog-level check against the live database (enumerate every SECURITY DEFINER function via
+ * pg_proc directly, not through this file) is the durable answer to the gaps above and is queued
+ * in docs/one3seven-security-hardening-roadmap.md — this script is a fast, zero-cost tripwire for
+ * the known textual pattern, not a substitute for that.
+ *
+ * Also worth being precise about: `current_user` genuinely, factually resolves to the function's
+ * OWNER for the duration of a SECURITY DEFINER call — that's just how Postgres works, not a
+ * judgment call. Whether that's a *bug* depends on what the check is being used for. In every
+ * instance found in this codebase, it was being used to decide whether to bypass a caller-identity
+ * authorization check — for that specific use, it is always wrong, because the owner identity has
+ * nothing to do with who's actually calling. A function using `current_user` for something else
+ * (e.g. owner-aware auditing/logging, not an authorization decision) would be a legitimate
+ * exception — none exist in this codebase today, but if one is ever added intentionally, add it
+ * to GRANDFATHERED below with a comment explaining why, not by weakening this check.
+ *
  * Scope note: this flags any `security definer` function body that also references
  * `current_user`, which is the exact shape of the known-bad pattern. A function that legitimately
  * needs SECURITY DEFINER for an unrelated reason (e.g. is_founder(), which keys off auth.uid(),
@@ -61,12 +85,23 @@ function findFunctionBodies(sql) {
 }
 
 function main() {
+  // Fail closed, not open, on a tooling error. An earlier version of this treated a missing
+  // migrations directory as "nothing to check, pass" — that's fine ONLY when the absence is
+  // actually expected. In this repo it never is (supabase/migrations always exists at the repo
+  // root); silently passing on any readdirSync error (wrong cwd, permissions, a CI checkout gone
+  // wrong) would make the check worthless exactly when something is already broken. Correctly
+  // flagged by external review, 2026-08-12: "scan/tool error should fail closed."
   let files;
   try {
     files = readdirSync(MIGRATIONS_DIR).filter((f) => f.endsWith('.sql'));
-  } catch {
-    console.log('No supabase/migrations directory found — nothing to check.');
-    return;
+  } catch (e) {
+    console.error(`FAIL: could not read ${MIGRATIONS_DIR}: ${e instanceof Error ? e.message : e}`);
+    console.error('This check refuses to silently pass when it cannot actually scan anything.');
+    process.exit(1);
+  }
+  if (files.length === 0) {
+    console.error(`FAIL: ${MIGRATIONS_DIR} exists but contains no .sql files — unexpected.`);
+    process.exit(1);
   }
 
   const violations = [];
