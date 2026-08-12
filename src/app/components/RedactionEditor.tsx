@@ -44,6 +44,10 @@ export function RedactionEditor({
   const [applying, setApplying] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [truncated, setTruncated] = useState(false);
+  /** Real page count of the source PDF — may exceed the MAX_PAGES rendered for review. Used by
+      apply() to carry forward any un-reviewed tail pages unmodified instead of silently dropping
+      them (a page you never got to redact is not the same as a page that's safe to delete). */
+  const [totalPageCount, setTotalPageCount] = useState(0);
 
   const unsupported = !isPdfFile(file) && !isImageFile(file);
 
@@ -80,6 +84,7 @@ export function RedactionEditor({
           if (!cancelled) {
             sourcePagesRef.current = rendered;
             setPageCount(rendered.length);
+            setTotalPageCount(total);
             setRectsByPage(rendered.map(() => []));
           }
         } else {
@@ -92,6 +97,7 @@ export function RedactionEditor({
           if (!cancelled) {
             sourcePagesRef.current = [canvas];
             setPageCount(1);
+            setTotalPageCount(1);
             setRectsByPage([[]]);
           }
         }
@@ -201,6 +207,20 @@ export function RedactionEditor({
           const p = doc.addPage([canvas.width, canvas.height]);
           p.drawImage(img, { x: 0, y: 0, width: canvas.width, height: canvas.height });
         }
+        // A file longer than MAX_PAGES only gets its first MAX_PAGES pages rendered for review —
+        // the worker never saw or had the chance to redact anything past that. Silently dropping
+        // those pages would be real, invisible data loss, worse than leaving them unredacted. Carry
+        // them forward unmodified (real pdf-lib page copies, not rasterized) instead of losing them.
+        if (totalPageCount > finalCanvases.length) {
+          const srcBytes = new Uint8Array(await file.arrayBuffer());
+          const srcDoc = await PDFDocument.load(srcBytes);
+          const tailIndexes = Array.from(
+            { length: totalPageCount - finalCanvases.length },
+            (_, i) => finalCanvases.length + i,
+          );
+          const tailPages = await doc.copyPages(srcDoc, tailIndexes);
+          for (const p of tailPages) doc.addPage(p);
+        }
         const bytes = await doc.save();
         const name = file.name.replace(/\.pdf$/i, '') + '-redacted.pdf';
         onApply(new File([bytes], name, { type: 'application/pdf' }));
@@ -243,7 +263,7 @@ export function RedactionEditor({
           )}
           {truncated ? (
             <p className="mt-2 text-center text-[11px] text-[#8A7A4E]">
-              Only the first {MAX_PAGES} pages are shown here for redaction.
+              Only the first {MAX_PAGES} pages can be redacted here. The rest will be included as-is, unredacted.
             </p>
           ) : null}
         </div>
