@@ -1,0 +1,21 @@
+version: 2
+updates:
+  # npm dependencies (the only package manifest in this repo — supabase/functions/* use Deno's
+  # esm.sh URL imports, not package.json, so they're not covered by this ecosystem).
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    groups:
+      # Batch routine patch/minor bumps into one PR instead of one-per-package noise; major
+      # version bumps still get their own PR since those are more likely to need real review.
+      minor-and-patch:
+        update-types: ["minor", "patch"]
+
+  # The GitHub Actions workflow itself (actions/checkout, actions/setup-node, etc. in ci.yml) —
+  # keeping these current is the same category of dependency risk as npm packages.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
