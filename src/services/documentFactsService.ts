@@ -86,7 +86,22 @@ export async function triggerDocumentFactExtraction(params: {
 
   if (error) return { ok: false, error: error.message };
   if (data?.error) return { ok: false, error: data.error };
-  return { ok: true, facts: data?.facts };
+  // Minimal runtime shape check before trusting data.facts as real DocumentFacts -- a malformed/
+  // partial object from the edge function that doesn't set data.error would otherwise be forwarded
+  // as ok:true and trusted downstream as a "confirmed" extracted fact. Found via an independent
+  // security/correctness review.
+  const facts = data?.facts;
+  const looksLikeDocumentFacts =
+    facts &&
+    typeof facts === 'object' &&
+    typeof facts.category === 'string' &&
+    typeof facts.file_name === 'string' &&
+    Array.isArray(facts.people_mentioned) &&
+    Array.isArray(facts.flags);
+  if (!looksLikeDocumentFacts) {
+    return { ok: false, error: 'Extraction returned an unexpected format.' };
+  }
+  return { ok: true, facts };
 }
 
 // ---------------------------------------------------------------------------

@@ -51,7 +51,10 @@ Deno.serve(async (req: Request) => {
 
   // ── Allowlist the price ──────────────────────────────────────────────────
   // priceId is client-supplied; only accept our own configured plan prices (same env vars
-  // the webhook maps price -> plan with). If none are configured yet, skip (setup phase).
+  // the webhook maps price -> plan with). Fails CLOSED: if none of the env vars are set, that's
+  // a real misconfiguration, not "setup phase" -- previously this skipped validation entirely in
+  // that case, letting any Stripe price ID in the connected account through unchecked. Found and
+  // fixed via an independent security review.
   const allowedPriceIds = new Set(
     [
       'STRIPE_PRICE_STARTER_MONTHLY', 'STRIPE_PRICE_STARTER_ANNUAL',
@@ -62,7 +65,7 @@ Deno.serve(async (req: Request) => {
       .map((k) => Deno.env.get(k)?.trim())
       .filter((v): v is string => Boolean(v)),
   );
-  if (allowedPriceIds.size > 0 && !allowedPriceIds.has(priceId)) {
+  if (!allowedPriceIds.has(priceId)) {
     return json({ error: 'Unknown price' }, 400);
   }
 

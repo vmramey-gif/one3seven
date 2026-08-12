@@ -6,8 +6,12 @@
  *
  * POST body: { messages: [{ role, content }] }
  *
- * Auth: requires an authenticated Supabase session (any signed-in user → 401 otherwise).
- * Founder/rep gating is enforced on the frontend; this function only checks authentication.
+ * Auth: requires an authenticated Supabase session AND founder/rep status (profiles.is_founder
+ * or profiles.crm_role = 'rep'), checked server-side — not just the frontend UI gate. The system
+ * prompt (systemPrompt.ts) contains confidential internal sales data (commission structure,
+ * competitive talking points); any signed-in user reaching this endpoint directly could otherwise
+ * extract it via a prompt-injection message, since a frontend-only gate does nothing against a
+ * direct API call. Found and fixed via an independent security review.
  * The Anthropic key is a server-side secret — never exposed to the browser.
  */
 
@@ -45,6 +49,16 @@ Deno.serve(async (req: Request) => {
   });
   const { data: { user }, error: authErr } = await supabase.auth.getUser();
   if (authErr || !user) return json({ error: 'Not authenticated' }, 401);
+
+  // --- Authorization: founder or rep only. Same client (RLS'd as the caller) so a non-founder/
+  // rep can only ever read their own profile row — no information disclosure via this check. ---
+  const { data: profile, error: profileErr } = await supabase
+    .from('profiles')
+    .select('is_founder, crm_role')
+    .eq('id', user.id)
+    .maybeSingle();
+  const isFounderOrRep = Boolean(profile?.is_founder) || profile?.crm_role === 'rep';
+  if (profileErr || !isFounderOrRep) return json({ error: 'Not authorized' }, 403);
 
   // --- Body ---
   let body: { messages?: { role: string; content: string }[] };

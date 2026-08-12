@@ -81,6 +81,19 @@ Deno.serve(async (req: Request) => {
     .maybeSingle();
   if (intakeErr || !intakeRow || intakeRow.worker_id !== user.id) return json({ error: 'Intake not found' }, 404);
 
+  // Reject if this number already belongs to a different worker, instead of silently overwriting
+  // their row -- an upsert keyed only on phone_number would otherwise let any worker submit
+  // someone else's real number, resetting a verified link back to pending and sending that other
+  // person an unsolicited verification text. Found and fixed via an independent security review.
+  const { data: existingLink } = await supabase
+    .from('worker_sms_links')
+    .select('worker_id')
+    .eq('phone_number', phone)
+    .maybeSingle();
+  if (existingLink && existingLink.worker_id !== user.id) {
+    return json({ error: 'This number is already linked to a different one3seven account.' }, 409);
+  }
+
   const code = generateCode();
   const codeHash = await hashCode(code);
   const expiresAt = new Date(Date.now() + CODE_TTL_MINUTES * 60_000).toISOString();
