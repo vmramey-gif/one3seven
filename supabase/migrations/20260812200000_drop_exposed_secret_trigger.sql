@@ -1,0 +1,19 @@
+-- URGENT, standalone fix — do not bundle with unrelated work. Removes a live trigger whose
+-- arguments hardcode the project's real service_role key (full RLS-bypass access) and a
+-- separate webhook secret, in plaintext, directly in the database catalog. Found 2026-08-12
+-- while dumping table DDL for the staging-project baseline (see
+-- security_curriculum.md and one3seven-security-hardening-roadmap.md). Not previously
+-- catchable by any repo-level secrets scan (task #12, this session) because the secret was never
+-- in git — it lived only in live trigger metadata (pg_trigger/pg_get_triggerdef), readable to
+-- anyone with direct SQL access to the database, or to any SECURITY DEFINER function that
+-- happens to introspect triggers (a temporary diagnostic RPC built earlier tonight did exactly
+-- that, briefly, before being identified and dropped).
+--
+-- Effect: the "notify pilot lead on signup" webhook (calling the notify-pilot-lead edge
+-- function on every new profiles row) stops firing until reinstated. That is an accepted,
+-- temporary loss of a low-stakes internal notification, not a security-relevant regression --
+-- traded deliberately against leaving a full-access credential exposed in the catalog. Rebuild
+-- properly later: read the webhook secret from Supabase Vault (or have the edge function itself
+-- require no bearer credential and instead validate a rotated x-webhook-secret header only) —
+-- never as a literal argument to a trigger, which is queryable by design.
+drop trigger if exists public_profiles on public.profiles;

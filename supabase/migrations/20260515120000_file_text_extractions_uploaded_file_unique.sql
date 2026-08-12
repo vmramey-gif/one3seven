@@ -1,3 +1,17 @@
--- One row per uploaded_file for Phase 2A extractions (upsert target).
-create unique index if not exists file_text_extractions_uploaded_file_unique_idx
-  on public.file_text_extractions (uploaded_file_id);
+-- Originally: one row per uploaded_file for Phase 2A extractions (upsert target).
+--
+-- NO-OP as of 2026-08-12 -- do not restore the CREATE INDEX below. This migration is timestamped
+-- BEFORE 20260515140000_file_text_extractions.sql, which creates the table this index targets,
+-- but 20260515140000 ALSO already creates this exact index (identical name,
+-- file_text_extractions_uploaded_file_unique_idx, line 30 of that file) as part of the table's
+-- initial definition. Discovered 2026-08-12 the only way that's actually reliable: replaying
+-- every migration against a brand-new empty project (docs/one3seven-security-hardening-roadmap.md
+-- item #8's "recovery proof" gate) failed on this exact file with `relation
+-- "public.file_text_extractions" does not exist` -- proof this file was never actually
+-- replayable from empty, only ever run against prod after the table already existed some other
+-- way. Since 20260515140000 supersedes this file's effect entirely and already runs after it
+-- alphabetically, the correct fix is to no-op here, not to reorder or rename either file (prod's
+-- already-applied migration history is tracked by filename, not content -- renaming would desync
+-- it; this edit is content-only and changes nothing for prod, which already has both the table
+-- and the index).
+do $$ begin end $$;
