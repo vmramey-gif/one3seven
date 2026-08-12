@@ -11,6 +11,7 @@
     "test": "vitest run",
     "test:rls": "node scripts/rls-isolation-test.mjs",
     "test:rls-firm": "node scripts/rls-firm-isolation-test.mjs",
+    "lint:security-definer": "node scripts/check-security-definer-current-user.mjs",
     "state": "bash scripts/session-state.sh"
   },
   "dependencies": {
