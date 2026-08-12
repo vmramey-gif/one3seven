@@ -22,7 +22,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
       - run: npm ci
       - name: Run tests (includes copy guardrail)
@@ -39,9 +39,23 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
       - name: Check for SECURITY DEFINER + current_user pattern
         run: npm run lint:security-definer
+
+  # Static guard against a second real incident: a trigger with the project's actual service_role
+  # key hardcoded in plaintext, found 2026-08-12. Scans every migration for secret-shaped strings
+  # (JWTs, vendor key prefixes, long hex tokens). No database or secrets needed, runs on every PR.
+  # See scripts/check-hardcoded-secrets-in-migrations.mjs and security_curriculum.md finding #9.
+  lint-migration-secrets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check for hardcoded secrets in migration files
+        run: npm run lint:migration-secrets
 
   # Proves worker RLS isolation against a NON-PROD Supabase project. Self-skips (green) when the
   # secrets are absent, so it never blocks until you wire a staging project. To ENFORCE: add repo
@@ -53,7 +67,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
       - run: npm ci
       - name: RLS isolation harness (worker<->worker)
@@ -71,7 +85,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
       - run: npm ci
       - name: RLS isolation harness (worker<->firm, firm<->firm)
