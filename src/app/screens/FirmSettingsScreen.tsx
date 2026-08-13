@@ -516,7 +516,7 @@ export function FirmSettingsScreen({
                   >
                     {isPopular && (
                       <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-[#42574E] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow">
-                        Most popular
+                        Recommended
                       </div>
                     )}
                     {isCurrent && (
@@ -540,11 +540,13 @@ export function FirmSettingsScreen({
                         <span className="text-[#42574E]">✓</span>
                         {plan.intakesPerMonth
                           ? `~${plan.intakesPerMonth} intakes/mo · fair-use`
-                          : 'Unlimited-ish intakes · fair-use'}
+                          : plan.id === 'starter'
+                          ? 'Organize & prep — every record, one dated timeline'
+                          : 'Highest-volume tier · fair-use'}
                       </li>
                       <li className="flex items-center gap-1.5 text-xs text-[#1B2623]/65">
                         <span className="text-[#42574E]">✓</span>
-                        {plan.includesDamages ? 'Includes 8B wage-exposure (CA)' : 'Tier-1 Element Lens pack'}
+                        {plan.includesDamages ? 'Includes wage-exposure estimate (CA)' : 'Add wage-exposure by upgrading to Underwriting'}
                       </li>
                       <li className="flex items-center gap-1.5 text-xs text-[#1B2623]/65">
                         <span className="text-[#42574E]">✓</span>
@@ -556,6 +558,22 @@ export function FirmSettingsScreen({
                       <div className="rounded-xl bg-emerald-100 py-2.5 text-center text-xs font-semibold text-emerald-700">
                         Active
                       </div>
+                    ) : plan.id.startsWith('underwriting_') ? (
+                      // Underwriting tiers route to a founder conversation, not instant self-serve
+                      // checkout -- same reasoning as Enterprise's mailto below, one step down the
+                      // ladder. Checkout itself (createCheckoutSession/handleUpgrade) is unchanged and
+                      // still used -- the founder sends that link personally after the pilot call,
+                      // rather than it being a public one-click button on an unproven price.
+                      <a
+                        href={`mailto:info@one3seven.com?subject=${encodeURIComponent(`Pilot request — ${plan.label}`)}`}
+                        className={`flex items-center justify-center rounded-xl py-2.5 text-center text-xs font-semibold transition ${
+                          isPopular
+                            ? 'bg-[#42574E] text-white hover:bg-[#42574E]'
+                            : 'border border-[#E4E5DE] bg-white text-[#42574E] hover:bg-[#F2F4EC]'
+                        }`}
+                      >
+                        Request a pilot →
+                      </a>
                     ) : canUpgrade ? (
                       <button
                         type="button"
@@ -594,7 +612,7 @@ export function FirmSettingsScreen({
             </div>
 
             <p className="mt-4 text-center text-[11px] text-[#1B2623]/35">
-              All plans include a 7-day free trial · Cancel anytime · Billed monthly via Stripe
+              Starter: 7-day free trial, self-serve, billed via Stripe · Underwriting: guided pilot, terms set with your onboarding call
             </p>
           </motion.section>
 
