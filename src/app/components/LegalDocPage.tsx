@@ -3,10 +3,25 @@
  * Used by the /terms and /privacy routes. Matches the site's brand styling.
  */
 
+import { useEffect } from 'react';
 import { WordMark } from './WordMark';
 import type { LegalDoc } from '../constants/legalContent';
 
+// Lets other pages deep-link to a specific section, e.g. /privacy#7-text-messaging-sms-program
+// for the SMS opt-in disclosure referenced from SmsLinkCard.
+function slugifyHeading(heading: string): string {
+  return heading.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+}
+
 export function LegalDocPage({ doc }: { doc: LegalDoc }) {
+  // The browser's native hash-scroll fires before this content exists in the DOM (it's
+  // client-rendered, not static HTML), so a fresh /privacy#section load lands at the top
+  // instead of the section. Retry once mounted.
+  useEffect(() => {
+    if (!window.location.hash) return;
+    document.getElementById(window.location.hash.slice(1))?.scrollIntoView();
+  }, []);
+
   return (
     <div className="min-h-screen bg-[#F1F3EF] text-[#1B2623] antialiased">
       {/* Header */}
@@ -25,7 +40,7 @@ export function LegalDocPage({ doc }: { doc: LegalDoc }) {
 
         <div className="mt-10 space-y-9">
           {doc.sections.map((section) => (
-            <section key={section.heading}>
+            <section key={section.heading} id={slugifyHeading(section.heading)}>
               <h2 className="mb-3 text-[18px] font-bold tracking-tight text-[#1B2623]">{section.heading}</h2>
               <div className="space-y-3">
                 {section.blocks.map((block, i) => {
