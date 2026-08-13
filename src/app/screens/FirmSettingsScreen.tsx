@@ -97,7 +97,6 @@ export function FirmSettingsScreen({
   const [acceptingCases, setAcceptingCases] = useState(() => firmProfile?.accepting_cases ?? true);
   const [showSaveConfirmation, setShowSaveConfirmation] = useState(false);
   const [intakeLinkCopied, setIntakeLinkCopied] = useState(false);
-  const [pilotRequestCopiedFor, setPilotRequestCopiedFor] = useState<string | null>(null);
 
   useEffect(() => {
     if (firmProfile) {
@@ -557,45 +556,17 @@ export function FirmSettingsScreen({
                       <div className="rounded-xl bg-emerald-100 py-2.5 text-center text-xs font-semibold text-emerald-700">
                         Active
                       </div>
-                    ) : plan.id.startsWith('underwriting_') ? (
-                      // Underwriting tiers route to a founder conversation, not instant self-serve
-                      // checkout -- same reasoning as Enterprise's mailto below, one step down the
-                      // ladder. Checkout itself (createCheckoutSession/handleUpgrade) is unchanged and
-                      // still used -- the founder sends that link personally after the pilot call,
-                      // rather than it being a public one-click button on an unproven price.
-                      //
-                      // A bare mailto: <a> silently does nothing if the visitor's browser has no
-                      // default mail client registered -- no error, no feedback, the click just
-                      // appears dead (found live 2026-08-12). Still attempt mailto as a best-effort
-                      // (works fine for anyone who does have one), but always ALSO copy the address
-                      // to the clipboard and show a visible confirmation, so the click never
-                      // silently fails for a real prospect the way it just did in testing.
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const subject = `Pilot request — ${plan.label}`;
-                          window.location.href = `mailto:info@one3seven.com?subject=${encodeURIComponent(subject)}`;
-                          void navigator.clipboard
-                            .writeText(`info@one3seven.com (Subject: ${subject})`)
-                            .then(() => {
-                              setPilotRequestCopiedFor(plan.id);
-                              window.setTimeout(() => setPilotRequestCopiedFor((cur) => (cur === plan.id ? null : cur)), 3500);
-                            })
-                            .catch(() => {
-                              // Clipboard API can be denied (permissions, insecure context); the
-                              // mailto attempt above still fired either way, so this is a soft
-                              // failure -- no need to surface an error for a fallback confirmation.
-                            });
-                        }}
-                        className={`flex items-center justify-center rounded-xl py-2.5 text-center text-xs font-semibold transition ${
-                          isPopular
-                            ? 'bg-[#42574E] text-white hover:bg-[#42574E]'
-                            : 'border border-[#E4E5DE] bg-white text-[#42574E] hover:bg-[#F2F4EC]'
-                        }`}
-                      >
-                        {pilotRequestCopiedFor === plan.id ? 'Email copied — info@one3seven.com' : 'Request a pilot →'}
-                      </button>
                     ) : canUpgrade ? (
+                      // Every tier, including Underwriting, uses the same self-serve checkout --
+                      // reverted 2026-08-12 from a "Request a pilot" email-gate after founder
+                      // feedback: gating ALL inbound interest behind an email conflated two
+                      // different visitors -- a firm the founder is already courting (who
+                      // genuinely benefits from a conversation before a $1,500+/mo commitment)
+                      // vs. a self-motivated visitor who's already sold and just wants to pay
+                      // (for whom the email gate was pure friction). "Pilot" terms are now a
+                      // founder-side judgment call offered personally to firms she's already
+                      // talking to, off-page entirely -- not a public button. Nobody else needs
+                      // to be blocked from the real, working checkout to reach them.
                       <button
                         type="button"
                         onClick={() => void handleUpgrade(priceId!, plan.id)}
@@ -633,7 +604,7 @@ export function FirmSettingsScreen({
             </div>
 
             <p className="mt-4 text-center text-[11px] text-[#1B2623]/35">
-              Starter: 7-day free trial, self-serve, billed via Stripe · Underwriting: guided pilot, terms set with your onboarding call
+              All plans include a 7-day free trial · Cancel anytime · Billed monthly via Stripe
             </p>
           </motion.section>
 
