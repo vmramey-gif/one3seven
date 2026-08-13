@@ -540,8 +540,6 @@ export function FirmSettingsScreen({
                         <span className="text-[#42574E]">✓</span>
                         {plan.intakesPerMonth
                           ? `~${plan.intakesPerMonth} intakes/mo · fair-use`
-                          : plan.id === 'starter'
-                          ? 'Organize & prep — every record, one dated timeline'
                           : 'Highest-volume tier · fair-use'}
                       </li>
                       <li className="flex items-center gap-1.5 text-xs text-[#1B2623]/65">

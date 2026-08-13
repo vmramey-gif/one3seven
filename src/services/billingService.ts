@@ -108,7 +108,14 @@ export const FIRM_PLANS: FirmPlan[] = [
     label: 'Starter',
     monthlyPrice: 350,
     annualPrice: 3500,
-    intakesPerMonth: null,
+    // Placeholder cap, not yet grounded in real usage data (0 paying firms as of 2026-08-12) --
+    // sized to sit clearly below Underwriting Low's ~15/mo without choking a real small firm's
+    // actual screening volume (intakes received, not just cases signed -- those are very
+    // different numbers). Revisit once real Starter firms exist to look at actual distributions.
+    // Copy-only for now -- nothing enforces this number yet. Don't assume a hard block exists
+    // just because this field is set; see docs/one3seven-security-hardening-roadmap.md's
+    // discipline of not overclaiming what a change actually does.
+    intakesPerMonth: 10,
     includesDamages: false,
     highlight: false,
     monthlyPriceId: import.meta.env.VITE_STRIPE_PRICE_STARTER_MONTHLY ?? null,
