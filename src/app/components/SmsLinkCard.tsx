@@ -161,6 +161,14 @@ export function SmsLinkCard({ intakeId }: { intakeId: string | null }) {
               Send code
             </button>
           </div>
+          <p className="mt-2 max-w-[58ch] text-[11px] leading-relaxed text-[#6A6D66]">
+            By entering your number and tapping Send code, you agree to receive text messages
+            from one3seven about your document uploads. Message and data rates may apply. Reply
+            STOP to opt out, HELP for help. See our{' '}
+            <a href="/privacy#7-text-messaging-sms-program" className="text-[#42574E] underline-offset-2 hover:underline">
+              SMS terms
+            </a>.
+          </p>
         </>
       )}
 
