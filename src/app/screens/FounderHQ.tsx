@@ -11,7 +11,7 @@ import { useEffect, useState } from 'react';
 import { ArrowRight, Lock, ShieldCheck, Users, Plus, Check, Trash2 } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
 import { FounderCRMScreen } from './FounderCRMScreen';
-import { addRepInvite, listRepInvites, revokeRepInvite, claimRepAccess, type CrmInvite } from '../../services/crmService';
+import { addRepInvite, listRepInvites, revokeRepInvite, revokeCrmRepAccess, claimRepAccess, listCrmMembers, type CrmInvite, type CrmMember } from '../../services/crmService';
 
 type Status = 'loading' | 'anon' | 'rep' | 'founder' | 'not_authorized' | 'recovery';
 
@@ -225,12 +225,17 @@ export function FounderHQ() {
 // ── Founder-only: manage sales reps ──────────────────────────────────────────
 function RepsManager() {
   const [invites, setInvites] = useState<CrmInvite[]>([]);
+  const [members, setMembers] = useState<CrmMember[]>([]);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
 
-  const load = async () => { const r = await listRepInvites(); if (!r.error) setInvites(r.data); };
+  const load = async () => {
+    const [invitesRes, membersRes] = await Promise.all([listRepInvites(), listCrmMembers()]);
+    if (!invitesRes.error) setInvites(invitesRes.data);
+    if (!membersRes.error) setMembers(membersRes.data);
+  };
   useEffect(() => { void load(); }, []);
 
   const add = async (e: React.FormEvent) => {
@@ -242,7 +247,17 @@ function RepsManager() {
     setName(''); setEmail(''); void load();
   };
 
-  const revoke = async (id: string) => { await revokeRepInvite(id); void load(); };
+  // An 'accepted' invite already has a live profiles.crm_role grant -- clearing that requires the
+  // SECURITY DEFINER RPC, not a plain crm_invites update. A never-claimed 'invited' row has no
+  // grant to clear yet, so revoking just the invite is already complete for that case.
+  const revoke = async (i: CrmInvite) => {
+    const match = i.status === 'accepted'
+      ? members.find((m) => (m.email || '').toLowerCase() === i.email.toLowerCase())
+      : null;
+    if (match) await revokeCrmRepAccess(match.id);
+    else await revokeRepInvite(i.id);
+    void load();
+  };
   const hqLink = typeof window !== 'undefined' ? `${window.location.origin}/hq` : '/hq';
 
   return (
@@ -274,7 +289,7 @@ function RepsManager() {
                   {i.status === 'accepted' ? <Check className="inline h-3 w-3" /> : null} {i.status}
                 </span>
                 {i.status !== 'revoked' && (
-                  <button type="button" onClick={() => revoke(i.id)} className="flex h-8 w-8 items-center justify-center rounded-full text-white/40 hover:bg-white/10 hover:text-red-300" aria-label="Revoke">
+                  <button type="button" onClick={() => void revoke(i)} className="flex h-8 w-8 items-center justify-center rounded-full text-white/40 hover:bg-white/10 hover:text-red-300" aria-label="Revoke">
                     <Trash2 className="h-3.5 w-3.5" />
                   </button>
                 )}

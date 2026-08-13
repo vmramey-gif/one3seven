@@ -198,6 +198,19 @@ export async function revokeRepInvite(id: string): Promise<{ error?: string }> {
   return {};
 }
 
+/**
+ * Actually cuts off an already-provisioned rep -- clears profiles.crm_role AND the matching
+ * crm_invites row, in one call. revokeRepInvite() alone only stops a NOT-yet-claimed invite from
+ * ever being claimed; it can't touch crm_role once granted (that column is locked down against
+ * direct client updates, on purpose, since 20260727120000). This calls a SECURITY DEFINER RPC
+ * that verifies the caller is founder server-side before doing either update.
+ */
+export async function revokeCrmRepAccess(targetUserId: string): Promise<{ error?: string }> {
+  const { error } = await supabase.rpc('revoke_crm_rep_access', { target_user_id: targetUserId });
+  if (error) return { error: error.message };
+  return {};
+}
+
 // ── Team chat (founder + reps share one channel) ─────────────────────────────
 
 export interface CrmMessage {
