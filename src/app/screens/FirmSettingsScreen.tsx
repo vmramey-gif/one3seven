@@ -97,6 +97,7 @@ export function FirmSettingsScreen({
   const [acceptingCases, setAcceptingCases] = useState(() => firmProfile?.accepting_cases ?? true);
   const [showSaveConfirmation, setShowSaveConfirmation] = useState(false);
   const [intakeLinkCopied, setIntakeLinkCopied] = useState(false);
+  const [pilotRequestCopiedFor, setPilotRequestCopiedFor] = useState<string | null>(null);
 
   useEffect(() => {
     if (firmProfile) {
@@ -562,16 +563,38 @@ export function FirmSettingsScreen({
                       // ladder. Checkout itself (createCheckoutSession/handleUpgrade) is unchanged and
                       // still used -- the founder sends that link personally after the pilot call,
                       // rather than it being a public one-click button on an unproven price.
-                      <a
-                        href={`mailto:info@one3seven.com?subject=${encodeURIComponent(`Pilot request — ${plan.label}`)}`}
+                      //
+                      // A bare mailto: <a> silently does nothing if the visitor's browser has no
+                      // default mail client registered -- no error, no feedback, the click just
+                      // appears dead (found live 2026-08-12). Still attempt mailto as a best-effort
+                      // (works fine for anyone who does have one), but always ALSO copy the address
+                      // to the clipboard and show a visible confirmation, so the click never
+                      // silently fails for a real prospect the way it just did in testing.
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const subject = `Pilot request — ${plan.label}`;
+                          window.location.href = `mailto:info@one3seven.com?subject=${encodeURIComponent(subject)}`;
+                          void navigator.clipboard
+                            .writeText(`info@one3seven.com (Subject: ${subject})`)
+                            .then(() => {
+                              setPilotRequestCopiedFor(plan.id);
+                              window.setTimeout(() => setPilotRequestCopiedFor((cur) => (cur === plan.id ? null : cur)), 3500);
+                            })
+                            .catch(() => {
+                              // Clipboard API can be denied (permissions, insecure context); the
+                              // mailto attempt above still fired either way, so this is a soft
+                              // failure -- no need to surface an error for a fallback confirmation.
+                            });
+                        }}
                         className={`flex items-center justify-center rounded-xl py-2.5 text-center text-xs font-semibold transition ${
                           isPopular
                             ? 'bg-[#42574E] text-white hover:bg-[#42574E]'
                             : 'border border-[#E4E5DE] bg-white text-[#42574E] hover:bg-[#F2F4EC]'
                         }`}
                       >
-                        Request a pilot →
-                      </a>
+                        {pilotRequestCopiedFor === plan.id ? 'Email copied — info@one3seven.com' : 'Request a pilot →'}
+                      </button>
                     ) : canUpgrade ? (
                       <button
                         type="button"
