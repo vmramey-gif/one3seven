@@ -126,50 +126,60 @@ const SITE_LINK_GROUPS: { group: string; items: { path: string; label: string; d
 // The Company Economics tab is restricted to these specific accounts only.
 const ECON_ALLOWED_EMAILS = ['vmramey@gmail.com', 'tadmor86@gmail.com'];
 
-// `founderOnly` tabs are hidden from sales reps. `econOnly` tabs show only for ECON_ALLOWED_EMAILS.
-const TABS: { id: Tab; label: string; icon: typeof LayoutGrid; founderOnly?: boolean; econOnly?: boolean }[] = [
-  { id: 'dashboard', label: 'Dashboard', icon: LayoutGrid },
-  { id: 'pipeline', label: 'Pipeline', icon: TrendingUp, founderOnly: true },
-  { id: 'firms', label: 'Firms', icon: Building2 },
-  { id: 'email_fu', label: 'Victoria email f/u', icon: Mail, founderOnly: true },
-  { id: 'outreach', label: 'Send emails', icon: Send, founderOnly: true },
-  { id: 'callqueue', label: 'Call queue', icon: Phone },
-  { id: 'linkedin', label: 'LinkedIn queue', icon: Linkedin },
-  { id: 'activity', label: 'Activity', icon: ClipboardList, founderOnly: true },
-  { id: 'metrics', label: 'Metrics', icon: BarChart3, founderOnly: true },
-  { id: 'team', label: 'Team chat', icon: MessageSquare },
-  { id: 'inbox', label: 'Inbox', icon: Mail },
-  { id: 'notes', label: 'Notes', icon: StickyNote },
-  { id: 'scripts', label: 'Scripts', icon: BookOpen },
-  { id: 'training', label: 'Training', icon: GraduationCap },
-  { id: 'comp', label: 'Earnings', icon: Trophy },
-  { id: 'accounts', label: 'Accounts', icon: CreditCard },
-  { id: 'support', label: 'Support', icon: LifeBuoy },
-  { id: 'zipfinder', label: 'Zip finder', icon: MapPin },
-  { id: 'firmmap', label: 'Map', icon: Globe },
-  { id: 'people', label: 'People & HR', icon: Users, founderOnly: true },
-  { id: 'economics', label: 'Company Economics', icon: Calculator, econOnly: true },
-  { id: 'growth', label: 'Growth', icon: Globe, econOnly: true },
-  { id: 'links', label: 'Links', icon: Link2, founderOnly: true },
-  { id: 'askai', label: 'Ask one3seven AI', icon: Sparkles },
-  { id: 'checklist', label: 'Checklist', icon: ListChecks, founderOnly: true },
-  { id: 'audit', label: 'Audit', icon: ShieldCheck, founderOnly: true },
-  { id: 'revenue', label: 'Revenue', icon: DollarSign, founderOnly: true },
-  { id: 'add', label: 'Add / Log', icon: Plus },
+// Top-level nav pills, and (company-only) the sub-headers inside the admin pill.
+type NavGroupId = 'sell' | 'me' | 'learn' | 'team' | 'company';
+type CompanySection = 'money' | 'ops' | 'people' | 'tools';
+
+const NAV_GROUP_META: { id: NavGroupId; label: string; icon: typeof LayoutGrid }[] = [
+  { id: 'sell', label: 'Sell', icon: TrendingUp },
+  { id: 'me', label: 'My numbers', icon: Trophy },
+  { id: 'learn', label: 'Learn', icon: BookOpen },
+  { id: 'team', label: 'Team', icon: MessageSquare },
+  { id: 'company', label: 'Company', icon: ShieldCheck },
+];
+const COMPANY_SECTION_META: { id: CompanySection; label: string }[] = [
+  { id: 'money', label: 'Money' },
+  { id: 'ops', label: 'Ops & compliance' },
+  { id: 'people', label: 'People' },
+  { id: 'tools', label: 'Tools' },
 ];
 
-// Tab lookup + categorized navigation. Reps live in "Sell" + "Me" + "Learn"; founder-only
-// and economics tabs collapse into "Founder". Groups render as dropdowns so the nav never
-// sprawls sideways — it wraps and stays one or two rows on a phone.
-const TAB_BY_ID: Record<Tab, { id: Tab; label: string; icon: typeof LayoutGrid; founderOnly?: boolean; econOnly?: boolean }> =
-  Object.fromEntries(TABS.map((t) => [t.id, t])) as Record<Tab, (typeof TABS)[number]>;
-
-const NAV_GROUPS: { id: string; label: string; icon: typeof LayoutGrid; tabIds: Tab[] }[] = [
-  { id: 'sell', label: 'Sell', icon: TrendingUp, tabIds: ['dashboard', 'firms', 'outreach', 'callqueue', 'linkedin', 'email_fu', 'pipeline', 'add', 'activity'] },
-  { id: 'me', label: 'My numbers', icon: Trophy, tabIds: ['comp', 'metrics'] },
-  { id: 'learn', label: 'Learn', icon: BookOpen, tabIds: ['scripts', 'training', 'askai'] },
-  { id: 'team', label: 'Team', icon: MessageSquare, tabIds: ['inbox', 'team', 'notes'] },
-  { id: 'founder', label: 'Founder', icon: ShieldCheck, tabIds: ['revenue', 'economics', 'growth', 'checklist', 'audit', 'links'] },
+// `founderOnly` tabs are hidden from sales reps. `econOnly` tabs show only for ECON_ALLOWED_EMAILS.
+// `group` is REQUIRED on every entry — the old design kept a separate NAV_GROUPS.tabIds list a
+// tab also had to be added to, and 5 tabs (People & HR, Accounts, Support, Zip finder, Map)
+// quietly fell out of sync with it: they rendered fine but had no menu path to reach them,
+// unreachable by founder or rep alike. Putting `group` directly on the tab makes that class of
+// bug a compile error instead of a silent gap. `companySection` only matters when group is
+// 'company' — it's what turns that one pill from a flat list into Money/Ops/People/Tools.
+const TABS: { id: Tab; label: string; icon: typeof LayoutGrid; group: NavGroupId; companySection?: CompanySection; founderOnly?: boolean; econOnly?: boolean }[] = [
+  { id: 'dashboard', label: 'Dashboard', icon: LayoutGrid, group: 'sell' },
+  { id: 'pipeline', label: 'Pipeline', icon: TrendingUp, group: 'sell', founderOnly: true },
+  { id: 'firms', label: 'Firms', icon: Building2, group: 'sell' },
+  { id: 'email_fu', label: 'Victoria email f/u', icon: Mail, group: 'sell', founderOnly: true },
+  { id: 'outreach', label: 'Send emails', icon: Send, group: 'sell', founderOnly: true },
+  { id: 'callqueue', label: 'Call queue', icon: Phone, group: 'sell' },
+  { id: 'linkedin', label: 'LinkedIn queue', icon: Linkedin, group: 'sell' },
+  { id: 'zipfinder', label: 'Zip finder', icon: MapPin, group: 'sell' },
+  { id: 'firmmap', label: 'Map', icon: Globe, group: 'sell' },
+  { id: 'activity', label: 'Activity', icon: ClipboardList, group: 'sell', founderOnly: true },
+  { id: 'add', label: 'Add / Log', icon: Plus, group: 'sell' },
+  { id: 'comp', label: 'Earnings', icon: Trophy, group: 'me' },
+  { id: 'metrics', label: 'Metrics', icon: BarChart3, group: 'me', founderOnly: true },
+  { id: 'scripts', label: 'Scripts', icon: BookOpen, group: 'learn' },
+  { id: 'training', label: 'Training', icon: GraduationCap, group: 'learn' },
+  { id: 'askai', label: 'Ask one3seven AI', icon: Sparkles, group: 'learn' },
+  { id: 'team', label: 'Team chat', icon: MessageSquare, group: 'team' },
+  { id: 'inbox', label: 'Inbox', icon: Mail, group: 'team' },
+  { id: 'notes', label: 'Notes', icon: StickyNote, group: 'team' },
+  { id: 'revenue', label: 'Revenue', icon: DollarSign, group: 'company', companySection: 'money', founderOnly: true },
+  { id: 'economics', label: 'Company Economics', icon: Calculator, group: 'company', companySection: 'money', econOnly: true },
+  { id: 'growth', label: 'Growth', icon: Globe, group: 'company', companySection: 'money', econOnly: true },
+  { id: 'checklist', label: 'Checklist', icon: ListChecks, group: 'company', companySection: 'ops', founderOnly: true },
+  { id: 'audit', label: 'Audit', icon: ShieldCheck, group: 'company', companySection: 'ops', founderOnly: true },
+  { id: 'links', label: 'Links', icon: Link2, group: 'company', companySection: 'ops', founderOnly: true },
+  { id: 'people', label: 'People & HR', icon: Users, group: 'company', companySection: 'people', founderOnly: true },
+  { id: 'accounts', label: 'Accounts', icon: CreditCard, group: 'company', companySection: 'tools', founderOnly: true },
+  { id: 'support', label: 'Support', icon: LifeBuoy, group: 'company', companySection: 'tools', founderOnly: true },
 ];
 
 type ClaimBundle = {
@@ -530,10 +540,8 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
         {/* Categorized dropdown nav — wraps, never scrolls sideways. */}
         <div className="relative mx-auto max-w-3xl px-3 pb-2">
           <div className="flex flex-wrap gap-1.5">
-            {NAV_GROUPS.map((group) => {
-              const items = group.tabIds
-                .map((id) => TAB_BY_ID[id])
-                .filter((t) => t && (!t.founderOnly || isFounder) && (!t.econOnly || showEconomics));
+            {NAV_GROUP_META.map((group) => {
+              const items = TABS.filter((t) => t.group === group.id && (!t.founderOnly || isFounder) && (!t.econOnly || showEconomics));
               if (items.length === 0) return null;
               const activeHere = items.some((t) => t.id === tab);
               const open = openGroup === group.id;
@@ -553,27 +561,49 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
                     )}
                   </button>
                   {open && (
-                    <div className="absolute left-0 z-40 mt-1 min-w-[190px] rounded-[12px] border border-[#D3DED6] bg-white p-1 shadow-[0_12px_30px_rgba(66,87,78,0.18)]">
-                      {items.map((t) => (
-                        <button
-                          key={t.id}
-                          type="button"
-                          onClick={() => { setTab(t.id); setOpenGroup(null); }}
-                          className={`flex ${tap} w-full items-center gap-2 rounded-[8px] px-3 text-left text-[13px] font-medium transition ${tab === t.id ? 'bg-[#F2F4EC] text-[#42574E]' : 'text-[#1B2623]/70 hover:bg-[#E7EDE8]'}`}
-                        >
-                          <t.icon className="h-3.5 w-3.5 shrink-0" /> {t.label}
-                          {t.id === 'team' && unreadTeam && (
-                            <span className="ml-auto inline-flex items-center gap-1 text-[10px] font-bold text-red-600">
-                              <span className="h-2 w-2 rounded-full bg-red-500" /> New
-                            </span>
-                          )}
-                          {t.id === 'inbox' && unreadDm > 0 && (
-                            <span className="ml-auto inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
-                              {unreadDm}
-                            </span>
-                          )}
-                        </button>
-                      ))}
+                    <div className="absolute left-0 z-40 mt-1 min-w-[210px] max-h-[70vh] overflow-y-auto rounded-[12px] border border-[#D3DED6] bg-white p-1 shadow-[0_12px_30px_rgba(66,87,78,0.18)]">
+                      {group.id === 'company' ? (
+                        COMPANY_SECTION_META.map((section) => {
+                          const sectionItems = items.filter((t) => t.companySection === section.id);
+                          if (sectionItems.length === 0) return null;
+                          return (
+                            <div key={section.id} className="mb-1 last:mb-0">
+                              <div className="px-3 pb-1 pt-2 text-[10px] font-bold uppercase tracking-wide text-[#1B2623]/40">{section.label}</div>
+                              {sectionItems.map((t) => (
+                                <button
+                                  key={t.id}
+                                  type="button"
+                                  onClick={() => { setTab(t.id); setOpenGroup(null); }}
+                                  className={`flex ${tap} w-full items-center gap-2 rounded-[8px] px-3 text-left text-[13px] font-medium transition ${tab === t.id ? 'bg-[#F2F4EC] text-[#42574E]' : 'text-[#1B2623]/70 hover:bg-[#E7EDE8]'}`}
+                                >
+                                  <t.icon className="h-3.5 w-3.5 shrink-0" /> {t.label}
+                                </button>
+                              ))}
+                            </div>
+                          );
+                        })
+                      ) : (
+                        items.map((t) => (
+                          <button
+                            key={t.id}
+                            type="button"
+                            onClick={() => { setTab(t.id); setOpenGroup(null); }}
+                            className={`flex ${tap} w-full items-center gap-2 rounded-[8px] px-3 text-left text-[13px] font-medium transition ${tab === t.id ? 'bg-[#F2F4EC] text-[#42574E]' : 'text-[#1B2623]/70 hover:bg-[#E7EDE8]'}`}
+                          >
+                            <t.icon className="h-3.5 w-3.5 shrink-0" /> {t.label}
+                            {t.id === 'team' && unreadTeam && (
+                              <span className="ml-auto inline-flex items-center gap-1 text-[10px] font-bold text-red-600">
+                                <span className="h-2 w-2 rounded-full bg-red-500" /> New
+                              </span>
+                            )}
+                            {t.id === 'inbox' && unreadDm > 0 && (
+                              <span className="ml-auto inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
+                                {unreadDm}
+                              </span>
+                            )}
+                          </button>
+                        ))
+                      )}
                     </div>
                   )}
                 </div>
@@ -1005,12 +1035,10 @@ function FirmCard({ firm, onLog, today, onQuickEmail, onQuickLog, userId, onClai
 function SuitesHome({ greeting, isFounder, showEconomics, activeTab, onPick }: {
   greeting: string; isFounder: boolean; showEconomics: boolean; activeTab: Tab; onPick: (t: Tab) => void;
 }) {
-  const groups = NAV_GROUPS
+  const groups = NAV_GROUP_META
     .map((g) => ({
       ...g,
-      items: g.tabIds
-        .map((id) => TAB_BY_ID[id])
-        .filter((t) => t && (!t.founderOnly || isFounder) && (!t.econOnly || showEconomics)),
+      items: TABS.filter((t) => t.group === g.id && (!t.founderOnly || isFounder) && (!t.econOnly || showEconomics)),
     }))
     .filter((g) => g.items.length > 0);
 
@@ -1027,18 +1055,44 @@ function SuitesHome({ greeting, isFounder, showEconomics, activeTab, onPick }: {
               <span className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-[#F2F4EC] text-[#42574E]"><g.icon className="h-4 w-4" /></span>
               <span className="text-[14px] font-bold text-[#1B2623]">{g.label}</span>
             </div>
-            <div className="flex flex-wrap gap-1.5">
-              {g.items.map((t) => (
-                <button
-                  key={t.id}
-                  type="button"
-                  onClick={() => onPick(t.id)}
-                  className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[12px] font-semibold transition ${activeTab === t.id ? 'bg-[#42574E] text-white' : 'bg-[#E7EDE8] text-[#1B2623]/70 hover:bg-[#F2F4EC]'}`}
-                >
-                  <t.icon className="h-3.5 w-3.5" /> {t.label}
-                </button>
-              ))}
-            </div>
+            {g.id === 'company' ? (
+              <div className="space-y-2.5">
+                {COMPANY_SECTION_META.map((section) => {
+                  const sectionItems = g.items.filter((t) => t.companySection === section.id);
+                  if (sectionItems.length === 0) return null;
+                  return (
+                    <div key={section.id}>
+                      <div className="mb-1 text-[10px] font-bold uppercase tracking-wide text-[#1B2623]/40">{section.label}</div>
+                      <div className="flex flex-wrap gap-1.5">
+                        {sectionItems.map((t) => (
+                          <button
+                            key={t.id}
+                            type="button"
+                            onClick={() => onPick(t.id)}
+                            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[12px] font-semibold transition ${activeTab === t.id ? 'bg-[#42574E] text-white' : 'bg-[#E7EDE8] text-[#1B2623]/70 hover:bg-[#F2F4EC]'}`}
+                          >
+                            <t.icon className="h-3.5 w-3.5" /> {t.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="flex flex-wrap gap-1.5">
+                {g.items.map((t) => (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onClick={() => onPick(t.id)}
+                    className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[12px] font-semibold transition ${activeTab === t.id ? 'bg-[#42574E] text-white' : 'bg-[#E7EDE8] text-[#1B2623]/70 hover:bg-[#F2F4EC]'}`}
+                  >
+                    <t.icon className="h-3.5 w-3.5" /> {t.label}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         ))}
       </div>
