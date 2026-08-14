@@ -5,7 +5,7 @@
  * the database. Never shown to workers or firms.
  */
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import {
   Phone, Mail, Calendar, ArrowLeft, Plus, X, TrendingUp,
@@ -529,9 +529,12 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
           </div>
           <span className="rounded-full border border-white/12 bg-white/6 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white/65">{roleLabel}</span>
         </div>
-        {/* Categorized dropdown nav — wraps, never scrolls sideways. */}
+        {/* Categorized dropdown nav — wraps, never scrolls sideways. Company sits apart from the
+            rest, pushed right behind a divider: it's not a fourth sales category, it's a
+            different job entirely (running the company vs. selling) that happens to share this
+            login. See [[project_founder_hq_crm]]'s 2026-08-14 hard-challenge note. */}
         <div className="relative mx-auto max-w-3xl px-3 pb-2">
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap items-center gap-1.5">
             {NAV_GROUP_META.map((group) => {
               const items = TABS.filter((t) => t.group === group.id && (!t.founderOnly || isFounder) && (!t.econOnly || showEconomics));
               if (items.length === 0) return null;
@@ -539,7 +542,7 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
               const open = openGroup === group.id;
               const activeItem = items.find((t) => t.id === tab);
               return (
-                <div key={group.id} className="relative">
+                <div key={group.id} className={`relative ${group.id === 'company' ? 'ml-auto flex items-center gap-1.5 border-l border-white/12 pl-2.5' : ''}`}>
                   <button
                     type="button"
                     onClick={() => setOpenGroup(open ? null : group.id)}
@@ -1039,7 +1042,14 @@ function SuitesHome({ greeting, isFounder, showEconomics, activeTab, onPick }: {
       <p className="mt-1 text-[13px] text-white/45">Your sales suite — jump back in.</p>
       <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
         {groups.map((g) => (
-          <div key={g.id} style={bevel(18)} className="border border-white/14 bg-white/[0.06] p-4 backdrop-blur-xl shadow-[0_20px_40px_rgba(0,0,0,0.3)]">
+          <Fragment key={g.id}>
+            {g.id === 'company' && (
+              <div className="col-span-full mt-2 flex items-center gap-3">
+                <span className="text-[10px] font-bold uppercase tracking-wide text-white/30">Founder ops — separate from the sales workspace above</span>
+                <span className="h-px flex-1 bg-white/10" />
+              </div>
+            )}
+            <div style={bevel(18)} className="border border-white/14 bg-white/[0.06] p-4 backdrop-blur-xl shadow-[0_20px_40px_rgba(0,0,0,0.3)]">
             <div className="mb-3 flex items-center gap-2">
               <span style={bevel(6)} className="flex h-8 w-8 items-center justify-center border border-white/12 bg-white/8 text-[#A6E8C2]"><g.icon className="h-4 w-4" /></span>
               <span className="text-[14px] font-bold text-white">{g.label}</span>
@@ -1084,7 +1094,8 @@ function SuitesHome({ greeting, isFounder, showEconomics, activeTab, onPick }: {
                 ))}
               </div>
             )}
-          </div>
+            </div>
+          </Fragment>
         ))}
       </div>
     </div>
