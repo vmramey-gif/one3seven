@@ -43,7 +43,7 @@ import { AUDIT_SITE_CHECKS, AUDIT_MANUAL_GROUPS } from '../constants/crmAudit';
 import { crmFirmIntel } from '../constants/crmFirmIntel';
 import { STARTER_QUESTIONS, askAssistant, type ChatMessage } from '../../services/chatAssistant';
 
-type Tab = 'dashboard' | 'pipeline' | 'firms' | 'activity' | 'metrics' | 'revenue' | 'comp' | 'economics' | 'growth' | 'team' | 'inbox' | 'notes' | 'scripts' | 'training' | 'askai' | 'checklist' | 'audit' | 'links' | 'email_fu' | 'outreach' | 'callqueue' | 'linkedin' | 'people' | 'accounts' | 'support' | 'zipfinder' | 'firmmap' | 'add';
+type Tab = 'dashboard' | 'pipeline' | 'firms' | 'activity' | 'metrics' | 'revenue' | 'comp' | 'economics' | 'growth' | 'inbox' | 'notes' | 'scripts' | 'training' | 'askai' | 'checklist' | 'audit' | 'links' | 'email_fu' | 'outreach' | 'callqueue' | 'linkedin' | 'people' | 'accounts' | 'support' | 'zipfinder' | 'firmmap' | 'add';
 
 // Pre-filled outreach email. Opens the founder's default mail app (Outlook) composing
 // FROM victoria@ — so it lands in Sent and replies thread back — with the firm's own
@@ -169,7 +169,6 @@ const TABS: { id: Tab; label: string; icon: typeof LayoutGrid; group: NavGroupId
   { id: 'scripts', label: 'Scripts', icon: BookOpen, group: 'learn' },
   { id: 'training', label: 'Training', icon: GraduationCap, group: 'learn' },
   { id: 'askai', label: 'Ask one3seven AI', icon: Sparkles, group: 'learn' },
-  { id: 'team', label: 'Team chat', icon: MessageSquare, group: 'team' },
   { id: 'inbox', label: 'Inbox', icon: Mail, group: 'team' },
   { id: 'notes', label: 'Notes', icon: StickyNote, group: 'team' },
   { id: 'revenue', label: 'Revenue', icon: DollarSign, group: 'company', companySection: 'money', founderOnly: true },
@@ -295,13 +294,6 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
   });
   const setTab = (t: Tab) => { try { localStorage.setItem('crm_tab', t); } catch { /* ignore */ } setTabState(t); };
   const [openGroup, setOpenGroup] = useState<string | null>(null);
-  // Team-chat unread indicator: compare the latest message time to the last one this
-  // member has seen (persisted), so the Team button lights up on new posts.
-  const [latestMsgAt, setLatestMsgAt] = useState<string | null>(null);
-  const [seenTeamAt, setSeenTeamAt] = useState<string>(() =>
-    (typeof window !== 'undefined' && window.localStorage.getItem('o3s_crm_team_seen')) || ''
-  );
-  const unreadTeam = !!latestMsgAt && latestMsgAt > seenTeamAt && tab !== 'team';
   const [unreadDm, setUnreadDm] = useState(0);
   const [realtimeLive, setRealtimeLive] = useState(false);
   const [memberName, setMemberName] = useState('');
@@ -348,30 +340,20 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
   // Live firms: when any rep claims/releases/advances a firm, refresh so pools stay
   // in sync across the team (debounced to avoid thrash). This is what makes claiming
   // feel live — a claimed firm vanishes from everyone else's Open list within ~1s.
+  // Also drives the header's Live/Polling pill — team chat used to own that status
+  // (removed 2026-08-14, not needed right now), and this subscription is the one that
+  // actually still matters for real-time sync, so the indicator now reflects it instead.
   useEffect(() => {
     let active = true;
     let t: number | undefined;
-    const unsub = subscribeCrmFirms(() => {
-      if (t) window.clearTimeout(t);
-      t = window.setTimeout(() => { if (active) void load(); }, 1200);
-    });
-    return () => { active = false; if (t) window.clearTimeout(t); unsub(); };
-  }, []);
-
-  // Team chat: real-time push the instant a message lands (poll is a slow fallback only).
-  useEffect(() => {
-    let active = true;
-    const check = async () => {
-      const at = await getLatestMessageAt();
-      if (active) setLatestMsgAt(at);
-    };
-    void check();
-    const unsub = subscribeTeamMessages(
-      (m) => setLatestMsgAt((prev) => (!prev || m.created_at > prev ? m.created_at : prev)),
+    const unsub = subscribeCrmFirms(
+      () => {
+        if (t) window.clearTimeout(t);
+        t = window.setTimeout(() => { if (active) void load(); }, 1200);
+      },
       (status) => setRealtimeLive(status === 'SUBSCRIBED'),
     );
-    const h = window.setInterval(check, 60000);
-    return () => { active = false; unsub(); window.clearInterval(h); };
+    return () => { active = false; if (t) window.clearTimeout(t); unsub(); };
   }, []);
 
   // Inbox: real-time unread count for direct messages addressed to me.
@@ -383,14 +365,6 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
     const iv = window.setInterval(refreshDm, 60000);
     return () => { active = false; unsub(); window.clearInterval(iv); };
   }, []);
-
-  // Opening Team marks everything up to the latest message as seen.
-  useEffect(() => {
-    if (tab === 'team' && latestMsgAt) {
-      setSeenTeamAt(latestMsgAt);
-      if (typeof window !== 'undefined') window.localStorage.setItem('o3s_crm_team_seen', latestMsgAt);
-    }
-  }, [tab, latestMsgAt]);
 
   const firmsById = useMemo(() => Object.fromEntries(firms.map((f) => [f.id, f])), [firms]);
   const today = todayISO();
@@ -575,7 +549,7 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
                     <group.icon className="h-3.5 w-3.5" />
                     {activeHere && activeItem ? activeItem.label : group.label}
                     <ChevronDown className={`h-3.5 w-3.5 transition-transform ${open ? 'rotate-180' : ''}`} />
-                    {group.id === 'team' && (unreadTeam || unreadDm > 0) && (
+                    {group.id === 'team' && unreadDm > 0 && (
                       <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 animate-pulse rounded-full bg-red-500 ring-2 ring-[#0A0C10]" />
                     )}
                   </button>
@@ -612,11 +586,6 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
                             className={`flex ${tap} w-full items-center gap-2 px-3 text-left text-[13px] font-medium transition ${tab === t.id ? 'bg-[#E08A52]/18 text-[#F0B486]' : 'text-white/65 hover:bg-white/8'}`}
                           >
                             <t.icon className="h-3.5 w-3.5 shrink-0" /> {t.label}
-                            {t.id === 'team' && unreadTeam && (
-                              <span className="ml-auto inline-flex items-center gap-1 text-[10px] font-bold text-red-400">
-                                <span className="h-2 w-2 rounded-full bg-red-500" /> New
-                              </span>
-                            )}
                             {t.id === 'inbox' && unreadDm > 0 && (
                               <span className="ml-auto inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
                                 {unreadDm}
@@ -663,7 +632,6 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
             {tab === 'linkedin' && <LinkedInQueueTab firms={firms} />}
             {tab === 'activity' && isFounder && <ActivityTab activity={activity} onOpenFirm={openFirmByName} />}
             {tab === 'metrics' && isFounder && <MetricsTab firms={firms} activity={activity} />}
-            {tab === 'team' && <TeamTab />}
             {tab === 'inbox' && <InboxTab onReadChange={async () => setUnreadDm(await getUnreadDmCount())} />}
             {tab === 'notes' && <NotesTab isFounder={isFounder} />}
             {tab === 'scripts' && <ScriptsTab />}
