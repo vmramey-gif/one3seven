@@ -633,7 +633,7 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
             {tab === 'dashboard' && (
               <SuitesHome greeting={crmGreeting(memberName)} isFounder={isFounder} showEconomics={showEconomics} activeTab={tab} onPick={setTab} />
             )}
-            {tab === 'dashboard' && <DashboardTab firms={firms} activity={activity} today={today} onLog={openFast} workerCount={workerCount} onChanged={load} onQuickEmail={quickEmail} onQuickLog={quickLog} onFounderEmailDone={founderEmailDone} claim={claim} isFounder={isFounder} onOpenFirm={openFirmByName} />}
+            {tab === 'dashboard' && <DashboardTab firms={firms} activity={activity} today={today} onLog={openFast} workerCount={workerCount} onChanged={load} onQuickEmail={quickEmail} onQuickLog={quickLog} onFounderEmailDone={founderEmailDone} claim={claim} isFounder={isFounder} onOpenFirm={openFirmByName} onOpenCallQueue={() => setTab('callqueue')} />}
             {tab === 'pipeline' && isFounder && <PipelineTab firms={firms} onLog={openFast} workerCount={workerCount} onQuickEmail={quickEmail} onQuickLog={quickLog} claim={claim} />}
             {tab === 'firms' && <FirmsTab firms={firms} onLog={openFast} userId={userId} onNoContact={(id) => quickLog(id, 'no_contact')} onNotInterested={markNotInterested} claim={claim} />}
             {tab === 'email_fu' && isFounder && <FounderEmailQueueTab firms={firms} onFounderEmailDone={founderEmailDone} onLog={openFast} />}
@@ -1150,7 +1150,7 @@ function RepScoreboard({ firms, activity, members, today }: { firms: CrmFirm[]; 
   );
 }
 
-function DashboardTab({ firms, activity, today, onLog, workerCount, onChanged, onQuickEmail, onQuickLog, onFounderEmailDone, claim, isFounder, onOpenFirm }: { firms: CrmFirm[]; activity: CrmActivityWithFirm[]; today: string; onLog: (id: string) => void; workerCount: number; onChanged: () => void; onQuickEmail?: (id: string) => Promise<void>; onQuickLog?: QuickLogFn; onFounderEmailDone?: (id: string) => Promise<void>; claim?: ClaimBundle; isFounder: boolean; onOpenFirm?: (name: string | null) => void }) {
+function DashboardTab({ firms, activity, today, onLog, workerCount, onChanged, onQuickEmail, onQuickLog, onFounderEmailDone, claim, isFounder, onOpenFirm, onOpenCallQueue }: { firms: CrmFirm[]; activity: CrmActivityWithFirm[]; today: string; onLog: (id: string) => void; workerCount: number; onChanged: () => void; onQuickEmail?: (id: string) => Promise<void>; onQuickLog?: QuickLogFn; onFounderEmailDone?: (id: string) => Promise<void>; claim?: ClaimBundle; isFounder: boolean; onOpenFirm?: (name: string | null) => void; onOpenCallQueue?: () => void }) {
   // Reps see only their own numbers/activity; founders see team-wide.
   const me = claim?.userId ?? null;
   const myActivity = isFounder ? activity : activity.filter((a) => a.logged_by === me);
@@ -1175,14 +1175,15 @@ function DashboardTab({ firms, activity, today, onLog, workerCount, onChanged, o
   return (
     <div className="space-y-6">
       {inbound.length > 0 && (
-        <section className="rounded-[18px] border-2 border-[#F59E0B]/45 bg-[#FFF9F0] p-4">
-          <div className="mb-1 flex items-center gap-2">
-            <span className="text-[15px] font-extrabold text-[#B45309]">🔥 New pilot requests</span>
-            <span className="rounded-full bg-[#F59E0B] px-2 py-0.5 text-[11px] font-bold text-white">{inbound.length}</span>
-          </div>
-          <p className="mb-3 text-[12px] text-[#B45309]/80">They raised their hand on /for-firms — claim and reach out fast. Inbound cools within hours.</p>
-          <div className="space-y-3">{inbound.map((f) => <FirmCard key={f.id} firm={f} onLog={onLog} today={today} onQuickEmail={onQuickEmail} onQuickLog={onQuickLog} userId={claim?.userId} onClaim={claim?.onClaim} onRelease={claim?.onRelease} isFounder={claim?.isFounder} members={claim?.members} onAssign={claim?.onAssign} />)}</div>
-        </section>
+        <button
+          type="button"
+          onClick={() => onOpenCallQueue?.()}
+          className="flex w-full items-center gap-2 rounded-[18px] border-2 border-[#F59E0B]/45 bg-[#FFF9F0] px-4 py-3 text-left transition hover:bg-[#FFF3E0]"
+        >
+          <span className="text-[15px] font-extrabold text-[#B45309]">🔥 New pilot requests</span>
+          <span className="rounded-full bg-[#F59E0B] px-2 py-0.5 text-[11px] font-bold text-white">{inbound.length}</span>
+          <span className="ml-auto text-[12px] font-bold text-[#B45309]">Inbound cools within hours — work them in Call queue →</span>
+        </button>
       )}
       {isFounder && founderEmailCount > 0 && (
         <div className="flex items-center gap-2 rounded-[14px] border border-[#CBD6CF] bg-[#E7EDE8] px-4 py-3">
@@ -1208,14 +1209,15 @@ function DashboardTab({ firms, activity, today, onLog, workerCount, onChanged, o
 
       {isFounder && <DemoPrepCard firms={firms} today={today} onChanged={onChanged} />}
 
-      <section>
-        <h2 className="mb-2 text-[14px] font-bold">Follow-ups due today</h2>
-        {due.length === 0 ? (
-          <p className="rounded-[12px] border border-[#D3DED6] bg-white px-4 py-3 text-[13px] text-[#1B2623]/45">Nothing due. Nice.</p>
-        ) : (
-          <div className="space-y-3">{due.map((f) => <FirmCard key={f.id} firm={f} onLog={onLog} today={today} onQuickEmail={onQuickEmail} onQuickLog={onQuickLog} userId={claim?.userId} onClaim={claim?.onClaim} onRelease={claim?.onRelease} isFounder={claim?.isFounder} members={claim?.members} onAssign={claim?.onAssign} />)}</div>
-        )}
-      </section>
+      <button
+        type="button"
+        onClick={() => onOpenCallQueue?.()}
+        className="flex w-full items-center gap-2 rounded-[12px] border border-[#D3DED6] bg-white px-4 py-3 text-left transition hover:bg-[#F7F9F5]"
+      >
+        <span className="text-[13px] font-bold text-[#1B2623]">Follow-ups due today</span>
+        <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${due.length > 0 ? 'bg-[#42574E] text-white' : 'bg-[#E7EDE8] text-[#1B2623]/50'}`}>{due.length}</span>
+        <span className="ml-auto text-[12px] font-bold text-[#42574E]">{due.length === 0 ? 'Nothing due. Nice.' : 'Work them in Call queue →'}</span>
+      </button>
 
       {/* Reps see their own daily targets (motivating + personal); founders see the team's. */}
       <DailyTargetsScoreboard activity={myActivity} today={today} />
@@ -1889,6 +1891,18 @@ function CallQueueTab({ firms, activity, onLog, today, onQuickEmail, onQuickLog,
     .filter((f) => lastEmail.has(f.id) && !called.has(f.id))
     .sort((x, y) => lastEmail.get(y.id)!.at.localeCompare(lastEmail.get(x.id)!.at));
 
+  // Every "act on this now" list lives here, hottest first — used to be split across the
+  // Dashboard (which just got too long to be a dashboard) and this tab. Dashboard now just links
+  // in with a count; this is where the actual working cards are.
+  const isFounder = claim?.isFounder;
+  const me = claim?.userId ?? null;
+  const inbound = firms
+    .filter((f) => f.source === 'pilot_form' && f.stage !== 'paid' && f.stage !== 'no')
+    .sort((a, b) => (b.created_at ?? '').localeCompare(a.created_at ?? ''));
+  const due = firms
+    .filter((f) => f.next_followup && f.next_followup <= today && (isFounder || (!!me && f.contacted_by === me)))
+    .sort((a, b) => (a.next_followup ?? '').localeCompare(b.next_followup ?? ''));
+
   const fmtWhen = (iso: string) => {
     try { return new Date(iso).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }); }
     catch { return iso; }
@@ -1896,6 +1910,22 @@ function CallQueueTab({ firms, activity, onLog, today, onQuickEmail, onQuickLog,
 
   return (
     <div className="space-y-4">
+      {inbound.length > 0 && (
+        <section className="rounded-[18px] border-2 border-[#F59E0B]/45 bg-[#FFF9F0] p-4">
+          <div className="mb-1 flex items-center gap-2">
+            <span className="text-[15px] font-extrabold text-[#B45309]">🔥 New pilot requests</span>
+            <span className="rounded-full bg-[#F59E0B] px-2 py-0.5 text-[11px] font-bold text-white">{inbound.length}</span>
+          </div>
+          <p className="mb-3 text-[12px] text-[#B45309]/80">They raised their hand on /for-firms — claim and reach out fast. Inbound cools within hours.</p>
+          <div className="space-y-3">{inbound.map((f) => <FirmCard key={f.id} firm={f} onLog={onLog} today={today} onQuickEmail={onQuickEmail} onQuickLog={onQuickLog} userId={claim?.userId} onClaim={claim?.onClaim} onRelease={claim?.onRelease} isFounder={claim?.isFounder} members={claim?.members} onAssign={claim?.onAssign} />)}</div>
+        </section>
+      )}
+      {due.length > 0 && (
+        <section>
+          <h2 className="mb-2 text-[14px] font-bold text-[#1B2623]">Follow-ups due today ({due.length})</h2>
+          <div className="space-y-3">{due.map((f) => <FirmCard key={f.id} firm={f} onLog={onLog} today={today} onQuickEmail={onQuickEmail} onQuickLog={onQuickLog} userId={claim?.userId} onClaim={claim?.onClaim} onRelease={claim?.onRelease} isFounder={claim?.isFounder} members={claim?.members} onAssign={claim?.onAssign} />)}</div>
+        </section>
+      )}
       <div className="rounded-2xl border border-[#E1E4DD] bg-[#F7F9F5] p-4">
         <h2 className="text-[15px] font-extrabold text-[#374A42]">Call queue — {queue.length} emailed, awaiting a call</h2>
         <p className="mt-1 text-[12.5px] leading-relaxed text-[#1B2623]/60">
