@@ -654,7 +654,7 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
             {tab === 'comp' && <CompTab firms={firms} />}
             {tab === 'accounts' && <AccountsTab firms={firms} activity={activity} />}
             {tab === 'support' && <SupportTab />}
-            {tab === 'zipfinder' && <ZipFinderTab />}
+            {tab === 'zipfinder' && <ZipFinderTab firms={firms} />}
             {tab === 'firmmap' && <MapTab firms={firms} />}
             {tab === 'people' && isFounder && <PeopleTab />}
             {tab === 'economics' && showEconomics && <CompanyEconomicsTab firms={firms} />}
@@ -3522,6 +3522,30 @@ function SupportTab() {
 //    geocodes a typed city once (cached to crm_firms.lat/lng), home base = Tracy, CA. ──
 const HOME_BASE: [number, number] = [37.7397, -121.4252]; // Tracy, CA
 
+function haversineMiles(a: [number, number], b: [number, number]): number {
+  const R = 3958.8;
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  const dLat = toRad(b[0] - a[0]);
+  const dLng = toRad(b[1] - a[1]);
+  const s = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(a[0])) * Math.cos(toRad(b[0])) * Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(s), Math.sqrt(1 - s));
+}
+
+/**
+ * Best-guess single-location geocode query from the messy free-text `region` field (things like
+ * "Riverside / Irvine" or "Beverly Hills (LA)" — a human-written sales-territory label, not a
+ * clean address). Strips parenthetical asides, takes the first "/"-separated segment, and
+ * defaults to CA since the whole pipeline is CA-only. Not perfect for every row — good enough to
+ * get most of 482 ungeocoded firms onto the map without hand-typing each one.
+ */
+function guessGeocodeQuery(firm: CrmFirm): string | null {
+  const source = (firm.region || '').trim();
+  if (!source) return null;
+  const firstSegment = source.split('/')[0].replace(/\([^)]*\)/g, '').trim();
+  if (!firstSegment) return null;
+  return /,\s*[A-Za-z]{2}$/.test(firstSegment) ? firstSegment : `${firstSegment}, CA, USA`;
+}
+
 function FirmLocRow({ firm, busy, onSave }: { firm: CrmFirm; busy: boolean; onSave: (f: CrmFirm, city: string) => void }) {
   const [city, setCity] = useState(firm.city || '');
   return (
@@ -3584,41 +3608,96 @@ function MapTab({ firms }: { firms: CrmFirm[] }) {
     if (pts.length > 1) { try { map.fitBounds(pts, { padding: [40, 40], maxZoom: 10 }); } catch { /* ignore */ } }
   }, [rows, ready]);
 
+  const geocodeOne = async (id: string, query: string): Promise<{ lat: number; lng: number } | null> => {
+    try {
+      const res = await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(query));
+      const d = await res.json();
+      if (d && d[0]) return { lat: parseFloat(d[0].lat), lng: parseFloat(d[0].lon) };
+    } catch { /* ignore */ }
+    return null;
+  };
+
   const geocodeAndSave = async (f: CrmFirm, cityInput: string) => {
     const city = cityInput.trim(); if (!city) return;
     setBusyId(f.id);
-    try {
-      const q = /,/.test(city) ? city : city + ', CA, USA';
-      const res = await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(q));
-      const d = await res.json();
-      if (d && d[0]) {
-        const lat = parseFloat(d[0].lat), lng = parseFloat(d[0].lon);
-        await supabase.from('crm_firms').update({ city, latitude: lat, longitude: lng }).eq('id', f.id);
-        setRows((prev) => prev.map((x) => (x.id === f.id ? { ...x, city, latitude: lat, longitude: lng } : x)));
-      }
-    } catch { /* ignore */ }
+    const q = /,/.test(city) ? city : city + ', CA, USA';
+    const hit = await geocodeOne(f.id, q);
+    if (hit) {
+      await supabase.from('crm_firms').update({ city, latitude: hit.lat, longitude: hit.lng }).eq('id', f.id);
+      setRows((prev) => prev.map((x) => (x.id === f.id ? { ...x, city, latitude: hit.lat, longitude: hit.lng } : x)));
+    }
     setBusyId('');
+  };
+
+  // Bulk pass over every firm missing coordinates, guessing a query from the `region` field.
+  // Nominatim's usage policy caps free lookups at ~1/sec, so this runs one at a time with a
+  // pause between — for ~480 firms that's roughly 8 minutes, run in the background while the
+  // tab stays usable. Firms with no usable region text, or that Nominatim can't resolve, land in
+  // `failed` for manual entry via the row below instead of silently vanishing.
+  const [bulkRunning, setBulkRunning] = useState(false);
+  const [bulkDone, setBulkDone] = useState(0);
+  const [bulkFailed, setBulkFailed] = useState<CrmFirm[]>([]);
+  const bulkStop = useRef(false);
+
+  const runBulkGeocode = async () => {
+    const targets = rows.filter((f) => f.latitude == null || f.longitude == null);
+    setBulkRunning(true); setBulkDone(0); setBulkFailed([]); bulkStop.current = false;
+    for (const f of targets) {
+      if (bulkStop.current) break;
+      const query = guessGeocodeQuery(f);
+      const hit = query ? await geocodeOne(f.id, query) : null;
+      if (hit) {
+        await supabase.from('crm_firms').update({ city: query, latitude: hit.lat, longitude: hit.lng }).eq('id', f.id);
+        setRows((prev) => prev.map((x) => (x.id === f.id ? { ...x, city: query, latitude: hit.lat, longitude: hit.lng } : x)));
+      } else {
+        setBulkFailed((prev) => [...prev, f]);
+      }
+      setBulkDone((n) => n + 1);
+      await new Promise((r) => setTimeout(r, 1100));
+    }
+    setBulkRunning(false);
   };
 
   const missing = rows.filter((f) => f.latitude == null || f.longitude == null);
   const placed = rows.length - missing.length;
+  const toRetry = bulkFailed.length > 0 ? bulkFailed : missing;
 
   return (
     <div className="space-y-4">
       <p className="text-[12px] leading-relaxed text-[#1B2623]/55">
-        Every firm with a location is pinned; the orange dot is home base (Tracy). Add a city to any firm below and it drops on the map — the location saves so it stays pinned next time.
+        Every firm with a location is pinned; the orange dot is home base (Tracy). "Geocode all" guesses a city from each firm's region label and pins it automatically — anything it can't resolve drops into the list below to fix by hand.
       </p>
       <div ref={mapEl} style={{ height: 440, borderRadius: 16, overflow: 'hidden', border: '1px solid #D3DED6' }} />
       {!ready ? <p className="text-[12px] text-[#1B2623]/45">Loading map…</p> : null}
-      <div className="flex items-center justify-between text-[13px] font-bold text-[#1B2623]">
+      <div className="flex flex-wrap items-center justify-between gap-2 text-[13px] font-bold text-[#1B2623]">
         <span>Add locations</span>
         <span className="text-[#42574E]">{placed} mapped · {missing.length} to place</span>
       </div>
+      {missing.length > 0 && (
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => void runBulkGeocode()}
+            disabled={bulkRunning}
+            className="rounded-lg bg-[#42574E] px-3.5 py-2 text-[12.5px] font-semibold text-white disabled:opacity-50"
+          >
+            {bulkRunning ? `Geocoding… ${bulkDone}/${missing.length}` : `Geocode all (${missing.length})`}
+          </button>
+          {bulkRunning && (
+            <button type="button" onClick={() => { bulkStop.current = true; }} className="rounded-lg border border-[#D3DED6] px-3 py-2 text-[12.5px] font-semibold text-[#1B2623]/70">
+              Stop
+            </button>
+          )}
+          {!bulkRunning && bulkFailed.length > 0 && (
+            <span className="text-[12px] text-[#8A5A3A]">{bulkFailed.length} couldn't be resolved automatically — fix below.</span>
+          )}
+        </div>
+      )}
       {missing.length === 0 ? (
         <p className="rounded-[12px] border border-dashed border-[#D3DED6] bg-[#FBFBFA] px-4 py-4 text-center text-[12px] text-[#1B2623]/50">Every firm has a location. 🎯</p>
       ) : (
         <div className="space-y-2">
-          {missing.map((f) => <FirmLocRow key={f.id} firm={f} busy={busyId === f.id} onSave={geocodeAndSave} />)}
+          {toRetry.map((f) => <FirmLocRow key={f.id} firm={f} busy={busyId === f.id} onSave={geocodeAndSave} />)}
         </div>
       )}
       <p className="text-[11px] text-[#1B2623]/40">Map: Leaflet + OpenStreetMap (free). Geocoding: nominatim.openstreetmap.org. Click a pin for firm details.</p>
@@ -3626,17 +3705,20 @@ function MapTab({ firms }: { firms: CrmFirm[] }) {
   );
 }
 
-// ── Zip finder — two-way ZIP <-> City,ST lookup (free keyless zippopotam.us) ──
+// ── Zip finder — ZIP <-> City,ST lookup, plus which pipeline firms are actually nearby ──
 type ZipResult =
-  | { kind: 'zip'; zip: string; city: string; st: string; state: string }
-  | { kind: 'city'; city: string; st: string; zips: string[] }
+  | { kind: 'zip'; zip: string; city: string; st: string; state: string; coords: [number, number] | null }
+  | { kind: 'city'; city: string; st: string; zips: string[]; coords: [number, number] | null }
   | { kind: 'error'; msg: string }
   | null;
 
-function ZipFinderTab() {
+const RADIUS_OPTIONS = [10, 25, 50, 100];
+
+function ZipFinderTab({ firms }: { firms: CrmFirm[] }) {
   const [q, setQ] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<ZipResult>(null);
+  const [radius, setRadius] = useState(25);
 
   const lookup = async () => {
     const query = q.trim();
@@ -3649,7 +3731,9 @@ function ZipFinderTab() {
         const d = await res.json();
         const p = d.places?.[0];
         if (!p) throw new Error('nf');
-        setResult({ kind: 'zip', zip: query, city: p['place name'], st: p['state abbreviation'], state: p['state'] });
+        const coords: [number, number] | null =
+          p.latitude && p.longitude ? [parseFloat(p.latitude), parseFloat(p.longitude)] : null;
+        setResult({ kind: 'zip', zip: query, city: p['place name'], st: p['state abbreviation'], state: p['state'], coords });
       } else {
         const m = query.match(/^(.+?),\s*([A-Za-z]{2})$/);
         if (!m) { setResult({ kind: 'error', msg: 'Enter a 5-digit ZIP, or “City, ST” — e.g., 95377 or Tracy, CA.' }); setLoading(false); return; }
@@ -3657,9 +3741,13 @@ function ZipFinderTab() {
         const res = await fetch(`https://api.zippopotam.us/us/${st.toLowerCase()}/${encodeURIComponent(city)}`);
         if (!res.ok) throw new Error('nf');
         const d = await res.json();
-        const zips = (d.places || []).map((p: Record<string, string>) => p['post code']);
+        const places = (d.places || []) as Record<string, string>[];
+        const zips = places.map((p) => p['post code']);
         if (!zips.length) throw new Error('nf');
-        setResult({ kind: 'city', city, st: st.toUpperCase(), zips });
+        const first = places[0];
+        const coords: [number, number] | null =
+          first.latitude && first.longitude ? [parseFloat(first.latitude), parseFloat(first.longitude)] : null;
+        setResult({ kind: 'city', city, st: st.toUpperCase(), zips, coords });
       }
     } catch {
       setResult({ kind: 'error', msg: 'No match found (or the lookup couldn’t be reached). Check spelling and try again.' });
@@ -3668,10 +3756,19 @@ function ZipFinderTab() {
   };
   const copy = (text: string) => { try { navigator.clipboard?.writeText(text); } catch { /* ignore */ } };
 
+  const center = result && result.kind !== 'error' ? result.coords : null;
+  const nearby = center
+    ? firms
+        .filter((f) => f.latitude != null && f.longitude != null)
+        .map((f) => ({ firm: f, miles: haversineMiles(center, [f.latitude as number, f.longitude as number]) }))
+        .filter((r) => r.miles <= radius)
+        .sort((a, b) => a.miles - b.miles)
+    : null;
+
   return (
     <div className="space-y-4">
       <p className="text-[12px] leading-relaxed text-[#1B2623]/55">
-        Look up a ZIP or a city. Enter a <b>5-digit ZIP</b> to get its city &amp; state, or <b>“City, ST”</b> (e.g., <i>Tracy, CA</i>) to get its ZIP codes.
+        Look up a ZIP or a city. Enter a <b>5-digit ZIP</b> to get its city &amp; state, or <b>“City, ST”</b> (e.g., <i>Tracy, CA</i>) to get its ZIP codes — plus which pipeline firms are actually nearby.
       </p>
       <div className="flex gap-2">
         <input
@@ -3715,7 +3812,44 @@ function ZipFinderTab() {
         <p className="rounded-[12px] border border-amber-200 bg-amber-50 px-4 py-3 text-[13px] text-amber-800">{result.msg}</p>
       ) : null}
 
-      <p className="text-[11px] text-[#1B2623]/40">US lookups via zippopotam.us (free). Click any result to copy it.</p>
+      {center && (
+        <div className="rounded-[14px] border border-[#E4E5DE] bg-[#FBFBFA] p-4">
+          <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+            <div className="text-[13px] font-bold text-[#1B2623]">Pipeline firms within</div>
+            <div className="flex gap-1">
+              {RADIUS_OPTIONS.map((r) => (
+                <button
+                  key={r}
+                  type="button"
+                  onClick={() => setRadius(r)}
+                  className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${radius === r ? 'bg-[#42574E] text-white' : 'border border-[#D3DED6] bg-white text-[#1B2623]/70'}`}
+                >
+                  {r} mi
+                </button>
+              ))}
+            </div>
+          </div>
+          {nearby && nearby.length > 0 ? (
+            <div className="space-y-1.5">
+              {nearby.slice(0, 25).map(({ firm, miles }) => (
+                <div key={firm.id} className="flex items-center justify-between gap-2 rounded-[10px] border border-[#E4E5DE] bg-white px-3 py-2">
+                  <span className="min-w-0 flex-1 truncate text-[13px] font-medium text-[#1B2623]">{firm.name}</span>
+                  <span className="shrink-0 text-[11px] font-semibold text-[#42574E]">{miles.toFixed(1)} mi</span>
+                </div>
+              ))}
+              {nearby.length > 25 && (
+                <p className="pt-1 text-center text-[11px] text-[#1B2623]/40">+{nearby.length - 25} more within {radius} mi</p>
+              )}
+            </div>
+          ) : (
+            <p className="rounded-[10px] border border-dashed border-[#D3DED6] bg-white px-3 py-3 text-center text-[12px] text-[#1B2623]/50">
+              No pipeline firms within {radius} miles. Try a wider radius — most firms don't have a pinned location yet (see the Map tab).
+            </p>
+          )}
+        </div>
+      )}
+
+      <p className="text-[11px] text-[#1B2623]/40">US lookups via zippopotam.us (free). Click any ZIP/city result to copy it. Proximity only covers firms with a pinned location.</p>
     </div>
   );
 }
