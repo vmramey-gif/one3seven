@@ -246,6 +246,12 @@ var ACADEMY = [
           {t:'“I can’t say how it’ll turn out — that’s for an attorney. What I can do is help you get your record organized so a lawyer can look at it clearly.”',ok:true},
           {t:'“You should probably file a lawsuit.”',ok:false},
         ], fb:{ ok:'Exactly — hold the no-promise line, and redirect to what you can actually do.', no:'That either overpromises or gives legal advice. Never predict the outcome; redirect to organizing the record.' } },
+      { gate:true, q:'A worker mentions, in passing, that they’ve been thinking about hurting themselves. What do you do?',
+        opts:[
+          {t:'Stay on the phone and try to talk them through it yourself — you want to help.',ok:false},
+          {t:'Stay kind, and escalate to a founder immediately. This is a safety line, not something to handle solo.',ok:true},
+          {t:'Make a note of it and follow up once things are less busy.',ok:false},
+        ], fb:{ ok:'Correct — you are not a therapist. Your steady presence in the moment is enough; a founder handles what comes next, right away.', no:'This is the one line in the whole curriculum that isn’t a suggestion. You are not a therapist or a counselor — stay kind, and escalate to a founder immediately. Not later, not handled yourself.' } },
       { q:'What does one3seven promise the worker about their record?',
         opts:[
           {t:'“You will win your case.”',ok:false},
