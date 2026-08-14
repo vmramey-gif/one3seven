@@ -345,12 +345,16 @@ export async function getUnreadDmCount(): Promise<number> {
   return count;
 }
 
-/** Subscribe to crm_firms changes (claims/releases/stage) so views stay live across reps. */
-export function subscribeCrmFirms(onChange: () => void): () => void {
+/**
+ * Subscribe to crm_firms changes (claims/releases/stage) so views stay live across reps.
+ * onStatus receives the channel state ('SUBSCRIBED' when the realtime socket is live) — the
+ * CRM header's Live/Polling pill reflects this subscription specifically.
+ */
+export function subscribeCrmFirms(onChange: () => void, onStatus?: (status: string) => void): () => void {
   const channel = supabase
     .channel(`crm_firms_${Math.random().toString(36).slice(2)}`)
     .on('postgres_changes', { event: '*', schema: 'public', table: 'crm_firms' }, () => onChange())
-    .subscribe();
+    .subscribe((status) => { onStatus?.(status); });
   return () => { void supabase.removeChannel(channel); };
 }
 
