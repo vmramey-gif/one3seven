@@ -238,7 +238,7 @@ function PhoneLink({ phone, className = '' }: { phone: string | null; className?
 function StageTag({ stage }: { stage: CrmStage }) {
   const hot = stage === 'pilot' || stage === 'paid' || stage === 'demo_booked' || stage === 'demo_done';
   return (
-    <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${hot ? 'bg-[#F2F4EC] text-[#42574E]' : 'bg-slate-100 text-slate-600'}`}>
+    <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${hot ? 'bg-[#6FC79A]/18 text-[#A6E8C2]' : 'bg-white/8 text-white/50'}`}>
       {CRM_STAGE_LABELS[stage]}
     </span>
   );
@@ -282,7 +282,7 @@ const PRIORITY_MEANS: Record<'A' | 'B' | 'C', string> = {
 };
 function PriorityBadge({ priority }: { priority: 'A' | 'B' | 'C' | null }) {
   if (priority !== 'A' && priority !== 'B') return null;
-  const c = priority === 'A' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700';
+  const c = priority === 'A' ? 'bg-red-500/18 text-red-300' : 'bg-[#D9A54A]/18 text-[#E8C583]';
   return <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${c}`}>{PRIORITY_MEANS[priority]}</span>;
 }
 
@@ -2195,42 +2195,42 @@ function FirmRow({ firm, me, today, onLog, onClaim, onNoContact, onNotInterested
   const due = !!firm.next_followup && firm.next_followup <= today;
   const owner = firm.contacted_by_name ? firm.contacted_by_name.split(' ')[0] : null;
   return (
-    <tr className="border-b border-[#E7EDE8] align-middle hover:bg-[#FAF8FF]">
+    <tr className="border-b border-white/8 align-middle hover:bg-white/[0.04]">
       <td className="px-3 py-2">
         <div className="flex items-center gap-1.5">
-          <button type="button" onClick={() => onLog(firm.id)} className="max-w-[200px] truncate text-left text-[13px] font-semibold text-[#1B2623] hover:text-[#42574E]" title={firm.name}>{firm.name}</button>
-          {firm.source === 'pilot_form' && <span className="shrink-0 rounded bg-[#F59E0B] px-1 py-0.5 text-[9px] font-extrabold text-white" title="Inbound pilot request">⚡</span>}
+          <button type="button" onClick={() => onLog(firm.id)} className="max-w-[200px] truncate text-left text-[13px] font-semibold text-white/85 hover:text-[#F0B486]" title={firm.name}>{firm.name}</button>
+          {firm.source === 'pilot_form' && <span className="shrink-0 rounded bg-[#E08A52] px-1 py-0.5 text-[9px] font-extrabold text-[#2B1608]" title="Inbound pilot request">⚡</span>}
           <PriorityBadge priority={firm.priority} />
         </div>
       </td>
-      <td className="hidden px-3 py-2 text-[12px] text-[#1B2623]/65 md:table-cell"><span className="block max-w-[130px] truncate" title={firm.attorney_name ?? ''}>{firm.attorney_name || '—'}</span></td>
-      <td className="hidden px-2 py-2 text-center text-[12px] font-semibold text-[#1B2623]/70 sm:table-cell">{firm.tier ?? '—'}</td>
+      <td className="hidden px-3 py-2 text-[12px] text-white/55 md:table-cell"><span className="block max-w-[130px] truncate" title={firm.attorney_name ?? ''}>{firm.attorney_name || '—'}</span></td>
+      <td className="hidden px-2 py-2 text-center text-[12px] font-semibold text-white/60 sm:table-cell">{firm.tier ?? '—'}</td>
       <td className="px-2 py-2"><StageTag stage={firm.stage} /></td>
-      <td className={`hidden px-2 py-2 text-[12px] sm:table-cell ${due ? 'font-bold text-red-600' : 'text-[#1B2623]/55'}`}>{firm.next_followup || '—'}</td>
+      <td className={`hidden px-2 py-2 text-[12px] sm:table-cell ${due ? 'font-bold text-red-400' : 'text-white/45'}`}>{firm.next_followup || '—'}</td>
       <td className="hidden px-2 py-2 text-[12px] md:table-cell">
-        {owner ? <span className={mine ? 'font-semibold text-emerald-600' : 'text-[#1B2623]/60'}>{mine ? 'You' : owner}</span> : <span className="text-[#1B2623]/30">—</span>}
+        {owner ? <span className={mine ? 'font-semibold text-[#A6E8C2]' : 'text-white/50'}>{mine ? 'You' : owner}</span> : <span className="text-white/25">—</span>}
       </td>
       <td className="relative px-2 py-2">
         <div className="flex items-center justify-end gap-1">
           {!owner && onClaim && (
-            <button type="button" disabled={claiming} onClick={async () => { setClaiming(true); try { await onClaim(firm.id); } finally { setClaiming(false); } }} className="rounded-full bg-[#F2F4EC] px-2 py-1 text-[10px] font-bold text-[#42574E] disabled:opacity-50">{claiming ? '…' : 'Claim'}</button>
+            <button type="button" disabled={claiming} onClick={async () => { setClaiming(true); try { await onClaim(firm.id); } finally { setClaiming(false); } }} className="rounded-full border border-white/14 bg-white/8 px-2 py-1 text-[10px] font-bold text-white/75 disabled:opacity-50">{claiming ? '…' : 'Claim'}</button>
           )}
-          {firm.phone && <a href={`tel:${digitsOf(firm.phone)}`} className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-50 text-emerald-600" aria-label={`Call ${firm.name}`}><Phone className="h-3.5 w-3.5" /></a>}
-          {firm.email && <a href={outreachHref(firm)} target="_blank" rel="noreferrer" className="flex h-7 w-7 items-center justify-center rounded-full bg-[#F2F4EC] text-[#42574E]" aria-label={`Email ${firm.name}`}><Mail className="h-3.5 w-3.5" /></a>}
-          <button type="button" onClick={() => onLog(firm.id)} className="rounded-full bg-[#42574E] px-3 py-1 text-[11px] font-bold text-white hover:bg-[#374A42]">Log</button>
+          {firm.phone && <a href={`tel:${digitsOf(firm.phone)}`} className="flex h-7 w-7 items-center justify-center rounded-full bg-[#6FC79A]/16 text-[#A6E8C2]" aria-label={`Call ${firm.name}`}><Phone className="h-3.5 w-3.5" /></a>}
+          {firm.email && <a href={outreachHref(firm)} target="_blank" rel="noreferrer" className="flex h-7 w-7 items-center justify-center rounded-full border border-white/14 bg-white/8 text-white/70" aria-label={`Email ${firm.name}`}><Mail className="h-3.5 w-3.5" /></a>}
+          <button type="button" onClick={() => onLog(firm.id)} style={bevel(6)} className="bg-[#E08A52] px-3 py-1 text-[11px] font-bold text-[#2B1608] hover:bg-[#D97A45]">Log</button>
           {(onNoContact || onNotInterested) && (
-            <button type="button" onClick={() => setMenu((v) => !v)} aria-label="More actions" className="flex h-7 w-7 items-center justify-center rounded-full text-[16px] font-bold leading-none text-[#1B2623]/50 hover:bg-[#F2F4EC]">⋯</button>
+            <button type="button" onClick={() => setMenu((v) => !v)} aria-label="More actions" className="flex h-7 w-7 items-center justify-center rounded-full text-[16px] font-bold leading-none text-white/45 hover:bg-white/10">⋯</button>
           )}
         </div>
         {menu && (
           <>
             <button type="button" aria-hidden className="fixed inset-0 z-10 cursor-default bg-transparent" onClick={() => setMenu(false)} />
-            <div className="absolute right-2 top-10 z-20 w-48 overflow-hidden rounded-[10px] border border-[#D3DED6] bg-white shadow-xl">
+            <div style={bevel(10)} className="absolute right-2 top-10 z-20 w-48 overflow-hidden border border-white/14 bg-[#151C17]/95 backdrop-blur-xl shadow-[0_16px_40px_rgba(0,0,0,0.5)]">
               {onNotInterested && (
-                <button type="button" onClick={() => { setMenu(false); void onNotInterested(firm.id); }} className="block w-full px-3 py-2.5 text-left text-[12px] font-semibold text-[#1B2623] hover:bg-[#F7F9F5]">Not interested<span className="block text-[10px] font-normal text-[#1B2623]/45">parks it — back in the queue in 3 months</span></button>
+                <button type="button" onClick={() => { setMenu(false); void onNotInterested(firm.id); }} className="block w-full px-3 py-2.5 text-left text-[12px] font-semibold text-white/85 hover:bg-white/8">Not interested<span className="block text-[10px] font-normal text-white/40">parks it — back in the queue in 3 months</span></button>
               )}
               {onNoContact && (
-                <button type="button" onClick={() => { setMenu(false); void onNoContact(firm.id); }} className="block w-full border-t border-[#F2F4EC] px-3 py-2.5 text-left text-[12px] font-semibold text-red-600 hover:bg-red-50">Do not contact<span className="block text-[10px] font-normal text-red-400">removes from the queue for good</span></button>
+                <button type="button" onClick={() => { setMenu(false); void onNoContact(firm.id); }} className="block w-full border-t border-white/10 px-3 py-2.5 text-left text-[12px] font-semibold text-red-400 hover:bg-red-500/10">Do not contact<span className="block text-[10px] font-normal text-red-400/70">removes from the queue for good</span></button>
               )}
             </div>
           </>
@@ -2277,7 +2277,7 @@ function FirmsTab({ firms, onLog, userId, onNoContact, onNotInterested, claim }:
   const base = view === 'open' ? firms.filter((f) => !f.contacted_by) : firms.filter((f) => !!me && f.contacted_by === me);
   const list = base.filter(passes);
 
-  const selCls = `${tap} rounded-[8px] border border-[#D3DED6] bg-white px-2 text-[12px]`;
+  const selCls = `${tap} border border-white/14 bg-white/[0.06] px-2 text-[12px] text-white/75 backdrop-blur-md [color-scheme:dark]`;
 
   return (
     <div className="space-y-3 pb-24">
@@ -2285,55 +2285,56 @@ function FirmsTab({ firms, onLog, userId, onNoContact, onNotInterested, claim }:
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         placeholder="Search firm or attorney…"
-        className="w-full rounded-[10px] border border-[#D3DED6] bg-white px-3 py-2.5 text-[14px] outline-none focus:border-[#42574E]"
+        style={bevel(11)}
+        className="w-full border border-white/14 bg-white/[0.06] px-3 py-2.5 text-[14px] text-white/90 placeholder:text-white/35 backdrop-blur-md outline-none focus:border-[#E08A52]/50"
       />
 
       {/* Filter bar — CDK-style: slice by contacted / tier / priority / stage / timing / email */}
       <div className="flex flex-wrap items-center gap-1.5">
-        <select value={contacted} onChange={(e) => setContacted(e.target.value as '' | 'yes' | 'no')} className={selCls}>
+        <select value={contacted} onChange={(e) => setContacted(e.target.value as '' | 'yes' | 'no')} style={bevel(6)} className={selCls}>
           <option value="">All</option>
           <option value="no">Not contacted</option>
           <option value="yes">Contacted</option>
         </select>
-        <select value={tierFilter === '' ? '' : String(tierFilter)} onChange={(e) => setTierFilter(e.target.value === '' ? '' : Number(e.target.value))} className={selCls}>
+        <select value={tierFilter === '' ? '' : String(tierFilter)} onChange={(e) => setTierFilter(e.target.value === '' ? '' : Number(e.target.value))} style={bevel(6)} className={selCls}>
           <option value="">All tiers</option>
           <option value="1">Tier 1</option><option value="2">Tier 2</option><option value="3">Tier 3</option><option value="4">Tier 4</option>
         </select>
-        <select value={priority} onChange={(e) => setPriority(e.target.value as 'A' | 'B' | 'C' | '')} className={selCls}>
+        <select value={priority} onChange={(e) => setPriority(e.target.value as 'A' | 'B' | 'C' | '')} style={bevel(6)} className={selCls}>
           <option value="">All priority</option>
           <option value="A">A · targets</option><option value="B">B · warm</option><option value="C">C · pipeline</option>
         </select>
-        <select value={stageFilter} onChange={(e) => setStageFilter(e.target.value as CrmStage | '')} className={selCls}>
+        <select value={stageFilter} onChange={(e) => setStageFilter(e.target.value as CrmStage | '')} style={bevel(6)} className={selCls}>
           <option value="">All stages</option>
           {CRM_STAGES.map((s) => <option key={s} value={s}>{CRM_STAGE_LABELS[s]}</option>)}
         </select>
-        <select value={timing} onChange={(e) => setTiming(e.target.value as '' | 'due' | 'cold' | 'recent')} className={selCls}>
+        <select value={timing} onChange={(e) => setTiming(e.target.value as '' | 'due' | 'cold' | 'recent')} style={bevel(6)} className={selCls}>
           <option value="">Any timing</option>
           <option value="due">Due today</option>
           <option value="cold">Going cold</option>
           <option value="recent">Recently worked</option>
         </select>
-        <select value={emailFilter} onChange={(e) => setEmailFilter(e.target.value as '' | 'has' | 'none')} className={selCls}>
+        <select value={emailFilter} onChange={(e) => setEmailFilter(e.target.value as '' | 'has' | 'none')} style={bevel(6)} className={selCls}>
           <option value="">Any email</option>
           <option value="has">Has email</option>
           <option value="none">Needs email</option>
         </select>
       </div>
 
-      <div className="flex items-center justify-between text-[12px] text-[#1B2623]/50">
+      <div className="flex items-center justify-between text-[12px] text-white/45">
         <span>{list.length} firm{list.length === 1 ? '' : 's'}</span>
         {(contacted || tierFilter !== '' || priority || stageFilter || timing || emailFilter || q) && (
-          <button type="button" onClick={() => { setContacted(''); setTierFilter(''); setPriority(''); setStageFilter(''); setTiming(''); setEmailFilter(''); setSearch(''); }} className="font-semibold text-[#42574E] hover:underline">Clear filters</button>
+          <button type="button" onClick={() => { setContacted(''); setTierFilter(''); setPriority(''); setStageFilter(''); setTiming(''); setEmailFilter(''); setSearch(''); }} className="font-semibold text-[#A6E8C2] hover:underline">Clear filters</button>
         )}
       </div>
 
       {list.length === 0 ? (
-        <p className="rounded-[12px] border border-[#D3DED6] bg-white px-4 py-6 text-center text-[13px] text-[#1B2623]/45">No firms match these filters.</p>
+        <p style={bevel(12)} className="border border-white/14 bg-white/[0.06] px-4 py-6 text-center text-[13px] text-white/45 backdrop-blur-md">No firms match these filters.</p>
       ) : (
-        <div className="rounded-[12px] border border-[#D3DED6] bg-white">
+        <div style={bevel(14)} className="overflow-hidden border border-white/14 bg-white/[0.04] backdrop-blur-md">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-[#F2F4EC] text-left text-[10px] uppercase tracking-wide text-[#1B2623]/40">
+              <tr className="border-b border-white/10 text-left text-[10px] uppercase tracking-wide text-white/35">
                 <th className="px-3 py-2 font-semibold">Firm</th>
                 <th className="hidden px-3 py-2 font-semibold md:table-cell">Attorney</th>
                 <th className="hidden px-2 py-2 text-center font-semibold sm:table-cell">Tier</th>
@@ -2351,17 +2352,18 @@ function FirmsTab({ firms, onLog, userId, onNoContact, onNotInterested, claim }:
       )}
 
       {/* Bottom toggle — Open = shared pool; Mine = claimed. */}
-      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-[#D3DED6] bg-white/95 px-4 py-2.5 backdrop-blur">
+      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-white/10 bg-[#0A0C10]/85 px-4 py-2.5 backdrop-blur-xl">
         <div className="mx-auto flex max-w-3xl gap-2">
           {([['open', 'Open', openTotal], ['mine', 'Mine', mineTotal]] as const).map(([key, label, n]) => (
             <button
               key={key}
               type="button"
               onClick={() => setView(key)}
-              className={`flex flex-1 flex-col items-center rounded-[14px] border px-3 py-2 transition ${view === key ? 'border-[#42574E] bg-[#42574E] text-white' : 'border-[#D3DED6] bg-white text-[#1B2623] hover:border-[#7C8B6F]'}`}
+              style={bevel(12)}
+              className={`flex flex-1 flex-col items-center border px-3 py-2 transition ${view === key ? 'border-[#F0B486]/50 bg-[#E08A52] text-[#2B1608]' : 'border-white/14 bg-white/[0.06] text-white/80 hover:border-white/30'}`}
             >
               <span className="text-[22px] font-black leading-none">{n}</span>
-              <span className={`mt-0.5 text-[11px] font-bold uppercase tracking-wide ${view === key ? 'text-white/80' : 'text-[#1B2623]/50'}`}>{label}</span>
+              <span className={`mt-0.5 text-[11px] font-bold uppercase tracking-wide ${view === key ? 'text-[#2B1608]/70' : 'text-white/45'}`}>{label}</span>
             </button>
           ))}
         </div>
