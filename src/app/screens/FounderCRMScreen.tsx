@@ -6,6 +6,7 @@
  */
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import type { CSSProperties } from 'react';
 import {
   Phone, Mail, Calendar, ArrowLeft, Plus, X, TrendingUp,
   ClipboardList, LayoutGrid, Building2, BookOpen, BarChart3, CheckCircle2,
@@ -217,6 +218,14 @@ function crmGreeting(name: string): string {
 const tap = 'min-h-[44px]'; // mobile touch-target floor
 const digitsOf = (p: string) => p.replace(/[^\d+]/g, '');
 
+/** The "Glass edge" theme's signature: a single cut top-right corner instead of a rounded one.
+ * Used as a `style` prop everywhere the dark-theme pass wants the sharp/pointed look — inline
+ * clip-path rather than a Tailwind arbitrary value, since a calc()-in-polygon() string is fragile
+ * to hand-escape correctly for Tailwind's class parser and this needs to render reliably. */
+const bevel = (px: number): CSSProperties => ({
+  clipPath: `polygon(0 0, calc(100% - ${px}px) 0, 100% ${px}px, 100% 100%, 0 100%)`,
+});
+
 function PhoneLink({ phone, className = '' }: { phone: string | null; className?: string }) {
   if (!phone || !phone.trim()) return <span className="text-[#1B2623]/30">—</span>;
   return (
@@ -247,14 +256,14 @@ function StageStrip({ firms }: { firms: CrmFirm[] }) {
       <h2 className="mb-2 text-[13px] font-bold text-white/85">Pipeline by stage</h2>
       <div className="flex flex-wrap items-stretch gap-1.5">
         {PIPELINE_STAGES.map((s) => (
-          <div key={s} className="min-w-[62px] flex-1 rounded-[10px] border border-white/12 bg-white/[0.06] px-2 py-1.5 text-center backdrop-blur-md">
+          <div key={s} style={bevel(8)} className="min-w-[62px] flex-1 border border-white/12 bg-white/[0.06] px-2 py-1.5 text-center backdrop-blur-md">
             <div className="text-[18px] font-black leading-none text-[#A6E8C2]" style={{ textShadow: '0 0 14px rgba(111,199,154,0.35)' }}>{n(s)}</div>
             <div className="mt-0.5 text-[9px] font-semibold uppercase tracking-wide text-white/45">{CRM_STAGE_LABELS[s]}</div>
           </div>
         ))}
         <div className="w-px self-stretch bg-white/12" />
         {SIDE_STAGES.map((s) => (
-          <div key={s} className="min-w-[58px] rounded-[10px] border border-white/8 bg-white/[0.03] px-2 py-1.5 text-center">
+          <div key={s} style={bevel(8)} className="min-w-[58px] border border-white/8 bg-white/[0.03] px-2 py-1.5 text-center">
             <div className="text-[18px] font-black leading-none text-white/30">{n(s)}</div>
             <div className="mt-0.5 text-[9px] font-semibold uppercase tracking-wide text-white/30">{CRM_STAGE_LABELS[s]}</div>
           </div>
@@ -560,7 +569,8 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
                   <button
                     type="button"
                     onClick={() => setOpenGroup(open ? null : group.id)}
-                    className={`relative flex ${tap} items-center gap-1.5 rounded-[10px] border px-3 text-[13px] font-semibold backdrop-blur-md transition ${activeHere ? 'border-[#F0B486]/50 bg-[#E08A52] text-[#2B1608]' : 'border-white/12 bg-white/6 text-white/70 hover:bg-white/10'}`}
+                    style={bevel(9)}
+                    className={`relative flex ${tap} items-center gap-1.5 border px-3 text-[13px] font-semibold backdrop-blur-md transition ${activeHere ? 'border-[#F0B486]/50 bg-[#E08A52] text-[#2B1608]' : 'border-white/12 bg-white/6 text-white/70 hover:bg-white/10'}`}
                   >
                     <group.icon className="h-3.5 w-3.5" />
                     {activeHere && activeItem ? activeItem.label : group.label}
@@ -570,7 +580,7 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
                     )}
                   </button>
                   {open && (
-                    <div className="absolute left-0 z-40 mt-1 min-w-[210px] max-h-[70vh] overflow-y-auto rounded-[12px] border border-white/14 bg-[#151C17]/95 p-1 backdrop-blur-xl shadow-[0_16px_40px_rgba(0,0,0,0.5)]">
+                    <div style={bevel(16)} className="absolute left-0 z-40 mt-1 min-w-[210px] max-h-[70vh] overflow-y-auto border border-white/14 bg-[#151C17]/95 p-1 backdrop-blur-xl shadow-[0_16px_40px_rgba(0,0,0,0.5)]">
                       {group.id === 'company' ? (
                         COMPANY_SECTION_META.map((section) => {
                           const sectionItems = items.filter((t) => t.companySection === section.id);
@@ -583,7 +593,8 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
                                   key={t.id}
                                   type="button"
                                   onClick={() => { setTab(t.id); setOpenGroup(null); }}
-                                  className={`flex ${tap} w-full items-center gap-2 rounded-[8px] px-3 text-left text-[13px] font-medium transition ${tab === t.id ? 'bg-[#E08A52]/18 text-[#F0B486]' : 'text-white/65 hover:bg-white/8'}`}
+                                  style={bevel(7)}
+                                  className={`flex ${tap} w-full items-center gap-2 px-3 text-left text-[13px] font-medium transition ${tab === t.id ? 'bg-[#E08A52]/18 text-[#F0B486]' : 'text-white/65 hover:bg-white/8'}`}
                                 >
                                   <t.icon className="h-3.5 w-3.5 shrink-0" /> {t.label}
                                 </button>
@@ -597,7 +608,8 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
                             key={t.id}
                             type="button"
                             onClick={() => { setTab(t.id); setOpenGroup(null); }}
-                            className={`flex ${tap} w-full items-center gap-2 rounded-[8px] px-3 text-left text-[13px] font-medium transition ${tab === t.id ? 'bg-[#E08A52]/18 text-[#F0B486]' : 'text-white/65 hover:bg-white/8'}`}
+                            style={bevel(7)}
+                            className={`flex ${tap} w-full items-center gap-2 px-3 text-left text-[13px] font-medium transition ${tab === t.id ? 'bg-[#E08A52]/18 text-[#F0B486]' : 'text-white/65 hover:bg-white/8'}`}
                           >
                             <t.icon className="h-3.5 w-3.5 shrink-0" /> {t.label}
                             {t.id === 'team' && unreadTeam && (
@@ -1059,9 +1071,9 @@ function SuitesHome({ greeting, isFounder, showEconomics, activeTab, onPick }: {
       <p className="mt-1 text-[13px] text-white/45">Your sales suite — jump back in.</p>
       <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
         {groups.map((g) => (
-          <div key={g.id} className="rounded-[18px] border border-white/14 bg-white/[0.06] p-4 backdrop-blur-xl shadow-[0_20px_40px_rgba(0,0,0,0.3)]">
+          <div key={g.id} style={bevel(18)} className="border border-white/14 bg-white/[0.06] p-4 backdrop-blur-xl shadow-[0_20px_40px_rgba(0,0,0,0.3)]">
             <div className="mb-3 flex items-center gap-2">
-              <span className="flex h-8 w-8 items-center justify-center rounded-[10px] border border-white/12 bg-white/8 text-[#A6E8C2]"><g.icon className="h-4 w-4" /></span>
+              <span style={bevel(6)} className="flex h-8 w-8 items-center justify-center border border-white/12 bg-white/8 text-[#A6E8C2]"><g.icon className="h-4 w-4" /></span>
               <span className="text-[14px] font-bold text-white">{g.label}</span>
             </div>
             {g.id === 'company' ? (
@@ -1078,7 +1090,8 @@ function SuitesHome({ greeting, isFounder, showEconomics, activeTab, onPick }: {
                             key={t.id}
                             type="button"
                             onClick={() => onPick(t.id)}
-                            className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[12px] font-semibold transition ${activeTab === t.id ? 'border-[#F0B486]/50 bg-[#E08A52] text-[#2B1608]' : 'border-white/12 bg-white/6 text-white/65 hover:bg-white/10'}`}
+                            style={bevel(8)}
+                            className={`inline-flex items-center gap-1.5 border px-3 py-1.5 text-[12px] font-semibold transition ${activeTab === t.id ? 'border-[#F0B486]/50 bg-[#E08A52] text-[#2B1608]' : 'border-white/12 bg-white/6 text-white/65 hover:bg-white/10'}`}
                           >
                             <t.icon className="h-3.5 w-3.5" /> {t.label}
                           </button>
@@ -1095,7 +1108,8 @@ function SuitesHome({ greeting, isFounder, showEconomics, activeTab, onPick }: {
                     key={t.id}
                     type="button"
                     onClick={() => onPick(t.id)}
-                    className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[12px] font-semibold transition ${activeTab === t.id ? 'border-[#F0B486]/50 bg-[#E08A52] text-[#2B1608]' : 'border-white/12 bg-white/6 text-white/65 hover:bg-white/10'}`}
+                    style={bevel(8)}
+                    className={`inline-flex items-center gap-1.5 border px-3 py-1.5 text-[12px] font-semibold transition ${activeTab === t.id ? 'border-[#F0B486]/50 bg-[#E08A52] text-[#2B1608]' : 'border-white/12 bg-white/6 text-white/65 hover:bg-white/10'}`}
                   >
                     <t.icon className="h-3.5 w-3.5" /> {t.label}
                   </button>
@@ -1129,7 +1143,7 @@ function RepScoreboard({ firms, activity, members, today }: { firms: CrmFirm[]; 
   return (
     <section>
       <h2 className="mb-2 text-[14px] font-bold text-white/85">Team — who's working</h2>
-      <div className="overflow-x-auto rounded-[12px] border border-white/12 bg-white/[0.04] backdrop-blur-md">
+      <div style={bevel(14)} className="overflow-x-auto border border-white/12 bg-white/[0.04] backdrop-blur-md">
         <table className="w-full min-w-[460px] text-[13px]">
           <thead>
             <tr className="border-b border-white/10 text-left text-[10px] uppercase tracking-wide text-white/35">
@@ -1187,7 +1201,8 @@ function DashboardTab({ firms, activity, today, onLog, workerCount, onChanged, o
         <button
           type="button"
           onClick={() => onOpenCallQueue?.()}
-          className="flex w-full items-center gap-2 rounded-[18px] border-2 border-[#E08A52]/45 bg-[#E08A52]/10 px-4 py-3 text-left backdrop-blur-md transition hover:bg-[#E08A52]/16"
+          style={bevel(20)}
+          className="flex w-full items-center gap-2 border-2 border-[#E08A52]/45 bg-[#E08A52]/10 px-4 py-3 text-left backdrop-blur-md transition hover:bg-[#E08A52]/16"
         >
           <span className="text-[15px] font-extrabold text-[#FFDDBC]">🔥 New pilot requests</span>
           <span className="rounded-full bg-[#E08A52] px-2 py-0.5 text-[11px] font-bold text-[#2B1608]">{inbound.length}</span>
@@ -1195,7 +1210,7 @@ function DashboardTab({ firms, activity, today, onLog, workerCount, onChanged, o
         </button>
       )}
       {isFounder && founderEmailCount > 0 && (
-        <div className="flex items-center gap-2 rounded-[14px] border border-white/14 bg-white/[0.06] px-4 py-3 backdrop-blur-md">
+        <div style={bevel(12)} className="flex items-center gap-2 border border-white/14 bg-white/[0.06] px-4 py-3 backdrop-blur-md">
           <Mail className="h-4 w-4 shrink-0 text-[#A6E8C2]" />
           <span className="text-[13px] font-semibold text-white/80">{founderEmailCount} firm{founderEmailCount === 1 ? '' : 's'} flagged for a founder email</span>
           <span className="ml-auto text-[12px] font-bold text-[#A6E8C2]">See “Victoria email f/u” tab →</span>
@@ -1204,7 +1219,7 @@ function DashboardTab({ firms, activity, today, onLog, workerCount, onChanged, o
       {isFounder && (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
           {stats.map((s) => (
-            <div key={s.label} className="rounded-[14px] border border-white/12 bg-white/[0.06] p-4 backdrop-blur-md">
+            <div key={s.label} style={bevel(12)} className="border border-white/12 bg-white/[0.06] p-4 backdrop-blur-md">
               <div className="text-[26px] font-black leading-none text-[#A6E8C2]" style={{ textShadow: '0 0 16px rgba(111,199,154,0.35)' }}>{s.value}</div>
               <div className="mt-1 text-[11px] font-semibold text-white/50">{s.label}</div>
             </div>
@@ -1221,7 +1236,8 @@ function DashboardTab({ firms, activity, today, onLog, workerCount, onChanged, o
       <button
         type="button"
         onClick={() => onOpenCallQueue?.()}
-        className="flex w-full items-center gap-2 rounded-[12px] border border-white/12 bg-white/[0.06] px-4 py-3 text-left backdrop-blur-md transition hover:bg-white/10"
+        style={bevel(11)}
+        className="flex w-full items-center gap-2 border border-white/12 bg-white/[0.06] px-4 py-3 text-left backdrop-blur-md transition hover:bg-white/10"
       >
         <span className="text-[13px] font-bold text-white/85">Follow-ups due today</span>
         <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${due.length > 0 ? 'bg-[#E08A52] text-[#2B1608]' : 'bg-white/8 text-white/40'}`}>{due.length}</span>
@@ -1282,7 +1298,7 @@ function DemoPrepCard({ firms, today, onChanged }: { firms: CrmFirm[]; today: st
       {booked.map((f) => {
         const intel = crmFirmIntel[f.name];
         return (
-        <div key={f.id} className="rounded-[16px] border border-[#D9A54A]/40 bg-[#D9A54A]/[0.08] p-4 backdrop-blur-md">
+        <div key={f.id} style={bevel(15)} className="border border-[#D9A54A]/40 bg-[#D9A54A]/[0.08] p-4 backdrop-blur-md">
           <div className="mb-1 flex items-start justify-between gap-2">
             <div className="min-w-0">
               <div className="break-words leading-snug text-[15px] font-bold text-white">{f.name}</div>
@@ -1310,7 +1326,7 @@ function DemoPrepCard({ firms, today, onChanged }: { firms: CrmFirm[]; today: st
               Tracy/Medline and Boyle Heights fire-displaced workers are the most urgent intake population right now — use this as the opening hook.
             </p>
           )}
-          <button type="button" onClick={() => markDone(f.id)} disabled={busyId === f.id} className={`flex ${tap} w-full items-center justify-center gap-2 rounded-[12px] bg-[#D9A54A] font-semibold text-[#2B1608] disabled:opacity-50`}>
+          <button type="button" onClick={() => markDone(f.id)} disabled={busyId === f.id} style={bevel(10)} className={`flex ${tap} w-full items-center justify-center gap-2 bg-[#D9A54A] font-semibold text-[#2B1608] disabled:opacity-50`}>
             <Check className="h-4 w-4" /> {busyId === f.id ? 'Saving…' : 'Mark demo done'}
           </button>
         </div>
@@ -1344,7 +1360,7 @@ function DailyTargetsScoreboard({ activity, today }: { activity: CrmActivityWith
           const color = colorMap[targetColor(c.count, c.target)];
           const pct = Math.min(100, Math.round((c.count / c.target) * 100));
           return (
-            <div key={c.label} className="rounded-[14px] border border-white/12 bg-white/[0.06] p-3 backdrop-blur-md">
+            <div key={c.label} style={bevel(12)} className="border border-white/12 bg-white/[0.06] p-3 backdrop-blur-md">
               <div className={`text-[26px] font-black leading-none ${color.text}`}>{c.count}</div>
               <div className="mt-1 text-[10px] font-semibold leading-tight text-white/50">{c.label}</div>
               <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/10"><div className={`h-full rounded-full ${color.bar}`} style={{ width: `${pct}%` }} /></div>
@@ -2363,7 +2379,8 @@ function ActivityRow({ a, onOpen }: { a: CrmActivityWithFirm; onOpen?: () => voi
       type="button"
       disabled={!clickable}
       onClick={onOpen}
-      className={`w-full rounded-[12px] border border-white/12 bg-white/[0.05] p-3.5 text-left backdrop-blur-md transition ${clickable ? 'cursor-pointer hover:border-[#E08A52]/40 hover:bg-white/10' : 'cursor-default'}`}
+      style={bevel(11)}
+      className={`w-full border border-white/12 bg-white/[0.05] p-3.5 text-left backdrop-blur-md transition ${clickable ? 'cursor-pointer hover:border-[#E08A52]/40 hover:bg-white/10' : 'cursor-default'}`}
     >
       <div className="mb-1 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
