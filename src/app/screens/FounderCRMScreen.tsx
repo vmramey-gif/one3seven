@@ -244,19 +244,19 @@ function StageStrip({ firms }: { firms: CrmFirm[] }) {
   const n = (s: CrmStage) => firms.filter((f) => f.stage === s).length;
   return (
     <section>
-      <h2 className="mb-2 text-[13px] font-bold text-[#1B2623]">Pipeline by stage</h2>
+      <h2 className="mb-2 text-[13px] font-bold text-white/85">Pipeline by stage</h2>
       <div className="flex flex-wrap items-stretch gap-1.5">
         {PIPELINE_STAGES.map((s) => (
-          <div key={s} className="min-w-[62px] flex-1 rounded-[10px] border border-[#D3DED6] bg-white px-2 py-1.5 text-center">
-            <div className="text-[18px] font-black leading-none text-[#42574E]">{n(s)}</div>
-            <div className="mt-0.5 text-[9px] font-semibold uppercase tracking-wide text-[#1B2623]/50">{CRM_STAGE_LABELS[s]}</div>
+          <div key={s} className="min-w-[62px] flex-1 rounded-[10px] border border-white/12 bg-white/[0.06] px-2 py-1.5 text-center backdrop-blur-md">
+            <div className="text-[18px] font-black leading-none text-[#A6E8C2]" style={{ textShadow: '0 0 14px rgba(111,199,154,0.35)' }}>{n(s)}</div>
+            <div className="mt-0.5 text-[9px] font-semibold uppercase tracking-wide text-white/45">{CRM_STAGE_LABELS[s]}</div>
           </div>
         ))}
-        <div className="w-px self-stretch bg-[#D3DED6]" />
+        <div className="w-px self-stretch bg-white/12" />
         {SIDE_STAGES.map((s) => (
-          <div key={s} className="min-w-[58px] rounded-[10px] border border-[#E7EDE8] bg-[#FBFBFA] px-2 py-1.5 text-center">
-            <div className="text-[18px] font-black leading-none text-[#1B2623]/40">{n(s)}</div>
-            <div className="mt-0.5 text-[9px] font-semibold uppercase tracking-wide text-[#1B2623]/40">{CRM_STAGE_LABELS[s]}</div>
+          <div key={s} className="min-w-[58px] rounded-[10px] border border-white/8 bg-white/[0.03] px-2 py-1.5 text-center">
+            <div className="text-[18px] font-black leading-none text-white/30">{n(s)}</div>
+            <div className="mt-0.5 text-[9px] font-semibold uppercase tracking-wide text-white/30">{CRM_STAGE_LABELS[s]}</div>
           </div>
         ))}
       </div>
@@ -518,24 +518,33 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
   };
 
   return (
-    <div className="min-h-screen bg-[#F2F4EC] text-[#1B2623] antialiased">
+    <div
+      className="min-h-screen text-[#EDEFE7] antialiased"
+      style={{
+        background:
+          'radial-gradient(65% 50% at 8% 0%, rgba(111,199,154,0.16) 0%, transparent 60%),' +
+          'radial-gradient(55% 45% at 100% 0%, rgba(155,126,255,0.10) 0%, transparent 60%),' +
+          'radial-gradient(70% 50% at 50% 100%, rgba(224,138,82,0.08) 0%, transparent 65%),' +
+          'linear-gradient(155deg, #0E2019 0%, #0A0C10 55%, #150E22 100%)',
+      }}
+    >
       {/* Header */}
-      <header className="sticky top-0 z-30 border-b border-[#D3DED6] bg-white/95 backdrop-blur-sm">
+      <header className="sticky top-0 z-30 border-b border-white/10 bg-[#0A0C10]/70 backdrop-blur-xl">
         <div className="mx-auto flex max-w-3xl items-center justify-between px-4 py-3">
-          <button type="button" onClick={onExit} className={`flex items-center gap-1.5 ${tap} px-1 text-sm font-medium text-[#1B2623]/60 hover:text-[#1B2623]`}>
+          <button type="button" onClick={onExit} className={`flex items-center gap-1.5 ${tap} px-1 text-sm font-medium text-white/55 hover:text-white`}>
             <ArrowLeft className="h-4 w-4" /> Exit
           </button>
           <div className="flex items-center gap-2">
             <span className="text-[15px] font-bold tracking-tight">Sales CRM</span>
             <span
               title={realtimeLive ? 'Real-time updates are live' : 'Using periodic refresh (real-time not connected)'}
-              className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold ${realtimeLive ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}
+              className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold ${realtimeLive ? 'bg-[#6FC79A]/15 text-[#A6E8C2]' : 'bg-white/8 text-white/45'}`}
             >
-              <span className={`h-1.5 w-1.5 rounded-full ${realtimeLive ? 'animate-pulse bg-emerald-500' : 'bg-slate-400'}`} />
+              <span className={`h-1.5 w-1.5 rounded-full ${realtimeLive ? 'animate-pulse bg-[#6FC79A]' : 'bg-white/40'}`} />
               {realtimeLive ? 'Live' : 'Polling'}
             </span>
           </div>
-          <span className="rounded-full bg-[#F2F4EC] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[#42574E]">{roleLabel}</span>
+          <span className="rounded-full border border-white/12 bg-white/6 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white/65">{roleLabel}</span>
         </div>
         {/* Categorized dropdown nav — wraps, never scrolls sideways. */}
         <div className="relative mx-auto max-w-3xl px-3 pb-2">
@@ -551,30 +560,30 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
                   <button
                     type="button"
                     onClick={() => setOpenGroup(open ? null : group.id)}
-                    className={`relative flex ${tap} items-center gap-1.5 rounded-[10px] px-3 text-[13px] font-semibold transition ${activeHere ? 'bg-[#42574E] text-white' : 'bg-[#E7EDE8] text-[#1B2623]/70 hover:bg-[#F2F4EC]'}`}
+                    className={`relative flex ${tap} items-center gap-1.5 rounded-[10px] border px-3 text-[13px] font-semibold backdrop-blur-md transition ${activeHere ? 'border-[#F0B486]/50 bg-[#E08A52] text-[#2B1608]' : 'border-white/12 bg-white/6 text-white/70 hover:bg-white/10'}`}
                   >
                     <group.icon className="h-3.5 w-3.5" />
                     {activeHere && activeItem ? activeItem.label : group.label}
                     <ChevronDown className={`h-3.5 w-3.5 transition-transform ${open ? 'rotate-180' : ''}`} />
                     {group.id === 'team' && (unreadTeam || unreadDm > 0) && (
-                      <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 animate-pulse rounded-full bg-red-500 ring-2 ring-white" />
+                      <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 animate-pulse rounded-full bg-red-500 ring-2 ring-[#0A0C10]" />
                     )}
                   </button>
                   {open && (
-                    <div className="absolute left-0 z-40 mt-1 min-w-[210px] max-h-[70vh] overflow-y-auto rounded-[12px] border border-[#D3DED6] bg-white p-1 shadow-[0_12px_30px_rgba(66,87,78,0.18)]">
+                    <div className="absolute left-0 z-40 mt-1 min-w-[210px] max-h-[70vh] overflow-y-auto rounded-[12px] border border-white/14 bg-[#151C17]/95 p-1 backdrop-blur-xl shadow-[0_16px_40px_rgba(0,0,0,0.5)]">
                       {group.id === 'company' ? (
                         COMPANY_SECTION_META.map((section) => {
                           const sectionItems = items.filter((t) => t.companySection === section.id);
                           if (sectionItems.length === 0) return null;
                           return (
                             <div key={section.id} className="mb-1 last:mb-0">
-                              <div className="px-3 pb-1 pt-2 text-[10px] font-bold uppercase tracking-wide text-[#1B2623]/40">{section.label}</div>
+                              <div className="px-3 pb-1 pt-2 text-[10px] font-bold uppercase tracking-wide text-white/35">{section.label}</div>
                               {sectionItems.map((t) => (
                                 <button
                                   key={t.id}
                                   type="button"
                                   onClick={() => { setTab(t.id); setOpenGroup(null); }}
-                                  className={`flex ${tap} w-full items-center gap-2 rounded-[8px] px-3 text-left text-[13px] font-medium transition ${tab === t.id ? 'bg-[#F2F4EC] text-[#42574E]' : 'text-[#1B2623]/70 hover:bg-[#E7EDE8]'}`}
+                                  className={`flex ${tap} w-full items-center gap-2 rounded-[8px] px-3 text-left text-[13px] font-medium transition ${tab === t.id ? 'bg-[#E08A52]/18 text-[#F0B486]' : 'text-white/65 hover:bg-white/8'}`}
                                 >
                                   <t.icon className="h-3.5 w-3.5 shrink-0" /> {t.label}
                                 </button>
@@ -588,11 +597,11 @@ export function FounderCRMScreen({ onExit, isFounder = true }: { onExit: () => v
                             key={t.id}
                             type="button"
                             onClick={() => { setTab(t.id); setOpenGroup(null); }}
-                            className={`flex ${tap} w-full items-center gap-2 rounded-[8px] px-3 text-left text-[13px] font-medium transition ${tab === t.id ? 'bg-[#F2F4EC] text-[#42574E]' : 'text-[#1B2623]/70 hover:bg-[#E7EDE8]'}`}
+                            className={`flex ${tap} w-full items-center gap-2 rounded-[8px] px-3 text-left text-[13px] font-medium transition ${tab === t.id ? 'bg-[#E08A52]/18 text-[#F0B486]' : 'text-white/65 hover:bg-white/8'}`}
                           >
                             <t.icon className="h-3.5 w-3.5 shrink-0" /> {t.label}
                             {t.id === 'team' && unreadTeam && (
-                              <span className="ml-auto inline-flex items-center gap-1 text-[10px] font-bold text-red-600">
+                              <span className="ml-auto inline-flex items-center gap-1 text-[10px] font-bold text-red-400">
                                 <span className="h-2 w-2 rounded-full bg-red-500" /> New
                               </span>
                             )}
@@ -1044,16 +1053,16 @@ function SuitesHome({ greeting, isFounder, showEconomics, activeTab, onPick }: {
 
   return (
     <div className="mb-7">
-      <h1 className="font-display text-[clamp(1.5rem,5vw,2rem)] font-medium leading-[1.12] tracking-[-0.02em] text-transparent bg-[linear-gradient(110deg,#1B2623_0%,#374A42_42%,#1B2623_78%)] bg-[length:220%_100%] bg-clip-text">
+      <h1 className="font-display text-[clamp(1.5rem,5vw,2rem)] font-medium leading-[1.12] tracking-[-0.02em] text-transparent bg-[linear-gradient(110deg,#EDEFE7_0%,#A6E8C2_42%,#EDEFE7_78%)] bg-[length:220%_100%] bg-clip-text">
         {greeting}
       </h1>
-      <p className="mt-1 text-[13px] text-[#1B2623]/50">Your sales suite — jump back in.</p>
+      <p className="mt-1 text-[13px] text-white/45">Your sales suite — jump back in.</p>
       <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
         {groups.map((g) => (
-          <div key={g.id} className="rounded-[18px] border border-[#D3DED6] bg-white p-4 shadow-[0_10px_30px_rgba(31,27,75,0.05)]">
+          <div key={g.id} className="rounded-[18px] border border-white/14 bg-white/[0.06] p-4 backdrop-blur-xl shadow-[0_20px_40px_rgba(0,0,0,0.3)]">
             <div className="mb-3 flex items-center gap-2">
-              <span className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-[#F2F4EC] text-[#42574E]"><g.icon className="h-4 w-4" /></span>
-              <span className="text-[14px] font-bold text-[#1B2623]">{g.label}</span>
+              <span className="flex h-8 w-8 items-center justify-center rounded-[10px] border border-white/12 bg-white/8 text-[#A6E8C2]"><g.icon className="h-4 w-4" /></span>
+              <span className="text-[14px] font-bold text-white">{g.label}</span>
             </div>
             {g.id === 'company' ? (
               <div className="space-y-2.5">
@@ -1062,14 +1071,14 @@ function SuitesHome({ greeting, isFounder, showEconomics, activeTab, onPick }: {
                   if (sectionItems.length === 0) return null;
                   return (
                     <div key={section.id}>
-                      <div className="mb-1 text-[10px] font-bold uppercase tracking-wide text-[#1B2623]/40">{section.label}</div>
+                      <div className="mb-1 text-[10px] font-bold uppercase tracking-wide text-white/35">{section.label}</div>
                       <div className="flex flex-wrap gap-1.5">
                         {sectionItems.map((t) => (
                           <button
                             key={t.id}
                             type="button"
                             onClick={() => onPick(t.id)}
-                            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[12px] font-semibold transition ${activeTab === t.id ? 'bg-[#42574E] text-white' : 'bg-[#E7EDE8] text-[#1B2623]/70 hover:bg-[#F2F4EC]'}`}
+                            className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[12px] font-semibold transition ${activeTab === t.id ? 'border-[#F0B486]/50 bg-[#E08A52] text-[#2B1608]' : 'border-white/12 bg-white/6 text-white/65 hover:bg-white/10'}`}
                           >
                             <t.icon className="h-3.5 w-3.5" /> {t.label}
                           </button>
@@ -1086,7 +1095,7 @@ function SuitesHome({ greeting, isFounder, showEconomics, activeTab, onPick }: {
                     key={t.id}
                     type="button"
                     onClick={() => onPick(t.id)}
-                    className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[12px] font-semibold transition ${activeTab === t.id ? 'bg-[#42574E] text-white' : 'bg-[#E7EDE8] text-[#1B2623]/70 hover:bg-[#F2F4EC]'}`}
+                    className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[12px] font-semibold transition ${activeTab === t.id ? 'border-[#F0B486]/50 bg-[#E08A52] text-[#2B1608]' : 'border-white/12 bg-white/6 text-white/65 hover:bg-white/10'}`}
                   >
                     <t.icon className="h-3.5 w-3.5" /> {t.label}
                   </button>
@@ -1119,11 +1128,11 @@ function RepScoreboard({ firms, activity, members, today }: { firms: CrmFirm[]; 
   }).sort((a, b) => (b.callsToday + b.emailsToday) - (a.callsToday + a.emailsToday));
   return (
     <section>
-      <h2 className="mb-2 text-[14px] font-bold">Team — who's working</h2>
-      <div className="overflow-x-auto rounded-[12px] border border-[#D3DED6] bg-white">
+      <h2 className="mb-2 text-[14px] font-bold text-white/85">Team — who's working</h2>
+      <div className="overflow-x-auto rounded-[12px] border border-white/12 bg-white/[0.04] backdrop-blur-md">
         <table className="w-full min-w-[460px] text-[13px]">
           <thead>
-            <tr className="border-b border-[#F2F4EC] text-left text-[10px] uppercase tracking-wide text-[#1B2623]/40">
+            <tr className="border-b border-white/10 text-left text-[10px] uppercase tracking-wide text-white/35">
               <th className="px-3 py-2 font-semibold">Rep</th>
               <th className="px-2 py-2 text-center font-semibold">Calls today</th>
               <th className="px-2 py-2 text-center font-semibold">Emails today</th>
@@ -1134,13 +1143,13 @@ function RepScoreboard({ firms, activity, members, today }: { firms: CrmFirm[]; 
           </thead>
           <tbody>
             {rows.map(({ m, callsToday, emailsToday, demosWeek, pilots, lastActive }) => (
-              <tr key={m.id} className="border-b border-[#E7EDE8] hover:bg-[#FAF8FF]">
-                <td className="px-3 py-2 font-semibold text-[#1B2623]">{m.name}</td>
-                <td className={`px-2 py-2 text-center font-bold ${callsToday > 0 ? 'text-[#42574E]' : 'text-[#1B2623]/30'}`}>{callsToday}</td>
-                <td className={`px-2 py-2 text-center ${emailsToday > 0 ? 'font-semibold text-[#1B2623]/70' : 'text-[#1B2623]/30'}`}>{emailsToday}</td>
-                <td className="px-2 py-2 text-center text-[#1B2623]/70">{demosWeek}</td>
-                <td className={`px-2 py-2 text-center ${pilots > 0 ? 'font-bold text-emerald-600' : 'text-[#1B2623]/30'}`}>{pilots}</td>
-                <td className="px-3 py-2 text-[12px] text-[#1B2623]/50">{lastActive ? new Date(lastActive).toLocaleDateString() : 'never'}</td>
+              <tr key={m.id} className="border-b border-white/8 hover:bg-white/[0.04]">
+                <td className="px-3 py-2 font-semibold text-white/85">{m.name}</td>
+                <td className={`px-2 py-2 text-center font-bold ${callsToday > 0 ? 'text-[#A6E8C2]' : 'text-white/25'}`}>{callsToday}</td>
+                <td className={`px-2 py-2 text-center ${emailsToday > 0 ? 'font-semibold text-white/70' : 'text-white/25'}`}>{emailsToday}</td>
+                <td className="px-2 py-2 text-center text-white/70">{demosWeek}</td>
+                <td className={`px-2 py-2 text-center ${pilots > 0 ? 'font-bold text-[#A6E8C2]' : 'text-white/25'}`}>{pilots}</td>
+                <td className="px-3 py-2 text-[12px] text-white/40">{lastActive ? new Date(lastActive).toLocaleDateString() : 'never'}</td>
               </tr>
             ))}
           </tbody>
@@ -1178,26 +1187,26 @@ function DashboardTab({ firms, activity, today, onLog, workerCount, onChanged, o
         <button
           type="button"
           onClick={() => onOpenCallQueue?.()}
-          className="flex w-full items-center gap-2 rounded-[18px] border-2 border-[#F59E0B]/45 bg-[#FFF9F0] px-4 py-3 text-left transition hover:bg-[#FFF3E0]"
+          className="flex w-full items-center gap-2 rounded-[18px] border-2 border-[#E08A52]/45 bg-[#E08A52]/10 px-4 py-3 text-left backdrop-blur-md transition hover:bg-[#E08A52]/16"
         >
-          <span className="text-[15px] font-extrabold text-[#B45309]">🔥 New pilot requests</span>
-          <span className="rounded-full bg-[#F59E0B] px-2 py-0.5 text-[11px] font-bold text-white">{inbound.length}</span>
-          <span className="ml-auto text-[12px] font-bold text-[#B45309]">Inbound cools within hours — work them in Call queue →</span>
+          <span className="text-[15px] font-extrabold text-[#FFDDBC]">🔥 New pilot requests</span>
+          <span className="rounded-full bg-[#E08A52] px-2 py-0.5 text-[11px] font-bold text-[#2B1608]">{inbound.length}</span>
+          <span className="ml-auto text-[12px] font-bold text-[#F0B486]">Inbound cools within hours — work them in Call queue →</span>
         </button>
       )}
       {isFounder && founderEmailCount > 0 && (
-        <div className="flex items-center gap-2 rounded-[14px] border border-[#CBD6CF] bg-[#E7EDE8] px-4 py-3">
-          <Mail className="h-4 w-4 shrink-0 text-[#374A42]" />
-          <span className="text-[13px] font-semibold text-[#374A42]">{founderEmailCount} firm{founderEmailCount === 1 ? '' : 's'} flagged for a founder email</span>
-          <span className="ml-auto text-[12px] font-bold text-[#42574E]">See “Victoria email f/u” tab →</span>
+        <div className="flex items-center gap-2 rounded-[14px] border border-white/14 bg-white/[0.06] px-4 py-3 backdrop-blur-md">
+          <Mail className="h-4 w-4 shrink-0 text-[#A6E8C2]" />
+          <span className="text-[13px] font-semibold text-white/80">{founderEmailCount} firm{founderEmailCount === 1 ? '' : 's'} flagged for a founder email</span>
+          <span className="ml-auto text-[12px] font-bold text-[#A6E8C2]">See “Victoria email f/u” tab →</span>
         </div>
       )}
       {isFounder && (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
           {stats.map((s) => (
-            <div key={s.label} className="rounded-[14px] border border-[#D3DED6] bg-white p-4">
-              <div className="text-[26px] font-black leading-none text-[#42574E]">{s.value}</div>
-              <div className="mt-1 text-[11px] font-semibold text-[#1B2623]/55">{s.label}</div>
+            <div key={s.label} className="rounded-[14px] border border-white/12 bg-white/[0.06] p-4 backdrop-blur-md">
+              <div className="text-[26px] font-black leading-none text-[#A6E8C2]" style={{ textShadow: '0 0 16px rgba(111,199,154,0.35)' }}>{s.value}</div>
+              <div className="mt-1 text-[11px] font-semibold text-white/50">{s.label}</div>
             </div>
           ))}
         </div>
@@ -1212,11 +1221,11 @@ function DashboardTab({ firms, activity, today, onLog, workerCount, onChanged, o
       <button
         type="button"
         onClick={() => onOpenCallQueue?.()}
-        className="flex w-full items-center gap-2 rounded-[12px] border border-[#D3DED6] bg-white px-4 py-3 text-left transition hover:bg-[#F7F9F5]"
+        className="flex w-full items-center gap-2 rounded-[12px] border border-white/12 bg-white/[0.06] px-4 py-3 text-left backdrop-blur-md transition hover:bg-white/10"
       >
-        <span className="text-[13px] font-bold text-[#1B2623]">Follow-ups due today</span>
-        <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${due.length > 0 ? 'bg-[#42574E] text-white' : 'bg-[#E7EDE8] text-[#1B2623]/50'}`}>{due.length}</span>
-        <span className="ml-auto text-[12px] font-bold text-[#42574E]">{due.length === 0 ? 'Nothing due. Nice.' : 'Work them in Call queue →'}</span>
+        <span className="text-[13px] font-bold text-white/85">Follow-ups due today</span>
+        <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${due.length > 0 ? 'bg-[#E08A52] text-[#2B1608]' : 'bg-white/8 text-white/40'}`}>{due.length}</span>
+        <span className="ml-auto text-[12px] font-bold text-[#F0B486]">{due.length === 0 ? 'Nothing due. Nice.' : 'Work them in Call queue →'}</span>
       </button>
 
       {/* Reps see their own daily targets (motivating + personal); founders see the team's. */}
@@ -1224,9 +1233,9 @@ function DashboardTab({ firms, activity, today, onLog, workerCount, onChanged, o
 
       {isFounder && (
         <section>
-          <h2 className="mb-2 text-[14px] font-bold">Recent activity</h2>
+          <h2 className="mb-2 text-[14px] font-bold text-white/85">Recent activity</h2>
           {recent.length === 0 ? (
-            <p className="rounded-[12px] border border-[#D3DED6] bg-white px-4 py-3 text-[13px] text-[#1B2623]/45">No activity logged yet.</p>
+            <p className="rounded-[12px] border border-white/12 bg-white/[0.06] px-4 py-3 text-[13px] text-white/40 backdrop-blur-md">No activity logged yet.</p>
           ) : (
             <div className="space-y-2">{recent.map((a) => <ActivityRow key={a.id} a={a} onOpen={() => onOpenFirm?.(a.firm_name)} />)}</div>
           )}
@@ -1269,39 +1278,39 @@ function DemoPrepCard({ firms, today, onChanged }: { firms: CrmFirm[]; today: st
 
   return (
     <section className="space-y-3">
-      <div className="flex items-center gap-2"><Flame className="h-4 w-4 text-amber-600" /><h2 className="text-[14px] font-bold">Demo prep</h2></div>
+      <div className="flex items-center gap-2"><Flame className="h-4 w-4 text-[#D9A54A]" /><h2 className="text-[14px] font-bold text-white/85">Demo prep</h2></div>
       {booked.map((f) => {
         const intel = crmFirmIntel[f.name];
         return (
-        <div key={f.id} className="rounded-[16px] border-2 border-amber-300 bg-amber-50 p-4">
+        <div key={f.id} className="rounded-[16px] border border-[#D9A54A]/40 bg-[#D9A54A]/[0.08] p-4 backdrop-blur-md">
           <div className="mb-1 flex items-start justify-between gap-2">
             <div className="min-w-0">
-              <div className="break-words leading-snug text-[15px] font-bold text-[#1B2623]">{f.name}</div>
-              {f.attorney_name && <div className="text-[12px] text-[#1B2623]/55">{f.attorney_name}</div>}
+              <div className="break-words leading-snug text-[15px] font-bold text-white">{f.name}</div>
+              {f.attorney_name && <div className="text-[12px] text-white/55">{f.attorney_name}</div>}
             </div>
-            <span className="shrink-0 rounded-full bg-amber-200 px-2 py-0.5 text-[11px] font-bold text-amber-800">Demo {daysUntil(f.next_followup)}</span>
+            <span className="shrink-0 rounded-full bg-[#D9A54A]/25 px-2 py-0.5 text-[11px] font-bold text-[#E8C583]">Demo {daysUntil(f.next_followup)}</span>
           </div>
           <div className="mb-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[13px]">
-            {f.phone && <span className="flex items-center gap-1.5"><Phone className="h-3.5 w-3.5 text-[#1B2623]/40" /><PhoneLink phone={f.phone} /></span>}
-            {f.region && <span className="text-[#1B2623]/55">{f.region}</span>}
+            {f.phone && <span className="flex items-center gap-1.5"><Phone className="h-3.5 w-3.5 text-white/40" /><PhoneLink phone={f.phone} /></span>}
+            {f.region && <span className="text-white/55">{f.region}</span>}
           </div>
-          {f.focus_areas && <p className="mb-2 text-[12px] leading-relaxed text-[#1B2623]/60">Focus: {f.focus_areas}</p>}
+          {f.focus_areas && <p className="mb-2 text-[12px] leading-relaxed text-white/60">Focus: {f.focus_areas}</p>}
           {intel && (
-            <div className="mb-2 rounded-[10px] border border-amber-300/60 bg-white/70 p-2.5">
-              <p className="text-[12px] font-semibold text-[#1B2623]">{intel.headlineWin}</p>
-              <p className="mt-1 text-[12px] leading-relaxed text-[#1B2623]/75"><span className="font-bold text-[#42574E]">Opener: </span>{intel.opener}</p>
+            <div className="mb-2 rounded-[10px] border border-[#D9A54A]/30 bg-white/[0.05] p-2.5">
+              <p className="text-[12px] font-semibold text-white/90">{intel.headlineWin}</p>
+              <p className="mt-1 text-[12px] leading-relaxed text-white/70"><span className="font-bold text-[#A6E8C2]">Opener: </span>{intel.opener}</p>
             </div>
           )}
-          <div className="mb-1 text-[11px] font-bold uppercase tracking-wide text-amber-800/70">Lead with these</div>
-          <ol className="mb-2 list-decimal space-y-1 pl-5 text-[13px] text-[#1B2623]/80">
+          <div className="mb-1 text-[11px] font-bold uppercase tracking-wide text-[#E8C583]/70">Lead with these</div>
+          <ol className="mb-2 list-decimal space-y-1 pl-5 text-[13px] text-white/75">
             {discoveryQuestions(f.focus_areas).map((q) => <li key={q}>{q}</li>)}
           </ol>
           {fireAngle(f.region) && (
-            <p className="mb-3 rounded-[10px] bg-amber-200/60 px-3 py-2 text-[12px] font-medium leading-relaxed text-amber-900">
+            <p className="mb-3 rounded-[10px] bg-[#D9A54A]/15 px-3 py-2 text-[12px] font-medium leading-relaxed text-[#F0D7A6]">
               Tracy/Medline and Boyle Heights fire-displaced workers are the most urgent intake population right now — use this as the opening hook.
             </p>
           )}
-          <button type="button" onClick={() => markDone(f.id)} disabled={busyId === f.id} className={`flex ${tap} w-full items-center justify-center gap-2 rounded-[12px] bg-amber-600 font-semibold text-white disabled:opacity-50`}>
+          <button type="button" onClick={() => markDone(f.id)} disabled={busyId === f.id} className={`flex ${tap} w-full items-center justify-center gap-2 rounded-[12px] bg-[#D9A54A] font-semibold text-[#2B1608] disabled:opacity-50`}>
             <Check className="h-4 w-4" /> {busyId === f.id ? 'Saving…' : 'Mark demo done'}
           </button>
         </div>
@@ -1323,28 +1332,28 @@ function DailyTargetsScoreboard({ activity, today }: { activity: CrmActivityWith
     { label: 'Demos this week', count: demos, target: DAILY_TARGETS.demos },
   ];
   const colorMap = {
-    green: { text: 'text-emerald-600', bar: 'bg-emerald-500' },
-    amber: { text: 'text-amber-600', bar: 'bg-amber-500' },
-    gray: { text: 'text-[#1B2623]/35', bar: 'bg-[#1B2623]/25' },
+    green: { text: 'text-[#A6E8C2]', bar: 'bg-[#6FC79A]' },
+    amber: { text: 'text-[#E8C583]', bar: 'bg-[#D9A54A]' },
+    gray: { text: 'text-white/30', bar: 'bg-white/20' },
   };
   return (
     <section>
-      <h2 className="mb-2 text-[14px] font-bold">Today’s targets</h2>
+      <h2 className="mb-2 text-[14px] font-bold text-white/85">Today’s targets</h2>
       <div className="grid grid-cols-3 gap-2">
         {cards.map((c) => {
           const color = colorMap[targetColor(c.count, c.target)];
           const pct = Math.min(100, Math.round((c.count / c.target) * 100));
           return (
-            <div key={c.label} className="rounded-[14px] border border-[#D3DED6] bg-white p-3">
+            <div key={c.label} className="rounded-[14px] border border-white/12 bg-white/[0.06] p-3 backdrop-blur-md">
               <div className={`text-[26px] font-black leading-none ${color.text}`}>{c.count}</div>
-              <div className="mt-1 text-[10px] font-semibold leading-tight text-[#1B2623]/55">{c.label}</div>
-              <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[#F2F4EC]"><div className={`h-full rounded-full ${color.bar}`} style={{ width: `${pct}%` }} /></div>
-              <div className="mt-1 text-[10px] text-[#1B2623]/40">target: {c.target}</div>
+              <div className="mt-1 text-[10px] font-semibold leading-tight text-white/50">{c.label}</div>
+              <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/10"><div className={`h-full rounded-full ${color.bar}`} style={{ width: `${pct}%` }} /></div>
+              <div className="mt-1 text-[10px] text-white/35">target: {c.target}</div>
             </div>
           );
         })}
       </div>
-      <p className="mt-2 text-[12px] font-medium text-[#42574E]">{dailyTargetsContext(calls, emails, demos)}</p>
+      <p className="mt-2 text-[12px] font-medium text-[#A6E8C2]">{dailyTargetsContext(calls, emails, demos)}</p>
     </section>
   );
 }
@@ -2347,28 +2356,28 @@ function FirmsTab({ firms, onLog, userId, onNoContact, onNotInterested, claim }:
 
 // ── Activity ─────────────────────────────────────────────────────────────────
 function ActivityRow({ a, onOpen }: { a: CrmActivityWithFirm; onOpen?: () => void }) {
-  const typeColor = a.activity_type === 'demo' ? 'bg-emerald-100 text-emerald-700' : a.activity_type === 'email' ? 'bg-blue-100 text-blue-700' : 'bg-[#F2F4EC] text-[#42574E]';
+  const typeColor = a.activity_type === 'demo' ? 'bg-[#6FC79A]/18 text-[#A6E8C2]' : a.activity_type === 'email' ? 'bg-[#9B7EFF]/18 text-[#C9BBFF]' : 'bg-white/8 text-white/60';
   const clickable = !!(onOpen && a.firm_id);
   return (
     <button
       type="button"
       disabled={!clickable}
       onClick={onOpen}
-      className={`w-full rounded-[12px] border border-[#D3DED6] bg-white p-3.5 text-left transition ${clickable ? 'cursor-pointer hover:border-[#42574E] hover:bg-[#F7F9F5]' : 'cursor-default'}`}
+      className={`w-full rounded-[12px] border border-white/12 bg-white/[0.05] p-3.5 text-left backdrop-blur-md transition ${clickable ? 'cursor-pointer hover:border-[#E08A52]/40 hover:bg-white/10' : 'cursor-default'}`}
     >
       <div className="mb-1 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${typeColor}`}>{a.activity_type ?? '—'}</span>
-          <span className="text-[13px] font-semibold">{a.firm_name ?? 'Unknown firm'}</span>
+          <span className="text-[13px] font-semibold text-white/85">{a.firm_name ?? 'Unknown firm'}</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="text-[11px] text-[#1B2623]/40">{a.logged_by_name ? `${a.logged_by_name.split(' ')[0]} · ` : ''}{a.activity_date}</span>
-          {clickable && <ChevronRight className="h-3.5 w-3.5 text-[#42574E]/50" />}
+          <span className="text-[11px] text-white/35">{a.logged_by_name ? `${a.logged_by_name.split(' ')[0]} · ` : ''}{a.activity_date}</span>
+          {clickable && <ChevronRight className="h-3.5 w-3.5 text-[#E08A52]/60" />}
         </div>
       </div>
-      {a.outcome && <div className="text-[13px] text-[#1B2623]/70">{a.outcome}</div>}
-      {a.objection && <div className="mt-0.5 text-[12px] text-amber-700">Objection: {a.objection}</div>}
-      {a.notes && <p className="mt-1 line-clamp-2 text-[12px] leading-relaxed text-[#1B2623]/50">{a.notes}</p>}
+      {a.outcome && <div className="text-[13px] text-white/65">{a.outcome}</div>}
+      {a.objection && <div className="mt-0.5 text-[12px] text-[#E8C583]">Objection: {a.objection}</div>}
+      {a.notes && <p className="mt-1 line-clamp-2 text-[12px] leading-relaxed text-white/40">{a.notes}</p>}
     </button>
   );
 }
