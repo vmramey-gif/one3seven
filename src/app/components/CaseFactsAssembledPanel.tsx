@@ -3,7 +3,7 @@ import { Check, ArrowRight, ChevronDown } from 'lucide-react';
 import { type CaseTimelinePatternResult, describeSequence } from '../../services/caseTimelinePatterns';
 import type { EmployerRecordCoverage } from '../../services/caEmployerRecordRequirements';
 import type { GapDetectionResult } from '../../services/gapDetection';
-import type { DamagesReport } from '../../services/damagesCalculator';
+import type { WageCalculationCoverageResult } from '../../services/wageCalculationCoverage';
 import type { WorkLocationNexusResult } from '../../services/workLocationNexus';
 
 /**
@@ -22,7 +22,7 @@ type CaseFactsAssembledPanelProps = {
   proximity: CaseTimelinePatternResult;
   coverage: EmployerRecordCoverage;
   gaps: GapDetectionResult;
-  damages: DamagesReport | null;
+  wageCoverage: WageCalculationCoverageResult | null;
   /** Raw uploaded documents, for the category-organized "case folder" view. */
   documents?: Array<{ fileName?: string; category?: string }>;
   /** Work-location vs. employer-location facts; a cross-state note surfaces when they differ. */
@@ -83,13 +83,11 @@ export function CaseFactsAssembledPanel({
   proximity,
   coverage,
   gaps,
-  damages,
+  wageCoverage,
   documents = [],
   nexus,
   illustrative = false,
 }: CaseFactsAssembledPanelProps) {
-  const currency = (n: number) =>
-    n.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
   const shortDate = (d: Date) => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
   const tightest = proximity.closestIntervalDays;
@@ -157,8 +155,12 @@ export function CaseFactsAssembledPanel({
         {gaps.computable ? (
           <Tile value={`${gaps.undocumentedMonths}mo`} label="pay records not represented" tone="orange" />
         ) : null}
-        {damages && damages.combinedEstimate > 0 ? (
-          <Tile value={currency(damages.combinedEstimate)} label="wage exposure (arithmetic)" tone="ink" />
+        {wageCoverage ? (
+          <Tile
+            value={`${wageCoverage.completeCount}/${wageCoverage.totalCount}`}
+            label="wage-premium calculations the record has inputs for"
+            tone="ink"
+          />
         ) : null}
       </div>
 
@@ -273,24 +275,45 @@ export function CaseFactsAssembledPanel({
           </Collapsible>
         ) : null}
 
-        {damages && damages.combinedEstimate > 0 ? (
-          <Collapsible summary="Wage exposure — arithmetic" count={currency(damages.combinedEstimate)} tone="sage">
-            <div className="space-y-1 text-[12.5px] text-[#5E6B62]">
-              {damages.overtimeTotalEstimate > 0 ? (
-                <div className="flex justify-between">
-                  <span>Overtime premium (§510)</span>
-                  <span className="font-medium text-[#40433f]">{currency(damages.overtimeTotalEstimate)}</span>
+        {wageCoverage ? (
+          <Collapsible
+            summary="Wage-premium calculation inputs — record coverage"
+            count={`${wageCoverage.completeCount}/${wageCoverage.totalCount} ready`}
+            tone="sage"
+          >
+            <div className="space-y-3">
+              {wageCoverage.items.map((item) => (
+                <div key={item.key}>
+                  <div className="flex items-center justify-between text-[12.5px]">
+                    <span className="font-medium text-[#20242a]">
+                      {item.label} <span className="text-[#8a938c]">· {item.statutoryRef}</span>
+                    </span>
+                    <span className={`font-semibold ${item.complete ? 'text-[#42574E]' : 'text-[#A8512B]'}`}>
+                      {item.presentCount}/{item.requiredCount} inputs on file
+                    </span>
+                  </div>
+                  <div className="mt-1 flex flex-wrap gap-1.5">
+                    {item.inputs.map((inp) => (
+                      <span
+                        key={inp.key}
+                        className={`flex items-center gap-1 rounded-[8px] border px-2 py-1 text-[11px] ${
+                          inp.present
+                            ? 'border-[#D3DED6] bg-[#EFF3ED] text-[#42574E]'
+                            : 'border-[#EBD9CD] bg-[#FBF4EF] text-[#8B4A2B]'
+                        }`}
+                      >
+                        {inp.present ? <Check className="h-3 w-3" strokeWidth={3} /> : null}
+                        {inp.label}
+                        {!inp.present ? ' — not in file' : null}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-              ) : null}
-              {damages.mealBreakTotalEstimate > 0 ? (
-                <div className="flex justify-between">
-                  <span>Meal/rest premium (§226.7)</span>
-                  <span className="font-medium text-[#40433f]">{currency(damages.mealBreakTotalEstimate)}</span>
-                </div>
-              ) : null}
+              ))}
             </div>
-            <p className="mt-2 text-[11px] italic leading-relaxed text-[#8a938c]">
-              Arithmetic from values stated in the records — not a determination of liability, recoverable amount, or merit.
+            <p className="mt-3 text-[11px] italic leading-relaxed text-[#8a938c]">
+              Shows which record-derived inputs each calculation needs and whether they're present — one3seven
+              does not calculate a figure or estimate exposure; your team runs the calculation.
             </p>
           </Collapsible>
         ) : null}

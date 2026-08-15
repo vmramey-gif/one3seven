@@ -2,14 +2,23 @@ import { CaseFactsAssembledPanel } from '../components/CaseFactsAssembledPanel';
 import { detectCaseTimelinePatterns } from '../../services/caseTimelinePatterns';
 import { assessEmployerRecordCoverage } from '../../services/caEmployerRecordRequirements';
 import { detectPayPeriodGaps, parseEmploymentDateRange, inferPayFrequency } from '../../services/gapDetection';
-import { calculateDamages } from '../../services/damagesCalculator';
+import { assessWageCalculationCoverage } from '../../services/wageCalculationCoverage';
 import { assessWorkLocationNexus } from '../../services/workLocationNexus';
 import { WordMark } from '../components/WordMark';
 
 /**
  * /?case-demo — the firm-facing sales canvas. Runs Marcus Rivera's illustrative data through ALL
- * FOUR factual engines (proximity · record coverage · pay gaps · wage exposure) into the assembled
- * attorney worksheet. This is the "we did your intake" moment the sales team points at.
+ * FOUR factual engines (proximity · record coverage · pay gaps · wage-calculation input coverage)
+ * into the assembled attorney worksheet. This is the "we did your intake" moment the sales team
+ * points at.
+ *
+ * 2026-08-15: wage-premium arithmetic (a computed dollar figure) removed from this PUBLIC,
+ * unauthenticated surface — it's the one deliberate exception to "organize and reflect, never
+ * conclude" (damagesCalculator.ts) and stays counsel-gated (DAMAGES_SURFACING_COUNSEL_APPROVED
+ * in billingService.ts) for real firm use. Replaced with assessWageCalculationCoverage, which
+ * shows only which record-derived inputs each calculation needs and whether they're present —
+ * structurally incapable of producing a dollar figure, since it never receives the underlying
+ * numeric values at all.
  */
 
 const BODY = { fontFamily: '"Inter Tight", ui-sans-serif, system-ui, -apple-system, sans-serif' } as const;
@@ -47,13 +56,11 @@ export function CaseFactsDemoPage() {
   });
   // Illustrative: worker performed the work in CA; employer is based out of state.
   const nexus = assessWorkLocationNexus({ workState: 'California', employerState: 'Texas' });
-  const damages = calculateDamages({
-    regularHourlyRate: { value: 22, citation: null },
-    overtimeRateApplied: { value: null, citation: null }, // records show no OT premium applied
-    overtimeHoursWorked: { value: 48, citation: null },
-    mealBreaksMissed: { value: 14, citation: null },
-    payPeriodsPresent: gaps.documentedPeriods,
-    expectedPayPeriods: gaps.estimatedPeriods,
+  // Record-completeness only — which wage-premium inputs are present, never a computed figure.
+  const wageCoverage = assessWageCalculationCoverage({
+    regularHourlyRatePresent: true,
+    overtimeHoursPresent: true,
+    mealBreaksMissedPresent: true,
   });
 
   return (
@@ -74,8 +81,8 @@ export function CaseFactsDemoPage() {
         </h1>
         <p className="mt-3 max-w-[60ch] text-[15.5px] leading-relaxed text-[#40433f]">
           Every fact below was organized from the worker's own records — the sequence, the record coverage, the
-          gaps to request in discovery, and the wage-exposure arithmetic. one3seven organizes and reflects; it
-          never concludes. Your team evaluates.
+          gaps to request in discovery, and which wage-premium calculations the record has the inputs for.
+          one3seven organizes and reflects; it never concludes. Your team evaluates.
         </p>
       </div>
 
@@ -87,7 +94,7 @@ export function CaseFactsDemoPage() {
           proximity={proximity}
           coverage={coverage}
           gaps={gaps}
-          damages={damages}
+          wageCoverage={wageCoverage}
           documents={FILE_INVENTORY}
           nexus={nexus}
           illustrative
