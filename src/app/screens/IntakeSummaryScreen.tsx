@@ -1833,6 +1833,10 @@ export function IntakeSummaryScreen({
               variant="quiet"
               titleClassName={expandableTitleClass}
             >
+              <p className="mb-3 text-xs text-[var(--o3s-text-muted)] leading-relaxed">
+                The records tell the story. Dates and summaries are assembled for review — confirm details in
+                source files.
+              </p>
               <ul className="divide-y divide-[var(--o3s-border)]">
                 {displayTimelineEvents.map((row, idx) => (
                   <li key={row.timelineEventId ?? `${row.date}-${row.event}-${row.category}`}>
