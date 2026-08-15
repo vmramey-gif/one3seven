@@ -144,7 +144,7 @@ var S = [
   { t: 10500, html:
       `<div class="eyebrow">What I did</div>`
     + `<div class="big">So I organized my own record — the way I’d want a stranger to see it.</div>`
-    + `<p class="sub">Every fact tied to the document that proved it. I handed it to my lawyers, and the claim settled for the policy limit. <b style="color:var(--ink)">I’d never claim the record won it</b> — but it made the truth impossible to miss.</p>` },
+    + `<p class="sub">Every fact tied to the document that proved it. I handed it to my lawyers. <b style="color:var(--ink)">I’d never claim the record decided anything on its own</b> — but it made the truth impossible to miss.</p>` },
 
   { t: 10500, html:
       `<div class="eyebrow">The realization</div>`
@@ -215,6 +215,11 @@ var film=document.getElementById('film'), dots=document.getElementById('dots'),
     bar=document.getElementById('bar'), ctr=document.getElementById('ctr'),
     hint=document.getElementById('hint'), pauseBtn=document.getElementById('pause');
 var AUDIO = S.map(function(_,ix){ return 'audio/s'+(ix+1)+'.mp3'; });
+// Slide 2 ("What I did") had its settlement-detail line removed from the on-screen text
+// 2026-08-15, but the recorded narration clip (s3.mp3) still speaks the old script verbatim --
+// regenerating it risks a voice/style mismatch against the rest of the film, so it's silenced
+// here instead until it can be properly re-recorded to match the new text.
+var SILENT_SLIDES = [2];
 var audio = new Audio(); audio.preload='auto';
 var i=0, started=false, paused=false;
 
@@ -231,7 +236,11 @@ function paint(){
   bar.style.width=(i/S.length*100)+'%';
   if(i>0) hint.style.opacity='0';
 }
-function playAudio(){ try{ audio.pause(); }catch(e){} audio.src=AUDIO[i]; audio.currentTime=0; var p=audio.play(); if(p&&p.catch)p.catch(function(){}); }
+function playAudio(){
+  try{ audio.pause(); }catch(e){}
+  if (SILENT_SLIDES.indexOf(i) !== -1) return;
+  audio.src=AUDIO[i]; audio.currentTime=0; var p=audio.play(); if(p&&p.catch)p.catch(function(){});
+}
 function goTo(n){ i=(n+S.length)%S.length; paint(); if(started&&!paused) playAudio(); }
 function next(){ if(i<S.length-1) goTo(i+1); }
 function prev(){ goTo(Math.max(0,i-1)); }
