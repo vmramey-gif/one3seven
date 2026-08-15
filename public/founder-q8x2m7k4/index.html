@@ -61,9 +61,28 @@
     padding:15px 32px;cursor:pointer;letter-spacing:.02em;transition:background .3s,transform .2s;}
   #startbtn:hover{background:rgba(143,184,162,.12);transform:translateY(-1px);}
   .startsub{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);}
+  #gate{position:fixed;inset:0;z-index:30;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;
+    background:radial-gradient(120% 120% at 50% 0%,#12201A 0%,var(--bg) 60%);}
+  #gate form{display:flex;flex-direction:column;align-items:center;gap:14px;}
+  #gate input{font-family:var(--sans);font-size:16px;color:var(--ink);background:none;border:1px solid var(--line);
+    border-radius:999px;padding:13px 22px;text-align:center;min-width:220px;outline:none;}
+  #gate input:focus{border-color:var(--sage);}
+  #gate button{font-family:var(--sans);font-size:15px;color:var(--ink);background:none;border:1px solid var(--sage);
+    border-radius:999px;padding:12px 28px;cursor:pointer;letter-spacing:.02em;transition:background .3s;}
+  #gate button:hover{background:rgba(143,184,162,.12);}
+  #gateerr{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);
+    min-height:14px;}
 </style>
 </head>
 <body>
+<div id="gate">
+  <div class="eyebrow">Private — investor link</div>
+  <form id="gateform">
+    <input id="gatepw" type="password" placeholder="Password" autocomplete="off"/>
+    <button type="submit">Enter</button>
+  </form>
+  <div id="gateerr"></div>
+</div>
 <div id="bar"></div>
 <button id="pause">⏸ pause</button>
 <div id="ctr"></div>
@@ -72,6 +91,39 @@
 <div id="dots"></div>
 
 <script>
+// Access gate — client-side only. Screens out casual/accidental discovery (URL-guessing,
+// search indexing, an old link shared out of context); it is NOT real security — the page
+// content still ships in this file regardless, same as any static asset. Change GATE_PASSWORD
+// below to rotate the password; sessionStorage means each visitor enters it once per browser tab.
+(function(){
+  var GATE_PASSWORD = 'onehonest137';
+  var STORAGE_KEY = 'o3s_founder_film_unlocked_q8x2m7k4';
+  var gate = document.getElementById('gate');
+  var form = document.getElementById('gateform');
+  var input = document.getElementById('gatepw');
+  var err = document.getElementById('gateerr');
+
+  function unlock(){
+    try { sessionStorage.setItem(STORAGE_KEY, '1'); } catch(e) {}
+    gate.style.display = 'none';
+  }
+
+  try {
+    if (sessionStorage.getItem(STORAGE_KEY) === '1') unlock();
+  } catch(e) {}
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    if (input.value.trim().toLowerCase() === GATE_PASSWORD.toLowerCase()) {
+      unlock();
+    } else {
+      err.textContent = 'Incorrect password';
+      input.value = '';
+      input.focus();
+    }
+  });
+})();
+
 var SHIELD = '<svg class="shield" width="58" height="68" viewBox="0 0 38 44" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
  + '<path d="M19 1 L37 7 V22 C37 33 29 40 19 43 C9 40 1 33 1 22 V7 Z" fill="none" stroke="#8FB8A2" stroke-width="1.4"/>'
  + '<text x="19" y="21" text-anchor="middle" font-family="Iowan Old Style,Palatino,Georgia,serif" font-size="12" font-weight="700" fill="#ECF0E8">137</text>'
@@ -92,7 +144,7 @@ var S = [
   { t: 10500, html:
       `<div class="eyebrow">What I did</div>`
     + `<div class="big">So I organized my own record — the way I’d want a stranger to see it.</div>`
-    + `<p class="sub">Every fact tied to the document that proved it. I handed it to my lawyers, and the claim settled for the policy limit. <b style="color:var(--ink)">I’d never claim the record won it</b> — but it made the truth impossible to miss.</p>` },
+    + `<p class="sub">Every fact tied to the document that proved it. I handed it to my lawyers. <b style="color:var(--ink)">I’d never claim the record decided anything on its own</b> — but it made the truth impossible to miss.</p>` },
 
   { t: 10500, html:
       `<div class="eyebrow">The realization</div>`
@@ -163,6 +215,11 @@ var film=document.getElementById('film'), dots=document.getElementById('dots'),
     bar=document.getElementById('bar'), ctr=document.getElementById('ctr'),
     hint=document.getElementById('hint'), pauseBtn=document.getElementById('pause');
 var AUDIO = S.map(function(_,ix){ return 'audio/s'+(ix+1)+'.mp3'; });
+// Slide 2 ("What I did") had its settlement-detail line removed from the on-screen text
+// 2026-08-15, but the recorded narration clip (s3.mp3) still speaks the old script verbatim --
+// regenerating it risks a voice/style mismatch against the rest of the film, so it's silenced
+// here instead until it can be properly re-recorded to match the new text.
+var SILENT_SLIDES = [2];
 var audio = new Audio(); audio.preload='auto';
 var i=0, started=false, paused=false;
 
@@ -179,7 +236,11 @@ function paint(){
   bar.style.width=(i/S.length*100)+'%';
   if(i>0) hint.style.opacity='0';
 }
-function playAudio(){ try{ audio.pause(); }catch(e){} audio.src=AUDIO[i]; audio.currentTime=0; var p=audio.play(); if(p&&p.catch)p.catch(function(){}); }
+function playAudio(){
+  try{ audio.pause(); }catch(e){}
+  if (SILENT_SLIDES.indexOf(i) !== -1) return;
+  audio.src=AUDIO[i]; audio.currentTime=0; var p=audio.play(); if(p&&p.catch)p.catch(function(){});
+}
 function goTo(n){ i=(n+S.length)%S.length; paint(); if(started&&!paused) playAudio(); }
 function next(){ if(i<S.length-1) goTo(i+1); }
 function prev(){ goTo(Math.max(0,i-1)); }
