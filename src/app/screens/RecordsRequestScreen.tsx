@@ -40,8 +40,6 @@ export function buildLetter(opts: {
   records: Record<RecordKey, boolean>;
 }): string {
   const today = new Date();
-  const deadline = new Date(today);
-  deadline.setDate(deadline.getDate() + 30); // 30 days covers the longest statutory window (§ 1198.5)
 
   const worker = opts.workerName.trim() || '[Your full name]';
   const employer = opts.employerName.trim() || '[Employer name]';
@@ -92,7 +90,7 @@ I am ${statusWord} employee of ${employer}.${period ? ' ' + period : ''} Under C
 
 ${numbered}
 
-Please provide these records by ${fmtDate(deadline)}. If any portion is maintained by a separate entity or payroll provider, please identify who holds it so I can direct my request appropriately.
+Please provide these records within the timeframe that applies to each, as noted above. If any portion is maintained by a separate entity or payroll provider, please identify who holds it so I can direct my request appropriately.
 
 You may provide the records electronically to ${opts.contactBack.trim() || '[your email]'} or by mail to the address on file for me.
 
