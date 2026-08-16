@@ -974,6 +974,29 @@ export async function emailIntakeSummaryToWorker(
   return {};
 }
 
+/**
+ * Emails the organized-summary PDF to a firm's own email address -- the worker types in the
+ * recipient, unlike emailIntakeSummaryToWorker above, which only ever sends to the caller's own
+ * verified account email. Does not require (or imply) that the firm has a one3seven account; see
+ * send-intake-to-firm-email for the rate-limiting/audit-logging that makes an arbitrary-recipient
+ * endpoint safe to expose.
+ */
+export async function emailIntakeSummaryToFirm(
+  payload: IntakeSummaryDownloadPayload,
+  intakeId: string,
+  recipientEmail: string,
+  firmName?: string
+): Promise<{ error?: string }> {
+  const bytes = await buildIntakeSummaryPdfBytes(payload);
+  const pdfBase64 = uint8ArrayToBase64(bytes);
+  const { data, error } = await supabase.functions.invoke('send-intake-to-firm-email', {
+    body: { intakeId, recipientEmail, firmName, pdfBase64, intakeNumber: payload.intakeNumber },
+  });
+  if (error) return { error: error.message };
+  if (data?.error) return { error: data.error };
+  return {};
+}
+
 /** Build and download a text PDF from pre-wrapped lines (firm review packets, etc.). */
 export function downloadPdfFromTextLines(allLines: string[], filename: string): void {
   triggerPdfDownload(buildAsciiTextPdf(allLines), filename);
