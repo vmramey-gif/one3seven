@@ -4941,13 +4941,6 @@ export default function App() {
                     : undefined
                 }
                 onAfterRoutingSuccess={handleAfterWorkerIntakeRouting}
-                onEmailActivitySaved={() =>
-                  pushWorkerNotification({
-                    id: `email-${Date.now()}`,
-                    title: 'Note saved with intake',
-                    body: 'Email delivery will be connected before external beta. Your note is saved with this intake.',
-                  })
-                }
                 showDemoSampleWatermark={SHOW_SAMPLE_INTAKE && currentIntakeNumber === SAMPLE_INTAKE_NUMBER}
                 workerBellNotifications={displayWorkerBellNotifications}
                 notificationsPanelNotice={workerBellPanelNotice}
