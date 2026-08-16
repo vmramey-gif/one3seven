@@ -128,6 +128,13 @@ function firmRoutingPeekLine(card: {
   const connected = Boolean((card.linkedFirmName ?? '').trim() || (card.linkedFirmCode ?? '').trim());
   if (!connected) return 'No firm connected';
   const firm = (card.linkedFirmName ?? '').trim() || 'your firm';
+  // A decline only ever changes workflowStatus, never routeStatus (see firmDeclineIntake) --
+  // routeStatus alone would keep reporting "Direct full review access" for a firm that already
+  // passed on this intake. Check the decline first; only trust the (now-stale) route label
+  // once we know the firm hasn't actually declined.
+  if (card.workflowStatus.trim() === 'Not Pursuing') {
+    return `${firm} · ${formatWorkerWorkflowStatusForDisplay(card.workflowStatus, card.submissionChannel)}`;
+  }
   const shared = linkedFirmIntakeAlreadyShared(card.routeStatus);
   const routeLabel = formatRouteStatusForWorker(card.routeStatus, card.submissionChannel);
   if (shared) return `Shared with ${firm}${routeLabel ? ` · ${routeLabel}` : ''}`;
