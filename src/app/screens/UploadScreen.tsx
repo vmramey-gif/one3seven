@@ -1128,7 +1128,7 @@ export function UploadScreen({
               className="mb-4 rounded-xl border border-[#D3DED6] bg-white px-3 py-2.5 shadow-sm"
             >
               <p className="text-xs text-[#6A6D66] leading-relaxed">
-                Record types are identified automatically from file names and content — no sorting required on your end.
+                Record types are identified automatically from file names — no sorting required on your end.
                 {detectedCategoryLabels.length > 0 ? (
                   <>
                     {' '}

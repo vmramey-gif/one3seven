@@ -177,6 +177,7 @@ interface IntakeSummaryScreenProps {
   /** Dated payroll/wage record strings for Gap Detection (from the pre-collapse timeline). */
   livePayrollDates?: string[];
   onApproveAccess?: (routeId: string) => Promise<{ error?: string }>;
+  onDeclineAccess?: (routeId: string) => Promise<{ error?: string }>;
   onShareFirmCode?: (code: string) => Promise<{ error?: string; firmName?: string }>;
   onShareParticipating?: () => Promise<{ error?: string; count?: number }>;
   workerWorkflowStatus?: string | null;
@@ -308,6 +309,7 @@ export function IntakeSummaryScreen({
   liveMissing,
   liveAccessRequests,
   onApproveAccess,
+  onDeclineAccess,
   onShareFirmCode,
   onShareParticipating,
   workerWorkflowStatus,
@@ -420,6 +422,8 @@ export function IntakeSummaryScreen({
   const [accessApprovalError, setAccessApprovalError] = useState<string | null>(null);
   const [accessApprovalErrorRouteId, setAccessApprovalErrorRouteId] = useState<string | null>(null);
   const [accessApprovalBusyRouteId, setAccessApprovalBusyRouteId] = useState<string | null>(null);
+  const [accessBusyAction, setAccessBusyAction] = useState<'approve' | 'decline' | null>(null);
+  const [accessDeclineMessage, setAccessDeclineMessage] = useState<string | null>(null);
   const [fulfilledDraft, setFulfilledDraft] = useState<string[]>([]);
   const [noteToFirmDraft, setNoteToFirmDraft] = useState('');
   const [docConfirmError, setDocConfirmError] = useState<string | null>(null);
@@ -1267,17 +1271,54 @@ export function IntakeSummaryScreen({
   const handleApproveAccess = async (routeId: string) => {
     if (!onApproveAccess) return;
     setAccessApprovalBusyRouteId(routeId);
+    setAccessBusyAction('approve');
     setAccessApprovalError(null);
     setAccessApprovalErrorRouteId(null);
     setAccessApprovalMessage(null);
-    const r = await onApproveAccess(routeId);
-    setAccessApprovalBusyRouteId(null);
-    if (r.error) {
-      setAccessApprovalError(r.error);
+    setAccessDeclineMessage(null);
+    try {
+      const r = await onApproveAccess(routeId);
+      if (r.error) {
+        setAccessApprovalError(r.error);
+        setAccessApprovalErrorRouteId(routeId);
+        return;
+      }
+      setAccessApprovalMessage(PARTICIPATING_NETWORK_COPY.accessApproved);
+    } catch (e) {
+      // Previously missing entirely -- a rejected promise here (vs. a resolved {error}) left the
+      // "Approving…" spinner stuck forever with no feedback. See worker-surface audit finding H3.
+      setAccessApprovalError(e instanceof Error ? e.message : 'Could not approve access. Try again.');
       setAccessApprovalErrorRouteId(routeId);
-      return;
+    } finally {
+      setAccessApprovalBusyRouteId(null);
+      setAccessBusyAction(null);
     }
-    setAccessApprovalMessage(PARTICIPATING_NETWORK_COPY.accessApproved);
+  };
+
+  const handleDeclineAccess = async (routeId: string) => {
+    if (!onDeclineAccess) return;
+    setAccessApprovalBusyRouteId(routeId);
+    setAccessBusyAction('decline');
+    setAccessApprovalError(null);
+    setAccessApprovalErrorRouteId(null);
+    setAccessDeclineMessage(null);
+    try {
+      const r = await onDeclineAccess(routeId);
+      if (r.error) {
+        setAccessApprovalError(r.error);
+        setAccessApprovalErrorRouteId(routeId);
+        return;
+      }
+      setAccessDeclineMessage(
+        "Declined — this firm's existing preview access is unchanged. You can approve full access later if you change your mind."
+      );
+    } catch (e) {
+      setAccessApprovalError(e instanceof Error ? e.message : 'Could not decline access. Try again.');
+      setAccessApprovalErrorRouteId(routeId);
+    } finally {
+      setAccessApprovalBusyRouteId(null);
+      setAccessBusyAction(null);
+    }
   };
 
   return (
@@ -1633,7 +1674,7 @@ export function IntakeSummaryScreen({
                       onClick={() => void handleApproveAccess(req.routeId)}
                       className="mt-4 w-full min-h-[44px] touch-manipulation text-sm font-medium bg-[#42574E] text-white px-4 py-3 rounded-[12px] hover:bg-[#42574E] disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {busy ? (
+                      {busy && accessBusyAction === 'approve' ? (
                         <span className="inline-flex items-center justify-center gap-2">
                           <Loader2 className="w-4 h-4 animate-spin" aria-hidden />
                           Approving…
@@ -1642,6 +1683,16 @@ export function IntakeSummaryScreen({
                         'Approve full access'
                       )}
                     </button>
+                    {onDeclineAccess ? (
+                      <button
+                        type="button"
+                        disabled={Boolean(accessApprovalBusyRouteId)}
+                        onClick={() => void handleDeclineAccess(req.routeId)}
+                        className="mt-2 w-full min-h-[44px] touch-manipulation text-sm font-medium bg-white text-[#6A6D66] border border-amber-200 px-4 py-3 rounded-[12px] hover:bg-amber-50/60 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {busy && accessBusyAction === 'decline' ? 'Declining…' : 'Not yet — decline for now'}
+                      </button>
+                    ) : null}
                   </div>
                 );
               })}
@@ -1650,10 +1701,19 @@ export function IntakeSummaryScreen({
                   {accessApprovalMessage}
                 </p>
               ) : null}
+              {accessDeclineMessage ? (
+                <p className="text-sm text-[#1B2623] bg-[#FAF9F6] border border-[#E4E5DE] rounded-[14px] px-4 py-3">
+                  {accessDeclineMessage}
+                </p>
+              ) : null}
             </section>
           ) : accessApprovalMessage ? (
             <p className="mb-4 text-sm text-[#1B2623] bg-emerald-50 border border-emerald-100 rounded-[14px] px-4 py-3">
               {accessApprovalMessage}
+            </p>
+          ) : accessDeclineMessage ? (
+            <p className="mb-4 text-sm text-[#1B2623] bg-[#FAF9F6] border border-[#E4E5DE] rounded-[14px] px-4 py-3">
+              {accessDeclineMessage}
             </p>
           ) : null}
 

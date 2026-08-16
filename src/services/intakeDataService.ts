@@ -4210,6 +4210,16 @@ export async function workerApproveFullAccess(routeId: string, workerId: string)
   return {};
 }
 
+export async function workerDeclineFullAccess(routeId: string, workerId: string): Promise<{ error?: string }> {
+  const { data: route, error: r0 } = await supabase.from('firm_intake_routes').select('id, intake_id').eq('id', routeId).single();
+  if (r0 || !route) return { error: r0?.message ?? 'Route not found' };
+  const { data: intake, error: r1 } = await supabase.from('intakes').select('worker_id').eq('id', route.intake_id).single();
+  if (r1 || !intake || intake.worker_id !== workerId) return { error: 'Not allowed' };
+  const { error } = await supabase.rpc('worker_decline_full_access', { p_route_id: routeId });
+  if (error) return { error: error.message };
+  return {};
+}
+
 export type FirmAccessibleUploadFile = {
   file_name: string;
   category: string;
