@@ -42,6 +42,7 @@ import {
 import { WORKER_RECORD_HANDOFF } from '../constants/workerStoryIntake';
 import {
   downloadIntakeSummaryDocument,
+  emailIntakeSummaryToFirm,
   emailIntakeSummaryToWorker,
 } from '../../services/intakeSummaryDownload';
 import { STATE_BAR_SEARCH_URLS, STATE_LABELS } from '../constants/stateBarDirectories';
@@ -411,6 +412,12 @@ export function IntakeSummaryScreen({
   const [showShareConfirmation, setShowShareConfirmation] = useState(false);
   const [emailSendError, setEmailSendError] = useState<string | null>(null);
   const [isSending, setIsSending] = useState(false);
+  const [showEmailFirmModal, setShowEmailFirmModal] = useState(false);
+  const [emailFirmRecipient, setEmailFirmRecipient] = useState('');
+  const [emailFirmName, setEmailFirmName] = useState('');
+  const [emailFirmBusy, setEmailFirmBusy] = useState(false);
+  const [emailFirmError, setEmailFirmError] = useState<string | null>(null);
+  const [showEmailFirmConfirmation, setShowEmailFirmConfirmation] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
   const [intakeNotesOpen, setIntakeNotesOpen] = useState(false);
   const [intakeNoteDraft, setIntakeNoteDraft] = useState('');
@@ -908,6 +915,45 @@ export function IntakeSummaryScreen({
       setEmailSendError(e instanceof Error ? e.message : 'Could not send the email. Try again.');
     } finally {
       setIsSending(false);
+    }
+  };
+
+  const handleEmailToFirm = async () => {
+    setEmailFirmError(null);
+    const intakeId = (exportIntakeId ?? '').trim();
+    const recipient = emailFirmRecipient.trim();
+    if (!intakeId) {
+      setEmailFirmError('Save your intake before emailing it to a firm.');
+      return;
+    }
+    if (!recipient || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(recipient)) {
+      setEmailFirmError('Enter a valid email address.');
+      return;
+    }
+    setEmailFirmBusy(true);
+    try {
+      let payload = buildSummaryDownloadPayload();
+      if (isSupabaseConfigured()) {
+        try {
+          payload = await loadFreshExportPayloadFields(intakeId, payload);
+        } catch (e) {
+          console.error('[o3s-export] fresh export payload failed', e);
+        }
+      }
+      const result = await emailIntakeSummaryToFirm(payload, intakeId, recipient, emailFirmName.trim() || undefined);
+      if (result.error) {
+        setEmailFirmError(result.error);
+        return;
+      }
+      setShowEmailFirmModal(false);
+      setEmailFirmRecipient('');
+      setEmailFirmName('');
+      setShowEmailFirmConfirmation(true);
+      setTimeout(() => setShowEmailFirmConfirmation(false), 6000);
+    } catch (e) {
+      setEmailFirmError(e instanceof Error ? e.message : 'Could not send the email. Try again.');
+    } finally {
+      setEmailFirmBusy(false);
     }
   };
 
@@ -2234,6 +2280,22 @@ export function IntakeSummaryScreen({
                 )}
               </button>
               <button
+                type="button"
+                onClick={() => {
+                  setEmailFirmError(null);
+                  setShowEmailFirmModal(true);
+                }}
+                className={`${sx.btnSecondary} transition-colors font-medium flex items-center justify-center gap-2`}
+              >
+                <Mail className="w-5 h-5" />
+                Email to a firm
+              </button>
+              {showEmailFirmConfirmation ? (
+                <p className="text-sm text-emerald-800 bg-emerald-50 border border-emerald-100 rounded-[14px] px-4 py-3 leading-relaxed">
+                  Sent. Your organized intake was emailed to the address you entered.
+                </p>
+              ) : null}
+              <button
                 onClick={() => void handleSaveForLater()}
                 disabled={saveForLaterBusy}
                 className={`${sx.btnSecondary} disabled:opacity-50`}
@@ -2767,6 +2829,117 @@ export function IntakeSummaryScreen({
                     disabled={isSharing}
                     className={`w-full py-4 px-6 rounded-[14px] transition-colors font-medium ${
                       isSharing
+                        ? 'bg-[#F2F4EC] text-[#9AA39B] cursor-not-allowed'
+                        : 'bg-[#F2F4EC] text-[#1B2623] hover:bg-[#E4E5DE]'
+                    }`}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Email organized intake directly to any firm's inbox -- does not require the firm to
+          have a one3seven account (unlike firm-code routing, currently gated off). */}
+      <AnimatePresence>
+        {showEmailFirmModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-[#1B2623]\50 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center"
+            onClick={() => !emailFirmBusy && setShowEmailFirmModal(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+              className="bg-white rounded-t-[24px] sm:rounded-[24px] w-full max-w-md mx-4 mb-0 sm:mb-4 shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-xl font-semibold text-[#1B2623]">Email to a firm</h3>
+                  <button
+                    type="button"
+                    onClick={() => !emailFirmBusy && setShowEmailFirmModal(false)}
+                    className="text-[#9AA39B] hover:text-[#6A6D66] transition-colors"
+                    disabled={emailFirmBusy}
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <p className="text-sm text-[#384039] leading-relaxed mb-4">
+                  Send your organized intake as a PDF directly to any email address — no firm
+                  account needed. Use this to reach an attorney or intake team you're already in
+                  touch with.
+                </p>
+
+                <label className="block text-xs font-medium text-[#40433F] mb-1.5" htmlFor="email-firm-recipient">
+                  Firm or attorney email
+                </label>
+                <input
+                  id="email-firm-recipient"
+                  type="email"
+                  value={emailFirmRecipient}
+                  onChange={(e) => setEmailFirmRecipient(e.target.value)}
+                  placeholder="intake@lawfirm.com"
+                  className="w-full px-4 py-3 bg-[#FAF9F6] border border-[#E4E5DE] rounded-[14px] text-sm mb-3"
+                  disabled={emailFirmBusy}
+                />
+
+                <label className="block text-xs font-medium text-[#40433F] mb-1.5" htmlFor="email-firm-name">
+                  Firm name (optional)
+                </label>
+                <input
+                  id="email-firm-name"
+                  value={emailFirmName}
+                  onChange={(e) => setEmailFirmName(e.target.value)}
+                  placeholder="e.g. Smith & Associates"
+                  className="w-full px-4 py-3 bg-[#FAF9F6] border border-[#E4E5DE] rounded-[14px] text-sm mb-4"
+                  disabled={emailFirmBusy}
+                />
+
+                {emailFirmError ? (
+                  <div className="mb-4 text-sm text-red-600 bg-red-50 border border-red-100 rounded-[14px] px-4 py-3">
+                    {emailFirmError}
+                  </div>
+                ) : null}
+
+                <div className="space-y-3">
+                  <button
+                    type="button"
+                    onClick={() => void handleEmailToFirm()}
+                    disabled={emailFirmBusy || !emailFirmRecipient.trim()}
+                    className={`w-full py-4 px-6 rounded-[14px] transition-all font-medium flex items-center justify-center gap-2 ${
+                      emailFirmBusy || !emailFirmRecipient.trim()
+                        ? 'bg-[#9AA39B] text-white cursor-not-allowed'
+                        : 'bg-[#42574E] text-white hover:bg-[#42574E] shadow-sm hover:shadow-md'
+                    }`}
+                  >
+                    {emailFirmBusy ? (
+                      <>
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                        Sending…
+                      </>
+                    ) : (
+                      <>
+                        <Mail className="w-5 h-5" />
+                        Send email
+                      </>
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowEmailFirmModal(false)}
+                    disabled={emailFirmBusy}
+                    className={`w-full py-4 px-6 rounded-[14px] transition-colors font-medium ${
+                      emailFirmBusy
                         ? 'bg-[#F2F4EC] text-[#9AA39B] cursor-not-allowed'
                         : 'bg-[#F2F4EC] text-[#1B2623] hover:bg-[#E4E5DE]'
                     }`}
