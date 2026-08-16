@@ -3873,8 +3873,17 @@ export default function App() {
       (profile?.role === 'worker' || userRole === 'worker') &&
       onboardingScreens.includes(currentScreen)
     ) {
-      abandonPendingWorkerOnboarding();
-      setCurrentScreen('landing');
+      // A worker mid-story-entry (or case-category entry) with no intake row yet has their whole
+      // draft living only in sessionStorage under the pending-onboarding key -- abandoning here
+      // deletes it immediately with no way back. Gate on the same hasUnsavedProgress signal the
+      // upload/processing branch below already uses, instead of wiping unconditionally.
+      const pendingUnpersisted =
+        isSupabaseConfigured() && !currentIntakeIdRef.current && Boolean(getPendingOnboarding());
+      if (pendingUnpersisted) {
+        setShowExitModal(true);
+      } else {
+        setCurrentScreen('landing');
+      }
       return;
     }
     const workerScreens: Screen[] = [
@@ -4635,10 +4644,7 @@ export default function App() {
                 onComplete={completeGuidedIntakeFlow}
                 onSkip={skipGuidedIntakeFlow}
                 onDraftChange={handleGuidedOnboardingDraftChange}
-                onBackToLanding={() => {
-                  abandonPendingWorkerOnboarding();
-                  setCurrentScreen('landing');
-                }}
+                onBackToLanding={handleLogoClick}
               />
             </motion.div>
           )}
@@ -4673,10 +4679,7 @@ export default function App() {
                 initialTags={resolveEmploymentMatterTags(currentIntakeIdRef.current)}
                 onContinue={handleEmploymentMatterContinue}
                 onDraftChange={handleEmploymentMatterDraftChange}
-                onBackToLanding={() => {
-                  abandonPendingWorkerOnboarding();
-                  setCurrentScreen('landing');
-                }}
+                onBackToLanding={handleLogoClick}
               />
             </motion.div>
           )}
