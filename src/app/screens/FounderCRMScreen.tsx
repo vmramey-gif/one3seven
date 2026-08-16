@@ -3469,12 +3469,22 @@ function SupportTab() {
   // Account/data deletion requests (CCPA §1798.105) — read from Supabase (founder RLS).
   const [delReqs, setDelReqs] = useState<DeletionReq[]>([]);
   const [delLoading, setDelLoading] = useState(true);
+  const [delError, setDelError] = useState('');
   useEffect(() => {
     void (async () => {
       try {
-        const { data } = await supabase.from('deletion_requests').select('*').order('requested_at', { ascending: false });
-        setDelReqs((data as DeletionReq[]) || []);
-      } catch { /* table may not be provisioned yet */ }
+        const { data, error } = await supabase.from('deletion_requests').select('*').order('requested_at', { ascending: false });
+        if (error) {
+          // Distinct from "zero pending requests" — a load failure here (stale session, RLS
+          // misconfig) must never render identically to "nothing to fulfill," since this is the
+          // only screen that surfaces the 45-day CCPA deletion obligation.
+          setDelError(error.message);
+        } else {
+          setDelReqs((data as DeletionReq[]) || []);
+        }
+      } catch (e) {
+        setDelError(e instanceof Error ? e.message : 'Failed to load deletion requests.');
+      }
       setDelLoading(false);
     })();
   }, []);
@@ -3496,6 +3506,10 @@ function SupportTab() {
         </div>
         {delLoading ? (
           <p className="text-[12px] text-[#1B2623]/45">Loading…</p>
+        ) : delError ? (
+          <p className="rounded-[12px] border border-red-200 bg-red-50 px-4 py-4 text-center text-[12px] text-red-700">
+            Couldn&rsquo;t load deletion requests: {delError} — this list may be incomplete. Check again before assuming there&rsquo;s nothing to fulfill.
+          </p>
         ) : delReqs.length === 0 ? (
           <p className="rounded-[12px] border border-dashed border-[#D3DED6] bg-[#FBFBFA] px-4 py-4 text-center text-[12px] text-[#1B2623]/50">No deletion requests. (If this never changes, the <code>deletion_requests</code> table may not be provisioned yet.)</p>
         ) : (

@@ -13,13 +13,34 @@ interface SignInScreenProps {
   onSignIn: (email: string, password: string) => Promise<{ error?: string }>;
   /** Google OAuth placeholder until Supabase provider is configured */
   onGoogleAuth?: () => void | Promise<void>;
+  onForgotPassword?: (email: string) => Promise<{ error?: string }>;
 }
 
-export function SignInScreen({ onNavigate, onSignIn, onGoogleAuth }: SignInScreenProps) {
+export function SignInScreen({ onNavigate, onSignIn, onGoogleAuth, onForgotPassword }: SignInScreenProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [apiError, setApiError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [resetState, setResetState] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
+  const [resetError, setResetError] = useState('');
+
+  const handleForgotPasswordClick = async () => {
+    if (!onForgotPassword) return;
+    if (!email.trim()) {
+      setResetState('error');
+      setResetError('Enter your email above first, then click "Forgot password?" again.');
+      return;
+    }
+    setResetState('sending');
+    setResetError('');
+    const res = await onForgotPassword(email.trim());
+    if (res.error) {
+      setResetState('error');
+      setResetError(res.error);
+    } else {
+      setResetState('sent');
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -120,17 +141,27 @@ export function SignInScreen({ onNavigate, onSignIn, onGoogleAuth }: SignInScree
 
             {/* Forgot Password */}
             <div className="mb-6 text-center">
-              <button
-                type="button"
-                onClick={() =>
-                  window.alert(
-                    'Password reset will connect through Supabase Auth when email templates are configured.'
-                  )
-                }
-                className="text-sm text-[#1B2623]/64 transition-colors hover:text-[#1B2623]"
-              >
-                Forgot password?
-              </button>
+              {resetState === 'sent' ? (
+                <p className="text-sm text-[#42574E]">
+                  If an account exists for that email, a reset link is on its way — check your inbox.
+                </p>
+              ) : onForgotPassword ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => void handleForgotPasswordClick()}
+                    disabled={resetState === 'sending'}
+                    className="text-sm text-[#1B2623]/64 transition-colors hover:text-[#1B2623] disabled:opacity-60"
+                  >
+                    {resetState === 'sending' ? 'Sending…' : 'Forgot password?'}
+                  </button>
+                  {resetState === 'error' ? (
+                    <p className="mt-2 text-xs text-red-600">{resetError}</p>
+                  ) : null}
+                </>
+              ) : (
+                <span className="text-sm text-[#1B2623]/40">Forgot password?</span>
+              )}
             </div>
 
             {/* Divider */}

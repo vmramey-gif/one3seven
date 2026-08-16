@@ -12,6 +12,54 @@ interface WorkerSettingsScreenProps {
   userEmail: string | null;
   profileId: string;
   onSignOut: () => void;
+  onForgotPassword?: (email: string) => Promise<{ error?: string }>;
+}
+
+function PasswordResetControl({ email, onForgotPassword }: { email: string | null; onForgotPassword?: (email: string) => Promise<{ error?: string }> }) {
+  const [state, setState] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
+  const [error, setError] = useState('');
+
+  if (!onForgotPassword || !email) {
+    return (
+      <>
+        <p className="mb-3 text-xs text-[#1B2623]/52">
+          Password reset email will be available when Supabase Auth templates are configured for this workspace.
+        </p>
+        <ComingSoonControl label="Send reset email" />
+      </>
+    );
+  }
+
+  const send = async () => {
+    setState('sending');
+    setError('');
+    const res = await onForgotPassword(email);
+    if (res.error) {
+      setState('error');
+      setError(res.error);
+    } else {
+      setState('sent');
+    }
+  };
+
+  if (state === 'sent') {
+    return <p className="text-xs text-[#42574E]">Reset link sent to {email} — check your inbox.</p>;
+  }
+
+  return (
+    <>
+      <p className="mb-3 text-xs text-[#1B2623]/52">Send a password-reset link to {email}.</p>
+      <button
+        type="button"
+        onClick={() => void send()}
+        disabled={state === 'sending'}
+        className="w-full rounded-2xl border border-[#CBD6CF] bg-white px-4 py-2 text-sm font-medium text-[#1B2623] transition hover:bg-[#F7F9F5] disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        {state === 'sending' ? 'Sending…' : 'Send reset email'}
+      </button>
+      {state === 'error' ? <p className="mt-2 text-xs text-red-600">{error}</p> : null}
+    </>
+  );
 }
 
 // Real, CCPA-compliant account/data deletion request (§1798.105). The worker files a verified
@@ -41,7 +89,7 @@ function DeleteAccountControl({ email, onSignOut }: { email: string | null; onSi
   if (status === 'done') {
     return (
       <div className="rounded-2xl border border-red-200 bg-white px-4 py-3 text-sm leading-relaxed text-[#1B2623]">
-        Request received. Your records and account will be permanently deleted within 45 days, and we&rsquo;ll email confirmation{email ? ` to ${email}` : ''}. Signing you out&hellip;
+        Request received. Your records and account will be permanently deleted within 45 days (or up to 90, as California law allows if more time is reasonably needed). Signing you out&hellip;
       </div>
     );
   }
@@ -101,9 +149,10 @@ function ComingSoonControl({ label }: { label: string }) {
   );
 }
 
-export function WorkerSettingsScreen({ onNavigate, userEmail, profileId, onSignOut }: WorkerSettingsScreenProps) {
+export function WorkerSettingsScreen({ onNavigate, userEmail, profileId, onSignOut, onForgotPassword }: WorkerSettingsScreenProps) {
   const [fullName, setFullName] = useState('');
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState('');
 
   useEffect(() => {
     void (async () => {
@@ -113,11 +162,14 @@ export function WorkerSettingsScreen({ onNavigate, userEmail, profileId, onSignO
   }, [profileId]);
 
   const handleSave = async () => {
+    setSaveError('');
     const r = await intakeData.updateProfileName(profileId, fullName);
-    if (!r.error) {
-      setSaved(true);
-      setTimeout(() => setSaved(false), 2500);
+    if (r.error) {
+      setSaveError(r.error);
+      return;
     }
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2500);
   };
 
   return (
@@ -159,10 +211,7 @@ export function WorkerSettingsScreen({ onNavigate, userEmail, profileId, onSignO
               <div className="mb-3 flex items-center gap-2 text-sm font-medium text-[#1B2623]">
                 <KeyRound className="h-4 w-4 text-[#42574E]" /> Password reset
               </div>
-              <p className="mb-3 text-xs text-[#1B2623]/52">
-                Password reset email will be available when Supabase Auth templates are configured for this workspace.
-              </p>
-              <ComingSoonControl label="Send reset email" />
+              <PasswordResetControl email={userEmail} onForgotPassword={onForgotPassword} />
             </div>
 
             <div className="rounded-[32px] border border-[#D3DED6] bg-white/95 p-6 opacity-95 shadow-[0_18px_56px_rgba(31,27,75,0.09)] sm:p-8">
@@ -220,7 +269,7 @@ export function WorkerSettingsScreen({ onNavigate, userEmail, profileId, onSignO
                 <Trash2 className="h-4 w-4" /> Delete account
               </div>
               <p className="mb-3 text-xs leading-relaxed text-[#1B2623]/64">
-                It&rsquo;s your data — you can delete it anytime. We permanently remove your records and account within 45 days of your request and email you confirmation.
+                It&rsquo;s your data — you can delete it anytime. We permanently remove your records and account within 45 days of your request (or up to 90, as California law allows if more time is reasonably needed).
               </p>
               <DeleteAccountControl email={userEmail} onSignOut={onSignOut} />
             </div>
@@ -233,6 +282,7 @@ export function WorkerSettingsScreen({ onNavigate, userEmail, profileId, onSignO
               Save changes
             </button>
             {saved ? <p className="text-sm text-green-700 text-center">Saved.</p> : null}
+            {saveError ? <p className="text-sm text-red-600 text-center">Couldn&rsquo;t save: {saveError}</p> : null}
             <button
               type="button"
               onClick={() => onSignOut()}
