@@ -50,14 +50,25 @@ export function MitigationLogCard({ intakeId }: { intakeId: string | null }) {
     })();
   }, [intakeId]);
 
-  const persist = async (next: MitigationLogEntry[]) => {
-    setEntries(next);
-    if (!intakeId) return;
+  const persist = async (next: MitigationLogEntry[]): Promise<boolean> => {
+    if (!intakeId) {
+      // No backend to persist to yet — reflect the edit locally rather than silently no-op,
+      // but there's nothing durable to roll back to if this path is ever reached.
+      setEntries(next);
+      return true;
+    }
     setSaving(true);
     setErr(null);
     const res = await saveMitigationLog(intakeId, next);
-    if (res.error) setErr(res.error);
     setSaving(false);
+    if (res.error) {
+      // Don't update `entries` on failure — the list stays exactly as it was before this
+      // edit, so what's on screen always matches what's actually saved.
+      setErr(res.error);
+      return false;
+    }
+    setEntries(next);
+    return true;
   };
 
   const canAdd = form.date.trim() && form.employer.trim() && form.role.trim();
@@ -74,9 +85,13 @@ export function MitigationLogCard({ intakeId }: { intakeId: string | null }) {
       loggedAt: new Date().toISOString(),
     };
     const next = [entry, ...entries].sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
-    setForm({ date: '', employer: '', role: '', outcome: 'applied', notes: '' });
-    setShowForm(false);
-    await persist(next);
+    const ok = await persist(next);
+    // Only clear the form on real success — a failed save keeps what the worker typed on
+    // screen instead of making them re-enter it after already seeing an error.
+    if (ok) {
+      setForm({ date: '', employer: '', role: '', outcome: 'applied', notes: '' });
+      setShowForm(false);
+    }
   };
 
   return (

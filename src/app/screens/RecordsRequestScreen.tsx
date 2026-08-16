@@ -44,11 +44,13 @@ export function buildLetter(opts: {
   const worker = opts.workerName.trim() || '[Your full name]';
   const employer = opts.employerName.trim() || '[Employer name]';
   const addr = opts.employerAddress.trim() || '[Employer address / HR email]';
+  const isCurrent = opts.employmentStatus === 'current';
+  const endDateText = opts.endDate.trim() || (isCurrent ? 'present' : '[end date]');
   const period =
     opts.startDate.trim() || opts.endDate.trim()
-      ? `I was employed from ${opts.startDate.trim() || '[start date]'} to ${opts.endDate.trim() || '[end date]'}.`
+      ? `I was employed from ${opts.startDate.trim() || '[start date]'} to ${endDateText}.`
       : '';
-  const statusWord = opts.employmentStatus === 'current' ? 'a current' : 'a former';
+  const statusWord = isCurrent ? 'a current' : 'a former';
 
   const items: string[] = [];
   if (opts.records.payroll)
@@ -71,10 +73,25 @@ export function buildLetter(opts: {
     items.push(
       'Records of business-expense reimbursements paid to me and any expense-reimbursement policy, including reimbursements for work-related use of a personal phone, internet, vehicle, equipment, or supplies (California Labor Code § 2802).',
     );
-  if (items.length === 0)
-    items.push('My payroll records, personnel file, signed documents, and timekeeping records.');
+  // Never silently substitute a different request than what was actually selected — an empty
+  // selection says so honestly instead of picking all four types on the worker's behalf.
+  const numbered =
+    items.length > 0
+      ? items.map((t, i) => `${i + 1}. ${t}`).join('\n\n')
+      : '[No record types were selected. Please go back and select at least one record type before sending this letter.]';
 
-  const numbered = items.map((t, i) => `${i + 1}. ${t}`).join('\n\n');
+  // Only payroll (§226, 21 days) and personnel (§1198.5, 30 days) items state a deadline —
+  // don't reference "the timeframe... as noted above" when neither is selected, or nothing was.
+  const hasStatedDeadline = opts.records.payroll || opts.records.personnel;
+  const deadlineSentence =
+    items.length === 0
+      ? ''
+      : hasStatedDeadline
+        ? 'Please provide these records within the timeframe that applies to each, as noted above. '
+        : 'Please provide these records at your earliest convenience. ';
+
+  // Avoid a double period when the employer name itself already ends with one (e.g. "Acme Inc.").
+  const employerSentenceEnd = employer.endsWith('.') ? '' : '.';
 
   return `${fmtDate(today)}
 
@@ -86,11 +103,11 @@ Re: Request for Employment Records — ${worker}
 
 To Whom It May Concern:
 
-I am ${statusWord} employee of ${employer}.${period ? ' ' + period : ''} Under California law, I am requesting to inspect and receive copies of the following employment records:
+I am ${statusWord} employee of ${employer}${employerSentenceEnd}${period ? ' ' + period : ''} Under California law, I am requesting to inspect and receive copies of the following employment records:
 
 ${numbered}
 
-Please provide these records within the timeframe that applies to each, as noted above. If any portion is maintained by a separate entity or payroll provider, please identify who holds it so I can direct my request appropriately.
+${deadlineSentence}If any portion is maintained by a separate entity or payroll provider, please identify who holds it so I can direct my request appropriately.
 
 You may provide the records electronically to ${opts.contactBack.trim() || '[your email]'} or by mail to the address on file for me.
 
@@ -137,6 +154,18 @@ export function RecordsRequestScreen({ workerName, onBackToLanding }: RecordsReq
 
   const toggle = (k: RecordKey) => setRecords((r) => ({ ...r, [k]: !r[k] }));
 
+  const hasAnyRecordSelected = Object.values(records).some(Boolean);
+  // Employer address is deliberately optional (the letter itself offers "by mail to the address
+  // on file" as a fallback) — but name/employer/contact-back all render as literal bracket
+  // placeholders in the letter when blank, and shouldn't go out to a real employer that way.
+  const canFinalize =
+    hasAnyRecordSelected && Boolean(name.trim()) && Boolean(employer.trim()) && Boolean(contactBack.trim());
+  const finalizeBlockedReason = !hasAnyRecordSelected
+    ? 'Select at least one record type above.'
+    : !name.trim() || !employer.trim() || !contactBack.trim()
+      ? 'Fill in your name, employer, and where records should be sent before sending.'
+      : '';
+
   // Worker sends from their OWN mail client — one3seven composes but never sends. Recipient
   // auto-fills only when the HR field is an email; otherwise the worker fills it in their client.
   // Mail clients silently drop mailto links whose URL exceeds ~2,000 chars, so a full-letter body
@@ -146,34 +175,10 @@ export function RecordsRequestScreen({ workerName, onBackToLanding }: RecordsReq
   // registered handler — most people use webmail in a browser tab, where mailto silently does nothing.
   // So we offer Gmail / Outlook web compose (which reliably open a pre-filled draft) plus a mailto
   // fallback for desktop mail apps. one3seven composes; the worker reviews and sends.
-  const openCompose = async (kind: 'gmail' | 'outlook' | 'mailto') => {
-    const recipient = employerAddress.includes('@') ? employerAddress.trim() : '';
-    const subject = `Request for Employment Records — ${name.trim() || 'Employee'}`;
-    track('records_request_email');
-    setShowSend(false);
-    if (kind === 'gmail') {
-      window.open(
-        `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(recipient)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(letter)}`,
-        '_blank',
-        'noopener',
-      );
-      return;
-    }
-    if (kind === 'outlook') {
-      window.open(
-        `https://outlook.office.com/mail/deeplink/compose?to=${encodeURIComponent(recipient)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(letter)}`,
-        '_blank',
-        'noopener',
-      );
-      return;
-    }
-    // mailto (desktop mail app). Mail clients drop mailto links over ~2,000 chars, so long letters
-    // go to the clipboard with a short "paste here" body instead of a dead link.
-    const fullHref = `mailto:${encodeURIComponent(recipient)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(letter)}`;
-    if (fullHref.length <= 1800) {
-      window.location.href = fullHref;
-      return;
-    }
+  // Copying the encoded letter into a "paste here" short body instead of a dead/truncated deep
+  // link — shared by all three compose destinations, not just mailto, since none of them
+  // reliably carry an arbitrarily long URL.
+  const openWithClipboardFallback = async (build: (body: string) => string) => {
     let clipboardOk = false;
     try {
       await navigator.clipboard.writeText(letter);
@@ -186,10 +191,54 @@ export function RecordsRequestScreen({ workerName, onBackToLanding }: RecordsReq
     const shortBody = clipboardOk
       ? 'Your request letter has been copied to your clipboard — paste it here (Ctrl/Cmd + V) before sending.'
       : 'Paste your records request letter here before sending. You can copy it from the one3seven screen.';
-    window.location.href = `mailto:${encodeURIComponent(recipient)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(shortBody)}`;
+    window.location.href = build(shortBody);
+  };
+
+  const openCompose = async (kind: 'gmail' | 'outlook' | 'mailto') => {
+    if (!canFinalize) return;
+    const recipient = employerAddress.includes('@') ? employerAddress.trim() : '';
+    const subject = `Request for Employment Records — ${name.trim() || 'Employee'}`;
+    track('records_request_email');
+    setShowSend(false);
+    if (kind === 'gmail') {
+      const url = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(recipient)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(letter)}`;
+      // Gmail/Outlook web compose links have no documented hard cap, but in practice very long
+      // URLs get silently truncated or rejected by the browser/server well before mailto's own
+      // ~2,000-char limit — apply the same length guard mailto already had, uniformly.
+      if (url.length <= 1800) {
+        window.open(url, '_blank', 'noopener');
+        return;
+      }
+      await openWithClipboardFallback(
+        (body) => `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(recipient)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`,
+      );
+      return;
+    }
+    if (kind === 'outlook') {
+      const url = `https://outlook.office.com/mail/deeplink/compose?to=${encodeURIComponent(recipient)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(letter)}`;
+      if (url.length <= 1800) {
+        window.open(url, '_blank', 'noopener');
+        return;
+      }
+      await openWithClipboardFallback(
+        (body) => `https://outlook.office.com/mail/deeplink/compose?to=${encodeURIComponent(recipient)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`,
+      );
+      return;
+    }
+    // mailto (desktop mail app). Mail clients drop mailto links over ~2,000 chars, so long letters
+    // go to the clipboard with a short "paste here" body instead of a dead link.
+    const fullHref = `mailto:${encodeURIComponent(recipient)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(letter)}`;
+    if (fullHref.length <= 1800) {
+      window.location.href = fullHref;
+      return;
+    }
+    await openWithClipboardFallback(
+      (body) => `mailto:${encodeURIComponent(recipient)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`,
+    );
   };
 
   const handleCopy = async () => {
+    if (!canFinalize) return;
     try {
       await navigator.clipboard.writeText(letter);
       setCopied(true);
@@ -201,6 +250,7 @@ export function RecordsRequestScreen({ workerName, onBackToLanding }: RecordsReq
   };
 
   const handleDownload = () => {
+    if (!canFinalize) return;
     const blob = new Blob([letter], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -311,17 +361,17 @@ export function RecordsRequestScreen({ workerName, onBackToLanding }: RecordsReq
           <div className="mb-2 flex items-center justify-between">
             <p className="text-xs font-semibold uppercase tracking-wide text-[#7C857F]">Your request letter</p>
             <div className="flex gap-2">
-              <button type="button" onClick={handleCopy} className="inline-flex items-center gap-1.5 rounded-[10px] border border-[#E4E5DE] bg-white px-3 py-2 text-xs font-semibold text-[#384039] hover:border-[#7C8B6F]">
+              <button type="button" onClick={() => void handleCopy()} disabled={!canFinalize} className="inline-flex items-center gap-1.5 rounded-[10px] border border-[#E4E5DE] bg-white px-3 py-2 text-xs font-semibold text-[#384039] hover:border-[#7C8B6F] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-[#E4E5DE]">
                 {copied ? <Check className="h-3.5 w-3.5 text-[#42574E]" /> : <Copy className="h-3.5 w-3.5" />} {copied ? 'Copied' : 'Copy'}
               </button>
-              <button type="button" onClick={handleDownload} className="inline-flex items-center gap-1.5 rounded-[10px] border border-[#E4E5DE] bg-white px-3 py-2 text-xs font-semibold text-[#384039] hover:border-[#7C8B6F]">
+              <button type="button" onClick={handleDownload} disabled={!canFinalize} className="inline-flex items-center gap-1.5 rounded-[10px] border border-[#E4E5DE] bg-white px-3 py-2 text-xs font-semibold text-[#384039] hover:border-[#7C8B6F] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-[#E4E5DE]">
                 <Download className="h-3.5 w-3.5" /> Download
               </button>
               <div className="relative">
-                <button type="button" onClick={() => setShowSend((s) => !s)} className="inline-flex items-center gap-1.5 rounded-[10px] bg-[#42574E] px-3 py-2 text-xs font-semibold text-white hover:bg-[#374a42]">
+                <button type="button" onClick={() => setShowSend((s) => !s)} disabled={!canFinalize} className="inline-flex items-center gap-1.5 rounded-[10px] bg-[#42574E] px-3 py-2 text-xs font-semibold text-white hover:bg-[#374a42] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-[#42574E]">
                   <Mail className="h-3.5 w-3.5" /> Send from your email
                 </button>
-                {showSend && (
+                {showSend && canFinalize && (
                   <>
                     <div className="fixed inset-0 z-10" onClick={() => setShowSend(false)} />
                     <div className="absolute right-0 z-20 mt-1 w-60 rounded-[12px] border border-[#E4E5DE] bg-white p-1 shadow-lg">
@@ -335,6 +385,9 @@ export function RecordsRequestScreen({ workerName, onBackToLanding }: RecordsReq
               </div>
             </div>
           </div>
+          {finalizeBlockedReason ? (
+            <p className="mb-2 text-xs font-medium text-[#A8512B]">{finalizeBlockedReason}</p>
+          ) : null}
           <pre className="max-h-[420px] overflow-auto whitespace-pre-wrap rounded-[14px] border border-[#E4E5DE] bg-white px-5 py-4 text-[13px] leading-relaxed text-[#1B2623]" style={{ fontFamily: "'IBM Plex Mono', ui-monospace, Menlo, monospace" }}>
             {letter}
           </pre>
