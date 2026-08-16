@@ -406,6 +406,8 @@ export function IntakeSummaryScreen({
   const [firmCodeInput, setFirmCodeInput] = useState('');
   const [shareApiError, setShareApiError] = useState('');
   const [showSaveConfirmation, setShowSaveConfirmation] = useState(false);
+  const [saveForLaterError, setSaveForLaterError] = useState('');
+  const [saveForLaterBusy, setSaveForLaterBusy] = useState(false);
   const [showEmailConfirmation, setShowEmailConfirmation] = useState(false);
   const [showShareConfirmation, setShowShareConfirmation] = useState(false);
   const [emailAddress, setEmailAddress] = useState('');
@@ -860,9 +862,25 @@ export function IntakeSummaryScreen({
   };
 
   const handleSaveForLater = async () => {
-    // Save the intake workspace
+    setSaveForLaterError('');
+    // Save the intake workspace (local state flag — the durable data below is the real save).
     onSaveIntake();
-    await new Promise((resolve) => setTimeout(resolve, 800));
+
+    // Notes edited but not yet submitted via the separate "Save notes" control are the one
+    // piece of real, unpersisted data this action needs to cover — otherwise "Your intake
+    // workspace has been saved" is false for anyone with an open notes draft.
+    const hasUnsavedNotes = Boolean(onSaveWorkerIntakeNotes) && intakeNoteDraft !== savedAdditionalNotesRaw;
+    if (hasUnsavedNotes) {
+      setSaveForLaterBusy(true);
+      const r = await onSaveWorkerIntakeNotes!(intakeNoteDraft);
+      setSaveForLaterBusy(false);
+      if (r?.error) {
+        setSaveForLaterError(r.error);
+        return;
+      }
+    } else {
+      await new Promise((resolve) => setTimeout(resolve, 800));
+    }
     setShowSaveConfirmation(true);
     setTimeout(() => setShowSaveConfirmation(false), 3000);
   };
@@ -2049,6 +2067,13 @@ export function IntakeSummaryScreen({
               )}
             </AnimatePresence>
 
+            {saveForLaterError && (
+              <div className="mb-4 bg-[#FBEAE9] border border-[#E3B8B4] text-[#8B2E27] rounded-[14px] p-4 text-sm">
+                Couldn&apos;t save your notes: {saveForLaterError} Everything else on this page is already saved —
+                only your latest note edits didn&apos;t go through. Try again.
+              </div>
+            )}
+
             {/* Email Confirmation */}
             <AnimatePresence>
               {showEmailConfirmation && (
@@ -2084,7 +2109,7 @@ export function IntakeSummaryScreen({
                     track status on your dashboard and approve expanded access if a firm asks.
                   </div>
                   <div className="text-xs text-[#95AB9B] pl-8 mt-2 leading-relaxed">
-                    We&apos;ll email you when a firm responds. Most participating firms respond within 1–2 business days.
+                    We&apos;ll notify you here when a firm responds. Most participating firms respond within 1–2 business days.
                   </div>
                 </motion.div>
               )}
@@ -2128,11 +2153,12 @@ export function IntakeSummaryScreen({
                 </button>
               )}
               <button
-                onClick={handleSaveForLater}
-                className={sx.btnSecondary}
+                onClick={() => void handleSaveForLater()}
+                disabled={saveForLaterBusy}
+                className={`${sx.btnSecondary} disabled:opacity-50`}
               >
                 <Save className="w-5 h-5" />
-                Save for Later
+                {saveForLaterBusy ? 'Saving…' : 'Save for Later'}
               </button>
               {canSendToLinkedFirm ? (
                 <button
