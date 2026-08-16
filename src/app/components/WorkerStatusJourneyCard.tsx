@@ -2,10 +2,13 @@ import { Check } from 'lucide-react';
 import {
   WORKFLOW_ADDITIONAL_DOCUMENTS_REQUESTED,
   WORKFLOW_WORKER_UPLOADED_REQUESTED_DOCUMENTS,
+  formatWorkerWorkflowStatusForDisplay,
   isFirmCodeSubmissionChannel,
   isParticipatingSubmissionChannel,
   workerParticipatingPreviewSent,
 } from '../constants/one3sevenProduct';
+
+const WORKFLOW_NOT_PURSUING = 'Not Pursuing';
 
 export type WorkerStatusJourneyCardProps = {
   workflow?: string | null;
@@ -87,7 +90,8 @@ function resolveJourneyMode(
       w === 'Shared with Firm' ||
       w === 'Firm Interest Received' ||
       w === WORKFLOW_ADDITIONAL_DOCUMENTS_REQUESTED ||
-      w === WORKFLOW_WORKER_UPLOADED_REQUESTED_DOCUMENTS
+      w === WORKFLOW_WORKER_UPLOADED_REQUESTED_DOCUMENTS ||
+      w === WORKFLOW_NOT_PURSUING
     ) {
       return 'firm-code';
     }
@@ -118,6 +122,26 @@ function getFutureOnlyFrom(mode: JourneyMode): number | null {
   return mode === 'participating' ? PARTICIPATING_FUTURE_ONLY_FROM : null;
 }
 
+// A decline (workflow -> 'Not Pursuing') leaves route_status as whatever it was the moment the
+// firm acted, since firmDeclineIntake only ever touches workflow_status. That stale route_status
+// is real signal for how far things actually got before the decline -- use it instead of
+// collapsing every decline back to step 0 ("You got started"), which is what happens if nothing
+// matches and the per-mode fallback fires.
+function getStepIndexFromRouteStatus(mode: JourneyMode, routeStatus: string): number | null {
+  if (mode === 'participating') {
+    if (routeStatus === 'full_access') return 5; // "You gave them access"
+    if (routeStatus === 'access_requested') return 4; // "A firm asked to see the full file"
+    if (routeStatus === 'preview_sent') return 2; // "You shared it with firms"
+    return null;
+  }
+  if (mode === 'firm-code') {
+    if (routeStatus === 'full_access') return 3; // "Your firm is reviewing it"
+    if (routeStatus === 'preview_sent' || routeStatus === 'access_requested') return 2; // "You sent it to your firm"
+    return null;
+  }
+  return null;
+}
+
 function getActiveStepIndex(
   mode: JourneyMode,
   workflow: string,
@@ -143,6 +167,7 @@ function getActiveStepIndex(
     if (w === 'Shared with Participating Firm' || route === 'full_access') return 5;
     if (w === WORKFLOW_ADDITIONAL_DOCUMENTS_REQUESTED) return 6;
     if (w === WORKFLOW_WORKER_UPLOADED_REQUESTED_DOCUMENTS) return 8;
+    if (w === WORKFLOW_NOT_PURSUING) return getStepIndexFromRouteStatus('participating', route) ?? 1;
     return 0;
   }
 
@@ -152,13 +177,15 @@ function getActiveStepIndex(
   if (w === 'Under Firm Review' || w === 'Under Review' || route === 'accepted') return 3;
   if (w === WORKFLOW_ADDITIONAL_DOCUMENTS_REQUESTED) return 4;
   if (w === WORKFLOW_WORKER_UPLOADED_REQUESTED_DOCUMENTS) return 5;
+  if (w === WORKFLOW_NOT_PURSUING) return getStepIndexFromRouteStatus('firm-code', route) ?? 1;
   return 1;
 }
 
 function resolveJourneySubtitle(
   mode: JourneyMode,
   workflow: string,
-  activeIndex: number
+  activeIndex: number,
+  channel?: string | null
 ): string {
   const w = workflow.trim();
 
@@ -167,6 +194,11 @@ function resolveJourneySubtitle(
   }
   if (w === WORKFLOW_WORKER_UPLOADED_REQUESTED_DOCUMENTS) {
     return 'Your new records are under review. We’ll keep you posted here.';
+  }
+  // Otherwise the per-mode fallbacks below still say "a firm is reviewing your file" even
+  // though this specific firm has already declined -- the whole reason this case exists.
+  if (w === WORKFLOW_NOT_PURSUING) {
+    return formatWorkerWorkflowStatusForDisplay(w, channel);
   }
 
   if (mode === 'pre-share') {
@@ -201,7 +233,7 @@ export function resolveWorkerStatusJourney(
   const activeIndex = showTracker ? getActiveStepIndex(mode, workflowTrimmed, routeStatus) : 0;
   const futureOnlyFrom = getFutureOnlyFrom(mode);
   const subtitle = showTracker
-    ? resolveJourneySubtitle(mode, workflowTrimmed, activeIndex)
+    ? resolveJourneySubtitle(mode, workflowTrimmed, activeIndex, channel)
     : 'Your file is taking shape.';
   const currentLabel = steps[Math.min(Math.max(activeIndex, 0), steps.length - 1)] ?? 'You got started';
 
