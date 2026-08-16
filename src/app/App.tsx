@@ -3309,6 +3309,17 @@ export default function App() {
     return res;
   };
 
+  const declineWorkerAccess = async (routeId: string) => {
+    if (!profile?.id) return { error: 'Not signed in' };
+    const res = await intakeData.workerDeclineFullAccess(routeId, profile.id);
+    if (!res.error) {
+      await refreshWorkerAccessRows();
+      if (currentIntakeId) await refreshWorkerSummaryLive(currentIntakeId);
+      void refreshPersistentNotifications();
+    }
+    return res;
+  };
+
   const handleSignIn = async (email: string, password: string) => {
     if (!isSupabaseConfigured()) {
       return { error: SUPABASE_REQUIRED_USER_MESSAGE };
@@ -4890,6 +4901,7 @@ export default function App() {
                   barState: w.barState,
                 }))}
                 onApproveAccess={isSupabaseConfigured() ? approveWorkerAccess : undefined}
+                onDeclineAccess={isSupabaseConfigured() ? declineWorkerAccess : undefined}
                 onShareFirmCode={
                   isSupabaseConfigured() && currentIntakeId
                     ? shareFirmCode
