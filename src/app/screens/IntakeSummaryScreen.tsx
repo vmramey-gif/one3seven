@@ -42,6 +42,7 @@ import {
 import { WORKER_RECORD_HANDOFF } from '../constants/workerStoryIntake';
 import {
   downloadIntakeSummaryDocument,
+  emailIntakeSummaryToWorker,
 } from '../../services/intakeSummaryDownload';
 import { STATE_BAR_SEARCH_URLS, STATE_LABELS } from '../constants/stateBarDirectories';
 import {
@@ -214,8 +215,6 @@ interface IntakeSummaryScreenProps {
     firmName?: string | null;
     participatingRouteCount?: number;
   }) => void;
-  /** Persist worker email modal note (no live email delivery in beta) */
-  onEmailActivitySaved?: (detail: { email: string; note: string }) => void;
   /** When true, show labeled demo watermark on summary */
   showDemoSampleWatermark?: boolean;
   /** When incremented, scrolls this screen to the intake-notes panel (dashboard handoff). */
@@ -335,7 +334,6 @@ export function IntakeSummaryScreen({
   onOpenWorkerSettings,
   onWorkerSignOut,
   onAfterRoutingSuccess,
-  onEmailActivitySaved,
   showDemoSampleWatermark,
   workerBellNotifications = [],
   notificationsPanelNotice,
@@ -356,7 +354,6 @@ export function IntakeSummaryScreen({
   caseCategory = null,
   shellMode = false,
 }: IntakeSummaryScreenProps) {
-  const [showEmailModal, setShowEmailModal] = useState(false);
 
   // Interactive sources: clicking a supporting-record chip opens that file. The worker OWNS their
   // uploads (owner storage RLS), so signing their own file_path works with no extra policy.
@@ -410,8 +407,7 @@ export function IntakeSummaryScreen({
   const [saveForLaterBusy, setSaveForLaterBusy] = useState(false);
   const [showEmailConfirmation, setShowEmailConfirmation] = useState(false);
   const [showShareConfirmation, setShowShareConfirmation] = useState(false);
-  const [emailAddress, setEmailAddress] = useState('');
-  const [emailNote, setEmailNote] = useState('');
+  const [emailSendError, setEmailSendError] = useState<string | null>(null);
   const [isSending, setIsSending] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
   const [intakeNotesOpen, setIntakeNotesOpen] = useState(false);
@@ -647,7 +643,6 @@ export function IntakeSummaryScreen({
   useEffect(() => {
     if (!accessApprovalScrollSignal) return;
     // Close summary modals so firm-access approval is not trapped under a dimmed backdrop.
-    setShowEmailModal(false);
     setShowShareModal(false);
     setIsSending(false);
     setIsSharing(false);
@@ -885,18 +880,31 @@ export function IntakeSummaryScreen({
     setTimeout(() => setShowSaveConfirmation(false), 3000);
   };
 
-  const handleEmailSubmit = async () => {
-    if (!emailAddress.trim()) return;
-
+  const handleEmailMeCopy = async () => {
+    setEmailSendError(null);
     setIsSending(true);
-    await new Promise((resolve) => setTimeout(resolve, 400));
-    onEmailActivitySaved?.({ email: emailAddress.trim(), note: emailNote.trim() });
-    setIsSending(false);
-    setShowEmailModal(false);
-    setShowEmailConfirmation(true);
-    setEmailAddress('');
-    setEmailNote('');
-    setTimeout(() => setShowEmailConfirmation(false), 5000);
+    try {
+      let payload = buildSummaryDownloadPayload();
+      const intakeId = (exportIntakeId ?? '').trim();
+      if (intakeId && isSupabaseConfigured()) {
+        try {
+          payload = await loadFreshExportPayloadFields(intakeId, payload);
+        } catch (e) {
+          console.error('[o3s-export] fresh export payload failed', e);
+        }
+      }
+      const result = await emailIntakeSummaryToWorker(payload);
+      if (result.error) {
+        setEmailSendError(result.error);
+        return;
+      }
+      setShowEmailConfirmation(true);
+      setTimeout(() => setShowEmailConfirmation(false), 5000);
+    } catch (e) {
+      setEmailSendError(e instanceof Error ? e.message : 'Could not send the email. Try again.');
+    } finally {
+      setIsSending(false);
+    }
   };
 
   const handleParticipatingShare = async () => {
@@ -2085,11 +2093,17 @@ export function IntakeSummaryScreen({
                 >
                   <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
                   <div className="text-sm">
-                    Email delivery is unavailable during the closed beta. Your note was saved with this intake.
+                    Sent — check your inbox for a copy of your organized summary.
                   </div>
                 </motion.div>
               )}
             </AnimatePresence>
+
+            {emailSendError && (
+              <div className="mb-4 bg-[#FBEAE9] border border-[#E3B8B4] text-[#8B2E27] rounded-[14px] p-4 text-sm">
+                Couldn&apos;t send the email: {emailSendError} Try again in a moment.
+              </div>
+            )}
 
             {/* Share Confirmation */}
             <AnimatePresence>
@@ -2138,20 +2152,24 @@ export function IntakeSummaryScreen({
               >
                 Or download the raw data (JSON)
               </button>
-              {preferLiveDataOnly ? (
-                <div className="rounded-[14px] border border-[#E4E5DE] bg-[#FAF9F6] px-4 py-3 text-sm text-[#6A6D66]">
-                  Email delivery is unavailable during the closed beta.
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => setShowEmailModal(true)}
-                  className={`${sx.btnSecondary} transition-colors font-medium flex items-center justify-center gap-2`}
-                >
-                  <Mail className="w-5 h-5" />
-                  Save email note
-                </button>
-              )}
+              <button
+                type="button"
+                onClick={() => void handleEmailMeCopy()}
+                disabled={isSending}
+                className={`${sx.btnSecondary} transition-colors font-medium flex items-center justify-center gap-2 disabled:opacity-50`}
+              >
+                {isSending ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    Sending…
+                  </>
+                ) : (
+                  <>
+                    <Mail className="w-5 h-5" />
+                    Email me a copy
+                  </>
+                )}
+              </button>
               <button
                 onClick={() => void handleSaveForLater()}
                 disabled={saveForLaterBusy}
@@ -2467,103 +2485,6 @@ export function IntakeSummaryScreen({
           </div>
         </footer>
       </div>
-
-      {/* Email Modal */}
-      <AnimatePresence>
-        {showEmailModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-[#1B2623]/50 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center"
-            onClick={() => !isSending && setShowEmailModal(false)}
-          >
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-              transition={{ duration: 0.3, ease: 'easeOut' }}
-              className="bg-white rounded-t-[24px] sm:rounded-[24px] w-full max-w-md mx-4 mb-0 sm:mb-4 shadow-2xl"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="p-6">
-                {/* Header */}
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-xl font-semibold text-[#1B2623]">Save Email Note</h3>
-                  <button
-                    onClick={() => !isSending && setShowEmailModal(false)}
-                    className="text-[#9AA39B] hover:text-[#6A6D66] transition-colors"
-                    disabled={isSending}
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
-
-                {/* Email Address */}
-                <div className="mb-5">
-                  <label className="text-sm font-medium text-[#1B2623] mb-2 block">Email Address</label>
-                  <input
-                    type="email"
-                    value={emailAddress}
-                    onChange={(e) => setEmailAddress(e.target.value)}
-                    placeholder="your@email.com"
-                    className="w-full px-4 py-3 bg-[#FAF9F6] border border-[#E4E5DE] rounded-[14px] text-sm text-[#1B2623] placeholder:text-[#9AA39B] focus:outline-none focus:ring-2 focus:ring-[#42574E] focus:border-transparent"
-                    disabled={isSending}
-                  />
-                </div>
-
-                {/* Optional Note */}
-                <div className="mb-6">
-                  <label className="text-sm font-medium text-[#1B2623] mb-2 block">Optional Note</label>
-                  <textarea
-                    value={emailNote}
-                    onChange={(e) => setEmailNote(e.target.value)}
-                    placeholder="Add a note to yourself (optional)"
-                    className="w-full h-24 px-4 py-3 bg-[#FAF9F6] border border-[#E4E5DE] rounded-[14px] text-sm text-[#1B2623] placeholder:text-[#9AA39B] focus:outline-none focus:ring-2 focus:ring-[#42574E] focus:border-transparent resize-none"
-                    disabled={isSending}
-                  />
-                </div>
-
-                {/* Actions */}
-                <div className="space-y-3">
-                  <button
-                    onClick={handleEmailSubmit}
-                    disabled={!emailAddress.trim() || isSending}
-                    className={`w-full py-4 px-6 rounded-[14px] transition-all font-medium flex items-center justify-center gap-2 ${
-                      !emailAddress.trim() || isSending
-                        ? 'bg-[#E4E5DE] text-[#9AA39B] cursor-not-allowed'
-                        : 'bg-[#42574E] text-white hover:bg-[#42574E] shadow-sm hover:shadow-md'
-                    }`}
-                  >
-                    {isSending ? (
-                      <>
-                        <Loader2 className="w-5 h-5 animate-spin" />
-                        Saving…
-                      </>
-                    ) : (
-                      <>
-                        <Mail className="w-5 h-5" />
-                        Save note with intake
-                      </>
-                    )}
-                  </button>
-                  <button
-                    onClick={() => setShowEmailModal(false)}
-                    disabled={isSending}
-                    className={`w-full py-4 px-6 rounded-[14px] transition-colors font-medium ${
-                      isSending
-                        ? 'bg-[#F2F4EC] text-[#9AA39B] cursor-not-allowed'
-                        : 'bg-[#F2F4EC] text-[#1B2623] hover:bg-[#E4E5DE]'
-                    }`}
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* Send organized intake (routing) */}
       <AnimatePresence>

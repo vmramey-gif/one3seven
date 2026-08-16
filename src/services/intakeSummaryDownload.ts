@@ -12,6 +12,7 @@ import {
 import { extractStoryFollowUpFromOverview } from './storyFollowUpPersistence';
 import { formatReadinessForExportPacket } from './readinessDiagnosticsPresentation';
 import { ONE3SEVEN_UNIVERSAL_DISCLAIMER } from '../app/constants/one3sevenProduct';
+import { supabase } from '../lib/supabaseClient';
 import type { IntakeOrganizationSections } from './intakeOrganizationTypes';
 import { EXPORT_SECTION_BUCKETS, legacyCategoryToBucket, type ExportBucket } from './intakePacketFormatting';
 
@@ -912,28 +913,65 @@ export function triggerPdfDownload(bytes: Uint8Array, filename: string): void {
   window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
 }
 
-function renderIntakeSummaryPdfDownload(payload: IntakeSummaryDownloadPayload): void {
+function buildIntakeSummaryAsciiPdfBytes(payload: IntakeSummaryDownloadPayload): Uint8Array {
   const pdfLines = collectIntakePacketPdfLines(payload);
-  const bytes = buildAsciiTextPdf(pdfLines);
-  triggerPdfDownload(bytes, INTAKE_SUMMARY_PDF_FILENAME);
+  return buildAsciiTextPdf(pdfLines);
 }
 
 export function buildIntakeSummaryHtml(payload: IntakeSummaryDownloadPayload): string {
   return buildIntakePacketHtml(payload);
 }
 
-export async function downloadIntakeSummaryDocument(payload: IntakeSummaryDownloadPayload): Promise<void> {
-  // Prestige (pdf-lib) renderer, built from the worker Story Packet data so content
-  // matches the worker workflow exactly. Falls back to the text PDF on any failure.
+/**
+ * Builds the worker summary PDF bytes -- shared by the browser download and the
+ * email-a-copy action, so both paths render identically and only one place needs the
+ * prestige-renderer-with-ASCII-fallback logic.
+ */
+export async function buildIntakeSummaryPdfBytes(
+  payload: IntakeSummaryDownloadPayload
+): Promise<Uint8Array> {
   try {
     const model = buildWorkerSummaryModel(payload);
     // Lazy-load the pdf-lib renderer so pdf-lib stays out of the initial bundle.
     const { renderWorkerSummaryPdf } = await import('./firmIntakePdfRenderer');
-    const bytes = await renderWorkerSummaryPdf(model, { firmCaseMode: payload.firmCaseMode });
-    triggerPdfDownload(bytes, INTAKE_SUMMARY_PDF_FILENAME);
+    return await renderWorkerSummaryPdf(model, { firmCaseMode: payload.firmCaseMode });
   } catch {
-    renderIntakeSummaryPdfDownload(payload);
+    return buildIntakeSummaryAsciiPdfBytes(payload);
   }
+}
+
+export async function downloadIntakeSummaryDocument(payload: IntakeSummaryDownloadPayload): Promise<void> {
+  const bytes = await buildIntakeSummaryPdfBytes(payload);
+  triggerPdfDownload(bytes, INTAKE_SUMMARY_PDF_FILENAME);
+}
+
+function uint8ArrayToBase64(bytes: Uint8Array): string {
+  let binary = '';
+  const chunkSize = 0x8000; // avoid a call-stack blowout on String.fromCharCode(...bigArray)
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
+  }
+  return btoa(binary);
+}
+
+/**
+ * Emails the worker a copy of their own organized-summary PDF, sent to their own verified
+ * account email (the edge function determines the recipient from the caller's auth session --
+ * it does not accept a client-supplied address, so this can't be used to email someone else's
+ * inbox). Builds the same PDF bytes the download button produces, base64-encodes them, and
+ * posts to the send-worker-summary-email edge function.
+ */
+export async function emailIntakeSummaryToWorker(
+  payload: IntakeSummaryDownloadPayload
+): Promise<{ error?: string }> {
+  const bytes = await buildIntakeSummaryPdfBytes(payload);
+  const pdfBase64 = uint8ArrayToBase64(bytes);
+  const { data, error } = await supabase.functions.invoke('send-worker-summary-email', {
+    body: { pdfBase64, intakeNumber: payload.intakeNumber },
+  });
+  if (error) return { error: error.message };
+  if (data?.error) return { error: data.error };
+  return {};
 }
 
 /** Build and download a text PDF from pre-wrapped lines (firm review packets, etc.). */
