@@ -3,6 +3,7 @@ import {
   formatRouteStatusForWorker,
   linkedFirmIntakeAlreadyShared,
 } from '../constants/one3sevenProduct';
+import { FIRM_CODE_ROUTING_LIVE } from '../constants/flags';
 
 const REMOVE_FIRM_CODE_WARNING =
   'Removing this firm code will remove your intake from the firm you were working with. They will no longer have access to this intake.';
@@ -113,6 +114,15 @@ export function WorkerFirmCodeSection({
               {busy ? 'Removing…' : 'Remove firm code'}
             </button>
           ) : null
+        ) : !FIRM_CODE_ROUTING_LIVE ? (
+          <span
+            className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-lg border border-slate-200 bg-slate-100 text-slate-400 cursor-not-allowed select-none"
+            title="Connecting to a firm by code is coming soon. For now, download or print your organized file to bring to any attorney consultation."
+            aria-disabled="true"
+          >
+            Add firm code
+            <span className="rounded-full bg-slate-200 px-1.5 py-0.5 text-[10px] font-semibold text-slate-500">Coming soon</span>
+          </span>
         ) : onAddFirmCode ? (
           <button
             type="button"

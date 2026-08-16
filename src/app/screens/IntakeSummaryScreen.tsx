@@ -22,7 +22,7 @@ import {
 } from 'lucide-react';
 import { Screen } from '../App';
 import { IntakeWorkspace } from '../types/IntakeWorkspace';
-import { BETA_ENABLE_PARTICIPATING_ROUTING, PARTICIPATING_NETWORK_LIVE } from '../constants/flags';
+import { BETA_ENABLE_PARTICIPATING_ROUTING, FIRM_CODE_ROUTING_LIVE, PARTICIPATING_NETWORK_LIVE } from '../constants/flags';
 import {
   ONE3SEVEN_NOTICES,
   PARTICIPATING_NETWORK_COPY,
@@ -1102,7 +1102,10 @@ export function IntakeSummaryScreen({
     Boolean(stripWorkerIntakeNotesBlock(liveOverview ?? '').trim()) || Boolean(liveReadiness?.length);
 
   const hasLinkedFirm = Boolean((connectedFirmCode ?? '').trim());
-  const canRouteFirmCode = Boolean(onShareFirmCode);
+  // FIRM_CODE_ROUTING_LIVE is off 2026-08-16 (funding/counsel pause, not a UPL question) --
+  // gates NEW firm-code connections only. An already-linked firm (hasLinkedFirm) keeps working;
+  // this only stops implying to a firm that has never connected that one3seven has accounts.
+  const canRouteFirmCode = FIRM_CODE_ROUTING_LIVE && Boolean(onShareFirmCode);
   // PARTICIPATING_ROUTING_LIVE is the single master switch for the participating-firm
   // network. While it is false, no participating surface renders anywhere on this screen
   // (button, share-modal option, or explainer section) — firm-code routing stays live.
@@ -2588,19 +2591,30 @@ export function IntakeSummaryScreen({
                           {FIRM_ROUTING_COPY.firmCodeFieldHelp}
                         </p>
                       </>
-                    ) : (
+                    ) : canRouteParticipating || canRouteFirmCode ? (
                       <>
                         <p className="text-sm text-[#384039] leading-relaxed mb-3">
-                          Choose how to share your organized intake. You do not need a firm code to use the
-                          participating review network.
+                          Choose how to share your organized intake.
+                          {canRouteParticipating
+                            ? ' You do not need a firm code to use the participating review network.'
+                            : ''}
                         </p>
-                        <p className="text-xs text-[#6A6D66] leading-relaxed mb-3">
-                          {PARTICIPATING_NETWORK_COPY.shareModalBody}
-                        </p>
-                        <p className="text-xs text-[#40433F] leading-relaxed mb-6">
-                          {PARTICIPATING_NETWORK_COPY.firmsSeeNow} {PARTICIPATING_NETWORK_COPY.firmsDoNotSee}
-                        </p>
+                        {canRouteParticipating ? (
+                          <>
+                            <p className="text-xs text-[#6A6D66] leading-relaxed mb-3">
+                              {PARTICIPATING_NETWORK_COPY.shareModalBody}
+                            </p>
+                            <p className="text-xs text-[#40433F] leading-relaxed mb-6">
+                              {PARTICIPATING_NETWORK_COPY.firmsSeeNow} {PARTICIPATING_NETWORK_COPY.firmsDoNotSee}
+                            </p>
+                          </>
+                        ) : null}
                       </>
+                    ) : (
+                      <p className="text-sm text-[#384039] leading-relaxed mb-6">
+                        Connecting directly to a firm is coming soon. For now, download your organized file to
+                        bring to any attorney consultation, or check back here once this opens up.
+                      </p>
                     )}
                   </>
                 ) : (
@@ -2698,6 +2712,15 @@ export function IntakeSummaryScreen({
                             </>
                           )}
                         </button>
+                      ) : !hasLinkedFirm && !canRouteParticipating && !canRouteFirmCode ? (
+                        <span
+                          className="w-full py-4 px-6 rounded-[14px] border border-[#E4E5DE] bg-[#F5F5F0] text-[#9AA39B] font-medium flex items-center justify-center gap-2 cursor-not-allowed select-none"
+                          title="Connecting directly to a firm is coming soon. For now, download your organized file to bring to any attorney consultation."
+                          aria-disabled="true"
+                        >
+                          <Share2 className="w-5 h-5" />
+                          Coming soon
+                        </span>
                       ) : !canRouteParticipating && !onShareFirmCode ? (
                         <button
                           type="button"

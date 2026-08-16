@@ -51,6 +51,7 @@ import { NotificationsBell } from '../components/NotificationsBell';
 import type { AppNotificationItem } from '../components/NotificationsBell';
 import { WordMark } from '../components/WordMark';
 import { RedactionEditor } from '../components/RedactionEditor';
+import { FIRM_CODE_ROUTING_LIVE } from '../constants/flags';
 
 const UPLOAD_PAGE_SHELL =
   'min-h-screen bg-[#f2f4ec] text-[#111827] selection:bg-[#CBD6CF]/70 selection:text-[#111827]';
@@ -505,6 +506,7 @@ export function UploadScreen({
       return;
     }
     const canUseFirmCodeGate =
+      FIRM_CODE_ROUTING_LIVE &&
       (Boolean(activeIntakeId) || Boolean(onEnsureWorkerIntakePersisted)) &&
       Boolean(onLookupFirmCode) &&
       Boolean(onLinkFirmToIntake);
@@ -1521,7 +1523,7 @@ export function UploadScreen({
             ) : null}
           </div>
 
-          {!intakeHasGeneratedSummary && onPrelinkFirmCode ? (
+          {!intakeHasGeneratedSummary && onPrelinkFirmCode && FIRM_CODE_ROUTING_LIVE ? (
             <div className="mb-8 rounded-[14px] border border-[#D3DED6] bg-white p-4 shadow-sm">
               <p className="text-sm font-semibold text-[#1B2623] mb-1">Link Firm Code</p>
               <p className="text-xs text-[#6A6D66] mb-3 leading-relaxed">
@@ -1553,6 +1555,19 @@ export function UploadScreen({
               {prelinkToast ? (
                 <p className="mt-2 text-xs font-medium text-emerald-800">{prelinkToast}</p>
               ) : null}
+            </div>
+          ) : !intakeHasGeneratedSummary && onPrelinkFirmCode ? (
+            <div className="mb-8 rounded-[14px] border border-[#E4E5DE] bg-[#F5F5F0] p-4">
+              <p className="text-sm font-semibold text-[#9AA39B] mb-1 flex items-center gap-2">
+                Link Firm Code
+                <span className="rounded-full bg-[#E4E5DE] px-2 py-0.5 text-[10px] font-semibold text-[#7C857F]">
+                  Coming soon
+                </span>
+              </p>
+              <p className="text-xs text-[#9AA39B] leading-relaxed">
+                Connecting directly to a firm is coming soon. For now, organize your file and download or print
+                it to bring to any attorney consultation.
+              </p>
             </div>
           ) : null}
 
