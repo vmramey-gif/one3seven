@@ -15,6 +15,7 @@ import { ParticipatingNetworkStatusSection } from '../components/ParticipatingNe
 import { NotificationsBell } from '../components/NotificationsBell';
 import type { AppNotificationItem } from '../components/NotificationsBell';
 import { WorkerFirmCodeSection } from '../components/WorkerFirmCodeSection';
+import { FIRM_CODE_ROUTING_LIVE } from '../constants/flags';
 import { WorkerExpandableSection } from '../components/WorkerExpandableSection';
 import type { WorkerIntakeFirmRoutingCard } from '../../services/intakeDataService';
 import { formatWorkerIntakeLastActivity } from '../utils/workerDashboardFormat';
@@ -470,7 +471,13 @@ export function LandingScreen({
       <WorkerExpandableSection
         key={key}
         title={WORKER_INTAKE_SECTIONS.firmActivity}
-        meta={noFirmConnected ? 'Not shared with a firm yet — tap to add a firm code' : peek}
+        meta={
+          noFirmConnected
+            ? FIRM_CODE_ROUTING_LIVE
+              ? 'Not shared with a firm yet — tap to add a firm code'
+              : 'Not shared with a firm yet'
+            : peek
+        }
         defaultOpen={false}
         size={size}
         className={workerDashboardCompact ? 'bg-white/80' : 'bg-[#F1F3EF]'}

@@ -39,3 +39,16 @@ export const BETA_ENABLE_PARTICIPATING_ROUTING =
  * updated to match. When false, no participating-network surface renders anywhere.
  */
 export const PARTICIPATING_NETWORK_LIVE = false;
+
+/**
+ * Master switch for firm-code routing (a worker enters a specific firm's code and their intake
+ * shares immediately, full access). OFF 2026-08-16 — GATED PENDING FUNDING/COUNSEL, not a UPL
+ * question like PARTICIPATING_NETWORK_LIVE above: founder directive is to push only the
+ * worker side (no legal tension) while there's no money to engage counsel yet, and any "send to
+ * your firm" CTA implies the firm already has a one3seven account, which is exactly the
+ * firm-side surface being paused. When false, every firm-code entry/share CTA should render the
+ * same disabled "Coming soon" treatment already proven for PARTICIPATING_NETWORK_LIVE — see
+ * project_strategy_pause_attorney_push_worker memory. Re-enable when the founder says the firm
+ * side is back on.
+ */
+export const FIRM_CODE_ROUTING_LIVE = false;
