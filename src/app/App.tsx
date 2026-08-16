@@ -8,6 +8,7 @@ import { PendingApprovalScreen } from './screens/PendingApprovalScreen';
 import { ForFirmsPage } from './screens/ForFirmsPage';
 import { WorkerLandingPage } from './screens/WorkerLandingPage';
 import { SignInScreen } from './screens/SignInScreen';
+import { SetNewPasswordScreen } from './screens/SetNewPasswordScreen';
 import { CreateAccountScreen } from './screens/CreateAccountScreen';
 import { RoleSelectionScreen } from './screens/RoleSelectionScreen';
 import { WorkerDetailsScreen } from './screens/WorkerDetailsScreen';
@@ -176,6 +177,7 @@ export type Screen =
   | 'createAccount'
   | 'roleSelection'
   | 'workerDetails'
+  | 'setNewPassword'
   | 'landing'
   | 'recordsRequest'
   | 'workerSettings'
@@ -696,6 +698,14 @@ export default function App() {
         userId: session?.user?.id ?? null,
         email: session?.user?.email ?? null,
       });
+      // A password-recovery link lands here with a real (recovery-scoped) session — route
+      // straight to the "set a new password" screen instead of the normal sign-in handling
+      // below, which would otherwise treat this like an ordinary sign-in and skip the step
+      // where the worker actually picks a new password.
+      if (evt === 'PASSWORD_RECOVERY') {
+        setCurrentScreen('setNewPassword');
+        return;
+      }
       // Worker-landing handoff: a guest arriving via /for-workers "Start" carries a one-shot flag.
       // Consume it here (the auth handler is the single consumer) so the no-session reset below
       // lands them on Create Account / Sign in instead of the firm-first marketing home.
@@ -3242,6 +3252,29 @@ export default function App() {
     return {};
   };
 
+  // Redirects back to the app root; the recovery token lands in the URL and Supabase's client
+  // (detectSessionInUrl, on by default) fires a PASSWORD_RECOVERY auth event automatically —
+  // handled in the onAuthStateChange listener above, which routes to SetNewPasswordScreen.
+  const handleForgotPassword = async (email: string) => {
+    if (!isSupabaseConfigured()) {
+      return { error: SUPABASE_REQUIRED_USER_MESSAGE };
+    }
+    const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+      redirectTo: window.location.origin,
+    });
+    if (error) return { error: error.message };
+    return {};
+  };
+
+  const handleSetNewPassword = async (password: string) => {
+    if (!isSupabaseConfigured()) {
+      return { error: SUPABASE_REQUIRED_USER_MESSAGE };
+    }
+    const { error } = await supabase.auth.updateUser({ password });
+    if (error) return { error: error.message };
+    return {};
+  };
+
   const handleCreateAccount = async (
     email: string,
     password: string,
@@ -4323,6 +4356,21 @@ export default function App() {
                 }}
                 onSignIn={handleSignIn}
                 onGoogleAuth={isSupabaseConfigured() ? handleGoogleSignIn : undefined}
+                onForgotPassword={isSupabaseConfigured() ? handleForgotPassword : undefined}
+              />
+            </motion.div>
+          )}
+          {currentScreen === 'setNewPassword' && (
+            <motion.div
+              key="setNewPassword"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+            >
+              <SetNewPasswordScreen
+                onSetPassword={handleSetNewPassword}
+                onDone={() => setCurrentScreen('landing')}
               />
             </motion.div>
           )}
@@ -5088,6 +5136,7 @@ export default function App() {
                 userEmail={userEmail}
                 profileId={authUser?.id ?? profile?.id ?? 'local-session'}
                 onSignOut={() => void handleSignOut()}
+                onForgotPassword={isSupabaseConfigured() ? handleForgotPassword : undefined}
               />
             </motion.div>
           )}
