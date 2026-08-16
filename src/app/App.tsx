@@ -3033,6 +3033,70 @@ export default function App() {
     pendingUploadContextRef.current = null;
   }, []);
 
+  // Runs AI document-fact extraction once after a worker's FIRST organize pass, in the
+  // background. Previously this only ever ran via the manual "Re-organize file" button or a
+  // firm-side action -- a worker's first "Begin Organizing" only ever produced the deterministic
+  // (regex-only) organization, never AI-read content, despite that being the product's core
+  // promise. Fires fire-and-forget from handleProcessingFinished rather than blocking
+  // ProcessingScreen, since extraction is a resumable multi-round batch designed for the
+  // possibility of needing longer than ProcessingScreen's ~75s hard cap (the firm-side equivalent
+  // allows up to 3 minutes). Mirrors handleReorganizeIntake's proven sequence (trigger extraction
+  // -> rebuild, which intakeOrganizationEngine.ts already upgrades using document_facts when
+  // present -> re-merge firm contact -> refresh live), but gives the worker a real, non-silent
+  // signal via the notification bell on failure instead of console-only logging -- deterministic
+  // content is already showing and still fully usable either way, so failure here degrades
+  // gracefully rather than blocking anything.
+  const runFirstPassAiExtraction = useCallback(async (intakeId: string) => {
+    const notifyExtractionIncomplete = () => {
+      pushWorkerNotification({
+        id: `ai-extract-incomplete-${Date.now()}`,
+        title: "We couldn't fully read your documents yet",
+        body: 'Your file is organized from what we could read directly. Try "Re-organize file" from your summary to have another go.',
+      });
+    };
+
+    let ext: Awaited<ReturnType<typeof triggerIntakeFactExtraction>>;
+    try {
+      ext = await triggerIntakeFactExtraction(intakeId);
+    } catch (e) {
+      console.error('[o3s-ai-extract] first-pass extraction failed', e);
+      notifyExtractionIncomplete();
+      return;
+    }
+    if (ext.errors.length) {
+      console.error('[o3s-ai-extract] first-pass extraction reported errors', ext.errors);
+    }
+    if (ext.triggered === 0) {
+      if (ext.errors.length) notifyExtractionIncomplete();
+      return; // nothing new extracted (e.g. every file already processed) -- nothing to rebuild
+    }
+
+    const rebuildErr = await intakeData.persistPlaceholderOrganizationForIntake(intakeId, {
+      employmentMatterTags: employmentMatterByIntakeIdRef.current[intakeId],
+    });
+    if (rebuildErr.error) {
+      console.error('[o3s-ai-extract] rebuild after first-pass extraction failed', rebuildErr.error);
+      notifyExtractionIncomplete();
+      return;
+    }
+
+    const routing = await intakeData.fetchWorkerIntakeRoutingDisplay(intakeId);
+    if (routing.submissionChannel === 'firm_code' || routing.linkedFirmId) {
+      const contactErr = await mergeWorkerContactIntoLatestIntakeSummary(intakeId, {
+        name: (profile?.full_name ?? '').trim() || null,
+        phone: (profile?.phone ?? '').trim() || null,
+      });
+      if (contactErr.error) console.warn('[o3s-ai-extract] worker contact merge failed', contactErr.error);
+    }
+    // Only refresh the on-screen live view if the worker is still looking at this intake --
+    // if they navigated to a different intake while extraction ran in the background, the
+    // rebuild above already updated the database; the summary will show the AI-read content
+    // next time they open it, no live-refresh needed (or safe) against the wrong intake.
+    if (currentIntakeIdRef.current === intakeId) {
+      await refreshWorkerSummaryLive(intakeId);
+    }
+  }, [profile?.full_name, profile?.phone]);
+
   const handleProcessingFinished = useCallback(async (): Promise<
     { ok: true } | { ok: false; error: string }
   > => {
@@ -3070,8 +3134,10 @@ export default function App() {
     if (wf === 'Additional Documents Requested') {
       setDocRequestConfirmScrollSignal((n) => n + 1);
     }
+    // Fire-and-forget: see runFirstPassAiExtraction's own comment for why this doesn't block.
+    void runFirstPassAiExtraction(intakeId);
     return { ok: true };
-  }, [profile?.id, workerIntakeWorkflow, syncWorkerIntakeUiToListRow]);
+  }, [profile?.id, workerIntakeWorkflow, syncWorkerIntakeUiToListRow, runFirstPassAiExtraction]);
 
   // Re-run organization on an EXISTING intake with the current code, then reload the summary. Lets a
   // worker refresh a file that was organized before a fix shipped (the raw extractions are unchanged;
