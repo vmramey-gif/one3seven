@@ -60,7 +60,7 @@ import {
   isWorkerDocumentRequestResponseComplete,
   stripWorkerIntakeNotesBlock,
   fetchIntakeSummaryBundle,
-  listUploadedFiles,
+  listUploadedFilesResult,
   createFirmIntakeFileSignedUrl,
   listExtractionFactsForCoverage,
   type CoverageExtractionFactsRow,
@@ -773,9 +773,9 @@ export function IntakeSummaryScreen({
     intakeId: string,
     base: IntakeSummaryDownloadPayload
   ): Promise<IntakeSummaryDownloadPayload> => {
-    const [bundle, fileRows] = await Promise.all([
+    const [bundle, filesResult] = await Promise.all([
       fetchIntakeSummaryBundle(intakeId),
-      listUploadedFiles(intakeId),
+      listUploadedFilesResult(intakeId),
     ]);
     const s = bundle.summary as {
       overview?: string;
@@ -802,21 +802,35 @@ export function IntakeSummaryScreen({
         sourceFileNames: trace?.sourceFileNames ?? [],
       };
     });
-    const uploadedFileInventory = fileRows.map((row) => {
-      const fileName =
-        typeof row.file_name === 'string' && row.file_name.trim() ? row.file_name : 'Uploaded file';
-      const category =
-        (row.category as string | null)?.trim() || inferCategoryFromFileName(fileName);
-      return { fileName, category };
-    });
-    const catCounts = new Map<string, number>();
-    for (const row of uploadedFileInventory) {
-      catCounts.set(row.category, (catCounts.get(row.category) ?? 0) + 1);
+    // A transient uploaded_files read error would otherwise silently wipe the itemized file
+    // inventory in a downloaded/exported packet while other fields kept their prior values (H2,
+    // worker audit 2026-08) -- on error, keep the whole file-derived block from `base` instead of
+    // rebuilding it from a wrongly-empty result.
+    let uploadedFileInventory = base.uploadedFileInventory ?? [];
+    let categoryBreakdown = base.categoryBreakdown ?? [];
+    let categories = base.categories;
+    let documentsUploaded = base.documentsUploaded;
+    if (filesResult.error) {
+      console.error('[o3s-export] uploaded_files read failed, keeping base file data', filesResult.error);
+    } else {
+      const fileRows = filesResult.rows;
+      uploadedFileInventory = fileRows.map((row) => {
+        const fileName =
+          typeof row.file_name === 'string' && row.file_name.trim() ? row.file_name : 'Uploaded file';
+        const category =
+          (row.category as string | null)?.trim() || inferCategoryFromFileName(fileName);
+        return { fileName, category };
+      });
+      const catCounts = new Map<string, number>();
+      for (const row of uploadedFileInventory) {
+        catCounts.set(row.category, (catCounts.get(row.category) ?? 0) + 1);
+      }
+      categoryBreakdown = [...catCounts.entries()].map(([name, count]) => ({ name, count }));
+      categories = uploadedFileInventory.length
+        ? [...new Set(uploadedFileInventory.map((f) => f.category))]
+        : base.categories;
+      documentsUploaded = fileRows.length || base.documentsUploaded;
     }
-    const categoryBreakdown = [...catCounts.entries()].map(([name, count]) => ({ name, count }));
-    const categories = uploadedFileInventory.length
-      ? [...new Set(uploadedFileInventory.map((f) => f.category))]
-      : base.categories;
     return {
       ...base,
       overview: overviewStripped,
@@ -825,7 +839,7 @@ export function IntakeSummaryScreen({
       readiness: (s?.readiness_indicators as string[] | undefined) ?? base.readiness,
       missing: (s?.missing_document_alerts as string[] | undefined) ?? base.missing,
       uploadedFileInventory,
-      documentsUploaded: fileRows.length || base.documentsUploaded,
+      documentsUploaded,
       categories,
       categoryBreakdown: categoryBreakdown.length ? categoryBreakdown : base.categoryBreakdown,
     };

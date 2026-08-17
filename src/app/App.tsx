@@ -499,19 +499,12 @@ export default function App() {
   const [processingQuickMode, setProcessingQuickMode] = useState(false);
 
   const currentIntakeIdRef = useRef<string | null>(null);
-  /** Read-only mirror of uploadedFiles.length for hydrateUploadedFilesForIntake's error guard --
-   * kept out of that callback's own deps so a successful hydrate doesn't change the callback's
-   * identity and re-trigger the effect that calls it (see currentIntakeIdRef for the same pattern). */
-  const uploadedFilesLengthRef = useRef(0);
   /** Prevents landing hub anchor effect from snapping back to a prior intake during create-new. */
   const skipAnchorIntakeSyncRef = useRef(false);
   const currentIntakeWorkspaceIdRef = useRef<string>(currentIntakeWorkspace.id);
   useEffect(() => {
     currentIntakeIdRef.current = currentIntakeId;
   }, [currentIntakeId]);
-  useEffect(() => {
-    uploadedFilesLengthRef.current = uploadedFiles.length;
-  }, [uploadedFiles]);
   useEffect(() => {
     currentIntakeWorkspaceIdRef.current = currentIntakeWorkspace.id;
   }, [currentIntakeWorkspace.id]);
@@ -1342,13 +1335,12 @@ export default function App() {
       }
       // A transient read error looks identical to "zero files" once collapsed to an empty array
       // (H2, worker audit 2026-08) -- nothing was actually deleted server-side, so don't let a
-      // failed refresh wipe a file list the worker can already see. Only trust an empty result
-      // when the read actually succeeded.
-      if (error && uploadedFilesLengthRef.current > 0) {
-        console.warn('[o3s-intake] hydrate skipped (read error, keeping existing file list)', {
-          intakeId,
-          error,
-        });
+      // failed refresh wipe or falsely populate a file list. Unconditional on any error (not just
+      // when a non-empty list was already showing) -- an intake's very first hydrate has nothing
+      // to protect via a prior-count check, but a first-load error is exactly as likely to be
+      // transient, and confidently rendering "zero files" would be just as wrong there.
+      if (error) {
+        console.warn('[o3s-intake] hydrate skipped (read error)', { intakeId, error });
         return;
       }
       const hydratedFiles = rows.map((row) => {
