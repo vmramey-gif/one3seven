@@ -57,6 +57,7 @@ const WAGE_EXPOSURE_DISCLAIMER: string[] = [
 ];
 import {
   buildFirmIntakeOverviewFields,
+  buildClaimLensInputFromFirmView,
   partitionFirmReadinessPresentation,
   polishFirmFacingProse,
   polishFirmFacingText,
@@ -65,6 +66,7 @@ import {
   polishTimelineEventSummary,
   polishTimelineEventTitle,
 } from './firmIntakeDisplay';
+import { pickStrongestClaimLensView } from './claimLens';
 import { buildIntakePacketViewModel } from './intakePacketPresentation';
 import { inferCategoryFromFileName } from './intakeDataService';
 
@@ -1162,6 +1164,25 @@ export function buildFirmIntakePacketModel(view: FirmLiveIntakeView): FirmPacket
       }
     : null;
 
+  // Element Lens — strongest-covered theory, mirroring the web Element Lens tab's default pick.
+  // Built from the same claimLensInput shape (buildClaimLensInputFromFirmView) so the PDF and the
+  // web tab can never disagree about which theory is "strongest" or how many elements are covered.
+  // Preview exports get nothing (matches every other real-content section); a real export with
+  // zero covered elements also gets nothing — an all-gaps "strongest theory" is noise, not signal.
+  const claimLens: FirmPacketModel['claimLens'] = (() => {
+    if (preview) return null;
+    const claimLensInput = buildClaimLensInputFromFirmView(view, workerStory);
+    const pick = pickStrongestClaimLensView(claimLensInput);
+    if (pick.view.coverage.withMaterial === 0) return null;
+    return {
+      title: pick.view.title,
+      withMaterial: pick.view.coverage.withMaterial,
+      total: pick.view.coverage.total,
+      gaps: pick.view.tally.gaps,
+      gapLabels: pick.gapLabels,
+    };
+  })();
+
   // Sequence (with timing interval) — mirrors buildSequenceWithTiming logic.
   let sequence: FirmPacketModel['sequence'];
   if (preview) {
@@ -1247,6 +1268,7 @@ export function buildFirmIntakePacketModel(view: FirmLiveIntakeView): FirmPacket
     reviewSnapshot: buildReviewSnapshot(view, overviewFields, cleanEvents, resolvedFiles),
     whyReview: buildWhyThisIntakeRequiresReview(cleanEvents, complaintDate),
     extracted,
+    claimLens,
     overviewFields: meaningfulFields,
     sequence,
     priorityQuestions: preview ? [] : buildPriorityQuestions(cleanEvents, resolvedFiles, workerStory, view.workerFollowUp),

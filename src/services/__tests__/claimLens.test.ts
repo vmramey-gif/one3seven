@@ -4,6 +4,7 @@ import {
   buildExistenceChecks,
   CLAIM_LENSES,
   lensEligibleForStrongestRanking,
+  pickStrongestClaimLensView,
   type ClaimLensInput,
 } from '../claimLens';
 
@@ -511,5 +512,35 @@ describe('paga ranking eligibility gate', () => {
 
   it('final_pay is unaffected by adding paga to the gate (regression guard)', () => {
     expect(lensEligibleForStrongestRanking('final_pay', ordinaryPayStubs)).toBe(false);
+  });
+});
+
+describe('pickStrongestClaimLensView — used to build the PDF Element Lens section (Task: Element Lens in PDF)', () => {
+  it('picks the same lens ClaimLensPanel.tsx would default to: highest coverage among rank-eligible lenses', () => {
+    const pick = pickStrongestClaimLensView(rosa);
+    const best = Math.max(
+      ...CLAIM_LENSES.filter((l) => lensEligibleForStrongestRanking(l.id, rosa)).map(
+        (l) => buildClaimLensView(l.id, rosa).coverage.withMaterial,
+      ),
+    );
+    expect(pick.view.coverage.withMaterial).toBe(best);
+  });
+
+  it('gapLabels exactly matches the picked view’s elements with no material on file', () => {
+    const pick = pickStrongestClaimLensView(rosa);
+    const expectedGaps = pick.view.elements.filter((e) => e.items.length === 0).map((e) => e.name);
+    expect(pick.gapLabels).toEqual(expectedGaps);
+  });
+
+  it('never picks a ranking-gated wage lens (final_pay/paga) when the record has no concrete pay-gap fact', () => {
+    const noPayGapFact: ClaimLensInput = {
+      events: rosa.events,
+      quotes: [],
+      intervals: rosa.intervals,
+      workerContext: 'I filed a written complaint about a safety concern at the warehouse. Nine days later I got a written warning.',
+      files: rosa.files,
+    };
+    const pick = pickStrongestClaimLensView(noPayGapFact);
+    expect(['final_pay', 'paga']).not.toContain(pick.lensId);
   });
 });

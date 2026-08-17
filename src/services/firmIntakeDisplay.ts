@@ -17,6 +17,7 @@ import {
 } from './intakePacketPresentation';
 import type { IntakeSummaryDownloadPayload } from './intakeSummaryDownload';
 import type { FirmLiveIntakeView } from './intakeDataService';
+import type { ClaimLensInput } from './claimLens';
 import {
   extractStoryFollowUpFromOverview,
   stripStoryFollowUpBlock,
@@ -373,6 +374,58 @@ export function resolveEventDisplayCategory(storedCategory: string, resolvedTitl
   const stored = (storedCategory ?? '').trim();
   if (stored && stored !== 'Uncategorized') return stored;
   return TITLE_TO_DISPLAY_CATEGORY[resolvedTitle] ?? stored ?? 'Uncategorized';
+}
+
+/**
+ * Builds the Element Lens engine's input from a FirmLiveIntakeView -- single source of truth used
+ * by the web Element Lens tab, the Decision Card's headcount extraction (see Task #70), and the
+ * downloaded PDF's Element Lens summary, so none of them can ever disagree about what's in the
+ * record. workerStoryFallback should be the same buildFirmWorkerStoryDisplay(view) result the
+ * caller already has on hand.
+ */
+export function buildClaimLensInputFromFirmView(
+  view: Pick<FirmLiveIntakeView, 'events' | 'intelligence' | 'files' | 'workerProvidedContext' | 'previewOnly'>,
+  workerStoryFallback: string,
+): ClaimLensInput {
+  return {
+    events: (view.events ?? []).map((e) => {
+      // Restore source-linking inside the lens: pull the supporting file the event's summary
+      // names ("Supported by X.pdf") so the item renders source-linked, not just "on file".
+      const supported = (e.ai_summary ?? '').match(
+        /[Ss]upported by\s+([^.,]+\.(?:pdf|docx?|png|jpe?g))/i
+      );
+      return {
+        title: polishTimelineEventTitle(e.title),
+        date: e.event_date,
+        category: e.category,
+        sourceFile: supported?.[1]?.trim() ?? null,
+      };
+    }),
+    quotes: (view.intelligence?.keyQuotes ?? []).map((q) => ({
+      quote: q.quote,
+      fileName: q.file_name,
+      category: q.category,
+    })),
+    intervals: (view.intelligence?.timingIntervals ?? []).map((iv) => ({
+      label: iv.label,
+      days: iv.days,
+      description: iv.description,
+    })),
+    confirmed: (() => {
+      const it = view.intelligence;
+      if (!it) return [];
+      const c: Array<{ label: string; value: string }> = [];
+      if (it.confirmedComplaintTopic) c.push({ label: 'HR complaint topic', value: it.confirmedComplaintTopic });
+      if (it.confirmedComplaintDate) c.push({ label: 'Complaint date', value: it.confirmedComplaintDate });
+      if (it.confirmedHrResponseSummary) c.push({ label: 'HR response', value: it.confirmedHrResponseSummary });
+      if (it.confirmedWarningReason) c.push({ label: 'Written warning states', value: it.confirmedWarningReason });
+      if (it.confirmedTerminationReason) c.push({ label: 'Termination states', value: it.confirmedTerminationReason });
+      return c;
+    })(),
+    // Preview gate (defense-in-depth): the lens never receives the narrative pre-approval.
+    workerContext: view.previewOnly ? '' : view.workerProvidedContext ?? workerStoryFallback ?? '',
+    files: (view.files ?? []).map((f) => ({ fileName: f.file_name, category: f.category })),
+  };
 }
 
 export function polishMissingContextLine(line: string | null | undefined): string {

@@ -52,6 +52,7 @@ function sampleModel(overrides: Partial<FirmPacketModel> = {}): FirmPacketModel 
     disclaimer: ['one3seven is not a law firm and does not provide legal advice.'],
     documentWorkflow: [],
     wageExposure: null,
+    claimLens: null,
     ...overrides,
   };
 }
@@ -62,6 +63,23 @@ describe('renderFirmIntakePacketPdf', () => {
     expect(bytes.length).toBeGreaterThan(1000);
     // PDF magic header "%PDF"
     expect([bytes[0], bytes[1], bytes[2], bytes[3]]).toEqual([0x25, 0x50, 0x44, 0x46]);
+  });
+
+  test('renders an Element Lens section when claimLens is present, and adds real content', async () => {
+    const base = await renderFirmIntakePacketPdf(sampleModel());
+    const withLens = await renderFirmIntakePacketPdf(
+      sampleModel({
+        claimLens: {
+          title: 'Labor Code §1102.5 — Retaliation',
+          withMaterial: 4,
+          total: 6,
+          gaps: 2,
+          gapLabels: ['Recipient of the report', 'Employer awareness material'],
+        },
+      }),
+    );
+    expect(withLens[0]).toBe(0x25);
+    expect(withLens.length).toBeGreaterThan(base.length);
   });
 
   test('renders without throwing on a sparse limited-preview model', async () => {
