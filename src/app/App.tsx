@@ -2414,6 +2414,20 @@ export default function App() {
     void refreshPersistentNotifications();
   }, [isAuthenticated, authUser?.id, profile?.role, userRole, refreshPersistentNotifications]);
 
+  // H8 (worker audit 2026-08): no realtime subscription exists for notifications -- a
+  // firm-initiated event (access granted, document request, etc.) during an open session
+  // wouldn't show up until the worker manually reloaded. Cheap mitigation: catch up whenever the
+  // tab regains focus (switching back from another tab/app is exactly when a worker is most
+  // likely to be checking for a response), without needing a full realtime subscription.
+  useEffect(() => {
+    if (!isSupabaseConfigured() || !isAuthenticated || !authUser?.id) return;
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') void refreshPersistentNotifications();
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => document.removeEventListener('visibilitychange', onVisible);
+  }, [isAuthenticated, authUser?.id, refreshPersistentNotifications]);
+
   const navigateToScreen = (screen: Screen) => {
     if (OFFLINE_DEV_GALLERY_ONLY && !isDevOnlyScreenWithoutSupabase(screen)) {
       setCurrentScreen('devNavMap');
