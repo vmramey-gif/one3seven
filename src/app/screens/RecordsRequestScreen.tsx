@@ -55,7 +55,7 @@ export function buildLetter(opts: {
   const items: string[] = [];
   if (opts.records.payroll)
     items.push(
-      'Payroll and wage records, including itemized wage statements, records of hours worked, rates of pay, and deductions (California Labor Code § 226). Under Labor Code § 226(c), these must be made available within 21 calendar days of this request.',
+      'Payroll and wage records, including itemized wage statements, records of hours worked, rates of pay, and deductions (California Labor Code § 226). Under Labor Code § 226(b), these must be made available within 21 calendar days of this request.',
     );
   if (opts.records.personnel)
     items.push(
