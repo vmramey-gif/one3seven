@@ -6,8 +6,14 @@ export type WorkerSmsLink = {
   status: 'pending_verification' | 'verified';
 };
 
-/** The worker's most recent phone link for this intake, if any (verified or awaiting a code). */
-export async function loadSmsLink(intakeId: string): Promise<WorkerSmsLink | null> {
+/**
+ * The worker's most recent phone link for this intake, if any (verified or awaiting a code).
+ * Distinguishes "no link exists" from "the read failed" -- collapsing both to a bare null (as
+ * this used to) silently invites a worker who already has a verified link to re-enter their
+ * number if a read transiently fails, since the UI has no way to tell "confirmed not linked"
+ * from "we don't actually know" (same bug family as H2, worker audit 2026-08).
+ */
+export async function loadSmsLink(intakeId: string): Promise<{ link: WorkerSmsLink | null; error?: string }> {
   const { data, error } = await supabase
     .from('worker_sms_links')
     .select('id, phone_number, status')
@@ -15,8 +21,11 @@ export async function loadSmsLink(intakeId: string): Promise<WorkerSmsLink | nul
     .order('created_at', { ascending: false })
     .limit(1)
     .maybeSingle();
-  if (error || !data) return null;
-  return { id: data.id as string, phoneNumber: data.phone_number as string, status: data.status as WorkerSmsLink['status'] };
+  if (error) return { link: null, error: error.message };
+  if (!data) return { link: null };
+  return {
+    link: { id: data.id as string, phoneNumber: data.phone_number as string, status: data.status as WorkerSmsLink['status'] },
+  };
 }
 
 /** Sends a 6-digit code to phoneNumber (E.164) and stores an unverified link. */
