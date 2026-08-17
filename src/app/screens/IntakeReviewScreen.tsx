@@ -53,6 +53,7 @@ import type { SourceCitation } from '../../services/damagesCalculator';
 import { normalizeFilenameForMatching } from '../../services/filenameMatching';
 import { CitationPanel } from '../components/CitationPanel';
 import { ClaimLensPanel } from '../components/ClaimLensPanel';
+import { buildExistenceChecks, type ClaimLensInput } from '../../services/claimLens';
 import { WageExposureReviewSection } from '../components/WageExposureReviewSection';
 import {
   createFirmIntakeFileSignedUrl,
@@ -562,6 +563,57 @@ export function IntakeReviewScreen({
     firmLiveView && useConnectedFirmLayout && !firmLiveView.previewOnly
       ? buildFirmWorkerStoryDisplay(firmLiveView)
       : '';
+
+  // Shared Element Lens input — single source of truth for both the Element Lens tab and the
+  // Decision Card's Layer-0 existence checks (e.g. headcount), so the two can never disagree about
+  // what's in the record. Previously this object was built inline only at the ClaimLensPanel call
+  // site, so nothing else on this screen could see it.
+  const claimLensInput: ClaimLensInput = useMemo(() => {
+    if (!firmLiveView) {
+      return { events: [], quotes: [], intervals: [], confirmed: [], workerContext: '', files: [] };
+    }
+    return {
+      events: (firmLiveView.events ?? []).map((e) => {
+        // Restore source-linking inside the lens: pull the supporting file the event's summary
+        // names ("Supported by X.pdf") so the item renders source-linked, not just "on file".
+        const supported = (e.ai_summary ?? '').match(
+          /[Ss]upported by\s+([^.,]+\.(?:pdf|docx?|png|jpe?g))/i
+        );
+        return {
+          title: polishTimelineEventTitle(e.title),
+          date: e.event_date,
+          category: e.category,
+          sourceFile: supported?.[1]?.trim() ?? null,
+        };
+      }),
+      quotes: (firmLiveView.intelligence?.keyQuotes ?? []).map((q) => ({
+        quote: q.quote,
+        fileName: q.file_name,
+        category: q.category,
+      })),
+      intervals: (firmLiveView.intelligence?.timingIntervals ?? []).map((iv) => ({
+        label: iv.label,
+        days: iv.days,
+        description: iv.description,
+      })),
+      confirmed: (() => {
+        const it = firmLiveView.intelligence;
+        if (!it) return [];
+        const c: Array<{ label: string; value: string }> = [];
+        if (it.confirmedComplaintTopic) c.push({ label: 'HR complaint topic', value: it.confirmedComplaintTopic });
+        if (it.confirmedComplaintDate) c.push({ label: 'Complaint date', value: it.confirmedComplaintDate });
+        if (it.confirmedHrResponseSummary) c.push({ label: 'HR response', value: it.confirmedHrResponseSummary });
+        if (it.confirmedWarningReason) c.push({ label: 'Written warning states', value: it.confirmedWarningReason });
+        if (it.confirmedTerminationReason) c.push({ label: 'Termination states', value: it.confirmedTerminationReason });
+        return c;
+      })(),
+      // Preview gate (defense-in-depth): the lens never receives the narrative pre-approval.
+      workerContext: firmLiveView.previewOnly
+        ? ''
+        : firmLiveView.workerProvidedContext ?? firmWorkerStoryDisplay ?? '',
+      files: (firmLiveView.files ?? []).map((f) => ({ fileName: f.file_name, category: f.category })),
+    };
+  }, [firmLiveView, firmWorkerStoryDisplay]);
 
   // Worker identity — lifted to component scope so the case-file spine and the intake header
   // can lead with a real human name (never a bare number). A named worker who assembled and
@@ -1406,58 +1458,6 @@ export function IntakeReviewScreen({
               );
             })() : null}
 
-            {/* Call-prep checklist — the PDF's "Priority Questions" section, packaged as an
-                interactive checklist for the actual client call. Thin UI layer on top of
-                buildPriorityQuestionsForView; no new question-generation logic. Session-local
-                check state only — not persisted, not worker-facing. */}
-            {activeTab === 'decision' && useConnectedFirmLayout && firmLiveView ? (() => {
-              const questions = buildPriorityQuestionsForView(firmLiveView);
-              if (questions.length === 0) return null;
-              return (
-                <div className="rounded-[18px] border border-[#D8E0CF] bg-white p-4">
-                  <p className="text-[11px] font-semibold uppercase tracking-wide text-[#42574E]">
-                    Call-prep checklist
-                  </p>
-                  <p className="mt-1 text-xs text-[#6A6D66]">
-                    Worth asking on the first call, based on what&rsquo;s on file. Check off as you go —
-                    this list isn&rsquo;t saved, it&rsquo;s just for you right now.
-                  </p>
-                  <ul className="mt-3 flex flex-col gap-1.5">
-                    {questions.map((q, i) => {
-                      const checked = checkedPrepQuestions.has(i);
-                      return (
-                        <li key={i}>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setCheckedPrepQuestions((prev) => {
-                                const next = new Set(prev);
-                                if (next.has(i)) next.delete(i);
-                                else next.add(i);
-                                return next;
-                              })
-                            }
-                            className="flex w-full items-start gap-2.5 rounded-[10px] px-2 py-1.5 text-left transition-colors hover:bg-[#F5F6F1]"
-                          >
-                            <span
-                              className={`mt-0.5 flex h-[16px] w-[16px] flex-none items-center justify-center rounded-[4px] border transition-colors ${
-                                checked ? 'border-[#42574E] bg-[#42574E]' : 'border-[#C6D0C8] bg-white'
-                              }`}
-                            >
-                              {checked ? <CheckCircle2 className="h-3 w-3 text-white" /> : null}
-                            </span>
-                            <span className={`text-sm leading-snug ${checked ? 'text-[#6A6D66] line-through' : 'text-[#1B2623]'}`}>
-                              {q}
-                            </span>
-                          </button>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </div>
-              );
-            })() : null}
-
             {/* Case Readiness Snapshot — attorney orientation card */}
             {activeTab === 'decision' && useConnectedFirmLayout && firmLiveView ? (() => {
               // Preview gate (defense-in-depth): the Decision Card never reads the narrative pre-approval.
@@ -1520,9 +1520,33 @@ export function IntakeReviewScreen({
                 }
               })();
 
+              // Employer headcount — Layer 0 (buildExistenceChecks) only tells us whether headcount
+              // material was referenced at all; a real number is worth more to an attorney scanning
+              // for size-dependent claims (CFRA/CalWARN/SB 951/§432.3/§6401.9) than a vague
+              // "Referenced" flag. Only show it when a real number can be extracted — never a
+              // placeholder. Gated on the engine's own detection so this can't drift from Element Lens.
+              const headcountValue = (() => {
+                const hasHeadcountMaterial = buildExistenceChecks(claimLensInput).find(
+                  (c) => c.label === 'Employer headcount',
+                )?.present;
+                if (!hasHeadcountMaterial) return '';
+                const HEADCOUNT_RE = /\b(\d[\d,]{0,6}\+?)\s*(?:employees|workers|staff(?:\s*members)?|people)\b/i;
+                const sources = [
+                  claimLensInput.workerContext,
+                  ...claimLensInput.quotes.map((q) => q.quote),
+                  ...claimLensInput.confirmed.map((c) => `${c.label} ${c.value}`),
+                ];
+                for (const s of sources) {
+                  const m = (s ?? '').match(HEADCOUNT_RE);
+                  if (m?.[1]) return `${m[1]} employees`;
+                }
+                return '';
+              })();
+
               const snapshotItems: Array<{ label: string; value: string }> = [];
               // Worker name intentionally omitted here — it leads the intake header above; repeating it inflates the card.
               if (employer) snapshotItems.push({ label: 'Employer', value: employer });
+              if (headcountValue) snapshotItems.push({ label: 'Employer Headcount', value: headcountValue });
               if (employmentDates) snapshotItems.push({ label: 'Employment Period', value: employmentDates });
               snapshotItems.push({ label: 'Records', value: `${reconstructedRecordCount} document${reconstructedRecordCount === 1 ? '' : 's'}` });
               if (lastDocumentedEvent) snapshotItems.push({ label: lastDocumentedEvent.label, value: lastDocumentedEvent.value });
@@ -1598,52 +1622,64 @@ export function IntakeReviewScreen({
               );
             })() : null}
 
+            {/* Call-prep checklist — the PDF's "Priority Questions" section, packaged as an
+                interactive checklist for the actual client call. Thin UI layer on top of
+                buildPriorityQuestionsForView; no new question-generation logic. Session-local
+                check state only — not persisted, not worker-facing. Rendered AFTER the Case
+                Readiness Snapshot (facts before questions — matches the PDF's ordering). */}
+            {activeTab === 'decision' && useConnectedFirmLayout && firmLiveView ? (() => {
+              const questions = buildPriorityQuestionsForView(firmLiveView);
+              if (questions.length === 0) return null;
+              return (
+                <div className="rounded-[18px] border border-[#D8E0CF] bg-white p-4">
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-[#42574E]">
+                    Call-prep checklist
+                  </p>
+                  <p className="mt-1 text-xs text-[#6A6D66]">
+                    Worth asking on the first call, based on what&rsquo;s on file. Check off as you go —
+                    this list isn&rsquo;t saved, it&rsquo;s just for you right now.
+                  </p>
+                  <ul className="mt-3 flex flex-col gap-1.5">
+                    {questions.map((q, i) => {
+                      const checked = checkedPrepQuestions.has(i);
+                      return (
+                        <li key={i}>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setCheckedPrepQuestions((prev) => {
+                                const next = new Set(prev);
+                                if (next.has(i)) next.delete(i);
+                                else next.add(i);
+                                return next;
+                              })
+                            }
+                            className="flex w-full items-start gap-2.5 rounded-[10px] px-2 py-1.5 text-left transition-colors hover:bg-[#F5F6F1]"
+                          >
+                            <span
+                              className={`mt-0.5 flex h-[16px] w-[16px] flex-none items-center justify-center rounded-[4px] border transition-colors ${
+                                checked ? 'border-[#42574E] bg-[#42574E]' : 'border-[#C6D0C8] bg-white'
+                              }`}
+                            >
+                              {checked ? <CheckCircle2 className="h-3 w-3 text-white" /> : null}
+                            </span>
+                            <span className={`text-sm leading-snug ${checked ? 'text-[#6A6D66] line-through' : 'text-[#1B2623]'}`}>
+                              {q}
+                            </span>
+                          </button>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              );
+            })() : null}
+
             {/* Claim Lens — real element-coverage map on THIS intake's facts. Firm-access-gated;
                 counsel-gated before any real firm is given the feature. Organizes, never concludes. */}
             {activeTab === 'claimlens' && useConnectedFirmLayout && firmLiveView ? (
               <ClaimLensPanel
-                input={{
-                  events: (firmLiveView.events ?? []).map((e) => {
-                    // Restore source-linking inside the lens: pull the supporting file the event's
-                    // summary names ("Supported by X.pdf") so the item renders source-linked, not
-                    // just "on file". Without this the three-state model collapsed to two.
-                    const supported = (e.ai_summary ?? '').match(
-                      /[Ss]upported by\s+([^.,]+\.(?:pdf|docx?|png|jpe?g))/i
-                    );
-                    return {
-                      title: polishTimelineEventTitle(e.title),
-                      date: e.event_date,
-                      category: e.category,
-                      sourceFile: supported?.[1]?.trim() ?? null,
-                    };
-                  }),
-                  quotes: (firmLiveView.intelligence?.keyQuotes ?? []).map((q) => ({
-                    quote: q.quote,
-                    fileName: q.file_name,
-                    category: q.category,
-                  })),
-                  intervals: (firmLiveView.intelligence?.timingIntervals ?? []).map((iv) => ({
-                    label: iv.label,
-                    days: iv.days,
-                    description: iv.description,
-                  })),
-                  confirmed: (() => {
-                    const it = firmLiveView.intelligence;
-                    if (!it) return [];
-                    const c: Array<{ label: string; value: string }> = [];
-                    if (it.confirmedComplaintTopic) c.push({ label: 'HR complaint topic', value: it.confirmedComplaintTopic });
-                    if (it.confirmedComplaintDate) c.push({ label: 'Complaint date', value: it.confirmedComplaintDate });
-                    if (it.confirmedHrResponseSummary) c.push({ label: 'HR response', value: it.confirmedHrResponseSummary });
-                    if (it.confirmedWarningReason) c.push({ label: 'Written warning states', value: it.confirmedWarningReason });
-                    if (it.confirmedTerminationReason) c.push({ label: 'Termination states', value: it.confirmedTerminationReason });
-                    return c;
-                  })(),
-                  // Preview gate (defense-in-depth): the lens never receives the narrative pre-approval.
-                  workerContext: firmLiveView.previewOnly
-                    ? ''
-                    : firmLiveView.workerProvidedContext ?? firmWorkerStoryDisplay ?? '',
-                  files: (firmLiveView.files ?? []).map((f) => ({ fileName: f.file_name, category: f.category })),
-                }}
+                input={claimLensInput}
                 onOpenSource={(fileName, snippet) => void openQuoteCitation(fileName, snippet)}
               />
             ) : null}
