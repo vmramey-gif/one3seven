@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
-import { ArrowLeft, User, Mail, KeyRound, Trash2, Bell, Shield, Download } from 'lucide-react';
+import { ArrowLeft, User, Mail, KeyRound, Trash2, Bell, Shield, Download, MapPin } from 'lucide-react';
 import { Screen } from '../App';
 import * as intakeData from '../../services/intakeDataService';
 import { supabase } from '../../lib/supabaseClient';
@@ -154,18 +154,48 @@ export function WorkerSettingsScreen({ onNavigate, userEmail, profileId, onSignO
   const [saved, setSaved] = useState(false);
   const [saveError, setSaveError] = useState('');
 
+  // Mailing address -- the one piece of WorkerDetailsScreen's original job that never got a new
+  // home after name/phone collection moved into CreateAccountScreen. middleInitial/phone are kept
+  // (not shown here) purely so saving the address below doesn't overwrite them with null --
+  // saveWorkerContactDetails always writes all 7 contact columns, not a partial patch.
+  const [middleInitial, setMiddleInitial] = useState('');
+  const [phone, setPhone] = useState('');
+  const [addressLine1, setAddressLine1] = useState('');
+  const [addressLine2, setAddressLine2] = useState('');
+  const [city, setCity] = useState('');
+  const [addrState, setAddrState] = useState('');
+  const [zip, setZip] = useState('');
+
   useEffect(() => {
     void (async () => {
       const p = await intakeData.fetchProfile(profileId);
       setFullName(p?.full_name ?? '');
+      setMiddleInitial(p?.middle_initial ?? '');
+      setPhone(p?.phone ?? '');
+      setAddressLine1(p?.address_line1 ?? '');
+      setAddressLine2(p?.address_line2 ?? '');
+      setCity(p?.city ?? '');
+      setAddrState(p?.state ?? '');
+      setZip(p?.zip ?? '');
     })();
   }, [profileId]);
 
   const handleSave = async () => {
     setSaveError('');
-    const r = await intakeData.updateProfileName(profileId, fullName);
-    if (r.error) {
-      setSaveError(r.error);
+    const [nameResult, contactResult] = await Promise.all([
+      intakeData.updateProfileName(profileId, fullName),
+      intakeData.saveWorkerContactDetails(profileId, {
+        middle_initial: middleInitial,
+        phone,
+        address_line1: addressLine1,
+        address_line2: addressLine2,
+        city,
+        state: addrState,
+        zip,
+      }),
+    ]);
+    if (nameResult.error || contactResult.error) {
+      setSaveError(nameResult.error || contactResult.error || 'Could not save.');
       return;
     }
     setSaved(true);
@@ -205,6 +235,58 @@ export function WorkerSettingsScreen({ onNavigate, userEmail, profileId, onSignO
               </label>
               <input value={userEmail ?? ''} disabled className="w-full rounded-2xl border border-[#CBD6CF] bg-[#F1F3EF] px-4 py-3 text-sm text-[#1B2623]/52" />
               <p className="mt-2 text-xs text-[#1B2623]/52">Email is managed through Supabase Auth.</p>
+            </div>
+
+            <div className="rounded-[32px] border border-[#D3DED6] bg-white/95 p-6 shadow-[0_18px_56px_rgba(31,27,75,0.09)] sm:p-8">
+              <h2 className="mb-1 flex items-center gap-2 text-sm font-semibold text-[#1B2623]">
+                <MapPin className="h-4 w-4 text-[#42574E]" /> Mailing address
+              </h2>
+              <p className="mb-4 text-xs text-[#1B2623]/52">
+                Optional. Save an address here if you&rsquo;d like one on file — for example, to include on a
+                records-request letter you send yourself.
+              </p>
+              <label className="mb-2 block text-sm font-medium text-[#1B2623]">Address line 1</label>
+              <input
+                value={addressLine1}
+                onChange={(e) => setAddressLine1(e.target.value)}
+                className="w-full rounded-2xl border border-[#CBD6CF] bg-[#F1F3EF] px-4 py-3 text-sm text-[#1B2623] placeholder:text-[#1B2623]/38 focus:border-[#42574E] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#42574E]/10"
+                placeholder="Street address"
+                autoComplete="street-address"
+              />
+              <label className="mb-2 mt-4 block text-sm font-medium text-[#1B2623]">Address line 2 (optional)</label>
+              <input
+                value={addressLine2}
+                onChange={(e) => setAddressLine2(e.target.value)}
+                className="w-full rounded-2xl border border-[#CBD6CF] bg-[#F1F3EF] px-4 py-3 text-sm text-[#1B2623] placeholder:text-[#1B2623]/38 focus:border-[#42574E] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#42574E]/10"
+                placeholder="Apt, suite, unit"
+              />
+              <div className="mt-4 grid grid-cols-2 gap-3">
+                <div className="col-span-2 sm:col-span-1">
+                  <label className="mb-2 block text-sm font-medium text-[#1B2623]">City</label>
+                  <input
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    className="w-full rounded-2xl border border-[#CBD6CF] bg-[#F1F3EF] px-4 py-3 text-sm text-[#1B2623] placeholder:text-[#1B2623]/38 focus:border-[#42574E] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#42574E]/10"
+                    autoComplete="address-level2"
+                  />
+                </div>
+                <div className="col-span-2 sm:col-span-1">
+                  <label className="mb-2 block text-sm font-medium text-[#1B2623]">State</label>
+                  <input
+                    value={addrState}
+                    onChange={(e) => setAddrState(e.target.value)}
+                    className="w-full rounded-2xl border border-[#CBD6CF] bg-[#F1F3EF] px-4 py-3 text-sm text-[#1B2623] placeholder:text-[#1B2623]/38 focus:border-[#42574E] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#42574E]/10"
+                    autoComplete="address-level1"
+                  />
+                </div>
+              </div>
+              <label className="mb-2 mt-4 block text-sm font-medium text-[#1B2623]">ZIP code</label>
+              <input
+                value={zip}
+                onChange={(e) => setZip(e.target.value)}
+                className="w-full max-w-[160px] rounded-2xl border border-[#CBD6CF] bg-[#F1F3EF] px-4 py-3 text-sm text-[#1B2623] placeholder:text-[#1B2623]/38 focus:border-[#42574E] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#42574E]/10"
+                autoComplete="postal-code"
+              />
             </div>
 
             <div className="rounded-[32px] border border-[#D3DED6] bg-white/95 p-6 opacity-95 shadow-[0_18px_56px_rgba(31,27,75,0.09)] sm:p-8">
