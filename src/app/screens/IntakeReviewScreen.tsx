@@ -84,6 +84,7 @@ import {
   polishNameForDisplay,
   polishTimelineEventSummary,
   polishTimelineEventTitle,
+  buildClaimLensInputFromFirmView,
   resolveEventDisplayCategory,
   resolveFirmPersistedWorkflowStatus,
   type FirmPersistedWorkflowTone,
@@ -572,47 +573,7 @@ export function IntakeReviewScreen({
     if (!firmLiveView) {
       return { events: [], quotes: [], intervals: [], confirmed: [], workerContext: '', files: [] };
     }
-    return {
-      events: (firmLiveView.events ?? []).map((e) => {
-        // Restore source-linking inside the lens: pull the supporting file the event's summary
-        // names ("Supported by X.pdf") so the item renders source-linked, not just "on file".
-        const supported = (e.ai_summary ?? '').match(
-          /[Ss]upported by\s+([^.,]+\.(?:pdf|docx?|png|jpe?g))/i
-        );
-        return {
-          title: polishTimelineEventTitle(e.title),
-          date: e.event_date,
-          category: e.category,
-          sourceFile: supported?.[1]?.trim() ?? null,
-        };
-      }),
-      quotes: (firmLiveView.intelligence?.keyQuotes ?? []).map((q) => ({
-        quote: q.quote,
-        fileName: q.file_name,
-        category: q.category,
-      })),
-      intervals: (firmLiveView.intelligence?.timingIntervals ?? []).map((iv) => ({
-        label: iv.label,
-        days: iv.days,
-        description: iv.description,
-      })),
-      confirmed: (() => {
-        const it = firmLiveView.intelligence;
-        if (!it) return [];
-        const c: Array<{ label: string; value: string }> = [];
-        if (it.confirmedComplaintTopic) c.push({ label: 'HR complaint topic', value: it.confirmedComplaintTopic });
-        if (it.confirmedComplaintDate) c.push({ label: 'Complaint date', value: it.confirmedComplaintDate });
-        if (it.confirmedHrResponseSummary) c.push({ label: 'HR response', value: it.confirmedHrResponseSummary });
-        if (it.confirmedWarningReason) c.push({ label: 'Written warning states', value: it.confirmedWarningReason });
-        if (it.confirmedTerminationReason) c.push({ label: 'Termination states', value: it.confirmedTerminationReason });
-        return c;
-      })(),
-      // Preview gate (defense-in-depth): the lens never receives the narrative pre-approval.
-      workerContext: firmLiveView.previewOnly
-        ? ''
-        : firmLiveView.workerProvidedContext ?? firmWorkerStoryDisplay ?? '',
-      files: (firmLiveView.files ?? []).map((f) => ({ fileName: f.file_name, category: f.category })),
-    };
+    return buildClaimLensInputFromFirmView(firmLiveView, firmWorkerStoryDisplay);
   }, [firmLiveView, firmWorkerStoryDisplay]);
 
   // Worker identity — lifted to component scope so the case-file spine and the intake header

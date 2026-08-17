@@ -1198,6 +1198,26 @@ export function lensEligibleForStrongestRanking(lensId: string, input: ClaimLens
   return facts.some((f) => CONCRETE_PAY_GAP_PATTERNS.some((re) => re.test(f.text)));
 }
 
+export type StrongestClaimLensPick = { lensId: string; view: ClaimLensView; gapLabels: string[] };
+
+/**
+ * The same "strongest-covered theory" selection ClaimLensPanel.tsx uses for its default tab
+ * (highest element coverage, subject to the ranking gate above), packaged as a pure function so
+ * any other consumer (e.g. the firm PDF packet) picks the identical theory the attorney sees on
+ * the web Element Lens tab -- the two must never disagree about which theory is "strongest."
+ */
+export function pickStrongestClaimLensView(input: ClaimLensInput): StrongestClaimLensPick {
+  const ordered = CLAIM_LENSES.map((l) => ({
+    id: l.id,
+    score: buildClaimLensView(l.id, input).coverage.withMaterial,
+    rankEligible: lensEligibleForStrongestRanking(l.id, input),
+  })).sort((a, b) => b.score - a.score);
+  const picked = ordered.find((l) => l.rankEligible) ?? ordered[0];
+  const view = buildClaimLensView(picked.id, input);
+  const gapLabels = view.elements.filter((e) => e.items.length === 0).map((e) => e.name);
+  return { lensId: picked.id, view, gapLabels };
+}
+
 /** Layer 0 — the lens-independent flag row. Pure existence facts — no legal judgment. */
 export function buildExistenceChecks(input: ClaimLensInput): ExistenceCheck[] {
   const allText = norm(

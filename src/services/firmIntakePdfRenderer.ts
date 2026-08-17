@@ -56,6 +56,19 @@ export type FirmPacketModel = {
     keyQuotes: Array<{ category: string; fileName: string; quote: string }>;
     overtimeNote: string | null;
   } | null;
+  /**
+   * Element Lens — strongest-covered theory (see claimLens.ts / ClaimLensPanel.tsx). null when in
+   * limited preview, or when the record has no material for any theory yet. gapLabels are the
+   * element names with no material on file — the actionable part, matching the "Not yet on file"
+   * list the web Element Lens tab shows for the same theory.
+   */
+  claimLens: {
+    title: string;
+    withMaterial: number;
+    total: number;
+    gaps: number;
+    gapLabels: string[];
+  } | null;
   overviewFields: Array<{ label: string; value: string }>;
   sequence:
     | { kind: 'preview' | 'empty'; note: string }
@@ -201,6 +214,29 @@ function bullet(c: Cursor, text: string): void {
   c.page.drawText('•', { x: MARGIN + 2, y: c.y - 10, size: 10, font: c.bold, color: BRAND });
   c.text(text, { x: MARGIN + 16, size: 10, color: SOFT });
   c.gap(2);
+}
+
+/** Section 4B: Element Lens — strongest-covered theory. Same doctrine as the web Element Lens
+ *  tab: an element is a checklist entry the theory requires, not a score; absence is a fact,
+ *  never a verdict. Gap labels are the "not yet on file" elements — the actionable half. */
+function drawElementLensSection(c: Cursor, lens: NonNullable<FirmPacketModel['claimLens']>): void {
+  sectionHeading(c, '4B.  Element Lens — Strongest-Covered Theory');
+  c.text(lens.title, { size: 11, font: c.bold, color: BRAND });
+  c.text(
+    `${lens.withMaterial} of ${lens.total} elements on file${lens.gaps > 0 ? ` · ${lens.gaps} gap${lens.gaps === 1 ? '' : 's'}` : ''}`,
+    { size: 9.5, color: MUTED },
+  );
+  c.gap(4);
+  c.text(
+    'An element is one fact this claim legally requires — the theory’s own checklist, not a score. It draws no conclusions.',
+    { size: 8, color: MUTED },
+  );
+  if (lens.gapLabels.length) {
+    c.gap(6);
+    c.text('Not yet on file', { size: 9, font: c.bold, color: AMBER_INK });
+    c.gap(2);
+    for (const g of lens.gapLabels) bullet(c, g);
+  }
 }
 
 // ── Section 8B: wage-exposure estimate (firm-only) ────────────────────────────
@@ -966,6 +1002,11 @@ export async function renderFirmIntakePacketPdf(
     drawChronologyTable(c, model.sequence.events, srcIndex);
   } else {
     c.text(model.sequence.note, { size: 10, color: SOFT });
+  }
+
+  // 4B. Element Lens — strongest-covered theory
+  if (model.claimLens) {
+    drawElementLensSection(c, model.claimLens);
   }
 
   // 5. Priority Questions
