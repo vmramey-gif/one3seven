@@ -3,7 +3,7 @@
  * function (which holds the system prompt + Anthropic key server-side). The system prompt
  * is never shipped to the browser — only the conversation messages are sent.
  */
-import { supabase } from '../lib/supabaseClient';
+import { supabase, resolveFunctionsInvokeErrorMessage } from '../lib/supabaseClient';
 
 export interface ChatMessage {
   role: 'user' | 'assistant';
@@ -34,7 +34,7 @@ export async function askAssistant(messages: ChatMessage[]): Promise<AskAssistan
       // FunctionsHttpError carries the original Response on .context
       status = (error as { context?: { status?: number } }).context?.status;
     } catch { /* ignore */ }
-    return { error: error.message, status };
+    return { error: await resolveFunctionsInvokeErrorMessage(error), status };
   }
   const content = (data as { content?: string } | null)?.content ?? '';
   return { content };

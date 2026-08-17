@@ -12,7 +12,7 @@ import {
 import { extractStoryFollowUpFromOverview } from './storyFollowUpPersistence';
 import { formatReadinessForExportPacket } from './readinessDiagnosticsPresentation';
 import { ONE3SEVEN_UNIVERSAL_DISCLAIMER } from '../app/constants/one3sevenProduct';
-import { supabase } from '../lib/supabaseClient';
+import { supabase, resolveFunctionsInvokeErrorMessage } from '../lib/supabaseClient';
 import type { IntakeOrganizationSections } from './intakeOrganizationTypes';
 import { EXPORT_SECTION_BUCKETS, legacyCategoryToBucket, type ExportBucket } from './intakePacketFormatting';
 
@@ -969,7 +969,7 @@ export async function emailIntakeSummaryToWorker(
   const { data, error } = await supabase.functions.invoke('send-worker-summary-email', {
     body: { pdfBase64, intakeNumber: payload.intakeNumber },
   });
-  if (error) return { error: error.message };
+  if (error) return { error: await resolveFunctionsInvokeErrorMessage(error) };
   if (data?.error) return { error: data.error };
   return {};
 }
@@ -992,7 +992,7 @@ export async function emailIntakeSummaryToFirm(
   const { data, error } = await supabase.functions.invoke('send-intake-to-firm-email', {
     body: { intakeId, recipientEmail, firmName, pdfBase64, intakeNumber: payload.intakeNumber },
   });
-  if (error) return { error: error.message };
+  if (error) return { error: await resolveFunctionsInvokeErrorMessage(error) };
   if (data?.error) return { error: data.error };
   return {};
 }
