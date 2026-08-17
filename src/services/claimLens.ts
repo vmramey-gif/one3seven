@@ -62,8 +62,14 @@ const p = (...s: string[]): RegExp[] => s.map((x) => new RegExp(x, 'i'));
  * (verb test: no "protected activity"/"adverse action"/"comparators"/"pretext"/"severity"/"strong
  * facts"). Absence is a fact, rendered loudly. The retaliation statutes are kept SEPARATE on purpose
  * (different reports, recipients, and windows). Element sets are data; firm-level editing + a
- * DB-backed store are a later slice. Staged next: PAGA + CalWARN (aggregate coverage), the wage
- * cluster split (§226 / §226.7 / §510 / §512 / §201–203), and Tier 2.
+ * DB-backed store are a later slice.
+ *
+ * 33 theories as of 2026-08-17 (up from 27): exempt/non-exempt classification (§515), independent
+ * contractor misclassification (§2775 ABC test), piece-rate pay (§226.2), written commission
+ * agreements (§2751), pay transparency (§432.3), non-compete voidness (§16600/.1/.5), and a
+ * workplace-violence-prevention compliance view (§6401.9) added after a verify-first legal
+ * research pass cross-referencing this library against current CA employment law -- see each new
+ * lens's own comment for sourcing/verification notes and what still needs counsel confirmation.
  */
 export const CLAIM_LENSES: LensDef[] = [
   {
@@ -161,7 +167,12 @@ export const CLAIM_LENSES: LensDef[] = [
     title: 'Labor Code §6310 — Retaliation (health & safety)',
     elements: [
       { name: 'Safety reports made, and to whom',
-        patterns: p('unsafe', 'safety (concern|report|complaint)', 'hazard', 'injur', 'osha', '\\bguard\\b', '\\bppe\\b', 'accident', 'dangerous'),
+        // Widened 2026-08-17 to include workplace-violence vocabulary: SB 553 (Labor Code
+        // §6401.9) has no private right of action of its own (Cal/OSHA-enforced only, verified
+        // against the enacted bill text) -- a worker retaliated against for reporting a violence
+        // hazard has a real §6310 claim, not a standalone SB 553 one. See the sb553_wvpp lens
+        // below for the presence-only compliance-record view (no retaliation elements there).
+        patterns: p('unsafe', 'safety (concern|report|complaint)', 'hazard', 'injur', 'osha', '\\bguard\\b', '\\bppe\\b', 'accident', 'dangerous', 'workplace violence', 'violent (incident|threat)', 'threat(ened)? (of )?violence', '\\bwvpp\\b'),
         absence: 'Nothing identifies a health or safety report by the worker.' },
       { name: 'Cal/OSHA material',
         patterns: p('cal[/ ]?osha', 'osha (complaint|report|filing)', 'inspection', 'citation'),
@@ -739,6 +750,230 @@ export const CLAIM_LENSES: LensDef[] = [
         note: 'Locates pay/benefit material on file. one3seven does not compute an amount owed.',
         patterns: p('back pay', 'wages', 'benefits', 'pay period', 'severance', 'final pay', 'compensation for', '60 days (of )?pay'),
         absence: 'No material addresses pay or benefits for the notice period.' },
+    ],
+  },
+  // ---------------------------------------------------------------------------------------
+  // Six theories added 2026-08-17, plus the SB 553 workplace-violence widening above, closing
+  // gaps found by cross-referencing this library against current CA employment law. Every
+  // citation below was verified against real primary/regulatory sources (leginfo.legislature.ca.gov
+  // statutory text, DIR/DLSE, Cal/OSHA) before being written -- not filled in from general
+  // knowledge. Two corrections worth recording: (1) the non-compete research initially assumed a
+  // "§16600.2" that does not exist -- the real sections are §16600.1 and §16600.5; (2) SB 553 was
+  // initially going to be modeled as a standalone retaliation lens like §6310, but it has NO
+  // private right of action (Cal/OSHA-enforced only) -- forcing a retaliation-sequence lens onto
+  // it would have implied a cause of action that doesn't exist, so it stays presence-only below
+  // and the real retaliation path was folded into the existing §6310 lens instead. COUNSEL-GATED
+  // like every lens in this file, same as SB 951 above -- ship the engine, gate the surface.
+  {
+    id: 'exempt_classification',
+    tab: 'Exempt/Non-Exempt §515',
+    title: 'Exempt/Non-Exempt Classification — Labor Code §515',
+    // Duties-test element phrasing is paraphrased from DIR's own DLSE glossary and secondary
+    // legal summaries, not read verbatim off IWC Wage Order 4-2001 (the source PDF could not be
+    // machine-parsed during research) -- verify against the actual wage-order text before this
+    // surfaces to any real firm. The salary-basis threshold itself (Labor Code §515(a), 2x
+    // minimum wage) and the "primarily = more than half of worktime" standard (§515(e)) ARE
+    // confirmed against the current statute.
+    elements: [
+      { name: 'Job title, offer letter, or posting describing duties',
+        patterns: p('job title', 'offer letter', 'job (posting|description)', 'duties (include|are)', 'role (is|was|involves)', 'position (description|summary)'),
+        absence: 'No job title, offer letter, or posting describing duties appears in the record.' },
+      { name: 'Pay structure — salary, hourly, or day-rate — as described',
+        patterns: p('salary', 'salaried', 'hourly (rate|pay|wage)', 'day[- ]rate', 'annual (salary|pay)', 'paid (a salary|hourly|by the (day|hour))'),
+        absence: 'No material describes the worker’s pay structure.' },
+      { name: 'Deductions for partial-day absences or short weeks',
+        patterns: p('dock', 'deduct.{0,20}(day|hour|absence)', 'partial[- ]day', 'short (week|day)', 'pay (cut|reduced) for'),
+        absence: 'No material addresses deductions for partial-day absences or short weeks.' },
+      { name: 'Supervisory or hiring/firing language',
+        patterns: p('supervis', 'directed (other|the work)', 'hir(e|ing)', 'fir(e|ing)', 'discipline others', 'manage(d|s)? (a team|other|staff|employees)', 'no (supervisory|management) (role|duties)'),
+        absence: 'No material addresses supervisory or hiring/firing responsibility.' },
+      { name: 'Day-to-day task description — hands-on vs. planning/oversight work',
+        patterns: p('day[- ]to[- ]day', 'typical (day|shift|week)', 'spent (most|the majority)', 'primarily (did|worked|performed)', 'hands[- ]on', 'mostly (did|performed|worked)', 'my (job|role|work) (was|involved|included)', 'not (managing|supervising) (anyone|others|staff)'),
+        absence: 'No material describes the worker’s day-to-day tasks.' },
+      { name: 'Discretion or independent-judgment language',
+        patterns: p('discretion', 'independent judgment', 'own (approach|decisions)', 'set my own', 'followed a (script|checklist)', 'required (approval|sign[- ]off)', 'no (discretion|independence)'),
+        absence: 'No material addresses discretion or independent judgment in the role.' },
+      { name: 'License, certification, or specialized training referenced',
+        patterns: p('licens', 'certif', 'degree', '\\brn\\b', 'registered nurse', 'engineer', 'cpa\\b', 'accountant', 'specialized training'),
+        absence: 'No license, certification, or specialized-training material appears in the record.' },
+      { name: 'Time spent away from the employer’s place of business selling',
+        patterns: p('outside sales', 'sold (to|at)', 'client (visit|site)', 'away from (the )?(office|store|business)', 'field sales', 'door[- ]to[- ]door'),
+        absence: 'No material addresses time spent selling away from the employer’s place of business.' },
+    ],
+  },
+  {
+    id: 'independent_contractor',
+    tab: 'Worker Classification §2775',
+    title: 'Independent Contractor Misclassification — Labor Code §2775 (ABC Test)',
+    // ABC test text (§2775(b)(1) prongs A/B/C) confirmed verbatim against leginfo.legislature.ca.gov.
+    // The exemption categories that revert to the Borello multi-factor test (licensed professions,
+    // B2B contracting, referral agencies, etc. under §§2776-2787) are summarized from DIR/DLSE's
+    // FAQ, not independently verified section-by-section -- confirm exact exemption scope with
+    // counsel before this surfaces to any real firm.
+    elements: [
+      { name: 'Tax and payment documents on file',
+        patterns: p('1099', '\\bw[- ]?2\\b', 'tax (form|document)', 'independent contractor (tax|form)'),
+        absence: 'Nothing in the record identifies a 1099, W-2, or other tax-status document.' },
+      { name: 'Contractor agreement or independent-contractor language',
+        patterns: p('independent contractor agreement', 'contractor agreement', '\\bic agreement\\b', 'freelance agreement', '1099 agreement'),
+        absence: 'No contractor agreement or independent-contractor language appears in the record.' },
+      { name: 'Instructions on how, when, or where the work was performed',
+        patterns: p('told (me|to) (how|when|where)', 'instructed', 'required to (be|work|follow)', 'set (my )?(hours|schedule)', 'schedule (was )?(set|assigned|given)', 'trained (on|to)'),
+        absence: 'Nothing in the record describes instructions given about how, when, or where the work was performed.' },
+      { name: 'Description of the work performed, in the worker’s own words',
+        patterns: p('my (job|work|role) (was|involved|included)', 'i (did|performed|worked as)', 'responsib(le|ilities)'),
+        absence: 'Nothing in the record describes what the work itself consisted of.' },
+      { name: 'Other clients, jobs, or business activity outside this relationship',
+        patterns: p('other client', 'other (job|work|customers)', 'own (business|company)', 'business license', 'also (worked|did work) for', 'side (job|business|work)'),
+        absence: 'No material identifies other clients or business activity outside this relationship.' },
+      { name: 'Who supplied tools, equipment, vehicle, or workspace',
+        patterns: p('provided (a |the )?(tool|equipment|vehicle|laptop|phone|uniform)', 'used (my|their) own (tool|equipment|vehicle|car)', 'company (car|vehicle|equipment|laptop)', 'workspace (provided|assigned)'),
+        absence: 'Nothing in the record identifies who supplied tools, equipment, or a vehicle for the work.' },
+      { name: 'Schedule, set hours, or exclusivity material',
+        patterns: p('set hours', 'fixed schedule', 'exclusiv', 'could not work for (another|other)', 'required to work (only|exclusively)', 'flexible (hours|schedule)'),
+        absence: 'No material addresses the worker’s schedule, set hours, or any restriction on other work.' },
+      { name: 'Business license, registration, or invoicing material',
+        patterns: p('business license', 'invoice', 'registered (business|entity)', '\\bllc\\b', 'sole proprietor', '\\bein\\b'),
+        absence: 'No business license, registration, or invoice appears in the record.' },
+    ],
+  },
+  {
+    id: 'piece_rate',
+    tab: 'Piece-Rate Pay §226.2',
+    title: 'Piece-Rate Compensation — Labor Code §226.2',
+    // Confirmed against the current text of §226.2 via leginfo.legislature.ca.gov: rest/recovery
+    // periods and "other nonproductive time" must be paid separately from piece-rate earnings, at
+    // specified rates, with dedicated wage-statement line items (waivable only under the §226.2(a)(7)
+    // safe harbor of paying at least minimum wage for all hours worked in addition to piece-rate pay).
+    elements: [
+      { name: 'Piece-rate pay structure documented',
+        patterns: p('piece[- ]?rate', 'per[- ]?(piece|unit|job)', 'paid per', 'commission per (item|unit)'),
+        absence: 'No material identifies a piece-rate pay structure in the record.' },
+      { name: 'Rest/recovery period pay as a separate line item',
+        patterns: p('rest (period|break) pay', 'recovery period', 'separate.{0,20}(rest|recovery)', 'rest.{0,20}line item'),
+        absence: 'No wage statement shows rest or recovery period pay as a separate line item.' },
+      { name: 'Nonproductive time pay documented',
+        patterns: p('nonproductive time', 'non[- ]productive', 'waiting time pay', 'training (time|pay)', 'cleanup time'),
+        absence: 'No material shows separate pay for nonproductive time.' },
+      { name: 'Hourly floor paid for all hours worked',
+        patterns: p('hourly (rate|floor|minimum)', 'minimum wage for all hours', 'paid.{0,30}(hourly|by the hour).{0,20}in addition', 'guaranteed (minimum|hourly)'),
+        absence: 'Nothing in the record addresses whether an hourly floor was paid for all hours worked.' },
+      { name: 'Worker’s description of unpaid rest breaks or downtime',
+        patterns: p('unpaid (rest|break)', 'not paid (for|during) (rest|break|downtime)', 'break.{0,20}not paid', 'waiting.{0,20}not paid'),
+        absence: 'Nothing in the record describes unpaid rest breaks or downtime under a piece-rate structure.' },
+    ],
+  },
+  {
+    id: 'commission_agreement',
+    tab: 'Commission Agreement §2751',
+    title: 'Written Commission Agreement — Labor Code §2751',
+    // Confirmed against the current text of §2751 via leginfo.legislature.ca.gov. Note for
+    // counsel review: §2751 itself creates no private right of action -- enforcement runs through
+    // PAGA and/or the Unfair Competition Law (Bus. & Prof. Code §17200), which changes how
+    // "no written agreement" should be framed if this ever surfaces beyond organize-only display.
+    elements: [
+      { name: 'Written commission agreement on file',
+        patterns: p('commission agreement', 'commission plan', 'compensation agreement.{0,20}commission', 'commission (structure|terms)'),
+        absence: 'No written commission agreement appears in the record.' },
+      { name: 'Commission calculation method stated',
+        patterns: p('commission (rate|formula|calculat)', 'percent(age)? of (sales|revenue)', 'commission (tier|quota|schedule)'),
+        absence: 'Nothing in the record describes how commissions are computed or paid.' },
+      { name: 'Signed acknowledgment or signed receipt on file',
+        patterns: p('signed (the )?(agreement|acknowledgment|receipt)', 'signature', 'acknowledged receipt'),
+        absence: 'No signed acknowledgment of the commission agreement appears in the record.' },
+      { name: 'Commission pay records',
+        patterns: p('commission (paid|payment|earned)', 'pay ?stub.{0,20}commission', 'wage statement.{0,20}commission'),
+        absence: 'No pay records referencing commission payments appear in the record.' },
+      { name: 'How commission terms were communicated, and whether they changed',
+        patterns: p('told (me|verbally)', 'terms (changed|were changed)', 'never (signed|received) (a|an|the)', 'verbal(ly)? (agreed|told)', 'no written'),
+        absence: 'Nothing in the record describes how commission terms were communicated to the worker.' },
+    ],
+  },
+  {
+    id: 'pay_transparency',
+    tab: 'Pay Transparency §432.3',
+    title: 'Pay Transparency — Labor Code §432.3',
+    // Confirmed against the current text of §432.3 via leginfo.legislature.ca.gov, including the
+    // SB 642 amendment effective 1/1/2026 (tightened "pay scale" definition to a good-faith,
+    // per-hire estimate). Individual pay-data reporting (100+-employee CRD filings) deliberately
+    // excluded as an element -- it's an employer state filing, not something a worker's own
+    // record would contain evidence of.
+    elements: [
+      { name: 'Job posting material — with or without a pay scale',
+        patterns: p('job (posting|listing|ad)', 'position (posted|listed)', 'pay (scale|range) (posted|listed|shown)'),
+        absence: 'No job-posting material appears in the record.' },
+      { name: 'Salary history question asked during hiring',
+        patterns: p('asked.{0,20}(salary|pay) history', 'previous (salary|pay)', 'current (salary|pay).{0,20}asked', 'salary history'),
+        absence: 'No salary-history request during hiring appears in the record.' },
+      { name: 'Pay scale request made by the worker',
+        patterns: p('requested.{0,20}(pay scale|salary range|pay range)', 'asked (for|about) (the )?(pay|salary) (scale|range)'),
+        absence: 'No pay-scale request appears in the record.' },
+      { name: 'Employer response to a pay scale request',
+        patterns: p('responded.{0,20}(pay|salary) (scale|range)', 'provided.{0,20}(pay|salary) (scale|range)', 'denied.{0,20}(pay|salary) (scale|range)', 'never (received|got).{0,20}(pay|salary) (scale|range)'),
+        absence: 'No employer response to a pay-scale request appears in the record.' },
+      { name: 'Employer size or headcount material',
+        patterns: p('\\d{2,}\\s+(employees|workers)', 'headcount', 'company (size|of)', 'number of employees'),
+        absence: 'No employer-headcount material appears in the record.' },
+      { name: 'Labor Commissioner complaint or civil action material',
+        patterns: p('labor commissioner', '\\bdlse\\b', 'civil action', 'complaint filed'),
+        absence: 'No complaint or civil-action material appears in the record.' },
+    ],
+  },
+  {
+    id: 'non_compete',
+    tab: 'Non-Compete Voidness §16600',
+    title: 'Non-Compete Voidness / Notice — Bus. & Prof. Code §16600, §16600.1, §16600.5',
+    // Confirmed against the current text of all three sections via leginfo.legislature.ca.gov.
+    // §16600.1 (AB 1076) required individualized written notice to affected employees by
+    // 2/14/2024 that any non-compete clause is void; §16600.5 (SB 699) reaches out-of-state
+    // agreements and creates a private right of action for injunctive relief/damages plus
+    // attorney's fees. Correction from initial research assumption: there is no "§16600.2".
+    elements: [
+      { name: 'Employment agreement containing a non-compete or similar restraint clause',
+        patterns: p('non[- ]?compete', 'restrictive covenant', 'not (to )?work for a competitor', 'competing (business|employer)', 'non[- ]?solicit'),
+        absence: 'Nothing in the record identifies a non-compete or similar restrictive clause in the worker’s employment agreement.' },
+      { name: 'Employer notice regarding the non-compete’s voidness',
+        patterns: p('notice.{0,20}(void|unenforceable)', 'clause is void', 'non[- ]?compete.{0,20}(void|unenforceable)', 'notified.{0,20}(void|no longer enforce)'),
+        absence: 'Nothing in the record identifies a notice from the employer regarding the non-compete’s voidness.' },
+      { name: 'Timing of employer notice',
+        patterns: p('notice (sent|dated|received) (on|in)', 'notified (on|in)', 'letter dated', 'email dated'),
+        absence: 'Nothing in the record establishes when, or whether, employer notice was sent.' },
+      { name: 'Worker’s job search or new employment referencing the non-compete',
+        patterns: p('turned down.{0,20}(job|offer|work)', 'could not (work|accept)', 'declined.{0,20}because of (the|a) non[- ]?compete', 'afraid to (work|accept)'),
+        absence: 'Nothing in the record identifies job-search or new-employment activity referencing the non-compete.' },
+      { name: 'Employer communications invoking or threatening to enforce the non-compete',
+        patterns: p('cease and desist', 'threatened (to sue|legal action)', 'enforce.{0,20}non[- ]?compete', 'lawsuit.{0,20}non[- ]?compete'),
+        absence: 'Nothing in the record identifies employer communications invoking or threatening to enforce the non-compete.' },
+    ],
+  },
+  {
+    id: 'sb553_wvpp',
+    tab: 'Workplace Violence Prevention',
+    title: 'Workplace Violence Prevention Plan — Labor Code §6401.9 (compliance record)',
+    // Presence-only by design: §6401.9 (SB 553, enforceable 7/1/2024) is Cal/OSHA-enforced with
+    // no private right of action -- confirmed against the enacted bill text. This lens
+    // deliberately has NO retaliation-sequence elements (no "employment action after report", no
+    // "interval") since including them would imply a cause of action the statute doesn't confer.
+    // A worker retaliated against after a workplace-violence report has a real claim under the
+    // lc_6310 lens above, whose "Safety reports made" patterns were widened for this same reason.
+    // Cal/OSHA's Title 8 standard implementing this is still in draft (targeted Standards Board
+    // adoption by end of 2026) -- re-verify before this surfaces to any real firm.
+    elements: [
+      { name: 'Written workplace violence prevention plan referenced or provided',
+        patterns: p('violence prevention plan', '\\bwvpp\\b', 'workplace violence plan'),
+        absence: 'Nothing in the record identifies a written workplace violence prevention plan.' },
+      { name: 'Workplace violence or threat reported, and in what words',
+        patterns: p('workplace violence', 'threat(ened)? (of )?violence', 'violent (incident|threat)', 'reported.{0,20}(threat|violence)'),
+        absence: 'Nothing in the record identifies a workplace violence or threat report by the worker.' },
+      { name: 'Violent incident log entry or reference',
+        patterns: p('incident log', 'violence log', 'logged.{0,20}(incident|threat)'),
+        absence: 'No violent incident log entry appears in the record.' },
+      { name: 'Training records',
+        patterns: p('violence prevention training', 'wvpp training', 'safety training.{0,20}violence'),
+        absence: 'No workplace violence prevention training record appears in the record.' },
+      { name: 'Employer’s response to a workplace violence report',
+        patterns: p('responded.{0,20}(violence|threat)', 'investigat.{0,20}(violence|threat)', 'no (action|response).{0,20}(violence|threat)'),
+        absence: 'Nothing addresses the employer’s response to a workplace violence report.' },
     ],
   },
 ];
