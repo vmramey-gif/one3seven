@@ -36,7 +36,8 @@ export function SmsLinkCard({ intakeId }: { intakeId: string | null }) {
         return;
       }
       setLoading(true);
-      setLink(await loadSmsLink(intakeId));
+      const result = await loadSmsLink(intakeId);
+      if (!result.error) setLink(result.link);
       setLoading(false);
     })();
   }, [intakeId]);
@@ -74,8 +75,10 @@ export function SmsLinkCard({ intakeId }: { intakeId: string | null }) {
     setLink({ id: '', phoneNumber: sentTo, status: 'verified' });
     setSentTo(null);
     setCode('');
-    // Refresh from the server to pick up the real row id (needed to unlink later).
-    setLink(await loadSmsLink(intakeId));
+    // Refresh from the server to pick up the real row id (needed to unlink later). A transient
+    // read error here shouldn't wipe the optimistic verified state just set above.
+    const refreshed = await loadSmsLink(intakeId);
+    if (!refreshed.error) setLink(refreshed.link);
   };
 
   const handleUnlink = async () => {
