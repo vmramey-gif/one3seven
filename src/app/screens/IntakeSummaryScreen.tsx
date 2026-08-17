@@ -411,6 +411,7 @@ export function IntakeSummaryScreen({
   const [showEmailConfirmation, setShowEmailConfirmation] = useState(false);
   const [showShareConfirmation, setShowShareConfirmation] = useState(false);
   const [emailSendError, setEmailSendError] = useState<string | null>(null);
+  const [downloadError, setDownloadError] = useState<string | null>(null);
   const [isSending, setIsSending] = useState(false);
   const [showEmailFirmModal, setShowEmailFirmModal] = useState(false);
   const [emailFirmRecipient, setEmailFirmRecipient] = useState('');
@@ -840,7 +841,13 @@ export function IntakeSummaryScreen({
         console.error('[o3s-export] fresh export payload failed', e);
       }
     }
-    await downloadIntakeSummaryDocument(payload);
+    setDownloadError(null);
+    try {
+      await downloadIntakeSummaryDocument(payload);
+    } catch (e) {
+      console.error('[o3s-export] PDF download failed', e);
+      setDownloadError('Could not build your download. Try again in a moment.');
+    }
   };
 
   // Same payload the PDF is built from, exported as plain JSON — the open-format sibling of the
@@ -1015,18 +1022,23 @@ export function IntakeSummaryScreen({
     if (!onShareFirmCode || !firmCodeInput.trim()) return;
     setShareApiError('');
     setIsSharing(true);
-    const r = await onShareFirmCode(firmCodeInput.trim());
-    setIsSharing(false);
-    if (r?.error) setShareApiError(r.error);
-    else {
-      setShowShareModal(false);
-      setRoutingSubpanel('menu');
-      setFirmCodeInput('');
-      if (onAfterRoutingSuccess) onAfterRoutingSuccess({ kind: 'firm_code', firmName: r?.firmName ?? null, participatingRouteCount: undefined });
+    try {
+      const r = await onShareFirmCode(firmCodeInput.trim());
+      if (r?.error) setShareApiError(r.error);
       else {
-        setShowShareConfirmation(true);
-        setTimeout(() => setShowShareConfirmation(false), 4000);
+        setShowShareModal(false);
+        setRoutingSubpanel('menu');
+        setFirmCodeInput('');
+        if (onAfterRoutingSuccess) onAfterRoutingSuccess({ kind: 'firm_code', firmName: r?.firmName ?? null, participatingRouteCount: undefined });
+        else {
+          setShowShareConfirmation(true);
+          setTimeout(() => setShowShareConfirmation(false), 4000);
+        }
       }
+    } catch (e) {
+      setShareApiError(e instanceof Error ? e.message : 'Could not send. Try again.');
+    } finally {
+      setIsSharing(false);
     }
   };
 
@@ -1034,21 +1046,26 @@ export function IntakeSummaryScreen({
     if (!onShareFirmCode || !connectedFirmCode) return;
     setShareApiError('');
     setIsSharing(true);
-    const r = await onShareFirmCode(connectedFirmCode);
-    setIsSharing(false);
-    if (r?.error) {
-      setShareApiError(r.error);
-      return;
-    }
-    if (onAfterRoutingSuccess) {
-      onAfterRoutingSuccess({
-        kind: 'firm_code',
-        firmName: r?.firmName ?? connectedFirmName ?? null,
-        participatingRouteCount: undefined,
-      });
-    } else {
-      setShowShareConfirmation(true);
-      setTimeout(() => setShowShareConfirmation(false), 4000);
+    try {
+      const r = await onShareFirmCode(connectedFirmCode);
+      if (r?.error) {
+        setShareApiError(r.error);
+        return;
+      }
+      if (onAfterRoutingSuccess) {
+        onAfterRoutingSuccess({
+          kind: 'firm_code',
+          firmName: r?.firmName ?? connectedFirmName ?? null,
+          participatingRouteCount: undefined,
+        });
+      } else {
+        setShowShareConfirmation(true);
+        setTimeout(() => setShowShareConfirmation(false), 4000);
+      }
+    } catch (e) {
+      setShareApiError(e instanceof Error ? e.message : 'Could not send. Try again.');
+    } finally {
+      setIsSharing(false);
     }
   };
 
@@ -2247,6 +2264,9 @@ export function IntakeSummaryScreen({
                 <Download className="w-5 h-5" />
                 {WORKER_INTAKE_ACTIONS.downloadPacket}
               </button>
+              {downloadError ? (
+                <p className="text-sm text-red-600 text-center">{downloadError}</p>
+              ) : null}
               <button
                 onClick={() => onNavigate('upload')}
                 className={sx.btnSecondary}
