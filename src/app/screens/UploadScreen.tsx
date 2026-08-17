@@ -431,16 +431,6 @@ export function UploadScreen({
     });
   }, [uploadedFilePersistMeta, uploadedFiles]);
 
-  const handleSaveForLater = async () => {
-    // Simulate save process
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    setShowSaveConfirmation(true);
-    // Auto-dismiss after 5 seconds
-    setTimeout(() => {
-      setShowSaveConfirmation(false);
-    }, 5000);
-  };
-
   const handleDismissSave = () => {
     setShowSaveConfirmation(false);
   };
@@ -1663,7 +1653,7 @@ export function UploadScreen({
                 </button>
                 <button
                   type="button"
-                  onClick={handleSaveForLater}
+                  onClick={() => onNavigate('landing')}
                   className={`w-full py-3 px-4 rounded-[14px] text-sm font-medium ${UPLOAD_SECONDARY_CTA}`}
                 >
                   Save for later

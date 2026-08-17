@@ -73,7 +73,12 @@ import type {
   PersistentNotificationRow,
 } from '../services/intakeDataService';
 import type { User } from '@supabase/supabase-js';
-import { BETA_ENABLE_PARTICIPATING_ROUTING, SHOW_DEV_GALLERY, SHOW_SAMPLE_INTAKE } from './constants/flags';
+import {
+  BETA_ENABLE_PARTICIPATING_ROUTING,
+  FIRM_CODE_ROUTING_LIVE,
+  SHOW_DEV_GALLERY,
+  SHOW_SAMPLE_INTAKE,
+} from './constants/flags';
 import {
   OFFLINE_DEV_GALLERY_ONLY,
   SUPABASE_REQUIRED_USER_MESSAGE,
@@ -276,7 +281,21 @@ export default function App() {
       // Lands the worker on the low-friction Create Account (or Sign in) — not the firm homepage.
       const workerCta = sessionStorage.getItem('o3s_worker_cta'); // read-only; cleared in an effect (pure initializer)
       if (workerCta) return workerCta === 'signin' ? 'signIn' : 'createAccount';
-      if (sessionStorage.getItem('o3s_prefill_fc')) return 'firmDirectedIntake';
+      if (sessionStorage.getItem('o3s_prefill_fc')) {
+        // FIRM_CODE_ROUTING_LIVE off (funding/counsel pause) -- a ?fc= link is exactly the "to
+        // firm" CTA this flag exists to disengage, so don't complete a live connection through
+        // it. Clear the stale code so the auto-apply/context-resolution effects below don't act
+        // on it later either.
+        if (!FIRM_CODE_ROUTING_LIVE) {
+          try {
+            sessionStorage.removeItem('o3s_prefill_fc');
+          } catch {
+            /* ignore */
+          }
+        } else {
+          return 'firmDirectedIntake';
+        }
+      }
     } catch { /* ignore */ }
     // Worker-first: the worker landing is the default front door. Firms reach their marketing
     // via the "For firms" link. (Firm-code deep links above bypass the landing entirely.)
@@ -1364,6 +1383,11 @@ export default function App() {
     const patch = await patchWorkerIntakeMetadata(intakeId, { workerStory: trimmed });
     if (patch.error) {
       console.warn('[o3s-metadata] worker story save failed', { intakeId, error: patch.error });
+      pushWorkerNotification({
+        id: `story-save-failed-${intakeId}-${Date.now()}`,
+        title: "Your story didn't sync",
+        body: "What you typed is still here in this session, but it didn't save to your account. Try again from the story step, or check your connection.",
+      });
       return;
     }
     if (patch.metadata) {
@@ -1553,6 +1577,11 @@ export default function App() {
         console.warn('[o3s-metadata] story follow-up commit failed', {
           intakeId,
           error: followUpPatch.error,
+        });
+        pushWorkerNotification({
+          id: `story-followup-failed-${intakeId}-${Date.now()}`,
+          title: "Some of your answers didn't save",
+          body: 'A few of your story details did not save to your account. You can add them back from your intake summary.',
         });
       } else if (followUpPatch.metadata) {
         workerMetadataByIntakeIdRef.current[intakeId] = {
@@ -2583,6 +2612,7 @@ export default function App() {
   // Auto-apply a firm code stored from a /?fc=FIRMCODE intake link.
   // Fires once when: worker role confirmed + active intake exists + no firm linked yet.
   useEffect(() => {
+    if (!FIRM_CODE_ROUTING_LIVE) return;
     if (profile?.role !== 'worker') return;
     if (!currentIntakeId) return;
     if (workerLinkedFirmCode?.trim()) return; // already linked
@@ -2614,6 +2644,7 @@ export default function App() {
   // If o3s_firm_ctx is already in sessionStorage (restored above in useState init),
   // skip the async lookup — context is already set. Otherwise resolve from o3s_prefill_fc.
   useEffect(() => {
+    if (!FIRM_CODE_ROUTING_LIVE) return;
     if (!isSupabaseConfigured()) return;
     // Already restored synchronously from sessionStorage — nothing to do.
     let existing: unknown = null;
@@ -2987,6 +3018,13 @@ export default function App() {
       pendingUploadContextRef.current = null;
       return;
     }
+    const notifyOrganizeIncomplete = () => {
+      pushWorkerNotification({
+        id: `organize-incomplete-${Date.now()}`,
+        title: "We couldn't finish organizing your file",
+        body: 'Something went wrong while building your summary. Try "Re-organize file" from your summary, or contact support if this keeps happening.',
+      });
+    };
     await waitForExtractionReadiness(intakeId, quick);
     const persistMs = quick ? 20_000 : 45_000;
     try {
@@ -2996,7 +3034,10 @@ export default function App() {
           const err = await intakeData.persistPlaceholderOrganizationForIntake(intakeId, {
             employmentMatterTags: matterTags,
           });
-          if (err.error) console.error(err.error);
+          if (err.error) {
+            console.error(err.error);
+            notifyOrganizeIncomplete();
+          }
           const selectedCategory = caseCategoryByIntakeIdRef.current[intakeId];
           if (selectedCategory) {
             const catErr = await mergeCaseCategoryIntoLatestIntakeSummary(intakeId, selectedCategory);
@@ -3029,6 +3070,7 @@ export default function App() {
       ]);
     } catch (e) {
       console.error('[o3s-processing] organization pipeline', e);
+      notifyOrganizeIncomplete();
     }
     pendingUploadContextRef.current = null;
   }, []);
@@ -3161,7 +3203,14 @@ export default function App() {
     const err = await intakeData.persistPlaceholderOrganizationForIntake(intakeId, {
       employmentMatterTags: matterTags,
     });
-    if (err.error) console.error('[o3s-reorg] re-organize failed', err.error);
+    if (err.error) {
+      console.error('[o3s-reorg] re-organize failed', err.error);
+      pushWorkerNotification({
+        id: `reorg-failed-${Date.now()}`,
+        title: "Re-organize didn't finish",
+        body: 'We could not rebuild your summary just now. Your existing summary is unchanged — try again in a moment.',
+      });
+    }
     if (!err.error) {
       // Rebuild replaces the stored overview, so re-merge the worker contact block for
       // linked/firm-code intakes the same way handleProcessingFinished does after a first
@@ -3466,6 +3515,11 @@ export default function App() {
     });
     if (contactSave.error) {
       console.warn('[o3s-worker-details] contact save error (non-blocking):', contactSave.error);
+      pushWorkerNotification({
+        id: `contact-details-failed-${authUser.id}-${Date.now()}`,
+        title: "Some contact details didn't save",
+        body: 'Your name saved, but phone/address details did not. Add them again from your account settings.',
+      });
     }
     try {
       sessionStorage.removeItem(O3S_SS_WORKER_PENDING_DETAILS);
