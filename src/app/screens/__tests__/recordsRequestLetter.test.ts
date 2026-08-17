@@ -32,6 +32,14 @@ describe('buildLetter — §2802 expense-reimbursement records', () => {
   });
 });
 
+describe('buildLetter — §226 payroll deadline citation', () => {
+  it('cites the 21-day deadline to §226(c), not §226(b) — the deadline lives in (c); (b) only establishes the right to request', () => {
+    const letter = buildLetter({ ...base, records: { ...noRecords, payroll: true } });
+    expect(letter).toMatch(/§ 226\(c\), these must be made available within 21 calendar days/);
+    expect(letter).not.toMatch(/§ 226\(b\), these must be made available/);
+  });
+});
+
 describe('buildLetter — zero record types selected', () => {
   it('never silently substitutes a different request than what was selected', () => {
     const letter = buildLetter({ ...base, records: { ...noRecords } });
