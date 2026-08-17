@@ -2264,12 +2264,16 @@ export default function App() {
 
   const handlePersistentNotificationClick = useCallback(
     async (row: PersistentNotificationRow) => {
-      const markResult = await intakeData.markNotificationRead(row.id);
-      if (markResult.error) {
-        console.error('[o3s-notifications] mark read failed', markResult.error);
-        return;
-      }
+      // Read-receipt write is best-effort (H7, worker audit 2026-08) -- a worker clicking a
+      // notification wants to go where it points, not to have that blocked by a transient
+      // failure marking it read. Update the local bell state immediately (safe regardless of the
+      // server write's outcome) and let the actual write happen in the background.
       markPersistentBellItemRead(row.id);
+      void intakeData.markNotificationRead(row.id).then((markResult) => {
+        if (markResult.error) {
+          console.error('[o3s-notifications] mark read failed', markResult.error);
+        }
+      });
 
       if (row.notification_type === 'worker_full_access_request' && (profile?.role === 'worker' || userRole === 'worker')) {
         if (row.related_intake_id) {
