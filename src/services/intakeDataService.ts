@@ -1177,7 +1177,7 @@ export async function uploadIntakeFile(
   return { path, uploadedFileId, contentHash };
 }
 
-export async function listUploadedFiles(intakeId: string) {
+async function queryUploadedFiles(intakeId: string) {
   const { data, error } = await supabase
     .from('uploaded_files')
     .select('id, file_name, file_type, file_path, category, file_size, created_at')
@@ -1185,9 +1185,25 @@ export async function listUploadedFiles(intakeId: string) {
     .order('created_at', { ascending: true });
   if (error) {
     console.error(error);
-    return [];
+    return { rows: [] as NonNullable<typeof data>, error: error.message };
   }
-  return data ?? [];
+  return { rows: data ?? [], error: undefined as string | undefined };
+}
+
+export async function listUploadedFiles(intakeId: string) {
+  const { rows } = await queryUploadedFiles(intakeId);
+  return rows;
+}
+
+/**
+ * Same query as listUploadedFiles, but distinguishes "zero files" from "the read failed" --
+ * listUploadedFiles collapses both to an empty array, which is fine for callers that only care
+ * about a count/best-effort loop, but is exactly the bug behind H2 (worker audit, 2026-08) when a
+ * caller hard-replaces visible UI state with the result: a transient read error made a worker's
+ * entire file list appear to vanish, even though nothing was actually deleted server-side.
+ */
+export async function listUploadedFilesResult(intakeId: string) {
+  return queryUploadedFiles(intakeId);
 }
 
 export async function updateUploadedFileName(
