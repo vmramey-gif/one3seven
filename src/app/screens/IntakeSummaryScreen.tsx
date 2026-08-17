@@ -1096,6 +1096,15 @@ export function IntakeSummaryScreen({
       intakeWorkspace.intakeSummary?.overview,
       intakeWorkspace.workerContext.mainContext,
       intakeWorkspace.workerContext.additionalNotes,
+      // H4 (worker audit 2026-08): buildSummaryDownloadPayload also reads these -- without them
+      // here, a downloaded/exported packet could keep showing a stale firm code or workflow
+      // status after a real change (e.g. connecting to a firm, or a status update) until some
+      // unrelated dep happened to also change and force a recompute.
+      firmCaseMode,
+      workerFullName,
+      workerPhone,
+      connectedFirmCode,
+      workerWorkflowStatus,
     ]
   );
   const executiveSummary = useMemo(
