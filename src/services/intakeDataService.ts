@@ -2514,13 +2514,17 @@ export async function persistPlaceholderOrganizationForIntake(
   const startedAt = Date.now();
   logSummarySave('organization persist start', { intakeId });
 
-  let files: Awaited<ReturnType<typeof listUploadedFiles>>;
-  try {
-    files = await listUploadedFiles(intakeId);
-  } catch (filesError) {
-    logSummarySaveError('uploaded_files list', filesError, { intakeId });
+  // listUploadedFiles collapses a real read error to [] -- this function goes on to rebuild and
+  // PERSIST an organization/summary from `files`, so trusting a wrongly-empty result here doesn't
+  // just flicker the UI, it writes a wiped-out organization to the database (H2, worker audit
+  // 2026-08, more severe instance than the original UI-only finding). Use the error-preserving
+  // variant and fail the whole persist rather than silently proceeding on a transient failure.
+  const filesResult = await listUploadedFilesResult(intakeId);
+  if (filesResult.error) {
+    logSummarySaveError('uploaded_files list', filesResult.error, { intakeId });
     return { error: 'Could not load uploaded files for this intake.', stage: 'uploaded_files_list' };
   }
+  const files = filesResult.rows;
   logSummarySave('uploaded_files loaded', { intakeId, fileCount: files.length });
 
   logOrgAudit('persist start', {
