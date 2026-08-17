@@ -26,7 +26,7 @@
  * in your .env.local and in Vercel/hosting environment variables.
  */
 
-import { supabase } from '../lib/supabaseClient';
+import { supabase, resolveFunctionsInvokeErrorMessage } from '../lib/supabaseClient';
 
 // ── Plan definitions ──────────────────────────────────────────────────────────
 
@@ -196,7 +196,7 @@ export async function createCheckoutSession(params: {
     const { data, error } = await supabase.functions.invoke('create-checkout-session', {
       body: { firmProfileId: params.firmProfileId, priceId: params.priceId },
     });
-    if (error) return { url: null, error: error.message };
+    if (error) return { url: null, error: await resolveFunctionsInvokeErrorMessage(error) };
     if (!data?.url) return { url: null, error: 'No checkout URL returned.' };
     return { url: data.url as string };
   } catch (e) {
@@ -213,7 +213,7 @@ export async function createCustomerPortalSession(params: {
     const { data, error } = await supabase.functions.invoke('create-portal-session', {
       body: { firmProfileId: params.firmProfileId },
     });
-    if (error) return { url: null, error: error.message };
+    if (error) return { url: null, error: await resolveFunctionsInvokeErrorMessage(error) };
     if (!data?.url) return { url: null, error: 'No portal URL returned.' };
     return { url: data.url as string };
   } catch (e) {

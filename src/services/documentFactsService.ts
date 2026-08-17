@@ -3,7 +3,7 @@
  * Triggers the edge function and reads stored facts for display.
  */
 
-import { supabase } from '../lib/supabaseClient';
+import { supabase, resolveFunctionsInvokeErrorMessage } from '../lib/supabaseClient';
 
 export type DocumentFacts = {
   category: string;
@@ -84,7 +84,7 @@ export async function triggerDocumentFactExtraction(params: {
     },
   });
 
-  if (error) return { ok: false, error: error.message };
+  if (error) return { ok: false, error: await resolveFunctionsInvokeErrorMessage(error) };
   if (data?.error) return { ok: false, error: data.error };
   // Minimal runtime shape check before trusting data.facts as real DocumentFacts -- a malformed/
   // partial object from the edge function that doesn't set data.error would otherwise be forwarded
@@ -129,7 +129,7 @@ export async function triggerIntakeFactExtraction(
       body: { intake_id: intakeId, batch: true },
     });
 
-    if (error) return { triggered, skipped: 0, errors: [...errors, error.message] };
+    if (error) return { triggered, skipped: 0, errors: [...errors, await resolveFunctionsInvokeErrorMessage(error)] };
     if (data?.error) return { triggered, skipped: 0, errors: [...errors, data.error] };
 
     const results = Array.isArray(data?.results) ? data.results : [];

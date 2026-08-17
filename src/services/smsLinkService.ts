@@ -1,4 +1,4 @@
-import { supabase } from '../lib/supabaseClient';
+import { supabase, resolveFunctionsInvokeErrorMessage } from '../lib/supabaseClient';
 
 export type WorkerSmsLink = {
   id: string;
@@ -27,7 +27,7 @@ export async function requestSmsLink(
   const { data, error } = await supabase.functions.invoke('sms-link-request', {
     body: { intakeId, phoneNumber },
   });
-  if (error) return { ok: false, error: error.message };
+  if (error) return { ok: false, error: await resolveFunctionsInvokeErrorMessage(error) };
   if (data?.error) return { ok: false, error: String(data.error) };
   return { ok: true };
 }
@@ -40,7 +40,7 @@ export async function verifySmsLink(
   const { data, error } = await supabase.functions.invoke('sms-verify-phone', {
     body: { phoneNumber, code },
   });
-  if (error) return { ok: false, error: error.message };
+  if (error) return { ok: false, error: await resolveFunctionsInvokeErrorMessage(error) };
   if (data?.error) return { ok: false, error: String(data.error) };
   return { ok: true };
 }
