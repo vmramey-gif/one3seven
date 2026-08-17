@@ -157,6 +157,99 @@ describe('buildClaimLensView', () => {
       expect(v.coverage.total).toBe(v.elements.length);
     }
   });
+
+  describe('2026-08-17 batch: 6 new theories from a verify-first legal research pass', () => {
+    it('every lens id in CLAIM_LENSES is unique (guards against a copy-paste id collision)', () => {
+      const ids = CLAIM_LENSES.map((l) => l.id);
+      expect(new Set(ids).size).toBe(ids.length);
+    });
+
+    it('all 6 new lenses build distinctly, are element-scoped, and locate (never characterize)', () => {
+      const ids = ['exempt_classification', 'independent_contractor', 'piece_rate', 'commission_agreement', 'pay_transparency', 'non_compete'];
+      const titles = ids.map((id) => buildClaimLensView(id, rosa).title);
+      expect(new Set(titles).size).toBe(ids.length);
+      for (const id of ids) {
+        const v = buildClaimLensView(id, rosa);
+        expect(v.coverage.total).toBe(v.elements.length);
+        for (const el of v.elements) {
+          expect(el.name).not.toMatch(/\b(protected|adverse|wrongful|pretext|severity|strong|liable|valid|misclassif|violat)\b/i);
+        }
+      }
+    });
+
+    it('independent_contractor lens matches realistic 1099/control-of-work facts', () => {
+      const gigWorker: ClaimLensInput = {
+        events: [{ title: '1099 issued for the prior tax year', date: 'Jan 2026', category: 'Tax Records', sourceFile: 'contractor_1099.pdf' }],
+        quotes: [{ quote: 'my manager told me exactly what hours to be online and which tasks to do first', fileName: 'text_thread.pdf', category: 'Communications' }],
+        intervals: [],
+        confirmed: [],
+        workerContext: 'I signed an independent contractor agreement but they set my schedule and gave me a company laptop.',
+        files: [{ fileName: 'Independent_Contractor_Agreement.pdf', category: 'Onboarding' }],
+      };
+      const v = buildClaimLensView('independent_contractor', gigWorker);
+      expect(v.elements.find((e) => /tax and payment/i.test(e.name))?.items.length).toBeGreaterThan(0);
+      expect(v.elements.find((e) => /contractor agreement/i.test(e.name))?.items.length).toBeGreaterThan(0);
+      expect(v.elements.find((e) => /instructions on how/i.test(e.name))?.items.length).toBeGreaterThan(0);
+      expect(v.elements.find((e) => /tools, equipment/i.test(e.name))?.items.length).toBeGreaterThan(0);
+      // no material on other clients/business activity in this record -- loud, honest absence
+      expect(v.elements.find((e) => /other clients/i.test(e.name))?.empty).toBeTruthy();
+    });
+
+    it('exempt_classification lens matches realistic salary/duties facts and reports a loud absence on an empty record', () => {
+      const manager: ClaimLensInput = {
+        events: [{ title: 'Offer letter for Assistant Store Manager role', date: 'Jan 2025', category: 'Onboarding', sourceFile: 'offer_letter.pdf' }],
+        quotes: [],
+        intervals: [],
+        confirmed: [],
+        workerContext: 'I was salaried. Most of my shifts I was ringing up customers and stocking shelves, not managing anyone.',
+        files: [{ fileName: 'offer_letter.pdf', category: 'Onboarding' }],
+      };
+      const v = buildClaimLensView('exempt_classification', manager);
+      expect(v.elements.find((e) => /job title, offer letter/i.test(e.name))?.items.length).toBeGreaterThan(0);
+      expect(v.elements.find((e) => /pay structure/i.test(e.name))?.items.length).toBeGreaterThan(0);
+      expect(v.elements.find((e) => /day-to-day task/i.test(e.name))?.items.length).toBeGreaterThan(0);
+      const empty = buildClaimLensView('exempt_classification', { events: [], quotes: [], intervals: [], workerContext: '', files: [] });
+      expect(empty.elements.every((e) => e.empty)).toBe(true);
+    });
+
+    it('non_compete lens matches a realistic clause + employer-threat record', () => {
+      const record: ClaimLensInput = {
+        events: [{ title: 'Employment agreement containing a two-year non-compete clause', date: 'Jun 2023', category: 'Onboarding', sourceFile: 'offer_letter.pdf' }],
+        quotes: [{ quote: 'we will pursue legal action to enforce the non-compete if you join a competing business', fileName: 'cease_and_desist.pdf', category: 'Communications' }],
+        intervals: [],
+        confirmed: [],
+        workerContext: 'I turned down a job offer because I was afraid to accept given the non-compete in my contract.',
+        files: [{ fileName: 'offer_letter.pdf', category: 'Onboarding' }, { fileName: 'cease_and_desist.pdf', category: 'Communications' }],
+      };
+      const v = buildClaimLensView('non_compete', record);
+      expect(v.elements.find((e) => /employment agreement containing/i.test(e.name))?.items.length).toBeGreaterThan(0);
+      expect(v.elements.find((e) => /worker.s job search/i.test(e.name))?.items.length).toBeGreaterThan(0);
+      expect(v.elements.find((e) => /invoking or threatening/i.test(e.name))?.items.length).toBeGreaterThan(0);
+      // no notice-of-voidness material in this record -- a real, honest gap
+      expect(v.elements.find((e) => /notice regarding the non-compete/i.test(e.name))?.empty).toBeTruthy();
+    });
+
+    it('sb553_wvpp is presence-only by design -- no retaliation-sequence elements (SB 553 has no private right of action)', () => {
+      const v = buildClaimLensView('sb553_wvpp', rosa);
+      expect(v.title).toMatch(/§6401\.9/);
+      for (const el of v.elements) {
+        expect(el.name).not.toMatch(/employment action|sequence and interval|adverse action/i);
+      }
+    });
+
+    it('lc_6310 "Safety reports made" now also catches workplace-violence vocabulary (SB 553 retaliation routes through the real §6310 claim, not a fictional standalone one)', () => {
+      const record: ClaimLensInput = {
+        events: [{ title: 'Reported a workplace violence threat from a coworker to HR', date: 'Feb 2026', category: 'Safety', sourceFile: 'incident_report.pdf' }],
+        quotes: [],
+        intervals: [],
+        confirmed: [],
+        workerContext: 'I reported a violent threat from a coworker.',
+        files: [],
+      };
+      const v = buildClaimLensView('lc_6310', record);
+      expect(v.elements.find((e) => /safety reports made/i.test(e.name))?.items.length).toBeGreaterThan(0);
+    });
+  });
 });
 
 describe('buildExistenceChecks (Layer 0 flag row)', () => {
