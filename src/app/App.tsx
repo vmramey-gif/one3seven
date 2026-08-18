@@ -4277,6 +4277,7 @@ export default function App() {
         resolveEmploymentMatterTags(currentIntakeId),
       scaffoldResponses: existing?.scaffoldResponses,
       skipped: false,
+      voiceAnswersDraft: existing?.voiceAnswersDraft,
     };
   }, [
     currentIntakeId,

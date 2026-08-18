@@ -153,7 +153,9 @@ export function GuidedIntakeScreen({
   const [speechError, setSpeechError] = useState<string | null>(null);
   const [guidedVoiceMode, setGuidedVoiceMode] = useState(false);
   const [activeVoiceQuestionIndex, setActiveVoiceQuestionIndex] = useState(0);
-  const [voiceAnswers, setVoiceAnswers] = useState<GuidedVoiceAnswer[]>([]);
+  const [voiceAnswers, setVoiceAnswers] = useState<GuidedVoiceAnswer[]>(
+    () => initialAnswers?.voiceAnswersDraft ?? []
+  );
   const [selectedFollowUpQuestions, setSelectedFollowUpQuestions] = useState<GuidedVoiceQuestion[]>([]);
   const [voiceAcknowledgment, setVoiceAcknowledgment] = useState<string | null>(null);
   const initialContext = initialAnswers?.context ?? '';
@@ -613,10 +615,14 @@ export function GuidedIntakeScreen({
         caseCategory: caseCategoryRef.current,
         scaffoldResponses: scaffoldRef.current,
         skipped: false,
+        // Committed voice answers not yet merged into `context` (worker hasn't hit "Next"
+        // yet) — without this, a mid-flow exit silently loses them, since context alone
+        // never changes while the worker is answering guided-voice questions.
+        voiceAnswersDraft: voiceAnswers,
       });
     }, 400);
     return () => window.clearTimeout(handle);
-  }, [context]);
+  }, [context, voiceAnswers]);
 
   return (
     <div className="min-h-screen bg-[var(--o3s-bg)]">
