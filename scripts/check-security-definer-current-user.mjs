@@ -65,6 +65,14 @@ const GRANDFATHERED = new Set([
   '20260727120000_fix_profiles_privilege_escalation.sql',
   '20260809140000_firm_profiles_privilege_escalation.sql',
   '20260812120000_profiles_insert_privilege_lock.sql',
+  // 2026-08-17: shipped the same known bug class a THIRD time, in a brand-new function
+  // (enforce_firm_profile_insert_lock) modeled on the already-broken 8/9 pattern without
+  // checking that 20260812140000 had superseded it. Caught by live-testing with an explicit
+  // firm_code payload before merge, not by this lint (both files were introduced and fixed
+  // within the same PR, so this check never saw a "clean" state to compare against). Fully
+  // neutralized by 20260817230000_fix_security_definer_current_user_bypass.sql, same PR.
+  '20260817220000_close_self_serve_firm_signup.sql',
+  '20260817223000_fix_firm_profile_insert_lock_plan_id_default.sql',
 ]);
 
 function findFunctionBodies(sql) {
