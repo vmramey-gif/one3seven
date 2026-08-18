@@ -39,6 +39,8 @@ const SCANNED_FILES = [
   'src/app/screens/ForFirmsPage.tsx',
   'src/app/screens/WorkerLandingPage.tsx',
   'src/app/screens/BrandPreviewPage.tsx',
+  'src/app/screens/HowItWorksScreen.tsx',
+  'src/app/screens/LandingScreen.tsx',
   'src/i18n/i18n.tsx',
   // demo / semi-public product surfaces
   'src/app/screens/DemoApp.tsx',

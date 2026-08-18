@@ -95,7 +95,7 @@ import {
   O3S_SUBLINE,
 } from '../constants/visualTheme';
 import { EmploymentMatterChipList } from '../components/EmploymentMatterTagsLine';
-import type { EmploymentMatterTagId } from '../constants/employmentMatter';
+import { EMPLOYMENT_MATTER_TOPIC_HELPER, type EmploymentMatterTagId } from '../constants/employmentMatter';
 import {
   buildRecordStoryExcerpt,
   buildTimelineSectionMeta,
@@ -1613,7 +1613,7 @@ export function IntakeSummaryScreen({
               </div>
 
               <div className="rounded-[14px] border border-[#CBD6CF] bg-white px-3 py-3">
-                <h2 className="text-sm font-semibold text-[#131A17]">Next Recommended Action</h2>
+                <h2 className="text-sm font-semibold text-[#131A17]">What's next</h2>
                 <p className="mt-2 text-sm leading-relaxed text-[#40433F]">{nextRecommendedAction}</p>
               </div>
             </div>
@@ -1693,6 +1693,7 @@ export function IntakeSummaryScreen({
                   <p className="mt-2 text-xs text-[#7C857F] leading-relaxed">You can add more detail to your story or upload additional records — one3seven will update your organized file.</p>
                 </>
               )}
+              <p className="mt-2 text-[10px] text-[#7C857F] leading-relaxed">{EMPLOYMENT_MATTER_TOPIC_HELPER}</p>
             </section>
           ) : null}
 

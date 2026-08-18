@@ -267,7 +267,10 @@ export function CreateAccountScreen({ onNavigate, onCreateAccount, onGoogleAuth 
                 Sign in
               </button>
             </div>
-            <One3SevenDisclaimer variant="compact" className="mt-8" />
+            {/* Uncollapsed on purpose: this is the exact moment a worker commits to an
+                account with real personal details, so the "not a law firm / no outcome
+                guaranteed" text should be visible, not tucked behind an accordion. */}
+            <One3SevenDisclaimer variant="full" className="mt-8" />
           </motion.div>
         </div>
       </div>

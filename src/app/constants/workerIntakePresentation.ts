@@ -115,6 +115,6 @@ export const WORKER_REVIEW_PHRASES = {
   inconsistency: 'Potential inconsistency identified',
   timelineGap: 'Timeline gap detected between uploaded records',
   compensationVariation: 'Compensation structure variation noted',
-  additionalReview: 'Additional review may be recommended',
+  additionalReview: 'Marked for additional review',
   needsReview: 'Needs review against source records',
 } as const;

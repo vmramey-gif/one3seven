@@ -334,7 +334,7 @@ export function RecordsRequestScreen({ workerName, onBackToLanding }: RecordsReq
         </div>
 
         <div className="mt-5">
-          <p className={labelCls}>Which records? <span className="font-normal text-[#7C857F]">(all recommended)</span></p>
+          <p className={labelCls}>Which records? <span className="font-normal text-[#7C857F]">(all selected by default)</span></p>
           <div className="mt-2 grid gap-2 sm:grid-cols-2">
             {RECORD_OPTIONS.map((o) => (
               <button
