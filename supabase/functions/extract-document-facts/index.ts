@@ -311,8 +311,12 @@ ${JSON_SCHEMA}`,
 }
 
 // Image-type routing: Claude's vision input accepts these directly; anything else (notably HEIC/HEIF,
-// the default iPhone camera format) isn't supported and gets an honest "unsupported_type" status
-// instead of silently being sent mislabeled as a PDF (the bug this replaces — see extractionAccuracy
+// the default iPhone camera format) isn't supported and gets an honest 'skipped' status (the closest
+// fit in file_text_extractions' fact_extraction_status CHECK constraint -- pending/processing/
+// completed/failed/skipped, see 20260608120000_document_facts_extraction.sql; a first pass used the
+// invented value 'unsupported_type', which silently violated that constraint and left the row stuck
+// at 'processing' forever, caught only by reading the row back after a live stress test) instead of
+// silently being sent mislabeled as a PDF (the bug this whole file replaces — see extractionAccuracy
 // audit 2026-08-17: images previously fell through to buildPdfPrompt with media_type hardcoded to
 // 'application/pdf', so Claude silently failed to parse raw JPEG/PNG bytes it was told were a PDF).
 const IMAGE_MEDIA_TYPES: Record<string, string> = {
@@ -782,9 +786,10 @@ async function processSingleFile(params: {
     // format (HEIC/HEIF) → honest not-yet-readable status, otherwise → PDF (chunked when large).
     if (isUnsupportedImageType(fileName)) {
       const msg = `${fileName} is a HEIC/HEIF photo, which can't be read yet — re-upload as JPG or PNG to have it read. The original file is still safely on file.`;
-      await supabase.from('file_text_extractions')
-        .update({ fact_extraction_status: 'unsupported_type', fact_extraction_error: msg })
+      const { error: skipErr } = await supabase.from('file_text_extractions')
+        .update({ fact_extraction_status: 'skipped', fact_extraction_error: msg })
         .eq('uploaded_file_id', uploadedFileId);
+      if (skipErr) console.error(`[extract] failed to persist 'skipped' status for ${fileName}`, skipErr);
       return { ok: false, error: msg };
     }
 
@@ -810,9 +815,10 @@ async function processSingleFile(params: {
     if (imageMediaType) {
       if (bytes.length > MAX_IMAGE_BYTES) {
         const msg = `${fileName} is too large to read as a photo (${(bytes.length / (1024 * 1024)).toFixed(1)}MB, limit ${(MAX_IMAGE_BYTES / (1024 * 1024)).toFixed(0)}MB) — the original file is still safely on file.`;
-        await supabase.from('file_text_extractions')
-          .update({ fact_extraction_status: 'unsupported_type', fact_extraction_error: msg })
+        const { error: skipErr } = await supabase.from('file_text_extractions')
+          .update({ fact_extraction_status: 'skipped', fact_extraction_error: msg })
           .eq('uploaded_file_id', uploadedFileId);
+        if (skipErr) console.error(`[extract] failed to persist 'skipped' status for ${fileName}`, skipErr);
         return { ok: false, error: msg };
       }
       messages = buildImagePrompt(category, fileName, bytesToBase64(bytes), imageMediaType);
