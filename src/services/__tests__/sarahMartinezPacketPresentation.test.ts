@@ -5,6 +5,7 @@ import { buildIntakePacketHtml, buildIntakePacketViewModel } from '../intakePack
 import {
   attorneyCategoryLabel,
   buildCaseSnapshot,
+  buildExecutiveSummary,
   buildPacketChronologyPresentation,
   mapWorkerDashboardTimelineRows,
 } from '../packetStoryPresentation';
@@ -106,6 +107,54 @@ employment_dates:March 2021 through August 2021
     // The clean case (Sarah — dates align) stays a bare, asserted period with no qualifier.
     const clean = buildCaseSnapshot(SARAH_MARTINEZ_FIXTURE);
     expect(clean.employmentPeriod).not.toMatch(/not confirmed by records/i);
+  });
+
+  test('falls back to document-derived employer/period when the worker gave no story at all (Marcus Delgado regression, 2026-08-18)', () => {
+    // A real upload-only intake (no guided-intake story, no story-followup) whose per-file
+    // extraction correctly identified the employer and start/end dates still showed "Not yet
+    // identified" / "Not yet confirmed" everywhere -- employerName and documentEmploymentPeriod
+    // existed on the payload type and were correctly computed by synthesizeIntakeIntelligence,
+    // but nothing wired them into either field. workerContext is empty here specifically to
+    // prove neither field depends on a worker-provided story.
+    const documentOnly: IntakeSummaryDownloadPayload = {
+      ...SARAH_MARTINEZ_FIXTURE,
+      workerContext: '',
+      employerName: 'Bright Horizon Logistics',
+      documentEmploymentPeriod: 'March 17, 2025 – June 24, 2025',
+    };
+    const snapshot = buildCaseSnapshot(documentOnly);
+    expect(snapshot.employmentPeriod).toBe('March 17, 2025 – June 24, 2025 (from records)');
+
+    const summary = buildExecutiveSummary(documentOnly);
+    expect(summary).toMatch(/Bright Horizon Logistics/);
+  });
+
+  test('a worker-stated employer/period still wins over document-derived fields when both are present', () => {
+    // Doctrine: the worker's own account is the primary source; document-derived fields are a
+    // fallback for when the worker didn't say, never an override.
+    const both: IntakeSummaryDownloadPayload = {
+      ...SARAH_MARTINEZ_FIXTURE,
+      employerName: 'Bright Horizon Logistics',
+      documentEmploymentPeriod: 'March 17, 2025 – June 24, 2025',
+    };
+    const snapshot = buildCaseSnapshot(both);
+    expect(snapshot.employmentPeriod).not.toMatch(/Bright Horizon|from records/i);
+    expect(snapshot.employmentPeriod).toMatch(/January 2019/);
+
+    const summary = buildExecutiveSummary(both);
+    expect(summary).toMatch(/Regional Medical Group/);
+    expect(summary).not.toMatch(/Bright Horizon Logistics/);
+  });
+
+  test('no fallback text leaks in when neither a story nor document-derived fields exist', () => {
+    const nothing: IntakeSummaryDownloadPayload = {
+      ...SARAH_MARTINEZ_FIXTURE,
+      workerContext: '',
+      employerName: undefined,
+      documentEmploymentPeriod: undefined,
+    };
+    const snapshot = buildCaseSnapshot(nothing);
+    expect(snapshot.employmentPeriod).toBe('Not yet confirmed');
   });
 
   test('employment start uses Employment begins with offer letter only', () => {

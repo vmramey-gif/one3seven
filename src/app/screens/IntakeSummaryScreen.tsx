@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { Screen } from '../App';
 import { IntakeWorkspace } from '../types/IntakeWorkspace';
+import { loadIntakeDocumentFacts, synthesizeIntakeIntelligence } from '../../services/documentFactsService';
 import { BETA_ENABLE_PARTICIPATING_ROUTING, FIRM_CODE_ROUTING_LIVE, PARTICIPATING_NETWORK_LIVE } from '../constants/flags';
 import {
   ONE3SEVEN_NOTICES,
@@ -172,6 +173,10 @@ interface IntakeSummaryScreenProps {
   liveOverview?: string;
   liveReadiness?: string[];
   liveMissing?: string[];
+  /** Employer confirmed from document extraction, when the worker hasn't stated one themselves. */
+  liveEmployerName?: string;
+  /** Employment period ("start – end") confirmed from document extraction. */
+  liveDocumentEmploymentPeriod?: string;
   liveAccessRequests?: Array<{ routeId: string; firmName: string; barNumber?: string | null; barState?: string | null }>;
   /** Timeline rows from Supabase `timeline_events` (worker summary bundle). */
   liveTimelineEvents?: WorkerTimelineItem[];
@@ -308,6 +313,8 @@ export function IntakeSummaryScreen({
   liveOverview,
   liveReadiness,
   liveMissing,
+  liveEmployerName,
+  liveDocumentEmploymentPeriod,
   liveAccessRequests,
   onApproveAccess,
   onDeclineAccess,
@@ -744,7 +751,13 @@ export function IntakeSummaryScreen({
       firmCaseMode,
       workerName: (workerFullName ?? '').trim() || undefined,
       workerPhone: (workerPhone ?? '').trim() || undefined,
-      employerName: undefined,
+      // Was hardcoded undefined -- inferEmployer() (intakePacketPresentation.ts) already prefers
+      // a worker-stated employer from their guided-intake story first and only falls back to this
+      // field, so filling it from document extraction only kicks in when the worker didn't state
+      // one themselves (worker-audit 2026-08-18, confirmed live: a real intake whose per-file
+      // extraction correctly identified the employer still showed "Not yet identified").
+      employerName: (liveEmployerName ?? '').trim() || undefined,
+      documentEmploymentPeriod: (liveDocumentEmploymentPeriod ?? '').trim() || undefined,
       firmCode: (connectedFirmCode ?? '').trim() || undefined,
       intakeStatus: (workerWorkflowStatus ?? '').trim() || 'In review',
       overview: overviewStripped,
@@ -773,10 +786,27 @@ export function IntakeSummaryScreen({
     intakeId: string,
     base: IntakeSummaryDownloadPayload
   ): Promise<IntakeSummaryDownloadPayload> => {
-    const [bundle, filesResult] = await Promise.all([
+    const [bundle, filesResult, documentFactsResult] = await Promise.all([
       fetchIntakeSummaryBundle(intakeId),
       listUploadedFilesResult(intakeId),
+      loadIntakeDocumentFacts(intakeId),
     ]);
+    // synthesizeIntakeIntelligence() already existed, fully built and tested, computing a
+    // correct confirmedEmployer from document_facts.employer_name -- it was just never called
+    // from any live screen (worker or firm). Confirmed live 2026-08-18: a real intake whose
+    // per-file extraction correctly identified "Bright Horizon Logistics" as the employer still
+    // showed "Not yet identified" everywhere, because `employerName` on the export payload was
+    // hardcoded undefined in buildSummaryDownloadPayload above and never overwritten by anything.
+    const intel = documentFactsResult.facts.length
+      ? synthesizeIntakeIntelligence(documentFactsResult.facts)
+      : null;
+    const confirmedEmployer = intel?.confirmedEmployer?.trim() || undefined;
+    const confirmedStart = intel?.confirmedStartDate?.trim();
+    const confirmedEnd = intel?.confirmedTerminationDate?.trim();
+    const confirmedEmploymentPeriod =
+      confirmedStart && confirmedEnd
+        ? `${confirmedStart} – ${confirmedEnd}`
+        : confirmedStart || confirmedEnd || undefined;
     const s = bundle.summary as {
       overview?: string;
       timeline_summary?: string;
@@ -838,6 +868,8 @@ export function IntakeSummaryScreen({
       timelineEvents: timelineEvents.length ? timelineEvents : base.timelineEvents,
       readiness: (s?.readiness_indicators as string[] | undefined) ?? base.readiness,
       missing: (s?.missing_document_alerts as string[] | undefined) ?? base.missing,
+      employerName: confirmedEmployer ?? base.employerName,
+      documentEmploymentPeriod: confirmedEmploymentPeriod ?? base.documentEmploymentPeriod,
       uploadedFileInventory,
       documentsUploaded,
       categories,
