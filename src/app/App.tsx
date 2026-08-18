@@ -41,7 +41,11 @@ import {
 } from './types/IntakeWorkspace';
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 import * as intakeData from '../services/intakeDataService';
-import { triggerIntakeFactExtraction } from '../services/documentFactsService';
+import {
+  triggerIntakeFactExtraction,
+  loadIntakeDocumentFacts,
+  synthesizeIntakeIntelligence,
+} from '../services/documentFactsService';
 import {
   clearPendingOnboardingSession,
   hasMeaningfulPendingOnboardingForDraft,
@@ -401,6 +405,10 @@ export default function App() {
     missing: string[];
     /** Dated payroll/wage records (raw strings) for Gap Detection — from the pre-collapse timeline. */
     payrollDates: string[];
+    /** Employer name confirmed from document extraction, when the worker hasn't stated one. */
+    confirmedEmployer: string | null;
+    /** Employment period ("start – end") confirmed from document extraction. */
+    confirmedEmploymentPeriod: string | null;
   } | null>(null);
   const [workerAccessRequests, setWorkerAccessRequests] = useState<
     Array<{ routeId: string; firmName: string; intakeNumber: string; intakeId: string; barNumber: string | null; barState: string | null }>
@@ -690,6 +698,21 @@ export default function App() {
       .filter((e) => PAYROLL_DATE_RE.test(e.category ?? '') || PAYROLL_DATE_RE.test(e.event ?? ''))
       .flatMap((e) => [e.date, ...(e.sourceDates ?? [])])
       .filter((d): d is string => Boolean(d && String(d).trim()));
+    // synthesizeIntakeIntelligence() already existed, fully built and tested, deriving a correct
+    // confirmedEmployer from document_facts.employer_name -- it was just never called from any
+    // live screen. Confirmed live 2026-08-18: a real intake whose per-file extraction correctly
+    // identified an employer still showed "Not yet identified" everywhere on the worker's summary
+    // (on-screen preview AND the downloaded/emailed packet), because nothing fed a document-derived
+    // employer name into either path -- only a worker-typed story could ever supply one.
+    const documentFacts = isSupabaseConfigured() ? await loadIntakeDocumentFacts(intakeId) : { facts: [] };
+    const intel = documentFacts.facts.length ? synthesizeIntakeIntelligence(documentFacts.facts) : null;
+    // Same class of fix as confirmedEmployer just above -- confirmedStartDate/confirmedTerminationDate
+    // were already correctly computed by synthesizeIntakeIntelligence but never promoted anywhere,
+    // so "Employment Period" showed "Not yet confirmed" even when the timeline below it correctly
+    // listed the exact same start/end dates.
+    const start = intel?.confirmedStartDate?.trim();
+    const end = intel?.confirmedTerminationDate?.trim();
+    const confirmedEmploymentPeriod = start && end ? `${start} – ${end}` : start || end || null;
     setWorkerLiveSummary({
       overview: s?.overview ?? '',
       timelineSummary: s?.timeline_summary ?? '',
@@ -697,6 +720,8 @@ export default function App() {
       missing: s?.missing_document_alerts ?? [],
       timeline: enrichedTimeline,
       payrollDates,
+      confirmedEmployer: intel?.confirmedEmployer?.trim() || null,
+      confirmedEmploymentPeriod,
     });
     await refreshWorkerRoutingFromIntake(intakeId);
   }
@@ -4980,6 +5005,8 @@ export default function App() {
                 liveTimelineEvents={workerLiveSummary?.timeline}
                 liveReadiness={workerLiveSummary?.readiness}
                 liveMissing={workerLiveSummary?.missing}
+                liveEmployerName={workerLiveSummary?.confirmedEmployer ?? undefined}
+                liveDocumentEmploymentPeriod={workerLiveSummary?.confirmedEmploymentPeriod ?? undefined}
                 liveAccessRequests={workerAccessRequests.map((w) => ({
                   routeId: w.routeId,
                   firmName: w.firmName,

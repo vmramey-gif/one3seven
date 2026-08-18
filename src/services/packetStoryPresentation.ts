@@ -553,10 +553,21 @@ export function buildCaseSnapshot(payload: IntakeSummaryDownloadPayload): Packet
 
   // Doctrine: never assert the free-text worker-stated period as fact when the source-linked
   // documents contradict it. Attribute it to the worker and flag that records do not confirm it.
+  // When the worker gave no story at all (rawDates empty — not a conflict, just absent), fall
+  // back to a document-derived period instead of leaving "Not yet confirmed" when the extraction
+  // already found clear start/end dates -- confirmed live 2026-08-18: a real upload-only intake
+  // (no guided-intake story) showed "Not yet confirmed" even though its own timeline correctly
+  // listed "March 17, 2025 -- Employment begins" and "June 24, 2025 -- Employment ends".
+  // Labeled "from records" rather than asserted outright -- still attributed to its source, same
+  // spirit as the worker-stated conflict case above.
   const employmentPeriod =
     rawDates && periodConflict
       ? `${formatEmploymentPeriod(rawDates)} (worker-stated; not confirmed by records)`
-      : formatEmploymentPeriod(rawDates);
+      : rawDates
+        ? formatEmploymentPeriod(rawDates)
+        : payload.documentEmploymentPeriod?.trim()
+          ? `${payload.documentEmploymentPeriod.trim()} (from records)`
+          : formatEmploymentPeriod(rawDates);
 
   return {
     employmentPeriod,

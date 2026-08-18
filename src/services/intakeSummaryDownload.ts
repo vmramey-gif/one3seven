@@ -38,6 +38,10 @@ export type IntakeSummaryDownloadPayload = {
   /** Worker's own callback number — shown on their own packet only. */
   workerPhone?: string;
   employerName?: string;
+  /** Employment period derived from document dates, when the worker hasn't stated one themselves
+   *  (e.g. "March 17, 2025 – June 24, 2025"). Never overrides a worker-stated period — buildCaseSnapshot
+   *  only falls back to this when the worker provided no employment_dates at all. */
+  documentEmploymentPeriod?: string;
   firmCode?: string;
   intakeStatus?: string;
   overview: string;
