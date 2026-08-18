@@ -272,6 +272,71 @@ ${JSON_SCHEMA}`,
   }];
 }
 
+function buildImagePrompt(category: string, fileName: string, base64Image: string, mediaType: string): { role: string; content: unknown }[] {
+  const guidance = CATEGORY_GUIDANCE[category] ??
+    `Extract: document date, people mentioned, employer name, and key_quote (most significant sentence).`;
+
+  return [{
+    role: 'user',
+    content: [
+      {
+        type: 'image',
+        source: {
+          type: 'base64',
+          media_type: mediaType,
+          data: base64Image,
+        },
+      },
+      {
+        type: 'text',
+        text: `Extract structured facts from the attached photo of an employment document. This is a photo, not a scan — read whatever text is legible; if part of it is blurry, cut off, or unreadable, leave those fields null rather than guessing.
+
+Document category: ${category}
+File name: ${fileName}
+
+Reminders: quote verbatim for key_quote (under 200 characters); use null / [] for anything not explicitly present or not legible; no legal conclusions; raw JSON only.
+Capture EVERY date explicitly stated in the document in "document_dates", each as { "date": "<as written>", "context": "<short factual label, e.g. 'complaint filed', 'warning issued'>" }. Include only dates the text actually states; never infer a date. Keep context labels factual, never conclusory.
+In "referenced_documents", list other documents this file explicitly mentions or refers to but does not itself contain (e.g. "performance improvement plan", "offer letter dated March 2021", "the attached schedule"). Use the document's own wording. Include only documents the text actually references; never infer documents that "should" exist.
+In "communication_parties", list the people party to any communication in this document — sender, recipient, and anyone explicitly named — as { "name": "<as written>", "role": "<role/title exactly as the document states it, e.g. 'sender', 'recipient', 'HR representative', 'supervisor'; empty string if none stated>" }. Include only people the document actually names; never infer a person or a role.
+For each wage field you fill (pay_rate, overtime_hours, overtime_rate, missed_breaks), also return in "damages_sources" the VERBATIM sentence or line the value was read from — copied exactly as written, under 200 characters, never paraphrased — e.g. "damages_sources": { "pay_rate": "Regular rate of pay: $22.00 per hour" }. Omit a field (or use null) when its value is null. This is a quotation only; it asserts nothing about the value.
+
+CATEGORY-SPECIFIC GUIDANCE:
+${guidance}
+
+Return ONLY valid JSON matching this schema — no markdown, no code fences:
+${JSON_SCHEMA}`,
+      },
+    ],
+  }];
+}
+
+// Image-type routing: Claude's vision input accepts these directly; anything else (notably HEIC/HEIF,
+// the default iPhone camera format) isn't supported and gets an honest "unsupported_type" status
+// instead of silently being sent mislabeled as a PDF (the bug this replaces — see extractionAccuracy
+// audit 2026-08-17: images previously fell through to buildPdfPrompt with media_type hardcoded to
+// 'application/pdf', so Claude silently failed to parse raw JPEG/PNG bytes it was told were a PDF).
+const IMAGE_MEDIA_TYPES: Record<string, string> = {
+  jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp', gif: 'image/gif',
+};
+const UNSUPPORTED_IMAGE_EXTENSIONS = new Set(['heic', 'heif']);
+// Anthropic's vision guidance recommends keeping image payloads well under ~5MB; there's no
+// server-side resize step (Deno edge functions have no image-processing runtime available here), so
+// this is a hard cap rather than a compress-then-send step. An oversized photo gets an honest status
+// instead of a risky/likely-to-fail API call.
+const MAX_IMAGE_BYTES = 4 * 1024 * 1024;
+
+function fileExtension(fileName: string): string {
+  return (fileName.split('.').pop() ?? '').toLowerCase();
+}
+
+function detectImageMediaType(fileName: string): string | null {
+  return IMAGE_MEDIA_TYPES[fileExtension(fileName)] ?? null;
+}
+
+function isUnsupportedImageType(fileName: string): boolean {
+  return UNSUPPORTED_IMAGE_EXTENSIONS.has(fileExtension(fileName));
+}
+
 // ---------------------------------------------------------------------------
 // Scanned-PDF chunk helpers
 // ---------------------------------------------------------------------------
@@ -713,7 +778,16 @@ async function processSingleFile(params: {
     textTruncated = existingRow.extracted_text.length > MAX_TEXT_CHARS;
     messages = buildTextPrompt(category, fileName, existingRow.extracted_text);
   } else {
-    // No text layer — download file and send as PDF to Claude (chunked when large)
+    // No text layer — download file and route by type: photo → Claude vision, unsupported photo
+    // format (HEIC/HEIF) → honest not-yet-readable status, otherwise → PDF (chunked when large).
+    if (isUnsupportedImageType(fileName)) {
+      const msg = `${fileName} is a HEIC/HEIF photo, which can't be read yet — re-upload as JPG or PNG to have it read. The original file is still safely on file.`;
+      await supabase.from('file_text_extractions')
+        .update({ fact_extraction_status: 'unsupported_type', fact_extraction_error: msg })
+        .eq('uploaded_file_id', uploadedFileId);
+      return { ok: false, error: msg };
+    }
+
     const storagePath = filePath || (await resolveFilePath(supabase, uploadedFileId));
     if (!storagePath) {
       await supabase.from('file_text_extractions')
@@ -731,41 +805,54 @@ async function processSingleFile(params: {
     }
 
     const bytes = new Uint8Array(await blob.arrayBuffer());
-    const chunks = await splitPdfIntoChunks(bytes);
+    const imageMediaType = detectImageMediaType(fileName);
 
-    if (chunks) {
-      // Large scan: one Claude call per page-range chunk, merged. A single failed chunk is
-      // logged and skipped (partial facts, flagged) rather than failing the whole file.
-      const started = Date.now();
-      const parts: DocumentFacts[] = [];
-      let attempted = 0;
-      for (const chunk of chunks) {
-        if (Date.now() - started > SCAN_TIME_BUDGET_MS) {
-          scanFlags.push('partial_scan_extraction');
-          scanFlags.push(`scan_pages_extracted_${chunk.firstPage - 1}_of_${chunk.totalPages}`);
-          break;
-        }
-        attempted++;
-        const pageNote = `\nNote: this is pages ${chunk.firstPage}-${chunk.lastPage} of a ${chunk.totalPages}-page scanned file; extract only what these pages state.`;
-        try {
-          const part = await callClaude(buildPdfPrompt(category, fileName, chunk.base64, pageNote), apiKey);
-          if (part) parts.push(part);
-        } catch (e) {
-          console.error(`[extract] chunk ${chunk.firstPage}-${chunk.lastPage} of ${fileName} failed`, e);
-          scanFlags.push(`scan_chunk_error_pages_${chunk.firstPage}_${chunk.lastPage}`);
-        }
-      }
-      if (parts.length === 0) {
-        const msg = `All ${attempted} scan chunks failed for ${fileName}`;
-        await supabase.from('file_text_extractions').update({
-          fact_extraction_status: 'failed', fact_extraction_error: msg,
-        }).eq('uploaded_file_id', uploadedFileId);
+    if (imageMediaType) {
+      if (bytes.length > MAX_IMAGE_BYTES) {
+        const msg = `${fileName} is too large to read as a photo (${(bytes.length / (1024 * 1024)).toFixed(1)}MB, limit ${(MAX_IMAGE_BYTES / (1024 * 1024)).toFixed(0)}MB) — the original file is still safely on file.`;
+        await supabase.from('file_text_extractions')
+          .update({ fact_extraction_status: 'unsupported_type', fact_extraction_error: msg })
+          .eq('uploaded_file_id', uploadedFileId);
         return { ok: false, error: msg };
       }
-      facts = mergeChunkFacts(parts);
-      scanFlags.push('multi_chunk_scan');
+      messages = buildImagePrompt(category, fileName, bytesToBase64(bytes), imageMediaType);
     } else {
-      messages = buildPdfPrompt(category, fileName, bytesToBase64(bytes));
+      const chunks = await splitPdfIntoChunks(bytes);
+
+      if (chunks) {
+        // Large scan: one Claude call per page-range chunk, merged. A single failed chunk is
+        // logged and skipped (partial facts, flagged) rather than failing the whole file.
+        const started = Date.now();
+        const parts: DocumentFacts[] = [];
+        let attempted = 0;
+        for (const chunk of chunks) {
+          if (Date.now() - started > SCAN_TIME_BUDGET_MS) {
+            scanFlags.push('partial_scan_extraction');
+            scanFlags.push(`scan_pages_extracted_${chunk.firstPage - 1}_of_${chunk.totalPages}`);
+            break;
+          }
+          attempted++;
+          const pageNote = `\nNote: this is pages ${chunk.firstPage}-${chunk.lastPage} of a ${chunk.totalPages}-page scanned file; extract only what these pages state.`;
+          try {
+            const part = await callClaude(buildPdfPrompt(category, fileName, chunk.base64, pageNote), apiKey);
+            if (part) parts.push(part);
+          } catch (e) {
+            console.error(`[extract] chunk ${chunk.firstPage}-${chunk.lastPage} of ${fileName} failed`, e);
+            scanFlags.push(`scan_chunk_error_pages_${chunk.firstPage}_${chunk.lastPage}`);
+          }
+        }
+        if (parts.length === 0) {
+          const msg = `All ${attempted} scan chunks failed for ${fileName}`;
+          await supabase.from('file_text_extractions').update({
+            fact_extraction_status: 'failed', fact_extraction_error: msg,
+          }).eq('uploaded_file_id', uploadedFileId);
+          return { ok: false, error: msg };
+        }
+        facts = mergeChunkFacts(parts);
+        scanFlags.push('multi_chunk_scan');
+      } else {
+        messages = buildPdfPrompt(category, fileName, bytesToBase64(bytes));
+      }
     }
   }
 
