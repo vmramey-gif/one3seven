@@ -550,15 +550,14 @@ export default function App() {
         userId: signedInUser.id,
       });
       setProfile(null);
-      const firmIntent = firmSignInIntentRef.current;
       const meta = signedInUser.user_metadata?.role;
-      if (firmIntent || meta === 'firm') {
-        setUserRole('firm');
-        firmSignInIntentRef.current = false;
-        console.info('[o3s-post-auth] safe route → firmSettings', { firmIntent, meta });
-        setCurrentScreen('firmSettings');
-        return;
-      }
+      // Firm accounts are founder-provisioned only (2026-08-17). Since the DB profile failed to
+      // load here, we have no verified role for this user — client-only signals (firmIntent,
+      // user_metadata) are self-settable and must never route straight into firmSettings on their
+      // own. A real firm's profile.role is already set server-side, so this path is never hit for
+      // them on a healthy load; on a genuine bootstrap failure, fall through to roleSelection
+      // (worker-only) rather than trust an unverified firm claim.
+      firmSignInIntentRef.current = false;
       if (meta === 'worker') {
         setUserRole('worker');
         firmSignInIntentRef.current = false;
@@ -4555,10 +4554,15 @@ export default function App() {
                     ? handleCommitRole
                     : async () => ({ error: SUPABASE_REQUIRED_USER_MESSAGE })
                 }
-                // Firm signup is invite-only. Only surface the firm tile when the account
-                // arrived with firm intent (firm sign-in path). Public workers entering via
-                // onWorkerStart have firmSignInIntentRef=false and see the worker path only.
-                allowFirmRole={firmSignInIntentRef.current || profile?.role === 'firm' || authUser?.user_metadata?.role === 'firm'}
+                // Firm accounts are founder-provisioned only (2026-08-17 -- self-serve firm
+                // signup closed; see 20260817220000_close_self_serve_firm_signup.sql). The tile
+                // now only shows for an account whose profiles.role is ALREADY 'firm' in the
+                // database -- never from client-only signals (firmSignInIntentRef, user_metadata),
+                // which a self-signed-up user could set themselves and which the DB no longer
+                // honors anyway. A legitimately founder-provisioned firm always has profile.role
+                // set before their first sign-in, so this is never reachable in the normal flow --
+                // it only exists as the disabled-by-default fallback state for this screen.
+                allowFirmRole={profile?.role === 'firm'}
               />
             </motion.div>
           )}
