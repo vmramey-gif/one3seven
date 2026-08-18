@@ -45,16 +45,20 @@ export function SignInScreen({ onNavigate, onSignIn, onGoogleAuth, onForgotPassw
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setApiError('');
-    if (email.trim() && password.trim()) {
-      setSubmitting(true);
-      try {
-        const res = await onSignIn(email, password);
-        if (res.error) setApiError(res.error);
-      } catch {
-        setApiError('Something went wrong while signing in. Please try again in a moment.');
-      } finally {
-        setSubmitting(false);
-      }
+    if (!email.trim() || !password.trim()) {
+      // HTML5 `required` doesn't reject whitespace-only input, so without this the click
+      // silently did nothing with zero feedback.
+      setApiError('Enter your email and password to sign in.');
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const res = await onSignIn(email, password);
+      if (res.error) setApiError(res.error);
+    } catch {
+      setApiError('Something went wrong while signing in. Please try again in a moment.');
+    } finally {
+      setSubmitting(false);
     }
   };
 

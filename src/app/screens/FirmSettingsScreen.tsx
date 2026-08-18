@@ -604,7 +604,7 @@ export function FirmSettingsScreen({
             </div>
 
             <p className="mt-4 text-center text-[11px] text-[#1B2623]/35">
-              All plans include a 7-day free trial · Cancel anytime · Billed monthly via Stripe
+              All plans include a 30-day free trial · Cancel anytime · Billed monthly via Stripe
             </p>
           </motion.section>
 

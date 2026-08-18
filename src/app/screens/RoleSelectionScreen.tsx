@@ -16,9 +16,17 @@ interface RoleSelectionScreenProps {
    * arrived with firm intent. Public workers (entering via onWorkerStart) never see it.
    */
   allowFirmRole?: boolean;
+  /** Already signed in — "Back" should return to the app, not the public marketing flow. */
+  isAuthenticated?: boolean;
 }
 
-export function RoleSelectionScreen({ onNavigate, onSelectRole, onCommitRole, allowFirmRole = false }: RoleSelectionScreenProps) {
+export function RoleSelectionScreen({
+  onNavigate,
+  onSelectRole,
+  onCommitRole,
+  allowFirmRole = false,
+  isAuthenticated = false,
+}: RoleSelectionScreenProps) {
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
 
@@ -64,7 +72,7 @@ export function RoleSelectionScreen({ onNavigate, onSelectRole, onCommitRole, al
         <div className="mb-6">
           <button
             type="button"
-            onClick={() => onNavigate('authWelcome')}
+            onClick={() => onNavigate(isAuthenticated ? 'landing' : 'authWelcome')}
             className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs uppercase tracking-wide text-[#1B2623]/60 hover:bg-[#F2F4EC] hover:text-[#1B2623]"
           >
             <ArrowLeft className="w-3.5 h-3.5" />

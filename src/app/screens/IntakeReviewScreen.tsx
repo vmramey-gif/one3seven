@@ -2566,7 +2566,7 @@ export function IntakeReviewScreen({
                       className="rounded-full px-6 py-3 text-sm font-semibold text-white transition-colors"
                       style={{ background: '#42574E', boxShadow: '0 8px 24px rgba(66,87,78,0.4)' }}
                     >
-                      Start 7-day free trial →
+                      Start 30-day free trial →
                     </button>
                     <button
                       onClick={() => { window.location.href = window.location.pathname; }}

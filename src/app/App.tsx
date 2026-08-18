@@ -713,8 +713,9 @@ export default function App() {
       console.info('[o3s-auth-audit] onAuthStateChange', {
         event: evt,
         hasSession: Boolean(session),
+        // userId only -- email is real PII with no debugging value the userId doesn't already
+        // give (cross-reference in the Supabase dashboard), and this fires on every sign-in.
         userId: session?.user?.id ?? null,
-        email: session?.user?.email ?? null,
       });
       // A password-recovery link lands here with a real (recovery-scoped) session — route
       // straight to the "set a new password" screen instead of the normal sign-in handling
@@ -2726,7 +2727,7 @@ export default function App() {
         {
           id: `billing-success-${Date.now()}`,
           title: 'Subscription started',
-          body: 'Your 7-day free trial is active. You can manage billing anytime from Settings.',
+          body: 'Your 30-day free trial is active. You can manage billing anytime from Settings.',
           read: false,
         },
         ...prev,
@@ -2788,6 +2789,11 @@ export default function App() {
     pendingPersistMetaAppendCountRef.current = files.length;
     let failedCount = 0;
     let duplicateCount = 0;
+    // Collect failures instead of alerting per-file — a batch of N failures used to stack N
+    // blocking window.alert() dialogs, each requiring manual dismissal. The caller (UploadScreen)
+    // already surfaces the thrown error below through its own error banner, so one combined
+    // message is both less jarring and no less informative.
+    const failedFiles: { name: string; message: string }[] = [];
     try {
       for (const f of files) {
         console.info('[o3s-upload] uploadIntakeFile (before)', { fileName: f.name, size: f.size });
@@ -2802,16 +2808,18 @@ export default function App() {
         if (r.error) {
           console.error(r.error);
           failedCount += 1;
-          window.alert(
-            `Upload failed for “${f.name}”: ${toBetaUserMessage(r.error, 'Could not upload this file. Try again.')}`
-          );
+          failedFiles.push({
+            name: f.name,
+            message: toBetaUserMessage(r.error, 'Could not upload this file. Try again.'),
+          });
         } else if (r.duplicate) {
           duplicateCount += 1;
         }
       }
       if (failedCount > 0) {
+        const detail = failedFiles.map((f) => `“${f.name}”: ${f.message}`).join('; ');
         throw new Error(
-          `${failedCount} file${failedCount === 1 ? '' : 's'} could not be uploaded.`
+          `${failedCount} file${failedCount === 1 ? '' : 's'} could not be uploaded — ${detail}`
         );
       }
       if (duplicateCount > 0) {
@@ -3728,6 +3736,11 @@ export default function App() {
     try {
       await persistNewFiles(uploadedFiles);
       setCurrentScreen('processing');
+    } catch (err) {
+      // persistNewFiles no longer alerts per-file (H13 fix) — without this catch, a failure
+      // here would go from "jarring but visible" to completely silent on this call site.
+      // eslint-disable-next-line no-alert
+      window.alert(err instanceof Error ? err.message : 'Could not upload one or more files. Try again.');
     } finally {
       setFirmCaseOrganizing(false);
     }
@@ -4564,6 +4577,7 @@ export default function App() {
                 // set before their first sign-in, so this is never reachable in the normal flow --
                 // it only exists as the disabled-by-default fallback state for this screen.
                 allowFirmRole={profile?.role === 'firm'}
+                isAuthenticated={isAuthenticated}
               />
             </motion.div>
           )}
