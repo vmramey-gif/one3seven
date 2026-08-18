@@ -45,6 +45,7 @@ import {
   triggerIntakeFactExtraction,
   loadIntakeDocumentFacts,
   synthesizeIntakeIntelligence,
+  deriveNamedPeopleForIntake,
 } from '../services/documentFactsService';
 import {
   clearPendingOnboardingSession,
@@ -409,6 +410,8 @@ export default function App() {
     confirmedEmployer: string | null;
     /** Employment period ("start – end") confirmed from document extraction. */
     confirmedEmploymentPeriod: string | null;
+    /** Count of named people + roles confirmed from document extraction. */
+    confirmedNamedPeopleCount: number;
   } | null>(null);
   const [workerAccessRequests, setWorkerAccessRequests] = useState<
     Array<{ routeId: string; firmName: string; intakeNumber: string; intakeId: string; barNumber: string | null; barState: string | null }>
@@ -713,6 +716,9 @@ export default function App() {
     const start = intel?.confirmedStartDate?.trim();
     const end = intel?.confirmedTerminationDate?.trim();
     const confirmedEmploymentPeriod = start && end ? `${start} – ${end}` : start || end || null;
+    const confirmedNamedPeopleCount = documentFacts.facts.length
+      ? deriveNamedPeopleForIntake(documentFacts.facts).length
+      : 0;
     setWorkerLiveSummary({
       overview: s?.overview ?? '',
       timelineSummary: s?.timeline_summary ?? '',
@@ -722,6 +728,7 @@ export default function App() {
       payrollDates,
       confirmedEmployer: intel?.confirmedEmployer?.trim() || null,
       confirmedEmploymentPeriod,
+      confirmedNamedPeopleCount,
     });
     await refreshWorkerRoutingFromIntake(intakeId);
   }
@@ -5007,6 +5014,7 @@ export default function App() {
                 liveMissing={workerLiveSummary?.missing}
                 liveEmployerName={workerLiveSummary?.confirmedEmployer ?? undefined}
                 liveDocumentEmploymentPeriod={workerLiveSummary?.confirmedEmploymentPeriod ?? undefined}
+                liveDocumentNamedPeopleCount={workerLiveSummary?.confirmedNamedPeopleCount}
                 liveAccessRequests={workerAccessRequests.map((w) => ({
                   routeId: w.routeId,
                   firmName: w.firmName,

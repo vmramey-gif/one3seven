@@ -192,10 +192,15 @@ function eventCandidateFromFilename(record: IntakeFileOrganizationRecord): Event
   if (/offer_letter|employment_agreement|onboard|hire/.test(name)) {
     return candidate('Employment begins', 84);
   }
-  if (/schedule_change|shift_change|hours_change|schedule|timesheet|timecard/.test(name)) {
+  // "timesheet"/"timecard" moved out of the schedule-change match below (2026-08-18 founder
+  // review): a plain timecard or timesheet records hours worked in a period -- it's evidence of
+  // pay/time records, not evidence a schedule CHANGED. Grouping it with genuine schedule-change
+  // filenames asserted a change the file itself never establishes (matches the same bug class
+  // fixed above for worker statements -- title the record for what it IS).
+  if (/schedule_change|shift_change|hours_change|schedule/.test(name)) {
     return candidate('Schedule change documented', 80);
   }
-  if (/paystub|pay_stub|payroll|wage_statement|overtime/.test(name)) {
+  if (/paystub|pay_stub|payroll|wage_statement|overtime|timesheet|timecard/.test(name)) {
     return candidate('Pay period or overtime record documented', 78);
   }
   return null;

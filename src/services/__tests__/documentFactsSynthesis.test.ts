@@ -1,5 +1,10 @@
 import { describe, expect, test } from 'vitest';
-import { synthesizeIntakeIntelligence, type DocumentFacts, type FileWithFacts } from '../documentFactsService';
+import {
+  synthesizeIntakeIntelligence,
+  deriveNamedPeopleForIntake,
+  type DocumentFacts,
+  type FileWithFacts,
+} from '../documentFactsService';
 
 function facts(p: Partial<DocumentFacts>): DocumentFacts {
   return {
@@ -55,5 +60,48 @@ describe('synthesizeIntakeIntelligence — task_8d413384 firm-output fixes', () 
       },
     ]);
     expect(intel.keyQuotes[0]?.category).toBe('Separation Records');
+  });
+});
+
+describe('deriveNamedPeopleForIntake (2026-08-18 founder review) — peopleRoleInference.ts was already built and tested but never called from any live screen', () => {
+  test('names real people from people_mentioned and communication_parties, infers HR role from issued_by context', () => {
+    const people = deriveNamedPeopleForIntake([
+      file('Offer Letters', '01-offer-letter.pdf', {
+        people_mentioned: ['Marcus Delgado', 'Renee Ashford'],
+        issued_by: 'Renee Ashford, HR Manager',
+        communication_parties: [
+          { name: 'Renee Ashford', role: 'sender' },
+          { name: 'Marcus Delgado', role: 'recipient' },
+        ],
+      }),
+    ]);
+    const names = people.map((p) => p.name);
+    expect(names).toContain('Marcus Delgado');
+    expect(names).toContain('Renee Ashford');
+    const renee = people.find((p) => p.name === 'Renee Ashford');
+    expect(renee?.role).toBe('Human Resources Representative');
+  });
+
+  test('excludes generic role labels that occasionally land in a name field', () => {
+    const people = deriveNamedPeopleForIntake([
+      file('Workplace Communications', 'hr_email.pdf', {
+        people_mentioned: ['Jordan Lee'],
+        communication_parties: [
+          { name: 'Human Resources', role: 'sender' },
+          { name: 'Jordan Lee', role: 'recipient' },
+        ],
+      }),
+    ]);
+    const names = people.map((p) => p.name);
+    expect(names).toEqual(['Jordan Lee']);
+    expect(names).not.toContain('Human Resources');
+  });
+
+  test('dedupes the same person named in multiple files', () => {
+    const people = deriveNamedPeopleForIntake([
+      file('Offer Letters', 'offer.pdf', { people_mentioned: ['Marcus Delgado', 'Renee Ashford'] }),
+      file('Separation Records', 'termination.pdf', { people_mentioned: ['Marcus Delgado', 'Renee Ashford'] }),
+    ]);
+    expect(people.length).toBe(2);
   });
 });

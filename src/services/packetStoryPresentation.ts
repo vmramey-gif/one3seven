@@ -13,6 +13,7 @@ import {
   PACKET_METADATA_FALLBACK,
 } from './intakePacketFormatting';
 import { extractStoryFollowUpFromOverview } from './storyFollowUpPersistence';
+import { DATE_UNCLEAR_LABEL } from './contextualDateClassification';
 import { normalizeFilenameForMatching } from './filenameMatching';
 import {
   inferInventoryCategory,
@@ -264,6 +265,12 @@ function countNamedPeopleOrRoleReferences(payload: IntakeSummaryDownloadPayload,
   const orgPeople = payload.orgSections?.people_and_entities?.join('\n') ?? '';
   const orgPeopleCount = countNamedIndividuals(orgPeople);
   if (orgPeopleCount > 0) return orgPeopleCount;
+
+  // Document-derived named people (peopleRoleInference.ts via documentFactsService.ts) -- real
+  // extracted names, still more accurate than the generic role-word scan below it. Founder-flagged
+  // live 2026-08-18: a real intake showed "Named Individuals: 1" (only "Human Resources" as a
+  // role-word match) despite its own extraction naming two actual people.
+  if ((payload.documentNamedPeopleCount ?? 0) > 0) return payload.documentNamedPeopleCount!;
 
   const corpus = packetSearchCorpus(payload);
   const roles = new Set<string>();
@@ -682,7 +689,20 @@ export function buildExecutiveSummary(payload: IntakeSummaryDownloadPayload): st
     unclearNotes.push(
       'Some date details may require confirmation because worker-provided dates and document dates do not fully align.'
     );
-  } else if (sequenceSummary && /source files|timing/i.test(sequenceSummary)) {
+  } else if (
+    // Was: any sequenceSummary containing the words "source files"/"timing" -- but
+    // buildDerivedSequenceSummary() deliberately bakes that phrase into nearly every summary as a
+    // causation/sequence hedge (it never asserts order from keyword presence alone), so this fired
+    // almost universally regardless of whether any date was actually unclear. Founder-flagged
+    // 2026-08-18: a real intake whose timeline events all had concrete, high-confidence dates still
+    // showed "Exact dates and timing may need confirmation" -- check the real signal (an actual
+    // unclear/missing date on a timeline event) instead of prose-pattern-matching a hedge that's
+    // there for an unrelated reason (not asserting causal sequence, not measuring date confidence).
+    sequenceSummary &&
+    (payload.timelineEvents ?? []).some(
+      (event) => !event.date?.trim() || event.date === DATE_UNCLEAR_LABEL
+    )
+  ) {
     unclearNotes.push('Exact dates and timing may need confirmation against source files.');
   }
   const missingNotes: string[] = [];
