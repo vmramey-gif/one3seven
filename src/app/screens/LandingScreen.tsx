@@ -497,7 +497,10 @@ export function LandingScreen({
             routeStatus={opts.routeStatus}
             routeSharedAt={opts.routeSharedAt}
             submissionChannel={opts.channel}
-            busy={firmCodeActionBusy}
+            // Scoped per-card, matching routingError below — firmCodeActionBusy/Error are
+            // global App.tsx state, so without this an action on one intake card would
+            // disable buttons / show errors on a worker's OTHER intake cards too (H6).
+            busy={activeIntakeHub?.intakeId === opts.intakeId && firmCodeActionBusy}
             error={routingError}
             onAddFirmCode={
               onAddFirmCodeForIntake && opts.intakeId
