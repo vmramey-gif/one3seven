@@ -146,6 +146,53 @@ describe('evidence-mapped timeline engine', () => {
     expect(events[0]?.title).not.toBe('Schedule change documented');
   });
 
+  test('titles a plain timecard/paystub as a pay record, not an asserted schedule change (Marcus Delgado regression, 2026-08-18)', () => {
+    // A bare timecard/timesheet records hours worked in a period -- it's evidence of a time/pay
+    // record, not evidence a schedule CHANGED. "timecard"/"timesheet" used to be grouped with
+    // genuine schedule-change filenames (schedule_change/shift_change), asserting a change the
+    // file itself never establishes.
+    const events = buildEvidenceMappedTimelineEvents({
+      fileRecords: [
+        sampleFileRecord({
+          source_file_id: 'timecard-1',
+          file_name: '04-timecards-and-paystub.pdf',
+          document_type: 'Payroll & Compensation Records',
+          legacy_upload_category: 'Payroll & Compensation Records',
+          likely_date: 'June 8, 2025',
+          employment_topics: ['Pay records'],
+          possible_timeline_event: {
+            title: 'Pay period or overtime record documented',
+            date: 'June 8, 2025',
+            neutral_summary: 'Materials may reflect payroll or timekeeping records.',
+          },
+        }),
+      ],
+    });
+    expect(events[0]?.title).toBe('Pay period or overtime record documented');
+    expect(events[0]?.title).not.toBe('Schedule change documented');
+  });
+
+  test('a genuine schedule-change filename still titles correctly', () => {
+    const events = buildEvidenceMappedTimelineEvents({
+      fileRecords: [
+        sampleFileRecord({
+          source_file_id: 'schedule-1',
+          file_name: 'schedule_change_notice.pdf',
+          document_type: 'HR Documents',
+          legacy_upload_category: 'HR Documents',
+          likely_date: 'June 8, 2025',
+          employment_topics: ['Scheduling'],
+          possible_timeline_event: {
+            title: 'Schedule change materials',
+            date: 'June 8, 2025',
+            neutral_summary: 'Materials may reflect a schedule change.',
+          },
+        }),
+      ],
+    });
+    expect(events[0]?.title).toBe('Schedule change documented');
+  });
+
   test('titles a witness statement as a witness statement, not an HR complaint (Elena Marquez regression)', () => {
     const events = buildEvidenceMappedTimelineEvents({
       fileRecords: [

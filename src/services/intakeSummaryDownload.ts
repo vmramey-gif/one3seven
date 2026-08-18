@@ -42,6 +42,10 @@ export type IntakeSummaryDownloadPayload = {
    *  (e.g. "March 17, 2025 – June 24, 2025"). Never overrides a worker-stated period — buildCaseSnapshot
    *  only falls back to this when the worker provided no employment_dates at all. */
   documentEmploymentPeriod?: string;
+  /** Count of named people + roles confirmed from document extraction, when the worker hasn't
+   *  listed key people themselves. Count only (not the roster) -- attributing a specific job
+   *  title to a specific name is a doctrine-sensitive step not attempted on this surface yet. */
+  documentNamedPeopleCount?: number;
   firmCode?: string;
   intakeStatus?: string;
   overview: string;

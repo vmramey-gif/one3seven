@@ -4,6 +4,7 @@
  */
 
 import { supabase, resolveFunctionsInvokeErrorMessage } from '../lib/supabaseClient';
+import { inferRolesForPeople, type InferredPersonRole } from './peopleRoleInference';
 
 export type DocumentFacts = {
   category: string;
@@ -341,6 +342,36 @@ function timingLabel(days: number, eventName: string): string {
   if (days < 30) return `${eventName}: ${days} days after complaint`;
   const months = Math.round(days / 30.4);
   return `${eventName}: approximately ${months} month${months === 1 ? '' : 's'} after complaint`;
+}
+
+/**
+ * Named people + inferred roles from document extraction (peopleRoleInference.ts, already built
+ * and tested, was only ever used to embellish a timeline-event title -- never to answer "who's
+ * named in this file set" for the worker-facing summary/packet). Same fix shape as
+ * confirmedEmployer/confirmedStartDate above: real, already-extracted data not promoted anywhere.
+ */
+// A raw name field occasionally holds a role label instead of an actual name (e.g. "Human
+// Resources" as a communication party) -- exclude those from the count so this doesn't just
+// recreate the generic-role-word counting it's meant to replace.
+const GENERIC_NAME_RE =
+  /^(human resources|hr|hr department|payroll|management|manager|supervisor|legal|benefits|employer|employee|company|worker|staff|n\/?a|unknown|not specified|none)$/i;
+
+export function deriveNamedPeopleForIntake(files: FileWithFacts[]): InferredPersonRole[] {
+  const names: string[] = [];
+  const contexts: string[] = [];
+  for (const f of files) {
+    const df = f.document_facts;
+    if (!df) continue;
+    for (const name of df.people_mentioned ?? []) names.push(name);
+    for (const party of df.communication_parties ?? []) names.push(party.name);
+    contexts.push(
+      [df.issued_by ?? '', df.key_quote ?? '', df.stated_reason ?? '', df.relationship_to_worker ?? '']
+        .filter(Boolean)
+        .join('\n')
+    );
+  }
+  const realNames = names.filter((n) => n.trim() && !GENERIC_NAME_RE.test(n.trim()));
+  return inferRolesForPeople({ names: realNames, contexts });
 }
 
 export function synthesizeIntakeIntelligence(files: FileWithFacts[]): IntakeIntelligence {

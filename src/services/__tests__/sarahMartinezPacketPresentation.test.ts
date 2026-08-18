@@ -121,9 +121,15 @@ employment_dates:March 2021 through August 2021
       workerContext: '',
       employerName: 'Bright Horizon Logistics',
       documentEmploymentPeriod: 'March 17, 2025 – June 24, 2025',
+      documentNamedPeopleCount: 2,
     };
     const snapshot = buildCaseSnapshot(documentOnly);
     expect(snapshot.employmentPeriod).toBe('March 17, 2025 – June 24, 2025 (from records)');
+    // "Named Individuals" also used to only count a worker-stated keyPeople list -- with no story
+    // at all it fell all the way through to a generic role-word scan of the corpus (e.g. "Human
+    // Resources" counted as if it were a named person). documentNamedPeopleCount is real,
+    // document-derived people (deriveNamedPeopleForIntake), and now wins over that generic scan.
+    expect(snapshot.namedIndividuals).toBe(2);
 
     const summary = buildExecutiveSummary(documentOnly);
     expect(summary).toMatch(/Bright Horizon Logistics/);
@@ -155,6 +161,30 @@ employment_dates:March 2021 through August 2021
     };
     const snapshot = buildCaseSnapshot(nothing);
     expect(snapshot.employmentPeriod).toBe('Not yet confirmed');
+  });
+
+  test('does not claim dates need confirmation when every timeline event has a concrete date (2026-08-18 founder review)', () => {
+    // Was: this caveat fired whenever the sequence-summary prose happened to contain "source
+    // files"/"timing" -- which buildDerivedSequenceSummary() bakes into nearly every summary as a
+    // causation-sequence hedge (a separate, legitimate concern from date confidence), regardless
+    // of whether any date was actually unclear. Founder-flagged live: a real intake whose timeline
+    // events all had concrete, high-confidence dates still showed "Exact dates and timing may
+    // need confirmation" right next to those dates.
+    const allDatesKnown: IntakeSummaryDownloadPayload = {
+      ...SARAH_MARTINEZ_FIXTURE,
+      timelineEvents: SARAH_MARTINEZ_FIXTURE.timelineEvents?.map((e) =>
+        e.date === DATE_UNCLEAR_LABEL ? { ...e, date: 'February 2024' } : e
+      ),
+    };
+    const summary = buildExecutiveSummary(allDatesKnown);
+    expect(summary).not.toMatch(/Exact dates and timing may need confirmation/i);
+  });
+
+  test('still flags date confirmation when a timeline event genuinely has no date (Sarah Martinez fixture, unmodified)', () => {
+    // The unmodified fixture has one event with DATE_UNCLEAR_LABEL -- confirms the real signal
+    // still fires correctly, this isn't just disabled outright.
+    const summary = buildExecutiveSummary(SARAH_MARTINEZ_FIXTURE);
+    expect(summary).toMatch(/Exact dates and timing may need confirmation/i);
   });
 
   test('employment start uses Employment begins with offer letter only', () => {

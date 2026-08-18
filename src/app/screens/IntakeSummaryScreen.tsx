@@ -22,7 +22,11 @@ import {
 } from 'lucide-react';
 import { Screen } from '../App';
 import { IntakeWorkspace } from '../types/IntakeWorkspace';
-import { loadIntakeDocumentFacts, synthesizeIntakeIntelligence } from '../../services/documentFactsService';
+import {
+  loadIntakeDocumentFacts,
+  synthesizeIntakeIntelligence,
+  deriveNamedPeopleForIntake,
+} from '../../services/documentFactsService';
 import { BETA_ENABLE_PARTICIPATING_ROUTING, FIRM_CODE_ROUTING_LIVE, PARTICIPATING_NETWORK_LIVE } from '../constants/flags';
 import {
   ONE3SEVEN_NOTICES,
@@ -177,6 +181,8 @@ interface IntakeSummaryScreenProps {
   liveEmployerName?: string;
   /** Employment period ("start – end") confirmed from document extraction. */
   liveDocumentEmploymentPeriod?: string;
+  /** Count of named people + roles confirmed from document extraction. */
+  liveDocumentNamedPeopleCount?: number;
   liveAccessRequests?: Array<{ routeId: string; firmName: string; barNumber?: string | null; barState?: string | null }>;
   /** Timeline rows from Supabase `timeline_events` (worker summary bundle). */
   liveTimelineEvents?: WorkerTimelineItem[];
@@ -315,6 +321,7 @@ export function IntakeSummaryScreen({
   liveMissing,
   liveEmployerName,
   liveDocumentEmploymentPeriod,
+  liveDocumentNamedPeopleCount,
   liveAccessRequests,
   onApproveAccess,
   onDeclineAccess,
@@ -758,6 +765,7 @@ export function IntakeSummaryScreen({
       // extraction correctly identified the employer still showed "Not yet identified").
       employerName: (liveEmployerName ?? '').trim() || undefined,
       documentEmploymentPeriod: (liveDocumentEmploymentPeriod ?? '').trim() || undefined,
+      documentNamedPeopleCount: liveDocumentNamedPeopleCount,
       firmCode: (connectedFirmCode ?? '').trim() || undefined,
       intakeStatus: (workerWorkflowStatus ?? '').trim() || 'In review',
       overview: overviewStripped,
@@ -807,6 +815,9 @@ export function IntakeSummaryScreen({
       confirmedStart && confirmedEnd
         ? `${confirmedStart} – ${confirmedEnd}`
         : confirmedStart || confirmedEnd || undefined;
+    const confirmedNamedPeopleCount = documentFactsResult.facts.length
+      ? deriveNamedPeopleForIntake(documentFactsResult.facts).length
+      : undefined;
     const s = bundle.summary as {
       overview?: string;
       timeline_summary?: string;
@@ -870,6 +881,7 @@ export function IntakeSummaryScreen({
       missing: (s?.missing_document_alerts as string[] | undefined) ?? base.missing,
       employerName: confirmedEmployer ?? base.employerName,
       documentEmploymentPeriod: confirmedEmploymentPeriod ?? base.documentEmploymentPeriod,
+      documentNamedPeopleCount: confirmedNamedPeopleCount ?? base.documentNamedPeopleCount,
       uploadedFileInventory,
       documentsUploaded,
       categories,
@@ -1312,7 +1324,12 @@ export function IntakeSummaryScreen({
       recordSignalCount > 0
         ? `${recordSignalCount} record${recordSignalCount === 1 ? '' : 's'} included.`
         : 'Records can be added later.';
-    const hasPeople = Boolean(storyFollowUpDetails?.keyPeople?.trim());
+    // Was worker-stated keyPeople only -- document-derived people (peopleRoleInference.ts, already
+    // built/tested, just never checked here) fall back for intakes with no guided-intake story.
+    // Founder-flagged live 2026-08-18: a real upload-only intake showed "People Not Yet Identified"
+    // even though its own extraction correctly named the sender and recipient of an HR email.
+    const hasPeople =
+      Boolean(storyFollowUpDetails?.keyPeople?.trim()) || (liveDocumentNamedPeopleCount ?? 0) > 0;
     const hasDateGap = missingInformationItems.some((item) => /date|when|timing/i.test(item));
 
     if (intakeMaturityState === 'records_only') {
