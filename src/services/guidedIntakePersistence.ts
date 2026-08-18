@@ -26,6 +26,8 @@ export type GuidedIntakeAnswers = {
   employmentMatterTags?: EmploymentMatterTagId[];
   scaffoldResponses?: Array<{ question: string; answer: string }>;
   skipped?: boolean;
+  /** Committed guided-voice answers not yet merged into `context` (worker hasn't hit "Next" yet). */
+  voiceAnswersDraft?: Array<{ question: string; label: string; answer: string }>;
 };
 
 const SESSION_COMPLETED_PREFIX = 'o3s_guided_intake_completed_v1_';
@@ -41,7 +43,8 @@ export function hasGuidedIntakeContent(answers: GuidedIntakeAnswers): boolean {
     answers.availableRecords.length > 0 ||
     Boolean(answers.context.trim()) ||
     Boolean(answers.scaffoldResponses?.some((x) => x.answer.trim().length > 0)) ||
-    Boolean(answers.employmentMatterTags?.length)
+    Boolean(answers.employmentMatterTags?.length) ||
+    Boolean(answers.voiceAnswersDraft?.some((x) => x.answer.trim().length > 0))
   );
 }
 
@@ -152,6 +155,15 @@ export function loadGuidedIntakeFromSession(intakeId: string): GuidedIntakeAnswe
             .filter((row) => row.question.trim().length > 0)
         : [],
       skipped: Boolean(parsed.skipped),
+      voiceAnswersDraft: Array.isArray(parsed.voiceAnswersDraft)
+        ? parsed.voiceAnswersDraft
+            .map((row) => ({
+              question: String((row as { question?: string }).question ?? ''),
+              label: String((row as { label?: string }).label ?? ''),
+              answer: String((row as { answer?: string }).answer ?? ''),
+            }))
+            .filter((row) => row.label.trim().length > 0 && row.answer.trim().length > 0)
+        : undefined,
     };
   } catch {
     return null;
