@@ -105,6 +105,7 @@ export const ATTORNEY_PACKET_SECTIONS = {
   caseSnapshot: 'Case Snapshot',
   workerStory: 'Worker Account',
   chronology: 'Chronology of Events',
+  peopleAndEntities: 'People Named in Records',
   evidenceMapping: 'Supporting Records',
   missingInformation: 'Additional Records That May Help',
   questionsForReview: 'Topics Present In Uploaded Records',

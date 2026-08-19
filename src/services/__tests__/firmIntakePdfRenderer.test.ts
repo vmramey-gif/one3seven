@@ -282,6 +282,7 @@ function workerModel(overrides: Partial<WorkerPacketModel> = {}): WorkerPacketMo
     workerStory: [{ heading: 'Concerns Reported', body: 'I raised the overtime issue with my supervisor in early 2023.' }],
     questionsForReview: ['What records show the overtime hours worked?'],
     chronology: ['November 26, 2025 — HR complaint filed', 'January 10, 2026 — employment ended'],
+    peopleAndEntities: ['Marcus Reyes', 'HR Department (Human Resources Representative)'],
     supportingDocuments: ['Rivera HR Complaint Nov2025', 'Rivera FinalPayStub Jan2026'],
     missingInformation: ['Time records for the full employment period may help complete the timeline.'],
     disclaimer: ['one3seven is not a law firm and does not provide legal advice. You control what you share.'],
