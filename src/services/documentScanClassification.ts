@@ -53,7 +53,16 @@ export const REVIEW_TOPIC_DEFINITIONS: ReadonlyArray<{
   },
   {
     label: 'Leave or accommodation references',
-    terms: ['accommodation', 'disability', 'ada', 'pregnancy', 'maternity', 'medical leave', 'leave', 'doctor', 'restriction', 'interactive process'],
+    // Bare 'ada' removed (2026-08-18 fresh-accuracy hard-challenge): employmentTopicLabelsForText
+    // matches every term via plain substring .includes(), no word boundaries -- the same bug
+    // class as the earlier-fixed 'pto' substring of 'laptop' collision. 'ada' (meant as the ADA
+    // acronym) is a substring of many ordinary Spanish past-participle verb forms ("pagadas",
+    // "trabajadas", "cambiadas", etc.), so a Spanish-language document got a false "Leave or
+    // accommodation references" topic hit purely from routine verb endings, which in turn won the
+    // event title over the document's actual, correctly-extracted complaint/response facts.
+    // 'disability'/'accommodation'/'restriction'/'interactive process' already cover the real ADA
+    // concept without this acronym's collision risk.
+    terms: ['accommodation', 'disability', 'pregnancy', 'maternity', 'medical leave', 'leave', 'doctor', 'restriction', 'interactive process'],
     review: 'leave or accommodation references should be matched to dates in other uploads',
     clarifying: 'leave requests, restrictions, or related medical paperwork',
   },

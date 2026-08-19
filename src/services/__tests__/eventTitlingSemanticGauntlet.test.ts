@@ -271,3 +271,108 @@ describe('semantic-event titling gauntlet (2026-08-18) — 16 document/communica
     });
   }
 });
+
+/**
+ * Round 2 (2026-08-18) — 3 real bugs found by an independent fresh-adversarial hard-challenge
+ * AFTER the 16-case gauntlet above had already shipped and passed. None of the 16 cases were
+ * two-file threads, casual-but-topic-adjacent messages, or non-English text -- this gauntlet's
+ * single-file harness (titleForCase) doesn't support multi-file scenarios, so these run directly
+ * against buildDocumentGroundedOrganization instead.
+ */
+describe('semantic-event titling gauntlet round 2 (2026-08-18) — bugs found by fresh adversarial testing after round 1 shipped', () => {
+  test('HR\'s own reply to a safety complaint is titled as a response, not re-titled with the worker\'s own "raises safety concerns" title', () => {
+    // Bug: the reply's filename/subject still carry the original topic word ("RE: Safety
+    // concern..."), and three separate candidate sources (filename pattern rank 104, the
+    // communication-direction heuristic, and the possible_timeline_event regex ladder) all
+    // matched on that bare keyword with no sender/recipient direction awareness -- HR's own
+    // reply got the worker's title.
+    const complaint: DocumentGroundedFileInput = {
+      uploadedFileId: 'f1',
+      fileName: 'safety_concern_email.pdf',
+      category: 'Workplace Communications',
+      extractedText: `From: Marcus Delgado\nTo: Human Resources\nDate: June 9, 2026\nSubject: Safety concern\n\nI want to raise a safety concern: the loading dock guardrail is broken. I'm concerned this could hurt someone.`,
+      documentFacts: facts({
+        category: 'Workplace Communications',
+        file_name: 'safety_concern_email.pdf',
+        complaint_topic: 'Broken guardrail on loading dock',
+      }) as any,
+    };
+    const reply: DocumentGroundedFileInput = {
+      uploadedFileId: 'f2',
+      fileName: 're_safety_concern_response.pdf',
+      category: 'HR Documents',
+      extractedText: `From: Renee Ashford\nTo: Marcus Delgado\nDate: June 10, 2026\nSubject: RE: Safety concern\n\nThank you for raising this. We have dispatched maintenance to repair the guardrail.`,
+      documentFacts: facts({
+        category: 'HR Documents',
+        file_name: 're_safety_concern_response.pdf',
+        complaint_topic: 'Broken guardrail on loading dock',
+        resolution_summary: 'Dispatched maintenance to repair the guardrail.',
+        issued_by: 'Renee Ashford',
+        relationship_to_worker: 'HR Manager',
+      }) as any,
+    };
+    const result = buildDocumentGroundedOrganization(
+      [
+        { fileName: complaint.fileName, category: complaint.category, uploadedFileId: 'f1' },
+        { fileName: reply.fileName, category: reply.category, uploadedFileId: 'f2' },
+      ],
+      [complaint, reply],
+      null
+    );
+    const events = result?.evidenceTimeline ?? [];
+    const complaintEvent = events.find((e) => e.date === 'June 9, 2026');
+    const replyEvent = events.find((e) => e.date === 'June 10, 2026');
+    expect(complaintEvent?.title).toBe('Worker raises safety concerns');
+    expect(replyEvent?.title).toBe('HR response received');
+  });
+
+  test('a routine question addressed to HR is not mislabeled a formal complaint', () => {
+    // Bug: commFact.workerConcernExcerpt was populated by findWorkerConcernExcerpt's overly
+    // broad "question about" trigger phrase (any question at all, not just a concern), and the
+    // event-titling engine trusted its mere presence as evidence of a complaint.
+    const casual: DocumentGroundedFileInput = {
+      uploadedFileId: 'f3',
+      fileName: 'quick_question.pdf',
+      category: 'Workplace Communications',
+      extractedText: `From: Marcus Delgado\nTo: Human Resources\nDate: June 9, 2026\nSubject: Scheduling question\n\nJust a quick question about scheduling next week, thanks.`,
+    };
+    const result = buildDocumentGroundedOrganization(
+      [{ fileName: casual.fileName, category: casual.category, uploadedFileId: 'f3' }],
+      [casual],
+      null
+    );
+    const title = result?.evidenceTimeline?.[0]?.title ?? '';
+    expect(title).not.toMatch(/complaint submitted/i);
+  });
+
+  test('a non-English (Spanish) complaint/response pair degrades to a neutral fallback title instead of confidently asserting an unrelated category', () => {
+    // Bug: the deterministic topic classifier's bare 'ada' term (meant as the ADA acronym) is
+    // substring-matched with no word boundaries against Spanish past-participle verb forms
+    // ("pagadas", "trabajadas") -- a false "Leave or accommodation references" topic hit then won
+    // the event title over the document's own correctly-extracted complaint/response facts. Full
+    // Spanish-language title support is a separate, deliberately-deferred effort (needs legal
+    // review per project doctrine); this only asserts the engine no longer confidently asserts
+    // the WRONG specific category when it can't titling in the source language -- a neutral
+    // fallback is the safe failure mode, matching every other "can't determine a specific title"
+    // case in this gauntlet.
+    const queja: DocumentGroundedFileInput = {
+      uploadedFileId: 'f5',
+      fileName: 'queja_horas_extra.pdf',
+      category: 'Workplace Communications',
+      extractedText: `De: Marcus Delgado\nPara: Recursos Humanos\nFecha: 6 de abril de 2026\nAsunto: Horas extra no pagadas\n\nQuiero presentar una queja formal: no se me han pagado correctamente las horas extra trabajadas.`,
+      documentFacts: facts({
+        category: 'Workplace Communications',
+        file_name: 'queja_horas_extra.pdf',
+        complaint_topic: 'Horas extra no pagadas',
+        document_date: '2026-04-06',
+      }) as any,
+    };
+    const result = buildDocumentGroundedOrganization(
+      [{ fileName: queja.fileName, category: queja.category, uploadedFileId: 'f5' }],
+      [queja],
+      null
+    );
+    const title = result?.evidenceTimeline?.[0]?.title ?? '';
+    expect(title).not.toMatch(/leave or accommodation/i);
+  });
+});

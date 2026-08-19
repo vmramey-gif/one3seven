@@ -35,6 +35,17 @@ export type CommunicationFacts = {
   employerOrCompany: string | null;
   subjectOrTopic: string | null;
   workerConcernExcerpt: string | null;
+  /**
+   * True only when workerConcernExcerpt came from findWorkerConcernExcerpt's genuine
+   * concern-language patterns ("I'm concerned...", "not sure...", "please advise..."). False when
+   * it came from the much weaker excerptAroundFirstTopic fallback, which grabs ANY sentence near
+   * ANY topic keyword regardless of whether it expresses a concern at all (2026-08-18
+   * fresh-accuracy hard-challenge: a routine "just a quick question about scheduling, thanks"
+   * email to HR got excerpted via the topic-keyword fallback and was then misread downstream as
+   * evidence of a complaint). Callers that broaden complaint-detection on excerpt presence should
+   * gate on this, not on workerConcernExcerpt being merely non-null.
+   */
+  workerConcernIsExplicit: boolean;
   employerOrHrResponseExcerpt: string | null;
   confidence: 'low' | 'medium';
 };
@@ -219,8 +230,15 @@ function findEmployerLine(lines: string[]): string | null {
 }
 
 function findWorkerConcernExcerpt(text: string): string | null {
+  // "question about"/"confused about" removed (2026-08-18, fresh-accuracy hard-challenge): both
+  // trip on completely routine messages ("a quick question about scheduling next week, thanks")
+  // that express no concern at all -- unlike "concerned"/"worried"/"uncomfortable", asking a
+  // question or being briefly confused isn't itself evidence of a complaint. Downstream, this
+  // function's output specifically gates whether a communication gets classified as a complaint
+  // (see workerConcernIsExplicit in evidenceMappedTimelineService.ts), so an over-broad trigger
+  // here mislabeled a mundane scheduling question as "Complaint submitted to Human Resources."
   const patterns = [
-    /\b(i am|i'm|i feel|concerned|worried|uncomfortable|confused about|question about)\b[^.!?]{0,200}[.!?]?/i,
+    /\b(i am|i'm|i feel|concerned|worried|uncomfortable)\b[^.!?]{0,200}[.!?]?/i,
     /\b(not sure|please advise|need clarification)\b[^.!?]{0,200}[.!?]?/i,
   ];
   for (const re of patterns) {
@@ -317,8 +335,10 @@ export function extractCommunicationFacts(row: CommunicationExtractionInput): Co
   const topics = collectTopicHits(text);
   const employerOrCompany = findEmployerLine(headLines);
   let workerConcernExcerpt = findWorkerConcernExcerpt(text);
+  let workerConcernIsExplicit = Boolean(workerConcernExcerpt);
   if (!workerConcernExcerpt && topics.length) {
     workerConcernExcerpt = excerptAroundFirstTopic(text, topics);
+    workerConcernIsExplicit = false;
   }
   if (workerConcernExcerpt && /^\s*(from|to|subject|date|sent|cc):\s/i.test(workerConcernExcerpt)) {
     workerConcernExcerpt = null;
@@ -366,6 +386,7 @@ export function extractCommunicationFacts(row: CommunicationExtractionInput): Co
     employerOrCompany: employerOrCompany ? scrubOutputPhrase(employerOrCompany) : null,
     subjectOrTopic,
     workerConcernExcerpt,
+    workerConcernIsExplicit: workerConcernIsExplicit && Boolean(workerConcernExcerpt),
     employerOrHrResponseExcerpt,
     confidence,
   };

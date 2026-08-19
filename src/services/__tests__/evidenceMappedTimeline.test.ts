@@ -281,6 +281,7 @@ describe('evidence-mapped timeline engine', () => {
       employerOrCompany: 'Cedarline Foods',
       subjectOrTopic: 'Complaint to Human Resources about unpaid overtime',
       workerConcernExcerpt: 'We complained to HR about the unpaid overtime.',
+      workerConcernIsExplicit: true,
       employerOrHrResponseExcerpt: null,
       confidence: 'medium',
     };

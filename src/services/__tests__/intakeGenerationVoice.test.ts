@@ -91,6 +91,7 @@ describe('intake generation voice', () => {
           employerOrCompany: null,
           subjectOrTopic: 'Schedule change',
           workerConcernExcerpt: undefined as unknown as string,
+          workerConcernIsExplicit: false,
           employerOrHrResponseExcerpt: null,
           confidence: 'medium',
         },
