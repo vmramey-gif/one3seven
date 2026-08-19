@@ -292,17 +292,44 @@ function eventCandidateFromPossibleTimelineEvent(record: IntakeFileOrganizationR
 }
 
 function eventCandidateFromCommunication(record: IntakeFileOrganizationRecord, commFact: CommunicationFacts | null): EventCandidate | null {
-  const hay = `${commFact?.subjectOrTopic ?? ''} ${commFact?.workerConcernExcerpt ?? ''} ${record.file_name}`.toLowerCase();
-  if (/safety|unsafe|hazard/.test(hay)) {
+  // Complaint-direction signal: the worker's own subject/words, plus WHO the message went TO --
+  // an email addressed to a confirmed HR party is a complaint even when the recipient name never
+  // appears in the subject line itself (semantic-event gauntlet, 2026-08-18: "Formal complaint -
+  // harassment" addressed To: Human Resources went unrecognized because the old hay never
+  // included the recipient field at all).
+  const complaintHay = `${commFact?.subjectOrTopic ?? ''} ${commFact?.workerConcernExcerpt ?? ''} ${
+    commFact?.recipient ?? ''
+  } ${record.file_name}`.toLowerCase();
+  // Response-direction signal: subject + an actual reply excerpt + WHO SENT the message.
+  // Deliberately excludes workerConcernExcerpt -- the worker's OWN words asking for "a response"
+  // or that something be "investigated" are not evidence a response WAS GIVEN. That exact
+  // collision mistitled a worker's own outgoing complaint email "HR response received" (same
+  // gauntlet run: "I'm submitting this to HR for review and would appreciate a response" tripped
+  // the old response-direction match on the worker's own outbound message).
+  const responseHay = `${commFact?.subjectOrTopic ?? ''} ${commFact?.employerOrHrResponseExcerpt ?? ''} ${
+    commFact?.sender ?? ''
+  }`.toLowerCase();
+
+  if (/safety|unsafe|hazard/.test(complaintHay)) {
     return candidate('Worker raises safety concerns', 90);
   }
-  if (/accommodation|medical leave|\bfmla\b|leave request/.test(hay)) {
+  if (/accommodation|medical leave|\bfmla\b|leave request/.test(complaintHay)) {
     return candidate('Worker requests leave or accommodation', 90);
   }
-  if (/complaint|grievance|workplace concern/.test(hay) && /\bhr\b|human resources/.test(hay)) {
+  // A worker-concern excerpt (commFact.workerConcernExcerpt is populated specifically when the
+  // deterministic extractor finds wording describing a worker's concern -- see
+  // documentFactExtractionService.ts) directed at a confirmed HR recipient IS a complaint, even
+  // when the subject/body never spell out the literal word "complaint" or "grievance" (real
+  // subject lines say things like "Overtime pay concern", not "Formal Complaint"; 2026-08-18
+  // gauntlet finding).
+  const hasWorkerConcernExcerpt = Boolean(commFact?.workerConcernExcerpt);
+  if (
+    (/complaint|grievance|workplace concern/.test(complaintHay) || hasWorkerConcernExcerpt) &&
+    /\bhr\b|human resources/.test(complaintHay)
+  ) {
     return candidate('Complaint submitted to Human Resources', 88);
   }
-  if (/response|investigation/.test(hay) && /complaint|grievance|concern|\bhr\b|human resources/.test(hay)) {
+  if (/response|investigation/.test(responseHay) && /\bhr\b|human resources/.test(responseHay)) {
     return candidate('HR response received', 84);
   }
   return null;

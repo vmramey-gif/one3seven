@@ -29,7 +29,13 @@ export const REVIEW_TOPIC_DEFINITIONS: ReadonlyArray<{
   },
   {
     label: 'Scheduling and timekeeping',
-    terms: ['timesheet', 'timecard', 'schedule', 'shift', 'clock in', 'clock out', 'meal break', 'rest break', 'pto', 'leave', 'fmla', 'sick'],
+    // Bare "leave" removed (2026-08-18 semantic-event gauntlet): it collided with medical/
+    // accommodation leave content -- a doctor's note advising the worker "take leave from work"
+    // has nothing to do with scheduling, but the single-hit match (buildSingleFileRecord calls
+    // this with minHits=1) tagged it "Scheduling and timekeeping" anyway, which then won the
+    // event title "Schedule change documented" -- a document that asserts no schedule change at
+    // all. "Leave or accommodation references" below already owns leave-of-absence content.
+    terms: ['timesheet', 'timecard', 'schedule', 'shift', 'clock in', 'clock out', 'meal break', 'rest break', 'pto', 'fmla', 'sick'],
     review: 'logged hours and schedules should be compared with pay records where both exist',
     clarifying: 'time records or schedules for the same dates',
   },
@@ -47,7 +53,7 @@ export const REVIEW_TOPIC_DEFINITIONS: ReadonlyArray<{
   },
   {
     label: 'Leave or accommodation references',
-    terms: ['accommodation', 'disability', 'ada', 'pregnancy', 'maternity', 'medical leave', 'doctor', 'restriction', 'interactive process'],
+    terms: ['accommodation', 'disability', 'ada', 'pregnancy', 'maternity', 'medical leave', 'leave', 'doctor', 'restriction', 'interactive process'],
     review: 'leave or accommodation references should be matched to dates in other uploads',
     clarifying: 'leave requests, restrictions, or related medical paperwork',
   },
