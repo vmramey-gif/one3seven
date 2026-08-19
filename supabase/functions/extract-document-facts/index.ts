@@ -12,8 +12,9 @@
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { PDFDocument } from 'https://esm.sh/pdf-lib@1.17.1';
+import Anthropic from 'https://esm.sh/@anthropic-ai/sdk@0.119.0';
+import type { MessageParam } from 'https://esm.sh/@anthropic-ai/sdk@0.119.0/resources/messages';
 
-const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
 // Model is an ENV VAR so it can be changed via `supabase secrets set EXTRACTION_MODEL=...` WITHOUT a
 // code redeploy. Fallbacks are tried in order if the primary is rejected (renamed / removed / access).
 const MODEL = Deno.env.get('EXTRACTION_MODEL')?.trim() || 'claude-sonnet-5';
@@ -446,37 +447,42 @@ async function callClaude(
   const tuning: Record<string, unknown> = { thinking: { type: 'disabled' } };
   let lastError = '';
 
+  // 2026-08-19: migrated off raw fetch to the official SDK (removes a hand-rolled 400-body
+  // string-parse "self-heal" hack that would silently stop working if Anthropic ever reworded an
+  // error message). maxRetries: 0 -- the SDK's own built-in retry would otherwise double up with
+  // the bespoke model-fallback/self-heal loop below, which needs to see every individual failure
+  // to decide what to do next, not have some of them silently retried underneath it first.
+  const client = new Anthropic({ apiKey, maxRetries: 0 });
+
   for (const model of models) {
     for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
-      const response = await fetch(ANTHROPIC_API_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01',
-          'anthropic-beta': 'pdfs-2024-09-25',
-        },
-        body: JSON.stringify({
-          model,
-          max_tokens: MAX_TOKENS,
-          system: [{ type: 'text', text: SYSTEM_PROMPT, cache_control: { type: 'ephemeral' } }],
-          messages,
-          ...tuning,
-        }),
-      });
+      let data: Anthropic.Message;
+      try {
+        data = await client.messages.create(
+          {
+            model,
+            max_tokens: MAX_TOKENS,
+            system: [{ type: 'text', text: SYSTEM_PROMPT, cache_control: { type: 'ephemeral' } }],
+            messages: messages as MessageParam[],
+            ...tuning,
+          },
+          { headers: { 'anthropic-beta': 'pdfs-2024-09-25' } }
+        );
+      } catch (e) {
+        if (!(e instanceof Anthropic.APIError)) throw e;
+        const status = e.status;
+        const errText = e.message;
 
-      // Transient (rate limit / overloaded) — back off and retry the SAME model.
-      if (response.status === 429 || response.status === 503 || response.status === 529) {
-        lastError = `Anthropic API ${response.status} (transient)`;
-        await new Promise((r) => setTimeout(r, 800 * (attempt + 1)));
-        continue;
-      }
+        // Transient (rate limit / overloaded) — back off and retry the SAME model.
+        if (status === 429 || status === 503 || status === 529) {
+          lastError = `Anthropic API ${status} (transient)`;
+          await new Promise((r) => setTimeout(r, 800 * (attempt + 1)));
+          continue;
+        }
 
-      if (!response.ok) {
-        const errText = await response.text();
         // Always log the real error to Supabase function logs — never let it hide again.
-        console.error(`[extract] Anthropic ${response.status} (model=${model}): ${errText}`);
-        if (response.status === 400) {
+        console.error(`[extract] Anthropic ${status} (model=${model}): ${errText}`);
+        if (status === 400) {
           // SELF-HEAL: if the 400 names a tuning param we sent, drop it and retry the same model.
           const field = errText.match(/`([a-zA-Z_]+)`/)?.[1];
           if (field && field in tuning) { delete tuning[field]; attempt--; continue; }
@@ -484,17 +490,16 @@ async function callClaude(
           if (/\bmodel\b/i.test(errText)) { lastError = errText; break; }
         }
         // Model not found → try the next fallback model.
-        if (response.status === 404) { lastError = errText; break; }
+        if (status === 404) { lastError = errText; break; }
         // Anything else is a genuine error — surface it (auth, overloaded content, etc.).
-        throw new Error(`Anthropic API error ${response.status}: ${errText}`);
+        throw new Error(`Anthropic API error ${status}: ${errText}`);
       }
 
-      const data = await response.json();
       // Join ALL text blocks — models with thinking enabled put a thinking block first,
       // so content[0].text is undefined and the old read produced '' → "Unparseable".
-      const blocks: { type?: string; text?: string }[] = Array.isArray(data?.content) ? data.content : [];
-      const content = blocks.filter((b) => b?.type === 'text').map((b) => b.text ?? '').join('\n');
-      if (data?.stop_reason === 'max_tokens') {
+      const blocks = data.content;
+      const content = blocks.filter((b) => b.type === 'text').map((b) => b.text ?? '').join('\n');
+      if (data.stop_reason === 'max_tokens') {
         console.error(`[extract] response truncated at max_tokens (model=${model}) — JSON likely cut off`);
       }
       const parsed = parseFacts(content);
@@ -503,7 +508,7 @@ async function callClaude(
         // pay figures, quoted statements). Length/shape only; enough to diagnose a parse failure
         // without writing worker PII into Supabase's unredacted function logs.
         console.error(
-          `[extract] unparseable response (model=${model}, stop=${data?.stop_reason}, blocks=${blocks.map((b) => b?.type).join(',')}, contentLength=${content.length})`
+          `[extract] unparseable response (model=${model}, stop=${data.stop_reason}, blocks=${blocks.map((b) => b.type).join(',')}, contentLength=${content.length})`
         );
       }
       return parsed;
