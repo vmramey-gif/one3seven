@@ -411,8 +411,15 @@ export function synthesizeIntakeIntelligence(files: FileWithFacts[]): IntakeInte
 
   const confirmedStartDate = offers[0]?.start_date ?? null;
 
+  // effective_date preferred over document_date (2026-08-18, document-range vs. employment-period
+  // conceptual split): document_date is WHEN THE LETTER WAS WRITTEN, not necessarily the worker's
+  // actual last day -- a termination letter dated a week before the stated effective date (a
+  // common real pattern: notice given in advance) would otherwise report the wrong end-of-
+  // employment date. effective_date is the field Claude extraction fills in specifically for "the
+  // date something takes effect," which for a separation/termination document IS the true
+  // employment-end date. Falls back to document_date only when effective_date wasn't extracted.
   const termDoc = separation[0];
-  const confirmedTerminationDate = termDoc?.document_date ?? null;
+  const confirmedTerminationDate = termDoc?.effective_date ?? termDoc?.document_date ?? null;
   const confirmedTerminationReason = termDoc?.stated_reason ?? null;
 
   const complaintDoc = communications.find((c) => c.complaint_topic || c.complaint_date);

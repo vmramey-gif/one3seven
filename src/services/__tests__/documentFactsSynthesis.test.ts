@@ -31,6 +31,28 @@ function file(category: string, fileName: string, p: Partial<DocumentFacts>): Fi
   };
 }
 
+describe('synthesizeIntakeIntelligence — employment-period end date (2026-08-18, document-range vs. employment-period split)', () => {
+  test('prefers effective_date (the actual termination date) over document_date (when the letter was written)', () => {
+    // A common real pattern: notice given in advance of the actual last day.
+    const intel = synthesizeIntakeIntelligence([
+      file('Separation Records', 'termination_letter.pdf', {
+        document_date: 'August 25, 2026',
+        effective_date: 'September 1, 2026',
+      }),
+    ]);
+    expect(intel.confirmedTerminationDate).toBe('September 1, 2026');
+  });
+
+  test('falls back to document_date when effective_date was not extracted', () => {
+    const intel = synthesizeIntakeIntelligence([
+      file('Separation Records', 'termination_letter.pdf', {
+        document_date: 'August 25, 2026',
+      }),
+    ]);
+    expect(intel.confirmedTerminationDate).toBe('August 25, 2026');
+  });
+});
+
 describe('synthesizeIntakeIntelligence — task_8d413384 firm-output fixes', () => {
   test('final paystub filed under Separation Records still suppresses the separation clarification', () => {
     const intel = synthesizeIntakeIntelligence([

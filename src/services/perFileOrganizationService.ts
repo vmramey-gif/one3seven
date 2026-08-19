@@ -222,6 +222,31 @@ export function mealPeriodRecordLineFromFacts(
 }
 
 /**
+ * Makes a pay/time record's PERIOD legible instead of silently collapsing it into a single
+ * anchor date (2026-08-18, document-range vs. employment-period vs. event-chronology conceptual
+ * split). A paystub covering "March 1 - March 15, 2024" is a two-week RANGE, not a point-in-time
+ * occurrence -- but the record's likely_date/event date fields are a single string (needed for
+ * sorting), so whichever boundary date wins reads as if something happened on exactly that one
+ * day. document_facts.pay_period_start/pay_period_end are already correctly extracted as a range
+ * (see PayRecordFacts) but were never consumed downstream -- same "real data, nothing reads it"
+ * pattern found repeatedly tonight. Rather than change what the sortable date field stores (real
+ * risk to every date-comparison/export consumer), this surfaces the actual covered range in the
+ * summary text, where a reader can see it's a period.
+ */
+export function payPeriodRangeNoteFromFacts(
+  facts: Record<string, unknown> | null | undefined
+): string | null {
+  if (!facts || typeof facts !== 'object') return null;
+  const start = (facts as { pay_period_start?: unknown }).pay_period_start;
+  const end = (facts as { pay_period_end?: unknown }).pay_period_end;
+  if (typeof start !== 'string' || typeof end !== 'string') return null;
+  const startTrim = start.trim();
+  const endTrim = end.trim();
+  if (!startTrim || !endTrim || startTrim === endTrim) return null;
+  return sanitizeGenerationPhrase(`This record covers the pay period ${startTrim} to ${endTrim}.`);
+}
+
+/**
  * Computes which named people across the WHOLE intake are confirmed Human Resources contacts
  * (peopleRoleInference.ts, via deriveNamedPeopleForIntake -- already built/tested, previously only
  * used for the worker-facing "named individuals" count). Cross-document: a communication's OWN
@@ -467,6 +492,15 @@ function buildSingleFileRecord(
   if (mealLine) {
     possibleTimelineEvent.neutral_summary =
       `${possibleTimelineEvent.neutral_summary} ${mealLine}`.trim();
+  }
+  // Surface the actual covered pay period so the single anchor date doesn't read as a point-in-
+  // time occurrence when the record is really a range (see payPeriodRangeNoteFromFacts).
+  const payPeriodNote = TIME_OR_PAY_RECORD_RE.test(`${legacyCategory} ${meta.fileName}`.toLowerCase())
+    ? payPeriodRangeNoteFromFacts(extraction?.documentFacts)
+    : null;
+  if (payPeriodNote) {
+    possibleTimelineEvent.neutral_summary =
+      `${possibleTimelineEvent.neutral_summary} ${payPeriodNote}`.trim();
   }
 
   const rawComplaintTopic = extraction?.documentFacts
