@@ -330,19 +330,28 @@ type EventWithSource = {
   sourceFile: string | null;
 };
 
+/**
+ * The interval-since-complaint label for a later event (e.g. "41 days later"), or null when the
+ * event isn't dated after the complaint (or either date is unknown). Single source of truth for
+ * both the plain-text sequence builder below and the structured packet-model sequence builder
+ * further down this file -- 2026-08-19 hard-challenge finding: those two had each computed this
+ * exact interval independently, with the structured one's own comment admitting it "mirrors"
+ * this function's logic. The live download button only ever reaches the structured builder;
+ * this shared helper is what keeps the two from silently drifting apart.
+ */
+function intervalSinceComplaint(evDate: Date | null, complaintDate: Date | null): string | null {
+  if (!complaintDate || !evDate || evDate <= complaintDate) return null;
+  return intervalLabel(daysBetween(complaintDate, evDate));
+}
+
 function buildSequenceWithTiming(
   events: EventWithSource[],
   complaintDate: Date | null
 ): string[] {
   const lines: string[] = [];
   for (const e of events) {
-    const evDate = parseEventDate(e.date);
-    let interval = '';
-    if (complaintDate && evDate && evDate > complaintDate) {
-      const days = daysBetween(complaintDate, evDate);
-      interval = `  [${intervalLabel(days)}]`;
-    }
-    lines.push(`${e.date}:  ${e.title}${interval}`);
+    const interval = intervalSinceComplaint(parseEventDate(e.date), complaintDate);
+    lines.push(`${e.date}:  ${e.title}${interval ? `  [${interval}]` : ''}`);
     if (e.sourceFile) {
       lines.push(`  Supported by: ${e.sourceFile}`);
     }
@@ -1183,7 +1192,10 @@ export function buildFirmIntakePacketModel(view: FirmLiveIntakeView): FirmPacket
     };
   })();
 
-  // Sequence (with timing interval) — mirrors buildSequenceWithTiming logic.
+  // Sequence (with timing interval) — shares its interval math with buildSequenceWithTiming via
+  // intervalSinceComplaint (2026-08-19: these two used to independently reimplement the same
+  // calculation; this is the live download path, so a drift here would never have shown up in
+  // buildSequenceWithTiming's own tests).
   let sequence: FirmPacketModel['sequence'];
   if (preview) {
     sequence = { kind: 'preview', note: 'Full timeline available upon approval.' };
@@ -1192,14 +1204,12 @@ export function buildFirmIntakePacketModel(view: FirmLiveIntakeView): FirmPacket
   } else {
     sequence = {
       kind: 'events',
-      events: linkedEvents.map((e) => {
-        const evDate = parseEventDate(e.date);
-        let interval: string | null = null;
-        if (complaintDate && evDate && evDate > complaintDate) {
-          interval = intervalLabel(daysBetween(complaintDate, evDate));
-        }
-        return { date: e.date, title: e.title, interval, sourceFile: e.sourceFile };
-      }),
+      events: linkedEvents.map((e) => ({
+        date: e.date,
+        title: e.title,
+        interval: intervalSinceComplaint(parseEventDate(e.date), complaintDate),
+        sourceFile: e.sourceFile,
+      })),
     };
   }
 

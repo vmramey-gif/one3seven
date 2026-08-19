@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import {
+  buildFirmIntakePacketModel,
   buildFirmIntakeReviewPdfLines,
   linkEventsToFiles,
   resolveFirmExportAccessTier,
@@ -114,5 +115,45 @@ describe('firm intake summary download', () => {
       [{ file_name: 'Schedule_Change_Notice_October_2024.pdf', category: 'Schedules' }]
     );
     expect(linked[0].sourceFile).toBe('Schedule Change Notice October 2024');
+  });
+
+  // 2026-08-19 hard-challenge finding: buildFirmIntakeReviewPdfLines (text lines, unreachable
+  // from the live download button) and buildFirmIntakePacketModel (structured model, the ONLY
+  // path the actual "Download" button uses) each independently reimplemented the
+  // interval-since-complaint math, primed to drift silently since only one of the two is ever
+  // exercised by a real user. Now both call the same shared helper -- this asserts they still
+  // agree, so a future edit to one can't quietly stop matching the other.
+  test('the live packet-model sequence and the text-lines sequence compute the identical interval label', () => {
+    const view = baseView({
+      events: [
+        {
+          id: 'e1',
+          event_date: 'June 9, 2026',
+          title: 'Complaint submitted to Human Resources',
+          category: 'Workplace Communications',
+          ai_summary: 'Worker raised a concern.',
+          worker_context: null,
+        },
+        {
+          id: 'e2',
+          event_date: 'June 20, 2026',
+          title: 'Termination documented',
+          category: 'Separation Records',
+          ai_summary: 'Employment ended.',
+          worker_context: null,
+        },
+      ],
+    });
+
+    const textLines = buildFirmIntakeReviewPdfLines(view).join('\n');
+    const model = buildFirmIntakePacketModel(view);
+
+    expect(model.sequence.kind).toBe('events');
+    if (model.sequence.kind !== 'events') throw new Error('unreachable');
+    const terminationRow = model.sequence.events.find((e) => e.title === 'Termination documented');
+    expect(terminationRow?.interval).toBe('11 days after complaint');
+    // The same interval label the structured model computed must appear verbatim in the
+    // independently-built text-lines output, bracketed the way buildSequenceWithTiming renders it.
+    expect(textLines).toContain(`[${terminationRow?.interval}]`);
   });
 });
