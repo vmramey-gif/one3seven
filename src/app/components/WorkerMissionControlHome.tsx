@@ -200,7 +200,7 @@ export function WorkerMissionControlHome({
             <span className="min-w-0">
               <span className="block text-[14px] font-semibold text-[#1B2623]">Get your employment records</span>
               <span className="block text-[12.5px] leading-snug text-[#6A6D66]">
-                California law entitles you to them — we’ll write the request letter.
+                California law lets you request them — we’ll write the letter.
               </span>
             </span>
           </button>

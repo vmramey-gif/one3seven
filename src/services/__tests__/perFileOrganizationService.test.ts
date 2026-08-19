@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest';
 import { buildPerFileOrganizationRecords } from '../perFileOrganizationService';
 import type { DocumentGroundedFileInput } from '../intakeOrganizationTypes';
+import { scanBannedVocabulary } from '../bannedVocabulary';
 
 // Real document_facts captured live from the actual extraction pipeline for the Marcus Delgado
 // case (2026-08-18 founder review) -- a worker's overtime complaint email and HR's reply.
@@ -54,6 +55,12 @@ describe('buildPossibleTimelineEvent — event semantics from document_facts (20
     const event = fileRecords[0]?.possible_timeline_event;
     expect(event?.title).toBe('HR response received regarding Overtime hours not being paid correctly');
     expect(event?.neutral_summary).toMatch(/forwarded this to payroll/i);
+    // Doctrine scanner against the ACTUAL generated title/summary, not a hand-picked example
+    // string (2026-08-18 audit finding) -- communicationTitleFromFacts interpolates an
+    // AI-extracted complaint_topic paraphrase directly into a persistent event title, so a
+    // looser extraction could reintroduce banned language with nothing catching it today.
+    expect(scanBannedVocabulary(event?.title)).toEqual([]);
+    expect(scanBannedVocabulary(event?.neutral_summary)).toEqual([]);
   });
 
   test('cross-document reasoning: an outgoing complaint with no role info of its own still resolves to HR when the SAME recipient is confirmed HR on another file in the intake', () => {
@@ -142,6 +149,7 @@ describe('pay-period range legibility (2026-08-18, document-range vs. employment
     expect(fileRecords[0]?.possible_timeline_event?.neutral_summary).toMatch(
       /covers the pay period March 1, 2024 to March 15, 2024/i
     );
+    expect(scanBannedVocabulary(fileRecords[0]?.possible_timeline_event?.neutral_summary)).toEqual([]);
   });
 
   test('a document with no pay_period_start/pay_period_end gets no range note', () => {

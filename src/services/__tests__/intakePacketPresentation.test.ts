@@ -14,6 +14,7 @@ import {
 } from '../intakePacketPresentation';
 import { ATTORNEY_PACKET_SECTIONS } from '../../app/constants/workerStoryIntake';
 import type { IntakeSummaryDownloadPayload } from '../intakeSummaryDownload';
+import { scanBannedVocabulary } from '../bannedVocabulary';
 
 const BASE: IntakeSummaryDownloadPayload = {
   intakeNumber: 'INT-001',
@@ -422,6 +423,9 @@ describe('people-named-in-records roster (2026-08-18 founder request)', () => {
     expect(text).toContain('Marcus Delgado');
     expect(text).toContain('Renee Ashford (Human Resources Representative)');
     expect(text).toMatch(/roles shown are as stated in or inferred from the uploaded records/i);
+    // Doctrine scanner against the ACTUAL generated packet text, including the roster's hedge
+    // line and every role label, not a hand-picked example string (2026-08-18 audit finding).
+    expect(scanBannedVocabulary(text)).toEqual([]);
   });
 
   test('an intake with no named individuals shows an honest empty state, not a blank or zero', () => {

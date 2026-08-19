@@ -2698,7 +2698,7 @@ export function IntakeSummaryScreen({
             <h3 className="text-sm font-semibold text-[#ECF3ED] mb-4">About one3seven</h3>
             <p className="text-xs text-white/60 leading-relaxed mb-3">{ONE3SEVEN_NOTICES.positioning}</p>
             <p className="text-xs text-white/60 leading-relaxed">
-              Intake summaries, timeline snapshots, category tags, and readiness notes are organizational aids for review preparation only.
+              Intake summaries, timeline snapshots, category tags, and review notes are organizational aids for review preparation only.
             </p>
           </div>
         </footer>
