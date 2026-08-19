@@ -9,6 +9,7 @@
     "typecheck": "tsc --noEmit",
     "sanitize-encoding": "node scripts/sanitize-src-encoding.mjs",
     "test": "vitest run",
+    "test:e2e": "playwright test",
     "test:rls": "node scripts/rls-isolation-test.mjs",
     "test:rls-firm": "node scripts/rls-firm-isolation-test.mjs",
     "lint:security-definer": "node scripts/check-security-definer-current-user.mjs",
@@ -18,8 +19,10 @@
   "dependencies": {
     "@sentry/react": "^10.69.0",
     "@supabase/supabase-js": "^2.49.2",
+    "chrono-node": "^2.10.1",
     "lucide-react": "0.487.0",
     "motion": "12.23.24",
+    "p-retry": "^8.0.0",
     "pdf-lib": "^1.17.1",
     "pdfjs-dist": "^4.10.38",
     "react": "18.3.1",
@@ -27,6 +30,8 @@
     "tw-animate-css": "1.3.8"
   },
   "devDependencies": {
+    "@anthropic-ai/sdk": "^0.119.0",
+    "@playwright/test": "^1.62.1",
     "@tailwindcss/vite": "4.1.12",
     "@types/node": "^26.1.2",
     "@types/react": "^18.3.0",

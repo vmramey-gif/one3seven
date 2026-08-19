@@ -1,4 +1,5 @@
 ﻿import type { User } from '@supabase/supabase-js';
+import pRetry from 'p-retry';
 import { supabase } from '../lib/supabaseClient';
 import { buildPlaceholderOrganization } from './aiOrganizationService';
 import { buildDocumentGroundedOrganization } from './documentGroundedOrganizationService';
@@ -3819,34 +3820,45 @@ export async function workerIntakeHasSummaryRow(intakeId: string): Promise<boole
   return hasRow;
 }
 
-/** Poll until summary row exists (handles post-write read lag). */
+/**
+ * Poll until summary row exists (handles post-write read lag). Was a hand-rolled fixed-interval
+ * loop (2026-08-19 hard-challenge finding: a magic-number retry loop is less honest about backoff
+ * than a real retry utility) -- now p-retry, but deliberately kept at `factor: 1` (fixed interval,
+ * not exponential) to preserve the exact original cadence/behavior; only the mechanism changed,
+ * not the timing, since this call site's callers don't expect a longer worst-case wait.
+ */
 export async function waitForWorkerSummaryRow(
   intakeId: string,
   opts?: { attempts?: number; delayMs?: number }
 ): Promise<boolean> {
   const attempts = opts?.attempts ?? 5;
   const delayMs = opts?.delayMs ?? 400;
-  for (let attempt = 0; attempt < attempts; attempt += 1) {
-    if (await workerIntakeHasSummaryRow(intakeId)) {
-      logOrgAudit('row verification succeeded', {
-        intakeId,
-        activeStep: 'post_save_verification',
-        rowVerificationStatus: 'passed',
-        attempt: attempt + 1,
-      });
-      return true;
-    }
-    if (attempt < attempts - 1) {
-      await new Promise((resolve) => window.setTimeout(resolve, delayMs));
-    }
+  try {
+    const attemptNumber = await pRetry(
+      async (attemptNumber) => {
+        if (!(await workerIntakeHasSummaryRow(intakeId))) {
+          throw new Error('Summary row not found yet');
+        }
+        return attemptNumber;
+      },
+      { retries: attempts - 1, minTimeout: delayMs, factor: 1 }
+    );
+    logOrgAudit('row verification succeeded', {
+      intakeId,
+      activeStep: 'post_save_verification',
+      rowVerificationStatus: 'passed',
+      attempt: attemptNumber,
+    });
+    return true;
+  } catch {
+    logOrgAudit('row verification exhausted retries', {
+      intakeId,
+      activeStep: 'post_save_verification',
+      rowVerificationStatus: 'failed',
+      attempts,
+    });
+    return false;
   }
-  logOrgAudit('row verification exhausted retries', {
-    intakeId,
-    activeStep: 'post_save_verification',
-    rowVerificationStatus: 'failed',
-    attempts,
-  });
-  return false;
 }
 
 export async function listWorkerIntakes(workerId: string): Promise<
