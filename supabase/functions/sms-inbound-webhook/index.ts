@@ -123,6 +123,14 @@ Deno.serve(async (req: Request) => {
     'STOP', 'STOPALL', 'UNSUBSCRIBE', 'CANCEL', 'END', 'QUIT', 'OPTOUT', 'REVOKE', 'UNLINK',
   ]);
   const HELP_KEYWORDS = new Set(['HELP', 'INFO']);
+  // Resubscribe keywords (CTIA-standard for A2P 10DLC campaigns). Cannot actually restore the
+  // link from a text reply alone -- STOP deletes the worker_sms_links row entirely, and
+  // re-linking requires proving control of the number again via a fresh OTP (sms-verify-phone),
+  // which only the signed-in website flow can do. Still must be RECOGNIZED and answered here: an
+  // A2P campaign registration that declares these keywords but has the webhook fall through to
+  // the generic "not linked" reply is an inconsistency a carrier reviewer will flag (2026-08-19,
+  // exactly the "Opt-in information" rejection this closes).
+  const RESUBSCRIBE_KEYWORDS = new Set(['START', 'YES', 'UNSTOP']);
 
   const bodyKeyword = (params['Body'] ?? '').trim().toUpperCase();
   if (OPT_OUT_KEYWORDS.has(bodyKeyword)) {
@@ -132,6 +140,11 @@ Deno.serve(async (req: Request) => {
   }
   if (HELP_KEYWORDS.has(bodyKeyword)) {
     return twiml('one3seven: text a photo or PDF to add it to your record. Reply STOP to unsubscribe. Msg&Data Rates May Apply.');
+  }
+  if (RESUBSCRIBE_KEYWORDS.has(bodyKeyword)) {
+    return twiml(
+      'To resume texting documents to one3seven, sign in at one3seven.com and re-link your phone under Upload (a new verification code is required).',
+    );
   }
 
   const { data: link, error: linkErr } = await supabase

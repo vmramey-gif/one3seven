@@ -94,5 +94,41 @@ Deno.serve(async (req: Request) => {
     return json({ error: 'Could not confirm this number. Try again.' }, 500);
   }
 
+  // Carrier-required opt-in confirmation (2026-08-19: the A2P 10DLC campaign was rejected for
+  // opt-in information -- no such message existed anywhere; the verification-code text doesn't
+  // count, it has no Msg&Data-rates/STOP/HELP language). Best-effort: the link is already
+  // verified above, which is what actually matters -- a failed confirmation text shouldn't roll
+  // back a successful verification.
+  const TWILIO_ACCOUNT_SID = Deno.env.get('TWILIO_ACCOUNT_SID');
+  const TWILIO_AUTH_TOKEN = Deno.env.get('TWILIO_AUTH_TOKEN');
+  const TWILIO_PHONE_NUMBER = Deno.env.get('TWILIO_PHONE_NUMBER');
+  if (TWILIO_ACCOUNT_SID && TWILIO_AUTH_TOKEN && TWILIO_PHONE_NUMBER) {
+    try {
+      const twilioResp = await fetch(
+        `https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/Messages.json`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Basic ${btoa(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`)}`,
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({
+            To: phone,
+            From: TWILIO_PHONE_NUMBER,
+            Body:
+              'one3seven: This number is now linked to text documents into your record. ' +
+              'Msg frequency varies. Msg&Data rates may apply. Reply STOP to opt out, HELP for help.',
+          }),
+        },
+      );
+      if (!twilioResp.ok) {
+        const detail = await twilioResp.text().catch(() => '');
+        console.error('[sms-verify-phone] opt-in confirmation send failed', twilioResp.status, detail);
+      }
+    } catch (e) {
+      console.error('[sms-verify-phone] opt-in confirmation send threw', e instanceof Error ? e.message : String(e));
+    }
+  }
+
   return json({ verified: true });
 });
