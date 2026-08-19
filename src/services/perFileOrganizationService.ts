@@ -465,6 +465,12 @@ function buildSingleFileRecord(
       `${possibleTimelineEvent.neutral_summary} ${mealLine}`.trim();
   }
 
+  const rawComplaintTopic = extraction?.documentFacts
+    ? (extraction.documentFacts as { complaint_topic?: unknown }).complaint_topic
+    : null;
+  const complaintTopic =
+    typeof rawComplaintTopic === 'string' && rawComplaintTopic.trim() ? rawComplaintTopic.trim() : null;
+
   return {
     source_file_id: resolveSourceFileId(meta),
     file_name: meta.fileName,
@@ -478,6 +484,7 @@ function buildSingleFileRecord(
     missing_or_unclear_information: [...new Set(missing)].slice(0, 6),
     confidence,
     extraction_quality: extractionQuality,
+    complaint_topic: complaintTopic,
   };
 }
 
@@ -570,7 +577,11 @@ export function buildPeopleIndexFromFileRecords(
       r.employment_topics.join(' '),
       r.possible_timeline_event?.title ?? '',
       r.possible_timeline_event?.neutral_summary ?? '',
-      r.people_or_entities.join(' '),
+      // '\n', not ' ' -- see the matching fix + comment in evidenceMappedTimelineService.ts's
+      // roleContextsForEvent (2026-08-18): joining different people's names onto one shared line
+      // lets a role phrase meant for one bleed onto another (e.g. a worker whose complaint email
+      // lists ["Worker Name", "Human Resources"] as mentioned people getting misclassified as HR).
+      r.people_or_entities.join('\n'),
     ].join('\n')
   );
   const rolesByName = new Map(

@@ -488,12 +488,16 @@ describe('evidence-mapped timeline engine', () => {
     expect(events[0]?.supporting_file_names).toEqual(
       expect.arrayContaining(['HR_Complaint.pdf', 'Screenshot_4.png'])
     );
+    // Jane Smith is HR_TEXT's SENDER (the worker filing the complaint), not HR -- only "HR
+    // Department" (the recipient) should be tagged. Previously both were tagged HR: joining
+    // multiple different people's names onto one context LINE let "HR Department" bleed its role
+    // onto Jane Smith too, since contextsNearName() matches whole lines (2026-08-18, found while
+    // adding cross-document relationship notes -- see the matching fix in roleContextsForEvent /
+    // buildPeopleIndexFromFileRecords).
     expect(events[0]?.people_involved).toEqual(
-      expect.arrayContaining([
-        'Jane Smith (Human Resources Representative)',
-        'HR Department (Human Resources Representative)',
-      ])
+      expect.arrayContaining(['HR Department (Human Resources Representative)'])
     );
+    expect(events[0]?.people_involved).not.toContain('Jane Smith (Human Resources Representative)');
     expect(events[0]?.related_topics).toContain('Workplace communications');
     expect(events[0]?.confidence).toBe('high');
   });
@@ -895,5 +899,123 @@ describe('evidence-mapped timeline engine', () => {
 
     expect(events[0]?.date).toBe('12/02/2025');
     expect(events[0]?.date).not.toMatch(/08:46|am|cst|2023/i);
+  });
+});
+
+describe('cross-document relationship notes (2026-08-18 founder request, scoped to structural links only)', () => {
+  test('a complaint and its response sharing the same complaint_topic get a grounded note on both sides', () => {
+    const events = buildEvidenceMappedTimelineEvents({
+      fileRecords: [
+        sampleFileRecord({
+          source_file_id: 'complaint-note-1',
+          file_name: 'Complaint_To_HR.pdf',
+          likely_date: 'June 9, 2026',
+          complaint_topic: 'Unpaid overtime hours',
+        }),
+        sampleFileRecord({
+          source_file_id: 'response-note-1',
+          file_name: 'HR_Response.pdf',
+          likely_date: 'June 10, 2026',
+          complaint_topic: 'Unpaid overtime hours',
+        }),
+      ],
+    });
+
+    const complaintEvent = events.find((e) => e.title === 'Complaint submitted to Human Resources');
+    const responseEvent = events.find((e) => e.title === 'HR response received');
+    expect(complaintEvent?.related_record_note).toBe(
+      'A response to this complaint is on file, dated June 10, 2026.'
+    );
+    expect(responseEvent?.related_record_note).toBe(
+      'This record responds to the complaint dated June 9, 2026.'
+    );
+  });
+
+  test('a complaint and an unrelated response (different complaint_topic) get no note', () => {
+    const events = buildEvidenceMappedTimelineEvents({
+      fileRecords: [
+        sampleFileRecord({
+          source_file_id: 'complaint-note-2',
+          file_name: 'Complaint_To_HR.pdf',
+          likely_date: 'June 9, 2026',
+          complaint_topic: 'Broken guardrail on loading dock',
+        }),
+        sampleFileRecord({
+          source_file_id: 'response-note-2',
+          file_name: 'HR_Response.pdf',
+          likely_date: 'July 1, 2026',
+          complaint_topic: 'Parking policy question',
+        }),
+      ],
+    });
+
+    for (const event of events) {
+      expect(event.related_record_note).toBeNull();
+    }
+  });
+
+  test('a complaint with no response on file gets no note', () => {
+    const events = buildEvidenceMappedTimelineEvents({
+      fileRecords: [
+        sampleFileRecord({
+          source_file_id: 'complaint-note-3',
+          file_name: 'Complaint_To_HR.pdf',
+          likely_date: 'June 9, 2026',
+          complaint_topic: 'Unpaid overtime hours',
+        }),
+      ],
+    });
+
+    expect(events[0]?.related_record_note).toBeNull();
+  });
+
+  test('the chronology line includes the relationship note when present, and nothing extra when absent', () => {
+    const events = buildEvidenceMappedTimelineEvents({
+      fileRecords: [
+        sampleFileRecord({
+          source_file_id: 'complaint-note-4',
+          file_name: 'Complaint_To_HR.pdf',
+          likely_date: 'June 9, 2026',
+          complaint_topic: 'Unpaid overtime hours',
+        }),
+        sampleFileRecord({
+          source_file_id: 'response-note-4',
+          file_name: 'HR_Response.pdf',
+          likely_date: 'June 10, 2026',
+          complaint_topic: 'Unpaid overtime hours',
+        }),
+      ],
+    });
+    const sections = buildIntakeOrganizationSections({
+      fileRecords: [],
+      peopleIndex: [],
+      evidenceTimeline: events,
+      executiveLead: '',
+      missingDocumentSuggestions: [],
+      readinessIndicators: [],
+      reviewItems: [],
+      docTotal: 2,
+    });
+    const complaintLine = sections.chronology.find((line) => line.includes('Complaint submitted to Human Resources'));
+    expect(complaintLine).toMatch(/A response to this complaint is on file, dated June 10, 2026\./);
+  });
+
+  // Regression: the people-role-bleed bug found while building this feature. A worker's own
+  // complaint email lists [worker name, "HR Department"] as mentioned people (sender + recipient);
+  // joining them onto one shared context line let "HR Department"'s role bleed onto the worker.
+  // See the matching fix + comment in roleContextsForEvent / buildPeopleIndexFromFileRecords.
+  test('a complaint\'s sender is not misclassified as HR merely for being named alongside the HR recipient', () => {
+    const events = buildEvidenceMappedTimelineEvents({
+      fileRecords: [
+        sampleFileRecord({
+          source_file_id: 'bleed-1',
+          file_name: 'Complaint_To_HR.pdf',
+          likely_date: 'June 9, 2026',
+          people_or_entities: ['Jane Smith', 'HR Department'],
+        }),
+      ],
+    });
+    expect(events[0]?.people_involved).toContain('HR Department (Human Resources Representative)');
+    expect(events[0]?.people_involved).not.toContain('Jane Smith (Human Resources Representative)');
   });
 });
