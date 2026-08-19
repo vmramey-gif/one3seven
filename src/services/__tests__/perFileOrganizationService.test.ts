@@ -118,3 +118,48 @@ describe('buildPerFileOrganizationRecords — people-and-entities roster (2026-0
     expect(peopleIndex).not.toContain('Marcus Delgado (Human Resources Representative)');
   });
 });
+
+describe('pay-period range legibility (2026-08-18, document-range vs. employment-period vs. event-chronology split)', () => {
+  test('a paystub with pay_period_start/pay_period_end gets the covered range stated in its summary, not just a single anchor date', () => {
+    const paystub: DocumentGroundedFileInput = {
+      uploadedFileId: 'f1',
+      fileName: 'paystub_march_2024.pdf',
+      category: 'Compensation & Payroll',
+      extractedText: 'PAY STUB\nPay period: March 1 - March 15, 2024\nGross pay: $2,400.00',
+      documentFacts: {
+        category: 'Compensation & Payroll',
+        file_name: 'paystub_march_2024.pdf',
+        pay_period_start: 'March 1, 2024',
+        pay_period_end: 'March 15, 2024',
+      } as any,
+    };
+    const { fileRecords } = buildPerFileOrganizationRecords(
+      [{ uploadedFileId: 'f1', fileName: paystub.fileName, category: paystub.category }],
+      [paystub]
+    );
+    // likely_date stays a single sortable string (unchanged contract for every date-comparison/
+    // export consumer) -- the range itself becomes legible in the summary text instead.
+    expect(fileRecords[0]?.possible_timeline_event?.neutral_summary).toMatch(
+      /covers the pay period March 1, 2024 to March 15, 2024/i
+    );
+  });
+
+  test('a document with no pay_period_start/pay_period_end gets no range note', () => {
+    const offerLetter: DocumentGroundedFileInput = {
+      uploadedFileId: 'f1',
+      fileName: 'offer_letter.pdf',
+      category: 'Offer Letters',
+      extractedText: 'OFFER OF EMPLOYMENT',
+      documentFacts: {
+        category: 'Offer Letters',
+        file_name: 'offer_letter.pdf',
+        start_date: '2026-03-03',
+      } as any,
+    };
+    const { fileRecords } = buildPerFileOrganizationRecords(
+      [{ uploadedFileId: 'f1', fileName: offerLetter.fileName, category: offerLetter.category }],
+      [offerLetter]
+    );
+    expect(fileRecords[0]?.possible_timeline_event?.neutral_summary).not.toMatch(/covers the pay period/i);
+  });
+});
