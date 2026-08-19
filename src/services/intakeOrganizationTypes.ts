@@ -23,6 +23,15 @@ export type IntakeFileOrganizationRecord = {
   missing_or_unclear_information: string[];
   confidence: 'high' | 'medium' | 'low';
   extraction_quality: ExtractionQuality;
+  /**
+   * document_facts.complaint_topic, carried through UNCONDITIONALLY (unlike
+   * possible_timeline_event.title, which only gets the topic-suffixed vocabulary when
+   * communicationTitleFromFacts already resolved the recipient as confirmed HR). Used to link a
+   * complaint and its response by their shared topic even when only one side of the pair has an
+   * HR-confirmed recipient of its own — see evidenceMappedTimelineService.ts's
+   * complaintResponseSignalFromFiles.
+   */
+  complaint_topic?: string | null;
 };
 
 /** Evidence-mapped timeline cluster (Phase 2). */
@@ -38,6 +47,15 @@ export type EvidenceMappedTimelineEvent = {
   confidence: 'high' | 'medium' | 'low';
   category: string;
   source_strength: SourceStrength;
+  /**
+   * A grounded, provenance-only note linking this record to ANOTHER specific record already on
+   * the timeline (e.g. "This record responds to the complaint dated June 9, 2026."). Populated
+   * only when the connection is stated by the documents themselves (a reply's own subject/topic
+   * matching an earlier complaint's) — never an inferred causal/legal relationship. Doctrine:
+   * describe the record, not the case — see project_describe_record_not_case memory. null when
+   * no grounded connection was found.
+   */
+  related_record_note?: string | null;
 };
 
 /** Structured review summary sections (Phase 3). */

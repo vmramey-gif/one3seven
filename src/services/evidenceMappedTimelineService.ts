@@ -846,7 +846,16 @@ function roleContextsForEvent(
       f.employment_topics.join(' '),
       f.possible_timeline_event?.title ?? '',
       f.possible_timeline_event?.neutral_summary ?? '',
-      f.people_or_entities.join(' '),
+      // '\n', not ' ' -- contextsNearName() keeps whole LINES that mention a given name, so
+      // joining multiple different people's names onto ONE shared line lets a role phrase meant
+      // for one bleed onto another. Real bug: a worker's own complaint email has
+      // peopleMentioned = [worker name, "Human Resources"] (sender + recipient); joined with a
+      // space that produced one line "Marcus Delgado Human Resources", and the worker himself got
+      // classified "Human Resources Representative" (2026-08-18, found while adding cross-document
+      // relationship notes). Same fix class as the issued_by/relationship_to_worker line-merge fix
+      // earlier tonight, opposite direction: that one needed two related fields COMBINED onto one
+      // line; this one needs unrelated people's names kept apart.
+      f.people_or_entities.join('\n'),
     ].join('\n')
   );
   for (const fact of commFacts) {
@@ -859,7 +868,7 @@ function roleContextsForEvent(
         fact.subjectOrTopic ?? '',
         fact.workerConcernExcerpt ?? '',
         fact.employerOrHrResponseExcerpt ?? '',
-        fact.peopleMentioned.join(' '),
+        fact.peopleMentioned.join('\n'),
       ].join('\n')
     );
   }
@@ -988,12 +997,100 @@ function guardScheduleChangeTitle(title: string, files: IntakeFileOrganizationRe
   return clusterHasSeparationCategorizedSource(files) ? NEUTRAL_SEPARATION_FALLBACK_TITLE : title;
 }
 
+/**
+ * Cross-document relationship prose (2026-08-18, founder request following the semantic-event
+ * gauntlet — "before adding cross-document relationship prose, build a gauntlet" was done first;
+ * this is the follow-up). SCOPE, deliberately narrow per the founder's own confirmed choice:
+ * connect two records ONLY when the connection is stated by the documents themselves — here, a
+ * complaint and its response sharing the SAME extracted complaint_topic (the same signal already
+ * used for event TITLING, see communicationTitleFromFacts in perFileOrganizationService.ts).
+ * Phrasing is provenance-only ("this record responds to X, dated Y") — never causal/sequence
+ * language toward a LATER, topically-unrelated event (no complaint→termination chaining). That
+ * broader pattern was explicitly tried and reverted before: the 2026-08-04 Francis audit flagged
+ * a generated sentence essentially saying "concerns placed before later workplace action records"
+ * as a prohibited causal-juxtaposition — and it was factually backwards for that record. See
+ * project_describe_record_not_case / feedback_public_surface_no_conclude memory.
+ */
+type ComplaintResponseSignal = { kind: 'complaint' | 'response'; topic: string };
+
+const COMPLAINT_TITLE = 'Complaint submitted to Human Resources';
+const RESPONSE_TITLE = 'HR response received';
+
+/** Normalizes a mined topic string for exact-match comparison — under-match is the safe failure
+ *  mode here (no note), so no fuzzy/partial matching is attempted. */
+function normalizeTopicForMatch(topic: string): string {
+  return topic.trim().toLowerCase().replace(/\s+/g, ' ').replace(/[.\s]+$/, '');
+}
+
+/**
+ * Reads document_facts.complaint_topic directly off the cluster's file records (carried through
+ * unconditionally by perFileOrganizationService.ts, see IntakeFileOrganizationRecord.complaint_topic)
+ * rather than mining it back out of possible_timeline_event.title — that title only carries the
+ * topic-suffixed vocabulary when communicationTitleFromFacts already resolved ITS OWN recipient as
+ * confirmed HR (via cross-document deriveNamedPeopleForIntake), which the ORIGINAL, outgoing side
+ * of a complaint/response pair frequently does NOT have (a worker emailing "Human Resources" by
+ * generic name, not a specific confirmed person) even though the response side does. Reading the
+ * raw field directly makes topic-matching independent of that unrelated, already-shipped titling
+ * mechanism. Only fires for a cluster whose FINAL, guarded title is exactly the complaint or
+ * response vocabulary string — so this never contradicts what the title itself already says the
+ * record is.
+ */
+function complaintResponseSignalFromFiles(
+  files: IntakeFileOrganizationRecord[],
+  finalTitle: string
+): ComplaintResponseSignal | null {
+  if (finalTitle !== COMPLAINT_TITLE && finalTitle !== RESPONSE_TITLE) return null;
+  const kind = finalTitle === COMPLAINT_TITLE ? 'complaint' : 'response';
+  for (const f of files) {
+    const topic = normalizeTopicForMatch(f.complaint_topic ?? '');
+    if (topic.length >= 4) return { kind, topic };
+  }
+  return null;
+}
+
+/**
+ * Second pass over the already-dated, already-sorted events: for each complaint/response pair
+ * sharing the same mined topic, attach a grounded note to BOTH sides naming the OTHER record's
+ * date. Nearest correct-directional match wins (a response looks backward for its nearest earlier
+ * matching complaint; a complaint looks forward for its nearest later matching response) so a
+ * long intake with several distinct complaint threads doesn't cross-wire them.
+ */
+function attachComplaintResponseRelationshipNotes(
+  built: Array<{ event: EvidenceMappedTimelineEvent; signal: ComplaintResponseSignal | null }>
+): void {
+  for (let i = 0; i < built.length; i++) {
+    const { event, signal } = built[i];
+    if (!signal) continue;
+    if (signal.kind === 'response') {
+      for (let j = i - 1; j >= 0; j--) {
+        const other = built[j];
+        if (other.signal?.kind === 'complaint' && other.signal.topic === signal.topic) {
+          if (other.event.date && other.event.date !== DATE_UNCLEAR_LABEL) {
+            event.related_record_note = `This record responds to the complaint dated ${other.event.date}.`;
+          }
+          break;
+        }
+      }
+    } else {
+      for (let j = i + 1; j < built.length; j++) {
+        const other = built[j];
+        if (other.signal?.kind === 'response' && other.signal.topic === signal.topic) {
+          if (other.event.date && other.event.date !== DATE_UNCLEAR_LABEL) {
+            event.related_record_note = `A response to this complaint is on file, dated ${other.event.date}.`;
+          }
+          break;
+        }
+      }
+    }
+  }
+}
+
 function clusterToEvent(
   cluster: TimelineCluster,
   payFacts: PayRecordFacts[],
   commFacts: CommunicationFacts[],
   authoritativeDateIds: ReadonlySet<string> = new Set()
-): EvidenceMappedTimelineEvent {
+): { event: EvidenceMappedTimelineEvent; signal: ComplaintResponseSignal | null } {
   const { files } = cluster;
   const dateInfo = clusterDate(files, authoritativeDateIds);
   const date = dateInfo.label;
@@ -1034,7 +1131,7 @@ function clusterToEvent(
     files[0]?.document_type ??
     'Uncategorized';
 
-  return {
+  const event: EvidenceMappedTimelineEvent = {
     date: date || DATE_UNCLEAR_LABEL,
     title,
     neutral_summary,
@@ -1046,7 +1143,12 @@ function clusterToEvent(
     confidence: clusterConfidence(files),
     category: primaryCategory,
     source_strength: clusterSourceStrength(files),
+    related_record_note: null,
   };
+  // Match on baseTitle (the guarded vocabulary string BEFORE roleAwareTitle's optional "(Name)"
+  // suffix), not the final display title — the suffix would otherwise break the exact-string
+  // match against COMPLAINT_TITLE/RESPONSE_TITLE.
+  return { event, signal: complaintResponseSignalFromFiles(files, baseTitle) };
 }
 
 export function buildEvidenceMappedTimelineEvents(
@@ -1084,9 +1186,11 @@ export function buildEvidenceMappedTimelineEvents(
   const clusteredIds = new Set(eventFirstClusters.flatMap((c) => c.files.map((f) => f.source_file_id)));
   const fallbackRecords = timelineRecords.filter((record) => !clusteredIds.has(record.source_file_id));
   const clusters = [...eventFirstClusters, ...clusterRecords(fallbackRecords)];
-  const events = clusters.map((c) => clusterToEvent(c, payFacts, commFacts, authoritativeDateIds));
+  const built = clusters.map((c) => clusterToEvent(c, payFacts, commFacts, authoritativeDateIds));
 
-  events.sort((a, b) => compareEmploymentChronologyDates(a.date, b.date));
+  built.sort((a, b) => compareEmploymentChronologyDates(a.event.date, b.event.date));
+  attachComplaintResponseRelationshipNotes(built);
+  const events = built.map((b) => b.event);
   // No hard cap here: this is the data-computation layer, and truncating would silently
   // discard real history on long/high-volume records (a 3.5-year, 107-file case previously
   // lost every event past month six, including the termination itself). Any display-side
@@ -1137,7 +1241,8 @@ export function formatEvidenceTimelineChronologyLine(event: EvidenceMappedTimeli
     event.related_topics.length > 0
       ? ` Topics: ${event.related_topics.slice(0, 3).join(', ')}.`
       : '';
+  const relatedNote = event.related_record_note ? ` ${event.related_record_note}` : '';
   return sanitizeGenerationPhrase(
-    `${dateLabel} — ${event.title}. ${event.neutral_summary} Supporting files: ${files}.${people}${topics} Confidence: ${event.confidence}.`
+    `${dateLabel} — ${event.title}. ${event.neutral_summary}${relatedNote} Supporting files: ${files}.${people}${topics} Confidence: ${event.confidence}.`
   );
 }
