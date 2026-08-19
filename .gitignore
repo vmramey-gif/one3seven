@@ -10,5 +10,10 @@ dev-server.log
 build/
 scratchpad/
 
+# Playwright
+/playwright-report/
+/test-results/
+/blob-report/
+
 # MS Office lock files
 ~$*

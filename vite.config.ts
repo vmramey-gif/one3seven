@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+import { configDefaults, defineConfig } from 'vitest/config'
 import path from 'path'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
@@ -69,4 +69,12 @@ export default defineConfig({
 
   // File types to support raw imports. Never add .css, .tsx, or .ts files to this.
   assetsInclude: ['**/*.svg', '**/*.csv'],
+
+  test: {
+    // Playwright owns e2e/**/*.spec.ts against a real running dev server (npx playwright test) --
+    // vitest's default include glob (**/*.{test,spec}.*) would otherwise also try to run those
+    // files itself and fail confusingly, since they use @playwright/test's test()/expect(), not
+    // vitest's (2026-08-19).
+    exclude: [...configDefaults.exclude, 'e2e/**'],
+  },
 })
