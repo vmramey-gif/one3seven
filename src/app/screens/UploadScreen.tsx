@@ -1629,7 +1629,7 @@ export function UploadScreen({
             ) : null}
             {hasMeaningfulStoryContext && uploadedFiles.length === 0 ? (
               <p className="rounded-[12px] border border-[#D3DED6] bg-white px-3 py-2 text-xs leading-relaxed text-[#40433F]">
-                You can begin with your story now. Records can be added later to strengthen the timeline.
+                You can begin with your story now. Records can be added to the timeline later.
               </p>
             ) : null}
             {intakeHasGeneratedSummary ? (

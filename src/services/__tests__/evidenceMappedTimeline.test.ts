@@ -13,6 +13,7 @@ import { collectOrganizedSectionsPdfLines } from '../intakePacketPresentation';
 import { ATTORNEY_PACKET_SECTIONS } from '../../app/constants/workerStoryIntake';
 import type { IntakeFileOrganizationRecord } from '../intakeOrganizationTypes';
 import type { CommunicationFacts } from '../documentFactExtractionService';
+import { scanBannedVocabulary } from '../bannedVocabulary';
 
 const PAY_TEXT = `
 PAY STUB
@@ -929,6 +930,12 @@ describe('cross-document relationship notes (2026-08-18 founder request, scoped 
     expect(responseEvent?.related_record_note).toBe(
       'This record responds to the complaint dated June 9, 2026.'
     );
+    // Doctrine scanner run against the ACTUAL generated note text, not a hand-picked example
+    // string (2026-08-18 audit finding: bannedVocabulary.test.ts only ever scanned example
+    // sentences, never real template output -- a looser complaint_topic extraction or a changed
+    // note template could reintroduce banned language with nothing catching it).
+    expect(scanBannedVocabulary(complaintEvent?.related_record_note)).toEqual([]);
+    expect(scanBannedVocabulary(responseEvent?.related_record_note)).toEqual([]);
   });
 
   test('a complaint and an unrelated response (different complaint_topic) get no note', () => {
