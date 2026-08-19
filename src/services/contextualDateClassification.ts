@@ -1,3 +1,5 @@
+import { strict as chronoStrict } from 'chrono-node';
+
 /**
  * Contextual date classification for employment chronology vs legal/birth/reference dates.
  * Shared by timeline generation, summaries, and sorting — not one-off year blocklists.
@@ -238,6 +240,25 @@ function scanDatePatterns(corpus: string, onHit: (token: string, index: number) 
     new RegExp(`\\b(${MONTHS})\\s+((?:19|20)\\d{2})\\b`, 'gi'),
     (m) => `${m[1]} ${m[2]}`
   );
+
+  // chrono-node as an additional token source (2026-08-19 hard-challenge finding): the fixed
+  // regex patterns above miss real-world formats worth catching -- ordinals ("March 1st, 2024"),
+  // abbreviated months ("Mar. 1, 2024"), and other written-date variations a hand-rolled regex
+  // list won't keep up with. Deliberately using `strict` (not `casual`) and additionally
+  // filtering to results where the YEAR is explicitly certain in the text itself, not inferred
+  // from the current real-world date chrono defaults to as its reference point -- this corpus is
+  // historical document text, and a vague/relative mention ("next Monday") resolved against
+  // *today* would be actively wrong, not just imprecise. Feeds the exact same onHit/dedup/
+  // plausibility/classification pipeline as every other pattern here -- purely additive.
+  try {
+    for (const result of chronoStrict.parse(corpus)) {
+      if (!result.start.isCertain('year')) continue;
+      onHit(result.text, result.index);
+    }
+  } catch {
+    // Never let a parser edge case (malformed corpus, chrono internal error) block the
+    // deterministic regex patterns above from still running.
+  }
 }
 
 /** Extract and classify every plausible date-like token in corpus. */

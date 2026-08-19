@@ -103,3 +103,40 @@ describe('contextual date classification', () => {
     expect(y?.category).not.toBe('employment_chronology');
   });
 });
+
+describe('chrono-node token extraction (2026-08-19 hard-challenge finding — messier real-world formats the fixed regex patterns miss)', () => {
+  test('catches an ordinal date the regex patterns do not match', () => {
+    // "March 1st, 2024" -- the ordinal suffix means none of scanDatePatterns' Month-day-year
+    // regexes match (they require a bare \d{1,2}, not "1st"). Real termination/offer letters
+    // routinely use ordinals.
+    const corpus = 'Your last day of employment will be March 1st, 2024.';
+    const hits = extractClassifiedDates(corpus);
+    expect(hits.some((h) => /2024/.test(h.token))).toBe(true);
+    expect(uniqueSortedEmploymentChronologyDates(corpus).some((d) => /2024/.test(d))).toBe(true);
+  });
+
+  test('catches an abbreviated month the regex patterns do not match', () => {
+    // "Mar. 1, 2024" -- the fixed MONTHS pattern list requires the spelled-out month name.
+    const corpus = 'Termination letter dated Mar. 1, 2024, effective immediately.';
+    const hits = extractClassifiedDates(corpus);
+    expect(hits.some((h) => /2024/.test(h.token))).toBe(true);
+  });
+
+  test('does NOT resolve a vague relative date against real-world "today" (safety filter)', () => {
+    // "next Monday" / "last week" have no fixed calendar value in HISTORICAL document text --
+    // chrono would resolve them against whatever the real clock says when the test runs, which
+    // is never correct for a document's own stated dates. isCertain('year') filters these out.
+    const corpus = 'HR said they would follow up next Monday about the schedule.';
+    const hits = extractClassifiedDates(corpus);
+    // No token resolving "next Monday" into an actual calendar year should appear.
+    const currentYear = String(new Date().getFullYear());
+    expect(hits.some((h) => h.token.toLowerCase().includes('monday'))).toBe(false);
+    expect(hits.some((h) => h.token === currentYear)).toBe(false);
+  });
+
+  test('a chrono-caught ordinal date still classifies correctly as employment chronology', () => {
+    const corpus = 'OFFER LETTER\nYour start date will be June 3rd, 2024. Welcome to the team.';
+    const meta = classifiedDatesByCategory(corpus);
+    expect(meta.employment_chronology.some((t) => /2024/.test(t))).toBe(true);
+  });
+});
