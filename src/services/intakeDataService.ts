@@ -4721,6 +4721,24 @@ async function listNotificationsForUserQuery(limit: number): Promise<{
   return { rows: (data ?? []) as PersistentNotificationRow[] };
 }
 
+/**
+ * Realtime subscription for the signed-in user's own notifications (2026-08-18 hard-challenge
+ * finding: the bell was fetch-on-trigger only -- a worker had to take an action or reload to see
+ * a server-side change like a firm's document request). No `filter` is needed: `notifications`
+ * RLS (`notifications_select_own`, recipient_user_id = auth.uid()) already scopes which rows a
+ * given subscriber's postgres_changes stream can see, same pattern already proven for
+ * crm_firms/crm_messages in crmService.ts. Caller re-fetches on any change rather than trying to
+ * merge the raw payload, reusing the one already-correct read path (listNotificationsForUser)
+ * instead of a second, divergent row-shaping implementation.
+ */
+export function subscribeToOwnNotifications(onChange: () => void): () => void {
+  const channel = supabase
+    .channel(`notifications_${Math.random().toString(36).slice(2)}`)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'notifications' }, () => onChange())
+    .subscribe();
+  return () => { void supabase.removeChannel(channel); };
+}
+
 export async function markNotificationRead(notificationId: string): Promise<{ error?: string }> {
   const {
     data: { user },

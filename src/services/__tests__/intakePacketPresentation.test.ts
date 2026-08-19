@@ -445,3 +445,40 @@ describe('people-named-in-records roster (2026-08-18 founder request)', () => {
     ]);
   });
 });
+
+describe('organized-record chronology falls back to live timeline events (2026-08-18 hard-challenge finding)', () => {
+  // orgSections.chronology empty (the org-engine hasn't computed structured lines) while
+  // payload.timelineEvents -- the same live events the worker's screen actually shows (BASE has
+  // 3) -- is populated. Before this fix, collectOrganizedSectionsPdfLines (reached directly, and
+  // via collectIntakePacketPdfLines / the prestige renderer's ASCII-PDF fallback when pdf-lib
+  // throws) printed a false "No timeline entries are available yet" here even though
+  // buildWorkerSummaryModel already had the identical fallback for the same payload shape.
+  const payloadWithEmptyOrgChronology: IntakeSummaryDownloadPayload = {
+    ...BASE,
+    orgSections: {
+      executive_summary: '',
+      chronology: [],
+      people_and_entities: [],
+      supporting_records: [],
+      potential_gaps: [],
+      clarification_items: [],
+      review_notes: [],
+      disclaimer: 'Not legal advice.',
+    },
+  };
+
+  test('does not falsely claim no timeline entries when live timeline events exist', () => {
+    const text = collectIntakePacketPdfLines(payloadWithEmptyOrgChronology).join('\n');
+    expect(text).not.toMatch(/no timeline entries are available yet/i);
+    expect(text).toContain('Offer letter materials');
+    expect(text).toContain('Separation notice materials');
+  });
+
+  test('still shows the honest empty state when there are truly no events anywhere', () => {
+    const text = collectIntakePacketPdfLines({
+      ...payloadWithEmptyOrgChronology,
+      timelineEvents: [],
+    }).join('\n');
+    expect(text).toMatch(/no timeline entries are available yet/i);
+  });
+});

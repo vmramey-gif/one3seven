@@ -921,6 +921,50 @@ export function triggerPdfDownload(bytes: Uint8Array, filename: string): void {
   window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
 }
 
+/** RFC 4180 field quoting: quote (and escape embedded quotes) whenever a comma, quote, or
+ *  newline is present -- a plain date/title/category usually needs none. */
+function csvField(value: string | null | undefined): string {
+  const v = (value ?? '').toString();
+  if (/[",\r\n]/.test(v)) return `"${v.replace(/"/g, '""')}"`;
+  return v;
+}
+
+function csvRow(fields: Array<string | null | undefined>): string {
+  return fields.map(csvField).join(',');
+}
+
+/**
+ * The timeline events as an open-format spreadsheet -- the tabular sibling of the PDF/JSON
+ * downloads (2026-08-18: no CSV export existed anywhere in the worker-facing app, confirmed by a
+ * capability hard-challenge). Same data source as the PDF chronology and the JSON export
+ * (payload.timelineEvents, the live events the worker's own screen shows), so all three exports
+ * can never disagree with each other. Pure and synchronous -- no network/DOM access -- so it's
+ * directly testable.
+ */
+export function buildTimelineCsvContent(payload: IntakeSummaryDownloadPayload): string {
+  const rows = [csvRow(['Date', 'Event', 'Category', 'Summary', 'Supporting files'])];
+  for (const e of payload.timelineEvents ?? []) {
+    rows.push(
+      csvRow([e.date, e.title, e.category, e.summary, (e.sourceFileNames ?? []).join('; ')])
+    );
+  }
+  // \r\n per RFC 4180; a leading BOM keeps Excel from mis-reading UTF-8 names/accents as Latin-1.
+  return `﻿${rows.join('\r\n')}\r\n`;
+}
+
+export function triggerTextFileDownload(content: string, filename: string, mimeType: string): void {
+  const blob = new Blob([content], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.rel = 'noopener';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
+}
+
 function buildIntakeSummaryAsciiPdfBytes(payload: IntakeSummaryDownloadPayload): Uint8Array {
   const pdfLines = collectIntakePacketPdfLines(payload);
   return buildAsciiTextPdf(pdfLines);

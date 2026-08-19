@@ -2446,6 +2446,18 @@ export default function App() {
     void refreshPersistentNotifications();
   }, [isAuthenticated, authUser?.id, profile?.role, userRole, refreshPersistentNotifications]);
 
+  // Realtime bell (2026-08-18 hard-challenge finding): without this, a server-side notification
+  // (e.g. a firm's document request) only appeared after the worker took one of a handful of
+  // specific actions or reloaded the app. Any change to the user's own notifications row
+  // re-triggers the existing fetch-and-shape path above -- no separate merge logic to drift.
+  useEffect(() => {
+    if (!isSupabaseConfigured() || !isAuthenticated || !authUser?.id) return;
+    const unsubscribe = intakeData.subscribeToOwnNotifications(() => {
+      void refreshPersistentNotifications();
+    });
+    return unsubscribe;
+  }, [isAuthenticated, authUser?.id, refreshPersistentNotifications]);
+
   const navigateToScreen = (screen: Screen) => {
     if (OFFLINE_DEV_GALLERY_ONLY && !isDevOnlyScreenWithoutSupabase(screen)) {
       setCurrentScreen('devNavMap');
