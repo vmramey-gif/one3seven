@@ -1084,6 +1084,15 @@ export function collectOrganizedSectionsPdfLines(
   else push('No timeline entries are available yet.');
   blank();
 
+  push(ATTORNEY_PACKET_SECTIONS.peopleAndEntities);
+  if (sections.people_and_entities.length) {
+    pushList(sections.people_and_entities);
+    push('Roles shown are as stated in or inferred from the uploaded records; confirm with the worker before relying on them.');
+  } else {
+    push('No named individuals are clearly identified in the uploaded records yet.');
+  }
+  blank();
+
   push('Supporting Documents');
   if (sections.supporting_records.length) {
     for (const r of sections.supporting_records) {
@@ -1146,6 +1155,7 @@ export function buildWorkerSummaryModel(payload: IntakeSummaryDownloadPayload): 
     },
     workerStory: account.narrative ? account.sections.map((s) => ({ heading: s.heading, body: s.body })) : [],
     questionsForReview: buildReviewTopicBullets(payload),
+    peopleAndEntities: sections?.people_and_entities ?? [],
     // Prefer the org-engine chronology; otherwise fall back to the live timeline events the worker
     // actually sees on screen (payload.timelineEvents). Without this the PDF printed "No timeline
     // entries are available yet" even when 15+ events existed. Same fallback for supporting records.

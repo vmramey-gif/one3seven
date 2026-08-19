@@ -1129,6 +1129,12 @@ export type WorkerPacketModel = {
   workerStory: Array<{ heading: string; body: string }>;
   questionsForReview: string[];
   chronology: string[];
+  /**
+   * Named people/entities from the uploaded records, role-labeled where confidently inferred
+   * (e.g. "Renee Ashford (Human Resources Representative)") -- see
+   * perFileOrganizationService.ts's buildPeopleIndexFromFileRecords. 'high' confidence only.
+   */
+  peopleAndEntities: string[];
   supportingDocuments: string[];
   missingInformation: string[];
   disclaimer: string[];
@@ -1274,6 +1280,18 @@ export async function renderWorkerSummaryPdf(
   sectionHeading(c, 'Timeline');
   if (model.chronology.length) for (const line of model.chronology) bullet(c, line);
   else c.text('No timeline entries are available yet.', { size: 10, color: MUTED });
+
+  sectionHeading(c, 'People Named in Records');
+  if (model.peopleAndEntities.length) {
+    for (const p of model.peopleAndEntities) bullet(c, p);
+    c.gap(2);
+    c.text(
+      'Roles shown are as stated in or inferred from the uploaded records; confirm with the worker before relying on them.',
+      { size: 8.5, color: MUTED },
+    );
+  } else {
+    c.text('No named individuals are clearly identified in the uploaded records yet.', { size: 10, color: MUTED });
+  }
 
   sectionHeading(c, 'Supporting Records');
   if (model.supportingDocuments.length) for (const r of model.supportingDocuments) bullet(c, r);

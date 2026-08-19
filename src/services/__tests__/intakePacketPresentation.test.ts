@@ -6,7 +6,12 @@ import {
   presentPacketEventDate,
   presentPacketTimelineStoryTitle,
 } from '../packetStoryPresentation';
-import { buildIntakePacketHtml, buildIntakePacketViewModel, collectIntakePacketPdfLines } from '../intakePacketPresentation';
+import {
+  buildIntakePacketHtml,
+  buildIntakePacketViewModel,
+  buildWorkerSummaryModel,
+  collectIntakePacketPdfLines,
+} from '../intakePacketPresentation';
 import { ATTORNEY_PACKET_SECTIONS } from '../../app/constants/workerStoryIntake';
 import type { IntakeSummaryDownloadPayload } from '../intakeSummaryDownload';
 
@@ -392,5 +397,47 @@ describe('story-first packet presentation', () => {
     expect(html).toContain(ATTORNEY_PACKET_SECTIONS.chronology);
     expect(html).not.toContain('Worker Narrative');
     expect(html).not.toContain('Event documented in uploaded records');
+  });
+});
+
+describe('people-named-in-records roster (2026-08-18 founder request)', () => {
+  const payloadWithRoster: IntakeSummaryDownloadPayload = {
+    ...BASE,
+    orgSections: {
+      executive_summary: '',
+      chronology: ['June 9, 2026 — Complaint submitted to Human Resources.'],
+      people_and_entities: ['Marcus Delgado', 'Renee Ashford (Human Resources Representative)'],
+      supporting_records: [],
+      potential_gaps: [],
+      clarification_items: [],
+      review_notes: [],
+      disclaimer: 'Not legal advice.',
+    },
+  };
+
+  test('the organized-record packet lines include a labeled section with each named person and a role disclaimer', () => {
+    const lines = collectIntakePacketPdfLines(payloadWithRoster);
+    const text = lines.join('\n');
+    expect(text).toContain(ATTORNEY_PACKET_SECTIONS.peopleAndEntities);
+    expect(text).toContain('Marcus Delgado');
+    expect(text).toContain('Renee Ashford (Human Resources Representative)');
+    expect(text).toMatch(/roles shown are as stated in or inferred from the uploaded records/i);
+  });
+
+  test('an intake with no named individuals shows an honest empty state, not a blank or zero', () => {
+    const lines = collectIntakePacketPdfLines({
+      ...BASE,
+      orgSections: { ...payloadWithRoster.orgSections!, people_and_entities: [] },
+    });
+    const text = lines.join('\n');
+    expect(text).toMatch(/no named individuals are clearly identified/i);
+  });
+
+  test('buildWorkerSummaryModel carries the role-labeled roster through to the prestige PDF model', () => {
+    const model = buildWorkerSummaryModel(payloadWithRoster);
+    expect(model.peopleAndEntities).toEqual([
+      'Marcus Delgado',
+      'Renee Ashford (Human Resources Representative)',
+    ]);
   });
 });

@@ -98,3 +98,23 @@ describe('buildPossibleTimelineEvent — event semantics from document_facts (20
     expect(fileRecords[0]?.possible_timeline_event?.title).not.toMatch(/Complaint submitted|HR response/);
   });
 });
+
+describe('buildPerFileOrganizationRecords — people-and-entities roster (2026-08-18 founder request)', () => {
+  test('a confirmed HR contact from document_facts.relationship_to_worker gets a role label; the worker does not', () => {
+    // Renee's role ("HR Manager") is only ever stated explicitly on the REPLY file's own
+    // document_facts -- not derivable from either file's possible_timeline_event title/summary
+    // strings alone (that weaker, per-file-record signal only carries a bare "HR", which is
+    // medium confidence and does not clear the roster's 'high' bar). The roster must read
+    // document_facts directly (deriveNamedPeopleForIntake) to resolve this correctly.
+    const { peopleIndex } = buildPerFileOrganizationRecords(
+      [
+        { uploadedFileId: 'f02', fileName: complaintEmail.fileName, category: complaintEmail.category },
+        { uploadedFileId: 'f03', fileName: hrReply.fileName, category: hrReply.category },
+      ],
+      [complaintEmail, hrReply]
+    );
+    expect(peopleIndex).toContain('Renee Ashford (Human Resources Representative)');
+    expect(peopleIndex).toContain('Marcus Delgado');
+    expect(peopleIndex).not.toContain('Marcus Delgado (Human Resources Representative)');
+  });
+});

@@ -31,7 +31,7 @@ import type {
   SourceStrength,
 } from './intakeOrganizationTypes';
 import { chronologyPhaseTitle, filterTextForOrganizerMining } from './intakeOrganizerReasoning';
-import { formatPersonWithRole, inferRolesForPeople } from './peopleRoleInference';
+import { formatPersonWithRole, inferRolesForPeople, type InferredPersonRole } from './peopleRoleInference';
 
 export type PerFileOrganizationMeta = {
   uploadedFileId?: string;
@@ -230,8 +230,8 @@ export function mealPeriodRecordLineFromFacts(
  * (relationship_to_worker: "HR Manager"). Aggregating across all files lets a specific event title
  * for file A use a role fact that was only ever stated explicitly in file B.
  */
-function buildHrContactNameSet(completedExtractions: DocumentGroundedFileInput[]): Set<string> {
-  const asFactsFiles: FileWithFacts[] = completedExtractions
+function toFactsFiles(completedExtractions: DocumentGroundedFileInput[]): FileWithFacts[] {
+  return completedExtractions
     .filter((e) => e.documentFacts)
     .map((e) => ({
       uploaded_file_id: e.uploadedFileId,
@@ -241,6 +241,10 @@ function buildHrContactNameSet(completedExtractions: DocumentGroundedFileInput[]
       fact_extraction_status: 'completed',
       document_facts: e.documentFacts as DocumentFacts,
     }));
+}
+
+function buildHrContactNameSet(completedExtractions: DocumentGroundedFileInput[]): Set<string> {
+  const asFactsFiles = toFactsFiles(completedExtractions);
   if (!asFactsFiles.length) return new Set();
   const roles = deriveNamedPeopleForIntake(asFactsFiles);
   return new Set(
@@ -546,7 +550,8 @@ function nameOrderDedupKey(entry: string): string {
 
 export function buildPeopleIndexFromFileRecords(
   records: IntakeFileOrganizationRecord[],
-  workerDisplayName?: string | null
+  workerDisplayName?: string | null,
+  completedExtractions?: DocumentGroundedFileInput[]
 ): string[] {
   // Hygiene happens on the RAW names (before role suffixes are appended): the worker's own
   // name is excluded in any order, organization strings are dropped, and name-order variants
@@ -591,8 +596,31 @@ export function buildPeopleIndexFromFileRecords(
     ])
   );
 
+  // document_facts-derived roles (deriveNamedPeopleForIntake) are a STRONGER signal than the
+  // per-file-record string context above: they read document_facts.relationship_to_worker /
+  // issued_by directly (e.g. "Renee Ashford — HR Manager", stated explicitly by the extraction),
+  // cross-document, rather than inferring from whatever happens to appear in a file's own name/
+  // category/topics/title strings. A confirmed real case: the reply's own possible_timeline_event
+  // title only carries a bare "HR" (medium confidence under the 'high' bar below), while
+  // document_facts.relationship_to_worker on that exact file explicitly says "HR Manager" (high).
+  // Preferred over rolesByName whenever both exist for the same person.
+  const docFactsRolesByName = completedExtractions
+    ? new Map(deriveNamedPeopleForIntake(toFactsFiles(completedExtractions)).map((role) => [role.name.toLowerCase(), role]))
+    : new Map<string, InferredPersonRole>();
+
+  // 'high' confidence only (was 'medium'): this people index feeds a visible, structured
+  // "People Named in Records" roster (2026-08-18) -- higher presentation weight than the single
+  // capped prose sentence it fed before. Two real role-misattribution bugs were found and fixed
+  // THIS SAME NIGHT (issued_by/relationship_to_worker line-merge; sender+recipient line-bleed),
+  // both driven by 'medium'-confidence bare-keyword matches (e.g. a lone "hr"). Under-labeling (a
+  // bare name with no role) is the safe failure mode for a standalone roster; a wrong role label
+  // sitting next to someone's name in a structured list is not.
   return rawPeople
-    .map((person) => formatPersonWithRole(person, rolesByName.get(person.toLowerCase()), 'medium'))
+    .map((person) => {
+      const key = person.toLowerCase();
+      const role = docFactsRolesByName.get(key) ?? rolesByName.get(key);
+      return formatPersonWithRole(person, role, 'high');
+    })
     .slice(0, 24);
 }
 
@@ -611,6 +639,6 @@ export function buildPerFileOrganizationRecords(
   );
   return {
     fileRecords,
-    peopleIndex: buildPeopleIndexFromFileRecords(fileRecords, opts?.workerDisplayName),
+    peopleIndex: buildPeopleIndexFromFileRecords(fileRecords, opts?.workerDisplayName, completedExtractions),
   };
 }
