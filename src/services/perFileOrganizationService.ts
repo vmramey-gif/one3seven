@@ -243,6 +243,14 @@ export function payPeriodRangeNoteFromFacts(
   const startTrim = start.trim();
   const endTrim = end.trim();
   if (!startTrim || !endTrim || startTrim === endTrim) return null;
+  // Sanity check (2026-08-19 rough-edge cleanup): a malformed/reversed extraction (end before
+  // start) previously produced a garbled-but-confident sentence ("...pay period 2026-08-15 to
+  // 2026-08-01"). Only suppress when BOTH sides parse as real dates and are confirmed reversed --
+  // if either is unparseable, stay silent on ordering rather than guess (under-match is the safe
+  // failure mode here, consistent with the rest of this pipeline).
+  const startMs = Date.parse(startTrim);
+  const endMs = Date.parse(endTrim);
+  if (!Number.isNaN(startMs) && !Number.isNaN(endMs) && endMs < startMs) return null;
   return sanitizeGenerationPhrase(`This record covers the pay period ${startTrim} to ${endTrim}.`);
 }
 

@@ -427,6 +427,14 @@ function buildEventFirstClusters(
 
   for (const record of fileRecords) {
     if (record.source_file_id && clusteredIds.has(record.source_file_id)) continue;
+    // HARD GUARD (2026-08-19 rough-edge cleanup): an unreadable/zero-content record has nothing
+    // real to contribute -- a whitespace-only scan and an unrelated photo previously ended up in
+    // the SAME cluster purely because both fell back to the same generic document_type bucket,
+    // and the resulting event's "Supported by" line credited the unreadable file with supporting
+    // something it never actually said anything about. Weak topic/doctype overlap is not a
+    // reliable enough signal to attach a record that offers no real evidence either way; it stays
+    // out of this fallback merge and gets its own cluster below instead.
+    if (record.extraction_quality === 'unreadable') continue;
     const dateKey = normalizeDateKey(record.likely_date);
     const target = clusters.find(
       (c) =>
@@ -451,22 +459,40 @@ function clusterRecords(fileRecords: IntakeFileOrganizationRecord[]): TimelineCl
   for (const record of fileRecords) {
     const dateKey = normalizeDateKey(record.likely_date);
     const topicKey = topicKeyForRecord(record);
+    // Same guard as buildEventFirstClusters' fallback pass (2026-08-19 rough-edge cleanup): an
+    // unreadable/zero-content record's topicKey/document_type are generic fallback values, not a
+    // real signal -- matching one to an existing cluster credits that cluster's event with
+    // "support" the record never actually provides. Unreadable records always get their own
+    // cluster here rather than attach to one via a weak/generic match. Symmetric in BOTH
+    // directions: an unreadable record never reaches into an existing cluster (isUnreadable
+    // check below), AND a cluster that is unreadable-only never receives a later READABLE
+    // record either (hasReadableFile check) -- without the second half, processing order alone
+    // decided whether a whitespace-only scan and an unrelated photo ended up merged: if the scan
+    // happened to be processed first, it created its own lonely cluster, but the very next
+    // readable record could still weak-match INTO that cluster since nothing stopped it.
+    const isUnreadable = record.extraction_quality === 'unreadable';
+    const hasReadableFile = (c: TimelineCluster) =>
+      c.files.some((f) => f.extraction_quality !== 'unreadable');
     let target =
-      clusters.find(
-        (c) =>
-          c.dateKey === dateKey &&
-          (c.topicKey === topicKey ||
-            topicsOverlap(
-              c.files.flatMap((f) => f.employment_topics),
-              record.employment_topics
-            ) ||
-            c.files.some((f) => f.document_type === record.document_type))
-      ) ?? null;
+      isUnreadable
+        ? null
+        : clusters.find(
+            (c) =>
+              c.dateKey === dateKey &&
+              hasReadableFile(c) &&
+              (c.topicKey === topicKey ||
+                topicsOverlap(
+                  c.files.flatMap((f) => f.employment_topics),
+                  record.employment_topics
+                ) ||
+                c.files.some((f) => f.document_type === record.document_type))
+          ) ?? null;
 
-    if (!target && dateKey !== 'undated') {
+    if (!target && dateKey !== 'undated' && !isUnreadable) {
       target = clusters.find(
         (c) =>
           c.dateKey === dateKey &&
+          hasReadableFile(c) &&
           c.files.some((f) => f.document_type === record.document_type)
       ) ?? null;
     }
@@ -840,25 +866,46 @@ function buildClusterSummary(
   return parts.length ? sanitizeGenerationPhrase(parts.join(' ')) : '';
 }
 
+// An email header with no display name ("From: marcus.delgado@personal-email.com", no angle
+// brackets) leaves humanizeAddressField() nothing to extract but the raw address -- confirmed via
+// documentFactExtractionService.ts:168-179, which falls through to returning the bare string when
+// neither the `"Name" <email>` nor `<email>` patterns match. Same filter already applied in
+// collectPeopleFromDocumentFacts (perFileOrganizationService.ts); needed here too so a bare email
+// can never enter the people set an event title's parenthetical name-suffix is chosen from
+// (2026-08-19 rough-edge cleanup — was live on the Marcus/Renee case: "...Human Resources
+// (marcus.delgado@personal-email.com)" instead of his name).
+function isEmailOrUrlLike(value: string): boolean {
+  return value.includes('@') || /^https?:|^www\./i.test(value);
+}
+
 function enrichPeopleFromFacts(
   files: IntakeFileOrganizationRecord[],
   payFacts: PayRecordFacts[],
   commFacts: CommunicationFacts[]
 ): string[] {
-  const people = new Set<string>(files.flatMap((f) => f.people_or_entities));
   const fileIds = new Set(files.map((f) => f.source_file_id));
+  const people = new Set<string>();
+  const add = (name: string | null | undefined) => {
+    if (name && !isEmailOrUrlLike(name)) people.add(name);
+  };
+  // people_or_entities is already filtered upstream (collectPeopleFromDocumentFacts) -- routed
+  // through the same guard here too rather than trusted, so this function stays safe regardless
+  // of what a caller passes in.
+  for (const f of files) {
+    for (const person of f.people_or_entities) add(person);
+  }
 
   for (const pf of payFacts) {
     if (!fileIds.has(pf.source.uploadedFileId)) continue;
-    if (pf.employeeName) people.add(pf.employeeName);
-    if (pf.employerName) people.add(pf.employerName);
+    add(pf.employeeName);
+    add(pf.employerName);
   }
   for (const cf of commFacts) {
     if (!fileIds.has(cf.source.uploadedFileId)) continue;
-    if (cf.sender) people.add(cf.sender);
-    if (cf.recipient) people.add(cf.recipient);
-    if (cf.employerOrCompany) people.add(cf.employerOrCompany);
-    for (const p of cf.peopleMentioned) people.add(p);
+    add(cf.sender);
+    add(cf.recipient);
+    add(cf.employerOrCompany);
+    for (const p of cf.peopleMentioned) add(p);
   }
 
   return [...people].slice(0, 12);
