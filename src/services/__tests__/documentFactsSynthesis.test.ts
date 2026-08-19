@@ -82,6 +82,36 @@ describe('deriveNamedPeopleForIntake (2026-08-18 founder review) — peopleRoleI
     expect(renee?.role).toBe('Human Resources Representative');
   });
 
+  test('infers HR role when issued_by (name) and relationship_to_worker (role) are separate fields, not combined in one string (real extraction shape, 2026-08-18)', () => {
+    // The prior test's issued_by: 'Renee Ashford, HR Manager' combined name+role in one string,
+    // which happened to still work even with the underlying bug -- it wasn't testing the real
+    // shape. Real Claude extraction stores them as two SEPARATE single-value fields
+    // (issued_by: "Renee Ashford", relationship_to_worker: "HR Manager"), and
+    // peopleRoleInference.ts's contextsNearName() only keeps LINES that literally mention the
+    // person's name -- joining them as two separate lines meant "HR Manager" sat on its own
+    // line with no name attached, so it was silently dropped and Renee was misclassified as a
+    // generic "Coworker" everywhere, including on OTHER files that only named her (no role of
+    // their own) -- confirmed live on the real Marcus Delgado case.
+    const people = deriveNamedPeopleForIntake([
+      file('Workplace Communications', '02-email-overtime-complaint.pdf', {
+        // This file names Renee as a recipient but states no role of its own for her --
+        // the only place her role is ever stated is on the OTHER file below.
+        people_mentioned: ['Marcus Delgado', 'Renee Ashford'],
+        communication_parties: [
+          { name: 'Marcus Delgado', role: 'sender' },
+          { name: 'Renee Ashford', role: 'recipient' },
+        ],
+      }),
+      file('HR Documents', '03-hr-reply.pdf', {
+        issued_by: 'Renee Ashford',
+        relationship_to_worker: 'HR Manager',
+        people_mentioned: ['Marcus Delgado', 'Renee Ashford'],
+      }),
+    ]);
+    const renee = people.find((p) => p.name === 'Renee Ashford');
+    expect(renee?.role).toBe('Human Resources Representative');
+  });
+
   test('excludes generic role labels that occasionally land in a name field', () => {
     const people = deriveNamedPeopleForIntake([
       file('Workplace Communications', 'hr_email.pdf', {

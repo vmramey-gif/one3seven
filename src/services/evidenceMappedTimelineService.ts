@@ -200,7 +200,19 @@ function eventCandidateFromFilename(record: IntakeFileOrganizationRecord): Event
   if (/schedule_change|shift_change|hours_change|schedule/.test(name)) {
     return candidate('Schedule change documented', 80);
   }
-  if (/paystub|pay_stub|payroll|wage_statement|overtime|timesheet|timecard/.test(name)) {
+  // "overtime" alone is ambiguous -- it's a strong payroll-document signal on its own
+  // ("Overtime_Report.pdf"), but also just as likely to mean "an email or complaint ABOUT
+  // overtime" ("email-overtime-complaint.pdf" isn't a pay record; it's a communication whose
+  // subject happens to be overtime). paystub/pay_stub/payroll/wage_statement/timesheet/timecard
+  // don't have that ambiguity -- a file isn't usually named that unless it IS one. Only let
+  // "overtime" alone win here when the filename doesn't also carry a clear communication signal;
+  // in that case a real communication-specific candidate (eventCandidateFromCommunication /
+  // eventCandidateFromPossibleTimelineEvent, using the actual extracted document_facts) should
+  // decide the title instead.
+  if (/paystub|pay_stub|payroll|wage_statement|timesheet|timecard/.test(name)) {
+    return candidate('Pay period or overtime record documented', 78);
+  }
+  if (/overtime/.test(name) && !/email|e_?mail|complaint|reply|response|message|memo|letter/.test(name)) {
     return candidate('Pay period or overtime record documented', 78);
   }
   return null;
