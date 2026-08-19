@@ -143,10 +143,22 @@ function eventCandidateFromFilename(record: IntakeFileOrganizationRecord): Event
     .replace(/([a-z0-9])([A-Z])/g, '$1_$2')
     .toLowerCase()
     .replace(/[\s.\-]+/g, '_');
-  if (/safety_concern|safety.?complaint|unsafe|hazard/.test(name)) {
+  // Excludes an obvious reply/response filename ("re_safety_concern_response.pdf") -- without
+  // this, HR's OWN reply was titled "Worker raises safety concerns" purely because the reply's
+  // filename still carries the original topic word (2026-08-18 fresh-accuracy hard-challenge).
+  // This filename-level match is checked FIRST and outranks every other candidate source (104 is
+  // the highest rank of any filename pattern), so it silently overrode the direction-aware fixes
+  // already made to eventCandidateFromCommunication / eventCandidateFromPossibleTimelineEvent for
+  // this exact bug class. Returning null here (rather than trying to positively detect "this is a
+  // reply" from the filename alone) is the safe fallback -- those other two candidate sources
+  // already resolve a genuine reply correctly using the file's actual extracted facts.
+  if (/safety_concern|safety.?complaint|unsafe|hazard/.test(name) && !/response|reply|\bre_/.test(name)) {
     return candidate('Worker raises safety concerns', 104);
   }
-  if (/accommodation_request|ada_request|medical_leave|fmla_request|leave_request/.test(name)) {
+  if (
+    /accommodation_request|ada_request|medical_leave|fmla_request|leave_request/.test(name) &&
+    !/response|reply|\bre_/.test(name)
+  ) {
     return candidate('Worker requests leave or accommodation', 102);
   }
   if (/complaint_to_hr|complaint.?hr|hr.?complaint|grievance.*hr/.test(name)) {
@@ -262,8 +274,17 @@ function eventCandidateFromPossibleTimelineEvent(record: IntakeFileOrganizationR
   const signals = `${title} ${record.file_name} ${record.employment_topics.join(' ')} ${
     record.possible_timeline_event?.neutral_summary ?? ''
   }`.toLowerCase();
+  // Structural checks (complaint-to-HR / HR-response) run BEFORE the generic topic-keyword
+  // checks below (safety/accommodation/etc.) -- 2026-08-18 fresh-accuracy hard-challenge: a
+  // topic-suffixed title like "HR response received regarding Safety concern in warehouse"
+  // (communicationTitleFromFacts) matched the generic "safety concern" keyword check FIRST in the
+  // old ordering, overriding the already-correct "HR response" classification the title itself
+  // states. A specific, well-formed structural match must win over a bare keyword-anywhere match.
   if (/complaint.*human resources|complaint.*\bhr\b|\bhr\b.*complaint/i.test(title)) {
     return candidate('Complaint submitted to Human Resources', 74);
+  }
+  if (/hr response|human resources response|response.*\bhr\b|\bhr\b.*response|investigation response/i.test(title)) {
+    return candidate('HR response received', 73);
   }
   if (/complaint|grievance|workplace concern/i.test(title)) {
     if (/supervisor|manager|management/i.test(signals)) {
@@ -274,9 +295,6 @@ function eventCandidateFromPossibleTimelineEvent(record: IntakeFileOrganizationR
   if (/safety concern|unsafe|hazard/i.test(title)) return candidate('Worker raises safety concerns', 74);
   if (/accommodation|medical leave|fmla|leave request/i.test(title)) {
     return candidate('Worker requests leave or accommodation', 74);
-  }
-  if (/hr response|human resources response|response.*\bhr\b|\bhr\b.*response|investigation response/i.test(title)) {
-    return candidate('HR response received', 73);
   }
   if (/terminat|separation|employment ends/i.test(title)) {
     return candidate('Termination documented', 72);
@@ -309,22 +327,35 @@ function eventCandidateFromCommunication(record: IntakeFileOrganizationRecord, c
   const responseHay = `${commFact?.subjectOrTopic ?? ''} ${commFact?.employerOrHrResponseExcerpt ?? ''} ${
     commFact?.sender ?? ''
   }`.toLowerCase();
+  // A reply-direction signal: an actual quoted-reply excerpt, or a "RE:"/"FW:" subject prefix.
+  // Without this, the topic-keyword shortcuts just below (safety/accommodation) fire on the
+  // REPLY side of a thread too, since a reply's subject line still carries the original topic
+  // word ("RE: Safety concern..."). 2026-08-18 fresh-accuracy hard-challenge: HR's own reply to a
+  // safety complaint was titled "Worker raises safety concerns" -- the worker's own title,
+  // applied to HR's message.
+  const looksLikeReply =
+    Boolean(commFact?.employerOrHrResponseExcerpt) || /^(re|fw|fwd):/i.test(commFact?.subjectOrTopic?.trim() ?? '');
 
-  if (/safety|unsafe|hazard/.test(complaintHay)) {
+  if (!looksLikeReply && /safety|unsafe|hazard/.test(complaintHay)) {
     return candidate('Worker raises safety concerns', 90);
   }
-  if (/accommodation|medical leave|\bfmla\b|leave request/.test(complaintHay)) {
+  if (!looksLikeReply && /accommodation|medical leave|\bfmla\b|leave request/.test(complaintHay)) {
     return candidate('Worker requests leave or accommodation', 90);
   }
-  // A worker-concern excerpt (commFact.workerConcernExcerpt is populated specifically when the
-  // deterministic extractor finds wording describing a worker's concern -- see
-  // documentFactExtractionService.ts) directed at a confirmed HR recipient IS a complaint, even
-  // when the subject/body never spell out the literal word "complaint" or "grievance" (real
-  // subject lines say things like "Overtime pay concern", not "Formal Complaint"; 2026-08-18
-  // gauntlet finding).
-  const hasWorkerConcernExcerpt = Boolean(commFact?.workerConcernExcerpt);
+  // An EXPLICIT worker-concern excerpt (commFact.workerConcernIsExplicit -- true only when
+  // findWorkerConcernExcerpt matched genuine concern-language: "I'm concerned...", "not sure...",
+  // "please advise..." -- see documentFactExtractionService.ts) directed at a confirmed HR
+  // recipient IS a complaint, even when the subject/body never spell out the literal word
+  // "complaint" or "grievance" (real subject lines say things like "Overtime pay concern", not
+  // "Formal Complaint"; 2026-08-18 gauntlet finding). Deliberately does NOT trust a bare
+  // workerConcernExcerpt presence -- that field is ALSO populated by a much weaker fallback
+  // (excerptAroundFirstTopic) that grabs any sentence near any topic keyword regardless of
+  // whether it expresses a concern at all. That looser signal previously mislabeled a routine
+  // "just a quick question about scheduling, thanks" email to HR as a formal complaint
+  // (2026-08-18 fresh-accuracy hard-challenge finding).
+  const hasExplicitWorkerConcern = Boolean(commFact?.workerConcernIsExplicit);
   if (
-    (/complaint|grievance|workplace concern/.test(complaintHay) || hasWorkerConcernExcerpt) &&
+    (/complaint|grievance|workplace concern/.test(complaintHay) || hasExplicitWorkerConcern) &&
     /\bhr\b|human resources/.test(complaintHay)
   ) {
     return candidate('Complaint submitted to Human Resources', 88);
