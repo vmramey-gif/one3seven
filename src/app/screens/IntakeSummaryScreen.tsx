@@ -46,9 +46,11 @@ import {
 } from '../constants/one3sevenProduct';
 import { WORKER_RECORD_HANDOFF } from '../constants/workerStoryIntake';
 import {
+  buildTimelineCsvContent,
   downloadIntakeSummaryDocument,
   emailIntakeSummaryToFirm,
   emailIntakeSummaryToWorker,
+  triggerTextFileDownload,
 } from '../../services/intakeSummaryDownload';
 import { STATE_BAR_SEARCH_URLS, STATE_LABELS } from '../constants/stateBarDirectories';
 import {
@@ -930,6 +932,26 @@ export function IntakeSummaryScreen({
     a.click();
     a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 60_000);
+  };
+
+  // The timeline as a spreadsheet -- same source data as the PDF/JSON downloads
+  // (payload.timelineEvents), so all three can never disagree with each other.
+  const handleDownloadTimelineCsv = async () => {
+    let payload = buildSummaryDownloadPayload();
+    const intakeId = (exportIntakeId ?? '').trim();
+    if (intakeId && isSupabaseConfigured()) {
+      try {
+        payload = await loadFreshExportPayloadFields(intakeId, payload);
+      } catch (e) {
+        console.error('[o3s-export] fresh export payload failed', e);
+      }
+    }
+    const csv = buildTimelineCsvContent(payload);
+    triggerTextFileDownload(
+      csv,
+      `one3seven-timeline-${(payload.intakeNumber || 'export').replace(/[^\w-]/g, '_')}.csv`,
+      'text/csv;charset=utf-8'
+    );
   };
 
   const handleSaveForLater = async () => {
@@ -2353,6 +2375,13 @@ export function IntakeSummaryScreen({
                 className="w-full text-center text-[12.5px] font-medium text-[#6A6D66] underline decoration-[#CBD6CF] underline-offset-4 transition hover:text-[#42574E]"
               >
                 Or download the raw data (JSON)
+              </button>
+              <button
+                type="button"
+                onClick={() => void handleDownloadTimelineCsv()}
+                className="w-full text-center text-[12.5px] font-medium text-[#6A6D66] underline decoration-[#CBD6CF] underline-offset-4 transition hover:text-[#42574E]"
+              >
+                Or download the timeline (CSV)
               </button>
               <button
                 type="button"

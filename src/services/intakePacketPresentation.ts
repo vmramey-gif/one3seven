@@ -1080,7 +1080,17 @@ export function collectOrganizedSectionsPdfLines(
   blank();
 
   push(ATTORNEY_PACKET_SECTIONS.chronology);
-  if (sections.chronology.length) pushList(sections.chronology.map(polishChronologyLine));
+  // Prefer the org-engine chronology; otherwise fall back to the live timeline events the worker
+  // actually sees on screen (payload.timelineEvents) -- same fallback buildWorkerSummaryModel
+  // already applies below. Without it, this function (also reached via the prestige renderer's
+  // ASCII-PDF fallback path when pdf-lib throws) printed "No timeline entries are available yet"
+  // even when the worker's screen showed real events (2026-08-18 hard-challenge finding).
+  const chronologyLines = sections.chronology.length
+    ? sections.chronology.map(polishChronologyLine)
+    : (payload.timelineEvents ?? [])
+        .map((e) => [normalizeEventDisplayDate(e.date), e.title].filter(Boolean).join(' — ') || e.summary || e.category)
+        .filter((s): s is string => Boolean(s && s.trim()));
+  if (chronologyLines.length) pushList(chronologyLines);
   else push('No timeline entries are available yet.');
   blank();
 
