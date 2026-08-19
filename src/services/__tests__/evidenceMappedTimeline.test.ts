@@ -172,6 +172,55 @@ describe('evidence-mapped timeline engine', () => {
     expect(events[0]?.title).not.toBe('Schedule change documented');
   });
 
+  test('an email filename that merely mentions "overtime" does not win over its own communication title (event-semantics fix, 2026-08-18)', () => {
+    // "overtime" alone is ambiguous -- a strong payroll-document signal on its own
+    // ("Overtime_Report.pdf"), but "email-overtime-complaint.pdf" is a COMMUNICATION whose
+    // subject happens to be overtime, not a pay record. Founder-flagged live: an actual overtime
+    // complaint email was titled "Pay period or overtime record documented" (via the filename's
+    // "overtime" match at rank 78) instead of a real, document_facts-derived communication title
+    // (rank 74) that correctly described what the document IS.
+    const events = buildEvidenceMappedTimelineEvents({
+      fileRecords: [
+        sampleFileRecord({
+          source_file_id: 'complaint-email-1',
+          file_name: '02-email-overtime-complaint.pdf',
+          document_type: 'Workplace Communications',
+          legacy_upload_category: 'Workplace Communications',
+          likely_date: 'June 9, 2025',
+          employment_topics: ['Payroll and wage records'],
+          possible_timeline_event: {
+            title: 'Complaint submitted to Human Resources regarding Overtime hours not being paid correctly',
+            date: 'June 9, 2025',
+            neutral_summary: 'Materials may reflect a complaint to HR about overtime pay.',
+          },
+        }),
+      ],
+    });
+    expect(events[0]?.title).not.toBe('Pay period or overtime record documented');
+    expect(events[0]?.title).toMatch(/Complaint submitted to Human Resources/);
+  });
+
+  test('a genuine payroll filename naming "overtime" still titles as a pay record', () => {
+    const events = buildEvidenceMappedTimelineEvents({
+      fileRecords: [
+        sampleFileRecord({
+          source_file_id: 'overtime-report-1',
+          file_name: 'Overtime_Report_June2025.pdf',
+          document_type: 'Payroll & Compensation Records',
+          legacy_upload_category: 'Payroll & Compensation Records',
+          likely_date: 'June 8, 2025',
+          employment_topics: ['Pay records'],
+          possible_timeline_event: {
+            title: 'Payroll period documented',
+            date: 'June 8, 2025',
+            neutral_summary: 'Materials may reflect an overtime report.',
+          },
+        }),
+      ],
+    });
+    expect(events[0]?.title).toBe('Pay period or overtime record documented');
+  });
+
   test('a genuine schedule-change filename still titles correctly', () => {
     const events = buildEvidenceMappedTimelineEvents({
       fileRecords: [

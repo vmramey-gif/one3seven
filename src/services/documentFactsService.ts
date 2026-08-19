@@ -364,11 +364,20 @@ export function deriveNamedPeopleForIntake(files: FileWithFacts[]): InferredPers
     if (!df) continue;
     for (const name of df.people_mentioned ?? []) names.push(name);
     for (const party of df.communication_parties ?? []) names.push(party.name);
-    contexts.push(
-      [df.issued_by ?? '', df.key_quote ?? '', df.stated_reason ?? '', df.relationship_to_worker ?? '']
-        .filter(Boolean)
-        .join('\n')
-    );
+    // issued_by and relationship_to_worker are both single-value-per-document fields, so when
+    // both are present they describe the SAME person -- keep them on one line ("Renee Ashford —
+    // HR Manager") rather than separate lines. peopleRoleInference.ts's contextsNearName() only
+    // keeps LINES that literally mention the person's name, so a role sitting on its own line
+    // (relationship_to_worker with no name alongside it) was silently dropped and never reached
+    // the role-matching regex at all -- confirmed live: Renee Ashford's document_facts.
+    // relationship_to_worker = "HR Manager" on one file, but deriveNamedPeopleForIntake still
+    // classified her as a generic "Coworker" everywhere, including on OTHER files naming her.
+    const issuedByLine = df.issued_by
+      ? df.relationship_to_worker
+        ? `${df.issued_by} — ${df.relationship_to_worker}`
+        : df.issued_by
+      : df.relationship_to_worker ?? '';
+    contexts.push([issuedByLine, df.key_quote ?? '', df.stated_reason ?? ''].filter(Boolean).join('\n'));
   }
   const realNames = names.filter((n) => n.trim() && !GENERIC_NAME_RE.test(n.trim()));
   return inferRolesForPeople({ names: realNames, contexts });

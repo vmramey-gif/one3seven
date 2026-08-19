@@ -13,6 +13,7 @@ import {
   extractPayRecordFacts,
 } from './documentFactExtractionService';
 import { usableDocumentDateLabel } from './evidenceMappedTimelineService';
+import { deriveNamedPeopleForIntake, type DocumentFacts, type FileWithFacts } from './documentFactsService';
 import type { DocumentGroundedFileInput } from './intakeOrganizationTypes';
 import {
   bestBucketFromScores,
@@ -220,17 +221,134 @@ export function mealPeriodRecordLineFromFacts(
   return sanitizeGenerationPhrase(`Time records show ${detail}.`);
 }
 
+/**
+ * Computes which named people across the WHOLE intake are confirmed Human Resources contacts
+ * (peopleRoleInference.ts, via deriveNamedPeopleForIntake -- already built/tested, previously only
+ * used for the worker-facing "named individuals" count). Cross-document: a communication's OWN
+ * document_facts often can't tell you the recipient's role (e.g. an outgoing complaint just says
+ * "recipient", not "HR") but a REPLY from the same person elsewhere in the file set often does
+ * (relationship_to_worker: "HR Manager"). Aggregating across all files lets a specific event title
+ * for file A use a role fact that was only ever stated explicitly in file B.
+ */
+function buildHrContactNameSet(completedExtractions: DocumentGroundedFileInput[]): Set<string> {
+  const asFactsFiles: FileWithFacts[] = completedExtractions
+    .filter((e) => e.documentFacts)
+    .map((e) => ({
+      uploaded_file_id: e.uploadedFileId,
+      file_name: e.fileName,
+      category: e.category,
+      extraction_status: 'completed',
+      fact_extraction_status: 'completed',
+      document_facts: e.documentFacts as DocumentFacts,
+    }));
+  if (!asFactsFiles.length) return new Set();
+  const roles = deriveNamedPeopleForIntake(asFactsFiles);
+  return new Set(
+    roles.filter((r) => r.role === 'Human Resources Representative').map((r) => r.name.toLowerCase())
+  );
+}
+
+const COMMUNICATION_TITLE_MAX_TOPIC_CHARS = 60;
+
+function clipTopicAtWordBoundary(s: string, max: number): string {
+  const t = s.trim();
+  if (t.length <= max) return t;
+  const cut = t.slice(0, max);
+  const sp = cut.lastIndexOf(' ');
+  return (sp > max * 0.5 ? cut.slice(0, sp) : cut).trim();
+}
+
+/**
+ * Concrete, factual title for a workplace communication, built from the Claude-extracted
+ * document_facts (complaint_topic / resolution_summary / relationship_to_worker) instead of the
+ * generic bucket label ("Workplace communications") that used to fall through to a wrong-category
+ * default (Marcus Delgado regression, 2026-08-18: an overtime-complaint email and HR's reply both
+ * ended up titled "Employment activity documented through payroll records" -- their content was
+ * ABOUT pay, but neither document IS a pay record). Reuses the exact title strings the rest of the
+ * organize pipeline already recognizes ("Complaint submitted to Human Resources" / "HR response
+ * received") so downstream category/role-name mapping tables still apply; the topic suffix makes it
+ * specific without inventing new vocabulary.
+ */
+function communicationTitleFromFacts(
+  documentFacts: Record<string, unknown> | null | undefined,
+  documentType: string,
+  hrNames: Set<string>
+): { title: string; extraSummary: string } | null {
+  if (!documentFacts || typeof documentFacts !== 'object') return null;
+  const df = documentFacts as Partial<DocumentFacts>;
+
+  // Was gated on the deterministic bucket-scorer's documentType === 'Workplace Communications' --
+  // the exact same fragility behind the underlying bug: an HR reply that mostly discusses payroll
+  // scored into a payroll-leaning bucket by content alone, so the gate silently skipped the very
+  // documents it was meant to fix. complaint_topic/resolution_summary are only ever populated by
+  // the extraction prompt for communication-shaped documents in the first place -- their presence
+  // is itself the reliable signal, independent of which bucket the deterministic scorer guessed.
+  void documentType;
+
+  const topicRaw = (df.complaint_topic ?? '').toString().trim();
+  const resolutionRaw = (df.resolution_summary ?? '').toString().trim();
+  if (!topicRaw && !resolutionRaw) return null;
+
+  const parties = (df.communication_parties ?? []).filter(
+    (p): p is { name: string; role: string } => Boolean(p?.name)
+  );
+  const relationshipToWorker = (df.relationship_to_worker ?? '').toString().toLowerCase();
+  const involvesHr =
+    /human resources|\bhr\b|\bhr manager\b/.test(relationshipToWorker) ||
+    parties.some((p) => hrNames.has(p.name.trim().toLowerCase()));
+  if (!involvesHr) return null;
+
+  const topic = clipTopicAtWordBoundary(topicRaw, COMMUNICATION_TITLE_MAX_TOPIC_CHARS);
+
+  if (resolutionRaw) {
+    const title = topic
+      ? `HR response received regarding ${topic}`
+      : 'HR response received';
+    return {
+      title: sanitizeGenerationPhrase(title),
+      extraSummary: sanitizeGenerationPhrase(
+        `Response indicates: ${clipTopicAtWordBoundary(resolutionRaw, 220)}`
+      ),
+    };
+  }
+  const title = topic
+    ? `Complaint submitted to Human Resources regarding ${topic}`
+    : 'Complaint submitted to Human Resources';
+  return { title: sanitizeGenerationPhrase(title), extraSummary: '' };
+}
+
 function buildPossibleTimelineEvent(opts: {
   documentType: string;
   dates: string[];
   fileName: string;
   hasText: boolean;
+  documentFacts?: Record<string, unknown> | null;
+  hrNames?: Set<string>;
 }): IntakeFileOrganizationRecord['possible_timeline_event'] {
   const anchor = opts.dates.length
     ? bestEmploymentChronologyAnchor(opts.dates.join('\n'))
     : bestEmploymentChronologyAnchor(opts.fileName);
   const date =
     anchor && anchor !== DATE_UNCLEAR_LABEL ? anchor : opts.dates[0] ?? null;
+
+  const factsTitle = communicationTitleFromFacts(
+    opts.documentFacts,
+    opts.documentType,
+    opts.hrNames ?? new Set()
+  );
+  if (factsTitle) {
+    const base = opts.hasText
+      ? materialsMayReflectPhrase(`${factsTitle.title.toLowerCase()} in uploaded materials from this file.`)
+      : materialsMayReflectPhrase(
+          `${factsTitle.title.toLowerCase()} grouped from file name and category until readable text is available.`
+        );
+    return {
+      title: factsTitle.title,
+      date,
+      neutral_summary: factsTitle.extraSummary ? `${base} ${factsTitle.extraSummary}` : base,
+    };
+  }
+
   const title = chronologyPhaseTitle(opts.documentType, date ? [date] : opts.dates.slice(0, 2));
   const summary = opts.hasText
     ? materialsMayReflectPhrase(`${title.toLowerCase()} in uploaded materials from this file.`)
@@ -246,7 +364,8 @@ function buildPossibleTimelineEvent(opts: {
 
 function buildSingleFileRecord(
   meta: PerFileOrganizationMeta,
-  extraction: DocumentGroundedFileInput | null
+  extraction: DocumentGroundedFileInput | null,
+  hrNames: Set<string> = new Set()
 ): IntakeFileOrganizationRecord {
   const legacyCategory = (meta.category ?? '').trim() || 'Uncategorized';
   const rawText = extraction?.extractedText?.trim() ?? '';
@@ -333,6 +452,8 @@ function buildSingleFileRecord(
     dates: fileDates,
     fileName: meta.fileName,
     hasText: minedText.length > 0,
+    documentFacts: extraction?.documentFacts,
+    hrNames,
   });
   // Surface extraction-stored meal-period facts in this time/pay record's summary
   // (presence description only — see mealPeriodRecordLineFromFacts).
@@ -473,8 +594,9 @@ export function buildPerFileOrganizationRecords(
   completedExtractions: DocumentGroundedFileInput[] = [],
   opts?: { workerDisplayName?: string | null }
 ): { fileRecords: IntakeFileOrganizationRecord[]; peopleIndex: string[] } {
+  const hrNames = buildHrContactNameSet(completedExtractions);
   const fileRecords = filesMeta.map((meta) =>
-    buildSingleFileRecord(meta, matchExtraction(meta, completedExtractions))
+    buildSingleFileRecord(meta, matchExtraction(meta, completedExtractions), hrNames)
   );
   return {
     fileRecords,

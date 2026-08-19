@@ -200,7 +200,19 @@ function eventCandidateFromFilename(record: IntakeFileOrganizationRecord): Event
   if (/schedule_change|shift_change|hours_change|schedule/.test(name)) {
     return candidate('Schedule change documented', 80);
   }
-  if (/paystub|pay_stub|payroll|wage_statement|overtime|timesheet|timecard/.test(name)) {
+  // "overtime" alone is ambiguous -- it's a strong payroll-document signal on its own
+  // ("Overtime_Report.pdf"), but also just as likely to mean "an email or complaint ABOUT
+  // overtime" ("email-overtime-complaint.pdf" isn't a pay record; it's a communication whose
+  // subject happens to be overtime). paystub/pay_stub/payroll/wage_statement/timesheet/timecard
+  // don't have that ambiguity -- a file isn't usually named that unless it IS one. Only let
+  // "overtime" alone win here when the filename doesn't also carry a clear communication signal;
+  // in that case a real communication-specific candidate (eventCandidateFromCommunication /
+  // eventCandidateFromPossibleTimelineEvent, using the actual extracted document_facts) should
+  // decide the title instead.
+  if (/paystub|pay_stub|payroll|wage_statement|timesheet|timecard/.test(name)) {
+    return candidate('Pay period or overtime record documented', 78);
+  }
+  if (/overtime/.test(name) && !/email|e_?mail|complaint|reply|response|message|memo|letter/.test(name)) {
     return candidate('Pay period or overtime record documented', 78);
   }
   return null;
@@ -280,17 +292,44 @@ function eventCandidateFromPossibleTimelineEvent(record: IntakeFileOrganizationR
 }
 
 function eventCandidateFromCommunication(record: IntakeFileOrganizationRecord, commFact: CommunicationFacts | null): EventCandidate | null {
-  const hay = `${commFact?.subjectOrTopic ?? ''} ${commFact?.workerConcernExcerpt ?? ''} ${record.file_name}`.toLowerCase();
-  if (/safety|unsafe|hazard/.test(hay)) {
+  // Complaint-direction signal: the worker's own subject/words, plus WHO the message went TO --
+  // an email addressed to a confirmed HR party is a complaint even when the recipient name never
+  // appears in the subject line itself (semantic-event gauntlet, 2026-08-18: "Formal complaint -
+  // harassment" addressed To: Human Resources went unrecognized because the old hay never
+  // included the recipient field at all).
+  const complaintHay = `${commFact?.subjectOrTopic ?? ''} ${commFact?.workerConcernExcerpt ?? ''} ${
+    commFact?.recipient ?? ''
+  } ${record.file_name}`.toLowerCase();
+  // Response-direction signal: subject + an actual reply excerpt + WHO SENT the message.
+  // Deliberately excludes workerConcernExcerpt -- the worker's OWN words asking for "a response"
+  // or that something be "investigated" are not evidence a response WAS GIVEN. That exact
+  // collision mistitled a worker's own outgoing complaint email "HR response received" (same
+  // gauntlet run: "I'm submitting this to HR for review and would appreciate a response" tripped
+  // the old response-direction match on the worker's own outbound message).
+  const responseHay = `${commFact?.subjectOrTopic ?? ''} ${commFact?.employerOrHrResponseExcerpt ?? ''} ${
+    commFact?.sender ?? ''
+  }`.toLowerCase();
+
+  if (/safety|unsafe|hazard/.test(complaintHay)) {
     return candidate('Worker raises safety concerns', 90);
   }
-  if (/accommodation|medical leave|\bfmla\b|leave request/.test(hay)) {
+  if (/accommodation|medical leave|\bfmla\b|leave request/.test(complaintHay)) {
     return candidate('Worker requests leave or accommodation', 90);
   }
-  if (/complaint|grievance|workplace concern/.test(hay) && /\bhr\b|human resources/.test(hay)) {
+  // A worker-concern excerpt (commFact.workerConcernExcerpt is populated specifically when the
+  // deterministic extractor finds wording describing a worker's concern -- see
+  // documentFactExtractionService.ts) directed at a confirmed HR recipient IS a complaint, even
+  // when the subject/body never spell out the literal word "complaint" or "grievance" (real
+  // subject lines say things like "Overtime pay concern", not "Formal Complaint"; 2026-08-18
+  // gauntlet finding).
+  const hasWorkerConcernExcerpt = Boolean(commFact?.workerConcernExcerpt);
+  if (
+    (/complaint|grievance|workplace concern/.test(complaintHay) || hasWorkerConcernExcerpt) &&
+    /\bhr\b|human resources/.test(complaintHay)
+  ) {
     return candidate('Complaint submitted to Human Resources', 88);
   }
-  if (/response|investigation/.test(hay) && /complaint|grievance|concern|\bhr\b|human resources/.test(hay)) {
+  if (/response|investigation/.test(responseHay) && /\bhr\b|human resources/.test(responseHay)) {
     return candidate('HR response received', 84);
   }
   return null;
