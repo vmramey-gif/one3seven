@@ -142,12 +142,15 @@ Deno.serve(async (req: Request) => {
       'You have successfully been unsubscribed. You will not receive any more messages from this number. Reply START to resubscribe.',
     );
   }
+  // HELP message matches the campaign's dedicated "What is the help message?" field verbatim
+  // (2026-08-19) -- that field is the canonical declared text for this exact reply; it must not
+  // be a paraphrase or a superset/subset of what actually gets sent.
   if (HELP_KEYWORDS.has(bodyKeyword)) {
-    return twiml('one3seven: text a photo or PDF to add it to your record. Reply STOP to unsubscribe. Msg&Data Rates May Apply.');
+    return twiml('Reply STOP to unsubscribe. Msg&Data Rates May Apply.');
   }
   if (RESUBSCRIBE_KEYWORDS.has(bodyKeyword)) {
     return twiml(
-      'To resume texting documents to one3seven, sign in at one3seven.com and re-link your phone under Upload (a new verification code is required).',
+      'one3seven: To resume texting documents to one3seven, sign in at one3seven.com and re-link your phone under Upload (a new verification code is required).',
     );
   }
 
@@ -158,12 +161,15 @@ Deno.serve(async (req: Request) => {
     .maybeSingle();
   if (linkErr || !link || link.status !== 'verified') {
     console.info('[sms-inbound-webhook] no verified link for sender', { from });
+    // Wording matches the campaign's declared Sample Message #3 verbatim (2026-08-19) -- see the
+    // brand-prefix note on Sample Message #2's reply below.
     return twiml(
-      "This number isn't linked to a one3seven account yet. Sign in at one3seven.com and link your phone under Upload to text documents in.",
+      "one3seven: This number isn't linked to a one3seven account yet. Sign in at one3seven.com and link your phone under Upload to text documents in.",
     );
   }
   if (numMedia === 0) {
-    return twiml('Got your text. To add a document, attach a photo or PDF to your next message.');
+    // Wording matches the campaign's declared Sample Message #4 verbatim.
+    return twiml('one3seven: Got your text. To add a document, attach a photo or PDF to your next message.');
   }
 
   const { workerId, intakeId } = { workerId: link.worker_id as string, intakeId: link.intake_id as string };
@@ -237,7 +243,13 @@ Deno.serve(async (req: Request) => {
   if (savedCount === 0) {
     return twiml("We couldn't save that. Try sending the photo again, one at a time.");
   }
+  // Wording matches the campaign's declared Sample Message #2 verbatim (2026-08-19) -- every
+  // declared sample carries a "one3seven: " brand-identification prefix; this reply, the "not
+  // linked yet" reply, and the "got your text" reply above were the three still missing it (found
+  // by a character-by-character diff against every declared sample after two "Opt-in information"
+  // rejections in a row on a resubmission that had already fixed the more obvious keyword/
+  // consent-capture gaps).
   return twiml(
-    `Got it — ${savedCount} file${savedCount === 1 ? '' : 's'} added to your record. Reply STOP to unlink this number.`,
+    `one3seven: Got it — ${savedCount} file${savedCount === 1 ? '' : 's'} added to your record. Reply STOP to unlink this number.`,
   );
 });

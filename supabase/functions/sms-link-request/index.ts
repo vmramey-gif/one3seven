@@ -135,7 +135,11 @@ Deno.serve(async (req: Request) => {
       body: new URLSearchParams({
         To: phone,
         From: TWILIO_PHONE_NUMBER,
-        Body: `Your one3seven verification code is ${code}. It expires in ${CODE_TTL_MINUTES} minutes.`,
+        // Wording matches the A2P 10DLC campaign's declared Sample Message #1 verbatim
+        // (2026-08-19) -- every declared sample carries a "one3seven: " brand-identification
+        // prefix; this was the one live message still missing it (had "one3seven" mid-sentence
+        // instead), a mismatch a carrier reviewer checking opt-in message consistency would catch.
+        Body: `one3seven: Your verification code is ${code}. It expires in ${CODE_TTL_MINUTES} minutes.`,
       }),
     },
   );
