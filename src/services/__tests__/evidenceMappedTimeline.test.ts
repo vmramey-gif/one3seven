@@ -1026,4 +1026,90 @@ describe('cross-document relationship notes (2026-08-18 founder request, scoped 
     expect(events[0]?.people_involved).toContain('HR Department (Human Resources Representative)');
     expect(events[0]?.people_involved).not.toContain('Jane Smith (Human Resources Representative)');
   });
+
+  // Regression (2026-08-19 rough-edge cleanup): a real live event showed
+  // "...Human Resources (marcus.delgado@personal-email.com)" instead of the worker's actual name.
+  // Root cause: an email header with no display name ("From: renee@acme-corp.com", no angle
+  // brackets) leaves humanizeAddressField() nothing to extract but the bare address, and nothing
+  // downstream filtered that out before it could be chosen as the role-aware title's
+  // parenthetical name-suffix. See enrichPeopleFromFacts' isEmailOrUrlLike guard.
+  test('a bare email address (no display name in the header) never appears in an event title', () => {
+    const commFact: CommunicationFacts = {
+      kind: 'workplace_communications',
+      source: { uploadedFileId: 'email-name-1', fileName: 'hr_reply.pdf', category: 'HR Documents' },
+      messageDate: 'June 10, 2026',
+      sender: 'renee.ashford@acme-corp.com',
+      recipient: 'Marcus Delgado',
+      peopleMentioned: ['Marcus Delgado'],
+      employerOrCompany: null,
+      subjectOrTopic: 'RE: Overtime pay concern',
+      workerConcernExcerpt: null,
+      workerConcernIsExplicit: false,
+      employerOrHrResponseExcerpt: 'I have received your message and am looking into it.',
+      confidence: 'medium',
+    };
+    const events = buildEvidenceMappedTimelineEvents({
+      fileRecords: [
+        sampleFileRecord({
+          source_file_id: 'email-name-1',
+          file_name: 'hr_reply.pdf',
+          document_type: 'HR Documents',
+          legacy_upload_category: 'HR Documents',
+          likely_date: 'June 10, 2026',
+          // Combined onto one line (per the earlier line-merge fix) so the bare email is
+          // confidently classified as HR at high confidence, same as a real extraction would.
+          people_or_entities: ['renee.ashford@acme-corp.com — HR Manager', 'Marcus Delgado'],
+          possible_timeline_event: {
+            title: 'HR response received',
+            date: 'June 10, 2026',
+            neutral_summary: 'HR response received in uploaded materials from this file.',
+          },
+        }),
+      ],
+      commFacts: [commFact],
+    });
+    expect(events[0]?.title).not.toContain('@');
+    expect(events[0]?.people_involved.some((p) => p.includes('@'))).toBe(false);
+  });
+
+  // Regression (2026-08-19 rough-edge cleanup, fresh-accuracy hard-challenge finding): a
+  // whitespace-only scan and an unrelated photo previously ended up in the SAME cluster purely
+  // because both fell back to the same generic document_type bucket when no real content was
+  // available to classify them by -- the resulting event's supporting-file list credited the
+  // unreadable scan with "supporting" a record it never actually said anything about.
+  test('an unreadable/zero-content record never gets swept into an unrelated readable event via a generic document_type match', () => {
+    const events = buildEvidenceMappedTimelineEvents({
+      fileRecords: [
+        sampleFileRecord({
+          source_file_id: 'unreadable-1',
+          file_name: 'scan.pdf',
+          document_type: 'Additional Supporting Records',
+          legacy_upload_category: 'Uncategorized',
+          likely_date: null,
+          people_or_entities: [],
+          employment_topics: [],
+          possible_timeline_event: null,
+          extraction_quality: 'unreadable',
+          confidence: 'low',
+        }),
+        sampleFileRecord({
+          source_file_id: 'readable-1',
+          file_name: 'IMG_0001.pdf',
+          document_type: 'Additional Supporting Records',
+          legacy_upload_category: 'Uncategorized',
+          likely_date: null,
+          people_or_entities: [],
+          employment_topics: [],
+          possible_timeline_event: null,
+          extraction_quality: 'high',
+        }),
+      ],
+    });
+    const scanEvent = events.find((e) => e.supporting_file_names.includes('scan.pdf'));
+    const imgEvent = events.find((e) => e.supporting_file_names.includes('IMG_0001.pdf'));
+    // Not the same event: the unreadable file must not be listed as supporting the readable one
+    // (or vice versa) purely because both share a generic fallback document_type.
+    expect(scanEvent).not.toBe(imgEvent);
+    expect(imgEvent?.supporting_file_names).not.toContain('scan.pdf');
+  });
 });

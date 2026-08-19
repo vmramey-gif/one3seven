@@ -170,4 +170,49 @@ describe('pay-period range legibility (2026-08-18, document-range vs. employment
     );
     expect(fileRecords[0]?.possible_timeline_event?.neutral_summary).not.toMatch(/covers the pay period/i);
   });
+
+  // Regression (2026-08-19 rough-edge cleanup): a malformed/reversed extraction (end before
+  // start) previously produced a garbled-but-confident sentence, e.g. "...pay period
+  // 2026-08-15 to 2026-08-01." Stay silent on the range rather than assert a backwards one.
+  test('reversed pay_period dates (end before start) get no range note, not a garbled one', () => {
+    const paystub: DocumentGroundedFileInput = {
+      uploadedFileId: 'f1',
+      fileName: 'paystub_reversed.pdf',
+      category: 'Compensation & Payroll',
+      extractedText: 'PAY STUB',
+      documentFacts: {
+        category: 'Compensation & Payroll',
+        file_name: 'paystub_reversed.pdf',
+        pay_period_start: '2026-08-15',
+        pay_period_end: '2026-08-01',
+      } as any,
+    };
+    const { fileRecords } = buildPerFileOrganizationRecords(
+      [{ uploadedFileId: 'f1', fileName: paystub.fileName, category: paystub.category }],
+      [paystub]
+    );
+    expect(fileRecords[0]?.possible_timeline_event?.neutral_summary).not.toMatch(/covers the pay period/i);
+  });
+
+  test('a date pair that is not parseable as real dates still gets the note as-is (under-match, not a guess)', () => {
+    const paystub: DocumentGroundedFileInput = {
+      uploadedFileId: 'f1',
+      fileName: 'paystub_freeform.pdf',
+      category: 'Compensation & Payroll',
+      extractedText: 'PAY STUB',
+      documentFacts: {
+        category: 'Compensation & Payroll',
+        file_name: 'paystub_freeform.pdf',
+        pay_period_start: 'first half of March',
+        pay_period_end: 'second half of March',
+      } as any,
+    };
+    const { fileRecords } = buildPerFileOrganizationRecords(
+      [{ uploadedFileId: 'f1', fileName: paystub.fileName, category: paystub.category }],
+      [paystub]
+    );
+    expect(fileRecords[0]?.possible_timeline_event?.neutral_summary).toMatch(
+      /covers the pay period first half of March to second half of March/i
+    );
+  });
 });
