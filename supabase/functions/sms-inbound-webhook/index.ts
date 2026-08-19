@@ -135,8 +135,12 @@ Deno.serve(async (req: Request) => {
   const bodyKeyword = (params['Body'] ?? '').trim().toUpperCase();
   if (OPT_OUT_KEYWORDS.has(bodyKeyword)) {
     await supabase.from('worker_sms_links').delete().eq('phone_number', from);
-    // Twilio also enforces STOP at the carrier level for future delivery — this just clears our link.
-    return twiml('This number has been unlinked from one3seven. You can re-link it anytime under Upload.');
+    // Twilio also enforces STOP at the carrier level for future delivery — this just clears our
+    // link. Wording matches the A2P 10DLC campaign's declared opt-out message verbatim
+    // (2026-08-19) -- the two had drifted apart, itself a consistency flag on resubmission.
+    return twiml(
+      'You have successfully been unsubscribed. You will not receive any more messages from this number. Reply START to resubscribe.',
+    );
   }
   if (HELP_KEYWORDS.has(bodyKeyword)) {
     return twiml('one3seven: text a photo or PDF to add it to your record. Reply STOP to unsubscribe. Msg&Data Rates May Apply.');
