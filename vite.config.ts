@@ -76,5 +76,8 @@ export default defineConfig({
     // files itself and fail confusingly, since they use @playwright/test's test()/expect(), not
     // vitest's (2026-08-19).
     exclude: [...configDefaults.exclude, 'e2e/**'],
+    // Serves Vite `?url` asset imports (embedded PDF fonts, the pdf.js worker script) from disk
+    // when a test actually exercises code that fetches them -- see src/test/setup.ts.
+    setupFiles: ['src/test/setup.ts'],
   },
 })

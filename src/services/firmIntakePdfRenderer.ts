@@ -7,8 +7,37 @@
  * Brand color: #42574E (sage — 2026-07-08 brand). Violet is reserved for AI UI only.
  */
 
-import { PDFDocument, StandardFonts, rgb, PDFName, PDFArray, type PDFFont, type PDFPage, type RGB } from 'pdf-lib';
+import { PDFDocument, rgb, PDFName, PDFArray, type PDFFont, type PDFPage, type RGB } from 'pdf-lib';
+import fontkit from '@pdf-lib/fontkit';
+import dejaVuSansUrl from '../assets/fonts/DejaVuSans.ttf?url';
+import dejaVuSansBoldUrl from '../assets/fonts/DejaVuSans-Bold.ttf?url';
 import type { DamagesReport } from './damagesCalculator';
+
+/**
+ * Embeds a Unicode-covering font (DejaVu Sans, real Latin Extended + Cyrillic + Greek glyph
+ * coverage) instead of pdf-lib's built-in StandardFonts.Helvetica, which is WinAnsi-only and
+ * cannot represent a worker's own name if it has an accented or non-Latin character (2026-08-19:
+ * confirmed live -- the renderer's escapePdfLiteral() was replacing every non-ASCII character
+ * with a literal "?", not just downgrading it).
+ *
+ * DejaVu Sans specifically, not a modern Google Fonts / Fontsource build: verified via direct
+ * testing (pdfjs-dist text extraction + visual render) that @pdf-lib/fontkit's bundled subsetter
+ * has a real bug with newer Noto Sans font files -- one subset crashed outright
+ * ("RangeError: Index out of range" inside its own TTFSubset encoder), another produced a PDF
+ * that rendered as blank/wrong glyphs despite no error being thrown. DejaVu Sans's more
+ * classically-structured TrueType tables subset correctly; confirmed round-trip via pdfjs-dist
+ * text extraction on real accented/Cyrillic text before adopting it.
+ */
+async function embedBrandFonts(doc: PDFDocument): Promise<{ font: PDFFont; bold: PDFFont }> {
+  doc.registerFontkit(fontkit);
+  const [regularBytes, boldBytes] = await Promise.all([
+    fetch(dejaVuSansUrl).then((r) => r.arrayBuffer()),
+    fetch(dejaVuSansBoldUrl).then((r) => r.arrayBuffer()),
+  ]);
+  const font = await doc.embedFont(regularBytes, { subset: true });
+  const bold = await doc.embedFont(boldBytes, { subset: true });
+  return { font, bold };
+}
 
 /**
  * A cited source document, supplied so the renderer can embed its pages as an appendix
@@ -919,8 +948,7 @@ export async function renderFirmIntakePacketPdf(
   const doc = await PDFDocument.create();
   doc.setTitle('one3seven — Firm Intake Review');
   doc.setCreator('one3seven');
-  const font = await doc.embedFont(StandardFonts.Helvetica);
-  const bold = await doc.embedFont(StandardFonts.HelveticaBold);
+  const { font, bold } = await embedBrandFonts(doc);
 
   const c = new Cursor(doc, font, bold);
   const srcIndex = buildSourceIndex(sources);
@@ -1206,8 +1234,7 @@ export async function renderWorkerSummaryPdf(
   const doc = await PDFDocument.create();
   doc.setTitle(firmCaseMode ? 'one3seven — Organized Case File' : 'one3seven — Your Organized Intake');
   doc.setCreator('one3seven');
-  const font = await doc.embedFont(StandardFonts.Helvetica);
-  const bold = await doc.embedFont(StandardFonts.HelveticaBold);
+  const { font, bold } = await embedBrandFonts(doc);
   const c = new Cursor(doc, font, bold);
 
   if (firmCaseMode) {
