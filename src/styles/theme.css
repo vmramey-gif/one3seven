@@ -256,10 +256,25 @@
     font-weight: var(--font-weight-normal);
     line-height: 1.5;
   }
+}
+/* @layer base closed above, deliberately, right after the plain-element resets it's meant for
+   (per the comment near line 209: base-layer rules are SUPPOSED to lose to Tailwind utilities).
+   Everything below needs the opposite behavior -- these are override/remap mechanisms whose whole
+   job is to beat a Tailwind utility class on the same element (e.g. .o3s-firm-review-skin
+   remapping text-[#1B2623] to a light color for dark mode). @layer base always loses to
+   @layer utilities regardless of selector specificity (that's what a cascade layer is), so this
+   entire block was nested inside @layer base until 2026-08-20 and its overrides could never
+   actually win -- confirmed via direct computed-style probing, not assumed: a `text-[#1B2623]`
+   element under `.o3s-firm-review-skin` stayed #1B2623, not the intended light remap color. Left
+   unlayered here (no @layer at all) so it wins against ANY Tailwind layer unconditionally, which
+   is what an override mechanism needs. */
 
-  /* Worker "sunset" sky — the summary page background ripens warm-light → sage as the worker
-     scrolls their file toward completion. Pure CSS gradient over the full page height (no JS, no
-     stacking tricks); the white content cards float on it and stay stable. See project_ui_direction_july2026. */
+  /* Worker "in process" sky — ripens warm-light → dark sage over the page height while an intake
+     is still being uploaded/organized, not yet complete (UploadScreen, ProcessingScreen). Pure
+     CSS gradient (no JS, no stacking tricks); content cards float on it and stay stable. Once an
+     intake is complete it moves to the solid .o3s-worker-complete-ground instead (2026-08-20 —
+     this class previously lived on the completed summary screen; reassigned so "still in motion"
+     and "arrived" read as visually distinct states). See project_ui_direction_july2026. */
   .o3s-worker-sky {
     background-image: linear-gradient(180deg,
       #FBF7EF 0%, #F4EFE1 14%, #EBEBD9 28%, #D3E1C8 42%, #A9CBA0 56%,
@@ -293,6 +308,55 @@
   .o3s-firm-review-skin [class*="bg-white"] { background-color: rgba(255, 255, 255, 0.035); }
   .o3s-firm-review-skin [class*="bg-[#FAF9F6]"],
   .o3s-firm-review-skin [class*="bg-[#F2F4EC]"] { background-color: rgba(255, 255, 255, 0.05); }
+
+  /* Worker "complete" ground — solid dark green, deliberately the resting/arrived state rather
+     than a gradient in motion. Color matches --o3s-navy's value (#2C3A34) -- hardcoded rather than
+     var(--o3s-navy) because that variable is scoped inside `.dark { }` (line ~87) and nothing in
+     this app actually toggles a .dark class on <html>; every sibling class here (o3s-firm-cockpit,
+     o3s-worker-sky) already uses literal hex for the same reason. Applied to IntakeSummaryScreen
+     only (2026-08-20 — complete = dark, in-process = the light→dark o3s-worker-sky gradient below,
+     now used the other way around from its original assignment). See project_ui_direction_july2026. */
+  .o3s-worker-complete-ground {
+    background-image:
+      radial-gradient(760px 460px at 14% -8%, rgba(143, 211, 166, 0.10), transparent 58%),
+      radial-gradient(680px 440px at 92% 8%, rgba(94, 114, 104, 0.16), transparent 55%),
+      linear-gradient(180deg, #1E2A24 0%, #2C3A34 50%, #1A241F 100%);
+    background-attachment: scroll;
+  }
+
+  /* Worker "complete" skin — remaps IntakeSummaryScreen's hardcoded light utilities to dark in
+     one place (attribute-substring selectors catch every opacity variant), same technique as
+     .o3s-firm-review-skin below. Scoped to the summary root only. */
+  .o3s-worker-complete-skin [class*="text-[#1B2623]"],
+  .o3s-worker-complete-skin [class*="text-[#131A17]"],
+  .o3s-worker-complete-skin [class*="text-[#20242a]"] { color: #ECF3ED; }
+  .o3s-worker-complete-skin [class*="text-[#384039]"],
+  .o3s-worker-complete-skin [class*="text-[#40433F]"],
+  .o3s-worker-complete-skin [class*="text-[#6A6D66]"] { color: rgba(236, 243, 237, 0.68); }
+  .o3s-worker-complete-skin [class*="text-[#7C857F]"],
+  .o3s-worker-complete-skin [class*="text-[#9AA39B]"] { color: rgba(236, 243, 237, 0.48); }
+  .o3s-worker-complete-skin [class*="text-[#42574E]"],
+  .o3s-worker-complete-skin [class*="text-[#374A42]"] { color: #8FD3A6; }
+  .o3s-worker-complete-skin [class*="text-[#8B2E27]"],
+  .o3s-worker-complete-skin [class*="text-[#A8512B]"] { color: #E4726B; }
+  .o3s-worker-complete-skin [class*="border-[#E4E5DE]"],
+  .o3s-worker-complete-skin [class*="border-[#CBD6CF]"],
+  .o3s-worker-complete-skin [class*="border-[#E7EDE8]"],
+  .o3s-worker-complete-skin [class*="border-[#F2F4EC]"],
+  .o3s-worker-complete-skin [class*="border-[#EFF1EC]"],
+  .o3s-worker-complete-skin [class*="border-[#7C8B6F]"] { border-color: rgba(255, 255, 255, 0.1); }
+  .o3s-worker-complete-skin [class*="border-[#E3B8B4]"] { border-color: rgba(228, 114, 107, 0.3); }
+  .o3s-worker-complete-skin [class*="bg-white"] { background-color: rgba(255, 255, 255, 0.035); }
+  .o3s-worker-complete-skin [class*="bg-[#FAF9F6]"],
+  .o3s-worker-complete-skin [class*="bg-[#F2F4EC]"],
+  .o3s-worker-complete-skin [class*="bg-[#E4E5DE]"],
+  .o3s-worker-complete-skin [class*="bg-[#FBFBFA]"],
+  .o3s-worker-complete-skin [class*="bg-[#F7F9F5]"],
+  .o3s-worker-complete-skin [class*="bg-[#F5F5F0]"],
+  .o3s-worker-complete-skin [class*="bg-[#FBF6EC]"],
+  .o3s-worker-complete-skin [class*="bg-[#FBF4EF]"],
+  .o3s-worker-complete-skin [class*="bg-[#F8F4FF]"] { background-color: rgba(255, 255, 255, 0.05); }
+  .o3s-worker-complete-skin [class*="bg-[#FBEAE9]"] { background-color: rgba(228, 114, 107, 0.12); }
 
   /* Warm entry-page ground (landing / sign-in / welcome) — sunset bone with a faint warm aura, so
      the front door reads warm and inviting like the worker side. Light per the marketing brand. */
@@ -395,4 +459,3 @@
       color: var(--o3s-gold);
     }
   }
-}
