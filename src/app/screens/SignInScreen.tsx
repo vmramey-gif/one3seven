@@ -6,12 +6,16 @@ import { One3SevenDisclaimer } from '../components/One3SevenDisclaimer';
 import { WordMark } from '../components/WordMark';
 import { SeedMark } from '../components/ui/SeedMark';
 
-// TODO(Supabase): Enable Google in Auth → Providers and wire `signInWithOAuth` instead of the placeholder handler from App.
-
 interface SignInScreenProps {
   onNavigate: (screen: Screen) => void;
   onSignIn: (email: string, password: string) => Promise<{ error?: string }>;
-  /** Google OAuth placeholder until Supabase provider is configured */
+  /**
+   * Already wired to a real `supabase.auth.signInWithOAuth({ provider: 'google' })` call in
+   * App.tsx (handleGoogleSignIn) -- not a placeholder. The one remaining step is enabling Google
+   * as a provider in the Supabase dashboard (Auth -> Providers) and creating a matching OAuth
+   * client in Google Cloud Console; until then this correctly shows a friendly fallback message
+   * (App.tsx catches the server's "provider is not enabled" error explicitly).
+   */
   onGoogleAuth?: () => void | Promise<void>;
   onForgotPassword?: (email: string) => Promise<{ error?: string }>;
 }

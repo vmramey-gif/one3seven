@@ -1,4 +1,4 @@
-/** Single labeled demo row for empty dashboards   gated by `SHOW_SAMPLE_INTAKE` in flags.ts (from App). */
+/** Single labeled demo row for empty dashboards — gated by `SHOW_SAMPLE_INTAKE` in flags.ts (from App). */
 export const SAMPLE_INTAKE_NUMBER = '137-DEMO';
 
 export const SAMPLE_WORKER_INTAKE_CARD = {
@@ -7,7 +7,7 @@ export const SAMPLE_WORKER_INTAKE_CARD = {
   updated_at: new Date().toISOString(),
   has_summary: true,
   label: 'Demo preview',
-  categoriesLine: 'Payroll � Scheduling � HR Communication',
+  categoriesLine: 'Payroll · Scheduling · HR Communication',
   timelineSummary:
     'Records span multiple pay periods with scheduling communications and HR policy references. Language is factual and organizational only.',
   missingLine: 'Additional schedule records may help complete the timeline.',
@@ -23,8 +23,8 @@ export const SAMPLE_FIRM_INTAKE_ROW = {
   categories: ['Payroll', 'Scheduling', 'HR Communication'],
   documentCount: 4,
   uploadDate: '2026-05-01',
-  workerLocation: ' ',
-  employerState: ' ',
+  workerLocation: 'California',
+  employerState: 'California',
   timelineComplete: true,
   hasAlerts: false,
   lastActivity: 'Demo preview',

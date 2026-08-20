@@ -1,254 +1,135 @@
-# One3Seven Shared Intake Workspace Architecture
+# one3seven — Data Architecture
 
-## Overview
+> **Rewritten 2026-08-20.** The previous version of this document described an in-memory,
+> `useState`-only prototype with no backend — that architecture no longer exists and hasn't for
+> some time. This version describes what's actually in the codebase today, verified by reading
+> the real code (import graphs, actual callers, actual RLS policies), not recalled from an earlier
+> design doc. If a claim here stops matching the code, trust the code and fix this file, not the
+> other way around.
 
-One3Seven uses a **shared intake workspace** architecture where worker-side and law firm-side views access the same underlying intake record. This ensures all worker-provided information remains connected throughout the intake lifecycle.
+## The real architecture, in one paragraph
 
-## Core Principles
+Supabase is the backend: Postgres tables with row-level security, real Auth (email/password,
+persisted sessions), Storage for uploaded files, and Deno edge functions for anything that needs a
+server-side secret (Claude API calls, Stripe, Resend, Twilio). The client is a React/Vite SPA
+(`src/app/`) that talks to Supabase directly via `src/lib/supabaseClient.ts` for most reads/writes,
+and to edge functions (`supabase/functions/*`, deployed separately from the frontend — see
+`reference_supabase_deploy` memory) for anything secret-gated. `src/services/intakeDataService.ts`
+is the central data-access layer nearly everything routes through for worker/firm data.
 
-### 1. Single Source of Truth
+## Where an intake's data actually lives
 
-Each intake creates one `IntakeWorkspace` that contains:
-- Uploaded documents (with original and worker-edited filenames)
-- Worker-provided context (main context + timeline-specific details)
-- AI-organized timeline events
-- Document categories
-- Intake summary narrative
-- Organization notes
-- Share/save/submit status
+- **`intakes`** — one row per case a worker started. Owns the worker relationship (`worker_id`),
+  category, and workflow status.
+- **`uploaded_files`** — one row per uploaded document (Storage path, filename, category,
+  content-hash for dedup).
+- **`file_text_extractions`** — Phase 2A (plain-text extraction, no AI) and the AI-extracted
+  `document_facts` JSON per file, written by the `extract-document-facts` edge function.
+- **`intake_summaries`** — the organized output: the generated narrative, timeline, categories. See
+  "The sidecar-JSON convention" below — this table's `overview` text column carries far more
+  structured state than its name suggests.
+- **`intake_routes`** — a worker's connection to a specific firm (firm-code routing) and its access
+  level (`preview`, `full_access`, etc.), immutably audited by a trigger into
+  `intake_route_events` (see `project_liability_audit_aug2026` memory).
+- **`firm_profiles`**, **`profiles`** — firm and user accounts. `profiles.role` (`'worker'` |
+  `'firm'`) drives which UI a signed-in user sees; it cannot be self-set to `'firm'` by a client
+  (see Auth below).
 
-### 2. Worker-Side Responsibility
+Nearly every read/write to these tables goes through named functions in `intakeDataService.ts`
+(e.g. `persistPlaceholderOrganizationForIntake`, `loadFirmLiveIntakeView`,
+`listFirmAccessibleUploadInventory`) rather than ad hoc `.from(...)` calls scattered across
+screens — that file is the thing to open first to understand how a given piece of data actually
+gets read or written.
 
-The worker-side app is the **creation and control layer**:
-- Creates the initial intake workspace
-- Uploads and renames files
-- Adds context to timeline events
-- Saves progress
-- Controls sharing with participating firms
-- Submits the intake only after explicit consent
+## The sidecar-JSON convention (the single most important thing to know before touching `overview`)
 
-### 3. AI Organization Intelligence
+`intake_summaries.overview` is a free-text column, but in practice it also carries **several
+independent pieces of structured state**, each encoded as a JSON blob wrapped in a distinct
+`--- O3S_<NAME> --- ... --- O3S_<NAME>_END ---` delimiter and concatenated into the same text
+field. This is a deliberate, migration-free way to add a new persisted field without a schema
+change — and it works, consistently, across the whole codebase — but it means **`overview` is not
+just prose**, and any code that reads or rewrites it needs to know these blocks exist or it will
+silently corrupt one.
 
-The AI reviews the **full intake workspace** together:
-- File contents + original filenames + renamed filenames
-- Worker-provided context across all timeline cards
-- Additional notes and uploaded information
-- Document relationships and timeline connections
+Known blocks, each with its own dedicated encode/decode module:
 
-This creates a **connected factual narrative** rather than isolated data points.
+| Block | Carries | Module |
+|---|---|---|
+| `O3S_ORG_ENGINE` | file records + timeline + sections (the organization engine's own output) | `intakeOrgEngineCodec.ts` |
+| `O3S_SOURCE_TRACE` / `O3S_RECORD_STORY` / `O3S_FIRM_REVIEW_SUMMARY` | source citations, per-record story, firm-facing summary | `timelineSourceTraceCodec.ts` |
+| `O3S_STORY_FOLLOWUP` | guided-intake follow-up answers (employer, dates, key people, remote-work/arbitration) | `storyFollowUpPersistence.ts` |
+| `O3S_MITIGATION_LOG` | worker-owned job-search log entries | `mitigationLog.ts` |
+| (reminders block) | worker/firm-set reminder dates, `.ics`-exportable | `workerReminders.ts` |
+| (contact block) | worker name/phone, copied in only at the consent moment a worker shares with a firm | `workerContactPersistence.ts` |
+| `O3S_EMPLOYMENT_MATTER` | selected employment-matter tags | `employmentMatterPersistence.ts` (this one also duplicates to `localStorage`) |
 
-### 4. Firm-Side Access
+**If you're writing new code that touches `overview`:** always go through the relevant
+`merge*IntoLatestIntakeSummary()` / `extract*FromOverview()` pair rather than reading or
+overwriting the raw string. A naive `overview = newText` will silently delete every other worker's
+block that happened to be encoded in the same field. This exact class of bug has caused real data
+loss before (see `project_extraction_accuracy` memory, the 2026-08-05 notes-loss incident) — it's
+the reason this table of blocks exists in this document at all.
 
-When a worker submits an intake to participating firms:
-- The intake workspace is marked as `submitted`
-- Firms receive **read-only access** to the same workspace
-- Firms see the AI-organized narrative built from worker inputs
-- All worker context, document connections, and timeline details are preserved
+## The legacy `IntakeWorkspace` layer — mostly superseded, partially still live
 
-## Data Flow
+`src/app/types/IntakeWorkspace.ts` predates the Supabase migration. It defines an in-memory
+`IntakeWorkspace` object tracked in `App.tsx`'s own `useState`, with helper functions to update it.
+**Do not treat this as the current architecture** — but it isn't fully dead either, which is worth
+being precise about rather than assuming either way:
 
-```
-Worker Creates Intake
-        ↓
-IntakeWorkspace Created (unique ID)
-        ↓
-Worker Uploads Files → Updates workspace.documents[]
-        ↓
-Worker Renames Files → Updates document.workerEditedFileName
-        ↓
-Worker Adds Timeline Context → Updates workspace.workerContext.timelineContexts
-        ↓
-AI Organization Process → Generates workspace.intakeSummary, workspace.timelineEvents
-        ↓
-Worker Reviews Summary
-        ↓
-Worker Clicks "Share With Participating Firms"
-        ↓
-Intake Submitted → workspace.shareStatus = 'submitted', workspace.sharedWithFirms = true
-        ↓
-Firms Access Same Workspace (read-only) → Law Firm Dashboard displays submitted intakes
-```
+- `App.tsx` still keeps a live `currentIntakeWorkspace` in state, updated via
+  `createEmptyIntakeWorkspace()` / `updateIntakeWorkspace()` / `markIntakeAsSaved()`, and passes it
+  down as a prop to `IntakeSummaryScreen` and `IntakeReviewScreen`.
+- Both of those screens read from it, but **only as a fallback** behind the real Supabase-backed
+  data — e.g. `IntakeSummaryScreen.tsx`: `liveOverview ?? intakeWorkspace.intakeSummary?.overview`.
+  If the real (Supabase) data is present, the workspace object is never consulted.
+- `IntakeReviewScreen` also still calls `updateWorkflowStatus()` from this file.
+- Several other exported functions on this file (`getEligibleFirms`, `submitIntakeToFirms`,
+  `addInternalReviewerNote`, `requestAdditionalInfo`, `routeIntakeToFirms`) have **zero callers
+  anywhere in the codebase** — confirmed by grep, not assumed — and were removed 2026-08-20.
+  `getEligibleFirms` in particular was a stub that claimed to route by geography/category/
+  readiness but just returned every firm ID unconditionally; since nothing called it, that was
+  dead code rather than a live bug, but a genuinely misleading one to leave sitting there.
 
-## Implementation
+**Bottom line:** treat `IntakeWorkspace` as a thin, mostly-inert fallback layer clinging to two
+screens, not as the source of truth. The source of truth is Supabase, reached through
+`intakeDataService.ts`.
 
-### Key Files
+## Firm access and routing (how it actually works today)
 
-- **`/types/IntakeWorkspace.ts`** - Core data structure and helper functions
-- **`/App.tsx`** - State management for current workspace and submitted intakes
-- **`/screens/IntakeSummaryScreen.tsx`** - Worker save/submit actions
-- **`/screens/LawFirmDashboardScreen.tsx`** - Firm-side intake display
-- **`/screens/IntakeReviewScreen.tsx`** - Detailed firm-side review
+There is no dynamic "eligible firms" matching engine (the pre-Supabase `getEligibleFirms` stub
+never did this, and nothing replaced it). Firm access today is one of:
 
-### State Management (App.tsx)
+1. **Firm-code routing** — a worker enters a specific firm's code, creating an `intake_routes` row
+   at `preview` or (after the firm requests and the worker approves) `full_access`. Currently
+   gated off for *new* connections (`FIRM_CODE_ROUTING_LIVE = false` in `constants/flags.ts`,
+   funding/counsel pause — see `project_strategy_pause_attorney_push_worker` memory); existing
+   connections and the *remove* path still work.
+2. **Worker-initiated email** — a worker emails their organized PDF directly to any firm's inbox
+   via the `send-intake-to-firm-email` edge function. No firm account or one3seven relationship
+   required on the receiving end. This is the live, unblocked path.
 
-```typescript
-// Current intake workspace (worker is editing)
-const [currentIntakeWorkspace, setCurrentIntakeWorkspace] = useState<IntakeWorkspace>(createEmptyIntakeWorkspace());
+Firm accounts themselves are **founder-provisioned only** — a DB trigger
+(`enforce_profile_privilege_lock`, migration `20260817220000`) rejects any user-initiated attempt
+to set `profiles.role = 'firm'`. There is no self-serve firm signup, and no public checkout page
+that doesn't already require an existing firm profile.
 
-// Submitted intakes (available to firms)
-const [submittedIntakes, setSubmittedIntakes] = useState<IntakeWorkspace[]>([]);
+## Privacy boundaries (verified against real RLS, not just app-level checks)
 
-// Helper functions
-updateCurrentIntake(updates) // Updates current workspace
-saveIntakeWorkspace() // Marks workspace as saved
-submitToFirms() // Submits workspace to participating firms
-startNewIntake() // Creates new empty workspace
-```
+- A firm can only read an intake's `intake_summaries`/uploaded files once its `intake_routes` row
+  reaches `full_access` — enforced at the RLS policy level, not just hidden in the UI.
+- A `preview`-level route strips the worker's narrative/notes before the firm ever sees it
+  (`stripWorkerFollowUpNarrativeForPreview` and friends) — this used to be a client-side-only
+  strip (a real, since-closed leak, see `project_worker_surface_audit_aug2026` memory); confirm
+  current RLS coverage before assuming a field is safe just because the UI hides it.
+- `intake_route_events` is an append-only audit trail of every access grant/revoke — no update or
+  delete policy exists for any role, including the founder.
 
-### Worker Actions
+## Where to look next
 
-**Save Progress:**
-```typescript
-onSaveIntake() // Marks workspace.saveStatus = 'saved'
-```
-
-**Submit to Firms:**
-```typescript
-onSubmitToFirms() // Marks workspace as submitted, adds to submittedIntakes[]
-```
-
-### Firm Access
-
-Firms receive `submittedIntakes[]` array containing all submitted `IntakeWorkspace` objects. Each workspace includes:
-- Full AI-organized narrative
-- Worker-provided context (preserved authentically)
-- Document inventory with worker-edited filenames
-- Timeline events with related documents
-- Organization notes and workflow alerts
-
-## Privacy & Control
-
-- Workers control when intakes are shared
-- Intakes are not visible to firms until explicitly submitted
-- Workers can save progress without sharing
-- Workers can download/email summaries without firm submission
-- "Start Over" clears the current workspace but preserves submitted intakes
-
-## Firm-Side Architecture
-
-### Permission-Based Access
-
-Participating firms have **read-only access** to the shared `IntakeWorkspace` with the ability to:
-- View AI-organized intake narratives
-- Review worker-provided context (preserved authentically)
-- See timeline events with related documents
-- Access document inventory with worker-edited filenames
-- View organization notes and workflow alerts
-
-Firms can also perform **workflow management actions** that update the shared workspace:
-- Update workflow status (New, Under Review, Contacted, etc.)
-- Add internal reviewer notes (private to firm, not visible to worker)
-- Request additional information from worker
-- Download intake summaries
-- Archive or decline intakes
-
-### Firm-Side Fields in IntakeWorkspace
-
-```typescript
-// Firm workflow management (attached to shared workspace)
-workflowStatus: WorkflowStatus // 'new' | 'additional-docs' | 'ready-review' | 'under-review' | 'contacted' | 'archived' | 'declined'
-internalReviewerNotes: InternalReviewerNote[] // Private - not visible to worker
-additionalInfoRequests: AdditionalInfoRequest[]
-routedToFirmIds: string[] // Which firms received this intake
-```
-
-### Privacy Boundaries
-
-**Visible to Firms:**
-- All worker-provided information (documents, context, timeline details)
-- AI-organized narratives and summaries
-- Document categories and relationships
-- Organization notes and alerts
-
-**Private to Firms (not visible to workers):**
-- Internal reviewer notes
-- Firm-specific workflow status changes
-- Which other firms received the same intake
-- Firm routing and preference matching details
-
-**Visible to Workers (from firm actions):**
-- Additional information requests (categories + optional note)
-- General workflow status updates (if configured to share)
-
-### Intake Routing Logic
-
-When a worker clicks "Share With Participating Firms," the intake is routed using controlled matching:
-
-```typescript
-routeIntakeToEligibleFirms(intake, firmPreferences)
-```
-
-**Routing Criteria:**
-1. **Geography Match**: Intake location/state matches firm's accepted states
-2. **Category Match**: Reported concerns match firm's accepted categories
-3. **Readiness Threshold**: Intake completeness meets firm's minimum requirements
-   - `all`: Accept all intakes
-   - `ready-only`: Timeline organized + 3+ documents
-   - `complete-only`: Timeline organized + 5+ documents
-4. **Active Status**: Firm is active and accepting new intakes
-
-**Not a Mass Email**: Intakes only appear to firms that match all routing criteria.
-
-### Firm Dashboard Display
-
-The Law Firm Dashboard maps shared `IntakeWorkspace` objects to display format:
-
-```typescript
-// Transforms IntakeWorkspace → IntakeSubmission (view layer)
-intakesFromWorkspaces = submittedIntakes.map(workspace => ({
-  id: workspace.id,
-  readiness: calculateReadiness(workspace),
-  categories: workspace.reportedConcerns,
-  documentCount: workspace.documents.length,
-  summary: workspace.intakeSummary?.overview || generateFallback(workspace),
-  // ... other display fields
-}))
-```
-
-This ensures firms always see the same AI-organized intelligence that was created from the worker's inputs.
-
-### Workflow Actions
-
-**Update Status:**
-```typescript
-updateWorkflowStatus(workspace, 'under-review')
-```
-
-**Add Internal Note (Private):**
-```typescript
-addInternalReviewerNote(workspace, content, reviewer, firmId)
-```
-
-**Request Additional Info (Visible to Worker):**
-```typescript
-requestAdditionalInfo(workspace, categories, note, firmId)
-```
-
-### Data Flow (Firm Side)
-
-```
-Worker Submits Intake
-        ↓
-Routing Logic Evaluates Firm Preferences
-        ↓
-Eligible Firms Determined (geography + category + readiness match)
-        ↓
-Intake Appears in Eligible Firm Dashboards
-        ↓
-Firm Reviews AI-Organized Narrative
-        ↓
-Firm Updates Workflow Status → Updates shared workspace
-        ↓
-Firm Adds Internal Note → Private, attached to workspace
-        ↓
-Firm Requests Additional Info → Worker can see request in their workspace
-```
-
-## Future Enhancements
-
-- Backend persistence (currently in-memory state)
-- Real-time intake status updates and notifications
-- Intake versioning for worker updates after submission
-- Advanced routing rules (firm capacity, specialization scoring)
-- Analytics dashboard for routing effectiveness
-- Multi-firm collaboration on same intake (with proper consent)
+- `src/services/` — the actual business logic (extraction, timeline/claim-lens engines, PDF
+  rendering, billing). See the codebase-wide inventory from the 2026-08-20 session if it still
+  exists, or re-derive it — it isn't checked into the repo as a file.
+- `supabase/functions/` — every server-side/secret-gated operation, one directory per function.
+- `supabase/migrations/` — the real schema and RLS history, in order. When in doubt about what a
+  table's policies actually allow, read the migration, don't guess from the app code.

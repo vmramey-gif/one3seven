@@ -33,15 +33,18 @@ export const STORY_FIRST_UPLOAD_INTRO =
 export const STORY_FIRST_UPLOAD_NOTICE =
   'By uploading documents, you confirm that you are choosing to share these records with one3seven for organization and intake-preparation purposes. Upload only records you feel comfortable sharing. Sensitive information such as Social Security numbers, banking information, account numbers, medical record numbers, or unrelated personal information may be removed or redacted before upload at your discretion.';
 
-// NOTE: Uploads are PDF-only. These describe the *kinds of records* that are useful, not file
-// formats. Entries that implied image upload ("Screenshots", "Photos") were removed because the
-// picker rejects image files; guidance for converting those to PDF lives in
-// WORKER_UPLOAD_SOURCING_GUIDANCE below.
+// These describe the *kinds of records* that are useful, not file formats. Uploads were PDF-only
+// when this list was first written, so entries implying image upload ("Screenshots", "Photos")
+// were removed; the picker now also accepts photos directly (JPG/PNG/HEIC/WEBP — see
+// UploadScreen.tsx's file input `accept`, and the image-vision extraction shipped 2026-08-17),
+// so "Text messages" no longer needs the "(saved as PDF)" qualifier and photos are back on the
+// list. Corrected 2026-08-20 — this comment and the list had drifted out of sync with the picker.
 export const STORY_FIRST_UPLOAD_EXAMPLES = [
   'Pay stubs',
   'Schedules or time records',
   'Emails',
-  'Text messages (saved as PDF)',
+  'Text messages',
+  'Photos or screenshots',
   'HR or termination letters',
   'Reviews or write-ups',
   'Policies or handbooks',
@@ -50,9 +53,10 @@ export const STORY_FIRST_UPLOAD_EXAMPLES = [
 
 /**
  * Practical "what can I upload / where do I find it" helper for workers who lost access to
- * physical records (e.g. displaced workers). PDF-only: the helper tells people how to convert
- * records to PDF rather than implying photos/screenshots upload directly. No banned vocabulary,
- * no legal conclusions, no deadlines.
+ * physical records (e.g. displaced workers). The picker accepts PDFs, text files, and photos
+ * (JPG/PNG/HEIC/WEBP) directly — a screenshot or phone photo of a document works as-is; PDF
+ * conversion is offered below only as one option among several, not a requirement. No banned
+ * vocabulary, no legal conclusions, no deadlines.
  */
 export const WORKER_UPLOAD_SOURCING_GUIDANCE = {
   heading: "Don't have your records handy?",
@@ -61,7 +65,7 @@ export const WORKER_UPLOAD_SOURCING_GUIDANCE = {
     'Pay stubs and W-2s — often in your employer’s HR or payroll portal, or with past tax records (irs.gov/individuals/get-transcript).',
     'Wage and work history — available through your EDD online account (edd.ca.gov).',
     'Emails and termination letters — check your email inbox and saved messages.',
-    'Text messages — most phones can save or print a conversation as a PDF.',
+    'Text messages — take a screenshot, or save/print the conversation as a PDF, whichever is easier.',
   ],
   pdfNote: 'You can upload PDFs or photos (JPG, PNG, HEIC) — snap a picture of a document, or add a file from your phone or computer. No need to convert anything.',
 } as const;
