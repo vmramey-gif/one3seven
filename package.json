@@ -12,6 +12,7 @@
     "test:e2e": "playwright test",
     "test:rls": "node scripts/rls-isolation-test.mjs",
     "test:rls-firm": "node scripts/rls-firm-isolation-test.mjs",
+    "gauntlet": "node scripts/gauntlet.mjs",
     "lint:security-definer": "node scripts/check-security-definer-current-user.mjs",
     "lint:migration-secrets": "node scripts/check-hardcoded-secrets-in-migrations.mjs",
     "state": "bash scripts/session-state.sh"
