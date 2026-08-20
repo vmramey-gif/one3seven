@@ -84,7 +84,33 @@
   --sidebar-ring: rgba(66,87,78, 0.3);
 }
 
-.dark {
+/*
+ * one3seven "dark workspace" tokens (obsidian/navy/gold/fg/muted/etc.) -- deliberately UNSCOPED
+ * (not inside .dark). These specific names never collide with anything in the bare :root above,
+ * and are only ever consumed by components that explicitly opt into a dark skin
+ * (.o3s-firm-cockpit, .o3s-worker-complete-ground, workerMobileSummarySkin's dark branch, the
+ * O3S_* constants in visualTheme.ts) -- they were never meant to be conditional on a global
+ * dark-mode toggle. They WERE inside `.dark { }` until 2026-08-20, which silently broke every one
+ * of those consumers: nothing in this app ever adds a `.dark` class to <html>, so `var(--o3s-fg)`
+ * (etc.) resolved to nothing everywhere it was used, falling back to default/inherited text color
+ * -- invisible as long as it happened to land on a light background, but confirmed live-broken
+ * (illegible dark-on-dark heading/status-pill text) the moment a real dark background (the worker
+ * "complete" ground) started rendering correctly.
+ *
+ * A DIFFERENT subset of names (--o3s-border, --o3s-ai*, --o3s-action*, --o3s-done*,
+ * --o3s-confirm*) intentionally DOES collide with light-theme values already in the bare :root
+ * above (e.g. --o3s-action is the orange "user action" color everywhere on the light worker
+ * surfaces -- WorkerLandingPage, SignInScreen, GuidedIntakeScreen, and shared components like
+ * RemindersCard/MitigationLogCard/WorkerTimelineEventCard all reference the SAME var name). That
+ * collision is deliberate, not a naming accident: it's how those shared components are meant to
+ * automatically re-theme by CSS cascade depending on which ancestor wraps them, without a dark
+ * prop or a separate dark component variant. Redefining those names UNconditionally here would
+ * have "fixed" the worker-complete screen while breaking every light screen that reuses the same
+ * components. The correct fix -- see the `.o3s-worker-complete-ground` block further below --
+ * is to redefine just that colliding subset LOCALLY, scoped to the dark wrapper, so descendants
+ * pick up the dark value only when actually rendered inside a dark-themed ancestor.
+ */
+:root {
   /* one3Seven obsidian workspace */
   --o3s-obsidian: #0b0c10;
   --o3s-obsidian-elevated: #111827;
@@ -93,7 +119,6 @@
   --o3s-fg: #e8e6e3;
   --o3s-muted: #9ca3af;
   --o3s-subtle: #6b7280;
-  --o3s-border: rgba(255, 255, 255, 0.06);
   --o3s-navy: #2C3A34;
   --o3s-navy-accent: #5E7268;
   --o3s-navy-muted: rgba(44,58,52, 0.35);
@@ -106,18 +131,9 @@
   --o3s-timeline-glow: rgba(44,58,52, 0.24);
   --o3s-ivory: #e8e6e3;
   --o3s-ivory-muted: rgba(232, 230, 227, 0.72);
-  /* Color-role system on dark (firm "cockpit") — brighter for contrast on green-black. */
-  --o3s-ai: #A78BFA;
-  --o3s-ai-strong: #7C5CFF;
-  --o3s-ai-soft: rgba(124, 92, 255, 0.14);
-  --o3s-action: #F3A268;
-  --o3s-action-accent: #E07B3E;
-  --o3s-action-soft: rgba(224, 123, 62, 0.12);
-  --o3s-done: #8FD3A6;
-  --o3s-done-soft: rgba(143, 211, 166, 0.12);
-  --o3s-confirm: #F3C775;
-  --o3s-confirm-soft: rgba(243, 199, 117, 0.12);
+}
 
+.dark {
   --background: var(--o3s-obsidian);
   --foreground: var(--o3s-fg);
   --card: var(--o3s-obsidian-elevated);
@@ -315,8 +331,29 @@
      this app actually toggles a .dark class on <html>; every sibling class here (o3s-firm-cockpit,
      o3s-worker-sky) already uses literal hex for the same reason. Applied to IntakeSummaryScreen
      only (2026-08-20 — complete = dark, in-process = the light→dark o3s-worker-sky gradient below,
-     now used the other way around from its original assignment). See project_ui_direction_july2026. */
+     now used the other way around from its original assignment). See project_ui_direction_july2026.
+
+     Also LOCALLY redefines the handful of --o3s-* names that intentionally collide with light
+     values in the bare :root (--o3s-border, --o3s-ai*, --o3s-action*, --o3s-done*,
+     --o3s-confirm*) -- confirmed live-broken 2026-08-20: every shared worker component rendered
+     inside this screen (RemindersCard, MitigationLogCard, WorkerTimelineEventCard,
+     WorkerDocumentRequestPanel, SourceRecordChips, the O3S_STATUS_PILL status chip, etc.) reads
+     these same var names expecting the dark value when nested under a dark ancestor and the light
+     value everywhere else -- that only works if something in the ancestor chain actually
+     redefines them, which nothing did. Scoped here (not globally) so the same components stay
+     correctly light everywhere else they're used (WorkerLandingPage, LandingScreen, GuidedIntakeScreen). */
   .o3s-worker-complete-ground {
+    --o3s-border: rgba(255, 255, 255, 0.08);
+    --o3s-ai: #A78BFA;
+    --o3s-ai-strong: #7C5CFF;
+    --o3s-ai-soft: rgba(124, 92, 255, 0.14);
+    --o3s-action: #F3A268;
+    --o3s-action-accent: #E07B3E;
+    --o3s-action-soft: rgba(224, 123, 62, 0.12);
+    --o3s-done: #8FD3A6;
+    --o3s-done-soft: rgba(143, 211, 166, 0.12);
+    --o3s-confirm: #F3C775;
+    --o3s-confirm-soft: rgba(243, 199, 117, 0.12);
     background-image:
       radial-gradient(760px 460px at 14% -8%, rgba(143, 211, 166, 0.10), transparent 58%),
       radial-gradient(680px 440px at 92% 8%, rgba(94, 114, 104, 0.16), transparent 55%),
