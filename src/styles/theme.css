@@ -395,6 +395,34 @@
   .o3s-worker-complete-skin [class*="bg-[#F8F4FF]"] { background-color: rgba(255, 255, 255, 0.05); }
   .o3s-worker-complete-skin [class*="bg-[#FBEAE9]"] { background-color: rgba(228, 114, 107, 0.12); }
 
+  /* Semantic alert cards (amber=confirm/warning, red=error, emerald=success) -- confirmed
+     live-broken 2026-08-20: these use Tailwind's NAMED color palette (bg-amber-50,
+     text-amber-950, etc.), not the hex-bracket classes the rules above target, so they fell
+     through the remap entirely. The card backgrounds stayed their original LIGHT color while
+     some of the text inside them (the hex-bracket classes, e.g. text-[#1B2623]) still correctly
+     went light-for-dark -- light text landing on a light card that was never darkened, nearly
+     invisible. Founder caught this live on the firm-access-request card. Colors chosen to match
+     the same hue family already established for these roles (amber -> --o3s-confirm #F3C775,
+     red -> the error red already used above #E4726B, emerald -> --o3s-done #8FD3A6). */
+  .o3s-worker-complete-skin [class*="bg-amber-50"],
+  .o3s-worker-complete-skin [class*="bg-amber-100"] { background-color: rgba(243, 199, 117, 0.10); }
+  .o3s-worker-complete-skin [class*="border-amber-100"],
+  .o3s-worker-complete-skin [class*="border-amber-200"] { border-color: rgba(243, 199, 117, 0.28); }
+  .o3s-worker-complete-skin [class*="text-amber-800"],
+  .o3s-worker-complete-skin [class*="text-amber-900"],
+  .o3s-worker-complete-skin [class*="text-amber-950"] { color: #F3C775; }
+  .o3s-worker-complete-skin [class*="bg-red-50"] { background-color: rgba(228, 114, 107, 0.10); }
+  .o3s-worker-complete-skin [class*="border-red-100"],
+  .o3s-worker-complete-skin [class*="border-red-200"] { border-color: rgba(228, 114, 107, 0.30); }
+  .o3s-worker-complete-skin [class*="text-red-600"],
+  .o3s-worker-complete-skin [class*="text-red-700"],
+  .o3s-worker-complete-skin [class*="text-red-800"] { color: #E4726B; }
+  .o3s-worker-complete-skin [class*="bg-emerald-50"] { background-color: rgba(143, 211, 166, 0.10); }
+  .o3s-worker-complete-skin [class*="border-emerald-100"],
+  .o3s-worker-complete-skin [class*="border-emerald-200"] { border-color: rgba(143, 211, 166, 0.28); }
+  .o3s-worker-complete-skin [class*="text-emerald-700"],
+  .o3s-worker-complete-skin [class*="text-emerald-800"] { color: #8FD3A6; }
+
   /* Warm entry-page ground (landing / sign-in / welcome) — sunset bone with a faint warm aura, so
      the front door reads warm and inviting like the worker side. Light per the marketing brand. */
   .o3s-warm-page {
