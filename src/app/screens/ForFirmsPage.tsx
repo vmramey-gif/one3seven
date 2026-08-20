@@ -318,6 +318,10 @@ export function ForFirmsPage({ onBack, onStartWorker }: ForFirmsPageProps) {
         <div className="mx-auto max-w-[520px]">
           <div className="mb-6 text-center">
             <h2 style={SERIF} className="text-[26px] font-semibold tracking-[-0.01em] text-[#17181C] sm:text-[32px]">Founding firms — shaped around your practice</h2>
+            <p className="mt-3 text-[13px] font-medium leading-relaxed text-[#42574E]">
+              The firm side of one3seven is by invitation while we're in the founding cohort — request access
+              below, or email <a href="mailto:info@one3seven.com" className="underline hover:text-[#374a42]">info@one3seven.com</a> directly.
+            </p>
             <p className="mt-3 text-[14px] leading-relaxed text-[#40433f]">
               We are opening a small founding cohort of California employment firms — onboarded a few at a
               time, hands-on — and shaping the intake experience around real plaintiff-side workflows: your
