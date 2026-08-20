@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { buildTimelineCsvContent } from '../intakeSummaryDownload';
+import { buildTimelineCsvContent, escapePdfLiteral } from '../intakeSummaryDownload';
 import type { IntakeSummaryDownloadPayload } from '../intakeSummaryDownload';
 
 function payloadWithEvents(
@@ -77,5 +77,29 @@ describe('buildTimelineCsvContent (2026-08-18, no CSV export existed anywhere �
       ])
     );
     expect(csv).toContain('paystub_1.pdf; paystub_2.pdf; timecard.pdf');
+  });
+});
+
+describe('escapePdfLiteral — non-Latin character handling (2026-08-19, confirmed live: was actively destroying every non-ASCII character, not just downgrading it)', () => {
+  test('transliterates accented Latin to its closest ASCII base letter instead of "?"', () => {
+    expect(escapePdfLiteral('José García Café Über François Müller Ñoño')).toBe(
+      'Jose Garcia Cafe Uber Francois Muller Nono'
+    );
+  });
+
+  test('a genuinely non-Latin script (no ASCII equivalent) still falls through to "?" -- an honest limit of this fallback-only renderer, not a silent corruption', () => {
+    const result = escapePdfLiteral('Москва Иванов');
+    expect(result).not.toContain('Москва');
+    expect(result).toMatch(/^\?+ \?+$/);
+  });
+
+  test('plain ASCII text is unaffected', () => {
+    expect(escapePdfLiteral('Marcus Delgado, Warehouse Associate')).toBe(
+      'Marcus Delgado, Warehouse Associate'
+    );
+  });
+
+  test('parentheses and backslashes are still escaped for PDF literal-string safety', () => {
+    expect(escapePdfLiteral('(test) and \\ backslash')).toBe('\\(test\\) and \\\\ backslash');
   });
 });

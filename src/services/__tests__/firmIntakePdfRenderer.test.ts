@@ -304,3 +304,31 @@ describe('renderWorkerSummaryPdf', () => {
     expect(bytes[0]).toBe(0x25);
   });
 });
+
+describe('non-Latin character support (2026-08-19, confirmed live: the PDF renderer previously used pdf-lib\'s built-in WinAnsi-only StandardFonts, which cannot represent a worker\'s own name if it has an accented or non-Latin character)', () => {
+  test('a worker\'s accented name renders as real, correct text -- not "?", not a missing-glyph box', async () => {
+    const bytes = await renderWorkerSummaryPdf(
+      workerModel({
+        cover: {
+          workerName: 'José García-Muñoz',
+          employer: 'Café François LLC',
+          employmentPeriod: 'March 2022 - January 2026',
+          recordCount: 11,
+          eventCount: 6,
+          preparedDate: 'Jun 16, 2026',
+        },
+      }),
+    );
+    // Independent verification via pdfjs-dist (this project's own PDF text-extraction engine,
+    // not just pdf-lib not throwing) -- proves the actual embedded glyphs decode back to the
+    // real characters, the same technique used to root-cause and confirm this fix originally.
+    const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs');
+    const doc = await pdfjsLib.getDocument({ data: bytes, useSystemFonts: true }).promise;
+    const page = await doc.getPage(1);
+    const textContent = await page.getTextContent();
+    const text = textContent.items.map((i: any) => i.str).join(' ');
+    expect(text).toContain('José García-Muñoz');
+    expect(text).toContain('Café François');
+  }, 15_000); // real CPU-bound work (font subsetting + independent PDF parsing) can exceed the
+  // 5s default under full-suite parallel load, even though it's fast in isolation.
+});
