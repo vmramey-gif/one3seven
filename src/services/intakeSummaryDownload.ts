@@ -688,12 +688,22 @@ function pdfSafeText(s: string): string {
     .replace(/\u2713|\u2714/g, '[x]'); // \u2713 checkmarks, if present
 }
 
-function escapePdfLiteral(s: string): string {
+export function escapePdfLiteral(s: string): string {
   return pdfSafeText(s)
     .replace(/\\/g, '\\\\')
     .replace(/\(/g, '\\(')
     .replace(/\)/g, '\\)')
     .replace(/[\r\n\t]/g, ' ')
+    // Transliterate accented Latin (café, José, François, Müller) to its closest ASCII base
+    // letter instead of destroying it with "?" (2026-08-19 — this ASCII fallback renderer uses
+    // pdf-lib's built-in WinAnsi-only StandardFonts, unlike the primary pdf-lib renderer, which
+    // now embeds a real Unicode font -- see firmIntakePdfRenderer.ts's embedBrandFonts. Teaching
+    // THIS hand-rolled minimal PDF writer full custom-font embedding would be a disproportionate
+    // effort for a rarely-hit last-resort fallback; this handles the most common real-world case
+    // -- an accented name -- while genuinely non-Latin scripts (Cyrillic, CJK, Arabic, Hebrew)
+    // still have no ASCII equivalent and fall through to "?" in this fallback path only).
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
     .replace(/[^\x20-\x7e]/g, '?');
 }
 
