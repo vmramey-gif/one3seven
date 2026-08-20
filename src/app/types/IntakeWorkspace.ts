@@ -1,5 +1,10 @@
-// Shared intake workspace architecture for One3Seven
-// This represents the single source of truth for both worker and firm views
+// Legacy in-memory intake workspace model, predates the Supabase-backed data layer
+// (src/services/intakeDataService.ts, intake_summaries/uploaded_files tables) that is the real
+// source of truth today. Still referenced as a fallback in App.tsx/IntakeSummaryScreen.tsx/
+// IntakeReviewScreen.tsx -- see src/app/types/ARCHITECTURE.md for the current data flow before
+// assuming this file describes it. 5 functions with zero callers anywhere in the codebase
+// (getEligibleFirms, submitIntakeToFirms, addInternalReviewerNote, requestAdditionalInfo,
+// routeIntakeToFirms) were removed 2026-08-20 -- confirmed dead via grep, not assumed.
 
 export interface UploadedDocument {
   id: string;
@@ -175,17 +180,6 @@ export function markIntakeAsSaved(workspace: IntakeWorkspace): IntakeWorkspace {
   };
 }
 
-export function submitIntakeToFirms(workspace: IntakeWorkspace): IntakeWorkspace {
-  return {
-    ...workspace,
-    shareStatus: 'submitted',
-    submittedAt: new Date().toISOString(),
-    sharedWithFirms: true,
-    firmRoutingStatus: 'pending',
-    lastModifiedAt: new Date().toISOString(),
-  };
-}
-
 // Firm-side helper functions
 
 export function updateWorkflowStatus(
@@ -198,79 +192,3 @@ export function updateWorkflowStatus(
     lastModifiedAt: new Date().toISOString(),
   };
 }
-
-export function addInternalReviewerNote(
-  workspace: IntakeWorkspace,
-  content: string,
-  reviewer?: string,
-  firmId?: string
-): IntakeWorkspace {
-  const newNote: InternalReviewerNote = {
-    id: `note-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-    content,
-    timestamp: new Date().toLocaleString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true,
-    }),
-    reviewer,
-    firmId,
-  };
-
-  return {
-    ...workspace,
-    internalReviewerNotes: [newNote, ...workspace.internalReviewerNotes],
-    lastModifiedAt: new Date().toISOString(),
-  };
-}
-
-export function requestAdditionalInfo(
-  workspace: IntakeWorkspace,
-  categories: string[],
-  note: string | undefined,
-  firmId: string
-): IntakeWorkspace {
-  const request: AdditionalInfoRequest = {
-    id: `request-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-    requestedAt: new Date().toISOString(),
-    categories,
-    note,
-    firmId,
-    status: 'pending',
-  };
-
-  return {
-    ...workspace,
-    additionalInfoRequests: [...workspace.additionalInfoRequests, request],
-    workflowStatus: 'additional-docs',
-    lastModifiedAt: new Date().toISOString(),
-  };
-}
-
-export function routeIntakeToFirms(
-  workspace: IntakeWorkspace,
-  firmIds: string[]
-): IntakeWorkspace {
-  return {
-    ...workspace,
-    routedToFirmIds: firmIds,
-    firmRoutingStatus: 'routed',
-    lastModifiedAt: new Date().toISOString(),
-  };
-}
-
-// Intake routing logic - determines which firms should see a given intake
-export function getEligibleFirms(workspace: IntakeWorkspace, firmPreferences: any[]): string[] {
-  // In production, this would check:
-  // - Geography match (firm covers worker location / employer state)
-  // - Category match (firm accepts these intake categories)
-  // - Document completeness (firm readiness threshold)
-  // - Firm subscription/routing settings
-
-  // For now, return all firm IDs as eligible
-  return firmPreferences.map(pref => pref.firmId);
-}
-
