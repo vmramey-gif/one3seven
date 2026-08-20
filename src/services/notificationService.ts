@@ -13,13 +13,6 @@ export type FirmPreviewNotifyArgs = {
   intakeNumber?: string;
 };
 
-export type WorkerFirmInterestNotifyArgs = {
-  workerEmail?: string;
-  workerId?: string;
-  firmName?: string;
-  intakeId?: string;
-};
-
 export type WorkerRoutingExpansionNotifyArgs = {
   workerEmail?: string;
   workerId?: string;
@@ -30,12 +23,6 @@ export type WorkerRoutingExpansionNotifyArgs = {
 /** @deprecated Beta stub — does not email the firm. */
 export async function notifyFirmOfPreview(args: FirmPreviewNotifyArgs): Promise<NotifyStubResult> {
   console.info('[o3s-notify-stub] notifyFirmOfPreview skipped (beta; no external delivery)', args);
-  return { delivered: false, stub: true };
-}
-
-/** @deprecated Beta stub — does not email the worker. */
-export async function notifyWorkerOfFirmInterest(args: WorkerFirmInterestNotifyArgs): Promise<NotifyStubResult> {
-  console.info('[o3s-notify-stub] notifyWorkerOfFirmInterest skipped (beta; no external delivery)', args);
   return { delivered: false, stub: true };
 }
 

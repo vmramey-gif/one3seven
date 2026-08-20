@@ -31,17 +31,3 @@ export function composeIntakeNarrativeForDisplay(
     recordCompleteness: buildMissingRecordBullets(payload),
   };
 }
-
-/** Alias for call sites that pass the standard download payload. */
-export function composeIntakeNarrativeFromPayload(
-  payload: IntakeSummaryDownloadPayload
-): ComposedIntakeNarrative {
-  return composeIntakeNarrativeForDisplay(payload);
-}
-
-/**
- * Legacy digest helper — returns executive summary only (Records Reviewed So Far removed).
- */
-export function formatDocumentGroundedOverviewDigest(narrative: ComposedIntakeNarrative): string {
-  return narrative.intakeAtAGlance.trim();
-}

@@ -465,9 +465,6 @@ export function buildOrganizerRecordStory(
   return buildNarrativeHierarchy(profile, opts).recordStory;
 }
 
-export function buildOrganizerTimelineLead(profile: RecordSetProfile): string {
-  return buildChronologySummary(profile);
-}
 
 function normalizeBucketLabel(label: string): string {
   const c = label.toLowerCase();

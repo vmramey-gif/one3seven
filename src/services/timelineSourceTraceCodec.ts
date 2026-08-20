@@ -99,7 +99,3 @@ export function extractRecordStoryFromOverview(overview: string | null | undefin
   return m?.[1]?.trim() || null;
 }
 
-export function extractFirmReviewSummaryFromOverview(overview: string | null | undefined): string | null {
-  const m = (overview ?? '').match(FIRM_REVIEW_PATTERN);
-  return m?.[1]?.trim() || null;
-}

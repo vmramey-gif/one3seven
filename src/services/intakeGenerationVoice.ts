@@ -104,11 +104,6 @@ export function materialsMayReflectPhrase(detail: string): string {
   return sanitizeGenerationPhrase(`The available materials may reflect ${d}`);
 }
 
-export function uploadedRecordsShowPhrase(detail: string): string {
-  const d = detail.replace(/^\s*uploaded records show\s+/i, '');
-  return sanitizeGenerationPhrase(`Records mention ${d}`);
-}
-
 export function takenTogetherPhrase(detail: string): string {
   const d = detail.replace(/^\s*taken together,?\s*(the\s+)?/i, '');
   return sanitizeGenerationPhrase(`Taken together, ${d}`);

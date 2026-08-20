@@ -89,19 +89,6 @@ export function getWorkerDocumentRequestStatus(
   return null;
 }
 
-export function workerDocumentRequestNeedsAction(
-  workflow: string | null | undefined,
-  view: WorkerDocumentRequestView | null
-): boolean {
-  const status = getWorkerDocumentRequestStatus(workflow);
-  // A worker needs to act while the firm's request is pending, or after they've
-  // uploaded but not yet submitted. 'submitted'/unknown statuses need no action.
-  // (`view` is retained in the signature for callers; the prior extra branch was
-  // dead — it re-tested status === 'pending' after that case had already returned.)
-  void view;
-  return status === 'pending' || status === 'uploaded';
-}
-
 export function buildWorkerDocumentRequestPayloadFromSummary(
   overview: string | undefined,
   missing: string[] | undefined,

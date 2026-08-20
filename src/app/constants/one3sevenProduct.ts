@@ -14,22 +14,6 @@ export const ONE3SEVEN_NOTICES = {
 export const UPLOAD_REDACTION_NOTICE =
   'Upload only records you feel comfortable sharing. You may redact Social Security numbers, banking details, medical record numbers, minors’ full details, or unrelated personal information before upload.';
 
-export const UPLOAD_PRIVACY_NOTICE = UPLOAD_REDACTION_NOTICE;
-
-/** Worker-facing pipeline labels (exact strings; also stored in intakes.workflow_status when using Supabase). */
-export const WORKER_WORKFLOW_STATUSES = [
-  'Upload Complete',
-  'Organizing Records',
-  'Intake Summary Generated',
-  'Matching Participating Firms',
-  'Under Review',
-  'Firm Interest Received',
-  'Awaiting Worker Approval',
-  'Shared with Participating Firm',
-] as const;
-
-export type WorkerWorkflowStatus = (typeof WORKER_WORKFLOW_STATUSES)[number];
-
 export const PARTICIPATING_NETWORK_IDLE = {
   noRequestsYet:
     'Your intake remains active in the participating review network. No firm has requested expanded access yet.',
@@ -62,17 +46,6 @@ export const PARTICIPATING_NETWORK_COPY = {
   zeroRoutesAvailable:
     'No participating firms are currently available in this beta workspace. You can save this intake or connect a firm directly with a firm code.',
 } as const;
-
-/** Tracker when submission_channel is participating (distinct from direct firm-code routing). */
-export const WORKER_PARTICIPATING_TRACKER_STEPS = [
-  'Records organized',
-  'Preview sent to participating firms',
-  'Under review in the network',
-  'Firm interest or access request',
-  'You approve expanded access (if needed)',
-  'Shared for full firm review',
-  'Additional records (if requested)',
-] as const;
 
 export function isParticipatingSubmissionChannel(channel: string | null | undefined): boolean {
   return (channel ?? '').trim() === 'participating';
@@ -202,43 +175,6 @@ export function formatRouteStatusForFirm(
   return 'Full intake access';
 }
 
-export function getWorkerTrackerSteps(channel: string | null | undefined): readonly string[] {
-  return isParticipatingSubmissionChannel(channel)
-    ? WORKER_PARTICIPATING_TRACKER_STEPS
-    : WORKER_LIVE_STATUS_TRACKER_STEPS;
-}
-
-/** User-facing tracker labels (internal workflow_status strings unchanged). */
-const WORKER_TRACKER_STEP_DISPLAY: Record<string, string> = {
-  'Upload Complete': 'Upload complete',
-  'Intake Summary Generated': 'Organized summary ready',
-  'Routed to Firm': 'Sent to firm',
-  'Under Firm Review': 'Under firm review',
-  'Firm Interest Received': 'Firm interest received',
-  'Additional Documents Requested': 'Additional records requested',
-  'Worker Uploaded Additional Documents': 'Additional records uploaded',
-  'Worker Uploaded Requested Documents': 'Requested records submitted',
-  'Shared with Firm': 'Shared with firm',
-  'Records organized': 'Records organized',
-  'Preview sent to participating firms': 'Preview sent to participating firms',
-  'Under review in the network': 'Under review in the network',
-  'Firm interest or access request': 'Firm interest or access request',
-  'You approve expanded access (if needed)': 'You approve expanded access (if needed)',
-  'Shared for full firm review': 'Shared for full firm review',
-  'Additional records (if requested)': 'Additional records (if requested)',
-};
-
-export function formatWorkerTrackerStepForDisplay(step: string): string {
-  const key = step.trim();
-  return WORKER_TRACKER_STEP_DISPLAY[key] ?? key;
-}
-
-export function getWorkerTrackerStepsForDisplay(
-  channel: string | null | undefined
-): readonly string[] {
-  return getWorkerTrackerSteps(channel).map(formatWorkerTrackerStepForDisplay);
-}
-
 export const FIRM_ROUTING_COPY = {
   sendOrganizedIntro:
     'Already working with a law firm? Enter their one3seven Firm Code to route this organized intake directly to their dashboard.',
@@ -270,18 +206,6 @@ export const SAMPLE_INTAKE_SUMMARY_PREVIEW = {
   workerDisplay: 'Sample record owner',
   workerInitials: 'V.R.',
 } as const;
-
-/** Worker dashboard live tracker (aligned with firm-side workflow wording). */
-export const WORKER_LIVE_STATUS_TRACKER_STEPS = [
-  'Upload Complete',
-  'Intake Summary Generated',
-  'Routed to Firm',
-  'Under Firm Review',
-  'Firm Interest Received',
-  'Additional Documents Requested',
-  'Worker Uploaded Additional Documents',
-  'Shared with Firm',
-] as const;
 
 /** Exact `intakes.workflow_status` values for firm document-request loop (no fuzzy matching). */
 export const WORKFLOW_ADDITIONAL_DOCUMENTS_REQUESTED = 'Additional Documents Requested' as const;
@@ -358,79 +282,3 @@ export function workerParticipatingPreviewSent(
   return true;
 }
 
-const WORKFLOW_TO_TRACKER_INDEX: Record<string, number> = {
-  'Upload Complete': 0,
-  'Organizing Records': 0,
-  'Intake Summary Generated': 1,
-  'Matching Participating Firms': 2,
-  'Routed to Firm': 2,
-  'Under Review': 3,
-  'Under Firm Review': 3,
-  'Firm Interest Received': 4,
-  'Awaiting Worker Approval': 4,
-  'Additional Documents Requested': 5,
-  'Worker Uploaded Additional Documents': 6,
-  'Worker Uploaded Requested Documents': 6,
-  'Shared with Participating Firm': 7,
-  'Shared with Firm': 7,
-};
-
-const PARTICIPATING_WORKFLOW_TO_TRACKER_INDEX: Record<string, number> = {
-  'Upload Complete': 0,
-  'Organizing Records': 0,
-  'Intake Summary Generated': 0,
-  'Matching Participating Firms': 1,
-  'Under Review': 2,
-  'Firm Interest Received': 3,
-  'Awaiting Worker Approval': 3,
-  'Shared with Participating Firm': 5,
-  'Additional Documents Requested': 6,
-  'Worker Uploaded Additional Documents': 6,
-  'Worker Uploaded Requested Documents': 6,
-};
-
-/** Returns index of the active tracker step (firm-code: 0–7; participating: 0–6). */
-export function getWorkerIntakeTrackerActiveIndex(
-  workflow: string | null | undefined,
-  channel?: string | null
-): number {
-  const w = (workflow ?? '').trim();
-  if (!w) return 0;
-
-  if (isParticipatingSubmissionChannel(channel)) {
-    if (PARTICIPATING_WORKFLOW_TO_TRACKER_INDEX[w] !== undefined) {
-      return PARTICIPATING_WORKFLOW_TO_TRACKER_INDEX[w];
-    }
-    const lower = w.toLowerCase();
-    if (lower.includes('organizing') || lower.includes('summary')) return 0;
-    if (lower.includes('matching') || lower.includes('sent')) return 1;
-    if (lower.includes('under review')) return 2;
-    if (lower.includes('interest') || lower.includes('approval')) return 3;
-    if (lower.includes('shared')) return 5;
-    if (lower.includes('additional documents') || lower.includes('uploaded requested')) return 6;
-    return 1;
-  }
-
-  if (WORKFLOW_TO_TRACKER_INDEX[w] !== undefined) return WORKFLOW_TO_TRACKER_INDEX[w];
-  const lower = w.toLowerCase();
-  if (lower.includes('organizing')) return 0;
-  if (lower.includes('summary')) return 1;
-  if (lower.includes('matching') || lower.includes('routed')) return 2;
-  if (lower.includes('review')) return 3;
-  if (lower.includes('interest') || lower.includes('approval')) return 4;
-  if (lower.includes('additional documents')) return 5;
-  if (lower.includes('uploaded requested')) return 6;
-  if (lower.includes('shared')) return 7;
-  return 1;
-}
-
-/** True when organization was in progress but may have been interrupted (e.g. browser refresh). */
-export function isInterruptedOrganizationWorkflowStatus(workflow: string | null | undefined): boolean {
-  const w = (workflow ?? '').trim();
-  if (!w) return false;
-  if (w === 'Organizing Records') return true;
-  const lower = w.toLowerCase();
-  if (lower === 'processing' || lower === 'organizing') return true;
-  if (lower.includes('organizing record')) return true;
-  return false;
-}

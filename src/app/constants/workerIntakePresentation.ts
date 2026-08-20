@@ -53,24 +53,6 @@ export const WORKER_HUB_COPY = {
   nextStepLabel: 'Next step',
 } as const;
 
-export const WORKER_DOC_REQUEST_DASHBOARD_COPY = {
-  headline: 'A law firm needs more records from you',
-  subline: (firmName: string) => `${firmName} is waiting on documents to continue review.`,
-  firmLabel: 'Firm name',
-  requestedRecordsLabel: 'Requested records',
-  firmMessageLabel: 'Firm message',
-  uploadCta: 'Upload requested records',
-  viewTimeline: 'View timeline',
-} as const;
-
-export const WORKER_DOC_REQUEST_ALERT_COPY = {
-  title: 'Additional records requested',
-  bodyWithFirm: (firmName: string) => `${firmName} asked for more records to continue review.`,
-  bodyGeneric: 'Your firm asked for more records to continue review.',
-  primaryCta: 'Review request & upload records',
-  confirmCta: 'Open summary to confirm response',
-} as const;
-
 export const WORKER_UPLOAD_COPY = {
   storyProvided: 'Story provided',
   viewStory: 'View story',
@@ -97,10 +79,6 @@ export const WORKER_DOC_REQUEST_STATUS_COPY = {
   submittedBody: 'Your firm can review your response when they open this intake on their dashboard.',
 } as const;
 
-export const WORKER_DOC_REQUEST_BELL_COPY = {
-  actionLabel: 'Review request & upload records',
-} as const;
-
 /** Approved neutral phrasing for flags and gaps (never legal conclusions). */
 /** How firmly a timeline row is tied to uploaded files (from generation metadata). */
 export const WORKER_SOURCE_STRENGTH_LABELS: Record<string, string> = {
@@ -109,12 +87,3 @@ export const WORKER_SOURCE_STRENGTH_LABELS: Record<string, string> = {
   inferred: 'Grouped from file type and filename',
   needs_review: 'Needs review against source files',
 };
-
-export const WORKER_REVIEW_PHRASES = {
-  flagged: 'Flagged for professional review',
-  inconsistency: 'Potential inconsistency identified',
-  timelineGap: 'Timeline gap detected between uploaded records',
-  compensationVariation: 'Compensation structure variation noted',
-  additionalReview: 'Marked for additional review',
-  needsReview: 'Needs review against source records',
-} as const;

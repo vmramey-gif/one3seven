@@ -170,12 +170,6 @@ export function loadGuidedIntakeFromSession(intakeId: string): GuidedIntakeAnswe
   }
 }
 
-export function extractCaseCategoryFromOverview(overview: string | null | undefined): IntakeCaseCategory | null {
-  const m = (overview ?? '').match(CASE_CATEGORY_BLOCK_RE);
-  const raw = m?.[1]?.trim() ?? '';
-  if (!raw) return null;
-  return raw as IntakeCaseCategory;
-}
 
 function mergeCaseCategoryBlock(
   overview: string,
