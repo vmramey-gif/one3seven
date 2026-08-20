@@ -1,8 +1,14 @@
-/** Mobile Summary tab presentation helpers (worker shell only). Desktop keeps light report styling. */
+/**
+ * Mobile Summary tab presentation helpers. shellMode is currently never set to true anywhere in
+ * the app (dead branch, kept as-authored rather than deleted here — out of scope for this
+ * change) -- the `!shellMode` branch below is the one actually rendered, on every breakpoint.
+ * 2026-08-20: its `root` now carries the dark "complete" ground+skin (see theme.css) on both
+ * mobile and desktop, since a completed intake is the same finished state regardless of device.
+ */
 export function workerMobileSummarySkin(shellMode: boolean) {
   if (!shellMode) {
     return {
-      root: 'min-h-screen o3s-worker-sky',
+      root: 'min-h-screen o3s-worker-complete-ground o3s-worker-complete-skin',
       content: (fullReview: boolean) => (fullReview ? 'pb-28' : 'pb-16'),
       skin: '',
       back: 'flex items-center gap-1.5 text-xs uppercase tracking-wide text-slate-500 hover:text-slate-700 transition-colors duration-200 font-normal',

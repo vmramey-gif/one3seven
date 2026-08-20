@@ -54,7 +54,7 @@ import { RedactionEditor } from '../components/RedactionEditor';
 import { FIRM_CODE_ROUTING_LIVE } from '../constants/flags';
 
 const UPLOAD_PAGE_SHELL =
-  'min-h-screen bg-[#f2f4ec] text-[#111827] selection:bg-[#CBD6CF]/70 selection:text-[#111827]';
+  'min-h-screen o3s-worker-sky text-[#111827] selection:bg-[#CBD6CF]/70 selection:text-[#111827]';
 const UPLOAD_NAV_TOP = 'sticky top-0 z-40 border-b border-[#D3DED6]/80 bg-white/88 backdrop-blur-xl';
 const UPLOAD_NAV_BRAND =
   'text-[15px] font-semibold tracking-tight text-[#1B2623] hover:text-[#42574E] transition-colors';

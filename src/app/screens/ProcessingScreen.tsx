@@ -164,9 +164,9 @@ export function ProcessingScreen({
   }, [phase, quickMode]);
 
   return (
-    <div className="min-h-screen bg-[#F1F3EF]">
+    <div className="min-h-screen o3s-worker-sky">
       {/* Top Navigation */}
-      <nav className="sticky top-0 bg-[#F1F3EF]/80 backdrop-blur-md border-b border-[#D3DED6] z-50">
+      <nav className="sticky top-0 bg-[#FBF7EF]/80 backdrop-blur-md border-b border-[#D3DED6] z-50">
         <div className="px-6 py-7 flex items-center justify-between gap-3">
           <button
             type="button"
