@@ -11,5 +11,3 @@
  */
 
 export type RecordType = 'personnel_file' | 'pay_records' | 'time_records' | 'signed_documents';
-
-export const RECORD_TYPES: readonly RecordType[] = ['personnel_file', 'pay_records', 'time_records', 'signed_documents'];

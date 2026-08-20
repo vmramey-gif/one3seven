@@ -250,14 +250,3 @@ export function legacyCategoryToBucket(name: string): ExportBucket {
       return 'Additional Supporting Records';
   }
 }
-
-export function confidenceLabel(confidence: string): string {
-  switch (confidence) {
-    case 'grounded':
-      return 'Grounded';
-    case 'partial':
-      return 'Partial';
-    default:
-      return 'Sparse';
-  }
-}

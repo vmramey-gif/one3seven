@@ -7,24 +7,6 @@ export const STORY_FIRST_STEP_LABELS = {
   followUp: 'Step 3 of 3',
 } as const;
 
-export const WORKER_STORY_HEADING = 'Tell your story';
-
-export const WORKER_STORY_INTRO =
-  "Don't worry about legal terms or perfect wording. Simply explain what happened in your own words. one3seven will help organize the records and build a timeline from there.";
-
-export const WORKER_STORY_PLACEHOLDER =
-  'Explain what happened in your own words — a few sentences is enough.';
-
-/** Helper examples shown on the story intake step. */
-export const WORKER_STORY_EXAMPLES = [
-  'I think I was not paid correctly.',
-  'I was fired after raising concerns.',
-  'I worked remotely and paid for my own phone or internet.',
-  'My schedule or hours changed.',
-  'I received discipline or a review that felt connected to something else.',
-  'I am not sure what matters yet.',
-] as const;
-
 export const STORY_FIRST_UPLOAD_HEADING = 'Add records';
 
 export const STORY_FIRST_UPLOAD_INTRO =
@@ -100,9 +82,6 @@ export const STORY_FIRST_FOLLOWUP_HEADING = 'Helpful details if you know them';
 
 export const STORY_FIRST_FOLLOWUP_SUBLINE = 'Optional — skip anything you are not sure about.';
 
-export const STORY_FIRST_REMOTE_EXPENSES_QUESTION =
-  'Did you use your own phone, internet, vehicle, equipment, tools, or supplies for work?';
-
 /** Intake packet section titles (story-first review packet). */
 export const ATTORNEY_PACKET_SECTIONS = {
   currentUnderstanding: 'Intake Overview',
@@ -176,34 +155,9 @@ export const US_STATES: { code: string; name: string }[] = [
   { code: 'WV', name: 'West Virginia' }, { code: 'WI', name: 'Wisconsin' }, { code: 'WY', name: 'Wyoming' },
 ];
 
-export const STORY_FOLLOWUP_REIMBURSEMENT_OPTIONS: { value: ReimbursementFollowUpAnswer; label: string }[] = [
-  { value: 'yes', label: 'Yes' },
-  { value: 'no', label: 'No' },
-  { value: 'sometimes', label: 'Sometimes' },
-  { value: 'not_sure', label: 'Not sure' },
-];
-
-export const STORY_FOLLOWUP_REMOTE_OPTIONS: { value: RemoteWorkFollowUpAnswer; label: string }[] = [
-  { value: 'yes', label: 'Yes' },
-  { value: 'no', label: 'No' },
-  { value: 'not_sure', label: 'Not sure' },
-];
-
 export const EMPLOYMENT_STATUS_OPTIONS: { value: EmploymentStatusAnswer; label: string }[] = [
   { value: 'still_employed', label: 'Still employed there' },
   { value: 'employment_ended', label: 'Employment ended' },
-  { value: 'not_sure', label: 'Not sure' },
-];
-
-export const ARBITRATION_OPTIONS: { value: ArbitrationAnswer; label: string }[] = [
-  { value: 'yes', label: 'Yes' },
-  { value: 'no', label: 'No' },
-  { value: 'not_sure', label: 'Not sure' },
-];
-
-export const AGENCY_FILING_OPTIONS: { value: AgencyFilingAnswer; label: string }[] = [
-  { value: 'yes', label: 'Yes' },
-  { value: 'no', label: 'No' },
   { value: 'not_sure', label: 'Not sure' },
 ];
 

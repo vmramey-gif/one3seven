@@ -29,7 +29,6 @@ import {
   normalizePersistedSubmissionChannel,
   resolveFirmSubmissionTypeDisplay,
   resolveIsFirmCodeRoutedIntake,
-  isInterruptedOrganizationWorkflowStatus,
   type FirmSubmissionTypeDisplay,
 } from '../app/constants/one3sevenProduct';
 import { inferInventoryCategory } from './packetChronologyIntelligence';
@@ -662,11 +661,6 @@ export async function fetchFirmProfileForUserWithTimeout(userId: string): Promis
   }
 }
 
-export async function updateProfileRole(userId: string, role: 'worker' | 'firm'): Promise<{ error?: string }> {
-  const { error } = await supabase.from('profiles').update({ role }).eq('id', userId);
-  return error ? { error: error.message } : {};
-}
-
 export async function updateProfileName(userId: string, full_name: string): Promise<{ error?: string }> {
   const { error } = await supabase.from('profiles').update({ full_name }).eq('id', userId);
   return error ? { error: error.message } : {};
@@ -698,15 +692,6 @@ export async function saveWorkerContactDetails(
   };
   const { error } = await supabase.from('profiles').update(patch).eq('id', userId);
   return error ? { error: error.message } : {};
-}
-
-export async function fetchFirmProfileForUser(userId: string): Promise<FirmProfileRow | null> {
-  const { data, error } = await supabase.from('firm_profiles').select('*').eq('profile_id', userId).maybeSingle();
-  if (error) {
-    console.error(error);
-    return null;
-  }
-  return data as FirmProfileRow | null;
 }
 
 /** Returns the existing firm profile only; does not create placeholder rows. */
@@ -956,19 +941,6 @@ async function saveFirmProfileBasicsInner(opts: {
     profile: null,
     error: created.error ?? 'Could not save firm profile. Try again in a moment.',
   };
-}
-
-export async function updateFirmProfile(
-  firmId: string,
-  patch: Partial<
-    Pick<
-      FirmProfileRow,
-      'firm_name' | 'contact_email' | 'practice_areas' | 'geographic_filters' | 'subscription_status' | 'plan_id'
-    >
-  >
-): Promise<{ error?: string }> {
-  const { error } = await supabase.from('firm_profiles').update(patch).eq('id', firmId);
-  return error ? { error: error.message } : {};
 }
 
 export async function createDraftIntake(
@@ -2974,17 +2946,6 @@ export async function fetchFirmByCodeForWorker(code: string): Promise<{ id: stri
   return { id: firmId, firm_name: trimmed, firm_code: trimmed };
 }
 
-export async function updateTimelineEventWorkerContext(
-  timelineEventId: string,
-  workerContext: string
-): Promise<{ error?: string }> {
-  const { error } = await supabase
-    .from('timeline_events')
-    .update({ worker_context: workerContext })
-    .eq('id', timelineEventId);
-  return error ? { error: error.message } : {};
-}
-
 export async function updateIntakeWorkflowStatus(
   intakeId: string,
   workflow_status: string
@@ -3911,75 +3872,6 @@ export async function listWorkerIntakes(workerId: string): Promise<
       case_category: categoryByIntake.get(i.id as string) ?? null,
     }))
     .filter((row, idx, arr) => arr.findIndex((x) => x.id === row.id) === idx);
-}
-
-export type OrganizationRecoveryResult = {
-  recoveredCount: number;
-  resetCount: number;
-  affectedIntakeIds: string[];
-  message: string | null;
-};
-
-/** Recover intakes stuck in an in-progress organization state after refresh or tab close. */
-export async function recoverInterruptedOrganizationIntakes(
-  workerId: string
-): Promise<OrganizationRecoveryResult> {
-  const rows = await listWorkerIntakes(workerId);
-  let recoveredCount = 0;
-  let resetCount = 0;
-  const affectedIntakeIds: string[] = [];
-
-  for (const row of rows) {
-    if (!isInterruptedOrganizationWorkflowStatus(row.workflow_status)) continue;
-
-    let targetStatus: string;
-    if (!row.has_summary) {
-      targetStatus = 'Upload Complete';
-      resetCount += 1;
-    } else {
-      recoveredCount += 1;
-      const bundle = await fetchIntakeSummaryBundle(row.id);
-      const overview = String((bundle.summary as { overview?: string } | null)?.overview ?? '');
-      const alerts =
-        ((bundle.summary as { missing_document_alerts?: string[] } | null)?.missing_document_alerts ??
-          []);
-      const firmBlock = extractFirmDocumentRequestBlockFromOverview(overview);
-      const response = resolveWorkerDocumentResponse(overview, alerts);
-
-      if (response && response.fulfilled.length > 0) {
-        targetStatus = 'Worker Uploaded Requested Documents';
-      } else if (firmBlock) {
-        targetStatus = 'Additional Documents Requested';
-      } else {
-        targetStatus = 'Intake Summary Generated';
-      }
-    }
-
-    const upd = await updateIntakeWorkflowStatus(row.id, targetStatus);
-    if (upd.error) {
-      console.error('[o3s-org-recovery] workflow update failed', {
-        intakeId: row.id,
-        from: row.workflow_status,
-        to: targetStatus,
-        error: upd.error,
-      });
-      continue;
-    }
-
-    affectedIntakeIds.push(row.id);
-    console.info('[o3s-org-recovery] recovered intake workflow', {
-      intakeId: row.id,
-      from: row.workflow_status,
-      to: targetStatus,
-    });
-  }
-
-  const message =
-    resetCount > 0
-      ? 'Organization was interrupted. Please run Begin Organizing again.'
-      : null;
-
-  return { recoveredCount, resetCount, affectedIntakeIds, message };
 }
 
 /**

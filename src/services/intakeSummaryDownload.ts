@@ -4,7 +4,6 @@
  */
 
 import {
-  buildIntakePacketHtml,
   buildPacketCoreStoryDisplay,
   buildWorkerSummaryModel,
   collectIntakePacketPdfLines,
@@ -980,10 +979,6 @@ function buildIntakeSummaryAsciiPdfBytes(payload: IntakeSummaryDownloadPayload):
   return buildAsciiTextPdf(pdfLines);
 }
 
-export function buildIntakeSummaryHtml(payload: IntakeSummaryDownloadPayload): string {
-  return buildIntakePacketHtml(payload);
-}
-
 /**
  * Builds the worker summary PDF bytes -- shared by the browser download and the
  * email-a-copy action, so both paths render identically and only one place needs the
@@ -1059,12 +1054,7 @@ export async function emailIntakeSummaryToFirm(
   return {};
 }
 
-/** Build and download a text PDF from pre-wrapped lines (firm review packets, etc.). */
-export function downloadPdfFromTextLines(allLines: string[], filename: string): void {
-  triggerPdfDownload(buildAsciiTextPdf(allLines), filename);
-}
-
-/** Append word-wrapped lines suitable for `downloadPdfFromTextLines`. */
+/** Append word-wrapped lines suitable for firm review packet PDF export. */
 export function appendPdfWrappedLines(lines: string[], text: string): void {
   for (const ln of wrapPdfLine(pdfSafeText(text), 92)) lines.push(ln);
 }
@@ -1073,48 +1063,3 @@ export function appendPdfBlankLine(lines: string[]): void {
   pushBlank(lines);
 }
 
-export function printIntakeSummaryDocument(payload: IntakeSummaryDownloadPayload): void {
-  const html = buildIntakeSummaryHtml(payload);
-  const iframe = document.createElement('iframe');
-  iframe.setAttribute('aria-hidden', 'true');
-  iframe.style.position = 'fixed';
-  iframe.style.left = '-10000px';
-  iframe.style.top = '0';
-  iframe.style.width = '8.5in';
-  iframe.style.height = '11in';
-  iframe.style.border = '0';
-  iframe.style.background = 'white';
-
-  const cleanup = () => {
-    try {
-      iframe.remove();
-    } catch {
-      /* ignore */
-    }
-  };
-
-  document.body.appendChild(iframe);
-  const doc = iframe.contentDocument ?? iframe.contentWindow?.document;
-  const w = iframe.contentWindow;
-  if (!doc || !w) {
-    cleanup();
-    return;
-  }
-
-  doc.open();
-  doc.write(html);
-  doc.close();
-
-  const runPrint = () => {
-    try {
-      w.focus();
-      w.print();
-      window.setTimeout(cleanup, 5000);
-    } catch {
-      cleanup();
-    }
-  };
-
-  w.addEventListener('afterprint', cleanup, { once: true });
-  window.setTimeout(runPrint, 250);
-}

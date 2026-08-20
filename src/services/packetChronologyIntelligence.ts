@@ -127,35 +127,6 @@ const EVENT_FORBIDDEN_FILE_PATTERNS: Record<string, RegExp[]> = {
  */
 const MISLEADING_UPSTREAM_TITLE_RE = /^(concern|issue|problem|incident|matter|situation)\b/i;
 
-/** Maps resolved event titles to a human-readable display category for the firm card badge. */
-const TITLE_TO_DISPLAY_CATEGORY: Record<string, string> = {
-  'Employment begins': 'Employment',
-  'Employment ends': 'Separation',
-  'Termination documented': 'Separation',
-  'Written warning issued': 'Disciplinary',
-  'Performance improvement plan issued': 'Performance Review',
-  'Performance review documented': 'Performance Review',
-  'Complaint submitted to Human Resources': 'HR Communication',
-  'Complaint submitted to supervisor': 'Workplace Communication',
-  'Concern raised with management': 'Workplace Communication',
-  'Schedule change documented': 'Scheduling',
-  'Employment activity documented through payroll records': 'Pay Records',
-  'Witness statement provided': 'Workplace Communication',
-  'Project removal documented': 'HR Communication',
-  'Recognition received': 'HR Communication',
-};
-
-/**
- * Resolves the display category badge for a firm-facing timeline event card.
- * Falls back to the stored category unless it is Uncategorized and the resolved
- * title maps to a known category.
- */
-export function resolveEventDisplayCategory(storedCategory: string, resolvedTitle: string): string {
-  const stored = (storedCategory ?? '').trim();
-  if (stored && stored !== 'Uncategorized') return stored;
-  return TITLE_TO_DISPLAY_CATEGORY[resolvedTitle] ?? stored ?? 'Uncategorized';
-}
-
 const CATEGORY_FALLBACK_TITLES: Record<string, string> = {
   'Offer Letters': 'Employment begins',
   'Pay Records': 'Employment activity documented through payroll records',

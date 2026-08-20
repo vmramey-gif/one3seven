@@ -71,10 +71,3 @@ export async function submitDemoDebrief(input: DemoDebriefInput): Promise<{ erro
   const { error } = await supabase.from('demo_debriefs').insert(toDebriefRow(input));
   return { error: error?.message ?? null };
 }
-
-/** Founder/own-rows (RLS-enforced) search-signal count for a simple "N of M asked to search". */
-export async function getSearchSignal(): Promise<{ asked: number; total: number }> {
-  const { data, error } = await supabase.from('demo_debriefs').select('asked_for_search');
-  if (error || !data) return { asked: 0, total: 0 };
-  return summarizeSearchSignal(data);
-}

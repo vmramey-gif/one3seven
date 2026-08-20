@@ -210,9 +210,6 @@ export function classifyDateToken(
   return { category: 'unknown', employmentPriority: 0 };
 }
 
-export function isExcludedFromEmploymentChronology(category: DateContextCategory): boolean {
-  return category !== 'employment_chronology';
-}
 
 function scanDatePatterns(corpus: string, onHit: (token: string, index: number) => void) {
   const run = (re: RegExp, transform?: (m: RegExpExecArray) => string) => {

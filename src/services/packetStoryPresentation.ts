@@ -812,11 +812,6 @@ export function buildWorkerAccount(payload: IntakeSummaryDownloadPayload): {
   return { sections, narrative };
 }
 
-/** @deprecated Use buildWorkerAccount().narrative */
-export function extractWorkerNarrative(payload: IntakeSummaryDownloadPayload): string {
-  return buildWorkerAccount(payload).narrative;
-}
-
 export function buildReviewTopicBullets(payload: IntakeSummaryDownloadPayload): string[] {
   const seen = new Set<string>();
   const out: string[] = [];
@@ -887,6 +882,3 @@ export function buildMissingRecordBullets(payload: IntakeSummaryDownloadPayload)
   return out;
 }
 
-export function presentPacketTimelineContextNote(_summary: string, _storyTitle: string): string {
-  return '';
-}
