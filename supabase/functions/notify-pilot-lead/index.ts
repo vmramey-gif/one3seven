@@ -19,7 +19,35 @@
  *   RESEND_API_KEY · PILOT_NOTIFY_FROM · PILOT_NOTIFY_TO · PILOT_WEBHOOK_SECRET
  */
 
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
 const RESEND_API_URL = 'https://api.resend.com/emails';
+
+/**
+ * This function's whole job is a founder-alert email. If Resend itself fails, the current 502
+ * response is invisible -- it's a DB-webhook-triggered call, so there's no human watching for it
+ * to fail, and a missed founder notification (a live lead going cold) is a real business cost.
+ * Writes a durable, founder-queryable row so a lost notification is discoverable later even if
+ * nobody notices in the moment. Best-effort: if this insert itself fails, don't let alerting
+ * failure mask the original error.
+ */
+async function recordAlert(
+  supabaseUrl: string,
+  serviceRoleKey: string,
+  detail: Record<string, unknown>,
+): Promise<void> {
+  try {
+    const supabase = createClient(supabaseUrl, serviceRoleKey);
+    const { error } = await supabase.from('edge_function_alerts').insert({
+      function_name: 'notify-pilot-lead',
+      alert_type: 'resend_send_failed',
+      detail,
+    });
+    if (error) console.error('[notify-pilot-lead] alert row insert failed (non-fatal)', error.message);
+  } catch (e) {
+    console.error('[notify-pilot-lead] alert row insert threw (non-fatal)', e instanceof Error ? e.message : String(e));
+  }
+}
 
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -47,6 +75,10 @@ Deno.serve(async (req: Request) => {
   if (!RESEND_API_KEY || !FROM || TO.length === 0) {
     return json({ error: 'Email not configured (RESEND_API_KEY / PILOT_NOTIFY_FROM / PILOT_NOTIFY_TO)' }, 500);
   }
+  // Only needed for the alert-on-failure path below (recordAlert) — every other line in this
+  // function already worked without touching the DB.
+  const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
+  const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
 
   let payload: { table?: string; record?: Record<string, unknown>; old_record?: Record<string, unknown> };
   try {
@@ -137,6 +169,14 @@ Deno.serve(async (req: Request) => {
 
   if (!res.ok) {
     const detail = await res.text();
+    if (SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY) {
+      await recordAlert(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+        table,
+        subject,
+        resendStatus: res.status,
+        detail: detail.slice(0, 2000),
+      });
+    }
     return json({ error: 'Email send failed', status: res.status, detail }, 502);
   }
   return json({ ok: true });

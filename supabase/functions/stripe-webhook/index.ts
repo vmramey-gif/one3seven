@@ -121,16 +121,24 @@ Deno.serve(async (req: Request) => {
       fpId = (data?.firm_profile_id as string | undefined) ?? null;
     }
     if (!fpId) {
-      // error, not warn: this event is dropped with no retry (Stripe sees 200) and no other
-      // code path ever revisits it — a real subscription state change (plan/status) silently
-      // never reaches firm_profiles. Log everything needed to reconcile by hand from Supabase's
-      // function logs, since nothing currently alerts on this automatically.
+      // This event is dropped with no retry (Stripe sees 200, by design -- retrying won't fix a
+      // mapping problem) and no other code path ever revisits it: a real subscription state
+      // change (plan/status) would otherwise silently never reach firm_profiles. console.error
+      // alone is invisible unless someone happens to be reading Supabase function logs at that
+      // exact moment, so this also writes a durable, founder-queryable row -- best-effort: if the
+      // insert itself fails, that must not turn an already-bad situation into a 500 to Stripe.
       console.error('[stripe-webhook] UNMAPPED FIRM — subscription event dropped, no automatic retry', {
         eventType: event.type,
         subscriptionId: subscription.id,
         customerId,
         priceId,
       });
+      const { error: alertErr } = await supabase.from('edge_function_alerts').insert({
+        function_name: 'stripe-webhook',
+        alert_type: 'unmapped_firm',
+        detail: { eventType: event.type, subscriptionId: subscription.id, customerId, priceId },
+      });
+      if (alertErr) console.error('[stripe-webhook] alert row insert failed (non-fatal)', alertErr.message);
       return new Response(JSON.stringify({ received: true, note: 'unmapped firm' }), { status: 200 });
     }
 
