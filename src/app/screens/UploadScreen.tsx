@@ -32,9 +32,9 @@ import {
   WORKER_UPLOAD_SOURCING_GUIDANCE,
   type StoryFollowUpAnswers,
 } from '../constants/workerStoryIntake';
+import { listCompletedExtractionsForIntake } from '../../services/fileUploadService';
 import {
   inferCategoryFromFileName,
-  listCompletedExtractionsForIntake,
   resolveUploadedFileDisplayCategory,
   type UploadedFilePersistMetaRow,
 } from '../../services/intakeDataService';
