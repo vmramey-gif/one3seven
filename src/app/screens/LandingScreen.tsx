@@ -32,7 +32,6 @@ import { WorkerMissionControlHome } from '../components/WorkerMissionControlHome
 import { RemindersCard } from '../components/RemindersCard';
 import { MitigationLogCard } from '../components/MitigationLogCard';
 import { RecordVerificationCard } from '../components/RecordVerificationCard';
-import { SmsLinkCard } from '../components/SmsLinkCard';
 import { WorkerMobileBottomNav, type WorkerMobileHubView, type WorkerMobileNavId } from '../components/WorkerMobileBottomNav';
 import { WorkerStatusJourneyCard } from '../components/WorkerStatusJourneyCard';
 import { WorkerIntakeCompactRow } from '../components/WorkerIntakeCompactRow';
@@ -574,7 +573,7 @@ export function LandingScreen({
             <div className="mx-auto mt-6 w-full max-w-[680px]">
               <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#42574E]">Your tools</p>
               <p className="mt-1 text-xs leading-relaxed text-[#1B2623]/60">
-                Reminders, a job-search log, and texting in documents — all optional, all yours.
+                Reminders and a job-search log — all optional, all yours.
               </p>
             </div>
             <div className="mx-auto mt-3 w-full max-w-[680px]">
@@ -582,9 +581,6 @@ export function LandingScreen({
             </div>
             <div className="mx-auto mt-4 w-full max-w-[680px]">
               <MitigationLogCard intakeId={homeIntakeId} />
-            </div>
-            <div className="mx-auto mt-4 w-full max-w-[680px]">
-              <SmsLinkCard intakeId={homeIntakeId} />
             </div>
             <div className="mx-auto mt-4 w-full max-w-[680px]">
               <RecordVerificationCard intakeId={homeIntakeId} />
