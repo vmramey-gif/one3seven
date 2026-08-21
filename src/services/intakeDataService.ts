@@ -109,63 +109,6 @@ export function betaPlaceholderBundleFromFiles(
   };
 }
 
-export type ProfileRow = {
-  id: string;
-  email: string | null;
-  full_name: string | null;
-  role: 'worker' | 'firm' | null;
-  /** Founder-only internal tooling (CRM) access. Set operator-side; never via the app. */
-  is_founder?: boolean | null;
-  /** Sales-rep CRM access marker. */
-  crm_role?: string | null;
-  /** Access gate: false until an operator approves the account (worker/firm hold during beta). */
-  approved?: boolean | null;
-  created_at: string;
-  // Worker contact details (persisted in DB ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â see migration 20260609_worker_contact_details)
-  middle_initial?: string | null;
-  phone?: string | null;
-  address_line1?: string | null;
-  address_line2?: string | null;
-  city?: string | null;
-  state?: string | null;
-  zip?: string | null;
-};
-
-export type FirmProfileRow = {
-  id: string;
-  profile_id: string;
-  firm_name: string;
-  firm_code: string;
-  contact_email: string | null;
-  practice_areas: string[];
-  geographic_filters: string[];
-  subscription_status: string;
-  plan_id: string;
-  created_at: string;
-  bar_number: string | null;
-  bar_state: string | null;
-  accepting_cases: boolean;
-};
-
-const PLACEHOLDER_FIRM_NAME = 'my firm (update in settings)';
-
-/** Legacy auto-provisioned label; not treated as a saved firm name. */
-export function isPlaceholderFirmName(firmName: string | null | undefined): boolean {
-  const t = (firmName ?? '').trim().toLowerCase();
-  return !t || t === PLACEHOLDER_FIRM_NAME;
-}
-
-/** True when the firm has a user-saved name and an assigned firm code. */
-export function isFirmProfileComplete(fp: FirmProfileRow | null | undefined): boolean {
-  if (!fp) return false;
-  const name = (fp.firm_name ?? '').trim();
-  const code = (fp.firm_code ?? '').trim();
-  return name.length > 0 && !isPlaceholderFirmName(name) && code.length >= 4;
-}
-
-export function firmProfileNeedsSetup(fp: FirmProfileRow | null | undefined): boolean {
-  return !isFirmProfileComplete(fp);
-}
 
 export type UploadedFilePersistMetaRow = {
   uploadedFileId: string;
@@ -207,7 +150,7 @@ export function inferCategoryFromFileName(fileName: string): string {
     rawLower.includes('w-2') ||
     name.includes('w 2');
 
-  // Separation / termination ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â check before pay to avoid "final pay" grabbing termination letters
+  // Separation / termination ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â check before pay to avoid "final pay" grabbing termination letters
   if (
     name.includes('termination') ||
     name.includes('separation') ||
@@ -235,7 +178,7 @@ export function inferCategoryFromFileName(fileName: string): string {
   }
 
   // Witness / coworker statements. Guard against financial "statements" (wage/earnings/pay/bank/
-  // income statements) ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â those are pay records, not witness statements, and the bare "statement"
+  // income statements) ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â those are pay records, not witness statements, and the bare "statement"
   // check used to swallow "EarningsStatement.pdf" before the pay branch below could catch it.
   const financialStatement = /\b(wage|earnings|pay|bank|income|financial|account)\b/.test(name);
   if (
@@ -307,7 +250,7 @@ export function inferCategoryFromFileName(fileName: string): string {
   return 'Uncategorized';
 }
 
-/** Strong title cues ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â used only when deciding whether a rename may change stored category. */
+/** Strong title cues ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â used only when deciding whether a rename may change stored category. */
 function fileNameHasStrongCategorySignal(fileName: string, category: string): boolean {
   // Space-normalized (CamelCase split, separators collapsed) so the \s-based patterns below
   // match "OfferLetter.pdf" / "PerformanceReview.pdf" as well as "offer_letter" / "offer letter".
@@ -367,587 +310,10 @@ export function generateFirmCode(seed?: string | null): string {
   return `${prefix}${number}`;
 }
 
-/** Avoid indefinite hang when Supabase auth lock blocks DB during onAuthStateChange. */
-export const PROFILE_QUERY_TIMEOUT_MS = 12_000;
-export const FIRM_SAVE_OVERALL_TIMEOUT_MS = 36_000;
-
-type ProfileQueryResult = {
-  profile: ProfileRow | null;
-  timedOut: boolean;
-  error?: string;
-};
-
-export async function withProfileQueryTimeout<T>(
-  label: string,
-  // PromiseLike, not Promise: Supabase query builders are thenable but not real Promise
-  // instances, so a Promise<T> parameter type fails structural inference and T collapses to
-  // {} at every call site ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â that was the single root cause behind ~25 of the tsc baseline errors.
-  promise: PromiseLike<T>,
-  timeoutMs: number = PROFILE_QUERY_TIMEOUT_MS
-): Promise<T> {
-  // number, not ReturnType<typeof setTimeout>: @types/node's ambient setTimeout declaration
-  // pollutes the merged global scope (even Window's), so any ReturnType-derived type here
-  // resolves to NodeJS.Timeout ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â this is always browser code (window.setTimeout), which truly
-  // returns a number at runtime regardless of what the merged ambient types claim.
-  let timer: number | undefined;
-  const timeout = new Promise<never>((_, reject) => {
-    timer = window.setTimeout(
-      () => reject(new Error(`[o3s-ensure-profile] ${label} timed out after ${timeoutMs}ms`)),
-      timeoutMs
-    );
-  });
-  try {
-    return await Promise.race([promise, timeout]);
-  } finally {
-    if (timer !== undefined) window.clearTimeout(timer);
-  }
-}
-
-async function fetchProfileQuery(userId: string): Promise<ProfileQueryResult> {
-  console.info('[o3s-ensure-profile] fetchProfile: before query', { userId });
-  try {
-    const { data, error } = await withProfileQueryTimeout(
-      'fetchProfile',
-      supabase.from('profiles').select('*').eq('id', userId).maybeSingle()
-    );
-    console.info('[o3s-ensure-profile] fetchProfile: after query', {
-      userId,
-      hasData: Boolean(data),
-      error: error?.message ?? null,
-    });
-    if (error) {
-      console.error('[o3s-ensure-profile] fetchProfile error', error);
-      return { profile: null, timedOut: false, error: error.message };
-    }
-    return { profile: (data as ProfileRow | null) ?? null, timedOut: false };
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e);
-    if (msg.includes('timed out')) {
-      console.error('[o3s-ensure-profile] fetchProfile: query timed out', { userId, PROFILE_QUERY_TIMEOUT_MS });
-      return { profile: null, timedOut: true, error: msg };
-    }
-    console.error('[o3s-ensure-profile] fetchProfile: unexpected failure', e);
-    return { profile: null, timedOut: false, error: msg };
-  }
-}
-
-export async function fetchProfile(userId: string): Promise<ProfileRow | null> {
-  const result = await fetchProfileQuery(userId);
-  return result.profile;
-}
-
-function profileRoleFromUserMetadata(user: User): 'worker' | 'firm' | null {
-  const r = user.user_metadata?.role;
-  if (r === 'worker' || r === 'firm') return r;
-  return null;
-}
-
-function profileFullNameFromUser(user: User): string | null {
-  const meta = user.user_metadata ?? {};
-  for (const k of ['full_name', 'name'] as const) {
-    const v = meta[k];
-    if (typeof v === 'string' && v.trim()) return v.trim();
-  }
-  return null;
-}
-
-/**
- * Ensures a `public.profiles` row exists for the authenticated user (e.g. trigger missing or legacy users).
- * Safe to call on every session: returns existing row without overwriting role/email when already present.
- * Requires RLS policy allowing insert where auth.uid() = id (see schema / migrations).
- */
-let ensureUserProfileInflight: Promise<{ profile: ProfileRow | null; error?: string }> | null = null;
-let ensureUserProfileInflightUserId: string | null = null;
-
-export async function ensureUserProfile(
-  user: User,
-  opts?: { role?: 'worker' | 'firm' | null }
-): Promise<{ profile: ProfileRow | null; error?: string }> {
-  if (ensureUserProfileInflight && ensureUserProfileInflightUserId === user.id) {
-    console.info('[o3s-ensure-profile] coalescing in-flight ensureUserProfile', { userId: user.id });
-    return ensureUserProfileInflight;
-  }
-
-  const run = async (): Promise<{ profile: ProfileRow | null; error?: string }> => {
-    console.info('[o3s-ensure-profile] start', { userId: user.id });
-
-    console.info('[o3s-ensure-profile] before fetchProfile (existing check)');
-    const existingResult = await fetchProfileQuery(user.id);
-    console.info('[o3s-ensure-profile] after fetchProfile (existing check)', {
-      userId: user.id,
-      hasExisting: Boolean(existingResult.profile),
-      timedOut: existingResult.timedOut,
-    });
-    if (existingResult.timedOut) {
-      return {
-        profile: null,
-        error: 'Profile lookup timed out. Refresh the page and try signing in again.',
-      };
-    }
-    if (existingResult.error && !existingResult.profile) {
-      return { profile: null, error: existingResult.error };
-    }
-    if (existingResult.profile) return { profile: existingResult.profile };
-
-    const role = opts?.role !== undefined ? opts.role : profileRoleFromUserMetadata(user);
-
-    const row = {
-      id: user.id,
-      email: user.email ?? null,
-      full_name: profileFullNameFromUser(user),
-      role: role ?? null,
-    };
-
-    console.info('[o3s-ensure-profile] before profiles.insert', { userId: user.id });
-    let data: ProfileRow | null = null;
-    let error: { message?: string; code?: string } | null = null;
-    try {
-      const insertResult = await withProfileQueryTimeout(
-        'profiles.insert',
-        supabase.from('profiles').insert(row).select('*').single()
-      );
-      data = (insertResult.data as ProfileRow | null) ?? null;
-      error = insertResult.error;
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : String(e);
-      if (msg.includes('timed out')) {
-        console.error('[o3s-ensure-profile] profiles.insert timed out', { userId: user.id });
-        return {
-          profile: null,
-          error: 'Profile setup timed out. Refresh the page and try signing in again.',
-        };
-      }
-      throw e;
-    }
-    console.info('[o3s-ensure-profile] after profiles.insert', {
-      userId: user.id,
-      hasData: Boolean(data),
-      error: error?.message ?? null,
-      code: error?.code ?? null,
-    });
-
-    if (!error && data) return { profile: data as ProfileRow };
-
-    const code = String(error?.code ?? '');
-    const msg = (error?.message ?? '').toLowerCase();
-    if (code === '23505' || msg.includes('duplicate') || msg.includes('unique')) {
-      console.info('[o3s-ensure-profile] duplicate insert ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â before fetchProfile (retry)');
-      const againResult = await fetchProfileQuery(user.id);
-      console.info('[o3s-ensure-profile] duplicate insert ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â after fetchProfile (retry)', {
-        hasProfile: Boolean(againResult.profile),
-        timedOut: againResult.timedOut,
-      });
-      if (againResult.timedOut) {
-        return {
-          profile: null,
-          error: 'Profile lookup timed out after create. Refresh and try again.',
-        };
-      }
-      if (againResult.profile) return { profile: againResult.profile };
-    }
-
-    console.error('[o3s-ensure-profile] ensureUserProfile failed', error);
-    return { profile: null, error: error?.message ?? 'Failed to ensure profile' };
-  };
-
-  ensureUserProfileInflightUserId = user.id;
-  ensureUserProfileInflight = run().finally(() => {
-    ensureUserProfileInflight = null;
-    ensureUserProfileInflightUserId = null;
-    console.info('[o3s-ensure-profile] in-flight complete', { userId: user.id });
-  });
-  return ensureUserProfileInflight;
-}
-
-/** Drop coalesced ensureUserProfile so role commit is not blocked by a hung post-auth fetch. */
-export function resetEnsureUserProfileInflight(): void {
-  ensureUserProfileInflight = null;
-  ensureUserProfileInflightUserId = null;
-}
-
-/** Local profile shape when DB read/write is blocked by auth lock (role commit optimistic path). */
-export function profileRowFromAuthUser(user: User, role: 'worker' | 'firm'): ProfileRow {
-  return {
-    id: user.id,
-    email: user.email ?? null,
-    full_name: profileFullNameFromUser(user),
-    role,
-    created_at: new Date().toISOString(),
-  };
-}
-
-/**
- * Role selection: upsert/update role without a prior profiles SELECT.
- * Falls back to update-only, then optimistic local profile on timeout.
- */
-export async function commitProfileRoleForUser(
-  user: User,
-  role: 'worker' | 'firm'
-): Promise<{ profile: ProfileRow | null; error?: string; timedOut?: boolean }> {
-  resetEnsureUserProfileInflight();
-  console.info('[o3s-role-commit] commitProfileRoleForUser: start', { userId: user.id, role });
-
-  const row = {
-    id: user.id,
-    email: user.email ?? null,
-    full_name: profileFullNameFromUser(user),
-    role,
-  };
-
-  try {
-    const { data, error } = await withProfileQueryTimeout(
-      'commitProfileRole.upsert',
-      supabase.from('profiles').upsert(row, { onConflict: 'id' }).select('*').single()
-    );
-    console.info('[o3s-role-commit] commitProfileRoleForUser: after upsert', {
-      userId: user.id,
-      hasData: Boolean(data),
-      error: error?.message ?? null,
-    });
-    if (!error && data) {
-      return { profile: data as ProfileRow };
-    }
-    if (error) {
-      console.info('[o3s-role-commit] upsert failed ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â trying update-only', { code: error.code });
-    }
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e);
-    if (!msg.includes('timed out')) {
-      return { profile: null, error: msg };
-    }
-    console.warn('[o3s-role-commit] upsert timed out ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â trying update-only', { userId: user.id });
-  }
-
-  try {
-    const { error: updateError } = await withProfileQueryTimeout(
-      'commitProfileRole.update',
-      supabase.from('profiles').update({ role }).eq('id', user.id)
-    );
-    console.info('[o3s-role-commit] commitProfileRoleForUser: after update-only', {
-      userId: user.id,
-      error: updateError?.message ?? null,
-    });
-    if (!updateError) {
-      return { profile: profileRowFromAuthUser(user, role) };
-    }
-    return { profile: null, error: updateError.message };
-  } catch (e2) {
-    const msg2 = e2 instanceof Error ? e2.message : String(e2);
-    if (msg2.includes('timed out')) {
-      console.error('[o3s-role-commit] commitProfileRoleForUser: update timed out ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â optimistic continue', {
-        userId: user.id,
-      });
-      return { profile: profileRowFromAuthUser(user, role), timedOut: true };
-    }
-    return { profile: null, error: msg2 };
-  }
-}
-
-export async function fetchFirmProfileForUserWithTimeout(userId: string): Promise<FirmProfileRow | null> {
-  try {
-    const { data, error } = await withProfileQueryTimeout(
-      'fetchFirmProfile',
-      supabase.from('firm_profiles').select('*').eq('profile_id', userId).maybeSingle()
-    );
-    if (error) {
-      console.error('[o3s-role-commit] fetchFirmProfile error', error);
-      return null;
-    }
-    return (data as FirmProfileRow | null) ?? null;
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e);
-    if (msg.includes('timed out')) {
-      console.warn('[o3s-role-commit] fetchFirmProfile timed out', { userId });
-    }
-    return null;
-  }
-}
-
-export async function updateProfileName(userId: string, full_name: string): Promise<{ error?: string }> {
-  const { error } = await supabase.from('profiles').update({ full_name }).eq('id', userId);
-  return error ? { error: error.message } : {};
-}
-
-export type WorkerContactPayload = {
-  middle_initial?: string;
-  phone?: string;
-  address_line1?: string;
-  address_line2?: string;
-  city?: string;
-  state?: string;
-  zip?: string;
-};
-
-/** Persist worker contact details to the profiles table (RLS: own row only). */
-export async function saveWorkerContactDetails(
-  userId: string,
-  contact: WorkerContactPayload,
-): Promise<{ error?: string }> {
-  const patch: Record<string, string | null> = {
-    middle_initial: contact.middle_initial?.trim() || null,
-    phone: contact.phone?.trim() || null,
-    address_line1: contact.address_line1?.trim() || null,
-    address_line2: contact.address_line2?.trim() || null,
-    city: contact.city?.trim() || null,
-    state: contact.state?.trim() || null,
-    zip: contact.zip?.trim() || null,
-  };
-  const { error } = await supabase.from('profiles').update(patch).eq('id', userId);
-  return error ? { error: error.message } : {};
-}
-
-/** Returns the existing firm profile only; does not create placeholder rows. */
-export async function ensureFirmProfile(userId: string, _email: string | null): Promise<FirmProfileRow | null> {
-  return fetchFirmProfileForUserWithTimeout(userId);
-}
-
-async function ensureProfileRoleForFirmSave(
-  userId: string,
-  email: string | null,
-  fullName?: string | null
-): Promise<{ error?: string }> {
-  console.info('[o3s-firm-save] ensureProfileRole: start', { userId });
-  const row = { id: userId, email, role: 'firm' as const, full_name: fullName ?? null };
-  try {
-    const { error } = await withProfileQueryTimeout(
-      'firmSave.profileRole.upsert',
-      supabase.from('profiles').upsert(row, { onConflict: 'id' })
-    );
-    if (!error) {
-      console.info('[o3s-firm-save] ensureProfileRole: upsert ok', { userId });
-      return {};
-    }
-    console.info('[o3s-firm-save] ensureProfileRole: upsert failed ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â update-only', {
-      userId,
-      message: error.message,
-    });
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e);
-    if (!msg.includes('timed out')) return { error: msg };
-    console.warn('[o3s-firm-save] ensureProfileRole: upsert timed out ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â update-only', { userId });
-  }
-
-  try {
-    const { error } = await withProfileQueryTimeout(
-      'firmSave.profileRole.update',
-      supabase.from('profiles').update({ role: 'firm' }).eq('id', userId)
-    );
-    if (error) return { error: error.message };
-    console.info('[o3s-firm-save] ensureProfileRole: update ok', { userId });
-    return {};
-  } catch (e2) {
-    const msg2 = e2 instanceof Error ? e2.message : String(e2);
-    if (msg2.includes('timed out')) {
-      return { error: 'Profile role save timed out. Try again in a moment.' };
-    }
-    return { error: msg2 };
-  }
-}
-
-async function updateFirmProfileRowTimed(
-  label: string,
-  filter: { column: 'id' | 'profile_id'; value: string },
-  patch: Record<string, unknown>
-): Promise<{ profile: FirmProfileRow | null; error?: string; timedOut?: boolean }> {
-  console.info(`[o3s-firm-save] ${label}: before update`, { filter: filter.column, value: filter.value });
-  try {
-    const { data, error } = await withProfileQueryTimeout(
-      label,
-      supabase.from('firm_profiles').update(patch).eq(filter.column, filter.value).select('*').maybeSingle()
-    );
-    console.info(`[o3s-firm-save] ${label}: after update`, {
-      hasData: Boolean(data),
-      error: error?.message ?? null,
-    });
-    if (error) return { profile: null, error: error.message };
-    return { profile: (data as FirmProfileRow | null) ?? null };
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e);
-    if (msg.includes('timed out')) {
-      console.error(`[o3s-firm-save] ${label}: timed out`, { PROFILE_QUERY_TIMEOUT_MS });
-      return { profile: null, timedOut: true, error: 'Firm profile save timed out. Try again in a moment.' };
-    }
-    return { profile: null, error: msg };
-  }
-}
-
-async function insertFirmProfileWithUniqueCode(
-  userId: string,
-  email: string | null,
-  row: {
-    firm_name: string;
-    practice_areas: string[];
-    geographic_filters: string[];
-    contact_email: string | null;
-  }
-): Promise<{ profile: FirmProfileRow | null; error?: string; timedOut?: boolean }> {
-  for (let attempt = 0; attempt < 8; attempt++) {
-    const firm_code = generateFirmCode(email);
-    const label = `firmSave.insert.${attempt}`;
-    console.info(`[o3s-firm-save] ${label}: before insert`, { userId, firm_code });
-    try {
-      const { data, error } = await withProfileQueryTimeout(
-        label,
-        supabase
-          .from('firm_profiles')
-          .insert({
-            profile_id: userId,
-            firm_name: row.firm_name,
-            firm_code,
-            contact_email: row.contact_email,
-            practice_areas: row.practice_areas,
-            geographic_filters: row.geographic_filters,
-          })
-          .select()
-          .single()
-      );
-      console.info(`[o3s-firm-save] ${label}: after insert`, {
-        hasData: Boolean(data),
-        error: error?.message ?? null,
-      });
-      if (!error && data) return { profile: data as FirmProfileRow };
-      if (error?.code !== '23505') {
-        console.error('[o3s-firm-save] insert failed', error);
-        return { profile: null, error: error?.message ?? 'Could not create firm profile.' };
-      }
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : String(e);
-      if (msg.includes('timed out')) {
-        console.error(`[o3s-firm-save] ${label}: timed out`, { PROFILE_QUERY_TIMEOUT_MS });
-        return {
-          profile: null,
-          timedOut: true,
-          error: 'Firm profile save timed out. Try again in a moment.',
-        };
-      }
-      return { profile: null, error: msg };
-    }
-  }
-  return { profile: null, error: 'Could not assign a unique firm code. Try again.' };
-}
-
-/**
- * Saves firm profile basics; assigns `firm_code` on first real save when missing.
- * Update-first by id or profile_id (no SELECT-before-write). Times out hung auth-lock queries.
- */
-export async function saveFirmProfileBasics(opts: {
-  firmId?: string;
-  userId: string;
-  email: string | null;
-  full_name?: string | null;
-  existingFirmCode?: string | null;
-  firm_name: string;
-  practice_areas: string[];
-  geographic_filters: string[];
-  bar_number?: string | null;
-  bar_state?: string | null;
-  accepting_cases?: boolean;
-}): Promise<{ profile: FirmProfileRow | null; error?: string }> {
-  try {
-    return await withProfileQueryTimeout(
-      'firmSave.overall',
-      saveFirmProfileBasicsInner(opts),
-      FIRM_SAVE_OVERALL_TIMEOUT_MS
-    );
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e);
-    if (msg.includes('timed out')) {
-      console.error('[o3s-firm-save] overall save timed out', { FIRM_SAVE_OVERALL_TIMEOUT_MS });
-      return {
-        profile: null,
-        error: 'Firm profile save timed out. Try again in a moment.',
-      };
-    }
-    return { profile: null, error: msg };
-  }
-}
-
-async function saveFirmProfileBasicsInner(opts: {
-  firmId?: string;
-  userId: string;
-  email: string | null;
-  full_name?: string | null;
-  existingFirmCode?: string | null;
-  firm_name: string;
-  practice_areas: string[];
-  geographic_filters: string[];
-  bar_number?: string | null;
-  bar_state?: string | null;
-  accepting_cases?: boolean;
-}): Promise<{ profile: FirmProfileRow | null; error?: string }> {
-  console.info('[o3s-firm-save] start', {
-    userId: opts.userId,
-    firmId: opts.firmId ?? null,
-    hasExistingFirmCode: Boolean(opts.existingFirmCode?.trim()),
-  });
-  resetEnsureUserProfileInflight();
-
-  const roleResult = await ensureProfileRoleForFirmSave(opts.userId, opts.email, opts.full_name);
-  if (roleResult.error) {
-    console.error('[o3s-firm-save] ensureProfileRole failed', { error: roleResult.error });
-    return { profile: null, error: roleResult.error };
-  }
-
-  const firm_name = opts.firm_name.trim();
-  if (!firm_name || isPlaceholderFirmName(firm_name)) {
-    return { profile: null, error: 'Enter a firm name before saving.' };
-  }
-
-  const filter: { column: 'id' | 'profile_id'; value: string } = opts.firmId
-    ? { column: 'id', value: opts.firmId }
-    : { column: 'profile_id', value: opts.userId };
-
-  const basePatch: Record<string, unknown> = {
-    firm_name,
-    practice_areas: opts.practice_areas,
-    geographic_filters: opts.geographic_filters,
-    contact_email: opts.email,
-  };
-  if (opts.bar_number !== undefined) basePatch.bar_number = opts.bar_number?.trim() || null;
-  if (opts.bar_state !== undefined) basePatch.bar_state = opts.bar_state?.trim() || null;
-  if (opts.accepting_cases !== undefined) basePatch.accepting_cases = opts.accepting_cases;
-
-  const hasFirmCode = Boolean((opts.existingFirmCode ?? '').trim());
-
-  if (!hasFirmCode) {
-    for (let attempt = 0; attempt < 8; attempt++) {
-      const firm_code = generateFirmCode(opts.email);
-      const updated = await updateFirmProfileRowTimed(`firmSave.updateWithCode.${attempt}`, filter, {
-        ...basePatch,
-        firm_code,
-      });
-      if (updated.timedOut) return { profile: null, error: updated.error };
-      if (updated.profile) return { profile: updated.profile };
-      if (updated.error) {
-        const lower = updated.error.toLowerCase();
-        if (lower.includes('unique') || lower.includes('duplicate')) continue;
-        return { profile: null, error: updated.error };
-      }
-      break;
-    }
-  } else {
-    const updated = await updateFirmProfileRowTimed('firmSave.updateBasics', filter, basePatch);
-    if (updated.profile) return { profile: updated.profile };
-    if (updated.error) return { profile: null, error: updated.error };
-  }
-
-  console.info('[o3s-firm-save] no row updated ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â before insert', { userId: opts.userId });
-  const created = await insertFirmProfileWithUniqueCode(opts.userId, opts.email, {
-    firm_name,
-    practice_areas: opts.practice_areas,
-    geographic_filters: opts.geographic_filters,
-    contact_email: opts.email,
-  });
-  if (created.profile) return { profile: created.profile };
-  return {
-    profile: null,
-    error: created.error ?? 'Could not save firm profile. Try again in a moment.',
-  };
-}
 
 /**
  * Embedded worker intake notes inside `intake_summaries.overview` (no new rows).
- * Newline-tolerant on both edges (`\n?`) — the stored overview is trimmed by safeTrim on
+ * Newline-tolerant on both edges (`\n?`) â€” the stored overview is trimmed by safeTrim on
  * save, so a strict leading/trailing `\n` requirement made the block unreadable after a
  * rebuild and the notes were silently dropped on the next one.
  */
@@ -977,13 +343,13 @@ export const WORKER_DOCUMENT_RESPONSE_PATTERN =
 
 /**
  * Worker contact (name/phone) copied into the firm-readable summary at share time.
- * Surfaced to the firm via the extracted `workerContact`, never as raw prose — so it
+ * Surfaced to the firm via the extracted `workerContact`, never as raw prose â€” so it
  * is stripped from all firm- and worker-facing display text by sanitizeFirmFacingText.
  */
 export const WORKER_CONTACT_PATTERN =
   /\n?---\s*O3S_WORKER_CONTACT\s*---[\s\S]*?---\s*O3S_WORKER_CONTACT_END\s*---\n?/gi;
 
-/** MVP firm → worker document request categories (checkbox labels). */
+/** MVP firm â†’ worker document request categories (checkbox labels). */
 export const FIRM_ADDITIONAL_DOCUMENT_CATEGORIES = [
   'Pay records / paystubs',
   'Time records / timecards',
@@ -1107,9 +473,9 @@ export function stripWorkerIntakeNotesBlock(overview: string): string {
 
 /**
  * Storage-path strip: removes ONLY the worker-notes block. Never use the sanitizing
- * `stripWorkerIntakeNotesBlock` on text that is written back to `intake_summaries.overview` ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â
+ * `stripWorkerIntakeNotesBlock` on text that is written back to `intake_summaries.overview` ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â
  * sanitizeFirmFacingText is a display polish that deletes every embedded O3S_ sidecar block
- * (worker contact, org engine, mitigation log, ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦) from whatever it touches.
+ * (worker contact, org engine, mitigation log, ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦) from whatever it touches.
  */
 export function stripWorkerIntakeNotesBlockForStorage(overview: string): string {
   return overview.replace(WORKER_INTAKE_NOTES_PATTERN, '\n');
@@ -1244,8 +610,8 @@ export function resolveWorkerProvidedContextForFirmView(
   options?: { includeTimelineContext?: boolean; previewOnly?: boolean }
 ): string | undefined {
   // PRIVACY GATE (worker dashboard promise, one3sevenProduct.ts: "Firms do not see yet: your full
-  // file contents, personal narrative, or private notesÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Âunless you approve expanded review
-  // access"): a preview-only (pre-approval) firm receives NO worker-provided narrative at all ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â
+  // file contents, personal narrative, or private notesÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Âunless you approve expanded review
+  // access"): a preview-only (pre-approval) firm receives NO worker-provided narrative at all ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â
   // no story, no additional notes, no guided summary, no follow-up narrative, no timeline
   // context. Gated here, at the source, so every consumer of the firm view model is protected.
   if (options?.previewOnly) return undefined;
@@ -1269,7 +635,7 @@ export function resolveWorkerProvidedContextForFirmView(
 /**
  * Preview-only strip for the structured worker follow-up: the free-text NARRATIVE answers
  * (what happened when they complained, what changed afterward, remote-expense description,
- * prior-filing details, and any named individuals ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â a treating physician, a manager, anyone the
+ * prior-filing details, and any named individuals ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â a treating physician, a manager, anyone the
  * worker named) are part of the worker's personal narrative and are withheld until the worker
  * approves expanded access. The identity/scheduling facts the preview surface already shows
  * (employment name, employer, dates, status, arbitration/agency flags, work state) are kept so
@@ -2073,7 +1439,7 @@ export async function persistPlaceholderOrganizationForIntake(
   const previousAlerts = (previousSummary?.missing_document_alerts as string[] | null) ?? [];
   let preservedWorkerNotes = extractWorkerIntakeNotesFromOverview(previousOverview);
   // Recovery: earlier rebuilds could drop the story / follow-up blocks from the stored
-  // overview. `intakes.worker_metadata` keeps the worker-owned originals ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â reconstruct.
+  // overview. `intakes.worker_metadata` keeps the worker-owned originals ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â reconstruct.
   try {
     const recoveryMetadata = parseWorkerIntakeMetadata(priorIntake?.worker_metadata);
     const recoverStory =
@@ -2170,7 +1536,7 @@ export async function persistPlaceholderOrganizationForIntake(
       buildPlaceholderOrganization(safeMeta, { employmentMatterTags });
   } catch (generationError) {
     generationUsedFallback = true;
-    logOrgAuditError('summary generation failed ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â placeholder fallback', generationError, {
+    logOrgAuditError('summary generation failed ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â placeholder fallback', generationError, {
       intakeId,
       activeStep: 'summary_generation',
       uploadedFileCount: files.length,
@@ -2179,7 +1545,7 @@ export async function persistPlaceholderOrganizationForIntake(
     try {
       org = buildPlaceholderOrganization(safeMeta, { employmentMatterTags });
     } catch (placeholderError) {
-      logOrgAuditError('summary generation placeholder failed ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â minimal fallback', placeholderError, {
+      logOrgAuditError('summary generation placeholder failed ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â minimal fallback', placeholderError, {
         intakeId,
         activeStep: 'summary_generation',
       });
@@ -2220,7 +1586,7 @@ export async function persistPlaceholderOrganizationForIntake(
     timelineEventCount: org.timelineEvents.length,
     evidenceTimelineCount: org.evidenceTimeline.length,
     fileRecordCount: org.fileRecords.length,
-    // org.sections is a fixed-shape object (IntakeOrganizationSections), not an array ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â this
+    // org.sections is a fixed-shape object (IntakeOrganizationSections), not an array ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â this
     // used to call .length on it, which is always undefined. Count populated sections instead.
     sectionCount: Object.values(org.sections).filter((v) =>
       Array.isArray(v) ? v.length > 0 : typeof v === 'string' ? v.trim().length > 0 : Boolean(v)
@@ -2345,7 +1711,7 @@ export async function persistPlaceholderOrganizationForIntake(
       fallbackUsed: true,
       errorMessage: message,
     });
-    logSummarySaveError('summary assembly ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â core preserved', assemblyError, { intakeId });
+    logSummarySaveError('summary assembly ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â core preserved', assemblyError, { intakeId });
   }
 
   logOrgAudit('timeline save start', {
@@ -2377,7 +1743,7 @@ export async function persistPlaceholderOrganizationForIntake(
     error: up ? { message: up.message, code: up.code } : null,
   });
   if (up) {
-    logOrgAuditError('intakes update failed ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â core summary preserved', up, {
+    logOrgAuditError('intakes update failed ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â core summary preserved', up, {
       intakeId,
       activeStep: 'intakes_update',
     });

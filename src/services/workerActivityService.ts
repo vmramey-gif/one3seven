@@ -7,7 +7,8 @@
  */
 import { supabase } from '../lib/supabaseClient';
 import * as notifications from './notificationService';
-import { isSchemaRelationUnavailable, withProfileQueryTimeout, PROFILE_QUERY_TIMEOUT_MS } from './intakeDataService';
+import { isSchemaRelationUnavailable } from './intakeDataService';
+import { withProfileQueryTimeout, PROFILE_QUERY_TIMEOUT_MS } from './authProfileService';
 
 export type RecordVerificationRow = {
   fileName: string;
