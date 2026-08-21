@@ -56,7 +56,6 @@ import { ClaimLensPanel } from '../components/ClaimLensPanel';
 import { buildExistenceChecks, type ClaimLensInput } from '../../services/claimLens';
 import { WageExposureReviewSection } from '../components/WageExposureReviewSection';
 import {
-  FIRM_ADDITIONAL_DOCUMENT_CATEGORIES,
   inferCategoryFromFileName,
   sanitizeFirmFacingText,
 } from '../../services/intakeDataService';
@@ -94,6 +93,13 @@ import { FirmCollapsibleText } from '../components/FirmCollapsibleText';
 import { FirmTimelineEventCard } from '../components/FirmTimelineEventCard';
 import { FIRM_REVIEW_SECTION } from '../constants/firmIntakePresentation';
 import { WordMark } from '../components/WordMark';
+import {
+  DeclineConfirmModal,
+  ReviewToast,
+  DemoWorkflowStatusModal,
+  RequestAdditionalDocumentsModal,
+  AddWorkerReminderModal,
+} from '../components/IntakeReviewModals';
 
 interface IntakeReviewScreenProps {
   onNavigate: (screen: Screen) => void;
@@ -2664,293 +2670,57 @@ export function IntakeReviewScreen({
         </div>
       </div>
 
-      {/* Decline Confirmation Modal */}
-      <AnimatePresence>
-        {showDeclineConfirm && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[190] bg-black/40"
-              onClick={() => !declineSubmitting && setShowDeclineConfirm(false)}
-            />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.96, y: 10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.96, y: 10 }}
-              className="fixed inset-x-4 bottom-6 z-[200] mx-auto max-w-sm rounded-3xl bg-white p-6 shadow-2xl sm:inset-auto sm:left-1/2 sm:-translate-x-1/2 sm:top-1/2 sm:-translate-y-1/2"
-            >
-              <h3 className="text-base font-semibold text-[#1B2623] mb-2">
-                Mark as not pursuing?
-              </h3>
-              <p className="text-sm text-[#1B2623]/65 leading-relaxed mb-6">
-                This intake will stay in your review queue for reference. The worker won't be notified — this is an internal status only.
-              </p>
-              <div className="flex gap-3">
-                <button
-                  type="button"
-                  onClick={() => setShowDeclineConfirm(false)}
-                  disabled={declineSubmitting}
-                  className="flex-1 rounded-full border border-[#E4E5DE] py-3 text-sm font-medium text-[#6A6D66] transition-colors hover:bg-[#F2F4EC] disabled:opacity-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={() => void handleDeclineIntake()}
-                  disabled={declineSubmitting}
-                  className="flex-1 rounded-full bg-[#42574E] py-3 text-sm font-medium text-white transition-colors hover:bg-[#42574E] disabled:opacity-50"
-                >
-                  {declineSubmitting ? 'Saving…' : 'Confirm'}
-                </button>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+      <DeclineConfirmModal
+        open={showDeclineConfirm}
+        submitting={declineSubmitting}
+        onCancel={() => setShowDeclineConfirm(false)}
+        onConfirm={() => void handleDeclineIntake()}
+      />
 
-      {/* Toast Notification */}
-      <AnimatePresence>
-        {showToast && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="fixed top-24 left-1/2 -translate-x-1/2 bg-[#42574E] text-white px-6 py-3 rounded-lg shadow-lg z-50 text-sm"
-          >
-            {toastMessage}
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <ReviewToast show={showToast} message={toastMessage} />
 
-      {/* Demo workspace workflow status (local only — never shown for live intakes) */}
-      <AnimatePresence>
-        {showStatusModal && canEditLocalWorkflow && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-[#1B2623]/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-            onClick={() => setShowStatusModal(false)}
-          >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl"
-            >
-              <h3 className="text-lg font-semibold text-[#1B2623] mb-2">Update demo workspace status</h3>
-              <p className="text-xs text-[#7C857F] mb-4 leading-relaxed">
-                For local demo layouts only. Live intakes use persisted workflow status from the database.
-              </p>
-              <div className="space-y-2 mb-6">
-                {(
-                  [
-                    'new',
-                    'additional-docs',
-                    'ready-review',
-                    'under-review',
-                    'contacted',
-                    'archived',
-                    'not-pursuing',
-                  ] as WorkflowStatus[]
-                ).map((status) => (
-                  <button
-                    key={status}
-                    onClick={() => handleUpdateStatus(status)}
-                    className={`w-full px-4 py-3 rounded-lg text-sm font-medium text-left transition-colors ${
-                      workflowStatus === status
-                        ? 'bg-[#42574E] text-white'
-                        : 'bg-[#FAF9F6] text-[#384039] hover:bg-[#F2F4EC]'
-                    }`}
-                  >
-                    {getStatusLabel(status)}
-                  </button>
-                ))}
-              </div>
-              <button
-                onClick={() => setShowStatusModal(false)}
-                className="w-full bg-[#F2F4EC] text-[#1B2623] py-2.5 px-4 rounded-lg hover:bg-[#E4E5DE] transition-colors text-sm font-medium"
-              >
-                Cancel
-              </button>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Demo workspace workflow status — local only, never shown for live intakes. */}
+      <DemoWorkflowStatusModal
+        open={showStatusModal && canEditLocalWorkflow}
+        workflowStatus={workflowStatus}
+        getStatusLabel={getStatusLabel}
+        onSelectStatus={handleUpdateStatus}
+        onClose={() => setShowStatusModal(false)}
+      />
 
-      {/* Request Additional Documents (firm → worker) */}
-      <AnimatePresence>
-        {showFirmDocRequestModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-[#1B2623]/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-            onClick={closeFirmDocRequestModal}
-          >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl"
-            >
-              <h3 className="text-lg font-semibold text-[#1B2623] mb-2">Request additional documents</h3>
-              <p className="text-sm text-[#6A6D66] mb-4">
-                Select the records your firm needs before continuing review.
-              </p>
-              {docReqError ? (
-                <p className="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-4">
-                  {docReqError}
-                </p>
-              ) : null}
-              <div className="space-y-2 mb-4 max-h-[40vh] overflow-y-auto">
-                {FIRM_ADDITIONAL_DOCUMENT_CATEGORIES.map((category) => (
-                  <label
-                    key={category}
-                    className={`flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-sm cursor-pointer border transition-colors ${
-                      docReqCategories.includes(category)
-                        ? 'bg-[#42574E] text-white border-[#42574E]'
-                        : 'bg-[#FAF9F6] text-[#384039] border-[#E4E5DE] hover:bg-[#F2F4EC]'
-                    }`}
-                  >
-                    <input
-                      type="checkbox"
-                      className="sr-only"
-                      checked={docReqCategories.includes(category)}
-                      onChange={() => toggleDocReqCategory(category)}
-                      disabled={docReqSubmitting}
-                    />
-                    <span
-                      className={`w-4 h-4 rounded border-2 flex-shrink-0 flex items-center justify-center ${
-                        docReqCategories.includes(category) ? 'border-white bg-white' : 'border-[#CBD6CF] bg-white'
-                      }`}
-                    >
-                      {docReqCategories.includes(category) ? (
-                        <CheckCircle2 className="w-3 h-3 text-[#1B2623]" />
-                      ) : null}
-                    </span>
-                    {polishHumanReadableDisplayText(category) || category}
-                  </label>
-                ))}
-              </div>
-              <label className="text-sm font-medium text-[#1B2623] mb-1 block">Optional note</label>
-              <textarea
-                value={docReqNote}
-                onChange={(e) => {
-                  setDocReqNote(e.target.value);
-                  if (docReqError) setDocReqError(null);
-                }}
-                className="w-full mb-4 px-3 py-2 border border-[#E4E5DE] rounded-lg text-sm h-24 resize-none text-[#1B2623]"
-                placeholder="Add context for the record owner (optional)."
-                disabled={docReqSubmitting}
-              />
-              <form
-                className="flex gap-2"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  void handleSubmitDocumentRequest();
-                }}
-              >
-                <button
-                  type="submit"
-                  disabled={docReqSubmitting || !onRequestAdditionalDocuments}
-                  className="flex-1 bg-[#42574E] text-white py-2.5 rounded-lg text-sm font-medium disabled:opacity-50"
-                >
-                  {docReqSubmitting ? 'Sending…' : 'Send request'}
-                </button>
-                <button
-                  type="button"
-                  onClick={closeFirmDocRequestModal}
-                  disabled={docReqSubmitting}
-                  className="flex-1 bg-[#F2F4EC] text-[#1B2623] py-2.5 rounded-lg text-sm font-medium"
-                >
-                  Cancel
-                </button>
-              </form>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <RequestAdditionalDocumentsModal
+        open={showFirmDocRequestModal}
+        error={docReqError}
+        selectedCategories={docReqCategories}
+        onToggleCategory={toggleDocReqCategory}
+        note={docReqNote}
+        onNoteChange={(next) => {
+          setDocReqNote(next);
+          if (docReqError) setDocReqError(null);
+        }}
+        submitting={docReqSubmitting}
+        canSubmit={Boolean(onRequestAdditionalDocuments)}
+        onSubmit={() => void handleSubmitDocumentRequest()}
+        onClose={closeFirmDocRequestModal}
+      />
 
-      {/* Add a reminder/date for the worker (firm -> worker). Same doctrine as the worker's own
-          reminders: a plain logistics item, never a computed legal deadline. Shows up on the
-          worker's dashboard tagged "from your firm". */}
-      <AnimatePresence>
-        {showAddReminderModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-[#1B2623]/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-            onClick={closeAddReminderModal}
-          >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl"
-            >
-              <h3 className="text-lg font-semibold text-[#1B2623] mb-2">Add a date for the worker</h3>
-              <p className="text-sm text-[#6A6D66] mb-4">
-                Shows up on their dashboard, tagged as from your firm. This is a plain logistics
-                note — one3seven does not calculate legal deadlines, so set the date yourself.
-              </p>
-              {addReminderError ? (
-                <p className="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-4">
-                  {addReminderError}
-                </p>
-              ) : null}
-              <label className="text-sm font-medium text-[#1B2623] mb-1 block">What is this for?</label>
-              <textarea
-                value={reminderText}
-                onChange={(e) => {
-                  setReminderText(e.target.value);
-                  if (addReminderError) setAddReminderError(null);
-                }}
-                className="w-full mb-4 px-3 py-2 border border-[#E4E5DE] rounded-lg text-sm h-20 resize-none text-[#1B2623]"
-                placeholder="e.g. Deposition, examination appointment, records due back"
-                disabled={addReminderSubmitting}
-              />
-              <label className="text-sm font-medium text-[#1B2623] mb-1 block">Date (optional)</label>
-              <input
-                type="date"
-                value={reminderDueDate}
-                onChange={(e) => setReminderDueDate(e.target.value)}
-                className="w-full mb-4 px-3 py-2 border border-[#E4E5DE] rounded-lg text-sm text-[#1B2623]"
-                disabled={addReminderSubmitting}
-              />
-              <form
-                className="flex gap-2"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  void handleSubmitAddReminder();
-                }}
-              >
-                <button
-                  type="submit"
-                  disabled={addReminderSubmitting || !onAddWorkerReminder}
-                  className="flex-1 bg-[#42574E] text-white py-2.5 rounded-lg text-sm font-medium disabled:opacity-50"
-                >
-                  {addReminderSubmitting ? 'Adding…' : 'Add reminder'}
-                </button>
-                <button
-                  type="button"
-                  onClick={closeAddReminderModal}
-                  disabled={addReminderSubmitting}
-                  className="flex-1 bg-[#F2F4EC] text-[#1B2623] py-2.5 rounded-lg text-sm font-medium"
-                >
-                  Cancel
-                </button>
-              </form>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Same doctrine as the worker's own reminders: a plain logistics item, never a computed
+          legal deadline. Shows up on the worker's dashboard tagged "from your firm". */}
+      <AddWorkerReminderModal
+        open={showAddReminderModal}
+        error={addReminderError}
+        text={reminderText}
+        onTextChange={(next) => {
+          setReminderText(next);
+          if (addReminderError) setAddReminderError(null);
+        }}
+        dueDate={reminderDueDate}
+        onDueDateChange={setReminderDueDate}
+        submitting={addReminderSubmitting}
+        canSubmit={Boolean(onAddWorkerReminder)}
+        onSubmit={() => void handleSubmitAddReminder()}
+        onClose={closeAddReminderModal}
+      />
       <CitationPanel
         citation={openCitation}
         signedUrl={openCitation ? citationUrls[openCitation.docId] ?? quoteCitationUrl : null}
