@@ -13,7 +13,7 @@ import type { ReviewCheckItem, SourceStrength, TimelineSourceTrace } from './int
 import { safeTrim, trimAssemblyValue } from './summarySaveDiagnostics';
 
 export const ORGANIZATION_BANNED_OUTPUT_PATTERN =
-  /\b(AI detected|violation(s)? found|wage violation|illegal(?:ly)?|employer failed|this proves(?:\s+(?:retaliation|discrimination))?|legal issue confirmed|high[- ]value case|strong claim|weak claim|strong case|weak case|case strength|case score|case value|claim value|settlement value|smoking gun|liable|liability|damages|merit score|legal merit|FLSA violation|wage theft|at fault|fault for|guarantees?|should sue|you should sue|recommend legal action|hire an attorney immediately|legal strategy|proves the|you have a case|withheld records|employer violated|likely illegal|likely to win|likely to lose|outcome likelihood|evidence of discrimination|evidence of retaliation|retaliation occurred|discrimination occurred|illegal termination|wrongful termination|wrongful termination occurred|attorney match score|discrimination proved|retaliation proved)\b/i;
+  /\b(AI detected|violation(s)?|wage violation|illegal(?:ly)?|employer failed|this proves(?:\s+(?:retaliation|discrimination))?|legal issue confirmed|high[- ]value case|strong claim|weak claim|valid claim|invalid claim|strong case|weak case|case strength|case score|case value|claim value|settlement value|smoking gun|liable|liability|damages|merit score|legal merit|FLSA violation|wage theft|at fault|fault for|guarantees?|owes|owed|entitled|entitlement|should sue|you should sue|recommend legal action|hire an attorney immediately|legal strategy|proves the|you have a case|you have a claim|withheld records|employer violated|likely illegal|likely to win|likely to lose|outcome likelihood|evidence of discrimination|evidence of retaliation|retaliation occurred|discrimination occurred|illegal termination|wrongful termination|wrongful termination occurred|attorney match score|discrimination proved|retaliation proved)\b/i;
 
 const BANNED_PATTERN = ORGANIZATION_BANNED_OUTPUT_PATTERN;
 
@@ -26,6 +26,13 @@ export function sanitizeGenerationPhrase(text: string): string {
       .replace(/\bviolation(s)? found\b/gi, 'topic noted for review')
       .replace(/\bviolations?\b/gi, 'concerns described in uploaded materials')
       .replace(/\bwage violation\b/gi, 'pay practices topic noted for review')
+      .replace(/\bvalid claim\b/gi, 'topic noted for review')
+      .replace(/\binvalid claim\b/gi, 'topic noted for review')
+      .replace(/\byou have a claim\b/gi, 'materials may be useful for review')
+      .replace(/\bowed\b/gi, 'compensation topics noted for review')
+      .replace(/\bowes\b/gi, 'compensation topics noted for review')
+      .replace(/\bentitlement\b/gi, 'topic noted for review')
+      .replace(/\bentitled\b/gi, 'topic noted for review')
       .replace(/\billegal(?:ly)?\b/gi, 'needs review')
       .replace(/\bemployer failed\b/gi, 'the available materials do not clearly show')
       .replace(/\bemployer violated\b/gi, 'uploaded materials describe concerns that need review')
