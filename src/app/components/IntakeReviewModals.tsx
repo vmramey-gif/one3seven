@@ -25,20 +25,18 @@ export function DeclineConfirmModal({
   return (
     <AnimatePresence>
       {open && (
-        <>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-[190] bg-black/40"
+          onClick={() => !submitting && onCancel()}
+        >
           <motion.div
-            key="decline-confirm-backdrop"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[190] bg-black/40"
-            onClick={() => !submitting && onCancel()}
-          />
-          <motion.div
-            key="decline-confirm-dialog"
             initial={{ opacity: 0, scale: 0.96, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 10 }}
+            onClick={(e) => e.stopPropagation()}
             className="fixed inset-x-4 bottom-6 z-[200] mx-auto max-w-sm rounded-3xl bg-white p-6 shadow-2xl sm:inset-auto sm:left-1/2 sm:-translate-x-1/2 sm:top-1/2 sm:-translate-y-1/2"
           >
             <h3 className="text-base font-semibold text-[#1B2623] mb-2">
@@ -66,7 +64,7 @@ export function DeclineConfirmModal({
               </button>
             </div>
           </motion.div>
-        </>
+        </motion.div>
       )}
     </AnimatePresence>
   );
