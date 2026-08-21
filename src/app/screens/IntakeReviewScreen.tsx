@@ -59,9 +59,9 @@ import {
   FIRM_ADDITIONAL_DOCUMENT_CATEGORIES,
   inferCategoryFromFileName,
   sanitizeFirmFacingText,
-  recordFirmRouteEvent,
 } from '../../services/intakeDataService';
 import { createFirmIntakeFileSignedUrl } from '../../services/firmRoutingService';
+import { recordFirmRouteEvent } from '../../services/workerActivityService';
 import type { FirmAccessibleUploadFile } from '../../services/firmRoutingService';
 import {
   ONE3SEVEN_NOTICES,
