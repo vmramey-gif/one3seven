@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ShieldCheck } from 'lucide-react';
-import { loadRecordVerificationRows, type RecordVerificationRow } from '../../services/intakeDataService';
+import { loadRecordVerificationRows, type RecordVerificationRow } from '../../services/workerActivityService';
 
 /**
  * Surfaces the content hash + upload timestamp one3seven already computes at upload time for

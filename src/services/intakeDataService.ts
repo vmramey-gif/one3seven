@@ -120,7 +120,7 @@ export type ProfileRow = {
   /** Access gate: false until an operator approves the account (worker/firm hold during beta). */
   approved?: boolean | null;
   created_at: string;
-  // Worker contact details (persisted in DB — see migration 20260609_worker_contact_details)
+  // Worker contact details (persisted in DB â€” see migration 20260609_worker_contact_details)
   middle_initial?: string | null;
   phone?: string | null;
   address_line1?: string | null;
@@ -206,7 +206,7 @@ export function inferCategoryFromFileName(fileName: string): string {
     rawLower.includes('w-2') ||
     name.includes('w 2');
 
-  // Separation / termination — check before pay to avoid "final pay" grabbing termination letters
+  // Separation / termination â€” check before pay to avoid "final pay" grabbing termination letters
   if (
     name.includes('termination') ||
     name.includes('separation') ||
@@ -234,7 +234,7 @@ export function inferCategoryFromFileName(fileName: string): string {
   }
 
   // Witness / coworker statements. Guard against financial "statements" (wage/earnings/pay/bank/
-  // income statements) — those are pay records, not witness statements, and the bare "statement"
+  // income statements) â€” those are pay records, not witness statements, and the bare "statement"
   // check used to swallow "EarningsStatement.pdf" before the pay branch below could catch it.
   const financialStatement = /\b(wage|earnings|pay|bank|income|financial|account)\b/.test(name);
   if (
@@ -306,7 +306,7 @@ export function inferCategoryFromFileName(fileName: string): string {
   return 'Uncategorized';
 }
 
-/** Strong title cues — used only when deciding whether a rename may change stored category. */
+/** Strong title cues â€” used only when deciding whether a rename may change stored category. */
 function fileNameHasStrongCategorySignal(fileName: string, category: string): boolean {
   // Space-normalized (CamelCase split, separators collapsed) so the \s-based patterns below
   // match "OfferLetter.pdf" / "PerformanceReview.pdf" as well as "offer_letter" / "offer letter".
@@ -380,13 +380,13 @@ export async function withProfileQueryTimeout<T>(
   label: string,
   // PromiseLike, not Promise: Supabase query builders are thenable but not real Promise
   // instances, so a Promise<T> parameter type fails structural inference and T collapses to
-  // {} at every call site — that was the single root cause behind ~25 of the tsc baseline errors.
+  // {} at every call site â€” that was the single root cause behind ~25 of the tsc baseline errors.
   promise: PromiseLike<T>,
   timeoutMs: number = PROFILE_QUERY_TIMEOUT_MS
 ): Promise<T> {
   // number, not ReturnType<typeof setTimeout>: @types/node's ambient setTimeout declaration
   // pollutes the merged global scope (even Window's), so any ReturnType-derived type here
-  // resolves to NodeJS.Timeout — this is always browser code (window.setTimeout), which truly
+  // resolves to NodeJS.Timeout â€” this is always browser code (window.setTimeout), which truly
   // returns a number at runtime regardless of what the merged ambient types claim.
   let timer: number | undefined;
   const timeout = new Promise<never>((_, reject) => {
@@ -530,9 +530,9 @@ export async function ensureUserProfile(
     const code = String(error?.code ?? '');
     const msg = (error?.message ?? '').toLowerCase();
     if (code === '23505' || msg.includes('duplicate') || msg.includes('unique')) {
-      console.info('[o3s-ensure-profile] duplicate insert — before fetchProfile (retry)');
+      console.info('[o3s-ensure-profile] duplicate insert â€” before fetchProfile (retry)');
       const againResult = await fetchProfileQuery(user.id);
-      console.info('[o3s-ensure-profile] duplicate insert — after fetchProfile (retry)', {
+      console.info('[o3s-ensure-profile] duplicate insert â€” after fetchProfile (retry)', {
         hasProfile: Boolean(againResult.profile),
         timedOut: againResult.timedOut,
       });
@@ -607,14 +607,14 @@ export async function commitProfileRoleForUser(
       return { profile: data as ProfileRow };
     }
     if (error) {
-      console.info('[o3s-role-commit] upsert failed — trying update-only', { code: error.code });
+      console.info('[o3s-role-commit] upsert failed â€” trying update-only', { code: error.code });
     }
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     if (!msg.includes('timed out')) {
       return { profile: null, error: msg };
     }
-    console.warn('[o3s-role-commit] upsert timed out — trying update-only', { userId: user.id });
+    console.warn('[o3s-role-commit] upsert timed out â€” trying update-only', { userId: user.id });
   }
 
   try {
@@ -633,7 +633,7 @@ export async function commitProfileRoleForUser(
   } catch (e2) {
     const msg2 = e2 instanceof Error ? e2.message : String(e2);
     if (msg2.includes('timed out')) {
-      console.error('[o3s-role-commit] commitProfileRoleForUser: update timed out — optimistic continue', {
+      console.error('[o3s-role-commit] commitProfileRoleForUser: update timed out â€” optimistic continue', {
         userId: user.id,
       });
       return { profile: profileRowFromAuthUser(user, role), timedOut: true };
@@ -716,14 +716,14 @@ async function ensureProfileRoleForFirmSave(
       console.info('[o3s-firm-save] ensureProfileRole: upsert ok', { userId });
       return {};
     }
-    console.info('[o3s-firm-save] ensureProfileRole: upsert failed — update-only', {
+    console.info('[o3s-firm-save] ensureProfileRole: upsert failed â€” update-only', {
       userId,
       message: error.message,
     });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     if (!msg.includes('timed out')) return { error: msg };
-    console.warn('[o3s-firm-save] ensureProfileRole: upsert timed out — update-only', { userId });
+    console.warn('[o3s-firm-save] ensureProfileRole: upsert timed out â€” update-only', { userId });
   }
 
   try {
@@ -930,7 +930,7 @@ async function saveFirmProfileBasicsInner(opts: {
     if (updated.error) return { profile: null, error: updated.error };
   }
 
-  console.info('[o3s-firm-save] no row updated — before insert', { userId: opts.userId });
+  console.info('[o3s-firm-save] no row updated â€” before insert', { userId: opts.userId });
   const created = await insertFirmProfileWithUniqueCode(opts.userId, opts.email, {
     firm_name,
     practice_areas: opts.practice_areas,
@@ -1125,7 +1125,7 @@ export async function uploadIntakeFile(
   if (uploadedFileId) {
     // Fire-and-forget so the upload returns fast. runPhase2AFileTextExtraction records its own
     // failures in-band (extraction_status='failed' via its outer catch), so a normal extraction
-    // error is NOT silent — it is persisted per file. This catch only fires if the dynamic import
+    // error is NOT silent â€” it is persisted per file. This catch only fires if the dynamic import
     // itself fails; log with enough context to trace which file/intake was affected.
     void import('./fileTextExtractionService')
       .then(({ runPhase2AFileTextExtraction }) =>
@@ -1237,7 +1237,7 @@ export async function deleteUploadedFileAndStorage(
   const { data: removed, error: storageError } = await supabase.storage.from('intake-files').remove([path]);
   if (storageError) return { error: storageError.message };
   // Verify the blob is actually gone before deleting its DB row. If we can't confirm removal,
-  // keep the row (the pointer) so the file is never orphaned/invisible — and report honestly.
+  // keep the row (the pointer) so the file is never orphaned/invisible â€” and report honestly.
   const confirmed = (removed ?? []).some((o) => (o?.name ?? '').trim() === path);
   if (!confirmed) {
     console.error('[o3s-delete-file] storage removal not confirmed', { uploadedFileId, path });
@@ -1314,7 +1314,7 @@ export type CoverageExtractionFactsRow = {
 
 /**
  * Facts + head-of-text snippets for coverage assessment. Unlike
- * `listCompletedExtractionsForIntake`, rows with an EMPTY text layer are kept — a scanned
+ * `listCompletedExtractionsForIntake`, rows with an EMPTY text layer are kept â€” a scanned
  * employment agreement or personnel-file production often has no text but rich stored facts,
  * and those facts are exactly what the coverage rail's content signals need.
  */
@@ -1422,7 +1422,7 @@ export async function ensureTimelineEventsFromUploadedFiles(intakeId: string): P
 
 /**
  * Embedded worker intake notes inside `intake_summaries.overview` (no new rows).
- * Newline-tolerant on both edges (`\n?`) — the stored overview is trimmed by safeTrim on
+ * Newline-tolerant on both edges (`\n?`) â€” the stored overview is trimmed by safeTrim on
  * save, so a strict leading/trailing `\n` requirement made the block unreadable after a
  * rebuild and the notes were silently dropped on the next one.
  */
@@ -1452,13 +1452,13 @@ const WORKER_DOCUMENT_RESPONSE_PATTERN =
 
 /**
  * Worker contact (name/phone) copied into the firm-readable summary at share time.
- * Surfaced to the firm via the extracted `workerContact`, never as raw prose — so it
+ * Surfaced to the firm via the extracted `workerContact`, never as raw prose â€” so it
  * is stripped from all firm- and worker-facing display text by sanitizeFirmFacingText.
  */
 const WORKER_CONTACT_PATTERN =
   /\n?---\s*O3S_WORKER_CONTACT\s*---[\s\S]*?---\s*O3S_WORKER_CONTACT_END\s*---\n?/gi;
 
-/** MVP firm → worker document request categories (checkbox labels). */
+/** MVP firm â†’ worker document request categories (checkbox labels). */
 export const FIRM_ADDITIONAL_DOCUMENT_CATEGORIES = [
   'Pay records / paystubs',
   'Time records / timecards',
@@ -1582,9 +1582,9 @@ export function stripWorkerIntakeNotesBlock(overview: string): string {
 
 /**
  * Storage-path strip: removes ONLY the worker-notes block. Never use the sanitizing
- * `stripWorkerIntakeNotesBlock` on text that is written back to `intake_summaries.overview` —
+ * `stripWorkerIntakeNotesBlock` on text that is written back to `intake_summaries.overview` â€”
  * sanitizeFirmFacingText is a display polish that deletes every embedded O3S_ sidecar block
- * (worker contact, org engine, mitigation log, …) from whatever it touches.
+ * (worker contact, org engine, mitigation log, â€¦) from whatever it touches.
  */
 export function stripWorkerIntakeNotesBlockForStorage(overview: string): string {
   return overview.replace(WORKER_INTAKE_NOTES_PATTERN, '\n');
@@ -1719,8 +1719,8 @@ export function resolveWorkerProvidedContextForFirmView(
   options?: { includeTimelineContext?: boolean; previewOnly?: boolean }
 ): string | undefined {
   // PRIVACY GATE (worker dashboard promise, one3sevenProduct.ts: "Firms do not see yet: your full
-  // file contents, personal narrative, or private notes—unless you approve expanded review
-  // access"): a preview-only (pre-approval) firm receives NO worker-provided narrative at all —
+  // file contents, personal narrative, or private notesâ€”unless you approve expanded review
+  // access"): a preview-only (pre-approval) firm receives NO worker-provided narrative at all â€”
   // no story, no additional notes, no guided summary, no follow-up narrative, no timeline
   // context. Gated here, at the source, so every consumer of the firm view model is protected.
   if (options?.previewOnly) return undefined;
@@ -1744,7 +1744,7 @@ export function resolveWorkerProvidedContextForFirmView(
 /**
  * Preview-only strip for the structured worker follow-up: the free-text NARRATIVE answers
  * (what happened when they complained, what changed afterward, remote-expense description,
- * prior-filing details, and any named individuals — a treating physician, a manager, anyone the
+ * prior-filing details, and any named individuals â€” a treating physician, a manager, anyone the
  * worker named) are part of the worker's personal narrative and are withheld until the worker
  * approves expanded access. The identity/scheduling facts the preview surface already shows
  * (employment name, employer, dates, status, arbitration/agency flags, work state) are kept so
@@ -2548,7 +2548,7 @@ export async function persistPlaceholderOrganizationForIntake(
   const previousAlerts = (previousSummary?.missing_document_alerts as string[] | null) ?? [];
   let preservedWorkerNotes = extractWorkerIntakeNotesFromOverview(previousOverview);
   // Recovery: earlier rebuilds could drop the story / follow-up blocks from the stored
-  // overview. `intakes.worker_metadata` keeps the worker-owned originals — reconstruct.
+  // overview. `intakes.worker_metadata` keeps the worker-owned originals â€” reconstruct.
   try {
     const recoveryMetadata = parseWorkerIntakeMetadata(priorIntake?.worker_metadata);
     const recoverStory =
@@ -2645,7 +2645,7 @@ export async function persistPlaceholderOrganizationForIntake(
       buildPlaceholderOrganization(safeMeta, { employmentMatterTags });
   } catch (generationError) {
     generationUsedFallback = true;
-    logOrgAuditError('summary generation failed — placeholder fallback', generationError, {
+    logOrgAuditError('summary generation failed â€” placeholder fallback', generationError, {
       intakeId,
       activeStep: 'summary_generation',
       uploadedFileCount: files.length,
@@ -2654,7 +2654,7 @@ export async function persistPlaceholderOrganizationForIntake(
     try {
       org = buildPlaceholderOrganization(safeMeta, { employmentMatterTags });
     } catch (placeholderError) {
-      logOrgAuditError('summary generation placeholder failed — minimal fallback', placeholderError, {
+      logOrgAuditError('summary generation placeholder failed â€” minimal fallback', placeholderError, {
         intakeId,
         activeStep: 'summary_generation',
       });
@@ -2695,7 +2695,7 @@ export async function persistPlaceholderOrganizationForIntake(
     timelineEventCount: org.timelineEvents.length,
     evidenceTimelineCount: org.evidenceTimeline.length,
     fileRecordCount: org.fileRecords.length,
-    // org.sections is a fixed-shape object (IntakeOrganizationSections), not an array — this
+    // org.sections is a fixed-shape object (IntakeOrganizationSections), not an array â€” this
     // used to call .length on it, which is always undefined. Count populated sections instead.
     sectionCount: Object.values(org.sections).filter((v) =>
       Array.isArray(v) ? v.length > 0 : typeof v === 'string' ? v.trim().length > 0 : Boolean(v)
@@ -2820,7 +2820,7 @@ export async function persistPlaceholderOrganizationForIntake(
       fallbackUsed: true,
       errorMessage: message,
     });
-    logSummarySaveError('summary assembly — core preserved', assemblyError, { intakeId });
+    logSummarySaveError('summary assembly â€” core preserved', assemblyError, { intakeId });
   }
 
   logOrgAudit('timeline save start', {
@@ -2852,7 +2852,7 @@ export async function persistPlaceholderOrganizationForIntake(
     error: up ? { message: up.message, code: up.code } : null,
   });
   if (up) {
-    logOrgAuditError('intakes update failed — core summary preserved', up, {
+    logOrgAuditError('intakes update failed â€” core summary preserved', up, {
       intakeId,
       activeStep: 'intakes_update',
     });
@@ -2884,179 +2884,3 @@ export async function persistPlaceholderOrganizationForIntake(
   return {};
 }
 
-export type RecordVerificationRow = {
-  fileName: string;
-  uploadedAt: string;
-  /** SHA-256 content hash, computed once at upload (fileUploadIntegrity.ts). Null on rows
-   * uploaded before the content_hash column existed, or if the column isn't provisioned yet. */
-  contentHash: string | null;
-};
-
-/**
- * Per-file upload timestamp + content hash, already computed at upload time for dedup — this
- * just surfaces it. Answers "did this exist, unmodified, as of this date" without one3seven
- * making any claim about what the record shows or means.
- */
-export async function loadRecordVerificationRows(intakeId: string): Promise<RecordVerificationRow[]> {
-  const { data, error } = await supabase
-    .from('uploaded_files')
-    .select('file_name, created_at, content_hash')
-    .eq('intake_id', intakeId)
-    .order('created_at', { ascending: true });
-  if (error) {
-    console.warn('[o3s-verification] loadRecordVerificationRows failed', error.message);
-    return [];
-  }
-  return (data ?? []).map((r) => ({
-    fileName: (r.file_name as string) ?? 'Uploaded file',
-    uploadedAt: (r.created_at as string) ?? '',
-    contentHash: (r.content_hash as string | null) ?? null,
-  }));
-}
-
-export type PersistentNotificationRow = {
-  id: string;
-  recipient_user_id: string;
-  recipient_kind: 'worker' | 'firm';
-  notification_type:
-    | 'firm_document_request'
-    | 'worker_documents_submitted'
-    | 'worker_full_access_request'
-    | 'firm_full_access_granted';
-  title: string;
-  body: string | null;
-  payload: Record<string, unknown>;
-  read_at: string | null;
-  related_intake_id: string | null;
-  related_route_id: string | null;
-  created_at: string;
-  updated_at: string;
-};
-
-const NOTIFICATIONS_SELECT =
-  'id, recipient_user_id, recipient_kind, notification_type, title, body, payload, read_at, related_intake_id, related_route_id, created_at, updated_at';
-
-/** Latest notifications for the signed-in user (recipient_user_id = auth.uid()). */
-export async function listNotificationsForUser(limit = 40): Promise<{
-  rows: PersistentNotificationRow[];
-  error?: string;
-}> {
-  try {
-    return await withProfileQueryTimeout('listNotificationsForUser', listNotificationsForUserQuery(limit));
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e);
-    if (msg.includes('timed out')) {
-      console.error('[o3s-notifications] list timed out', { PROFILE_QUERY_TIMEOUT_MS });
-      return { rows: [], error: 'Notifications load timed out.' };
-    }
-    return { rows: [], error: msg };
-  }
-}
-
-async function listNotificationsForUserQuery(limit: number): Promise<{
-  rows: PersistentNotificationRow[];
-  error?: string;
-}> {
-  const {
-    data: { user },
-    error: authErr,
-  } = await supabase.auth.getUser();
-  if (authErr) return { rows: [], error: authErr.message };
-  if (!user) return { rows: [], error: 'Not signed in' };
-
-  const { data, error } = await supabase
-    .from('notifications')
-    .select(NOTIFICATIONS_SELECT)
-    .eq('recipient_user_id', user.id)
-    .order('created_at', { ascending: false })
-    .limit(limit);
-
-  if (error) {
-    if (isSchemaRelationUnavailable(error)) return { rows: [], error: error.message };
-    console.error('[o3s-notifications] list', error);
-    return { rows: [], error: error.message };
-  }
-
-  return { rows: (data ?? []) as PersistentNotificationRow[] };
-}
-
-/**
- * Realtime subscription for the signed-in user's own notifications (2026-08-18 hard-challenge
- * finding: the bell was fetch-on-trigger only -- a worker had to take an action or reload to see
- * a server-side change like a firm's document request). No `filter` is needed: `notifications`
- * RLS (`notifications_select_own`, recipient_user_id = auth.uid()) already scopes which rows a
- * given subscriber's postgres_changes stream can see, same pattern already proven for
- * crm_firms/crm_messages in crmService.ts. Caller re-fetches on any change rather than trying to
- * merge the raw payload, reusing the one already-correct read path (listNotificationsForUser)
- * instead of a second, divergent row-shaping implementation.
- */
-export function subscribeToOwnNotifications(onChange: () => void): () => void {
-  const channel = supabase
-    .channel(`notifications_${Math.random().toString(36).slice(2)}`)
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'notifications' }, () => onChange())
-    .subscribe();
-  return () => { void supabase.removeChannel(channel); };
-}
-
-export async function markNotificationRead(notificationId: string): Promise<{ error?: string }> {
-  const {
-    data: { user },
-    error: authErr,
-  } = await supabase.auth.getUser();
-  if (authErr) return { error: authErr.message };
-  if (!user) return { error: 'Not signed in' };
-
-  const now = new Date().toISOString();
-  const { error } = await supabase
-    .from('notifications')
-    .update({ read_at: now, updated_at: now })
-    .eq('id', notificationId)
-    .eq('recipient_user_id', user.id);
-
-  if (error) {
-    console.error('[o3s-notifications] mark read', error);
-    return { error: error.message };
-  }
-  return {};
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Firm-side event timestamp instrumentation
-// Records one-time action timestamps on intake_routes for pilot measurement.
-// Each column is written at most once — the null-check guard prevents overwrite.
-// ─────────────────────────────────────────────────────────────────────────────
-
-export type FirmRouteEvent = 'first_opened' | 'accepted' | 'declined';
-
-const ROUTE_EVENT_COLUMN: Record<FirmRouteEvent, string> = {
-  first_opened: 'firm_first_opened_at',
-  accepted: 'firm_accepted_at',
-  declined: 'firm_declined_at',
-};
-
-/**
- * Records a one-time event timestamp on an intake_routes row.
- * The update is guarded by `.is(column, null)` so return visits never overwrite
- * the original timestamp. Silent no-op on demo/sample route IDs.
- */
-export async function recordFirmRouteEvent(
-  routeId: string,
-  event: FirmRouteEvent,
-): Promise<void> {
-  // Skip demo / sample routes — they have no real DB rows
-  if (!routeId || routeId.startsWith('demo-') || routeId.startsWith('sample-')) return;
-
-  const column = ROUTE_EVENT_COLUMN[event];
-  const now = new Date().toISOString();
-
-  const { error } = await supabase
-    .from('intake_routes')
-    .update({ [column]: now, updated_at: now })
-    .eq('id', routeId)
-    .is(column, null); // one-time write guard
-
-  if (error) {
-    // Non-fatal — log and continue
-    console.warn(`[o3s-events] recordFirmRouteEvent(${event})`, error.message);
-  }
-}
