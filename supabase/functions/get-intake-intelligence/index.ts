@@ -202,7 +202,12 @@ function synthesize(files: any[]): unknown {
 
   const confirmedEmployer =
     offers[0]?.employer_name ?? separation[0]?.employer_name ?? warnings[0]?.employer_name ?? null;
-  const confirmedStartDate = offers[0]?.start_date ?? null;
+  // 2026-08-20: start_date is a general extraction field, not offer-letter-exclusive (any
+  // document type can carry it if the text states it) -- fall back to separation/warning
+  // records the same way confirmedEmployer already does, instead of only ever trusting the
+  // offer letter. Found via the gauntlet's first staging run: this had zero fallback at all,
+  // making it the single most fragile confirmed* field.
+  const confirmedStartDate = offers[0]?.start_date ?? separation[0]?.start_date ?? warnings[0]?.start_date ?? null;
   const termDoc = separation[0];
   const confirmedTerminationDate = termDoc?.document_date ?? null;
   const confirmedTerminationReason = termDoc?.stated_reason ?? null;

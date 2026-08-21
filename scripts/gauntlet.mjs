@@ -67,6 +67,42 @@ if (URL.includes(PROD_REF)) {
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FIXTURES_DIR = path.join(__dirname, 'gauntlet-fixtures');
 
+// Mirrors src/services/intakeDataService.ts's inferCategoryFromFileName() -- kept manually in
+// sync, not imported, since that file pulls in the full Supabase client and app dependency graph
+// this plain Node script doesn't have. 2026-08-20: added after this script's own upload step
+// (which previously omitted `category` entirely) turned out to mask a real synthesis bug rather
+// than exercise the same path real uploads do -- real production always sets category at upload
+// time, so a gauntlet that skips it isn't testing what production actually does. Only the subset
+// of rules relevant to this repo's fixture filenames is ported; if new fixtures use filename
+// patterns not covered here, extend this to match the real function rather than skip it.
+function inferCategoryFromFileName(fileName) {
+  const name = fileName
+    .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+    .toLowerCase()
+    .replace(/[\s._-]+/g, ' ')
+    .trim();
+  if (name.includes('termination') || name.includes('separation') || name.includes('final pay') || name.includes('final paystub')) {
+    return 'Separation Records';
+  }
+  if (name.includes('warning') || name.includes('disciplin') || name.includes('write up') || name.includes('writeup')) {
+    return 'Performance / discipline records';
+  }
+  if (name.includes('witness') || name.includes('statement') || name.includes('declaration')) {
+    return 'Witness Statement';
+  }
+  if (name.includes('schedule') || name.includes('shift') || name.includes('roster')) {
+    return 'Schedules';
+  }
+  if (name.includes('complaint') || name.includes('grievance') || name.includes('email') || name.includes('text message')) {
+    return 'Workplace Communications';
+  }
+  if (name.includes('wage') || name.includes('payroll') || name.includes('paystub') || name.includes('pay stub')) {
+    return 'Pay Records / Payroll';
+  }
+  if (name.includes('offer')) return 'Offer Letters';
+  return 'Uncategorized';
+}
+
 const admin = createClient(URL, SERVICE, { auth: { autoRefreshToken: false, persistSession: false } });
 
 function sha256(buf) {
@@ -210,6 +246,7 @@ async function runCase(kase) {
     const { error: rowErr } = await admin.from('uploaded_files').insert({
       intake_id: intakeId, worker_id: userId, file_name: fname, file_path: storagePath,
       file_type: 'application/pdf', file_size: bytes.byteLength, content_hash: sha256(bytes),
+      category: inferCategoryFromFileName(fname),
     });
     if (rowErr) fail(caseId, `uploaded_files insert failed for ${fname}: ${rowErr.message}`);
   }

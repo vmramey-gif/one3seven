@@ -1027,6 +1027,13 @@ function normalizeCategory(raw: string, fileName = ''): string {
   // separators collapsed, and the string padded so the ( |$) word-boundary checks fire.
   const f = ' ' + fileName.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/[_\-.]+/g, ' ').toLowerCase() + ' ';
   if (/witness statement/.test(f)) return 'Witness Statement';
+  // 2026-08-20: added after the gauntlet's first real staging run showed confirmedEmployer and
+  // confirmedStartDate silently returning null for offer letters whose stored DB category was
+  // empty -- this filename-first block had no rule for "offer" at all, so it fell to the
+  // DB-category fallback below, which needs the DB value to already say "offer" to work. This
+  // rule mirrors intakeDataService.ts's inferCategoryFromFileName(), the real upload-time
+  // classifier, so a bare filename alone is now enough regardless of what's stored.
+  if (/offer letter|offer of employment|employment offer|onboarding/.test(f)) return 'Offer Letters';
   if (/written warning|final warning|write ?up|disciplin/.test(f)) return 'Performance / discipline records';
   if (/terminat/.test(f) && !/terminat.*review/.test(f)) return 'Separation Records';
   if (/complaint to hr|hr complaint|complaint hr|complaint to supervisor|complaint supervisor/.test(f)) return 'Workplace Communications';

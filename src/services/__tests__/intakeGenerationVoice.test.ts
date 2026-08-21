@@ -111,6 +111,17 @@ describe('intake generation voice', () => {
       'The outcome likelihood is high and the case strength is obvious.',
       'You should sue and hire an attorney immediately.',
       'Recommend legal action based on settlement value.',
+      // 2026-08-20: closed a real gap where these five slipped past the production sanitizer even
+      // though a separate, disconnected bannedVocabulary.ts already flagged them (never wired in).
+      // NOTE: bannedVocabulary.ts's bare "guarantee"/"guaranteed" was deliberately NOT added here --
+      // the site's own ONE3SEVEN_UNIVERSAL_DISCLAIMER legitimately ends "...is guaranteed" (negated:
+      // "No outcome... is guaranteed"), and a blanket ban has no way to tell that apart from a
+      // promise without negation-aware matching. Present-tense guarantee(s) stays banned below.
+      'The employer owes back pay and the worker is owed overtime.',
+      'You are entitled to compensation under this entitlement.',
+      'This is a valid claim, not an invalid claim.',
+      'You have a claim worth pursuing.',
+      'There was a clear violation of the policy.',
     ];
     for (const raw of samples) {
       const cleaned = sanitizeGenerationPhrase(raw);

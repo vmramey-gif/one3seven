@@ -409,7 +409,13 @@ export function synthesizeIntakeIntelligence(files: FileWithFacts[]): IntakeInte
     warnings[0]?.employer_name ??
     null;
 
-  const confirmedStartDate = offers[0]?.start_date ?? null;
+  // 2026-08-20: start_date is a general extraction field, not offer-letter-exclusive (any
+  // document type can carry it if the text states it) -- fall back to separation/warning
+  // records the same way confirmedEmployer already does, instead of only ever trusting the
+  // offer letter. Found via the gauntlet's first staging run: this had zero fallback at all,
+  // making it the single most fragile confirmed* field. Mirrors the same fix in
+  // get-intake-intelligence's edge function.
+  const confirmedStartDate = offers[0]?.start_date ?? separation[0]?.start_date ?? warnings[0]?.start_date ?? null;
 
   // effective_date preferred over document_date (2026-08-18, document-range vs. employment-period
   // conceptual split): document_date is WHEN THE LETTER WAS WRITTEN, not necessarily the worker's
