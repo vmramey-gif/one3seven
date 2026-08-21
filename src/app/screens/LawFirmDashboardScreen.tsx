@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import { Screen } from '../App';
 
-import type { FirmDashboardRow } from '../../services/intakeDataService';
+import type { FirmDashboardRow } from '../../services/firmRoutingService';
 import { polishFirmFacingProse } from '../../services/firmIntakeDisplay';
 import { EmploymentMatterChipList } from '../components/EmploymentMatterTagsLine';
 import type { FirmSubmissionTypeDisplay } from '../constants/one3sevenProduct';

@@ -41,6 +41,7 @@ import {
 } from './types/IntakeWorkspace';
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 import * as intakeData from '../services/intakeDataService';
+import * as firmRouting from '../services/firmRoutingService';
 import {
   triggerIntakeFactExtraction,
   loadIntakeDocumentFacts,
@@ -71,12 +72,11 @@ import { uploadedFileKey } from '../services/employmentTimelineOrganization';
 import { polishNameForDisplay } from '../services/firmIntakeDisplay';
 import * as notifications from '../services/notificationService';
 import type {
-  FirmDashboardRow,
-  FirmLiveIntakeView,
   ProfileRow,
   FirmProfileRow,
   PersistentNotificationRow,
 } from '../services/intakeDataService';
+import type { FirmDashboardRow, FirmLiveIntakeView } from '../services/firmRoutingService';
 import type { User } from '@supabase/supabase-js';
 import {
   BETA_ENABLE_PARTICIPATING_ROUTING,
@@ -228,7 +228,7 @@ const O3S_SS_SIGNUP_PHONE = 'o3s_worker_signup_phone_v1';
  * Last meaningful worker view, so a browser refresh restores where the worker was instead of
  * dropping them back to the case list / marketing page. Only 'summary' (their file, with its
  * intake) and 'landing' (case list) are persisted; any other in-flow screen falls back to
- * 'landing' — their draft is saved server-side, so no work is lost.
+ * 'landing' â€” their draft is saved server-side, so no work is lost.
  */
 const O3S_SS_LAST_WORKER_VIEW = 'o3s_last_worker_view_v1';
 type LastWorkerView = { screen: 'summary'; intakeId: string } | { screen: 'landing' };
@@ -283,7 +283,7 @@ export default function App() {
     // and go straight to the firm-directed intake. firmDirectedContext will resolve async.
     try {
       // Worker landing (/for-workers) handoff: a one-shot flag set before reloading to '/'.
-      // Lands the worker on the low-friction Create Account (or Sign in) — not the firm homepage.
+      // Lands the worker on the low-friction Create Account (or Sign in) â€” not the firm homepage.
       const workerCta = sessionStorage.getItem('o3s_worker_cta'); // read-only; cleared in an effect (pure initializer)
       if (workerCta) return workerCta === 'signin' ? 'signIn' : 'createAccount';
       if (sessionStorage.getItem('o3s_prefill_fc')) {
@@ -384,13 +384,13 @@ export default function App() {
   }, [userRole, currentScreen, currentIntakeId]);
   const [firmDashboardRows, setFirmDashboardRows] = useState<FirmDashboardRow[]>([]);
   const [firmDashboardError, setFirmDashboardError] = useState<string | null>(null);
-  // The firm's OWN case files (documents the firm uploaded and organized itself) — kept separate
+  // The firm's OWN case files (documents the firm uploaded and organized itself) â€” kept separate
   // from worker-submitted intakes so the dashboard clearly divides "your case files" from "client intakes".
   const [firmOwnCaseFiles, setFirmOwnCaseFiles] = useState<WorkerIntakeListEntry[]>([]);
   const [firmLiveView, setFirmLiveView] = useState<FirmLiveIntakeView | null>(null);
   const [firmLiveViewLoading, setFirmLiveViewLoading] = useState(false);
   // Set when loadFirmLiveIntakeView returns null because of a genuine backend fetch failure
-  // (not because there was simply no route metadata to load from) — distinguishes "we tried to
+  // (not because there was simply no route metadata to load from) â€” distinguishes "we tried to
   // load this and it failed" from "there's nothing connected here" so the review screen can show
   // a real error state instead of silently rendering nothing.
   const [firmLiveViewError, setFirmLiveViewError] = useState<string | null>(null);
@@ -404,11 +404,11 @@ export default function App() {
     timeline: WorkerTimelineItem[];
     readiness: string[];
     missing: string[];
-    /** Dated payroll/wage records (raw strings) for Gap Detection — from the pre-collapse timeline. */
+    /** Dated payroll/wage records (raw strings) for Gap Detection â€” from the pre-collapse timeline. */
     payrollDates: string[];
     /** Employer name confirmed from document extraction, when the worker hasn't stated one. */
     confirmedEmployer: string | null;
-    /** Employment period ("start – end") confirmed from document extraction. */
+    /** Employment period ("start â€“ end") confirmed from document extraction. */
     confirmedEmploymentPeriod: string | null;
     /** Count of named people + roles confirmed from document extraction. */
     confirmedNamedPeopleCount: number;
@@ -427,7 +427,7 @@ export default function App() {
   const [workerLinkedRouteStatus, setWorkerLinkedRouteStatus] = useState<string | null>(null);
   const [workerLinkedRouteSharedAt, setWorkerLinkedRouteSharedAt] = useState<string | null>(null);
   const [workerIntakeRoutingCards, setWorkerIntakeRoutingCards] = useState<
-    intakeData.WorkerIntakeFirmRoutingCard[]
+    firmRouting.WorkerIntakeFirmRoutingCard[]
   >([]);
   const [workerLandingInitialHubView, setWorkerLandingInitialHubView] =
     useState<WorkerMobileHubView>('home');
@@ -488,7 +488,7 @@ export default function App() {
   /** Display labels for uploaded files on summary (key: stable file fingerprint). */
   const [uploadedFileLabels, setUploadedFileLabels] = useState<Record<string, string>>({});
 
-  /** Upload-screen “Add Context”; flushed into Supabase intake_summaries after org persist, or into workspace when offline. */
+  /** Upload-screen â€œAdd Contextâ€; flushed into Supabase intake_summaries after org persist, or into workspace when offline. */
   const pendingUploadContextRef = useRef<string | null>(null);
   /** Pre-upload guided intake answers keyed by intake id; merged after first summary row exists. */
   const guidedIntakeByIntakeIdRef = useRef<Record<string, GuidedIntakeAnswers>>({});
@@ -530,7 +530,7 @@ export default function App() {
     }
   }, [profile?.id, profile?.role]);
 
-  /** Any saved intake row means the worker already started organizing — skip the first-run law-firm modal. */
+  /** Any saved intake row means the worker already started organizing â€” skip the first-run law-firm modal. */
   useEffect(() => {
     if (!profile?.id || profile.role !== 'worker') return;
     if (workerIntakesList.length === 0) return;
@@ -556,14 +556,14 @@ export default function App() {
 
   function routeSafeAfterProfileBootstrapFailure(signedInUser: User, reason: string) {
     try {
-      console.error('[o3s-post-auth] profile bootstrap failed — safe route', {
+      console.error('[o3s-post-auth] profile bootstrap failed â€” safe route', {
         reason,
         userId: signedInUser.id,
       });
       setProfile(null);
       const meta = signedInUser.user_metadata?.role;
       // Firm accounts are founder-provisioned only (2026-08-17). Since the DB profile failed to
-      // load here, we have no verified role for this user — client-only signals (firmIntent,
+      // load here, we have no verified role for this user â€” client-only signals (firmIntent,
       // user_metadata) are self-settable and must never route straight into firmSettings on their
       // own. A real firm's profile.role is already set server-side, so this path is never hit for
       // them on a healthy load; on a genuine bootstrap failure, fall through to roleSelection
@@ -572,13 +572,13 @@ export default function App() {
       if (meta === 'worker') {
         setUserRole('worker');
         firmSignInIntentRef.current = false;
-        console.info('[o3s-post-auth] safe route → landing', { meta });
+        console.info('[o3s-post-auth] safe route â†’ landing', { meta });
         setCurrentScreen('landing');
         return;
       }
       setUserRole(null);
       firmSignInIntentRef.current = false;
-      console.info('[o3s-post-auth] safe route → roleSelection');
+      console.info('[o3s-post-auth] safe route â†’ roleSelection');
       setCurrentScreen('roleSelection');
     } catch (safeRouteError: unknown) {
       console.error('[o3s-post-auth] safe route handler failed', safeRouteError);
@@ -596,7 +596,7 @@ export default function App() {
       firmProfileId: fp.id,
       profileUserId: fp.profile_id,
     });
-    const { rows, error: dashError } = await intakeData.loadFirmDashboardRows(fp.id);
+    const { rows, error: dashError } = await firmRouting.loadFirmDashboardRows(fp.id);
     // Preserve the prior list on failure so a transient error doesn't blank the firm's queue
     // (which reads as "no intakes"). Surface the error instead.
     if (dashError) {
@@ -609,7 +609,7 @@ export default function App() {
     // from the worker-routed rows above so the dashboard can divide the two clearly.
     if (authUser?.id) {
       try {
-        setFirmOwnCaseFiles(await intakeData.listWorkerIntakes(authUser.id));
+        setFirmOwnCaseFiles(await firmRouting.listWorkerIntakes(authUser.id));
       } catch (e) {
         console.error('[o3s-firm-dashboard] own case files load failed', e);
       }
@@ -618,7 +618,7 @@ export default function App() {
   }
 
   async function refreshWorkerRoutingFromIntake(intakeId: string, firmNameHint?: string | null) {
-    const routing = await intakeData.fetchWorkerIntakeRoutingDisplay(intakeId);
+    const routing = await firmRouting.fetchWorkerIntakeRoutingDisplay(intakeId);
     setWorkerIntakeWorkflow(routing.workflowStatus);
     const hasFirmLink =
       routing.submissionChannel === 'firm_code' || Boolean(routing.linkedFirmId);
@@ -643,7 +643,7 @@ export default function App() {
       const ensure = await intakeData.ensureTimelineEventsFromUploadedFiles(intakeId);
       if (ensure.error) console.error(ensure.error);
     }
-    const bundle = await intakeData.fetchIntakeSummaryBundle(intakeId);
+    const bundle = await firmRouting.fetchIntakeSummaryBundle(intakeId);
     const intakeRow = bundle.intake as { workflow_status?: string; submission_channel?: string | null } | null;
     setWorkerIntakeWorkflow(intakeRow?.workflow_status ?? null);
     setWorkerIntakeChannel(intakeRow?.submission_channel ?? null);
@@ -715,7 +715,7 @@ export default function App() {
     // listed the exact same start/end dates.
     const start = intel?.confirmedStartDate?.trim();
     const end = intel?.confirmedTerminationDate?.trim();
-    const confirmedEmploymentPeriod = start && end ? `${start} – ${end}` : start || end || null;
+    const confirmedEmploymentPeriod = start && end ? `${start} â€“ ${end}` : start || end || null;
     const confirmedNamedPeopleCount = documentFacts.facts.length
       ? deriveNamedPeopleForIntake(documentFacts.facts).length
       : 0;
@@ -736,7 +736,7 @@ export default function App() {
   async function refreshWorkerAccessRows(forUserId?: string) {
     const id = forUserId ?? profile?.id;
     if (!id) return;
-    const rows = await intakeData.listWorkerAccessRequests(id);
+    const rows = await firmRouting.listWorkerAccessRequests(id);
     setWorkerAccessRequests(rows);
   }
 
@@ -749,7 +749,7 @@ export default function App() {
         // give (cross-reference in the Supabase dashboard), and this fires on every sign-in.
         userId: session?.user?.id ?? null,
       });
-      // A password-recovery link lands here with a real (recovery-scoped) session — route
+      // A password-recovery link lands here with a real (recovery-scoped) session â€” route
       // straight to the "set a new password" screen instead of the normal sign-in handling
       // below, which would otherwise treat this like an ordinary sign-in and skip the step
       // where the worker actually picks a new password.
@@ -915,7 +915,7 @@ export default function App() {
             setProfile(routingProfile);
 
             if (currentScreenRef.current === 'roleSelection') {
-              console.info('[o3s-post-auth] on roleSelection — skip auto-routing until user commits role');
+              console.info('[o3s-post-auth] on roleSelection â€” skip auto-routing until user commits role');
               return;
             }
 
@@ -1062,7 +1062,7 @@ export default function App() {
               } else if (routingProfile?.role === 'worker') {
                 firmSignInIntentRef.current = false;
                 // Restore where the worker was before a refresh. Only 'summary' (their file) is
-                // deep-restored, and only if that intake still exists; everything else → case list.
+                // deep-restored, and only if that intake still exists; everything else â†’ case list.
                 const lastView = firmIntent ? null : readLastWorkerView();
                 if (
                   lastView?.screen === 'summary' &&
@@ -1128,7 +1128,7 @@ export default function App() {
       const screen = currentScreenRef.current;
       if (!AUTH_FLOW_SCREENS.includes(screen) && screen !== 'firmSettings') return;
       if (postAuthInFlightRef.current) return;
-      console.info('[o3s-post-auth] visibility retry — scheduling deferred post-auth', { screen });
+      console.info('[o3s-post-auth] visibility retry â€” scheduling deferred post-auth', { screen });
       const runRetry = () => {
         if (postAuthInFlightRef.current) return;
         postAuthInFlightRef.current = true;
@@ -1202,14 +1202,14 @@ export default function App() {
 
   useEffect(() => {
     if (currentScreen !== 'processing' || !currentIntakeId || !isSupabaseConfigured()) return;
-    void intakeData.updateIntakeWorkflowStatus(currentIntakeId, 'Organizing Records');
+    void firmRouting.updateIntakeWorkflowStatus(currentIntakeId, 'Organizing Records');
   }, [currentScreen, currentIntakeId]);
 
   useEffect(() => {
     if (!currentIntakeId || !isSupabaseConfigured()) return;
     const pendingHere = workerAccessRequests.filter((r) => r.intakeId === currentIntakeId);
     if (pendingHere.length === 0) return;
-    void intakeData.updateIntakeWorkflowStatus(currentIntakeId, 'Awaiting Worker Approval');
+    void firmRouting.updateIntakeWorkflowStatus(currentIntakeId, 'Awaiting Worker Approval');
   }, [workerAccessRequests, currentIntakeId]);
 
   // Helper: Save intake workspace
@@ -1526,7 +1526,7 @@ export default function App() {
     }
     if (currentIntakeIdRef.current) return currentIntakeIdRef.current;
     // Concurrent step transitions can both pass the guard above before the first insert
-    // finishes — share one in-flight creation so we never insert two intakes/numbers.
+    // finishes â€” share one in-flight creation so we never insert two intakes/numbers.
     if (commitIntakeInFlightRef.current) return commitIntakeInFlightRef.current;
     commitIntakeInFlightRef.current = (async (): Promise<string | null> => {
 
@@ -1710,7 +1710,7 @@ export default function App() {
       if (fromLocal) {
         // isBetaEmploymentCategory already lowercases and matches BETA_WORKER_CASE_CATEGORY
         // ('employment') internally, so `|| fromLocal === BETA_WORKER_CASE_CATEGORY` here was
-        // unreachable — fromLocal's type (IntakeCaseCategory) never actually contains the
+        // unreachable â€” fromLocal's type (IntakeCaseCategory) never actually contains the
         // lowercase literal, which is exactly what tsc was flagging.
         if (isBetaEmploymentCategory(fromLocal)) {
           return BETA_WORKER_CASE_CATEGORY;
@@ -1788,7 +1788,7 @@ export default function App() {
         }
       }
       clearWorkerIntakeUiState();
-      console.info('[o3s-intake] completeGuidedIntakeFlow → upload', {
+      console.info('[o3s-intake] completeGuidedIntakeFlow â†’ upload', {
         activeIntakeId: persistedIntakeId,
         pendingOnly: !persistedIntakeId,
       });
@@ -1835,7 +1835,7 @@ export default function App() {
       });
     }
     clearWorkerIntakeUiState();
-    console.info('[o3s-intake] skipGuidedIntakeFlow → upload', {
+    console.info('[o3s-intake] skipGuidedIntakeFlow â†’ upload', {
       activeIntakeId: intakeId,
       pendingOnly: !intakeId,
     });
@@ -1991,7 +1991,7 @@ export default function App() {
               workerMetadataByIntakeIdRef.current[intakeId] = patch.metadata;
             }
             // Also merge into intake_summaries so firm-side view stays in sync
-            // (no-op if no summary row exists yet — safe to always call)
+            // (no-op if no summary row exists yet â€” safe to always call)
             if (hasStoryFollowUpContent(answers)) {
               const mergeErr = await mergeStoryFollowUpIntoLatestIntakeSummary(intakeId, answers);
               if (mergeErr.error) console.warn('[o3s-story-follow-up] post-edit merge failed', mergeErr.error);
@@ -2120,7 +2120,7 @@ export default function App() {
     [selectedCaseCategory, getPendingOnboarding, syncPendingOnboardingDraft]
   );
 
-  // Firm-directed intake — routes directly to the intake form, no login required upfront.
+  // Firm-directed intake â€” routes directly to the intake form, no login required upfront.
   const startFirmDirectedGuestIntake = () => {
     setCurrentScreen('firmDirectedIntake');
   };
@@ -2357,7 +2357,7 @@ export default function App() {
           setFirmLiveView(null);
           setFirmLiveViewError(null);
           try {
-            const v = await intakeData.loadFirmLiveIntakeView(
+            const v = await firmRouting.loadFirmLiveIntakeView(
               intakeId,
               meta.routeId,
               routeStatus,
@@ -2502,9 +2502,9 @@ export default function App() {
     if (!id || !isSupabaseConfigured()) return [];
     setWorkerIntakesLoading(true);
     try {
-      const rows = await intakeData.listWorkerIntakes(id);
+      const rows = await firmRouting.listWorkerIntakes(id);
       setWorkerIntakesList(rows);
-      const cards = await intakeData.listWorkerIntakeFirmRoutingCards(id);
+      const cards = await firmRouting.listWorkerIntakeFirmRoutingCards(id);
       setWorkerIntakeRoutingCards(cards);
       return rows;
     } finally {
@@ -2516,7 +2516,7 @@ export default function App() {
     if (!isSupabaseConfigured()) return { error: 'Firm code routing requires a connected workspace.' };
     setFirmCodeActionBusy(true);
     setFirmCodeActionError(null);
-    const result = await intakeData.removeFirmCodeFromIntake(intakeId);
+    const result = await firmRouting.removeFirmCodeFromIntake(intakeId);
     if (result.error) {
       setFirmCodeActionBusy(false);
       setFirmCodeActionError(result.error);
@@ -2535,7 +2535,7 @@ export default function App() {
     setDeleteIntakeBusyId(intakeId);
     setDeleteIntakeError(null);
     setDeleteIntakeErrorIntakeId(null);
-    const result = await intakeData.deleteWorkerOwnedIntake(intakeId);
+    const result = await firmRouting.deleteWorkerOwnedIntake(intakeId);
     if (result.error) {
       setDeleteIntakeBusyId(null);
       setDeleteIntakeError(result.error);
@@ -2581,7 +2581,7 @@ export default function App() {
       }
     }
 
-    // Intake rows are deleted, but storage cleanup could not be confirmed — tell the worker
+    // Intake rows are deleted, but storage cleanup could not be confirmed â€” tell the worker
     // honestly rather than reporting a clean delete (orphaned-file risk).
     if (result.storageWarning) {
       pushWorkerNotification({
@@ -2616,7 +2616,7 @@ export default function App() {
       provider: 'google',
       options: { redirectTo },
     });
-    if (error) window.alert(/not enabled|unsupported provider/i.test(error.message) ? 'Google sign-in isn’t available yet — please continue with email and password.' : error.message);
+    if (error) window.alert(/not enabled|unsupported provider/i.test(error.message) ? 'Google sign-in isnâ€™t available yet â€” please continue with email and password.' : error.message);
   };
 
   /** Link firm on intake row only (upload gate / modal). Does not submit or create firm route. */
@@ -2628,12 +2628,12 @@ export default function App() {
     }
     const intakeId = currentIntakeIdRef.current;
     if (!intakeId) return { error: 'No active intake.' };
-    const link = await intakeData.linkFirmCodeToIntake(intakeId, firmId);
+    const link = await firmRouting.linkFirmCodeToIntake(intakeId, firmId);
     if (link.error) {
       return { error: toBetaUserMessage(link.error, 'Could not link this firm code. Try again.') };
     }
     setWorkerIntakeChannel('firm_code');
-    const display = await intakeData.fetchWorkerIntakeRoutingDisplay(intakeId);
+    const display = await firmRouting.fetchWorkerIntakeRoutingDisplay(intakeId);
     await refreshWorkerRoutingFromIntake(intakeId, display.linkedFirmName);
     if (profile?.id) await refreshWorkerIntakesList(profile.id);
     return {};
@@ -2650,9 +2650,9 @@ export default function App() {
     }
     const intakeId = currentIntakeIdRef.current;
     if (!intakeId) return { error: 'No active intake.' };
-    const firm = await intakeData.fetchFirmByCodeForWorker(code);
+    const firm = await firmRouting.fetchFirmByCodeForWorker(code);
     if (!firm) return { error: 'Firm code not found. Check the code and try again.' };
-    const link = await intakeData.linkFirmCodeToIntake(intakeId, firm.id);
+    const link = await firmRouting.linkFirmCodeToIntake(intakeId, firm.id);
     if (link.error) {
       return { error: toBetaUserMessage(link.error, 'Could not link this firm code. Try again.') };
     }
@@ -2679,7 +2679,7 @@ export default function App() {
       if (!result.error) {
         try {
           sessionStorage.removeItem('o3s_prefill_fc');
-          sessionStorage.removeItem('o3s_firm_ctx'); // intake is linked — context no longer needed
+          sessionStorage.removeItem('o3s_firm_ctx'); // intake is linked â€” context no longer needed
         } catch { /* ignore */ }
         setFirmDirectedContext(null);
         pushWorkerNotification({
@@ -2694,13 +2694,13 @@ export default function App() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile?.role, currentIntakeId, workerLinkedFirmCode]);
 
-  // Firm-directed entry — resolve ?fc= firm code into context on mount (once).
+  // Firm-directed entry â€” resolve ?fc= firm code into context on mount (once).
   // If o3s_firm_ctx is already in sessionStorage (restored above in useState init),
-  // skip the async lookup — context is already set. Otherwise resolve from o3s_prefill_fc.
+  // skip the async lookup â€” context is already set. Otherwise resolve from o3s_prefill_fc.
   useEffect(() => {
     if (!FIRM_CODE_ROUTING_LIVE) return;
     if (!isSupabaseConfigured()) return;
-    // Already restored synchronously from sessionStorage — nothing to do.
+    // Already restored synchronously from sessionStorage â€” nothing to do.
     let existing: unknown = null;
     try { existing = sessionStorage.getItem('o3s_firm_ctx'); } catch { /* ignore */ }
     if (existing) return;
@@ -2712,7 +2712,7 @@ export default function App() {
     void (async () => {
       let firm: { id: string; firm_name: string; firm_code?: string } | null = null;
       try {
-        firm = await intakeData.fetchFirmByCodeForWorker(trimmed);
+        firm = await firmRouting.fetchFirmByCodeForWorker(trimmed);
       } catch (e) {
         console.error('[o3s-fc] firm code lookup failed', e);
       }
@@ -2723,7 +2723,7 @@ export default function App() {
           firmCode: firm.firm_code ?? trimmed,
         });
       } else {
-        // Unresolvable or errored firm code — never leave the visitor on the infinite
+        // Unresolvable or errored firm code â€” never leave the visitor on the infinite
         // firm-directed "Loading..." screen. Clear the stale code and fall back to marketing.
         try { sessionStorage.removeItem('o3s_prefill_fc'); } catch { /* ignore */ }
         if (currentScreenRef.current === 'firmDirectedIntake') setCurrentScreen('forFirms');
@@ -2759,7 +2759,7 @@ export default function App() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated, profile?.role, currentScreen]);
 
-  // Stripe billing return — surface notification when firm returns from checkout or portal
+  // Stripe billing return â€” surface notification when firm returns from checkout or portal
   useEffect(() => {
     if (profile?.role !== 'firm') return;
     let result: string | null = null;
@@ -2833,7 +2833,7 @@ export default function App() {
     pendingPersistMetaAppendCountRef.current = files.length;
     let failedCount = 0;
     let duplicateCount = 0;
-    // Collect failures instead of alerting per-file — a batch of N failures used to stack N
+    // Collect failures instead of alerting per-file â€” a batch of N failures used to stack N
     // blocking window.alert() dialogs, each requiring manual dismissal. The caller (UploadScreen)
     // already surfaces the thrown error below through its own error banner, so one combined
     // message is both less jarring and no less informative.
@@ -2861,9 +2861,9 @@ export default function App() {
         }
       }
       if (failedCount > 0) {
-        const detail = failedFiles.map((f) => `“${f.name}”: ${f.message}`).join('; ');
+        const detail = failedFiles.map((f) => `â€œ${f.name}â€: ${f.message}`).join('; ');
         throw new Error(
-          `${failedCount} file${failedCount === 1 ? '' : 's'} could not be uploaded — ${detail}`
+          `${failedCount} file${failedCount === 1 ? '' : 's'} could not be uploaded â€” ${detail}`
         );
       }
       if (duplicateCount > 0) {
@@ -3053,7 +3053,7 @@ export default function App() {
     ) {
       return {
         error:
-          'Your response did not save completely. The request is still active — select categories and try again.',
+          'Your response did not save completely. The request is still active â€” select categories and try again.',
       };
     }
     void patchWorkerIntakeMetadata(currentIntakeId, { documentResponseDraft: null });
@@ -3183,7 +3183,7 @@ export default function App() {
       return;
     }
 
-    const routing = await intakeData.fetchWorkerIntakeRoutingDisplay(intakeId);
+    const routing = await firmRouting.fetchWorkerIntakeRoutingDisplay(intakeId);
     if (routing.submissionChannel === 'firm_code' || routing.linkedFirmId) {
       const contactErr = await mergeWorkerContactIntoLatestIntakeSummary(intakeId, {
         name: (profile?.full_name ?? '').trim() || null,
@@ -3207,7 +3207,7 @@ export default function App() {
     if (!intakeId || !isSupabaseConfigured()) {
       return { ok: false, error: 'No active intake to open.' };
     }
-    const hasSummaryRow = await intakeData.workerIntakeHasSummaryRow(intakeId);
+    const hasSummaryRow = await firmRouting.workerIntakeHasSummaryRow(intakeId);
     if (!hasSummaryRow) {
       return {
         ok: false,
@@ -3216,10 +3216,10 @@ export default function App() {
       };
     }
     await refreshWorkerSummaryLive(intakeId);
-    void intakeData.ensureLinkedFirmPreviewRoute(intakeId);
+    void firmRouting.ensureLinkedFirmPreviewRoute(intakeId);
     // Firm-code / firm-directed intakes auto-share to the linked firm on organize (no explicit
     // "send" click). The worker consented by entering the firm's code, so copy their contact now.
-    const routing = await intakeData.fetchWorkerIntakeRoutingDisplay(intakeId);
+    const routing = await firmRouting.fetchWorkerIntakeRoutingDisplay(intakeId);
     if (routing.submissionChannel === 'firm_code' || routing.linkedFirmId) {
       const contactErr = await mergeWorkerContactIntoLatestIntakeSummary(intakeId, {
         name: (profile?.full_name ?? '').trim() || null,
@@ -3250,7 +3250,7 @@ export default function App() {
     const intakeId = currentIntakeIdRef.current;
     if (!intakeId || !isSupabaseConfigured()) return;
     // Re-run fact extraction BEFORE rebuilding, so the organization below reads fresh facts.
-    // Without this, "Re-organize file" only re-summarized whatever extraction had already stored —
+    // Without this, "Re-organize file" only re-summarized whatever extraction had already stored â€”
     // files whose extraction previously failed (e.g. scanned PDFs before the chunked path) never
     // got another chance. Completed files are skipped server-side, so this is cheap when nothing
     // changed; extraction errors are logged but never block the rebuild.
@@ -3269,14 +3269,14 @@ export default function App() {
       pushWorkerNotification({
         id: `reorg-failed-${Date.now()}`,
         title: "Re-organize didn't finish",
-        body: 'We could not rebuild your summary just now. Your existing summary is unchanged — try again in a moment.',
+        body: 'We could not rebuild your summary just now. Your existing summary is unchanged â€” try again in a moment.',
       });
     }
     if (!err.error) {
       // Rebuild replaces the stored overview, so re-merge the worker contact block for
       // linked/firm-code intakes the same way handleProcessingFinished does after a first
-      // organize — otherwise the firm packet header falls back to "Not yet identified".
-      const routing = await intakeData.fetchWorkerIntakeRoutingDisplay(intakeId);
+      // organize â€” otherwise the firm packet header falls back to "Not yet identified".
+      const routing = await firmRouting.fetchWorkerIntakeRoutingDisplay(intakeId);
       if (routing.submissionChannel === 'firm_code' || routing.linkedFirmId) {
         const contactErr = await mergeWorkerContactIntoLatestIntakeSummary(intakeId, {
           name: (profile?.full_name ?? '').trim() || null,
@@ -3325,7 +3325,7 @@ export default function App() {
     if (!isSupabaseConfigured()) {
       return { error: SUPABASE_REQUIRED_USER_MESSAGE, count: 0 };
     }
-    const r = await intakeData.routePreviewToParticipatingFirms(currentIntakeId);
+    const r = await firmRouting.routePreviewToParticipatingFirms(currentIntakeId);
     if (r.error) {
       return {
         error: toBetaUserMessage(
@@ -3342,7 +3342,7 @@ export default function App() {
         count: 0,
       };
     }
-    await intakeData.markIntakeSubmitted(currentIntakeId, { workflow_status: 'Matching Participating Firms' });
+    await firmRouting.markIntakeSubmitted(currentIntakeId, { workflow_status: 'Matching Participating Firms' });
     if (profile?.id) {
       await notifications.notifyWorkerOfRoutingExpansion({
         workerId: profile.id,
@@ -3356,11 +3356,11 @@ export default function App() {
 
   const shareFirmCode = async (code: string) => {
     if (!currentIntakeId) return { error: 'No active intake.' };
-    const routing = await intakeData.fetchWorkerIntakeRoutingDisplay(currentIntakeId);
+    const routing = await firmRouting.fetchWorkerIntakeRoutingDisplay(currentIntakeId);
     const r =
       routing.submissionChannel === 'firm_code' && routing.linkedFirmId
-        ? await intakeData.sendOrganizedIntakeToLinkedFirm(currentIntakeId)
-        : await intakeData.routeIntakeToFirmCode(currentIntakeId, code);
+        ? await firmRouting.sendOrganizedIntakeToLinkedFirm(currentIntakeId)
+        : await firmRouting.routeIntakeToFirmCode(currentIntakeId, code);
     console.info('[o3s-firm-routing] shareFirmCode result', { intakeId: currentIntakeId, result: r });
     if (r.error) {
       return {
@@ -3378,7 +3378,7 @@ export default function App() {
     if (profile?.id) await refreshWorkerIntakesList(profile.id);
     setWorkerIntakeWorkflow('Under Firm Review');
     setFirmCodeShareCompleted(true);
-    // Worker-facing confirmation — the manual share previously only notified the FIRM,
+    // Worker-facing confirmation â€” the manual share previously only notified the FIRM,
     // so the worker got no feedback that their intake was actually sent.
     pushWorkerNotification({
       id: `share-fc-${Date.now()}`,
@@ -3402,9 +3402,9 @@ export default function App() {
 
   const approveWorkerAccess = async (routeId: string) => {
     if (!profile?.id) return { error: 'Not signed in' };
-    const res = await intakeData.workerApproveFullAccess(routeId, profile.id);
+    const res = await firmRouting.workerApproveFullAccess(routeId, profile.id);
     if (!res.error) {
-      // Approving full access is a consent moment too — make sure the firm now sees the contact.
+      // Approving full access is a consent moment too â€” make sure the firm now sees the contact.
       if (currentIntakeId) {
         const contactErr = await mergeWorkerContactIntoLatestIntakeSummary(currentIntakeId, {
           name: (profile.full_name ?? '').trim() || null,
@@ -3421,7 +3421,7 @@ export default function App() {
 
   const declineWorkerAccess = async (routeId: string) => {
     if (!profile?.id) return { error: 'Not signed in' };
-    const res = await intakeData.workerDeclineFullAccess(routeId, profile.id);
+    const res = await firmRouting.workerDeclineFullAccess(routeId, profile.id);
     if (!res.error) {
       await refreshWorkerAccessRows();
       if (currentIntakeId) await refreshWorkerSummaryLive(currentIntakeId);
@@ -3440,7 +3440,7 @@ export default function App() {
   };
 
   // Redirects back to the app root; the recovery token lands in the URL and Supabase's client
-  // (detectSessionInUrl, on by default) fires a PASSWORD_RECOVERY auth event automatically —
+  // (detectSessionInUrl, on by default) fires a PASSWORD_RECOVERY auth event automatically â€”
   // handled in the onAuthStateChange listener above, which routes to SetNewPasswordScreen.
   const handleForgotPassword = async (email: string) => {
     if (!isSupabaseConfigured()) {
@@ -3513,7 +3513,7 @@ export default function App() {
 
     if (!data.session?.user) {
       console.info(
-        '[o3s-auth-audit] signUp: no session returned (common when "Confirm email" is enabled). Check Auth → Users and user email inbox.',
+        '[o3s-auth-audit] signUp: no session returned (common when "Confirm email" is enabled). Check Auth â†’ Users and user email inbox.',
         { userId: data?.user?.id ?? null }
       );
       return { needsEmailConfirmation: true };
@@ -3525,7 +3525,7 @@ export default function App() {
       setUserEmail(user.email ?? null);
       setIsAuthenticated(true);
       setCurrentScreen('roleSelection');
-      // Profile load/create runs in deferred onAuthStateChange — do not await Supabase here.
+      // Profile load/create runs in deferred onAuthStateChange â€” do not await Supabase here.
     }
 
     return {};
@@ -3551,7 +3551,7 @@ export default function App() {
       } catch {
         /* ignore */
       }
-      window.alert(/not enabled|unsupported provider/i.test(error.message) ? 'Google sign-in isn’t available yet — please continue with email and password.' : error.message);
+      window.alert(/not enabled|unsupported provider/i.test(error.message) ? 'Google sign-in isnâ€™t available yet â€” please continue with email and password.' : error.message);
     }
   };
 
@@ -3732,7 +3732,7 @@ export default function App() {
     if (!selectedRouteMeta || !selectedIntakeId || !isSupabaseConfigured()) return;
     setFirmLiveViewLoading(true);
     try {
-      const v = await intakeData.loadFirmLiveIntakeView(
+      const v = await firmRouting.loadFirmLiveIntakeView(
         selectedIntakeId,
         selectedRouteMeta.routeId,
         selectedRouteMeta.routeStatus,
@@ -3747,7 +3747,7 @@ export default function App() {
 
   // Attorney-side engine (increment 1): a firm creates and owns a case file, then uploads its own
   // documents into the same organizing pipeline. TEMP: alerts on failure so the RLS/ownership path
-  // is visible during testing — replaced with in-app UI in a later increment.
+  // is visible during testing â€” replaced with in-app UI in a later increment.
   const [firmCaseOrganizing, setFirmCaseOrganizing] = useState(false);
   const [firmCaseMode, setFirmCaseMode] = useState(false);
   const handleStartFirmCaseFile = async () => {
@@ -3781,7 +3781,7 @@ export default function App() {
       await persistNewFiles(uploadedFiles);
       setCurrentScreen('processing');
     } catch (err) {
-      // persistNewFiles no longer alerts per-file (H13 fix) — without this catch, a failure
+      // persistNewFiles no longer alerts per-file (H13 fix) â€” without this catch, a failure
       // here would go from "jarring but visible" to completely silent on this call site.
       // eslint-disable-next-line no-alert
       window.alert(err instanceof Error ? err.message : 'Could not upload one or more files. Try again.');
@@ -3804,7 +3804,7 @@ export default function App() {
     if (!selectedRouteMeta?.routeId) {
       return { error: 'Open this intake from your firm dashboard before sending a request.' };
     }
-    const result = await intakeData.firmRequestAdditionalDocuments(
+    const result = await firmRouting.firmRequestAdditionalDocuments(
       selectedRouteMeta.routeId,
       categories,
       payload.noteToWorker
@@ -3832,7 +3832,7 @@ export default function App() {
     if (!selectedRouteMeta?.routeId) {
       return { error: 'Open this intake from your firm dashboard before adding a reminder.' };
     }
-    const result = await intakeData.firmAddWorkerReminder(
+    const result = await firmRouting.firmAddWorkerReminder(
       selectedRouteMeta.routeId,
       payload.text,
       payload.dueDate
@@ -3913,7 +3913,7 @@ export default function App() {
       events: [
         {
           id: 'sample-ev-1',
-          event_date: 'Jan – Mar 2026',
+          event_date: 'Jan â€“ Mar 2026',
           title: 'Payroll and schedule alignment window',
           category: 'Payroll',
           ai_summary: SAMPLE_INTAKE_SUMMARY_PREVIEW.timelineSummary,
@@ -4035,11 +4035,11 @@ export default function App() {
     }
   };
 
-  // Canonical "brand logo → home" rule for every corner wordmark:
-  //   • logged-in worker → their case-list dashboard (via handleLogoClick, which preserves the
+  // Canonical "brand logo â†’ home" rule for every corner wordmark:
+  //   â€¢ logged-in worker â†’ their case-list dashboard (via handleLogoClick, which preserves the
   //     unsaved-progress exit modal)
-  //   • logged-in firm   → the firm dashboard
-  //   • everyone else (logged out / marketing) → the worker home landing page (forWorkers)
+  //   â€¢ logged-in firm   â†’ the firm dashboard
+  //   â€¢ everyone else (logged out / marketing) â†’ the worker home landing page (forWorkers)
   // Fixes the old behavior where corner logos routed to the firm marketing page.
   const handleBrandHomeClick = () => {
     const isWorker = userRole === 'worker' || profile?.role === 'worker';
@@ -4142,7 +4142,7 @@ export default function App() {
             workerLandingIntakeRow.intake_number
           )
         : hasCompletedIntake
-          ? `Local · ${currentIntakeWorkspace.id.replace(/^intake-/, '').slice(0, 12)}`
+          ? `Local Â· ${currentIntakeWorkspace.id.replace(/^intake-/, '').slice(0, 12)}`
           : null;
 
   const workerActiveHubEligible =
@@ -4172,7 +4172,7 @@ export default function App() {
       }
     : undefined;
 
-  // Worker Home "at a glance" data — derived from the already-loaded live summary so the Home hub
+  // Worker Home "at a glance" data â€” derived from the already-loaded live summary so the Home hub
   // (WorkerMissionControlHome tiles + timeline peek) has real numbers instead of defaulting to 0.
   const hubTimelineForDisplay = workerLiveSummary?.timeline ?? [];
   const hubEventCount = hubTimelineForDisplay.length;
@@ -4284,7 +4284,7 @@ export default function App() {
   const isWorkerRole = profile?.role === 'worker' || userRole === 'worker';
   // Worker-first: never force a firm decision before the worker has organized anything. They
   // organize first and choose sharing later, from their file. (Was: a "share with a firm / keep my
-  // file" modal popped on the very first "Start organizing" — a firm choice before the win.)
+  // file" modal popped on the very first "Start organizing" â€” a firm choice before the win.)
   const workerFirstOrganizeGateActive = false;
   void lawFirmGateCompleted;
   const workerHasOrganizingActivity =
@@ -4373,17 +4373,17 @@ export default function App() {
       <div className="min-h-screen bg-[#F1F3EF] flex items-center justify-center px-6">
         <div className="text-center">
           <p className="text-lg font-semibold text-[#1B2623]"><WordMark /></p>
-          <p className="mt-2 text-sm text-[#6A6D66]">Restoring your secure session…</p>
+          <p className="mt-2 text-sm text-[#6A6D66]">Restoring your secure sessionâ€¦</p>
         </div>
       </div>
     );
   }
 
-  // ── Beta access gate ──────────────────────────────────────────────────────
+  // â”€â”€ Beta access gate â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // A signed-up worker/firm is held on the approval screen until an operator sets
   // profiles.approved = true. Founders and reps bypass. Auth/marketing screens stay reachable
   // (so people can still sign up + we capture the lead); the gate only blocks entry into the
-  // product itself. Approve an account: update public.profiles set approved = true where email = '…'.
+  // product itself. Approve an account: update public.profiles set approved = true where email = 'â€¦'.
   const accountGated =
     ACCOUNT_APPROVAL_GATE &&
     !!profile &&
@@ -4402,7 +4402,7 @@ export default function App() {
           className="bg-amber-50 border-b border-amber-200 px-4 py-2 text-center text-xs text-amber-900"
           role="status"
         >
-          Dev UI gallery only — Supabase is not configured. Set{' '}
+          Dev UI gallery only â€” Supabase is not configured. Set{' '}
           <span className="font-mono">VITE_SUPABASE_URL</span> and{' '}
           <span className="font-mono">VITE_SUPABASE_ANON_KEY</span> to run real auth and workflows.
         </div>
@@ -4484,7 +4484,7 @@ export default function App() {
           {currentScreen === 'firmDirectedIntake' && !firmDirectedContext && (
             <motion.div key="firmDirectedIntakeLoading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               className="flex min-h-screen items-center justify-center bg-[#F2F4EC]">
-              <span className="text-sm text-[#1B2623]/40">Loading…</span>
+              <span className="text-sm text-[#1B2623]/40">Loadingâ€¦</span>
             </motion.div>
           )}
           {currentScreen === 'firmDirectedIntake' && firmDirectedContext && (
@@ -4879,7 +4879,7 @@ export default function App() {
                   isAuthenticated &&
                   !currentIntakeId
                 }
-                onLookupFirmCode={isSupabaseConfigured() ? (code) => intakeData.fetchFirmByCodeForWorker(code) : undefined}
+                onLookupFirmCode={isSupabaseConfigured() ? (code) => firmRouting.fetchFirmByCodeForWorker(code) : undefined}
                 onLinkFirmToIntake={
                   isSupabaseConfigured() && (currentIntakeId || pendingWorkerOnboarding?.guidedFlowCompleted)
                     ? linkFirmCodeForActiveIntake
@@ -5182,7 +5182,7 @@ export default function App() {
                   void (async () => {
                     try {
                       if (meta && isSupabaseConfigured()) {
-                        const v = await intakeData.loadFirmLiveIntakeView(
+                        const v = await firmRouting.loadFirmLiveIntakeView(
                           intakeId,
                           meta.routeId,
                           meta.routeStatus,
@@ -5239,7 +5239,7 @@ export default function App() {
                 onRequestFullAccess={
                   selectedRouteMeta && isSupabaseConfigured() && !firmLiveView?.isFirmCodeIntake
                     ? async () => {
-                        const result = await intakeData.firmRequestFullAccess(selectedRouteMeta.routeId);
+                        const result = await firmRouting.firmRequestFullAccess(selectedRouteMeta.routeId);
                         if (!result.error) {
                           setSelectedRouteMeta((prev) =>
                             prev && prev.routeId === selectedRouteMeta.routeId
@@ -5268,7 +5268,7 @@ export default function App() {
                 onAcceptIntake={
                   selectedRouteMeta && isSupabaseConfigured()
                     ? async () => {
-                        const result = await intakeData.firmAcceptIntake(selectedRouteMeta.routeId);
+                        const result = await firmRouting.firmAcceptIntake(selectedRouteMeta.routeId);
                         if (!result.error) {
                           await reloadFirmLiveViewForSelection();
                           if (firmProfile) void refreshFirmDashboardRows(firmProfile);
@@ -5280,7 +5280,7 @@ export default function App() {
                 onDeclineIntake={
                   selectedRouteMeta && isSupabaseConfigured()
                     ? async () => {
-                        const result = await intakeData.firmDeclineIntake(selectedRouteMeta.routeId);
+                        const result = await firmRouting.firmDeclineIntake(selectedRouteMeta.routeId);
                         if (!result.error) {
                           await reloadFirmLiveViewForSelection();
                           if (firmProfile) void refreshFirmDashboardRows(firmProfile);

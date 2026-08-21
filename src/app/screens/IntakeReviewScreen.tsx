@@ -32,7 +32,7 @@ import {
 } from '../types/IntakeWorkspace';
 import { pickReviewBase } from '../utils/reviewDataSelection';
 
-import type { FirmLiveIntakeView } from '../../services/intakeDataService';
+import type { FirmLiveIntakeView } from '../../services/firmRoutingService';
 import {
   downloadFirmIntakeReviewDocument,
   resolveWageExposure,
@@ -56,13 +56,13 @@ import { ClaimLensPanel } from '../components/ClaimLensPanel';
 import { buildExistenceChecks, type ClaimLensInput } from '../../services/claimLens';
 import { WageExposureReviewSection } from '../components/WageExposureReviewSection';
 import {
-  createFirmIntakeFileSignedUrl,
   FIRM_ADDITIONAL_DOCUMENT_CATEGORIES,
   inferCategoryFromFileName,
   sanitizeFirmFacingText,
   recordFirmRouteEvent,
 } from '../../services/intakeDataService';
-import type { FirmAccessibleUploadFile } from '../../services/intakeDataService';
+import { createFirmIntakeFileSignedUrl } from '../../services/firmRoutingService';
+import type { FirmAccessibleUploadFile } from '../../services/firmRoutingService';
 import {
   ONE3SEVEN_NOTICES,
   SAMPLE_INTAKE_NUMBER,

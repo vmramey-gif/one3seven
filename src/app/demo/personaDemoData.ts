@@ -17,7 +17,7 @@
  * `IntakeReviewScreen` component with `demoMode`. The `worker` field is a lighter custom shape
  * consumed by this demo's own worker-summary screen.
  */
-import type { FirmLiveIntakeView } from '../../services/intakeDataService';
+import type { FirmLiveIntakeView } from '../../services/firmRoutingService';
 import type { EmploymentMatterTagId } from '../constants/employmentMatter';
 import type { StoryFollowUpAnswers } from '../constants/workerStoryIntake';
 import type { RecordState } from '../../services/caEmployerRecordRequirements';
