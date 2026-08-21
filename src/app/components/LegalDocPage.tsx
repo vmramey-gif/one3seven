@@ -7,8 +7,8 @@ import { useEffect } from 'react';
 import { WordMark } from './WordMark';
 import type { LegalDoc } from '../constants/legalContent';
 
-// Lets other pages deep-link to a specific section, e.g. /privacy#7-text-messaging-sms-program
-// for the SMS opt-in disclosure referenced from SmsLinkCard.
+// Lets other pages deep-link to a specific section, e.g. ForFirmsPage.tsx's
+// /privacy#california-privacy-rights link.
 function slugifyHeading(heading: string): string {
   return heading.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 }

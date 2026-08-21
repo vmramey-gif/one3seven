@@ -11,7 +11,7 @@
 
 Supabase is the backend: Postgres tables with row-level security, real Auth (email/password,
 persisted sessions), Storage for uploaded files, and Deno edge functions for anything that needs a
-server-side secret (Claude API calls, Stripe, Resend, Twilio). The client is a React/Vite SPA
+server-side secret (Claude API calls, Stripe, Resend). The client is a React/Vite SPA
 (`src/app/`) that talks to Supabase directly via `src/lib/supabaseClient.ts` for most reads/writes,
 and to edge functions (`supabase/functions/*`, deployed separately from the frontend — see
 `reference_supabase_deploy` memory) for anything secret-gated. `src/services/intakeDataService.ts`
