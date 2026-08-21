@@ -8,7 +8,7 @@ import {
 import { resolveWageExposure } from '../firmIntakeSummaryDownload';
 import { assembleDamagesInput } from '../damagesAssembly';
 import { calculateDamages } from '../damagesCalculator';
-import type { FirmLiveIntakeView } from '../intakeDataService';
+import type { FirmLiveIntakeView } from '../firmRoutingService';
 import type { WageFactsDocument } from '../documentFactsService';
 
 const wageDoc: WageFactsDocument = {

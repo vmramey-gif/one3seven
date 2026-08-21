@@ -5,8 +5,8 @@
 
 import { ONE3SEVEN_NOTICES } from '../app/constants/one3sevenProduct';
 import { FIRM_REVIEW_SECTION } from '../app/constants/firmIntakePresentation';
-import type { FirmLiveIntakeView } from './intakeDataService';
-import type { FirmAccessibleUploadFile } from './intakeDataService';
+import type { FirmLiveIntakeView } from './firmRoutingService';
+import type { FirmAccessibleUploadFile } from './firmRoutingService';
 import {
   appendPdfBlankLine,
   appendPdfWrappedLines,

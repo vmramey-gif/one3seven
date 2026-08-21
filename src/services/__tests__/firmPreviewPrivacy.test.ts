@@ -4,7 +4,7 @@ import {
   resolveWorkerProvidedContextForFirmView,
   stripWorkerFollowUpNarrativeForPreview,
 } from '../intakeDataService';
-import type { FirmLiveIntakeView } from '../intakeDataService';
+import type { FirmLiveIntakeView } from '../firmRoutingService';
 import {
   extractStoryFollowUpFromOverview,
   mergeStoryFollowUpIntoWorkerNotesBody,

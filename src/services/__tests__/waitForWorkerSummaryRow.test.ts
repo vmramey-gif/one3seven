@@ -31,7 +31,7 @@ vi.mock('../../lib/supabaseClient', () => ({
   isSupabaseConfigured: () => true,
 }));
 
-import { waitForWorkerSummaryRow } from '../intakeDataService';
+import { waitForWorkerSummaryRow } from '../firmRoutingService';
 
 beforeEach(() => {
   callCount = 0;

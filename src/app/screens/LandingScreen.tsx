@@ -17,7 +17,7 @@ import type { AppNotificationItem } from '../components/NotificationsBell';
 import { WorkerFirmCodeSection } from '../components/WorkerFirmCodeSection';
 import { FIRM_CODE_ROUTING_LIVE } from '../constants/flags';
 import { WorkerExpandableSection } from '../components/WorkerExpandableSection';
-import type { WorkerIntakeFirmRoutingCard } from '../../services/intakeDataService';
+import type { WorkerIntakeFirmRoutingCard } from '../../services/firmRoutingService';
 import { formatWorkerIntakeLastActivity } from '../utils/workerDashboardFormat';
 import { WordMark } from '../components/WordMark';
 import {

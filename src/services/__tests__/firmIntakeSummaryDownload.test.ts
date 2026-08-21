@@ -5,7 +5,7 @@ import {
   linkEventsToFiles,
   resolveFirmExportAccessTier,
 } from '../firmIntakeSummaryDownload';
-import type { FirmLiveIntakeView } from '../intakeDataService';
+import type { FirmLiveIntakeView } from '../firmRoutingService';
 
 function baseView(overrides: Partial<FirmLiveIntakeView> = {}): FirmLiveIntakeView {
   return {

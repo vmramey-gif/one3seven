@@ -16,7 +16,7 @@ import {
   type SecondBrainPacketViewModel,
 } from './intakePacketPresentation';
 import type { IntakeSummaryDownloadPayload } from './intakeSummaryDownload';
-import type { FirmLiveIntakeView } from './intakeDataService';
+import type { FirmLiveIntakeView } from './firmRoutingService';
 import type { ClaimLensInput } from './claimLens';
 import {
   extractStoryFollowUpFromOverview,

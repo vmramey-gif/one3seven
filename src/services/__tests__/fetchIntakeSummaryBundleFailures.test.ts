@@ -45,7 +45,7 @@ vi.mock('../../lib/supabaseClient', () => ({
   isSupabaseConfigured: () => true,
 }));
 
-import { fetchIntakeSummaryBundle, loadFirmLiveIntakeView } from '../intakeDataService';
+import { fetchIntakeSummaryBundle, loadFirmLiveIntakeView } from '../firmRoutingService';
 
 const INTAKE_ID = 'intake-123';
 

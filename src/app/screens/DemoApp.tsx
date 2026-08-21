@@ -8,7 +8,7 @@
 
 import { IntakeReviewScreen } from './IntakeReviewScreen';
 import { IntakeReviewErrorBoundary } from '../components/IntakeReviewErrorBoundary';
-import type { FirmLiveIntakeView } from '../../services/intakeDataService';
+import type { FirmLiveIntakeView } from '../../services/firmRoutingService';
 
 const DEMO_FIRM_LIVE_VIEW: FirmLiveIntakeView = {
   previewOnly: false,

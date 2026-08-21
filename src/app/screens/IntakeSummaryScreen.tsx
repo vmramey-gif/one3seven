@@ -66,12 +66,11 @@ import {
   resolveWorkerDocumentResponse,
   isWorkerDocumentRequestResponseComplete,
   stripWorkerIntakeNotesBlock,
-  fetchIntakeSummaryBundle,
   listUploadedFilesResult,
-  createFirmIntakeFileSignedUrl,
   listExtractionFactsForCoverage,
   type CoverageExtractionFactsRow,
 } from '../../services/intakeDataService';
+import { fetchIntakeSummaryBundle, createFirmIntakeFileSignedUrl } from '../../services/firmRoutingService';
 import { normalizeFilenameForMatching } from '../../services/filenameMatching';
 import { CitationPanel } from '../components/CitationPanel';
 import type { SourceCitation } from '../../services/damagesCalculator';
