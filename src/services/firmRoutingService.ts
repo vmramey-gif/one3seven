@@ -42,12 +42,12 @@ import {
   inferCategoryFromFileName,
   INTAKE_FILES_BUCKET,
   betaPlaceholderBundleFromFiles,
-  listUploadedFiles,
   isWorkerDocumentRequestResponseComplete,
   stripWorkerFollowUpNarrativeForPreview,
   type FirmDocumentRequestPayload,
   type WorkerDocumentResponsePayload,
 } from './intakeDataService';
+import { listUploadedFiles } from './fileUploadService';
 
 export async function ensureLinkedFirmPreviewRoute(intakeId: string): Promise<{ error?: string }> {
   const { data: intake, error } = await supabase
