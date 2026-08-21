@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { ArrowLeft, User, Mail, KeyRound, Trash2, Bell, Shield, Download, MapPin } from 'lucide-react';
 import { Screen } from '../App';
-import * as intakeData from '../../services/intakeDataService';
+import * as authProfile from '../../services/authProfileService';
 import { supabase } from '../../lib/supabaseClient';
 import { ONE3SEVEN_NOTICES } from '../constants/one3sevenProduct';
 import { BETA_HIDE_WORKER_BILLING_UI } from '../constants/flags';
@@ -43,7 +43,7 @@ function PasswordResetControl({ email, onForgotPassword }: { email: string | nul
   };
 
   if (state === 'sent') {
-    return <p className="text-xs text-[#42574E]">Reset link sent to {email} — check your inbox.</p>;
+    return <p className="text-xs text-[#42574E]">Reset link sent to {email} â€” check your inbox.</p>;
   }
 
   return (
@@ -55,14 +55,14 @@ function PasswordResetControl({ email, onForgotPassword }: { email: string | nul
         disabled={state === 'sending'}
         className="w-full rounded-2xl border border-[#CBD6CF] bg-white px-4 py-2 text-sm font-medium text-[#1B2623] transition hover:bg-[#F7F9F5] disabled:cursor-not-allowed disabled:opacity-50"
       >
-        {state === 'sending' ? 'Sending…' : 'Send reset email'}
+        {state === 'sending' ? 'Sendingâ€¦' : 'Send reset email'}
       </button>
       {state === 'error' ? <p className="mt-2 text-xs text-red-600">{error}</p> : null}
     </>
   );
 }
 
-// Real, CCPA-compliant account/data deletion request (§1798.105). The worker files a verified
+// Real, CCPA-compliant account/data deletion request (Â§1798.105). The worker files a verified
 // request; it is recorded server-side (deletion_requests) and fulfilled within the statutory window.
 // Degrades gracefully (falls back to email) if the table isn't provisioned yet.
 function DeleteAccountControl({ email, onSignOut }: { email: string | null; onSignOut: () => void }) {
@@ -120,7 +120,7 @@ function DeleteAccountControl({ email, onSignOut }: { email: string | null; onSi
           onClick={() => void submit()}
           className="flex-1 rounded-2xl bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-40"
         >
-          {status === 'sending' ? 'Submitting…' : 'Confirm deletion'}
+          {status === 'sending' ? 'Submittingâ€¦' : 'Confirm deletion'}
         </button>
         <button
           type="button"
@@ -131,7 +131,7 @@ function DeleteAccountControl({ email, onSignOut }: { email: string | null; onSi
         </button>
       </div>
       {status === 'error' ? (
-        <p className="text-xs text-red-600">Couldn&rsquo;t submit right now — please email <a className="underline" href="mailto:info@one3seven.com?subject=Account%20deletion%20request">info@one3seven.com</a> to request deletion.</p>
+        <p className="text-xs text-red-600">Couldn&rsquo;t submit right now â€” please email <a className="underline" href="mailto:info@one3seven.com?subject=Account%20deletion%20request">info@one3seven.com</a> to request deletion.</p>
       ) : null}
     </div>
   );
@@ -144,7 +144,7 @@ function ComingSoonControl({ label }: { label: string }) {
       disabled
       className="w-full cursor-not-allowed rounded-2xl border border-[#CBD6CF] bg-[#F1F3EF] px-4 py-2 text-sm text-[#1B2623]/42"
     >
-      {label} — Coming soon
+      {label} â€” Coming soon
     </button>
   );
 }
@@ -168,7 +168,7 @@ export function WorkerSettingsScreen({ onNavigate, userEmail, profileId, onSignO
 
   useEffect(() => {
     void (async () => {
-      const p = await intakeData.fetchProfile(profileId);
+      const p = await authProfile.fetchProfile(profileId);
       setFullName(p?.full_name ?? '');
       setMiddleInitial(p?.middle_initial ?? '');
       setPhone(p?.phone ?? '');
@@ -183,8 +183,8 @@ export function WorkerSettingsScreen({ onNavigate, userEmail, profileId, onSignO
   const handleSave = async () => {
     setSaveError('');
     const [nameResult, contactResult] = await Promise.all([
-      intakeData.updateProfileName(profileId, fullName),
-      intakeData.saveWorkerContactDetails(profileId, {
+      authProfile.updateProfileName(profileId, fullName),
+      authProfile.saveWorkerContactDetails(profileId, {
         middle_initial: middleInitial,
         phone,
         address_line1: addressLine1,
@@ -242,7 +242,7 @@ export function WorkerSettingsScreen({ onNavigate, userEmail, profileId, onSignO
                 <MapPin className="h-4 w-4 text-[#42574E]" /> Mailing address
               </h2>
               <p className="mb-4 text-xs text-[#1B2623]/52">
-                Optional. Save an address here if you&rsquo;d like one on file — for example, to include on a
+                Optional. Save an address here if you&rsquo;d like one on file â€” for example, to include on a
                 records-request letter you send yourself.
               </p>
               <label className="mb-2 block text-sm font-medium text-[#1B2623]">Address line 1</label>
@@ -351,7 +351,7 @@ export function WorkerSettingsScreen({ onNavigate, userEmail, profileId, onSignO
                 <Trash2 className="h-4 w-4" /> Delete account
               </div>
               <p className="mb-3 text-xs leading-relaxed text-[#1B2623]/64">
-                It&rsquo;s your data — you can delete it anytime. We permanently remove your records and account within 45 days of your request (or up to 90, as California law allows if more time is reasonably needed).
+                It&rsquo;s your data â€” you can delete it anytime. We permanently remove your records and account within 45 days of your request (or up to 90, as California law allows if more time is reasonably needed).
               </p>
               <DeleteAccountControl email={userEmail} onSignOut={onSignOut} />
             </div>

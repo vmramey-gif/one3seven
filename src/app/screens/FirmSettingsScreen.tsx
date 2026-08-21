@@ -3,14 +3,14 @@ import type { ReactNode } from 'react';
 import { motion } from 'motion/react';
 import { ArrowLeft, Filter, Info, Link2, MapPin, Save } from 'lucide-react';
 import { Screen } from '../App';
-import type { FirmProfileRow } from '../../services/intakeDataService';
+import type { FirmProfileRow } from '../../services/authProfileService';
 import {
   getFirmSubscriptionStatus,
   createCheckoutSession,
   createCustomerPortalSession,
   FIRM_PLANS,
 } from '../../services/billingService';
-import * as intakeData from '../../services/intakeDataService';
+import * as authProfile from '../../services/authProfileService';
 import { runSupabaseSetupDiagnostics } from '../../services/supabaseSetupDiagnostics';
 import { ONE3SEVEN_NOTICES } from '../constants/one3sevenProduct';
 import { NotificationsBell } from '../components/NotificationsBell';
@@ -75,9 +75,9 @@ export function FirmSettingsScreen({
   onFirmProfileUpdated,
   onFirmProfileSaved,
 }: FirmSettingsScreenProps) {
-  const profileComplete = firmProfile ? intakeData.isFirmProfileComplete(firmProfile) : false;
+  const profileComplete = firmProfile ? authProfile.isFirmProfileComplete(firmProfile) : false;
   const [firmName, setFirmName] = useState(() => {
-    if (!firmProfile?.firm_name || intakeData.isPlaceholderFirmName(firmProfile.firm_name)) return '';
+    if (!firmProfile?.firm_name || authProfile.isPlaceholderFirmName(firmProfile.firm_name)) return '';
     return firmProfile.firm_name;
   });
   const [firmCodeDisplay, setFirmCodeDisplay] = useState(
@@ -101,10 +101,10 @@ export function FirmSettingsScreen({
   useEffect(() => {
     if (firmProfile) {
       setFirmName(
-        intakeData.isPlaceholderFirmName(firmProfile.firm_name) ? '' : firmProfile.firm_name
+        authProfile.isPlaceholderFirmName(firmProfile.firm_name) ? '' : firmProfile.firm_name
       );
       setFirmCodeDisplay(
-        intakeData.isFirmProfileComplete(firmProfile) ? firmProfile.firm_code : ''
+        authProfile.isFirmProfileComplete(firmProfile) ? firmProfile.firm_code : ''
       );
       setSelectedGeographies(firmProfile.geographic_filters?.length ? firmProfile.geographic_filters : ['CA']);
       const nextPracticeAreas = normalizePracticeAreas(firmProfile.practice_areas);
@@ -166,7 +166,7 @@ export function FirmSettingsScreen({
     setIsSaving(true);
     try {
       console.info('[o3s-firm-save] UI save clicked', { profileUserId, firmId: firmProfile?.id ?? null });
-      const r = await intakeData.saveFirmProfileBasics({
+      const r = await authProfile.saveFirmProfileBasics({
         firmId: firmProfile?.id,
         userId: profileUserId,
         email: profileEmail ?? firmProfile?.contact_email ?? null,
@@ -191,7 +191,7 @@ export function FirmSettingsScreen({
       }
       onFirmProfileUpdated?.(r.profile);
       setFirmCodeDisplay(r.profile.firm_code);
-      if (setupRequired && intakeData.isFirmProfileComplete(r.profile)) {
+      if (setupRequired && authProfile.isFirmProfileComplete(r.profile)) {
         onFirmProfileSaved?.();
       } else {
         setShowSaveConfirmation(true);
@@ -324,11 +324,11 @@ export function FirmSettingsScreen({
                     <p className="mt-2 text-xs text-[#1B2623]/52">
                       Share this code with workers so their organized intake routes directly to your dashboard.
                     </p>
-                    {/* Intake link — shareable URL that pre-fills this firm code for any worker */}
+                    {/* Intake link â€” shareable URL that pre-fills this firm code for any worker */}
                     <div className="mt-3 rounded-2xl border border-[#E4E5DE] bg-[#F2F4EC] px-4 py-3">
                       <p className="mb-1 text-xs font-semibold text-[#1B2623]">Your intake link</p>
                       <p className="mb-2 text-xs text-[#1B2623]/55 leading-relaxed">
-                        Send this link to anyone. They go through the guided intake flow and their organized case routes directly to your dashboard — no code needed.
+                        Send this link to anyone. They go through the guided intake flow and their organized case routes directly to your dashboard â€” no code needed.
                       </p>
                       <div className="flex items-center gap-2">
                         <input
@@ -366,7 +366,7 @@ export function FirmSettingsScreen({
             <div className="mt-5 rounded-2xl border border-[#E4E5DE] bg-[#FAF9F6] p-5">
               <p className="mb-1 text-sm font-semibold text-[#1B2623]">Attorney credentials</p>
               <p className="mb-4 text-xs text-[#1B2623]/58 leading-relaxed">
-                Your bar number and state are shown to workers when they review access requests. Workers can use this to verify your licensure through their state bar directory. These credentials are attorney-provided — one3seven does not independently verify bar status.
+                Your bar number and state are shown to workers when they review access requests. Workers can use this to verify your licensure through their state bar directory. These credentials are attorney-provided â€” one3seven does not independently verify bar status.
               </p>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
@@ -453,7 +453,7 @@ export function FirmSettingsScreen({
                   <span className={`font-semibold ${sub.isPaid ? 'text-emerald-600' : 'text-[#42574E]'}`}>
                     {sub.label}
                   </span>
-                  {' · '}
+                  {' Â· '}
                   <span className="text-[#1B2623]/50">{sub.subscriptionStatus}</span>
                 </p>
               </div>
@@ -464,7 +464,7 @@ export function FirmSettingsScreen({
                   disabled={billingLoading === 'portal'}
                   className="shrink-0 rounded-xl border border-[#E4E5DE] bg-white px-4 py-2 text-xs font-semibold text-[#42574E] transition hover:bg-[#F2F4EC] disabled:opacity-60"
                 >
-                  {billingLoading === 'portal' ? 'Opening…' : 'Manage billing →'}
+                  {billingLoading === 'portal' ? 'Openingâ€¦' : 'Manage billing â†’'}
                 </button>
               )}
             </div>
@@ -475,7 +475,7 @@ export function FirmSettingsScreen({
               </div>
             )}
 
-            {/* Billing cycle toggle — every tier is flat-priced monthly or annual (2 months free) */}
+            {/* Billing cycle toggle â€” every tier is flat-priced monthly or annual (2 months free) */}
             <div className="mb-4 flex items-center justify-center gap-2">
               {(['monthly', 'annual'] as const).map((cycle) => (
                 <button
@@ -488,7 +488,7 @@ export function FirmSettingsScreen({
                       : 'border border-[#E4E5DE] bg-white text-[#1B2623]/55 hover:bg-[#F2F4EC]'
                   }`}
                 >
-                  {cycle === 'monthly' ? 'Monthly' : 'Annual · 2 months free'}
+                  {cycle === 'monthly' ? 'Monthly' : 'Annual Â· 2 months free'}
                 </button>
               ))}
             </div>
@@ -537,17 +537,17 @@ export function FirmSettingsScreen({
 
                     <ul className="mb-5 flex-1 space-y-1.5">
                       <li className="flex items-center gap-1.5 text-xs text-[#1B2623]/65">
-                        <span className="text-[#42574E]">✓</span>
+                        <span className="text-[#42574E]">âœ“</span>
                         {plan.intakesPerMonth
-                          ? `~${plan.intakesPerMonth} intakes/mo · fair-use`
-                          : 'Highest-volume tier · fair-use'}
+                          ? `~${plan.intakesPerMonth} intakes/mo Â· fair-use`
+                          : 'Highest-volume tier Â· fair-use'}
                       </li>
                       <li className="flex items-center gap-1.5 text-xs text-[#1B2623]/65">
-                        <span className="text-[#42574E]">✓</span>
+                        <span className="text-[#42574E]">âœ“</span>
                         {plan.includesDamages ? 'Includes wage-exposure estimate (CA)' : 'Add wage-exposure by upgrading to Underwriting'}
                       </li>
                       <li className="flex items-center gap-1.5 text-xs text-[#1B2623]/65">
-                        <span className="text-[#42574E]">✓</span>
+                        <span className="text-[#42574E]">âœ“</span>
                         Beta pilot pricing
                       </li>
                     </ul>
@@ -577,7 +577,7 @@ export function FirmSettingsScreen({
                             : 'border border-[#E4E5DE] bg-white text-[#42574E] hover:bg-[#F2F4EC]'
                         }`}
                       >
-                        {loading ? 'Opening Stripe…' : 'Start free trial →'}
+                        {loading ? 'Opening Stripeâ€¦' : 'Start free trial â†’'}
                       </button>
                     ) : (
                       <div className="rounded-xl border border-dashed border-[#E4E5DE] py-2.5 text-center text-xs text-[#1B2623]/40">
@@ -593,18 +593,18 @@ export function FirmSettingsScreen({
             <div className="mt-4 flex items-center justify-between rounded-[18px] border border-dashed border-[#E4E5DE] bg-[#FAF9F6] px-5 py-4">
               <div>
                 <p className="text-[13px] font-bold text-[#1B2623]">Enterprise</p>
-                <p className="text-xs text-[#1B2623]/50">Unlimited intakes · Unlimited seats · Custom onboarding</p>
+                <p className="text-xs text-[#1B2623]/50">Unlimited intakes Â· Unlimited seats Â· Custom onboarding</p>
               </div>
               <a
                 href="mailto:info@one3seven.com?subject=Enterprise%20inquiry"
                 className="rounded-xl border border-[#E4E5DE] bg-white px-4 py-2 text-xs font-semibold text-[#42574E] transition hover:bg-[#F2F4EC]"
               >
-                Contact us →
+                Contact us â†’
               </a>
             </div>
 
             <p className="mt-4 text-center text-[11px] text-[#1B2623]/35">
-              All plans include a 30-day free trial · Cancel anytime · Billed monthly via Stripe
+              All plans include a 30-day free trial Â· Cancel anytime Â· Billed monthly via Stripe
             </p>
           </motion.section>
 
@@ -737,7 +737,7 @@ export function FirmSettingsScreen({
                     disabled={diagBusy || isSaving}
                     className="w-fit text-xs text-[#1B2623]/60 underline underline-offset-2 hover:text-[#1B2623] disabled:opacity-50"
                   >
-                    {diagBusy ? 'Running DB diagnostics…' : 'Run DB diagnostics (temp)'}
+                    {diagBusy ? 'Running DB diagnosticsâ€¦' : 'Run DB diagnostics (temp)'}
                   </button>
                   {diagSummary ? (
                     <p className="break-words font-mono text-xs text-[#1B2623]/60">{diagSummary}</p>
