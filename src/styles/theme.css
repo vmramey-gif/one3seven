@@ -325,6 +325,39 @@
   .o3s-firm-review-skin [class*="bg-[#FAF9F6]"],
   .o3s-firm-review-skin [class*="bg-[#F2F4EC]"] { background-color: rgba(255, 255, 255, 0.05); }
 
+  /* Semantic alert cards (amber=confirm/warning, red=error, emerald=success) using Tailwind's
+     NAMED palette (bg-amber-50, text-amber-800, etc.) -- same gap as .o3s-worker-complete-skin
+     above (2026-08-20 fix), found again independently here 2026-08-21: named-palette classes
+     aren't hex-bracket classes, so they fell through this skin's remap entirely. The "Items
+     Requiring Confirmation" card kept its light bg-amber-50 background while the hex-bracket text
+     inside it (text-[#1B2623]/70) still correctly went light-for-dark -- light text landing on a
+     light card that was never darkened, nearly invisible. Founder caught this live. Same color
+     mapping as the worker-complete skin's fix (amber -> --o3s-confirm #F3C775, red -> the error
+     red #E4726B, emerald -> --o3s-done #8FD3A6), scoped to the shades actually used on this
+     screen (also covers the "Gaps & requests" nav tab's red accent, same underlying classes). */
+  .o3s-firm-review-skin [class*="bg-amber-50"] { background-color: rgba(243, 199, 117, 0.10); }
+  .o3s-firm-review-skin [class*="border-amber-100"],
+  .o3s-firm-review-skin [class*="border-amber-200"],
+  .o3s-firm-review-skin [class*="border-amber-300"] { border-color: rgba(243, 199, 117, 0.28); }
+  .o3s-firm-review-skin [class*="text-amber-500"],
+  .o3s-firm-review-skin [class*="text-amber-600"],
+  .o3s-firm-review-skin [class*="text-amber-700"],
+  .o3s-firm-review-skin [class*="text-amber-800"],
+  .o3s-firm-review-skin [class*="text-amber-950"] { color: #F3C775; }
+  .o3s-firm-review-skin [class*="bg-red-50"] { background-color: rgba(228, 114, 107, 0.10); }
+  .o3s-firm-review-skin [class*="border-red-200"] { border-color: rgba(228, 114, 107, 0.30); }
+  .o3s-firm-review-skin [class*="border-red-600"] { border-color: rgba(228, 114, 107, 0.55); }
+  .o3s-firm-review-skin [class*="text-red-500"],
+  .o3s-firm-review-skin [class*="text-red-600"],
+  .o3s-firm-review-skin [class*="text-red-700"],
+  .o3s-firm-review-skin [class*="text-red-800"] { color: #E4726B; }
+  .o3s-firm-review-skin [class*="bg-emerald-50"] { background-color: rgba(143, 211, 166, 0.10); }
+  .o3s-firm-review-skin [class*="border-emerald-100"],
+  .o3s-firm-review-skin [class*="border-emerald-200"] { border-color: rgba(143, 211, 166, 0.28); }
+  .o3s-firm-review-skin [class*="text-emerald-600"],
+  .o3s-firm-review-skin [class*="text-emerald-700"],
+  .o3s-firm-review-skin [class*="text-emerald-800"] { color: #8FD3A6; }
+
   /* Worker "complete" ground — solid dark green, deliberately the resting/arrived state rather
      than a gradient in motion. Color matches --o3s-navy's value (#2C3A34) -- hardcoded rather than
      var(--o3s-navy) because that variable is scoped inside `.dark { }` (line ~87) and nothing in
