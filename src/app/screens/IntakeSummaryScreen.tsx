@@ -17,10 +17,10 @@ import {
   Clock,
   ArrowLeft,
   Info,
-  X,
   Loader2,
 } from 'lucide-react';
 import { Screen } from '../App';
+import { SendOrganizedIntakeModal, EmailToFirmModal } from '../components/IntakeSummaryModals';
 import { IntakeWorkspace } from '../types/IntakeWorkspace';
 import {
   loadIntakeDocumentFacts,
@@ -31,7 +31,6 @@ import { BETA_ENABLE_PARTICIPATING_ROUTING, FIRM_CODE_ROUTING_LIVE, PARTICIPATIN
 import {
   ONE3SEVEN_NOTICES,
   PARTICIPATING_NETWORK_COPY,
-  FIRM_ROUTING_COPY,
   isParticipatingSubmissionChannel,
   isFirmCodeSubmissionChannel,
   SAMPLE_INTAKE_NUMBER,
@@ -42,7 +41,6 @@ import {
   isWorkerUploadedAdditionalDocumentsWorkflow,
   linkedFirmIntakeAlreadyShared,
   linkedFirmSendButtonLabel,
-  linkedFirmShareModalButtonLabel,
 } from '../constants/one3sevenProduct';
 import { WORKER_RECORD_HANDOFF } from '../constants/workerStoryIntake';
 import {
@@ -2734,347 +2732,46 @@ export function IntakeSummaryScreen({
         </footer>
       </div>
 
-      {/* Send organized intake (routing) */}
-      <AnimatePresence>
-        {showShareModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-[#1B2623]/50 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center"
-            onClick={() => !isSharing && setShowShareModal(false)}
-          >
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-              transition={{ duration: 0.3, ease: 'easeOut' }}
-              className="bg-white rounded-t-[24px] sm:rounded-[24px] w-full max-w-md mx-4 mb-0 sm:mb-4 shadow-2xl"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-xl font-semibold text-[#1B2623]">Send organized intake</h3>
-                  <button
-                    type="button"
-                    onClick={() => !isSharing && setShowShareModal(false)}
-                    className="text-[#9AA39B] hover:text-[#6A6D66] transition-colors"
-                    disabled={isSharing}
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
+      <SendOrganizedIntakeModal
+        open={showShareModal}
+        isSharing={isSharing}
+        routingSubpanel={routingSubpanel}
+        hasLinkedFirm={hasLinkedFirm}
+        canRouteParticipating={canRouteParticipating}
+        canRouteFirmCode={canRouteFirmCode}
+        canRouteToLinkedFirm={Boolean(onShareFirmCode)}
+        canRouteToAnyFirm={Boolean(onShareFirmCode)}
+        shareApiError={shareApiError}
+        firmCodeInput={firmCodeInput}
+        onFirmCodeInputChange={setFirmCodeInput}
+        connectedFirmName={connectedFirmName}
+        linkedFirmAlreadyShared={linkedFirmAlreadyShared}
+        onClose={() => setShowShareModal(false)}
+        onBackToMenu={() => {
+          setShareApiError('');
+          setRoutingSubpanel('menu');
+        }}
+        onOpenFirmCodePanel={() => {
+          setShareApiError('');
+          setRoutingSubpanel('firm_code');
+        }}
+        onParticipatingShare={() => void handleParticipatingShare()}
+        onSendToLinkedFirm={() => void handleSendToLinkedFirm()}
+        onShareSubmit={() => void handleShareSubmit()}
+        onFirmCodeShare={() => void handleFirmCodeShare()}
+      />
 
-                {routingSubpanel === 'menu' ? (
-                  <>
-                    {hasLinkedFirm ? (
-                      <>
-                        <p className="text-sm text-[#384039] leading-relaxed mb-4">
-                          {FIRM_ROUTING_COPY.sendOrganizedIntro}
-                        </p>
-                        <p className="text-xs text-[#40433F] leading-relaxed mb-6">
-                          {FIRM_ROUTING_COPY.firmCodeFieldHelp}
-                        </p>
-                      </>
-                    ) : canRouteParticipating || canRouteFirmCode ? (
-                      <>
-                        <p className="text-sm text-[#384039] leading-relaxed mb-3">
-                          Choose how to share your organized intake.
-                          {canRouteParticipating
-                            ? ' You do not need a firm code to use the participating review network.'
-                            : ''}
-                        </p>
-                        {canRouteParticipating ? (
-                          <>
-                            <p className="text-xs text-[#6A6D66] leading-relaxed mb-3">
-                              {PARTICIPATING_NETWORK_COPY.shareModalBody}
-                            </p>
-                            <p className="text-xs text-[#40433F] leading-relaxed mb-6">
-                              {PARTICIPATING_NETWORK_COPY.firmsSeeNow} {PARTICIPATING_NETWORK_COPY.firmsDoNotSee}
-                            </p>
-                          </>
-                        ) : null}
-                      </>
-                    ) : (
-                      <p className="text-sm text-[#384039] leading-relaxed mb-6">
-                        Connecting directly to a firm is coming soon. For now, download your organized file to
-                        bring to any attorney consultation, or check back here once this opens up.
-                      </p>
-                    )}
-                  </>
-                ) : (
-                  <>
-                    <button
-                      type="button"
-                      className="text-xs text-[#6A6D66] mb-4 hover:text-[#1B2623]"
-                      disabled={isSharing}
-                      onClick={() => {
-                        setShareApiError('');
-                        setRoutingSubpanel('menu');
-                      }}
-                    >
-                      ← Back
-                    </button>
-                    <p className="text-sm text-[#6A6D66] mb-3">{FIRM_ROUTING_COPY.firmCodeFieldHelp}</p>
-                    <input
-                      value={firmCodeInput}
-                      onChange={(e) => setFirmCodeInput(e.target.value)}
-                      placeholder="e.g. ABC12XYZ"
-                      className="w-full px-4 py-3 bg-[#FAF9F6] border border-[#E4E5DE] rounded-[14px] text-sm mb-3"
-                      disabled={isSharing}
-                    />
-                  </>
-                )}
-
-                {shareApiError ? (
-                  <div className="mb-4 text-sm text-red-600 bg-red-50 border border-red-100 rounded-[14px] px-4 py-3">{shareApiError}</div>
-                ) : null}
-
-                <div className="space-y-3">
-                  {routingSubpanel === 'menu' ? (
-                    <>
-                      {canRouteParticipating && !hasLinkedFirm ? (
-                        <button
-                          type="button"
-                          onClick={() => void handleParticipatingShare()}
-                          disabled={isSharing}
-                          className={`w-full py-4 px-6 rounded-[14px] transition-all font-medium flex items-center justify-center gap-2 ${
-                            isSharing
-                              ? 'bg-[#9AA39B] text-white cursor-not-allowed'
-                              : 'bg-[#42574E] text-white hover:bg-[#42574E] shadow-sm hover:shadow-md'
-                          }`}
-                        >
-                          {isSharing ? (
-                            <>
-                              <Loader2 className="w-5 h-5 animate-spin" />
-                              Sending…
-                            </>
-                          ) : (
-                            <>
-                              <Share2 className="w-5 h-5" />
-                              {PARTICIPATING_NETWORK_COPY.shareModalTitle}
-                            </>
-                          )}
-                        </button>
-                      ) : null}
-                      {canRouteFirmCode && !hasLinkedFirm ? (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setShareApiError('');
-                            setRoutingSubpanel('firm_code');
-                          }}
-                          disabled={isSharing}
-                          className={`w-full py-4 px-6 rounded-[14px] border text-[#1B2623] font-medium transition-colors flex items-center justify-center gap-2 ${
-                            isSharing
-                              ? 'border-[#E4E5DE] text-[#9AA39B] cursor-not-allowed'
-                              : 'border-[#CBD6CF] hover:bg-[#F2F4EC]'
-                          }`}
-                        >
-                          Enter Firm Code
-                        </button>
-                      ) : null}
-                      {hasLinkedFirm && onShareFirmCode ? (
-                        <button
-                          type="button"
-                          onClick={() => void handleSendToLinkedFirm()}
-                          disabled={isSharing}
-                          className={`w-full py-4 px-6 rounded-[14px] transition-all font-medium flex items-center justify-center gap-2 ${
-                            isSharing
-                              ? 'bg-[#9AA39B] text-white cursor-not-allowed'
-                              : 'bg-[#42574E] text-white hover:bg-[#42574E] shadow-sm hover:shadow-md'
-                          }`}
-                        >
-                          {isSharing ? (
-                            <>
-                              <Loader2 className="w-5 h-5 animate-spin" />
-                              Sending…
-                            </>
-                          ) : (
-                            <>
-                              <Share2 className="w-5 h-5" />
-                              {linkedFirmShareModalButtonLabel(connectedFirmName, linkedFirmAlreadyShared)}
-                            </>
-                          )}
-                        </button>
-                      ) : !hasLinkedFirm && !canRouteParticipating && !canRouteFirmCode ? (
-                        <span
-                          className="w-full py-4 px-6 rounded-[14px] border border-[#E4E5DE] bg-[#F5F5F0] text-[#9AA39B] font-medium flex items-center justify-center gap-2 cursor-not-allowed select-none"
-                          title="Connecting directly to a firm is coming soon. For now, download your organized file to bring to any attorney consultation."
-                          aria-disabled="true"
-                        >
-                          <Share2 className="w-5 h-5" />
-                          Coming soon
-                        </span>
-                      ) : !canRouteParticipating && !onShareFirmCode ? (
-                        <button
-                          type="button"
-                          onClick={() => void handleShareSubmit()}
-                          disabled={isSharing}
-                          className={`w-full py-4 px-6 rounded-[14px] transition-all font-medium flex items-center justify-center gap-2 ${
-                            isSharing
-                              ? 'bg-[#9AA39B] text-white cursor-not-allowed'
-                              : 'bg-[#42574E] text-white hover:bg-[#42574E] shadow-sm hover:shadow-md'
-                          }`}
-                        >
-                          {isSharing ? (
-                            <>
-                              <Loader2 className="w-5 h-5 animate-spin" />
-                              Sending…
-                            </>
-                          ) : (
-                            <>
-                              <Share2 className="w-5 h-5" />
-                              Send organized intake
-                            </>
-                          )}
-                        </button>
-                      ) : null}
-                    </>
-                  ) : (
-                    <>
-                      {onShareFirmCode ? (
-                        <button
-                          type="button"
-                          disabled={isSharing || !firmCodeInput.trim()}
-                          onClick={() => void handleFirmCodeShare()}
-                          className="w-full bg-[#42574E] text-white py-4 rounded-[14px] font-medium disabled:opacity-50"
-                        >
-                          {isSharing ? 'Routing…' : 'Route with Firm Code'}
-                        </button>
-                      ) : null}
-                    </>
-                  )}
-
-                  <button
-                    type="button"
-                    onClick={() => setShowShareModal(false)}
-                    disabled={isSharing}
-                    className={`w-full py-4 px-6 rounded-[14px] transition-colors font-medium ${
-                      isSharing
-                        ? 'bg-[#F2F4EC] text-[#9AA39B] cursor-not-allowed'
-                        : 'bg-[#F2F4EC] text-[#1B2623] hover:bg-[#E4E5DE]'
-                    }`}
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Email organized intake directly to any firm's inbox -- does not require the firm to
-          have a one3seven account (unlike firm-code routing, currently gated off). */}
-      <AnimatePresence>
-        {showEmailFirmModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-[#1B2623]\50 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center"
-            onClick={() => !emailFirmBusy && setShowEmailFirmModal(false)}
-          >
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-              transition={{ duration: 0.3, ease: 'easeOut' }}
-              className="bg-white rounded-t-[24px] sm:rounded-[24px] w-full max-w-md mx-4 mb-0 sm:mb-4 shadow-2xl"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-xl font-semibold text-[#1B2623]">Email to a firm</h3>
-                  <button
-                    type="button"
-                    onClick={() => !emailFirmBusy && setShowEmailFirmModal(false)}
-                    className="text-[#9AA39B] hover:text-[#6A6D66] transition-colors"
-                    disabled={emailFirmBusy}
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
-
-                <p className="text-sm text-[#384039] leading-relaxed mb-4">
-                  Send your organized intake as a PDF directly to any email address — no firm
-                  account needed. Use this to reach an attorney or intake team you're already in
-                  touch with.
-                </p>
-
-                <label className="block text-xs font-medium text-[#40433F] mb-1.5" htmlFor="email-firm-recipient">
-                  Firm or attorney email
-                </label>
-                <input
-                  id="email-firm-recipient"
-                  type="email"
-                  value={emailFirmRecipient}
-                  onChange={(e) => setEmailFirmRecipient(e.target.value)}
-                  placeholder="intake@lawfirm.com"
-                  className="w-full px-4 py-3 bg-[#FAF9F6] border border-[#E4E5DE] rounded-[14px] text-sm mb-3"
-                  disabled={emailFirmBusy}
-                />
-
-                <label className="block text-xs font-medium text-[#40433F] mb-1.5" htmlFor="email-firm-name">
-                  Firm name (optional)
-                </label>
-                <input
-                  id="email-firm-name"
-                  value={emailFirmName}
-                  onChange={(e) => setEmailFirmName(e.target.value)}
-                  placeholder="e.g. Smith & Associates"
-                  className="w-full px-4 py-3 bg-[#FAF9F6] border border-[#E4E5DE] rounded-[14px] text-sm mb-4"
-                  disabled={emailFirmBusy}
-                />
-
-                {emailFirmError ? (
-                  <div className="mb-4 text-sm text-red-600 bg-red-50 border border-red-100 rounded-[14px] px-4 py-3">
-                    {emailFirmError}
-                  </div>
-                ) : null}
-
-                <div className="space-y-3">
-                  <button
-                    type="button"
-                    onClick={() => void handleEmailToFirm()}
-                    disabled={emailFirmBusy || !emailFirmRecipient.trim()}
-                    className={`w-full py-4 px-6 rounded-[14px] transition-all font-medium flex items-center justify-center gap-2 ${
-                      emailFirmBusy || !emailFirmRecipient.trim()
-                        ? 'bg-[#9AA39B] text-white cursor-not-allowed'
-                        : 'bg-[#42574E] text-white hover:bg-[#42574E] shadow-sm hover:shadow-md'
-                    }`}
-                  >
-                    {emailFirmBusy ? (
-                      <>
-                        <Loader2 className="w-5 h-5 animate-spin" />
-                        Sending…
-                      </>
-                    ) : (
-                      <>
-                        <Mail className="w-5 h-5" />
-                        Send email
-                      </>
-                    )}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setShowEmailFirmModal(false)}
-                    disabled={emailFirmBusy}
-                    className={`w-full py-4 px-6 rounded-[14px] transition-colors font-medium ${
-                      emailFirmBusy
-                        ? 'bg-[#F2F4EC] text-[#9AA39B] cursor-not-allowed'
-                        : 'bg-[#F2F4EC] text-[#1B2623] hover:bg-[#E4E5DE]'
-                    }`}
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <EmailToFirmModal
+        open={showEmailFirmModal}
+        busy={emailFirmBusy}
+        recipient={emailFirmRecipient}
+        onRecipientChange={setEmailFirmRecipient}
+        name={emailFirmName}
+        onNameChange={setEmailFirmName}
+        error={emailFirmError}
+        onSubmit={() => void handleEmailToFirm()}
+        onClose={() => setShowEmailFirmModal(false)}
+      />
 
       {showDownloadBar ? (
         <WorkerFullReviewBar
